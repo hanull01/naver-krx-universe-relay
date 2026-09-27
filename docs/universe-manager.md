@@ -69,3 +69,26 @@ commands.
 Discovery output is a candidate list only. It never promotes a stock into the Universe.
 After review, a user explicitly adds the stock with `universe_manager.py`; disabling is
 the default removal method, and hard delete is reserved for exceptional cleanup.
+
+## Local Web UI
+
+The CLI remains the canonical management backend. `universe_web.py` is a local GUI layer
+that reuses its validation, mutation, backup, and atomic-write behavior.
+
+```bash
+python3 universe_web.py
+# Open http://127.0.0.1:8765
+```
+
+The server binds only to `127.0.0.1`; it has no deployment or external-publication mode.
+Use the UI in this order:
+
+1. Dashboard to inspect current status and validation.
+2. Stocks or Groups to review the current configuration.
+3. Enter a management action and select **Preview**.
+4. Review validation messages and the diff, then select **Apply**.
+
+The UI never changes the configuration on dashboard/list requests or Preview. Apply is
+blocked on validation errors, rejects configuration changes made after Preview, and asks
+for explicit confirmation before hard delete. Warnings remain visible but can be applied.
+Discovery candidates remain manual review items; they are not shown or promoted by v1.

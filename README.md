@@ -32,6 +32,10 @@ Use [`universe_manager.py`](docs/universe-manager.md) for normal local managemen
 stocks, groups, and leaders. Discovery candidates are never added automatically: review
 them first, then add them explicitly with the manager.
 
+For a local browser UI, run `python3 universe_web.py` and open
+`http://127.0.0.1:8765`. The Web UI is a GUI layer over the same manager logic; it
+requires Preview before Apply and is never exposed outside the local machine.
+
 ## Schedule and permissions
 
 - Monday–Friday 08:35 KST: Sunday–Thursday 23:35 UTC.
