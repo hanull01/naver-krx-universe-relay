@@ -112,8 +112,12 @@ jobs:
                   and states >= enabled
               ):
                   raise SystemExit("Invalid OK coverage status")
-          else:
+          elif x["coverageStatus"] == "INCOMPLETE_MARKET_COVERAGE":
               print("Market coverage incomplete; report will be published as DEGRADED.")
+          elif x["coverageStatus"] == "STALE_MARKET_DATA":
+              print("Market data is stale; report will be published as DEGRADED.")
+          else:
+              raise SystemExit("Unknown market coverage status")
           PY
 
       - name: Commit daily report

@@ -207,6 +207,199 @@ def coverage_status(
     return "OK"
 
 
+def ratio(count, denominator):
+    """Return a descriptive ratio, without inventing a zero denominator."""
+    return count / denominator if denominator else None
+
+
+def event_stock(row):
+    return {
+        "itemCode": row["itemCode"],
+        "itemName": row["itemName"],
+        "changeRate": row["market"]["changeRate"],
+    }
+
+
+def market_breadth(rows):
+    """Summarize only observed market/state values; absent values stay absent."""
+    observed = [row for row in rows if row.get("marketObserved")]
+    directions = [row["market"]["changeRate"] for row in observed]
+    directions = [value for value in directions if value is not None]
+
+    ma20_observed = [
+        row for row in observed
+        if row["state"].get("priceVsMA20") is not None
+    ]
+    ma60_observed = [
+        row for row in observed
+        if row["state"].get("priceVsMA60") is not None
+    ]
+
+    def state_count(key, value):
+        return sum(row["state"].get(key) == value for row in observed)
+
+    up_count = sum(value > 0 for value in directions)
+    down_count = sum(value < 0 for value in directions)
+    flat_count = sum(value == 0 for value in directions)
+    ma20_above = state_count("priceVsMA20", "above")
+    ma20_below = state_count("priceVsMA20", "below")
+    ma60_above = state_count("priceVsMA60", "above")
+    ma60_below = state_count("priceVsMA60", "below")
+
+    return {
+        "observedCount": len(observed),
+        "directionObservedCount": len(directions),
+        "ma20ObservedCount": len(ma20_observed),
+        "ma60ObservedCount": len(ma60_observed),
+        "upCount": up_count,
+        "downCount": down_count,
+        "flatCount": flat_count,
+        "upRatio": ratio(up_count, len(directions)),
+        "downRatio": ratio(down_count, len(directions)),
+        "ma20AboveCount": ma20_above,
+        "ma20BelowCount": ma20_below,
+        "ma20AboveRatio": ratio(ma20_above, len(ma20_observed)),
+        "ma20BelowRatio": ratio(ma20_below, len(ma20_observed)),
+        "ma60AboveCount": ma60_above,
+        "ma60BelowCount": ma60_below,
+        "ma60AboveRatio": ratio(ma60_above, len(ma60_observed)),
+        "ma60BelowRatio": ratio(ma60_below, len(ma60_observed)),
+        "breakout20AttemptCount": state_count("breakout20", "attempt"),
+        "breakout20ConfirmedCount": state_count("breakout20", "confirmed"),
+        "breakout20FailedCount": state_count("breakout20", "failed"),
+        "breakout60AttemptCount": state_count("breakout60", "attempt"),
+        "breakout60ConfirmedCount": state_count("breakout60", "confirmed"),
+        "breakout60FailedCount": state_count("breakout60", "failed"),
+        "volumeSurgeCount": state_count("volumeState", "surge"),
+        "volumeElevatedCount": state_count("volumeState", "elevated"),
+        "pullbackCount": sum(
+            str(row["state"].get("pullbackState", "")).startswith("pullback")
+            for row in observed
+        ),
+        "nearBreakoutCount": sum(
+            str(row["state"].get("pullbackState", "")).startswith("near_breakout")
+            for row in observed
+        ),
+    }
+
+
+def normalized_group_summary(payload):
+    """Keep the dynamic group-state contract, with no group-name assumptions."""
+    groups = payload.get("groups", []) if isinstance(payload, dict) else []
+    if not isinstance(groups, list):
+        groups = []
+    fields = [
+        "groupType", "groupName", "enabledMembers", "upCount", "downCount",
+        "flatCount", "upRatio", "downRatio", "aboveMA20Count",
+        "aboveMA20CountRatio", "aboveMA60Count", "aboveMA60CountRatio",
+        "breakout20AttemptCount", "breakout20ConfirmedCount",
+        "breakout20FailedCount", "volumeSurgeCount", "volumeElevatedCount",
+        "leaderUpCount", "averageChangePct", "diffusionState", "status",
+    ]
+    return [
+        {field: group.get(field) for field in fields}
+        for group in groups
+        if isinstance(group, dict)
+    ]
+
+
+def technical_events(rows):
+    """Classify existing state values only; this is not a ranking or score."""
+    predicates = {
+        "breakout20Confirmed": lambda s: s.get("breakout20") == "confirmed",
+        "breakout20Attempt": lambda s: s.get("breakout20") == "attempt",
+        "breakout20Failed": lambda s: s.get("breakout20") == "failed",
+        "breakout60Confirmed": lambda s: s.get("breakout60") == "confirmed",
+        "breakout60Attempt": lambda s: s.get("breakout60") == "attempt",
+        "breakout60Failed": lambda s: s.get("breakout60") == "failed",
+        "volumeSurge": lambda s: s.get("volumeState") == "surge",
+        "volumeElevated": lambda s: s.get("volumeState") == "elevated",
+        "nearBreakout": lambda s: str(s.get("pullbackState", "")).startswith("near_breakout"),
+        "pullback": lambda s: str(s.get("pullbackState", "")).startswith("pullback"),
+        "ma20Above": lambda s: s.get("priceVsMA20") == "above",
+        "ma20Below": lambda s: s.get("priceVsMA20") == "below",
+        "ma60Above": lambda s: s.get("priceVsMA60") == "above",
+        "ma60Below": lambda s: s.get("priceVsMA60") == "below",
+    }
+    return {
+        name: [event_stock(row) for row in rows if predicate(row["state"])]
+        for name, predicate in predicates.items()
+    }
+
+
+def research_summary(rows, source):
+    active = [row for row in rows if row["research"]["rankingEligible"]]
+    active.sort(
+        key=lambda row: (
+            row["research"]["recentReportCount"],
+            abs(row["research"]["targetMeanChangePct"] or 0),
+        ),
+        reverse=True,
+    )
+    return {
+        "statusCounts": source.get("statusCounts", {}),
+        "rankingEligibleCount": source.get("rankingEligibleCount", len(active)),
+        "activeStocks": [
+            {"itemCode": row["itemCode"], "itemName": row["itemName"], **row["research"]}
+            for row in active
+        ],
+        "recentCoverageActiveCount": sum(
+            row["research"]["recentReportCount"] > 0 for row in active
+        ),
+        "targetRevisionObservedCount": sum(
+            (row["research"]["revisionUp"] or 0) > 0
+            or (row["research"]["revisionDown"] or 0) > 0
+            for row in active
+        ),
+        "risingTopicObservedCount": sum(
+            bool(row["research"]["risingTopics"]) for row in active
+        ),
+    }
+
+
+def market_research_cross(rows):
+    buckets = {
+        "MARKET_ACTIVE_RESEARCH_ACTIVE": [],
+        "MARKET_ACTIVE_RESEARCH_LIMITED": [],
+        "MARKET_QUIET_RESEARCH_ACTIVE": [],
+        "MARKET_QUIET_RESEARCH_LIMITED": [],
+        "MARKET_WEAK_RESEARCH_ACTIVE": [],
+        "MARKET_WEAK_RESEARCH_LIMITED": [],
+        "INSUFFICIENT_DATA": [],
+    }
+    for row in rows:
+        market = row["market"]
+        state = row["state"]
+        research = row["research"]
+        if not row.get("marketObserved") or market["changeRate"] is None:
+            bucket = "INSUFFICIENT_DATA"
+        else:
+            market_active = any((
+                market["changeRate"] > 0,
+                state.get("breakout20") in ("attempt", "confirmed"),
+                state.get("volumeState") in ("surge", "elevated"),
+                state.get("priceVsMA20") == "above",
+            ))
+            research_active = (
+                research["rankingEligible"]
+                and research["recentReportCount"] > 0
+            )
+            if market_active and research_active:
+                bucket = "MARKET_ACTIVE_RESEARCH_ACTIVE"
+            elif market_active:
+                bucket = "MARKET_ACTIVE_RESEARCH_LIMITED"
+            elif market["changeRate"] < 0 and research_active:
+                bucket = "MARKET_WEAK_RESEARCH_ACTIVE"
+            elif market["changeRate"] < 0:
+                bucket = "MARKET_WEAK_RESEARCH_LIMITED"
+            elif research_active:
+                bucket = "MARKET_QUIET_RESEARCH_ACTIVE"
+            else:
+                bucket = "MARKET_QUIET_RESEARCH_LIMITED"
+        buckets[bucket].append(event_stock(row))
+    return {name: {"count": len(items), "stocks": items} for name, items in buckets.items()}
+
+
 def build_report(as_of=None):
     universe = load_json(UNIVERSE_PATH)
     quotes = load_json(QUOTES_PATH)
@@ -241,6 +434,7 @@ def build_report(as_of=None):
                 "itemCode": code,
                 "itemName": item["stockName"],
                 "groups": member_idx.get(code, []),
+                "marketObserved": code in quote_idx,
                 "market": q,
                 "technical": compact_dict(
                     t,
@@ -301,19 +495,6 @@ def build_report(as_of=None):
         reverse=True,
     )
 
-    research_active = sorted(
-        [
-            row
-            for row in rows
-            if row["research"]["rankingEligible"]
-        ],
-        key=lambda row: (
-            row["research"]["recentReportCount"],
-            abs(row["research"]["targetMeanChangePct"] or 0),
-        ),
-        reverse=True,
-    )
-
     report_date = as_of or datetime.now(KST).date().isoformat()
 
     missing_market = [
@@ -337,11 +518,14 @@ def build_report(as_of=None):
         quotes.get("status"),
         quotes.get("fresh"),
     )
+    breadth = market_breadth(rows)
+    groups = normalized_group_summary(group_states)
+    research_overview = research_summary(rows, research)
 
     return {
         "status": "OK" if coverage_state == "OK" else "DEGRADED",
         "coverageStatus": coverage_state,
-        "version": "daily-market-research-report-v1",
+        "version": "daily-market-research-report-v2",
         "asOf": report_date,
         "generatedAt": datetime.now(KST).isoformat(),
         "sources": {
@@ -350,6 +534,7 @@ def build_report(as_of=None):
                 "generatedAt": quotes.get("generatedAt"),
                 "sourceTime": quotes.get("sourceTime"),
                 "status": quotes.get("status"),
+                "fresh": quotes.get("fresh"),
             },
             "technicals": {
                 "path": "data/technicals.json",
@@ -377,6 +562,7 @@ def build_report(as_of=None):
             "missingMarketStocks": missing_market,
         },
         "marketSummary": {
+            "breadth": breadth,
             "topGainers": [
                 {
                     "itemCode": row["itemCode"],
@@ -396,21 +582,10 @@ def build_report(as_of=None):
                 for row in reversed(market_movers[-10:])
             ],
         },
-        "researchSummary": {
-            "statusCounts": research.get("statusCounts", {}),
-            "rankingEligibleCount": research.get(
-                "rankingEligibleCount", 0
-            ),
-            "activeStocks": [
-                {
-                    "itemCode": row["itemCode"],
-                    "itemName": row["itemName"],
-                    **row["research"],
-                }
-                for row in research_active
-            ],
-        },
-        "groupStates": group_states,
+        "groupSummary": groups,
+        "technicalEvents": technical_events(rows),
+        "researchSummary": research_overview,
+        "marketResearchCross": market_research_cross(rows),
         "stocks": rows,
         "methodology": {
             "investmentRecommendation": False,
@@ -426,24 +601,35 @@ def build_report(as_of=None):
 
 
 def write_markdown(report, path):
+    breadth = report["marketSummary"]["breadth"]
+    degraded = report["status"] == "DEGRADED"
     lines = [
         f"# 국내증시 일일 종합 리포트 - {report['asOf']}",
         "",
         f"- 생성시각: {report['generatedAt']}",
         f"- Universe: {report['coverage']['enabledStockCount']}종목",
-        (
-            "- 리서치 상태: "
-            + ", ".join(
-                f"{k} {v}"
-                for k, v in report["researchSummary"][
-                    "statusCounts"
-                ].items()
-            )
-        ),
-        "",
-        "## 등락 상위",
-        "",
     ]
+    if degraded:
+        lines.extend([
+            "",
+            f"> **데이터 품질 경고:** {report['coverageStatus']} 상태입니다. "
+            "아래 내용은 불완전하거나 오래된 시장 데이터를 포함할 수 있습니다.",
+        ])
+
+    lines.extend([
+        "",
+        "## 1. 시장 요약",
+        "",
+        f"- 관측 종목: {breadth['observedCount']}종목",
+        f"- 상승/하락/보합: {breadth['upCount']}/{breadth['downCount']}/{breadth['flatCount']}",
+        f"- MA20 위/아래: {breadth['ma20AboveCount']}/{breadth['ma20BelowCount']}",
+        f"- MA60 위/아래: {breadth['ma60AboveCount']}/{breadth['ma60BelowCount']}",
+        f"- 20일 돌파 확인/시도/실패: {breadth['breakout20ConfirmedCount']}/{breadth['breakout20AttemptCount']}/{breadth['breakout20FailedCount']}",
+        f"- 거래량 급증/증가: {breadth['volumeSurgeCount']}/{breadth['volumeElevatedCount']}",
+        "",
+        "### 등락 상위",
+        "",
+    ])
 
     for row in report["marketSummary"]["topGainers"][:5]:
         lines.append(
@@ -454,7 +640,7 @@ def write_markdown(report, path):
     lines.extend(
         [
             "",
-            "## 등락 하위",
+            "### 등락 하위",
             "",
         ]
     )
@@ -468,10 +654,52 @@ def write_markdown(report, path):
     lines.extend(
         [
             "",
-            "## 최근 리서치 표본이 충분한 종목",
+            "## 2. 섹터·그룹 확산",
             "",
         ]
     )
+
+    for group in report["groupSummary"]:
+        lines.append(
+            f"- [{group['groupType']}] {group['groupName']}: "
+            f"상승 {group['upCount']}, 하락 {group['downCount']}, "
+            f"20일 돌파확인 {group['breakout20ConfirmedCount']}, "
+            f"확산 {group['diffusionState']}, 상태 {group['status']}"
+        )
+
+    lines.extend(["", "## 3. 기술 이벤트", ""])
+    for label, key in (
+        ("20일 돌파 확인", "breakout20Confirmed"),
+        ("20일 돌파 시도", "breakout20Attempt"),
+        ("20일 돌파 실패", "breakout20Failed"),
+        ("60일 돌파 확인", "breakout60Confirmed"),
+        ("60일 돌파 시도", "breakout60Attempt"),
+        ("60일 돌파 실패", "breakout60Failed"),
+        ("거래량 급증", "volumeSurge"),
+        ("거래량 증가", "volumeElevated"),
+        ("근접 돌파", "nearBreakout"),
+        ("눌림목", "pullback"),
+    ):
+        stocks = report["technicalEvents"][key]
+        names = ", ".join(
+            f"{stock['itemName']}({stock['itemCode']})" for stock in stocks[:10]
+        )
+        lines.append(f"- {label}: {len(stocks)}종목" + (f" — {names}" if names else ""))
+
+    lines.extend([
+        "",
+        "## 4. 리서치 변화",
+        "",
+        "- 리서치 상태: " + ", ".join(
+            f"{key} {value}" for key, value in report["researchSummary"]["statusCounts"].items()
+        ),
+        f"- 최근 커버리지 활성: {report['researchSummary']['recentCoverageActiveCount']}종목",
+        f"- 목표가 수정 관측: {report['researchSummary']['targetRevisionObservedCount']}종목",
+        f"- 상승 주제 관측: {report['researchSummary']['risingTopicObservedCount']}종목",
+        "",
+        "### 최근 리서치 표본이 충분한 종목",
+        "",
+    ])
 
     for row in report["researchSummary"]["activeStocks"]:
         change = row.get("targetMeanChangePct")
@@ -494,15 +722,42 @@ def write_markdown(report, path):
     lines.extend(
         [
             "",
-            "## 주의",
-            "",
-            (
-                "이 리포트는 시장 및 리서치 데이터의 기술적·서술적 요약이며 "
-                "매수·매도 추천을 생성하지 않습니다."
-            ),
+            "## 5. 시장 × 리서치",
             "",
         ]
     )
+    for bucket, detail in report["marketResearchCross"].items():
+        lines.append(f"- {bucket}: {detail['count']}종목")
+
+    lines.extend([
+        "",
+        "## 6. 데이터 품질",
+        "",
+        f"- 보고서 상태: {report['status']}",
+        f"- 시장 커버리지 상태: {report['coverageStatus']}",
+        f"- Quotes fresh: {report['sources']['quotes']['fresh']}",
+        f"- Quotes status: {report['sources']['quotes']['status']}",
+        f"- Quotes sourceTime: {report['sources']['quotes']['sourceTime']}",
+        f"- Quotes generatedAt: {report['sources']['quotes']['generatedAt']}",
+        f"- Research asOf: {report['sources']['researchIntelligence']['asOf']}",
+        "- Research statusCounts: " + ", ".join(
+            f"{key} {value}"
+            for key, value in report["researchSummary"]["statusCounts"].items()
+        ),
+        f"- 누락 시장 데이터: {report['coverage']['missingMarketCount']}종목",
+    ])
+    missing_names = [
+        row["itemName"] for row in report["coverage"]["missingMarketStocks"]
+    ]
+    if missing_names:
+        lines.append("- 누락 종목: " + ", ".join(missing_names))
+    lines.extend([
+        "",
+        "## 주의",
+        "",
+        "이 리포트는 시장 및 리서치 데이터의 기술적·서술적 요약이며 매수·매도 추천을 생성하지 않습니다.",
+        "",
+    ])
 
     Path(path).write_text(
         "\n".join(lines),
