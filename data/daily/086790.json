@@ -1,48 +1,20 @@
 {
   "schemaVersion": 1,
   "itemCode": "086790",
-  "generatedAt": "2026-09-24T01:44:27.063315+09:00",
+  "generatedAt": "2026-09-28T00:41:33.685713+09:00",
   "source": "NAVER_KRX",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/086790/day?startDateTime=20250323&endDateTime=20260924",
-  "status": "ok",
-  "fresh": true,
-  "errors": [],
-  "count": 369,
-  "completedCount": 369,
+  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/086790/day?startDateTime=20250327&endDateTime=20260928",
+  "status": "stale",
+  "fresh": false,
+  "errors": [
+    {
+      "error": "stale",
+      "expectedCompletedDate": "2026-09-25"
+    }
+  ],
+  "count": 366,
+  "completedCount": 366,
   "datas": [
-    {
-      "date": "2025-03-24",
-      "open": 61800,
-      "high": 62900,
-      "low": 61800,
-      "close": 62500,
-      "volume": 555478,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
-    {
-      "date": "2025-03-25",
-      "open": 62000,
-      "high": 62600,
-      "low": 61600,
-      "close": 62600,
-      "volume": 467432,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
-    {
-      "date": "2025-03-26",
-      "open": 63200,
-      "high": 63200,
-      "low": 61700,
-      "close": 62000,
-      "volume": 417289,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
     {
       "date": "2025-03-27",
       "open": 61500,
