@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "034020",
   "itemName": "두산에너빌리티",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-14",
     "to": "2026-08-03"
@@ -12,8 +12,8 @@
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
       "reportCount": 0,
       "brokerCount": 0,
       "targetPrice": {},
@@ -27,41 +27,37 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 10,
-      "brokerCount": 10,
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 9,
-        "min": 100000,
-        "max": 165000,
-        "mean": 128778,
-        "median": 130000,
-        "stdev": 19713,
-        "range": 65000
+        "count": 1,
+        "min": 110000,
+        "max": 110000,
+        "mean": 110000,
+        "median": 110000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 7,
-        "UNKNOWN": 3
+        "UNKNOWN": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 44,
-        "negative": 4,
-        "net": 40,
-        "netPerReport": 4.0
+        "positive": 12,
+        "negative": 3,
+        "net": 9,
+        "netPerReport": 4.5
       },
       "topics": {
         "수요": {
           "count": 2,
-          "perReport": 0.2
-        },
-        "환율": {
-          "count": 1,
-          "perReport": 0.1
+          "perReport": 1.0
         },
         "AI": {
           "count": 1,
-          "perReport": 0.1
+          "perReport": 0.5
         }
       }
     },
@@ -71,17 +67,8 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.1,
-        "perReportDelta": -0.1,
-        "ratio": 0.0
-      },
-      {
-        "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.1,
-        "perReportDelta": -0.1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
         "ratio": 0.0
       },
       {
@@ -89,14 +76,14 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 2,
-        "previousPerReport": 0.2,
-        "perReportDelta": -0.2,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -10,
+    "reportCountChange": -2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

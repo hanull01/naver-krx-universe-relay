@@ -1,32 +1,32 @@
 {
   "schemaVersion": 1,
-  "itemCode": "310210",
-  "itemName": "보로노이",
-  "reportCount": 3,
-  "latestReportNid": "96315",
+  "itemCode": "468530",
+  "itemName": "프로티나",
+  "reportCount": 1,
+  "latestReportNid": "96312",
   "latestWriteDate": "2026-09-28",
   "latest": {
-    "nid": "96315",
+    "nid": "96312",
     "writeDate": "2026-09-28",
-    "brokerName": "현대차증권",
-    "title": "타그리소를 넘어 왕좌를 노린다",
-    "goalPrice": 230000,
-    "normalizedOpinion": "BUY",
+    "brokerName": "한국IR협의회",
+    "title": "[AI] 단일분자 PPI 분석 플랫폼 기반 바이오테크",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 1,
         "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 2
+      }
     }
   },
   "reportNids": [
-    "96315",
-    "96211",
-    "91704"
+    "96312"
   ]
 }

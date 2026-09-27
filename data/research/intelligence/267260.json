@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "267260",
   "itemName": "HD현대일렉트릭",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-08",
     "to": "2026-08-24"
@@ -12,8 +12,8 @@
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
       "reportCount": 0,
       "brokerCount": 0,
       "targetPrice": {},
@@ -27,115 +27,75 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 9,
-      "brokerCount": 8,
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 9,
+        "count": 1,
         "min": 900000,
-        "max": 1440000,
-        "mean": 1106111,
-        "median": 1150000,
-        "stdev": 163975,
-        "range": 540000
+        "max": 900000,
+        "mean": 900000,
+        "median": 900000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 8,
-        "MIXED": 1
+        "UP": 1
       },
       "textSignal": {
-        "positive": 59,
-        "negative": 12,
-        "net": 47,
-        "netPerReport": 5.222
+        "positive": 7,
+        "negative": 0,
+        "net": 7,
+        "netPerReport": 7.0
       },
       "topics": {
-        "환율": {
-          "count": 4,
-          "perReport": 0.444
-        },
         "AI": {
-          "count": 3,
-          "perReport": 0.333
-        },
-        "수요": {
-          "count": 3,
-          "perReport": 0.333
-        },
-        "사이클": {
           "count": 1,
-          "perReport": 0.111
-        },
-        "재고": {
-          "count": 1,
-          "perReport": 0.111
+          "perReport": 1.0
         },
         "CAPEX/생산능력": {
           "count": 1,
-          "perReport": 0.111
+          "perReport": 1.0
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 1.0
         }
       }
     },
     "topicAcceleration": [
       {
+        "topic": "AI",
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
+        "ratio": 0.0
+      },
+      {
         "topic": "CAPEX/생산능력",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": -0.111,
-        "ratio": 0.0
-      },
-      {
-        "topic": "사이클",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": -0.111,
-        "ratio": 0.0
-      },
-      {
-        "topic": "재고",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": -0.111,
-        "ratio": 0.0
-      },
-      {
-        "topic": "AI",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 3,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
         "ratio": 0.0
       },
       {
         "topic": "수요",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 3,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
-        "ratio": 0.0
-      },
-      {
-        "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 4,
-        "previousPerReport": 0.444,
-        "perReportDelta": -0.444,
+        "previousCount": 1,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -9,
+    "reportCountChange": -1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "068270",
   "itemName": "셀트리온",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-03-30",
     "to": "2026-09-17"
@@ -12,8 +12,8 @@
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
       "reportCount": 2,
       "brokerCount": 2,
       "targetPrice": {
@@ -38,66 +38,37 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 7,
-      "brokerCount": 7,
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 7,
+        "count": 1,
         "min": 247823,
-        "max": 320000,
-        "mean": 279689,
-        "median": 280000,
-        "stdev": 21162,
-        "range": 72177
+        "max": 247823,
+        "mean": 247823,
+        "median": 247823,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 6,
-        "UNKNOWN": 1
+        "UP": 1
       },
       "textSignal": {
-        "positive": 38,
+        "positive": 7,
         "negative": 0,
-        "net": 38,
-        "netPerReport": 5.429
+        "net": 7,
+        "netPerReport": 7.0
       },
-      "topics": {
-        "원가": {
-          "count": 2,
-          "perReport": 0.286
-        },
-        "중국": {
-          "count": 1,
-          "perReport": 0.143
-        }
-      }
+      "topics": {}
     },
-    "topicAcceleration": [
-      {
-        "topic": "중국",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.143,
-        "perReportDelta": -0.143,
-        "ratio": 0.0
-      },
-      {
-        "topic": "원가",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": -0.286,
-        "ratio": 0.0
-      }
-    ]
+    "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": -5,
-    "targetMeanChangePct": 7.26,
-    "targetMedianChangePct": 7.14,
-    "targetDispersionChangePct": -5.49
+    "reportCountChange": 1,
+    "targetMeanChangePct": 21.05,
+    "targetMedianChangePct": 21.05,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 2,

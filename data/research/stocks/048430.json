@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "itemCode": "310210",
-  "itemName": "보로노이",
-  "reportCount": 3,
-  "latestReportNid": "96315",
+  "itemCode": "048430",
+  "itemName": "유라테크",
+  "reportCount": 1,
+  "latestReportNid": "96311",
   "latestWriteDate": "2026-09-28",
   "latest": {
-    "nid": "96315",
+    "nid": "96311",
     "writeDate": "2026-09-28",
-    "brokerName": "현대차증권",
-    "title": "타그리소를 넘어 왕좌를 노린다",
-    "goalPrice": 230000,
-    "normalizedOpinion": "BUY",
+    "brokerName": "한국IR협의회",
+    "title": "[AI] 자동차용 점화코일·점화플러그 제조 전문기업",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
         "positive": 0,
@@ -21,12 +21,12 @@
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "자동차": 4
+      }
     }
   },
   "reportNids": [
-    "96315",
-    "96211",
-    "91704"
+    "96311"
   ]
 }

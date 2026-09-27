@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-01",
     "to": "2026-09-07"
@@ -12,8 +12,8 @@
   "brokerCount": 15,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -46,59 +46,59 @@
       }
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 19,
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 17,
       "brokerCount": 12,
       "targetPrice": {
-        "count": 18,
+        "count": 17,
         "min": 2200000,
         "max": 4000000,
-        "mean": 3272222,
-        "median": 3175000,
-        "stdev": 524463,
+        "mean": 3300000,
+        "median": 3200000,
+        "stdev": 526643,
         "range": 1800000
       },
       "earningsDirection": {
-        "DOWN": 2,
-        "UP": 5,
         "UNKNOWN": 10,
-        "MIXED": 2
+        "UP": 4,
+        "MIXED": 2,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 48,
-        "negative": 32,
-        "net": 16,
-        "netPerReport": 0.842
+        "positive": 38,
+        "negative": 24,
+        "net": 14,
+        "netPerReport": 0.824
       },
       "topics": {
         "수요": {
-          "count": 8,
-          "perReport": 0.421
+          "count": 6,
+          "perReport": 0.353
         },
         "AI": {
-          "count": 7,
-          "perReport": 0.368
-        },
-        "중국": {
-          "count": 2,
-          "perReport": 0.105
+          "count": 6,
+          "perReport": 0.353
         },
         "HBM": {
           "count": 2,
-          "perReport": 0.105
+          "perReport": 0.118
         },
         "재고": {
           "count": 1,
-          "perReport": 0.053
+          "perReport": 0.059
         },
         "원가": {
           "count": 1,
-          "perReport": 0.053
+          "perReport": 0.059
         },
         "주주환원": {
           "count": 1,
-          "perReport": 0.053
+          "perReport": 0.059
+        },
+        "중국": {
+          "count": 1,
+          "perReport": 0.059
         }
       }
     },
@@ -117,17 +117,17 @@
         "currentCount": 1,
         "currentPerReport": 1.0,
         "previousCount": 2,
-        "previousPerReport": 0.105,
-        "perReportDelta": 0.895,
-        "ratio": 9.52
+        "previousPerReport": 0.118,
+        "perReportDelta": 0.882,
+        "ratio": 8.47
       },
       {
         "topic": "원가",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.053,
-        "perReportDelta": -0.053,
+        "previousPerReport": 0.059,
+        "perReportDelta": -0.059,
         "ratio": 0.0
       },
       {
@@ -135,8 +135,8 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.053,
-        "perReportDelta": -0.053,
+        "previousPerReport": 0.059,
+        "perReportDelta": -0.059,
         "ratio": 0.0
       },
       {
@@ -144,43 +144,43 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.053,
-        "perReportDelta": -0.053,
+        "previousPerReport": 0.059,
+        "perReportDelta": -0.059,
         "ratio": 0.0
       },
       {
         "topic": "중국",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 2,
-        "previousPerReport": 0.105,
-        "perReportDelta": -0.105,
+        "previousCount": 1,
+        "previousPerReport": 0.059,
+        "perReportDelta": -0.059,
         "ratio": 0.0
       },
       {
         "topic": "AI",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 7,
-        "previousPerReport": 0.368,
-        "perReportDelta": -0.368,
+        "previousCount": 6,
+        "previousPerReport": 0.353,
+        "perReportDelta": -0.353,
         "ratio": 0.0
       },
       {
         "topic": "수요",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 8,
-        "previousPerReport": 0.421,
-        "perReportDelta": -0.421,
+        "previousCount": 6,
+        "previousPerReport": 0.353,
+        "perReportDelta": -0.353,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -18,
-    "targetMeanChangePct": -5.26,
-    "targetMedianChangePct": -2.36,
+    "reportCountChange": -16,
+    "targetMeanChangePct": -6.06,
+    "targetMedianChangePct": -3.12,
     "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {

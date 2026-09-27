@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "042660",
   "itemName": "한화오션",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-14",
     "to": "2026-09-15"
@@ -12,8 +12,8 @@
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -37,66 +37,27 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 9,
-      "brokerCount": 9,
-      "targetPrice": {
-        "count": 9,
-        "min": 130000,
-        "max": 179000,
-        "mean": 146333,
-        "median": 139000,
-        "stdev": 17023,
-        "range": 49000
-      },
-      "earningsDirection": {
-        "UP": 6,
-        "UNKNOWN": 3
-      },
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
       "textSignal": {
-        "positive": 30,
-        "negative": 9,
-        "net": 21,
-        "netPerReport": 2.333
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
       },
-      "topics": {
-        "원가": {
-          "count": 6,
-          "perReport": 0.667
-        },
-        "환율": {
-          "count": 5,
-          "perReport": 0.556
-        }
-      }
+      "topics": {}
     },
-    "topicAcceleration": [
-      {
-        "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 5,
-        "previousPerReport": 0.556,
-        "perReportDelta": -0.556,
-        "ratio": 0.0
-      },
-      {
-        "topic": "원가",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 6,
-        "previousPerReport": 0.667,
-        "perReportDelta": -0.667,
-        "ratio": 0.0
-      }
-    ]
+    "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": -8,
-    "targetMeanChangePct": -18.0,
-    "targetMedianChangePct": -13.67,
-    "targetDispersionChangePct": -100.0
+    "reportCountChange": 1,
+    "targetMeanChangePct": null,
+    "targetMedianChangePct": null,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 6,

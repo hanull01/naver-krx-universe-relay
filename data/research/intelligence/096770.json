@@ -1,9 +1,9 @@
 {
-  "status": "OK",
-  "rankingEligible": true,
+  "status": "LOW_SAMPLE",
+  "rankingEligible": false,
   "itemCode": "096770",
   "itemName": "SK이노베이션",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-02",
     "to": "2026-09-15"
@@ -12,83 +12,79 @@
   "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
-      "reportCount": 5,
-      "brokerCount": 4,
+      "from": "2026-08-29",
+      "to": "2026-09-28",
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 5,
+        "count": 2,
         "min": 190000,
         "max": 200000,
-        "mean": 194000,
-        "median": 190000,
-        "stdev": 4899,
+        "mean": 195000,
+        "median": 195000,
+        "stdev": 5000,
         "range": 10000
       },
       "earningsDirection": {
-        "UNKNOWN": 4,
-        "UP": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 4,
-        "net": 6,
-        "netPerReport": 1.2
+        "positive": 6,
+        "negative": 2,
+        "net": 4,
+        "netPerReport": 2.0
       },
       "topics": {
-        "원가": {
-          "count": 1,
-          "perReport": 0.2
-        },
         "AI": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.5
         },
         "수요": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.5
         }
       }
     },
     "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 4,
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 7,
       "brokerCount": 4,
       "targetPrice": {
-        "count": 4,
+        "count": 7,
         "min": 171000,
         "max": 200000,
-        "mean": 187750,
+        "mean": 190143,
         "median": 190000,
-        "stdev": 10497,
+        "stdev": 8951,
         "range": 29000
       },
       "earningsDirection": {
-        "UP": 4
+        "UP": 5,
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 21,
-        "negative": 10,
-        "net": 11,
-        "netPerReport": 2.75
+        "positive": 25,
+        "negative": 12,
+        "net": 13,
+        "netPerReport": 1.857
       },
       "topics": {
         "재고": {
           "count": 4,
-          "perReport": 1.0
+          "perReport": 0.571
         },
         "원가": {
-          "count": 3,
-          "perReport": 0.75
+          "count": 4,
+          "perReport": 0.571
         },
         "수요": {
           "count": 2,
-          "perReport": 0.5
+          "perReport": 0.286
         },
         "중국": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.143
         }
       }
     },
@@ -96,55 +92,55 @@
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.2,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.2,
+        "perReportDelta": 0.5,
         "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 1,
+        "currentPerReport": 0.5,
+        "previousCount": 2,
+        "previousPerReport": 0.286,
+        "perReportDelta": 0.214,
+        "ratio": 1.75
       },
       {
         "topic": "중국",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
+        "previousPerReport": 0.143,
+        "perReportDelta": -0.143,
         "ratio": 0.0
       },
       {
-        "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.2,
-        "previousCount": 2,
-        "previousPerReport": 0.5,
-        "perReportDelta": -0.3,
-        "ratio": 0.4
-      },
-      {
         "topic": "원가",
-        "currentCount": 1,
-        "currentPerReport": 0.2,
-        "previousCount": 3,
-        "previousPerReport": 0.75,
-        "perReportDelta": -0.55,
-        "ratio": 0.27
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 4,
+        "previousPerReport": 0.571,
+        "perReportDelta": -0.571,
+        "ratio": 0.0
       },
       {
         "topic": "재고",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 4,
-        "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
+        "previousPerReport": 0.571,
+        "perReportDelta": -0.571,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": 3.33,
-    "targetMedianChangePct": 0.0,
-    "targetDispersionChangePct": -53.33
+    "reportCountChange": -5,
+    "targetMeanChangePct": 2.55,
+    "targetMedianChangePct": 2.63,
+    "targetDispersionChangePct": -44.14
   },
   "goalPriceRevisions": {
     "total": 4,

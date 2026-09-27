@@ -1,0 +1,424 @@
+{
+  "status": "LOW_SAMPLE",
+  "rankingEligible": false,
+  "itemCode": "006800",
+  "itemName": "미래에셋증권",
+  "asOf": "2026-09-28",
+  "dateRange": {
+    "from": "2026-04-06",
+    "to": "2026-09-10"
+  },
+  "reportCount": 22,
+  "brokerCount": 8,
+  "recentVsPrevious": {
+    "recent": {
+      "from": "2026-08-29",
+      "to": "2026-09-28",
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 61000,
+        "max": 61000,
+        "mean": 61000,
+        "median": 61000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 0,
+        "negative": 2,
+        "net": -2,
+        "netPerReport": -2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
+    },
+    "previous": {
+      "from": "2026-07-30",
+      "to": "2026-08-28",
+      "reportCount": 6,
+      "brokerCount": 6,
+      "targetPrice": {
+        "count": 6,
+        "min": 42000,
+        "max": 95000,
+        "mean": 62833,
+        "median": 57500,
+        "stdev": 18032,
+        "range": 53000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 3,
+        "UP": 3
+      },
+      "textSignal": {
+        "positive": 30,
+        "negative": 0,
+        "net": 30,
+        "netPerReport": 5.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 0.167
+        }
+      }
+    },
+    "topicAcceleration": [
+      {
+        "topic": "환율",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 1,
+        "previousPerReport": 0.167,
+        "perReportDelta": 0.833,
+        "ratio": 5.99
+      }
+    ]
+  },
+  "comparison": {
+    "reportCountChange": -5,
+    "targetMeanChangePct": -2.92,
+    "targetMedianChangePct": 6.09,
+    "targetDispersionChangePct": -100.0
+  },
+  "goalPriceRevisions": {
+    "total": 9,
+    "up": 2,
+    "down": 7,
+    "flat": 0
+  },
+  "monthly": {
+    "2026-04": {
+      "reportCount": 3,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 2,
+        "min": 81000,
+        "max": 83000,
+        "mean": 82000,
+        "median": 82000,
+        "stdev": 1000,
+        "range": 2000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 2,
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 12,
+        "negative": 4,
+        "net": 8,
+        "netPerReport": 2.667
+      },
+      "topics": {}
+    },
+    "2026-05": {
+      "reportCount": 10,
+      "brokerCount": 8,
+      "targetPrice": {
+        "count": 8,
+        "min": 62000,
+        "max": 95000,
+        "mean": 78500,
+        "median": 77000,
+        "stdev": 12155,
+        "range": 33000
+      },
+      "earningsDirection": {
+        "DOWN": 1,
+        "UNKNOWN": 3,
+        "UP": 6
+      },
+      "textSignal": {
+        "positive": 54,
+        "negative": 8,
+        "net": 46,
+        "netPerReport": 4.6
+      },
+      "topics": {
+        "원가": {
+          "count": 1,
+          "perReport": 0.1
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.1
+        }
+      }
+    },
+    "2026-07": {
+      "reportCount": 2,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 2,
+        "min": 51000,
+        "max": 62000,
+        "mean": 56500,
+        "median": 56500,
+        "stdev": 5500,
+        "range": 11000
+      },
+      "earningsDirection": {
+        "UP": 1,
+        "DOWN": 1
+      },
+      "textSignal": {
+        "positive": 4,
+        "negative": 4,
+        "net": 0,
+        "netPerReport": 0.0
+      },
+      "topics": {}
+    },
+    "2026-08": {
+      "reportCount": 6,
+      "brokerCount": 6,
+      "targetPrice": {
+        "count": 6,
+        "min": 42000,
+        "max": 95000,
+        "mean": 62833,
+        "median": 57500,
+        "stdev": 18032,
+        "range": 53000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 3,
+        "UP": 3
+      },
+      "textSignal": {
+        "positive": 30,
+        "negative": 0,
+        "net": 30,
+        "netPerReport": 5.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 0.167
+        }
+      }
+    },
+    "2026-09": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 61000,
+        "max": 61000,
+        "mean": 61000,
+        "median": 61000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 0,
+        "negative": 2,
+        "net": -2,
+        "netPerReport": -2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
+    }
+  },
+  "brokerTrajectory": {
+    "SK증권": {
+      "reportCount": 5,
+      "targetPricePointCount": 3,
+      "firstGoalPrice": 69000,
+      "latestGoalPrice": 42000,
+      "changeAmount": -27000,
+      "changePct": -39.13,
+      "trajectory": [
+        {
+          "date": "2026-05-21",
+          "goalPrice": 69000,
+          "title": "해외법인 체력 개선 확인. 지속성 검증 구간"
+        },
+        {
+          "date": "2026-07-15",
+          "goalPrice": 51000,
+          "title": "2Q26 Preview: 예견된 스페이스X 대규모 평가이익"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 42000,
+          "title": "2Q26 Review: 역대급 실적. 하반기 변동성 관리가 필요"
+        }
+      ]
+    },
+    "iM증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 65000,
+      "latestGoalPrice": 65000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-05-13",
+          "goalPrice": 65000,
+          "title": "방향과 속도"
+        }
+      ]
+    },
+    "교보증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 80000,
+      "latestGoalPrice": 50000,
+      "changeAmount": -30000,
+      "changePct": -37.5,
+      "trajectory": [
+        {
+          "date": "2026-05-18",
+          "goalPrice": 80000,
+          "title": "1Q26Review: 적극적인 투자 및 해외법인과 시너지 기대"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 50000,
+          "title": "2Q26 Review: 2026년 수익구조 고도화의 시작"
+        }
+      ]
+    },
+    "대신증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 62000,
+      "latestGoalPrice": 62000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-05-13",
+          "goalPrice": 62000,
+          "title": "Next Level"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 62000,
+          "title": "브로커리지와 평가이익이 견인하는 실적 호조 지속"
+        }
+      ]
+    },
+    "신한투자증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 74000,
+      "latestGoalPrice": 50000,
+      "changeAmount": -24000,
+      "changePct": -32.43,
+      "trajectory": [
+        {
+          "date": "2026-05-13",
+          "goalPrice": 74000,
+          "title": "원래 명품은 비싸다"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 50000,
+          "title": "사상 최대 실적"
+        }
+      ]
+    },
+    "유안타증권": {
+      "reportCount": 4,
+      "targetPricePointCount": 4,
+      "firstGoalPrice": 83000,
+      "latestGoalPrice": 61000,
+      "changeAmount": -22000,
+      "changePct": -26.51,
+      "trajectory": [
+        {
+          "date": "2026-04-06",
+          "goalPrice": 83000,
+          "title": "스페이스x 상장까지 걱정 없음"
+        },
+        {
+          "date": "2026-05-13",
+          "goalPrice": 93000,
+          "title": "1분기 순이익 1조, 2분기 더 높다"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 75000,
+          "title": "우주에 묻혀버린 양호한 실적"
+        },
+        {
+          "date": "2026-09-10",
+          "goalPrice": 61000,
+          "title": "11월 신규 기업가치 제고 계획 발표"
+        }
+      ]
+    },
+    "키움증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 90000,
+      "latestGoalPrice": 65000,
+      "changeAmount": -25000,
+      "changePct": -27.78,
+      "trajectory": [
+        {
+          "date": "2026-05-13",
+          "goalPrice": 90000,
+          "title": "1Q26 Re: 역대 최대 실적, 2분기에 더 큰 거 온다"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 65000,
+          "title": "2Q26 Re: 단기 실적 변동성과 장기 확고한 방향성"
+        }
+      ]
+    },
+    "하나증권": {
+      "reportCount": 4,
+      "targetPricePointCount": 3,
+      "firstGoalPrice": 81000,
+      "latestGoalPrice": 95000,
+      "changeAmount": 14000,
+      "changePct": 17.28,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 81000,
+          "title": "1Q26 Pre - SpaceX 가 끝이 아님"
+        },
+        {
+          "date": "2026-05-13",
+          "goalPrice": 95000,
+          "title": "1Q26 Re - 이제 시작"
+        },
+        {
+          "date": "2026-08-13",
+          "goalPrice": 95000,
+          "title": "2026년 2분기 컨퍼런스 콜 요약"
+        }
+      ]
+    }
+  },
+  "methodology": {
+    "rawContentStored": false,
+    "topicSource": "report title + stored rule-based topic keys only",
+    "topicCountsAreFullTextCounts": false,
+    "buySellUsedAsRecommendationScore": false,
+    "minimumRecentReportsForRanking": 3
+  }
+}

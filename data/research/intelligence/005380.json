@@ -1,9 +1,9 @@
 {
-  "status": "OK",
-  "rankingEligible": true,
+  "status": "LOW_SAMPLE",
+  "rankingEligible": false,
   "itemCode": "005380",
   "itemName": "현대차",
-  "asOf": "2026-09-26",
+  "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-04-03",
     "to": "2026-09-23"
@@ -12,44 +12,85 @@
   "brokerCount": 14,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-27",
-      "to": "2026-09-26",
+      "from": "2026-08-29",
+      "to": "2026-09-28",
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 500000,
+        "max": 500000,
+        "mean": 500000,
+        "median": 500000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "DOWN": 1
+      },
+      "textSignal": {
+        "positive": 5,
+        "negative": 4,
+        "net": 1,
+        "netPerReport": 1.0
+      },
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 1.0
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        },
+        "중국": {
+          "count": 1,
+          "perReport": 1.0
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
+    },
+    "previous": {
+      "from": "2026-07-30",
+      "to": "2026-08-28",
       "reportCount": 8,
       "brokerCount": 8,
       "targetPrice": {
         "count": 7,
-        "min": 500000,
+        "min": 630000,
         "max": 840000,
-        "mean": 681429,
-        "median": 650000,
-        "stdev": 101620,
-        "range": 340000
+        "mean": 730000,
+        "median": 740000,
+        "stdev": 82808,
+        "range": 210000
       },
       "earningsDirection": {
-        "UP": 5,
-        "UNKNOWN": 2,
-        "DOWN": 1
+        "UNKNOWN": 3,
+        "UP": 5
       },
       "textSignal": {
-        "positive": 57,
-        "negative": 12,
-        "net": 45,
-        "netPerReport": 5.625
+        "positive": 52,
+        "negative": 10,
+        "net": 42,
+        "netPerReport": 5.25
       },
       "topics": {
-        "중국": {
-          "count": 5,
-          "perReport": 0.625
-        },
         "원가": {
           "count": 5,
           "perReport": 0.625
         },
-        "AI": {
-          "count": 3,
-          "perReport": 0.375
+        "중국": {
+          "count": 4,
+          "perReport": 0.5
         },
         "수요": {
+          "count": 2,
+          "perReport": 0.25
+        },
+        "AI": {
           "count": 2,
           "perReport": 0.25
         },
@@ -59,93 +100,59 @@
         }
       }
     },
-    "previous": {
-      "from": "2026-07-28",
-      "to": "2026-08-26",
-      "reportCount": 1,
-      "brokerCount": 1,
-      "targetPrice": {
-        "count": 1,
-        "min": 840000,
-        "max": 840000,
-        "mean": 840000,
-        "median": 840000,
-        "stdev": 0,
-        "range": 0
-      },
-      "earningsDirection": {
-        "UNKNOWN": 1
-      },
-      "textSignal": {
-        "positive": 0,
-        "negative": 2,
-        "net": -2,
-        "netPerReport": -2.0
-      },
-      "topics": {
-        "환율": {
-          "count": 1,
-          "perReport": 1.0
-        },
-        "원가": {
-          "count": 1,
-          "perReport": 1.0
-        }
-      }
-    },
     "topicAcceleration": [
-      {
-        "topic": "중국",
-        "currentCount": 5,
-        "currentPerReport": 0.625,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.625,
-        "ratio": null
-      },
-      {
-        "topic": "AI",
-        "currentCount": 3,
-        "currentPerReport": 0.375,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.375,
-        "ratio": null
-      },
-      {
-        "topic": "수요",
-        "currentCount": 2,
-        "currentPerReport": 0.25,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.25,
-        "ratio": null
-      },
-      {
-        "topic": "원가",
-        "currentCount": 5,
-        "currentPerReport": 0.625,
-        "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -0.375,
-        "ratio": 0.62
-      },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 0.125,
+        "currentPerReport": 1.0,
         "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -0.875,
-        "ratio": 0.12
+        "previousPerReport": 0.125,
+        "perReportDelta": 0.875,
+        "ratio": 8.0
+      },
+      {
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 2,
+        "previousPerReport": 0.25,
+        "perReportDelta": 0.75,
+        "ratio": 4.0
+      },
+      {
+        "topic": "중국",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 4,
+        "previousPerReport": 0.5,
+        "perReportDelta": 0.5,
+        "ratio": 2.0
+      },
+      {
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 5,
+        "previousPerReport": 0.625,
+        "perReportDelta": 0.375,
+        "ratio": 1.6
+      },
+      {
+        "topic": "수요",
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 2,
+        "previousPerReport": 0.25,
+        "perReportDelta": -0.25,
+        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 7,
-    "targetMeanChangePct": -18.88,
-    "targetMedianChangePct": -22.62,
-    "targetDispersionChangePct": null
+    "reportCountChange": -7,
+    "targetMeanChangePct": -31.51,
+    "targetMedianChangePct": -32.43,
+    "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
     "total": 12,
