@@ -25,6 +25,13 @@ They must not be treated as actual zero-price trades when computing highs/lows.
 One-KRW discrepancies in adjusted OHLC are preserved and marked `roundingMismatch`.
 Failed retrieval overwrites that file with explicit error status, never a newly timestamped old success.
 
+## Universe Management
+
+Use [`universe_manager.py`](docs/universe-manager.md) for normal local management of
+`config/universe.json`. It supports safe previews, validation, atomic writes, backups,
+stocks, groups, and leaders. Discovery candidates are never added automatically: review
+them first, then add them explicitly with the manager.
+
 ## Schedule and permissions
 
 - Monday–Friday 08:35 KST: Sunday–Thursday 23:35 UTC.
