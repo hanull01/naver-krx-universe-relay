@@ -269,7 +269,8 @@ class RelayTests(unittest.TestCase):
                    'datas': [{'itemCode': '051600', 'stockName': '한전KPS', 'closePrice': 1,
                               'fluctuationsRatio': 0, 'accumulatedTradingVolume': 2,
                               'sourceTime': 'now', 'marketStatus': 'CLOSE', 'delayTime': 0,
-                              'fresh': True, 'freshnessReason': 'latest_valid', 'session': 'AFTER',
+                              'fresh': True, 'freshnessReason': 'after_market_live', 'session': 'AFTER',
+                              'priceBasis': 'AFTER_MARKET', 'marketSessionType': 'AFTER_MARKET',
                               'status': 'ok', 'unwanted': 'x'}]}
         result = relay.lite_payload(payload)
         self.assertEqual(set(result['datas'][0]), set(relay.LITE_FIELDS))
@@ -292,20 +293,47 @@ class RelayTests(unittest.TestCase):
         self.assertTrue(relay.quote_freshness(friday, monday, 'CLOSE', 0)[0])
         self.assertTrue(relay.quote_freshness(friday, monday, 'OPEN', 0)[0])
 
+    def test_first_report_uses_only_previous_krx_close(self):
+        current = datetime(2026, 9, 21, 8, 40, tzinfo=relay.KST)
+        previous_close = datetime(2026, 9, 18, 15, 30, tzinfo=relay.KST)
+        premarket = datetime(2026, 9, 21, 8, 35, tzinfo=relay.KST)
+        self.assertTrue(relay.quote_freshness(previous_close, current, 'UNKNOWN', 0)[0])
+        self.assertFalse(relay.quote_freshness(premarket, current, 'OPEN', 0)[0])
+
     def test_2026_market_sessions_and_freshness(self):
         day = datetime(2026, 9, 23, tzinfo=relay.KST)
-        cases = [(14, 0, 13, 55, 'REGULAR', True), (15, 40, 15, 30, 'REGULAR_CLOSED', True),
+        cases = [(14, 0, 13, 55, 'REGULAR', True), (15, 40, 15, 30, 'AFTER', True),
+                 (15, 39, 15, 30, 'REGULAR_CLOSED', True),
                  (16, 40, 16, 35, 'AFTER', True), (19, 40, 19, 35, 'AFTER', True),
-                 (20, 40, 20, 0, 'CLOSED', False), (14, 0, 13, 40, 'REGULAR', False),
+                 (20, 40, 19, 30, 'CLOSED', True), (14, 0, 13, 40, 'REGULAR', False),
                  (16, 40, 16, 20, 'AFTER', False)]
         for hour, minute, source_hour, source_minute, session, fresh in cases:
             current = day.replace(hour=hour, minute=minute)
             traded = day.replace(hour=source_hour, minute=source_minute)
             self.assertEqual(relay.detect_market_session(current), session)
             self.assertEqual(relay.quote_freshness(traded, current, 'OPEN', 0)[0], fresh)
-        self.assertFalse(relay.quote_freshness(day.replace(hour=19, minute=59), day.replace(hour=20, minute=40), 'OPEN', 0)[0])
+        self.assertTrue(relay.quote_freshness(day.replace(hour=19, minute=59), day.replace(hour=20, minute=40), 'OPEN', 0)[0])
         self.assertFalse(relay.quote_freshness(day.replace(day=22, hour=15, minute=30), day.replace(hour=15, minute=40), 'OPEN', 0)[0])
         self.assertFalse(relay.quote_freshness(day.replace(hour=14, minute=5), day.replace(hour=14), 'OPEN', 0)[0])
+
+    def test_regular_close_hold_ignores_age_only_during_short_gap(self):
+        current = datetime(2026, 9, 23, 15, 39, 30, tzinfo=relay.KST)
+        regular_close = datetime(2026, 9, 23, 15, 30, tzinfo=relay.KST)
+        for status in ('OPEN', 'CLOSE', 'UNKNOWN'):
+            self.assertEqual(relay.quote_freshness(regular_close, current, status, 0),
+                             (True, 'krx_close_hold'))
+        for source in (datetime(2026, 9, 23, 15, 29, 59, tzinfo=relay.KST),
+                       datetime(2026, 9, 23, 15, 0, tzinfo=relay.KST)):
+            self.assertEqual(relay.quote_freshness(source, current, 'UNKNOWN', 0),
+                             (False, 'stale_krx_close_hold'))
+
+    def test_after_market_final_accepts_same_day_but_rejects_previous_day(self):
+        current = datetime(2026, 9, 23, 20, 40, tzinfo=relay.KST)
+        for minute in (50, 30):
+            self.assertTrue(relay.quote_freshness(
+                datetime(2026, 9, 23, 19, minute, tzinfo=relay.KST), current, 'UNKNOWN', 0)[0])
+        self.assertFalse(relay.quote_freshness(
+            datetime(2026, 9, 22, 19, 30, tzinfo=relay.KST), current, 'UNKNOWN', 0)[0])
 
     def test_quote_json_includes_session(self):
         current = datetime(2026, 9, 23, 16, 40, tzinfo=relay.KST)
@@ -322,7 +350,31 @@ class RelayTests(unittest.TestCase):
                    accumulatedTradingValue='1')
         quote = relay.normalize_quote(row, current)
         self.assertTrue(quote['fresh'])
-        self.assertEqual(quote['freshnessReason'], 'latest_valid')
+        self.assertEqual(quote['freshnessReason'], 'after_market_live')
+
+    def test_market_status_text_is_not_a_freshness_input(self):
+        current = datetime(2026, 9, 23, 16, 50, tzinfo=relay.KST)
+        traded = datetime(2026, 9, 23, 16, 47, tzinfo=relay.KST)
+        results = {relay.quote_freshness(traded, current, status, 0) for status in ('OPEN', 'CLOSE', 'UNKNOWN')}
+        self.assertEqual(results, {(True, 'after_market_live')})
+
+    def test_after_market_metadata_and_price_basis_are_preserved(self):
+        current = datetime(2026, 9, 23, 16, 50, tzinfo=relay.KST)
+        row = dict(itemCode='005930', stockName='삼성전자',
+                   localTradedAt='2026-09-23T16:47:00+09:00', marketStatus='OPEN',
+                   marketSessionType='AFTER_MARKET', stockExchangeType={'delayTime': 0, 'code': 'KRX'},
+                   overMarketPriceInfo={'tradingSessionType': 'AFTER_MARKET', 'overPrice': '100500',
+                                        'localTradedAt': '2026-09-23T16:47:00+09:00'},
+                   closePrice='100500', compareToPreviousClosePrice='0', compareToPreviousPrice={},
+                   fluctuationsRatio='0', openPrice='1', highPrice='1', lowPrice='1',
+                   accumulatedTradingVolume='1', accumulatedTradingValue='1')
+        quote = relay.normalize_quote(row, current)
+        self.assertEqual(quote['closePrice'], 100500)
+        self.assertEqual(quote['priceBasis'], 'AFTER_MARKET')
+        self.assertEqual(quote['marketSessionType'], 'AFTER_MARKET')
+        self.assertEqual(quote['stockExchangeType']['code'], 'KRX')
+        self.assertEqual(quote['overMarketPriceInfo']['tradingSessionType'], 'AFTER_MARKET')
+        self.assertEqual(quote['overMarketPriceInfo']['overPrice'], '100500')
 
     def test_breakout_close_confirmation_uses_source_timestamp_not_market_status(self):
         config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}

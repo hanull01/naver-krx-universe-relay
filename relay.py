@@ -132,13 +132,27 @@ def detect_market_session(current):
     clock = current.time()
     if clock < dtime(9): return 'PRE'
     if clock < dtime(15, 30): return 'REGULAR'
-    if clock < dtime(16): return 'REGULAR_CLOSED'
+    if clock < dtime(15, 40): return 'REGULAR_CLOSED'
     if clock < dtime(20): return 'AFTER'
     return 'CLOSED'
 
 
+def price_basis(session):
+    return {
+        'PRE': 'PREVIOUS_KRX_CLOSE',
+        'REGULAR': 'KRX_REGULAR',
+        'REGULAR_CLOSED': 'KRX_CLOSE_HOLD',
+        'AFTER': 'AFTER_MARKET',
+        'CLOSED': 'AFTER_MARKET_FINAL',
+    }[session]
+
+
 def quote_freshness(traded, current, market, delay):
-    """Accept the latest valid, non-delayed quote without status-string gating."""
+    """Apply the timestamp-based KRX/after-market price policy.
+
+    ``market`` is retained for the stable call signature but intentionally is
+    not a freshness input: NAVER's OPEN/CLOSE text is raw reference metadata.
+    """
     age = (current - traded).total_seconds()
     if age < -60:
         return False, 'future_source_time'
@@ -151,8 +165,36 @@ def quote_freshness(traded, current, market, delay):
         valid = (traded.date() == previous_weekday(current.date())
                  and traded.time() >= dtime(15, 30))
         return valid, 'previous_close' if valid else 'stale_previous_close'
-    valid = traded.date() == current.date() and -60 <= age <= 600
-    return valid, 'latest_valid' if valid else 'stale_source_time'
+    if session == 'REGULAR':
+        valid = traded.date() == current.date() and -60 <= age <= 600
+        return valid, 'krx_regular_live' if valid else 'stale_krx_regular'
+    if session == 'REGULAR_CLOSED':
+        # Preserve the same-day regular-session close during the short gap
+        # before the after-market opens; only the 15:30 close window is valid
+        # and freshness age is irrelevant inside this short hold interval.
+        valid = (traded.date() == current.date()
+                 and dtime(15, 30) <= traded.time() < dtime(15, 40))
+        return valid, 'krx_close_hold' if valid else 'stale_krx_close_hold'
+    if session == 'AFTER':
+        valid = traded.date() == current.date() and -60 <= age <= 600
+        return valid, 'after_market_live' if valid else 'stale_after_market'
+    # After 20:00 NAVER may keep the last after-market trade at 19:xx.  It is
+    # still today's final valid after-market price, not a stale live quote.
+    valid = traded.date() == current.date() and traded.time() >= dtime(15, 40)
+    return valid, 'after_market_final' if valid else 'stale_after_market_final'
+
+
+def optional_market_metadata(row, delay):
+    """Keep selected public NAVER session metadata without parsing it as price."""
+    exchange = row.get('stockExchangeType')
+    exchange = exchange if isinstance(exchange, dict) else {}
+    over_market = row.get('overMarketPriceInfo')
+    over_market = over_market if isinstance(over_market, dict) else {}
+    return (
+        {key: exchange[key] for key in ('code', 'name') if key in exchange} | {'delayTime': delay},
+        {key: over_market[key] for key in ('tradingSessionType', 'overPrice', 'localTradedAt')
+         if key in over_market},
+    )
 
 
 def normalize_quote(row, current, sector=None):
@@ -178,18 +220,22 @@ def normalize_quote(row, current, sector=None):
     delay = row.get('stockExchangeType', {}).get('delayTime')
     delay = number(delay, 'stockExchangeType.delayTime') if delay is not None else None
     fresh, reason = quote_freshness(traded, current, row.get('marketStatus'), delay)
+    session = detect_market_session(current)
+    exchange_metadata, over_market_metadata = optional_market_metadata(row, delay)
     result.update(source='NAVER_KRX', sourceTime=traded.isoformat(),
                   localTradedAt=traded.isoformat(), marketStatus=row.get('marketStatus'),
-                  delayTime=delay, stockExchangeType={'delayTime': delay},
+                  delayTime=delay, stockExchangeType=exchange_metadata,
+                  marketSessionType=row.get('marketSessionType'),
+                  overMarketPriceInfo=over_market_metadata,
                   ageSeconds=round((current - traded).total_seconds()), fresh=fresh,
                   status='ok' if fresh else 'stale', freshnessReason=reason,
-                  session=detect_market_session(current))
+                  session=session, priceBasis=price_basis(session))
     return result
 
 
 LITE_FIELDS = ('itemCode', 'stockName', 'closePrice', 'fluctuationsRatio',
                'accumulatedTradingVolume', 'sourceTime', 'marketStatus', 'delayTime',
-               'fresh', 'freshnessReason', 'session', 'status')
+               'fresh', 'freshnessReason', 'session', 'priceBasis', 'marketSessionType', 'status')
 
 
 def lite_payload(payload):
@@ -210,7 +256,7 @@ def quote_payload(rows, codes, expected, errors, started):
             'freshCount': fresh_count, 'status': status, 'fresh': status == 'ok', 'errors': errors,
             'missingCodes': missing, 'sourceTime': min(times) if times else None,
             'sourceTimeLatest': max(times) if times else None,
-            'freshnessPolicy': '600 seconds intraday; conservative weekday close check; consumer must verify KRX trading calendar and final close',
+            'freshnessPolicy': 'previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00',
             'datas': [rows[c] for c in codes if c in rows]}
 
 
