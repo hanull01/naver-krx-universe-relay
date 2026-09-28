@@ -1,839 +1,1106 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-28T08:39:57.991675+09:00",
-  "collectionStartedAt": "2026-09-28T08:39:33.289987+09:00",
+  "generatedAt": "2026-09-28T09:50:32.895582+09:00",
+  "collectionStartedAt": "2026-09-28T09:50:31.659165+09:00",
   "source": "NAVER_KRX",
-  "count": 0,
+  "count": 42,
   "expectedCount": 42,
-  "freshCount": 0,
-  "status": "error",
-  "fresh": false,
-  "errors": [
-    {
-      "stage": "all_batch",
-      "code": "005930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "000660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "042700",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "240810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "036930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "058470",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "009150",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "007660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "353200",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "267260",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "010120",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "298040",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "329180",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "042660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "010140",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "012450",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "064350",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "079550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "005380",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "000270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "012330",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "105560",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "086790",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "055550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "207940",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "068270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "196170",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "373220",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "006400",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "096770",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "034020",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "052690",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "051600",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "272210",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "201490",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "039200",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "344820",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "277810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "454910",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "108490",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "058610",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "all_batch",
-      "code": "006800",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "005930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "000660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "042700",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "240810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "036930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "058470",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "009150",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "007660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "353200",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "267260",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "010120",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "298040",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "329180",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "042660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "010140",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "012450",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "064350",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "079550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "272210",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "005380",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "000270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "012330",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "105560",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "086790",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "055550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "207940",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "068270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "196170",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "373220",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "006400",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "096770",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "034020",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "052690",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "051600",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "277810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "454910",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "108490",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "sector_batch",
-      "code": "058610",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "005930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "000660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "042700",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "240810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "036930",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "058470",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "009150",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "007660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "353200",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "267260",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "010120",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "298040",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "329180",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "042660",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "010140",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "012450",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "064350",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "079550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "005380",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "000270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "012330",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "105560",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "086790",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "055550",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "207940",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "068270",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "196170",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "373220",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "006400",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "096770",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "034020",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "052690",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "051600",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "272210",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "201490",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "039200",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "344820",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "277810",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "454910",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "108490",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "058610",
-      "error": "invalid numeric field"
-    },
-    {
-      "stage": "individual",
-      "code": "006800",
-      "error": "invalid numeric field"
-    },
-    {
-      "code": "005930",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "000660",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "042700",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "240810",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "036930",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "058470",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "009150",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "007660",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "353200",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "267260",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "010120",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "298040",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "329180",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "042660",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "010140",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "012450",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "064350",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "079550",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "005380",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "000270",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "012330",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "105560",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "086790",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "055550",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "207940",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "068270",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "196170",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "373220",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "006400",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "096770",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "034020",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "052690",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "051600",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "272210",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "201490",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "039200",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "344820",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "277810",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "454910",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "108490",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "058610",
-      "error": "no_valid_quote"
-    },
-    {
-      "code": "006800",
-      "error": "no_valid_quote"
-    }
-  ],
-  "missingCodes": [
-    "005930",
-    "000660",
-    "042700",
-    "240810",
-    "036930",
-    "058470",
-    "009150",
-    "007660",
-    "353200",
-    "267260",
-    "010120",
-    "298040",
-    "329180",
-    "042660",
-    "010140",
-    "012450",
-    "064350",
-    "079550",
-    "005380",
-    "000270",
-    "012330",
-    "105560",
-    "086790",
-    "055550",
-    "207940",
-    "068270",
-    "196170",
-    "373220",
-    "006400",
-    "096770",
-    "034020",
-    "052690",
-    "051600",
-    "272210",
-    "201490",
-    "039200",
-    "344820",
-    "277810",
-    "454910",
-    "108490",
-    "058610",
-    "006800"
-  ],
-  "sourceTime": null,
-  "sourceTimeLatest": null,
+  "freshCount": 42,
+  "status": "ok",
+  "fresh": true,
+  "errors": [],
+  "missingCodes": [],
+  "sourceTime": "2026-09-28T09:50:32.430464+09:00",
+  "sourceTimeLatest": "2026-09-28T09:50:32.430820+09:00",
   "freshnessPolicy": "600 seconds intraday; conservative weekday close check; consumer must verify KRX trading calendar and final close",
-  "datas": []
+  "datas": [
+    {
+      "itemCode": "005930",
+      "stockName": "삼성전자",
+      "closePrice": 277000,
+      "compareToPreviousClosePrice": -8500,
+      "fluctuationsRatio": -2.98,
+      "openPrice": 284500,
+      "highPrice": 285500,
+      "lowPrice": 277000,
+      "accumulatedTradingVolume": 4973405,
+      "accumulatedTradingValue": 1402483000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430464+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430464+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 대형주"
+    },
+    {
+      "itemCode": "000660",
+      "stockName": "SK하이닉스",
+      "closePrice": 1808000,
+      "compareToPreviousClosePrice": -54000,
+      "fluctuationsRatio": -2.9,
+      "openPrice": 1825000,
+      "highPrice": 1840000,
+      "lowPrice": 1807000,
+      "accumulatedTradingVolume": 862232,
+      "accumulatedTradingValue": 1569536000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430475+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430475+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 대형주"
+    },
+    {
+      "itemCode": "042700",
+      "stockName": "한미반도체",
+      "closePrice": 244250,
+      "compareToPreviousClosePrice": 750,
+      "fluctuationsRatio": 0.31,
+      "openPrice": 240500,
+      "highPrice": 245000,
+      "lowPrice": 238500,
+      "accumulatedTradingVolume": 74173,
+      "accumulatedTradingValue": 17974000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430483+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430483+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 장비·부품"
+    },
+    {
+      "itemCode": "240810",
+      "stockName": "원익IPS",
+      "closePrice": 129700,
+      "compareToPreviousClosePrice": -4000,
+      "fluctuationsRatio": -2.99,
+      "openPrice": 132000,
+      "highPrice": 132000,
+      "lowPrice": 126400,
+      "accumulatedTradingVolume": 320392,
+      "accumulatedTradingValue": 41162000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430489+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430489+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 장비·부품"
+    },
+    {
+      "itemCode": "036930",
+      "stockName": "주성엔지니어링",
+      "closePrice": 213500,
+      "compareToPreviousClosePrice": 4000,
+      "fluctuationsRatio": 1.91,
+      "openPrice": 209500,
+      "highPrice": 214500,
+      "lowPrice": 204000,
+      "accumulatedTradingVolume": 278176,
+      "accumulatedTradingValue": 58536000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430496+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430496+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 장비·부품"
+    },
+    {
+      "itemCode": "058470",
+      "stockName": "리노공업",
+      "closePrice": 73600,
+      "compareToPreviousClosePrice": -700,
+      "fluctuationsRatio": -0.94,
+      "openPrice": 73400,
+      "highPrice": 74300,
+      "lowPrice": 72200,
+      "accumulatedTradingVolume": 117541,
+      "accumulatedTradingValue": 8607000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430504+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430504+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "반도체 장비·부품"
+    },
+    {
+      "itemCode": "009150",
+      "stockName": "삼성전기",
+      "closePrice": 1533000,
+      "compareToPreviousClosePrice": 26000,
+      "fluctuationsRatio": 1.73,
+      "openPrice": 1552000,
+      "highPrice": 1587000,
+      "lowPrice": 1523000,
+      "accumulatedTradingVolume": 250636,
+      "accumulatedTradingValue": 390660000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430510+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430510+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전자부품·PCB"
+    },
+    {
+      "itemCode": "007660",
+      "stockName": "이수페타시스",
+      "closePrice": 116600,
+      "compareToPreviousClosePrice": -2300,
+      "fluctuationsRatio": -1.93,
+      "openPrice": 118900,
+      "highPrice": 119000,
+      "lowPrice": 114500,
+      "accumulatedTradingVolume": 200832,
+      "accumulatedTradingValue": 23396000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430517+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430517+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전자부품·PCB"
+    },
+    {
+      "itemCode": "353200",
+      "stockName": "대덕전자",
+      "closePrice": 125400,
+      "compareToPreviousClosePrice": 6000,
+      "fluctuationsRatio": 5.03,
+      "openPrice": 124600,
+      "highPrice": 129100,
+      "lowPrice": 122200,
+      "accumulatedTradingVolume": 673706,
+      "accumulatedTradingValue": 85058000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430524+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430524+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전자부품·PCB"
+    },
+    {
+      "itemCode": "267260",
+      "stockName": "HD현대일렉트릭",
+      "closePrice": 703000,
+      "compareToPreviousClosePrice": -5000,
+      "fluctuationsRatio": -0.71,
+      "openPrice": 700000,
+      "highPrice": 709000,
+      "lowPrice": 700000,
+      "accumulatedTradingVolume": 18162,
+      "accumulatedTradingValue": 12772000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430530+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430530+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전력기기·전력인프라"
+    },
+    {
+      "itemCode": "010120",
+      "stockName": "LS ELECTRIC",
+      "closePrice": 208500,
+      "compareToPreviousClosePrice": 3000,
+      "fluctuationsRatio": 1.46,
+      "openPrice": 207000,
+      "highPrice": 209500,
+      "lowPrice": 204500,
+      "accumulatedTradingVolume": 60964,
+      "accumulatedTradingValue": 12657000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430537+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430537+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전력기기·전력인프라"
+    },
+    {
+      "itemCode": "298040",
+      "stockName": "효성중공업",
+      "closePrice": 2850000,
+      "compareToPreviousClosePrice": -46000,
+      "fluctuationsRatio": -1.59,
+      "openPrice": 2925000,
+      "highPrice": 2925000,
+      "lowPrice": 2846000,
+      "accumulatedTradingVolume": 7041,
+      "accumulatedTradingValue": 20210000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430544+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430544+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "전력기기·전력인프라"
+    },
+    {
+      "itemCode": "329180",
+      "stockName": "HD현대중공업",
+      "closePrice": 445000,
+      "compareToPreviousClosePrice": 4000,
+      "fluctuationsRatio": 0.91,
+      "openPrice": 445000,
+      "highPrice": 447000,
+      "lowPrice": 440000,
+      "accumulatedTradingVolume": 23166,
+      "accumulatedTradingValue": 10279000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430551+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430551+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "조선"
+    },
+    {
+      "itemCode": "042660",
+      "stockName": "한화오션",
+      "closePrice": 81300,
+      "compareToPreviousClosePrice": 1700,
+      "fluctuationsRatio": 2.14,
+      "openPrice": 80800,
+      "highPrice": 81500,
+      "lowPrice": 79800,
+      "accumulatedTradingVolume": 128752,
+      "accumulatedTradingValue": 10400000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430557+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430557+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "조선"
+    },
+    {
+      "itemCode": "010140",
+      "stockName": "삼성중공업",
+      "closePrice": 20400,
+      "compareToPreviousClosePrice": 150,
+      "fluctuationsRatio": 0.74,
+      "openPrice": 20400,
+      "highPrice": 20450,
+      "lowPrice": 20250,
+      "accumulatedTradingVolume": 302745,
+      "accumulatedTradingValue": 6162000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430564+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430564+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "조선"
+    },
+    {
+      "itemCode": "012450",
+      "stockName": "한화에어로스페이스",
+      "closePrice": 1045000,
+      "compareToPreviousClosePrice": 24000,
+      "fluctuationsRatio": 2.35,
+      "openPrice": 1015000,
+      "highPrice": 1049000,
+      "lowPrice": 1008000,
+      "accumulatedTradingVolume": 34529,
+      "accumulatedTradingValue": 35429000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430570+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430570+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "방산"
+    },
+    {
+      "itemCode": "064350",
+      "stockName": "현대로템",
+      "closePrice": 118600,
+      "compareToPreviousClosePrice": 2700,
+      "fluctuationsRatio": 2.33,
+      "openPrice": 116000,
+      "highPrice": 118800,
+      "lowPrice": 113500,
+      "accumulatedTradingVolume": 93634,
+      "accumulatedTradingValue": 10882000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430577+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430577+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "방산"
+    },
+    {
+      "itemCode": "079550",
+      "stockName": "LIG디펜스앤에어로스페이스",
+      "closePrice": 701000,
+      "compareToPreviousClosePrice": 9000,
+      "fluctuationsRatio": 1.3,
+      "openPrice": 693000,
+      "highPrice": 703000,
+      "lowPrice": 680000,
+      "accumulatedTradingVolume": 12569,
+      "accumulatedTradingValue": 8707000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430583+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430583+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "방산"
+    },
+    {
+      "itemCode": "005380",
+      "stockName": "현대차",
+      "closePrice": 356000,
+      "compareToPreviousClosePrice": 2500,
+      "fluctuationsRatio": 0.71,
+      "openPrice": 357000,
+      "highPrice": 358000,
+      "lowPrice": 353500,
+      "accumulatedTradingVolume": 104542,
+      "accumulatedTradingValue": 37186000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430590+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430590+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "자동차·부품"
+    },
+    {
+      "itemCode": "000270",
+      "stockName": "기아",
+      "closePrice": 116500,
+      "compareToPreviousClosePrice": 1100,
+      "fluctuationsRatio": 0.95,
+      "openPrice": 116600,
+      "highPrice": 117000,
+      "lowPrice": 115600,
+      "accumulatedTradingVolume": 227358,
+      "accumulatedTradingValue": 26474000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430596+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430596+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "자동차·부품"
+    },
+    {
+      "itemCode": "012330",
+      "stockName": "현대모비스",
+      "closePrice": 376500,
+      "compareToPreviousClosePrice": 9000,
+      "fluctuationsRatio": 2.45,
+      "openPrice": 369000,
+      "highPrice": 379000,
+      "lowPrice": 369000,
+      "accumulatedTradingVolume": 72169,
+      "accumulatedTradingValue": 27036000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430603+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430603+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "자동차·부품"
+    },
+    {
+      "itemCode": "105560",
+      "stockName": "KB금융",
+      "closePrice": 173350,
+      "compareToPreviousClosePrice": 150,
+      "fluctuationsRatio": 0.09,
+      "openPrice": 171000,
+      "highPrice": 174400,
+      "lowPrice": 170200,
+      "accumulatedTradingVolume": 217298,
+      "accumulatedTradingValue": 37534000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430609+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430609+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "금융"
+    },
+    {
+      "itemCode": "086790",
+      "stockName": "하나금융지주",
+      "closePrice": 133500,
+      "compareToPreviousClosePrice": 400,
+      "fluctuationsRatio": 0.3,
+      "openPrice": 133900,
+      "highPrice": 134000,
+      "lowPrice": 132000,
+      "accumulatedTradingVolume": 134545,
+      "accumulatedTradingValue": 17924000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430618+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430618+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "금융"
+    },
+    {
+      "itemCode": "055550",
+      "stockName": "신한지주",
+      "closePrice": 110000,
+      "compareToPreviousClosePrice": 700,
+      "fluctuationsRatio": 0.64,
+      "openPrice": 108800,
+      "highPrice": 110300,
+      "lowPrice": 108800,
+      "accumulatedTradingVolume": 221453,
+      "accumulatedTradingValue": 24216000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430628+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430628+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "금융"
+    },
+    {
+      "itemCode": "207940",
+      "stockName": "삼성바이오로직스",
+      "closePrice": 1388000,
+      "compareToPreviousClosePrice": 22000,
+      "fluctuationsRatio": 1.61,
+      "openPrice": 1367000,
+      "highPrice": 1397000,
+      "lowPrice": 1366000,
+      "accumulatedTradingVolume": 8453,
+      "accumulatedTradingValue": 11705000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430638+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430638+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "바이오 대형주"
+    },
+    {
+      "itemCode": "068270",
+      "stockName": "셀트리온",
+      "closePrice": 179600,
+      "compareToPreviousClosePrice": 2200,
+      "fluctuationsRatio": 1.24,
+      "openPrice": 178400,
+      "highPrice": 180400,
+      "lowPrice": 177600,
+      "accumulatedTradingVolume": 77350,
+      "accumulatedTradingValue": 13858000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430649+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430649+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "바이오 대형주"
+    },
+    {
+      "itemCode": "196170",
+      "stockName": "알테오젠",
+      "closePrice": 258500,
+      "compareToPreviousClosePrice": 8500,
+      "fluctuationsRatio": 3.4,
+      "openPrice": 256500,
+      "highPrice": 259500,
+      "lowPrice": 254000,
+      "accumulatedTradingVolume": 77039,
+      "accumulatedTradingValue": 19796000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430659+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430659+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "바이오 대형주"
+    },
+    {
+      "itemCode": "373220",
+      "stockName": "LG에너지솔루션",
+      "closePrice": 366000,
+      "compareToPreviousClosePrice": 14500,
+      "fluctuationsRatio": 4.13,
+      "openPrice": 352000,
+      "highPrice": 368000,
+      "lowPrice": 350500,
+      "accumulatedTradingVolume": 117208,
+      "accumulatedTradingValue": 42335000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430669+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430669+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "2차전지·에너지"
+    },
+    {
+      "itemCode": "006400",
+      "stockName": "삼성SDI",
+      "closePrice": 536000,
+      "compareToPreviousClosePrice": 15000,
+      "fluctuationsRatio": 2.88,
+      "openPrice": 525000,
+      "highPrice": 540000,
+      "lowPrice": 524000,
+      "accumulatedTradingVolume": 117678,
+      "accumulatedTradingValue": 62803000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430688+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430688+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "2차전지·에너지"
+    },
+    {
+      "itemCode": "096770",
+      "stockName": "SK이노베이션",
+      "closePrice": 158200,
+      "compareToPreviousClosePrice": 9000,
+      "fluctuationsRatio": 6.03,
+      "openPrice": 148500,
+      "highPrice": 161200,
+      "lowPrice": 147600,
+      "accumulatedTradingVolume": 536707,
+      "accumulatedTradingValue": 84608000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430698+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430698+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "2차전지·에너지"
+    },
+    {
+      "itemCode": "034020",
+      "stockName": "두산에너빌리티",
+      "closePrice": 82300,
+      "compareToPreviousClosePrice": 600,
+      "fluctuationsRatio": 0.73,
+      "openPrice": 82600,
+      "highPrice": 82700,
+      "lowPrice": 80900,
+      "accumulatedTradingVolume": 411700,
+      "accumulatedTradingValue": 33772000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430709+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430709+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "원전·발전설비"
+    },
+    {
+      "itemCode": "052690",
+      "stockName": "한전기술",
+      "closePrice": 129200,
+      "compareToPreviousClosePrice": -1200,
+      "fluctuationsRatio": -0.92,
+      "openPrice": 129600,
+      "highPrice": 130800,
+      "lowPrice": 126600,
+      "accumulatedTradingVolume": 73090,
+      "accumulatedTradingValue": 9418000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430719+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430719+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "원전·발전설비"
+    },
+    {
+      "itemCode": "051600",
+      "stockName": "한전KPS",
+      "closePrice": 46300,
+      "compareToPreviousClosePrice": 550,
+      "fluctuationsRatio": 1.2,
+      "openPrice": 45550,
+      "highPrice": 46300,
+      "lowPrice": 45000,
+      "accumulatedTradingVolume": 17108,
+      "accumulatedTradingValue": 783000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430729+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430729+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "원전·발전설비"
+    },
+    {
+      "itemCode": "272210",
+      "stockName": "한화시스템",
+      "closePrice": 74900,
+      "compareToPreviousClosePrice": 1000,
+      "fluctuationsRatio": 1.35,
+      "openPrice": 73900,
+      "highPrice": 75100,
+      "lowPrice": 71300,
+      "accumulatedTradingVolume": 138156,
+      "accumulatedTradingValue": 10137000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430739+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430739+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "방산"
+    },
+    {
+      "itemCode": "201490",
+      "stockName": "미투온",
+      "closePrice": 3780,
+      "compareToPreviousClosePrice": 75,
+      "fluctuationsRatio": 2.02,
+      "openPrice": 3705,
+      "highPrice": 3795,
+      "lowPrice": 3665,
+      "accumulatedTradingVolume": 587747,
+      "accumulatedTradingValue": 2194000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430750+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430750+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR"
+    },
+    {
+      "itemCode": "039200",
+      "stockName": "오스코텍",
+      "closePrice": 36650,
+      "compareToPreviousClosePrice": 850,
+      "fluctuationsRatio": 2.37,
+      "openPrice": 36200,
+      "highPrice": 36650,
+      "lowPrice": 35900,
+      "accumulatedTradingVolume": 15537,
+      "accumulatedTradingValue": 564000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430760+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430760+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR"
+    },
+    {
+      "itemCode": "344820",
+      "stockName": "KCC글라스",
+      "closePrice": 23750,
+      "compareToPreviousClosePrice": 50,
+      "fluctuationsRatio": 0.21,
+      "openPrice": 23800,
+      "highPrice": 23950,
+      "lowPrice": 23250,
+      "accumulatedTradingVolume": 306,
+      "accumulatedTradingValue": 7000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430770+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430770+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR"
+    },
+    {
+      "itemCode": "277810",
+      "stockName": "레인보우로보틱스",
+      "closePrice": 433500,
+      "compareToPreviousClosePrice": 500,
+      "fluctuationsRatio": 0.12,
+      "openPrice": 438000,
+      "highPrice": 438500,
+      "lowPrice": 427000,
+      "accumulatedTradingVolume": 8909,
+      "accumulatedTradingValue": 3852000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430780+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430780+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "로봇"
+    },
+    {
+      "itemCode": "454910",
+      "stockName": "두산로보틱스",
+      "closePrice": 70500,
+      "compareToPreviousClosePrice": -300,
+      "fluctuationsRatio": -0.42,
+      "openPrice": 71100,
+      "highPrice": 71200,
+      "lowPrice": 69500,
+      "accumulatedTradingVolume": 61084,
+      "accumulatedTradingValue": 4298000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430790+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430790+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "로봇"
+    },
+    {
+      "itemCode": "108490",
+      "stockName": "로보티즈",
+      "closePrice": 299000,
+      "compareToPreviousClosePrice": -2000,
+      "fluctuationsRatio": -0.66,
+      "openPrice": 297500,
+      "highPrice": 300000,
+      "lowPrice": 290000,
+      "accumulatedTradingVolume": 49040,
+      "accumulatedTradingValue": 14472000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430800+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430800+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "로봇"
+    },
+    {
+      "itemCode": "058610",
+      "stockName": "에스피지",
+      "closePrice": 100500,
+      "compareToPreviousClosePrice": -200,
+      "fluctuationsRatio": -0.2,
+      "openPrice": 99600,
+      "highPrice": 100600,
+      "lowPrice": 98000,
+      "accumulatedTradingVolume": 37173,
+      "accumulatedTradingValue": 3701000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430809+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430809+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR",
+      "sector": "로봇"
+    },
+    {
+      "itemCode": "006800",
+      "stockName": "미래에셋증권",
+      "closePrice": 32050,
+      "compareToPreviousClosePrice": -200,
+      "fluctuationsRatio": -0.62,
+      "openPrice": 32100,
+      "highPrice": 32150,
+      "lowPrice": 31650,
+      "accumulatedTradingVolume": 136994,
+      "accumulatedTradingValue": 4367000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-09-28T09:50:32.430820+09:00",
+      "localTradedAt": "2026-09-28T09:50:32.430820+09:00",
+      "marketStatus": "OPEN",
+      "delayTime": 0,
+      "stockExchangeType": {
+        "delayTime": 0
+      },
+      "ageSeconds": 0,
+      "fresh": true,
+      "status": "ok",
+      "freshnessReason": "live",
+      "session": "REGULAR"
+    }
+  ]
 }

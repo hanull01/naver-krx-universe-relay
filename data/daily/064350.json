@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "itemCode": "064350",
-  "generatedAt": "2026-09-28T08:39:27.538798+09:00",
+  "generatedAt": "2026-09-28T09:50:26.283106+09:00",
   "source": "NAVER_KRX",
   "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/064350/day?startDateTime=20250327&endDateTime=20260928",
   "status": "stale",
@@ -12,7 +12,7 @@
       "expectedCompletedDate": "2026-09-25"
     }
   ],
-  "count": 366,
+  "count": 367,
   "completedCount": 366,
   "datas": [
     {
@@ -4040,9 +4040,20 @@
       "noTrading": false,
       "roundingMismatch": false,
       "complete": true
+    },
+    {
+      "date": "2026-09-28",
+      "open": 116000,
+      "high": 118600,
+      "low": 113500,
+      "close": 118400,
+      "volume": 91620,
+      "noTrading": false,
+      "roundingMismatch": false,
+      "complete": false
     }
   ],
   "sourceTime": "2026-09-23",
-  "latestDate": "2026-09-23",
+  "latestDate": "2026-09-28",
   "freshnessPolicy": "latest completed date must equal conservative expected weekday; consumer must verify actual KRX calendar"
 }
