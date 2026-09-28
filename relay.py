@@ -1,6 +1,7 @@
 """Public NAVER KRX quotes and daily candles. No credentials required."""
 import argparse
 import json
+import math
 import re
 import time
 import statistics
@@ -101,13 +102,22 @@ def save(path, payload, compact=False):
     temp.replace(target)
 
 
-def number(value):
+def number(value, field='unknown'):
+    """Parse NAVER numeric text without silently coercing bad required data.
+
+    The endpoint exposes display strings as well as *Raw values.  Raw values
+    remain mandatory for quote fields.  The error deliberately
+    reports just field/value, never an entire response payload.
+    """
     if value is None or isinstance(value, bool):
-        raise ValueError('missing numeric field')
-    value = str(value).replace(',', '').strip()
-    if not re.fullmatch(r'[+-]?\d+(?:\.\d+)?', value):
-        raise ValueError('invalid numeric field')
-    result = float(value)
+        raise ValueError(f'missing numeric field: field={field}, value={value!r}')
+    text = str(value).strip()
+    text = text.replace(',', '')
+    if not re.fullmatch(r'[+-]?\d+(?:\.\d+)?', text):
+        raise ValueError(f'invalid numeric field: field={field}, value={value!r}')
+    result = float(text)
+    if not math.isfinite(result):
+        raise ValueError(f'invalid numeric field: field={field}, value={value!r}')
     return int(result) if result.is_integer() else result
 
 
@@ -166,7 +176,7 @@ def normalize_quote(row, current, sector=None):
               'openPrice', 'highPrice', 'lowPrice', 'accumulatedTradingVolume',
               'accumulatedTradingValue']
     for field in fields:
-        result[field] = number(row.get(field + 'Raw', row.get(field)))
+        result[field] = number(row.get(field + 'Raw', row.get(field)), field)
     # NAVER sometimes gives an unsigned change plus a separate direction enum.
     direction = str(row.get('compareToPreviousPrice', {}).get('code', ''))
     if direction in ('4', '5') or result['fluctuationsRatio'] < 0:
@@ -174,7 +184,7 @@ def normalize_quote(row, current, sector=None):
     if result['closePrice'] <= 0 or result['accumulatedTradingVolume'] < 0:
         raise ValueError('invalid price or volume')
     delay = row.get('stockExchangeType', {}).get('delayTime')
-    delay = number(delay) if delay is not None else None
+    delay = number(delay, 'stockExchangeType.delayTime') if delay is not None else None
     fresh, reason = quote_freshness(traded, current, row.get('marketStatus'), delay)
     result.update(source='NAVER_KRX', sourceTime=traded.isoformat(),
                   localTradedAt=traded.isoformat(), marketStatus=row.get('marketStatus'),
@@ -296,7 +306,7 @@ def collect_daily(code):
             for out, field in [('open', 'openPrice'), ('high', 'highPrice'),
                                ('low', 'lowPrice'), ('close', 'closePrice'),
                                ('volume', 'accumulatedTradingVolume')]:
-                bar[out] = number(row[field])
+                bar[out] = number(row[field], field)
             bar['noTrading'] = (bar['open'] == bar['high'] == bar['low'] == bar['volume'] == 0
                                 and bar['close'] > 0)
             # Adjusted historical prices can differ by one KRW from rounding.

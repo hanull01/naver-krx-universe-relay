@@ -229,6 +229,18 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(result['accumulatedTradingVolume'], 1234)
         self.assertTrue(result['fresh'])
 
+    def test_numeric_parser_keeps_required_fields_strict_and_reports_field_value(self):
+        self.assertEqual(relay.number('1,234', 'closePrice'), 1234)
+        self.assertEqual(relay.number('+1,234', 'closePrice'), 1234)
+        self.assertEqual(relay.number('-1,234.50', 'fluctuationsRatio'), -1234.5)
+        with self.assertRaisesRegex(ValueError, r"field=closePrice, value='--'"):
+            relay.number('--', 'closePrice')
+        with self.assertRaisesRegex(ValueError, r"field=accumulatedTradingValue, value='1조 1,110억'"):
+            relay.number('1조 1,110억', 'accumulatedTradingValue')
+        for value in ('', '-', 'N/A', None, '-2.10%'):
+            with self.assertRaisesRegex(ValueError, r"field=openPrice"):
+                relay.number(value, 'openPrice')
+
     def test_sector_then_individual_fallback(self):
         calls = []
         def fetch(url):
