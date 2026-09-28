@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "reportCount": 71,
-  "latestReportNid": "96295",
-  "latestWriteDate": "2026-09-23",
+  "reportCount": 72,
+  "latestReportNid": "96343",
+  "latestWriteDate": "2026-09-29",
   "latest": {
-    "nid": "96295",
-    "writeDate": "2026-09-23",
-    "brokerName": "유안타증권",
-    "title": "메모리 가격 상승폭 둔화보다 사이클 장기화!",
-    "goalPrice": 630000,
+    "nid": "96343",
+    "writeDate": "2026-09-29",
+    "brokerName": "유진투자증권",
+    "title": "긴 호흡으로",
+    "goalPrice": 560000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 6
+        "positive": 12,
+        "negative": 9
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 6,
-        "가격": 4,
-        "환율": 2
+        "반도체": 16,
+        "가격": 13,
+        "환율": 4,
+        "수요": 2,
+        "AI": 1,
+        "원가": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "96343",
     "96295",
     "96289",
     "96282",

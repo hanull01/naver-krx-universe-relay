@@ -3,61 +3,65 @@
   "rankingEligible": true,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "asOf": "2026-09-28",
+  "asOf": "2026-09-29",
   "dateRange": {
     "from": "2026-03-31",
-    "to": "2026-09-18"
+    "to": "2026-09-29"
   },
-  "reportCount": 59,
+  "reportCount": 62,
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-29",
-      "to": "2026-09-28",
-      "reportCount": 4,
-      "brokerCount": 3,
+      "from": "2026-08-30",
+      "to": "2026-09-29",
+      "reportCount": 7,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 4,
+        "count": 7,
         "min": 1750000,
         "max": 2800000,
-        "mean": 2162500,
-        "median": 2050000,
-        "stdev": 389511,
+        "mean": 2185714,
+        "median": 2100000,
+        "stdev": 411195,
         "range": 1050000
       },
       "earningsDirection": {
-        "UNKNOWN": 2,
-        "UP": 1,
+        "UNKNOWN": 3,
+        "UP": 3,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 32,
-        "negative": 8,
-        "net": 24,
-        "netPerReport": 6.0
+        "positive": 38,
+        "negative": 9,
+        "net": 29,
+        "netPerReport": 4.143
       },
       "topics": {
         "AI": {
-          "count": 4,
-          "perReport": 1.0
+          "count": 5,
+          "perReport": 0.714
         },
         "수요": {
-          "count": 3,
-          "perReport": 0.75
+          "count": 4,
+          "perReport": 0.571
         },
         "환율": {
           "count": 3,
-          "perReport": 0.75
+          "perReport": 0.429
+        },
+        "CAPEX/생산능력": {
+          "count": 2,
+          "perReport": 0.286
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.143
         }
       }
     },
     "previous": {
-      "from": "2026-07-30",
-      "to": "2026-08-28",
+      "from": "2026-07-31",
+      "to": "2026-08-29",
       "reportCount": 13,
       "brokerCount": 11,
       "targetPrice": {
@@ -96,48 +100,57 @@
     },
     "topicAcceleration": [
       {
+        "topic": "CAPEX/생산능력",
+        "currentCount": 2,
+        "currentPerReport": 0.286,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.286,
+        "ratio": null
+      },
+      {
         "topic": "환율",
         "currentCount": 3,
-        "currentPerReport": 0.75,
+        "currentPerReport": 0.429,
         "previousCount": 3,
         "previousPerReport": 0.231,
-        "perReportDelta": 0.519,
-        "ratio": 3.25
-      },
-      {
-        "topic": "AI",
-        "currentCount": 4,
-        "currentPerReport": 1.0,
-        "previousCount": 8,
-        "previousPerReport": 0.615,
-        "perReportDelta": 0.385,
-        "ratio": 1.63
-      },
-      {
-        "topic": "수요",
-        "currentCount": 3,
-        "currentPerReport": 0.75,
-        "previousCount": 6,
-        "previousPerReport": 0.462,
-        "perReportDelta": 0.288,
-        "ratio": 1.62
+        "perReportDelta": 0.198,
+        "ratio": 1.86
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.143,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.143,
         "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 4,
+        "currentPerReport": 0.571,
+        "previousCount": 6,
+        "previousPerReport": 0.462,
+        "perReportDelta": 0.109,
+        "ratio": 1.24
+      },
+      {
+        "topic": "AI",
+        "currentCount": 5,
+        "currentPerReport": 0.714,
+        "previousCount": 8,
+        "previousPerReport": 0.615,
+        "perReportDelta": 0.099,
+        "ratio": 1.16
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -9,
-    "targetMeanChangePct": -10.9,
-    "targetMedianChangePct": -10.87,
-    "targetDispersionChangePct": -18.82
+    "reportCountChange": -6,
+    "targetMeanChangePct": -9.94,
+    "targetMedianChangePct": -8.7,
+    "targetDispersionChangePct": -14.3
   },
   "goalPriceRevisions": {
     "total": 27,
@@ -391,44 +404,48 @@
       }
     },
     "2026-09": {
-      "reportCount": 4,
-      "brokerCount": 3,
+      "reportCount": 7,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 4,
+        "count": 7,
         "min": 1750000,
         "max": 2800000,
-        "mean": 2162500,
-        "median": 2050000,
-        "stdev": 389511,
+        "mean": 2185714,
+        "median": 2100000,
+        "stdev": 411195,
         "range": 1050000
       },
       "earningsDirection": {
-        "UNKNOWN": 2,
-        "UP": 1,
+        "UNKNOWN": 3,
+        "UP": 3,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 32,
-        "negative": 8,
-        "net": 24,
-        "netPerReport": 6.0
+        "positive": 38,
+        "negative": 9,
+        "net": 29,
+        "netPerReport": 4.143
       },
       "topics": {
         "AI": {
-          "count": 4,
-          "perReport": 1.0
+          "count": 5,
+          "perReport": 0.714
         },
         "수요": {
-          "count": 3,
-          "perReport": 0.75
+          "count": 4,
+          "perReport": 0.571
         },
         "환율": {
           "count": 3,
-          "perReport": 0.75
+          "perReport": 0.429
+        },
+        "CAPEX/생산능력": {
+          "count": 2,
+          "perReport": 0.286
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.143
         }
       }
     }
@@ -455,8 +472,8 @@
       ]
     },
     "IBK투자증권": {
-      "reportCount": 7,
-      "targetPricePointCount": 6,
+      "reportCount": 8,
+      "targetPricePointCount": 7,
       "firstGoalPrice": 600000,
       "latestGoalPrice": 1750000,
       "changeAmount": 1150000,
@@ -491,6 +508,11 @@
           "date": "2026-09-02",
           "goalPrice": 1750000,
           "title": "MLCC 대규모 수주 공시"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 1750000,
+          "title": "신규시설투자 공시"
         }
       ]
     },
@@ -530,8 +552,8 @@
       ]
     },
     "iM증권": {
-      "reportCount": 9,
-      "targetPricePointCount": 9,
+      "reportCount": 10,
+      "targetPricePointCount": 10,
       "firstGoalPrice": 600000,
       "latestGoalPrice": 2100000,
       "changeAmount": 1500000,
@@ -581,6 +603,11 @@
           "date": "2026-09-18",
           "goalPrice": 2100000,
           "title": "이익 컨센서스 상향 조정이 재가속화될 전망"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 2100000,
+          "title": "패키지기판 증설 공시 코멘트: FC-BGA 산업 내 최대 규모"
         }
       ]
     },
@@ -795,8 +822,8 @@
       ]
     },
     "키움증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 2800000,
       "latestGoalPrice": 2800000,
       "changeAmount": 0,
@@ -806,6 +833,11 @@
           "date": "2026-07-31",
           "goalPrice": 2800000,
           "title": "우려를 걷어내고 만개하는 업황에 주목할 때"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 2800000,
+          "title": "FC-BGA 증설 공시와 예상보다 더 강한 실적 전망"
         }
       ]
     },
