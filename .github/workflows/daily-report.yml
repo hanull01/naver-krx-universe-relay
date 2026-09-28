@@ -9,10 +9,9 @@ on:
 permissions:
   contents: write
 
-# Share the same group as market-data workflows.
-# If the 20:35 market refresh is still running, this report waits.
+# Every generated-data workflow shares one main-branch writer queue.
 concurrency:
-  group: market-data-write-${{ github.ref }}
+  group: generated-data-write
   cancel-in-progress: false
 
 jobs:

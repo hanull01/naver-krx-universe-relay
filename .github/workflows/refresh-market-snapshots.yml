@@ -19,7 +19,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: market-data-write-${{ github.ref }}
+  # One repository-wide generated-data writer.  data/market has a single
+  # owner, but every generated-data commit still advances main.
+  group: generated-data-write
   cancel-in-progress: false
 
 jobs:
@@ -54,6 +56,10 @@ jobs:
       - name: Test market collector
         if: steps.market_day.outputs.run == 'true'
         run: python -m unittest test_naver_market.py test_krx_market_day.py -v
+
+      - name: Sync latest main before collection
+        if: steps.market_day.outputs.run == 'true'
+        run: git pull --ff-only origin main
 
       - name: Collect market snapshots
         id: collect

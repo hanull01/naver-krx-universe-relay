@@ -12,7 +12,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: research-data-write-${{ github.ref }}
+  # All generated-data commits share main, even when their output paths differ.
+  group: generated-data-write
   cancel-in-progress: false
 
 jobs:
@@ -28,6 +29,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Sync latest main before collection
+        run: git pull --ff-only origin main
 
       - name: Refresh recent research
         run: |

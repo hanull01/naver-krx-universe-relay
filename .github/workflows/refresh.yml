@@ -22,7 +22,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: market-data-write-${{ github.ref }}
+  # All generated-data commits share main, even when their output paths differ.
+  group: generated-data-write
   cancel-in-progress: false
 
 jobs:
@@ -58,6 +59,10 @@ jobs:
         if: steps.market_day.outputs.run == 'true'
         run: python -m unittest discover -s . -v
 
+      - name: Sync latest main before collection
+        if: steps.market_day.outputs.run == 'true'
+        run: git pull --ff-only origin main
+
       - name: Collect NAVER data
         id: collect
         if: steps.market_day.outputs.run == 'true'
@@ -76,7 +81,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data
+          # relay.py owns these Universe-core outputs.  In particular, it does
+          # not own data/market, data/research, or data/reports.
+          git add \
+            data/quotes.json data/quotes-lite.json \
+            data/core33.json data/core33-lite.json \
+            data/daily data/daily-status.json \
+            data/groups \
+            data/technicals.json data/technicals-lite.json \
+            data/states.json data/states-lite.json \
+            data/group-states.json data/group-states-lite.json
 
           if git diff --cached --quiet; then
             echo "No data changes to commit"
