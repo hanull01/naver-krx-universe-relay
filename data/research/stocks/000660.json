@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "reportCount": 63,
-  "latestReportNid": "96025",
-  "latestWriteDate": "2026-09-07",
+  "reportCount": 64,
+  "latestReportNid": "96327",
+  "latestWriteDate": "2026-09-28",
   "latest": {
-    "nid": "96025",
-    "writeDate": "2026-09-07",
-    "brokerName": "미래에셋증권",
-    "title": "HBM 고객 다변화 본격화",
-    "goalPrice": 3100000,
+    "nid": "96327",
+    "writeDate": "2026-09-28",
+    "brokerName": "대신증권",
+    "title": "소음보다 방향성에",
+    "goalPrice": 3200000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 3
+        "positive": 4,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "가격": 2,
-        "반도체": 2,
-        "환율": 1
+        "반도체": 3,
+        "가격": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96327",
     "96025",
     "95869",
     "95791",

@@ -1,41 +1,46 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "068270",
   "itemName": "셀트리온",
   "asOf": "2026-09-28",
   "dateRange": {
     "from": "2026-03-30",
-    "to": "2026-09-17"
+    "to": "2026-09-28"
   },
-  "reportCount": 24,
-  "brokerCount": 10,
+  "reportCount": 25,
+  "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-08-29",
       "to": "2026-09-28",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 280000,
         "max": 320000,
         "mean": 300000,
         "median": 300000,
-        "stdev": 20000,
+        "stdev": 16330,
         "range": 40000
       },
       "earningsDirection": {
         "UP": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
         "positive": 6,
         "negative": 0,
         "net": 6,
-        "netPerReport": 3.0
+        "netPerReport": 2.0
       },
-      "topics": {}
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     },
     "previous": {
       "from": "2026-07-30",
@@ -62,10 +67,20 @@
       },
       "topics": {}
     },
-    "topicAcceleration": []
+    "topicAcceleration": [
+      {
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.333,
+        "ratio": null
+      }
+    ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": 21.05,
     "targetMedianChangePct": 21.05,
     "targetDispersionChangePct": null
@@ -240,28 +255,33 @@
       "topics": {}
     },
     "2026-09": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 280000,
         "max": 320000,
         "mean": 300000,
         "median": 300000,
-        "stdev": 20000,
+        "stdev": 16330,
         "range": 40000
       },
       "earningsDirection": {
         "UP": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
         "positive": 6,
         "negative": 0,
         "net": 6,
-        "netPerReport": 3.0
+        "netPerReport": 2.0
       },
-      "topics": {}
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -387,6 +407,21 @@
           "date": "2026-09-17",
           "goalPrice": 280000,
           "title": "유럽에서 확인한 Omlyclo의 Potential"
+        }
+      ]
+    },
+    "메리츠증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 300000,
+      "latestGoalPrice": 300000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-09-28",
+          "goalPrice": 300000,
+          "title": "바이오시밀러 Golden Decade의 준비된 플레이어"
         }
       ]
     },

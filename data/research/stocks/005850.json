@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "005850",
   "itemName": "에스엘",
-  "reportCount": 4,
-  "latestReportNid": "95715",
-  "latestWriteDate": "2026-08-18",
+  "reportCount": 5,
+  "latestReportNid": "96336",
+  "latestWriteDate": "2026-09-28",
   "latest": {
-    "nid": "95715",
-    "writeDate": "2026-08-18",
-    "brokerName": "하나증권",
-    "title": "램프가 쉬는 동안, 전동화가 뛰었다",
-    "goalPrice": 85000,
+    "nid": "96336",
+    "writeDate": "2026-09-28",
+    "brokerName": "한화투자증권",
+    "title": "단기 물량 차질보다는 SDV-로보틱스 전환에 주목하자",
+    "goalPrice": 89000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 10,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 7,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "로봇": 1
+        "자동차": 2,
+        "파업": 1
       }
     }
   },
   "reportNids": [
+    "96336",
     "95715",
     "93103",
     "93096",
