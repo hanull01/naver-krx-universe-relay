@@ -1,1161 +1,830 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-28T20:43:24.959866+09:00",
-  "collectionStartedAt": "2026-09-28T20:43:22.991100+09:00",
+  "generatedAt": "2026-09-29T08:41:39.800017+09:00",
+  "collectionStartedAt": "2026-09-29T08:41:15.349290+09:00",
   "source": "NAVER_KRX",
-  "count": 33,
+  "count": 0,
   "expectedCount": 33,
-  "freshCount": 33,
-  "status": "ok",
-  "fresh": true,
-  "errors": [],
-  "missingCodes": [],
-  "sourceTime": "2026-09-28T20:00:00+09:00",
-  "sourceTimeLatest": "2026-09-28T20:00:00+09:00",
-  "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
-  "datas": [
+  "freshCount": 0,
+  "status": "error",
+  "fresh": false,
+  "errors": [
     {
-      "itemCode": "005930",
-      "stockName": "삼성전자",
-      "closePrice": 270000,
-      "compareToPreviousClosePrice": -15500,
-      "fluctuationsRatio": -5.43,
-      "openPrice": 284500,
-      "highPrice": 285500,
-      "lowPrice": 268500,
-      "accumulatedTradingVolume": 21080365,
-      "accumulatedTradingValue": 5794187000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "270,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 대형주"
+      "stage": "all_batch",
+      "code": "005930",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "000660",
-      "stockName": "SK하이닉스",
-      "closePrice": 1761000,
-      "compareToPreviousClosePrice": -101000,
-      "fluctuationsRatio": -5.42,
-      "openPrice": 1825000,
-      "highPrice": 1840000,
-      "lowPrice": 1755000,
-      "accumulatedTradingVolume": 3264425,
-      "accumulatedTradingValue": 5842451000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "1,762,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 대형주"
+      "stage": "all_batch",
+      "code": "000660",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "042700",
-      "stockName": "한미반도체",
-      "closePrice": 233000,
-      "compareToPreviousClosePrice": -10500,
-      "fluctuationsRatio": -4.31,
-      "openPrice": 240500,
-      "highPrice": 245000,
-      "lowPrice": 232000,
-      "accumulatedTradingVolume": 347031,
-      "accumulatedTradingValue": 82733000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "232,500",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 장비·부품"
+      "stage": "all_batch",
+      "code": "042700",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "240810",
-      "stockName": "원익IPS",
-      "closePrice": 123700,
-      "compareToPreviousClosePrice": -10000,
-      "fluctuationsRatio": -7.48,
-      "openPrice": 132000,
-      "highPrice": 132000,
-      "lowPrice": 122100,
-      "accumulatedTradingVolume": 1041930,
-      "accumulatedTradingValue": 131872000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KQ",
-        "name": "KOSDAQ",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {},
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 장비·부품"
+      "stage": "all_batch",
+      "code": "240810",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "036930",
-      "stockName": "주성엔지니어링",
-      "closePrice": 208000,
-      "compareToPreviousClosePrice": -1500,
-      "fluctuationsRatio": -0.72,
-      "openPrice": 209500,
-      "highPrice": 215000,
-      "lowPrice": 204000,
-      "accumulatedTradingVolume": 795334,
-      "accumulatedTradingValue": 167652000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KQ",
-        "name": "KOSDAQ",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {},
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 장비·부품"
+      "stage": "all_batch",
+      "code": "036930",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "058470",
-      "stockName": "리노공업",
-      "closePrice": 71000,
-      "compareToPreviousClosePrice": -3300,
-      "fluctuationsRatio": -4.44,
-      "openPrice": 73400,
-      "highPrice": 74300,
-      "lowPrice": 70800,
-      "accumulatedTradingVolume": 583151,
-      "accumulatedTradingValue": 42124000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KQ",
-        "name": "KOSDAQ",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "70,900",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "반도체 장비·부품"
+      "stage": "all_batch",
+      "code": "058470",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "009150",
-      "stockName": "삼성전기",
-      "closePrice": 1491000,
-      "compareToPreviousClosePrice": -16000,
-      "fluctuationsRatio": -1.06,
-      "openPrice": 1552000,
-      "highPrice": 1587000,
-      "lowPrice": 1475000,
-      "accumulatedTradingVolume": 659923,
-      "accumulatedTradingValue": 1005267000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "1,490,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전자부품·PCB"
+      "stage": "all_batch",
+      "code": "009150",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "007660",
-      "stockName": "이수페타시스",
-      "closePrice": 112000,
-      "compareToPreviousClosePrice": -6900,
-      "fluctuationsRatio": -5.8,
-      "openPrice": 118900,
-      "highPrice": 119000,
-      "lowPrice": 111700,
-      "accumulatedTradingVolume": 725494,
-      "accumulatedTradingValue": 83244000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "112,100",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전자부품·PCB"
+      "stage": "all_batch",
+      "code": "007660",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "353200",
-      "stockName": "대덕전자",
-      "closePrice": 121700,
-      "compareToPreviousClosePrice": 2300,
-      "fluctuationsRatio": 1.93,
-      "openPrice": 124600,
-      "highPrice": 129100,
-      "lowPrice": 121300,
-      "accumulatedTradingVolume": 1363903,
-      "accumulatedTradingValue": 170564000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {},
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전자부품·PCB"
+      "stage": "all_batch",
+      "code": "353200",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "267260",
-      "stockName": "HD현대일렉트릭",
-      "closePrice": 693000,
-      "compareToPreviousClosePrice": -15000,
-      "fluctuationsRatio": -2.12,
-      "openPrice": 700000,
-      "highPrice": 709000,
-      "lowPrice": 689000,
-      "accumulatedTradingVolume": 101135,
-      "accumulatedTradingValue": 70389000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "693,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전력기기·전력인프라"
+      "stage": "all_batch",
+      "code": "267260",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "010120",
-      "stockName": "LS ELECTRIC",
-      "closePrice": 203000,
-      "compareToPreviousClosePrice": -2500,
-      "fluctuationsRatio": -1.22,
-      "openPrice": 207000,
-      "highPrice": 209500,
-      "lowPrice": 201000,
-      "accumulatedTradingVolume": 304267,
-      "accumulatedTradingValue": 62243000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "202,500",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전력기기·전력인프라"
+      "stage": "all_batch",
+      "code": "010120",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "298040",
-      "stockName": "효성중공업",
-      "closePrice": 2784000,
-      "compareToPreviousClosePrice": -112000,
-      "fluctuationsRatio": -3.87,
-      "openPrice": 2925000,
-      "highPrice": 2925000,
-      "lowPrice": 2771000,
-      "accumulatedTradingVolume": 39809,
-      "accumulatedTradingValue": 111664000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "2,784,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "전력기기·전력인프라"
+      "stage": "all_batch",
+      "code": "298040",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "329180",
-      "stockName": "HD현대중공업",
-      "closePrice": 439000,
-      "compareToPreviousClosePrice": -2000,
-      "fluctuationsRatio": -0.45,
-      "openPrice": 445000,
-      "highPrice": 447000,
-      "lowPrice": 439000,
-      "accumulatedTradingVolume": 101821,
-      "accumulatedTradingValue": 45061000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "439,500",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "조선"
+      "stage": "all_batch",
+      "code": "329180",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "042660",
-      "stockName": "한화오션",
-      "closePrice": 80500,
-      "compareToPreviousClosePrice": 900,
-      "fluctuationsRatio": 1.13,
-      "openPrice": 80800,
-      "highPrice": 81800,
-      "lowPrice": 79800,
-      "accumulatedTradingVolume": 494649,
-      "accumulatedTradingValue": 39838000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "80,500",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "조선"
+      "stage": "all_batch",
+      "code": "042660",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "010140",
-      "stockName": "삼성중공업",
-      "closePrice": 20150,
-      "compareToPreviousClosePrice": -100,
-      "fluctuationsRatio": -0.49,
-      "openPrice": 20400,
-      "highPrice": 20550,
-      "lowPrice": 20050,
-      "accumulatedTradingVolume": 2061664,
-      "accumulatedTradingValue": 41621000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "20,150",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "조선"
+      "stage": "all_batch",
+      "code": "010140",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "012450",
-      "stockName": "한화에어로스페이스",
-      "closePrice": 1034000,
-      "compareToPreviousClosePrice": 13000,
-      "fluctuationsRatio": 1.27,
-      "openPrice": 1015000,
-      "highPrice": 1054000,
-      "lowPrice": 1008000,
-      "accumulatedTradingVolume": 114905,
-      "accumulatedTradingValue": 119081000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "1,034,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "방산"
+      "stage": "all_batch",
+      "code": "012450",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "064350",
-      "stockName": "현대로템",
-      "closePrice": 116200,
-      "compareToPreviousClosePrice": 300,
-      "fluctuationsRatio": 0.26,
-      "openPrice": 116000,
-      "highPrice": 119400,
-      "lowPrice": 113500,
-      "accumulatedTradingVolume": 377492,
-      "accumulatedTradingValue": 44089000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "116,100",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "방산"
+      "stage": "all_batch",
+      "code": "064350",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "079550",
-      "stockName": "LIG디펜스앤에어로스페이스",
-      "closePrice": 690000,
-      "compareToPreviousClosePrice": -2000,
-      "fluctuationsRatio": -0.29,
-      "openPrice": 693000,
-      "highPrice": 704000,
-      "lowPrice": 680000,
-      "accumulatedTradingVolume": 56500,
-      "accumulatedTradingValue": 39192000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "691,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "방산"
+      "stage": "all_batch",
+      "code": "079550",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "005380",
-      "stockName": "현대차",
-      "closePrice": 354000,
-      "compareToPreviousClosePrice": 500,
-      "fluctuationsRatio": 0.14,
-      "openPrice": 357000,
-      "highPrice": 358000,
-      "lowPrice": 353500,
-      "accumulatedTradingVolume": 443320,
-      "accumulatedTradingValue": 157648000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "354,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "자동차·부품"
+      "stage": "all_batch",
+      "code": "005380",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "000270",
-      "stockName": "기아",
-      "closePrice": 117100,
-      "compareToPreviousClosePrice": 1700,
-      "fluctuationsRatio": 1.47,
-      "openPrice": 116600,
-      "highPrice": 118400,
-      "lowPrice": 115600,
-      "accumulatedTradingVolume": 1042498,
-      "accumulatedTradingValue": 121936000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "117,200",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "자동차·부품"
+      "stage": "all_batch",
+      "code": "000270",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "012330",
-      "stockName": "현대모비스",
-      "closePrice": 371500,
-      "compareToPreviousClosePrice": 4000,
-      "fluctuationsRatio": 1.09,
-      "openPrice": 369000,
-      "highPrice": 379000,
-      "lowPrice": 369000,
-      "accumulatedTradingVolume": 207725,
-      "accumulatedTradingValue": 77814000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "371,500",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "자동차·부품"
+      "stage": "all_batch",
+      "code": "012330",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "105560",
-      "stockName": "KB금융",
-      "closePrice": 173800,
-      "compareToPreviousClosePrice": 600,
-      "fluctuationsRatio": 0.35,
-      "openPrice": 171000,
-      "highPrice": 175200,
-      "lowPrice": 170200,
-      "accumulatedTradingVolume": 828012,
-      "accumulatedTradingValue": 143857000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "173,700",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "금융"
+      "stage": "all_batch",
+      "code": "105560",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "086790",
-      "stockName": "하나금융지주",
-      "closePrice": 134400,
-      "compareToPreviousClosePrice": 1300,
-      "fluctuationsRatio": 0.98,
-      "openPrice": 133900,
-      "highPrice": 135400,
-      "lowPrice": 132000,
-      "accumulatedTradingVolume": 625190,
-      "accumulatedTradingValue": 84026000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "134,600",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "금융"
+      "stage": "all_batch",
+      "code": "086790",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "055550",
-      "stockName": "신한지주",
-      "closePrice": 110800,
-      "compareToPreviousClosePrice": 1500,
-      "fluctuationsRatio": 1.37,
-      "openPrice": 108800,
-      "highPrice": 112200,
-      "lowPrice": 108800,
-      "accumulatedTradingVolume": 948015,
-      "accumulatedTradingValue": 104988000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "110,800",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "금융"
+      "stage": "all_batch",
+      "code": "055550",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "207940",
-      "stockName": "삼성바이오로직스",
-      "closePrice": 1390000,
-      "compareToPreviousClosePrice": 24000,
-      "fluctuationsRatio": 1.76,
-      "openPrice": 1367000,
-      "highPrice": 1406000,
-      "lowPrice": 1366000,
-      "accumulatedTradingVolume": 48017,
-      "accumulatedTradingValue": 66827000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "1,390,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "바이오 대형주"
+      "stage": "all_batch",
+      "code": "207940",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "068270",
-      "stockName": "셀트리온",
-      "closePrice": 177900,
-      "compareToPreviousClosePrice": 500,
-      "fluctuationsRatio": 0.28,
-      "openPrice": 178400,
-      "highPrice": 180700,
-      "lowPrice": 177600,
-      "accumulatedTradingVolume": 267873,
-      "accumulatedTradingValue": 47898000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "177,900",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "바이오 대형주"
+      "stage": "all_batch",
+      "code": "068270",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "196170",
-      "stockName": "알테오젠",
-      "closePrice": 251000,
-      "compareToPreviousClosePrice": 1000,
-      "fluctuationsRatio": 0.4,
-      "openPrice": 256500,
-      "highPrice": 260000,
-      "lowPrice": 250500,
-      "accumulatedTradingVolume": 270647,
-      "accumulatedTradingValue": 69072000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KQ",
-        "name": "KOSDAQ",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "251,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "바이오 대형주"
+      "stage": "all_batch",
+      "code": "196170",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "373220",
-      "stockName": "LG에너지솔루션",
-      "closePrice": 360500,
-      "compareToPreviousClosePrice": 9000,
-      "fluctuationsRatio": 2.56,
-      "openPrice": 352000,
-      "highPrice": 368000,
-      "lowPrice": 350500,
-      "accumulatedTradingVolume": 321270,
-      "accumulatedTradingValue": 116521000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "361,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "2차전지·에너지"
+      "stage": "all_batch",
+      "code": "373220",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "006400",
-      "stockName": "삼성SDI",
-      "closePrice": 528000,
-      "compareToPreviousClosePrice": 7000,
-      "fluctuationsRatio": 1.34,
-      "openPrice": 525000,
-      "highPrice": 540000,
-      "lowPrice": 524000,
-      "accumulatedTradingVolume": 324344,
-      "accumulatedTradingValue": 172827000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "528,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "2차전지·에너지"
+      "stage": "all_batch",
+      "code": "006400",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "096770",
-      "stockName": "SK이노베이션",
-      "closePrice": 158900,
-      "compareToPreviousClosePrice": 9700,
-      "fluctuationsRatio": 6.5,
-      "openPrice": 148500,
-      "highPrice": 161200,
-      "lowPrice": 147600,
-      "accumulatedTradingVolume": 1143988,
-      "accumulatedTradingValue": 180508000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "158,900",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "2차전지·에너지"
+      "stage": "all_batch",
+      "code": "096770",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "034020",
-      "stockName": "두산에너빌리티",
-      "closePrice": 81100,
-      "compareToPreviousClosePrice": -600,
-      "fluctuationsRatio": -0.73,
-      "openPrice": 82600,
-      "highPrice": 83000,
-      "lowPrice": 80900,
-      "accumulatedTradingVolume": 1579200,
-      "accumulatedTradingValue": 129453000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "81,200",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "원전·발전설비"
+      "stage": "all_batch",
+      "code": "034020",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "052690",
-      "stockName": "한전기술",
-      "closePrice": 125000,
-      "compareToPreviousClosePrice": -5400,
-      "fluctuationsRatio": -4.14,
-      "openPrice": 129600,
-      "highPrice": 130900,
-      "lowPrice": 124800,
-      "accumulatedTradingVolume": 273492,
-      "accumulatedTradingValue": 34901000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "124,900",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "원전·발전설비"
+      "stage": "all_batch",
+      "code": "052690",
+      "error": "invalid numeric field: field=openPrice, value=''"
     },
     {
-      "itemCode": "051600",
-      "stockName": "한전KPS",
-      "closePrice": 46000,
-      "compareToPreviousClosePrice": 250,
-      "fluctuationsRatio": 0.55,
-      "openPrice": 45550,
-      "highPrice": 46500,
-      "lowPrice": 45000,
-      "accumulatedTradingVolume": 72140,
-      "accumulatedTradingValue": 3328000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-09-28T20:00:00+09:00",
-      "localTradedAt": "2026-09-28T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "delayTime": 0,
-      "stockExchangeType": {
-        "code": "KS",
-        "name": "KOSPI",
-        "delayTime": 0
-      },
-      "marketSessionType": "afterMarket",
-      "overMarketPriceInfo": {
-        "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "46,000",
-        "localTradedAt": "2026-09-28T20:00:00.000000+09:00"
-      },
-      "ageSeconds": 2605,
-      "fresh": true,
-      "status": "ok",
-      "freshnessReason": "after_market_final",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "sector": "원전·발전설비"
+      "stage": "all_batch",
+      "code": "051600",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "272210",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "201490",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "039200",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "344820",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "277810",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "454910",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "108490",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "058610",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "all_batch",
+      "code": "006800",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "005930",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "000660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "042700",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "240810",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "036930",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "058470",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "009150",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "007660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "353200",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "267260",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "010120",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "298040",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "329180",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "042660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "010140",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "012450",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "064350",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "079550",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "272210",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "005380",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "000270",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "012330",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "105560",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "086790",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "055550",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "207940",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "068270",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "196170",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "373220",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "006400",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "096770",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "034020",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "052690",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "051600",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "277810",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "454910",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "108490",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "sector_batch",
+      "code": "058610",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "005930",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "000660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "042700",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "240810",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "036930",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "058470",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "009150",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "007660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "353200",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "267260",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "010120",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "298040",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "329180",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "042660",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "010140",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "012450",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "064350",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "079550",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "005380",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "000270",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "012330",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "105560",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "086790",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "055550",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "207940",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "068270",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "196170",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "373220",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "006400",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "096770",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "034020",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "052690",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "051600",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "272210",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "201490",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "039200",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "344820",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "277810",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "454910",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "108490",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "058610",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "stage": "individual",
+      "code": "006800",
+      "error": "invalid numeric field: field=openPrice, value=''"
+    },
+    {
+      "code": "005930",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "000660",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "042700",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "240810",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "036930",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "058470",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "009150",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "007660",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "353200",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "267260",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "010120",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "298040",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "329180",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "042660",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "010140",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "012450",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "064350",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "079550",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "005380",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "000270",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "012330",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "105560",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "086790",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "055550",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "207940",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "068270",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "196170",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "373220",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "006400",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "096770",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "034020",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "052690",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "051600",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "272210",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "201490",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "039200",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "344820",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "277810",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "454910",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "108490",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "058610",
+      "error": "no_valid_quote"
+    },
+    {
+      "code": "006800",
+      "error": "no_valid_quote"
     }
-  ]
+  ],
+  "missingCodes": [
+    "005930",
+    "000660",
+    "042700",
+    "240810",
+    "036930",
+    "058470",
+    "009150",
+    "007660",
+    "353200",
+    "267260",
+    "010120",
+    "298040",
+    "329180",
+    "042660",
+    "010140",
+    "012450",
+    "064350",
+    "079550",
+    "005380",
+    "000270",
+    "012330",
+    "105560",
+    "086790",
+    "055550",
+    "207940",
+    "068270",
+    "196170",
+    "373220",
+    "006400",
+    "096770",
+    "034020",
+    "052690",
+    "051600"
+  ],
+  "sourceTime": null,
+  "sourceTimeLatest": null,
+  "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
+  "datas": []
 }
