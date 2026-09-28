@@ -156,6 +156,71 @@ class RelayTests(unittest.TestCase):
             relay.collect_all_daily()
         self.assertEqual(sorted(call.args[0] for call in daily.call_args_list), codes)
 
+    def test_intraday_mode_skips_daily_network_collection_and_runs_derived_steps(self):
+        quotes = {'count': 3, 'expectedCount': 3, 'datas': []}
+        technicals = {'count': 3, 'datas': []}
+        states = {'count': 3, 'datas': []}
+        legacy = [f'{index:06d}' for index in range(33)]
+        with patch.object(relay, 'collect_all_daily') as daily, \
+             patch.object(relay, 'collect_quotes', return_value=quotes) as collect_quotes, \
+             patch.object(relay, 'build_technicals', return_value=technicals) as build_technicals, \
+             patch.object(relay, 'build_states', return_value=states) as build_states, \
+             patch.object(relay, 'build_group_states') as build_group_states, \
+             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+            self.assertEqual(relay.main(['intraday']), 0)
+        daily.assert_not_called()
+        collect_quotes.assert_called_once_with()
+        build_technicals.assert_called_once_with(quotes)
+        build_states.assert_called_once_with(quotes, technicals)
+        build_group_states.assert_called_once_with(quotes, technicals, states)
+
+    def test_daily_and_all_modes_keep_their_existing_pipeline_contracts(self):
+        daily_rows = [{'itemCode': '000001', 'status': 'ok', 'completedCount': 60}]
+        quotes = {'count': 1, 'expectedCount': 1, 'datas': []}
+        technicals = {'count': 1, 'datas': []}
+        states = {'count': 1, 'datas': []}
+        legacy = [f'{index:06d}' for index in range(33)]
+        with patch.object(relay, 'collect_all_daily', return_value=daily_rows) as daily, \
+             patch.object(relay, 'collect_quotes', return_value=quotes) as collect_quotes, \
+             patch.object(relay, 'build_technicals', return_value=technicals), \
+             patch.object(relay, 'build_states', return_value=states), \
+             patch.object(relay, 'build_group_states'), \
+             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+            self.assertEqual(relay.main(['daily']), 0)
+            collect_quotes.assert_not_called()
+            self.assertEqual(relay.main(['all']), 0)
+        self.assertEqual(daily.call_count, 2)
+        collect_quotes.assert_called_once_with()
+
+    def test_missing_or_corrupt_daily_cache_remains_visible_in_technicals(self):
+        universe = self.expanded_universe()
+        codes = relay.universe_codes(universe)
+        quotes = {'datas': [{'itemCode': code, 'accumulatedTradingVolume': 1000} for code in codes]}
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+             patch.object(relay, 'load_daily_for_technical', return_value=None), \
+             patch.object(relay, 'save'):
+            payload = relay.build_technicals(quotes)
+        self.assertEqual(payload['status'], 'error')
+        self.assertEqual(payload['missingCodes'], codes)
+        self.assertTrue(all(row['status'] == 'error' for row in payload['datas']))
+
+    def test_corrupt_daily_cache_is_not_treated_as_valid_history(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            daily = root / 'data' / 'daily'
+            daily.mkdir(parents=True)
+            (daily / '000001.json').write_text('{not json', encoding='utf-8')
+            with patch.object(relay, 'ROOT', root):
+                self.assertIsNone(relay.load_daily_for_technical('000001'))
+
+    def test_stale_saved_daily_cache_is_not_silently_technical_ok(self):
+        daily = self.daily_fixture(60)
+        daily.update({'status': 'ok', 'latestDate': '2026-09-21'})
+        current = datetime(2026, 9, 23, 14, 35, tzinfo=relay.KST)
+        with patch.object(relay, 'now', return_value=current):
+            result = relay.calculate_technicals('000001', 'A', daily, {'accumulatedTradingVolume': 1000})
+        self.assertEqual(result['status'], 'error')
+
     def test_universe_legacy_and_validation(self):
         universe = relay.load_universe()
         self.assertEqual(len(universe['watchlists']['legacy33']), 33)

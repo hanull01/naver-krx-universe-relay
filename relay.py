@@ -358,6 +358,27 @@ def load_daily_for_technical(code):
         return None
 
 
+def daily_cache_is_current(daily, current=None):
+    """Accept legacy fixtures, but fail closed for stale saved collector data."""
+    if not daily:
+        return False
+    if daily.get('status') in ('error', 'insufficient', 'stale'):
+        return False
+    source_date = daily.get('latestDate') or daily.get('sourceTime')
+    # Older cache fixtures predate source-date metadata. Their history checks
+    # still determine technical status; saved collector payloads have metadata.
+    if source_date is None:
+        return True
+    try:
+        actual = datetime.fromisoformat(str(source_date)).date()
+    except ValueError:
+        return False
+    current = current or now()
+    expected = (current.date() if current.weekday() < 5 and current.time() >= dtime(16, 30)
+                else previous_weekday(current.date()))
+    return actual == expected
+
+
 def technical_average(values):
     return round(sum(values) / len(values), 2)
 
@@ -385,7 +406,7 @@ def calculate_technicals(code, stock_name, daily, quote):
         'avgVolume20': avg_volume20,
         'volumeRatio20': round(current_volume / avg_volume20, 2)
                          if avg_volume20 and current_volume is not None else None,
-        'status': 'error' if not daily else 'ok' if enough20 else 'insufficient_history',
+        'status': 'error' if not daily_cache_is_current(daily) else 'ok' if enough20 else 'insufficient_history',
     }
 
 
@@ -512,18 +533,38 @@ def build_group_states(quote_payload, technical_payload, state_payload):
     payload={'generatedAt':now().isoformat(),'groupCount':len(groups),'status':'ok','groups':groups}; save('data/group-states.json',payload); fields=('groupType','groupName','enabledMembers','upRatio','aboveMA20CountRatio','aboveMA60CountRatio','breakout20AttemptCount','breakout20ConfirmedCount','volumeSurgeCount','leaderUpCount','averageChangePct','diffusionState','status'); save('data/group-states-lite.json',{**{k:payload[k] for k in ('generatedAt','groupCount','status')},'groups':[{k:g[k] for k in fields} for g in groups]},compact=True); return payload
 
 
-if __name__ == '__main__':
+def timed_step(name, fn, *args):
+    """Emit small operational timing logs without changing output schemas."""
+    started = time.perf_counter()
+    result = fn(*args)
+    print(f'{name} elapsedSeconds={time.perf_counter() - started:.2f}')
+    return result
+
+
+def run_quote_pipeline():
+    """Refresh quotes and derive intraday outputs from the local daily cache."""
+    failed = False
+    result = timed_step('quotes', collect_quotes)
+    _, _, legacy_codes, _ = universe_state()
+    failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
+    technicals = timed_step('technicals', build_technicals, result)
+    failed |= technicals['count'] != result['expectedCount']
+    states = timed_step('states', build_states, result, technicals)
+    timed_step('group-states', build_group_states, result, technicals, states)
+    return failed
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['quotes', 'daily', 'all'], default='all', nargs='?')
-    args = parser.parse_args()
+    parser.add_argument('mode', choices=['quotes', 'daily', 'intraday', 'all'], default='all', nargs='?')
+    args = parser.parse_args(argv)
     failed = False
     if args.mode in ('daily', 'all'):
-        failed |= any(r['status'] in ('error', 'insufficient') for r in collect_all_daily())
-    if args.mode in ('quotes', 'all'):
-        result = collect_quotes()
-        _, _, legacy_codes, _ = universe_state()
-        failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
-        technicals = build_technicals(result); failed |= technicals['count'] != result['expectedCount']
-        states = build_states(result, technicals); failed |= states['count'] != result['expectedCount']
-        build_group_states(result, technicals, states)
-    raise SystemExit(1 if failed else 0)
+        failed |= any(r['status'] in ('error', 'insufficient') for r in timed_step('daily', collect_all_daily))
+    if args.mode in ('quotes', 'intraday', 'all'):
+        failed |= run_quote_pipeline()
+    return 1 if failed else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

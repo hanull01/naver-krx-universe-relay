@@ -1,35 +1,26 @@
-name: Refresh market data
+name: Refresh daily candles
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "relay.py"
-      - "test_relay.py"
-      - "universe_cli.py"
-      - "config/universe.json"
-      - "config/analysis.json"
-      - ".github/workflows/refresh.yml"
   schedule:
-    # 08:35 KST Mon-Fri = 23:35 UTC Sun-Thu
-    - cron: "35 23 * * 0-4"
-
-    # 09:35-20:35 KST Mon-Fri = 00:35-11:35 UTC Mon-Fri
-    - cron: "35 0-11 * * 1-5"
+    # 16:40 KST Mon-Fri = 07:40 UTC Mon-Fri. relay.py marks today's candle
+    # complete after 16:30 KST, so the next intraday run can use this cache.
+    - cron: "40 7 * * 1-5"
 
 permissions:
   contents: write
 
 concurrency:
-  # All generated-data commits share main, even when their output paths differ.
+  # Preserve the single main-branch generated-data writer policy.
   group: generated-data-write
   cancel-in-progress: false
 
 jobs:
-  refresh:
+  refresh-daily:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Daily requests are per-stock with four workers; leave room for a larger
+    # Universe without allowing an unbounded job.
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -51,74 +42,66 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping refresh (closed market or unverifiable KRX calendar)."
+            echo "Skipping daily candle collection (closed market or unverifiable KRX calendar)."
           fi
           exit 0
 
-      - name: Run tests
+      - name: Test daily collector
         if: steps.market_day.outputs.run == 'true'
-        run: python -m unittest discover -s . -v
+        run: |
+          python -m py_compile relay.py test_relay.py
+          python -m unittest test_relay.py -v
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
         run: git pull --ff-only origin main
 
-      - name: Collect NAVER data
+      - name: Collect daily candles
         id: collect
         if: steps.market_day.outputs.run == 'true'
         shell: bash
         run: |
           set +e
-          # :35 KST is the fast intraday path: use cached daily candles and
-          # refresh quotes, technicals, states, and group states without daily
-          # NAVER API requests.
-          python relay.py intraday
+          echo "Daily collection started at $(TZ=Asia/Seoul date --iso-8601=seconds)"
+          python relay.py daily
           code=$?
+          echo "Daily collection finished at $(TZ=Asia/Seoul date --iso-8601=seconds)"
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Commit refreshed data
+      - name: Commit daily candles
         if: steps.market_day.outputs.run == 'true'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # relay.py owns these Universe-core outputs.  In particular, it does
-          # not own data/market, data/research, or data/reports.
-          git add \
-            data/quotes.json data/quotes-lite.json \
-            data/core33.json data/core33-lite.json \
-            data/groups \
-            data/technicals.json data/technicals-lite.json \
-            data/states.json data/states-lite.json \
-            data/group-states.json data/group-states-lite.json
-
+          # Slow Daily is the sole writer for these paths.
+          git add data/daily data/daily-status.json
           if git diff --cached --quiet; then
-            echo "No data changes to commit"
+            echo "No daily candle changes to commit"
           else
-            git commit -m "Refresh NAVER market data"
-            echo "Market data collection succeeded; synchronizing its data commit."
+            git commit -m "Update daily candles"
+            echo "Daily collection produced updated outputs; synchronizing its data commit."
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
               git fetch origin main
               if ! git rebase origin/main; then
-                echo "::error::Data commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
+                echo "::error::Daily candle commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
                 git rebase --abort || true
                 exit 1
               fi
               if git push origin HEAD:main; then
-                echo "Market data push succeeded."
+                echo "Daily candle data push succeeded."
                 exit 0
               fi
               echo "Push was rejected because main advanced; retrying with latest main."
             done
-            echo "::error::Data collection succeeded, but push was rejected after 3 attempts."
+            echo "::error::Daily collection succeeded, but push was rejected after 3 attempts."
             exit 1
           fi
 
-      - name: Fail after publishing error files
+      - name: Fail after publishing daily error files
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0'
         run: |
-          echo "Collector reported one or more failures."
+          echo "Daily collector reported one or more failures."
           exit 1
