@@ -138,6 +138,7 @@ def detect_market_session(current):
 
 
 def quote_freshness(traded, current, market, delay):
+    """Accept the latest valid, non-delayed quote without status-string gating."""
     age = (current - traded).total_seconds()
     if age < -60:
         return False, 'future_source_time'
@@ -148,19 +149,10 @@ def quote_freshness(traded, current, market, delay):
     session = detect_market_session(current)
     if session == 'PRE':
         valid = (traded.date() == previous_weekday(current.date())
-                 and traded.time() >= dtime(15, 30) and market == 'CLOSE')
-        return valid, 'previous_close' if valid else 'stale_or_unconfirmed_close'
-    if session == 'REGULAR':
-        valid = traded.date() == current.date() and -60 <= age <= 600 and market == 'OPEN'
-        return valid, 'live' if valid else 'stale_or_not_open'
-    if session == 'REGULAR_CLOSED':
-        valid = traded.date() == current.date() and traded.time() >= dtime(15, 30)
-        return valid, 'regular_close' if valid else 'stale_or_unconfirmed_close'
-    if session == 'AFTER':
-        valid = traded.date() == current.date() and -60 <= age <= 600
-        return valid, 'after_live' if valid else 'stale_after'
-    valid = traded.date() == current.date() and traded.time() >= dtime(20)
-    return valid, 'final_after_close' if valid else 'stale_or_unconfirmed_final'
+                 and traded.time() >= dtime(15, 30))
+        return valid, 'previous_close' if valid else 'stale_previous_close'
+    valid = traded.date() == current.date() and -60 <= age <= 600
+    return valid, 'latest_valid' if valid else 'stale_source_time'
 
 
 def normalize_quote(row, current, sector=None):
@@ -197,7 +189,7 @@ def normalize_quote(row, current, sector=None):
 
 LITE_FIELDS = ('itemCode', 'stockName', 'closePrice', 'fluctuationsRatio',
                'accumulatedTradingVolume', 'sourceTime', 'marketStatus', 'delayTime',
-               'fresh', 'status')
+               'fresh', 'freshnessReason', 'session', 'status')
 
 
 def lite_payload(payload):
@@ -364,7 +356,9 @@ def daily_cache_is_current(daily, current=None):
         return False
     if daily.get('status') in ('error', 'insufficient', 'stale'):
         return False
-    source_date = daily.get('latestDate') or daily.get('sourceTime')
+    # ``latestDate`` may include a provisional current-day candle.  Technical
+    # indicators must instead be keyed to the latest completed candle.
+    source_date = daily.get('sourceTime') or daily.get('latestDate')
     # Older cache fixtures predate source-date metadata. Their history checks
     # still determine technical status; saved collector payloads have metadata.
     if source_date is None:
@@ -473,7 +467,7 @@ def calculate_state(code, stock_name, technical, daily, quote, config):
     prior20, prior60 = prior_highs(daily)
     price = quote.get('closePrice') if quote else None
     session_high = quote.get('highPrice') if quote else None
-    final = bool(quote and quote.get('marketStatus') == 'CLOSE')
+    final = regular_close_confirmed(quote)
     ma20, ma60 = technical.get('ma20'), technical.get('ma60')
     def distance(value): return round((price - value) / value * 100, 2) if price is not None and value else None
     def near(value): return value is not None and price is not None and abs((price-value)/value*100) <= config['nearPct']
@@ -488,6 +482,20 @@ def calculate_state(code, stock_name, technical, daily, quote, config):
             'breakout20': breakout(price, session_high, prior20, final), 'breakout60': breakout(price, session_high, prior60, final),
             'volumeRatio20': technical.get('volumeRatio20'), 'volumeState': volume_state(technical.get('volumeRatio20'), config),
             'pullbackState': pullback, 'status': 'ok' if technical.get('status') == 'ok' and quote else 'partial'}
+
+
+def regular_close_confirmed(quote):
+    """Confirm a regular-session close from the quote timestamp, not NAVER text."""
+    if not quote or not quote.get('sourceTime'):
+        return False
+    try:
+        source_time = datetime.fromisoformat(str(quote['sourceTime']))
+    except ValueError:
+        return False
+    if source_time.tzinfo is None:
+        source_time = source_time.replace(tzinfo=KST)
+    source_time = source_time.astimezone(KST)
+    return source_time.date() == now().astimezone(KST).date() and source_time.time() >= dtime(15, 30)
 
 
 def build_states(quote_payload=None, technical_payload=None):
@@ -549,6 +557,11 @@ def run_quote_pipeline():
     failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
     technicals = timed_step('technicals', build_technicals, result)
     failed |= technicals['count'] != result['expectedCount']
+    # A complete-looking row count is not healthy if every daily-derived row
+    # carries an error (for example, a stale completed-candle cache).
+    failed |= technicals.get('status') == 'error'
+    if technicals.get('status') == 'partial':
+        print(f"WARNING technicals partial missingCodes={len(technicals.get('missingCodes', []))}")
     states = timed_step('states', build_states, result, technicals)
     timed_step('group-states', build_group_states, result, technicals, states)
     return failed

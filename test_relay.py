@@ -221,6 +221,38 @@ class RelayTests(unittest.TestCase):
             result = relay.calculate_technicals('000001', 'A', daily, {'accumulatedTradingVolume': 1000})
         self.assertEqual(result['status'], 'error')
 
+    def test_daily_cache_uses_completed_source_time_before_provisional_latest_date(self):
+        current = datetime(2026, 9, 28, 15, 32, tzinfo=relay.KST)
+        daily = self.daily_fixture(60)
+        daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-25T15:30:00+09:00'})
+        self.assertTrue(relay.daily_cache_is_current(daily, current))
+
+    def test_daily_cache_requires_current_completed_candle_after_regular_close(self):
+        current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
+        current_daily = self.daily_fixture(60)
+        current_daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-28T15:30:00+09:00'})
+        stale_daily = dict(current_daily, sourceTime='2026-09-25T15:30:00+09:00')
+        self.assertTrue(relay.daily_cache_is_current(current_daily, current))
+        self.assertFalse(relay.daily_cache_is_current(stale_daily, current))
+
+    def test_daily_cache_rejects_missing_or_corrupt_metadata(self):
+        current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
+        self.assertFalse(relay.daily_cache_is_current({'status': 'ok', 'sourceTime': 'not-a-date'}, current))
+        self.assertFalse(relay.daily_cache_is_current({'status': 'error'}, current))
+
+    def test_run_quote_pipeline_fails_when_all_technical_rows_are_errors(self):
+        quotes = {'count': 3, 'expectedCount': 3, 'datas': []}
+        technicals = {'count': 3, 'expectedCount': 3, 'status': 'error',
+                      'missingCodes': ['000001', '000002', '000003'], 'datas': []}
+        states = {'count': 3, 'datas': []}
+        legacy = [f'{index:06d}' for index in range(33)]
+        with patch.object(relay, 'collect_quotes', return_value=quotes), \
+             patch.object(relay, 'build_technicals', return_value=technicals), \
+             patch.object(relay, 'build_states', return_value=states), \
+             patch.object(relay, 'build_group_states'), \
+             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+            self.assertTrue(relay.run_quote_pipeline())
+
     def test_universe_legacy_and_validation(self):
         universe = relay.load_universe()
         self.assertEqual(len(universe['watchlists']['legacy33']), 33)
@@ -237,7 +269,8 @@ class RelayTests(unittest.TestCase):
                    'datas': [{'itemCode': '051600', 'stockName': '한전KPS', 'closePrice': 1,
                               'fluctuationsRatio': 0, 'accumulatedTradingVolume': 2,
                               'sourceTime': 'now', 'marketStatus': 'CLOSE', 'delayTime': 0,
-                              'fresh': True, 'status': 'ok', 'unwanted': 'x'}]}
+                              'fresh': True, 'freshnessReason': 'latest_valid', 'session': 'AFTER',
+                              'status': 'ok', 'unwanted': 'x'}]}
         result = relay.lite_payload(payload)
         self.assertEqual(set(result['datas'][0]), set(relay.LITE_FIELDS))
         self.assertNotIn('unwanted', result['datas'][0])
@@ -257,13 +290,13 @@ class RelayTests(unittest.TestCase):
         monday = datetime(2026, 9, 21, 8, 35, tzinfo=relay.KST)
         friday = datetime(2026, 9, 18, 15, 30, tzinfo=relay.KST)
         self.assertTrue(relay.quote_freshness(friday, monday, 'CLOSE', 0)[0])
-        self.assertFalse(relay.quote_freshness(friday, monday, 'OPEN', 0)[0])
+        self.assertTrue(relay.quote_freshness(friday, monday, 'OPEN', 0)[0])
 
     def test_2026_market_sessions_and_freshness(self):
         day = datetime(2026, 9, 23, tzinfo=relay.KST)
         cases = [(14, 0, 13, 55, 'REGULAR', True), (15, 40, 15, 30, 'REGULAR_CLOSED', True),
                  (16, 40, 16, 35, 'AFTER', True), (19, 40, 19, 35, 'AFTER', True),
-                 (20, 40, 20, 0, 'CLOSED', True), (14, 0, 13, 40, 'REGULAR', False),
+                 (20, 40, 20, 0, 'CLOSED', False), (14, 0, 13, 40, 'REGULAR', False),
                  (16, 40, 16, 20, 'AFTER', False)]
         for hour, minute, source_hour, source_minute, session, fresh in cases:
             current = day.replace(hour=hour, minute=minute)
@@ -278,6 +311,29 @@ class RelayTests(unittest.TestCase):
         current = datetime(2026, 9, 23, 16, 40, tzinfo=relay.KST)
         row = dict(itemCode='005930', stockName='삼성전자', localTradedAt=current.isoformat(), marketStatus='OPEN', stockExchangeType={'delayTime': 0}, closePrice='1', compareToPreviousClosePrice='0', compareToPreviousPrice={}, fluctuationsRatio='0', openPrice='1', highPrice='1', lowPrice='1', accumulatedTradingVolume='1', accumulatedTradingValue='1')
         self.assertEqual(relay.normalize_quote(row, current)['session'], 'AFTER')
+
+    def test_latest_valid_quote_does_not_depend_on_market_status_text(self):
+        current = datetime(2026, 9, 23, 16, 50, tzinfo=relay.KST)
+        row = dict(itemCode='005930', stockName='삼성전자',
+                   localTradedAt='2026-09-23T16:47:00+09:00', marketStatus='OPEN',
+                   stockExchangeType={'delayTime': 0}, closePrice='1',
+                   compareToPreviousClosePrice='0', compareToPreviousPrice={}, fluctuationsRatio='0',
+                   openPrice='1', highPrice='1', lowPrice='1', accumulatedTradingVolume='1',
+                   accumulatedTradingValue='1')
+        quote = relay.normalize_quote(row, current)
+        self.assertTrue(quote['fresh'])
+        self.assertEqual(quote['freshnessReason'], 'latest_valid')
+
+    def test_breakout_close_confirmation_uses_source_timestamp_not_market_status(self):
+        config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}
+        daily = self.daily_fixture(21)
+        technical = {'ma20': 100, 'ma60': 90, 'volumeRatio20': 1.0, 'status': 'ok'}
+        closed = {'closePrice': 123, 'highPrice': 124, 'marketStatus': 'OPEN',
+                  'sourceTime': '2026-09-23T15:30:00+09:00'}
+        before_close = dict(closed, sourceTime='2026-09-23T15:29:00+09:00')
+        with patch.object(relay, 'now', return_value=datetime(2026, 9, 23, 16, 0, tzinfo=relay.KST)):
+            self.assertEqual(relay.calculate_state('000001', 'A', technical, daily, closed, config)['breakout20'], 'confirmed')
+            self.assertEqual(relay.calculate_state('000001', 'A', technical, daily, before_close, config)['breakout20'], 'attempt')
 
     def test_numeric_units_and_direction(self):
         current = datetime(2026, 9, 23, 10, 35, tzinfo=relay.KST)
