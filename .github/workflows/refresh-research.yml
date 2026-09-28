@@ -129,4 +129,20 @@ jobs:
           fi
 
           git commit -m "Update NAVER research intelligence"
-          git push origin HEAD:main
+          echo "Research collection succeeded; synchronizing its data commit."
+          for attempt in 1 2 3; do
+            echo "Push synchronization attempt ${attempt}/3"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "::error::Data commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
+              git rebase --abort || true
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              echo "Research data push succeeded."
+              exit 0
+            fi
+            echo "Push was rejected because main advanced; retrying with latest main."
+          done
+          echo "::error::Research collection succeeded, but push was rejected after 3 attempts."
+          exit 1
