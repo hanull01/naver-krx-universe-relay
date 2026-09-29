@@ -1,4 +1,6 @@
 import json
+import socket
+import smtplib
 import tempfile
 import unittest
 from datetime import datetime
@@ -59,7 +61,25 @@ class ReadyMailTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'quotes-lite.json'; path.write_text(json.dumps(self.payload()),encoding='utf-8'); output=StringIO()
             with patch('sys.stdout',output): self.assertEqual(ready.main(self.env(),path,FailingSMTP,current=self.current),1)
-        self.assertIn('MARKET_DATA_READY not sent: Gmail delivery failed',output.getvalue()); self.assertNotIn('secret',output.getvalue())
+        self.assertIn('MARKET_DATA_READY not sent: Gmail SMTP unexpected error: RuntimeError',output.getvalue()); self.assertNotIn('secret',output.getvalue())
+    def assert_smtp_failure(self, error, expected):
+        class FailingSMTP(FakeSMTP):
+            def login(self, username, password): raise error
+        with self.assertRaisesRegex(RuntimeError, expected) as caught:
+            ready.send_ready_email(ready.ready_message(ready.validate_quotes(self.payload(), current=self.current), self.env()),
+                                   self.env(), FailingSMTP)
+        self.assertNotIn('secret', str(caught.exception))
+    def test_smtp_authentication_failure_is_safe_and_includes_only_status_code(self):
+        self.assert_smtp_failure(smtplib.SMTPAuthenticationError(535, b'bad password secret'),
+                                 r'Gmail SMTP authentication failed \(status=535\)')
+    def test_smtp_connection_failure_is_safe(self):
+        self.assert_smtp_failure(smtplib.SMTPConnectError(421, b'connection secret'),
+                                 'Gmail SMTP connection failed')
+    def test_smtp_recipient_rejection_is_safe(self):
+        self.assert_smtp_failure(smtplib.SMTPRecipientsRefused({'target@example.com': (550, b'secret')}),
+                                 'Gmail recipient rejected')
+    def test_smtp_timeout_is_safe(self):
+        self.assert_smtp_failure(socket.timeout('secret'), 'Gmail SMTP timeout')
     def test_workflow_sends_only_after_successful_publish(self):
         workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+500])
 

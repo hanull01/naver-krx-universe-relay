@@ -1,6 +1,7 @@
 """Send a guarded Gmail signal after production market data reaches GitHub."""
 import json
 import os
+import socket
 import smtplib
 from datetime import datetime
 from email.message import EmailMessage
@@ -108,8 +109,22 @@ def send_ready_email(message, env, smtp_factory=smtplib.SMTP_SSL):
     try:
         with smtp_factory('smtp.gmail.com', 465, timeout=20) as smtp:
             smtp.login(username, password); smtp.send_message(message)
+    except smtplib.SMTPAuthenticationError as exc:
+        # The SMTP response text may contain sensitive server details.  A
+        # numeric status code is sufficient for operational diagnosis.
+        code = getattr(exc, 'smtp_code', None)
+        suffix = f' (status={code})' if isinstance(code, int) else ''
+        raise RuntimeError(f'Gmail SMTP authentication failed{suffix}') from exc
+    except (smtplib.SMTPConnectError, smtplib.SMTPServerDisconnected) as exc:
+        raise RuntimeError('Gmail SMTP connection failed') from exc
+    except smtplib.SMTPRecipientsRefused as exc:
+        raise RuntimeError('Gmail recipient rejected') from exc
+    except smtplib.SMTPSenderRefused as exc:
+        raise RuntimeError('Gmail sender rejected') from exc
+    except (socket.timeout, TimeoutError) as exc:
+        raise RuntimeError('Gmail SMTP timeout') from exc
     except Exception as exc:
-        raise RuntimeError('Gmail delivery failed') from exc
+        raise RuntimeError(f'Gmail SMTP unexpected error: {type(exc).__name__}') from exc
 
 def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, current=None):
     env = os.environ if env is None else env
