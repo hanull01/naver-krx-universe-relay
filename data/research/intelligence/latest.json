@@ -5,12 +5,12 @@
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
-    "OK": 6,
-    "LOW_SAMPLE": 15,
+    "OK": 7,
+    "LOW_SAMPLE": 14,
     "NO_RESEARCH": 4,
     "NO_RECENT_RESEARCH": 17
   },
-  "rankingEligibleCount": 6,
+  "rankingEligibleCount": 7,
   "stocks": [
     {
       "itemCode": "005930",
@@ -173,43 +173,43 @@
       "itemName": "삼성전기",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 62,
+      "reportCount": 65,
       "brokerCount": 13,
-      "recentReportCount": 7,
+      "recentReportCount": 10,
       "previousReportCount": 13,
-      "recentTargetMean": 2185714,
+      "recentTargetMean": 2390000,
       "previousTargetMean": 2426923,
-      "recentTargetMedian": 2100000,
-      "recentTargetStdev": 411195,
-      "targetMeanChangePct": -9.94,
-      "targetDispersionChangePct": -14.3,
+      "recentTargetMedian": 2450000,
+      "recentTargetStdev": 467333,
+      "targetMeanChangePct": -1.52,
+      "targetDispersionChangePct": -2.6,
       "revisionUp": 24,
       "revisionDown": 3,
       "risingTopics": [
         {
           "topic": "CAPEX/생산능력",
-          "delta": 0.286,
+          "delta": 0.3,
           "ratio": null
         },
         {
           "topic": "환율",
-          "delta": 0.198,
-          "ratio": 1.86
+          "delta": 0.169,
+          "ratio": 1.73
         },
         {
           "topic": "원가",
-          "delta": 0.143,
+          "delta": 0.1,
           "ratio": null
         },
         {
-          "topic": "수요",
-          "delta": 0.109,
-          "ratio": 1.24
+          "topic": "AI",
+          "delta": 0.085,
+          "ratio": 1.14
         },
         {
-          "topic": "AI",
-          "delta": 0.099,
-          "ratio": 1.16
+          "topic": "수요",
+          "delta": 0.038,
+          "ratio": 1.08
         }
       ]
     },
@@ -325,14 +325,14 @@
       "itemName": "HD현대중공업",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 23,
-      "brokerCount": 12,
-      "recentReportCount": 5,
+      "reportCount": 24,
+      "brokerCount": 13,
+      "recentReportCount": 6,
       "previousReportCount": 0,
-      "recentTargetMean": 825200,
+      "recentTargetMean": 821000,
       "previousTargetMean": null,
-      "recentTargetMedian": 840000,
-      "recentTargetStdev": 103403,
+      "recentTargetMedian": 823000,
+      "recentTargetStdev": 94860,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 2,
@@ -340,22 +340,22 @@
       "risingTopics": [
         {
           "topic": "수요",
-          "delta": 1.0,
+          "delta": 0.833,
           "ratio": null
         },
         {
           "topic": "CAPEX/생산능력",
-          "delta": 0.4,
+          "delta": 0.5,
           "ratio": null
         },
         {
           "topic": "AI",
-          "delta": 0.2,
+          "delta": 0.167,
           "ratio": null
         },
         {
           "topic": "중국",
-          "delta": 0.2,
+          "delta": 0.167,
           "ratio": null
         }
       ]
@@ -365,14 +365,14 @@
       "itemName": "한화오션",
       "status": "LOW_SAMPLE",
       "rankingEligible": false,
-      "reportCount": 28,
-      "brokerCount": 11,
-      "recentReportCount": 1,
+      "reportCount": 29,
+      "brokerCount": 12,
+      "recentReportCount": 2,
       "previousReportCount": 0,
-      "recentTargetMean": 120000,
+      "recentTargetMean": 124000,
       "previousTargetMean": null,
-      "recentTargetMedian": 120000,
-      "recentTargetStdev": 0,
+      "recentTargetMedian": 124000,
+      "recentTargetStdev": 4000,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 0,
@@ -382,16 +382,16 @@
     {
       "itemCode": "010140",
       "itemName": "삼성중공업",
-      "status": "LOW_SAMPLE",
-      "rankingEligible": false,
-      "reportCount": 23,
-      "brokerCount": 11,
-      "recentReportCount": 2,
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 24,
+      "brokerCount": 12,
+      "recentReportCount": 3,
       "previousReportCount": 0,
-      "recentTargetMean": 38500,
+      "recentTargetMean": 36667,
       "previousTargetMean": null,
-      "recentTargetMedian": 38500,
-      "recentTargetStdev": 1500,
+      "recentTargetMedian": 37000,
+      "recentTargetStdev": 2867,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 2,
@@ -399,7 +399,7 @@
       "risingTopics": [
         {
           "topic": "AI",
-          "delta": 0.5,
+          "delta": 0.333,
           "ratio": null
         }
       ]
@@ -1067,14 +1067,14 @@
         "itemName": "HD현대중공업",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 23,
-        "brokerCount": 12,
-        "recentReportCount": 5,
+        "reportCount": 24,
+        "brokerCount": 13,
+        "recentReportCount": 6,
         "previousReportCount": 0,
-        "recentTargetMean": 825200,
+        "recentTargetMean": 821000,
         "previousTargetMean": null,
-        "recentTargetMedian": 840000,
-        "recentTargetStdev": 103403,
+        "recentTargetMedian": 823000,
+        "recentTargetStdev": 94860,
         "targetMeanChangePct": null,
         "targetDispersionChangePct": null,
         "revisionUp": 2,
@@ -1082,22 +1082,22 @@
         "risingTopics": [
           {
             "topic": "수요",
-            "delta": 1.0,
+            "delta": 0.833,
             "ratio": null
           },
           {
             "topic": "CAPEX/생산능력",
-            "delta": 0.4,
+            "delta": 0.5,
             "ratio": null
           },
           {
             "topic": "AI",
-            "delta": 0.2,
+            "delta": 0.167,
             "ratio": null
           },
           {
             "topic": "중국",
-            "delta": 0.2,
+            "delta": 0.167,
             "ratio": null
           }
         ]
@@ -1133,6 +1133,31 @@
           {
             "topic": "원가",
             "delta": 0.25,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "010140",
+        "itemName": "삼성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 24,
+        "brokerCount": 12,
+        "recentReportCount": 3,
+        "previousReportCount": 0,
+        "recentTargetMean": 36667,
+        "previousTargetMean": null,
+        "recentTargetMedian": 37000,
+        "recentTargetStdev": 2867,
+        "targetMeanChangePct": null,
+        "targetDispersionChangePct": null,
+        "revisionUp": 2,
+        "revisionDown": 1,
+        "risingTopics": [
+          {
+            "topic": "AI",
+            "delta": 0.333,
             "ratio": null
           }
         ]
@@ -1186,43 +1211,43 @@
         "itemName": "삼성전기",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 62,
+        "reportCount": 65,
         "brokerCount": 13,
-        "recentReportCount": 7,
+        "recentReportCount": 10,
         "previousReportCount": 13,
-        "recentTargetMean": 2185714,
+        "recentTargetMean": 2390000,
         "previousTargetMean": 2426923,
-        "recentTargetMedian": 2100000,
-        "recentTargetStdev": 411195,
-        "targetMeanChangePct": -9.94,
-        "targetDispersionChangePct": -14.3,
+        "recentTargetMedian": 2450000,
+        "recentTargetStdev": 467333,
+        "targetMeanChangePct": -1.52,
+        "targetDispersionChangePct": -2.6,
         "revisionUp": 24,
         "revisionDown": 3,
         "risingTopics": [
           {
             "topic": "CAPEX/생산능력",
-            "delta": 0.286,
+            "delta": 0.3,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.198,
-            "ratio": 1.86
+            "delta": 0.169,
+            "ratio": 1.73
           },
           {
             "topic": "원가",
-            "delta": 0.143,
+            "delta": 0.1,
             "ratio": null
           },
           {
-            "topic": "수요",
-            "delta": 0.109,
-            "ratio": 1.24
+            "topic": "AI",
+            "delta": 0.085,
+            "ratio": 1.14
           },
           {
-            "topic": "AI",
-            "delta": 0.099,
-            "ratio": 1.16
+            "topic": "수요",
+            "delta": 0.038,
+            "ratio": 1.08
           }
         ]
       },
@@ -1367,43 +1392,43 @@
         "itemName": "삼성전기",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 62,
+        "reportCount": 65,
         "brokerCount": 13,
-        "recentReportCount": 7,
+        "recentReportCount": 10,
         "previousReportCount": 13,
-        "recentTargetMean": 2185714,
+        "recentTargetMean": 2390000,
         "previousTargetMean": 2426923,
-        "recentTargetMedian": 2100000,
-        "recentTargetStdev": 411195,
-        "targetMeanChangePct": -9.94,
-        "targetDispersionChangePct": -14.3,
+        "recentTargetMedian": 2450000,
+        "recentTargetStdev": 467333,
+        "targetMeanChangePct": -1.52,
+        "targetDispersionChangePct": -2.6,
         "revisionUp": 24,
         "revisionDown": 3,
         "risingTopics": [
           {
             "topic": "CAPEX/생산능력",
-            "delta": 0.286,
+            "delta": 0.3,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.198,
-            "ratio": 1.86
+            "delta": 0.169,
+            "ratio": 1.73
           },
           {
             "topic": "원가",
-            "delta": 0.143,
+            "delta": 0.1,
             "ratio": null
           },
           {
-            "topic": "수요",
-            "delta": 0.109,
-            "ratio": 1.24
+            "topic": "AI",
+            "delta": 0.085,
+            "ratio": 1.14
           },
           {
-            "topic": "AI",
-            "delta": 0.099,
-            "ratio": 1.16
+            "topic": "수요",
+            "delta": 0.038,
+            "ratio": 1.08
           }
         ]
       }
@@ -1459,43 +1484,43 @@
         "itemName": "삼성전기",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 62,
+        "reportCount": 65,
         "brokerCount": 13,
-        "recentReportCount": 7,
+        "recentReportCount": 10,
         "previousReportCount": 13,
-        "recentTargetMean": 2185714,
+        "recentTargetMean": 2390000,
         "previousTargetMean": 2426923,
-        "recentTargetMedian": 2100000,
-        "recentTargetStdev": 411195,
-        "targetMeanChangePct": -9.94,
-        "targetDispersionChangePct": -14.3,
+        "recentTargetMedian": 2450000,
+        "recentTargetStdev": 467333,
+        "targetMeanChangePct": -1.52,
+        "targetDispersionChangePct": -2.6,
         "revisionUp": 24,
         "revisionDown": 3,
         "risingTopics": [
           {
             "topic": "CAPEX/생산능력",
-            "delta": 0.286,
+            "delta": 0.3,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.198,
-            "ratio": 1.86
+            "delta": 0.169,
+            "ratio": 1.73
           },
           {
             "topic": "원가",
-            "delta": 0.143,
+            "delta": 0.1,
             "ratio": null
           },
           {
-            "topic": "수요",
-            "delta": 0.109,
-            "ratio": 1.24
+            "topic": "AI",
+            "delta": 0.085,
+            "ratio": 1.14
           },
           {
-            "topic": "AI",
-            "delta": 0.099,
-            "ratio": 1.16
+            "topic": "수요",
+            "delta": 0.038,
+            "ratio": 1.08
           }
         ]
       },

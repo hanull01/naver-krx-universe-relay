@@ -6,32 +6,32 @@
   "asOf": "2026-09-29",
   "dateRange": {
     "from": "2026-04-14",
-    "to": "2026-09-15"
+    "to": "2026-09-29"
   },
-  "reportCount": 28,
-  "brokerCount": 11,
+  "reportCount": 29,
+  "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-08-30",
       "to": "2026-09-29",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 120000,
-        "max": 120000,
-        "mean": 120000,
-        "median": 120000,
-        "stdev": 0,
-        "range": 0
+        "max": 128000,
+        "mean": 124000,
+        "median": 124000,
+        "stdev": 4000,
+        "range": 8000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 2,
+        "positive": 4,
         "negative": 0,
-        "net": 2,
+        "net": 4,
         "netPerReport": 2.0
       },
       "topics": {}
@@ -54,7 +54,7 @@
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -135,24 +135,24 @@
       }
     },
     "2026-09": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 120000,
-        "max": 120000,
-        "mean": 120000,
-        "median": 120000,
-        "stdev": 0,
-        "range": 0
+        "max": 128000,
+        "mean": 124000,
+        "median": 124000,
+        "stdev": 4000,
+        "range": 8000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 2,
+        "positive": 4,
         "negative": 0,
-        "net": 2,
+        "net": 4,
         "netPerReport": 2.0
       },
       "topics": {}
@@ -271,6 +271,21 @@
           "date": "2026-07-29",
           "goalPrice": 139000,
           "title": "놀라운 상선 실적 22.7%"
+        }
+      ]
+    },
+    "미래에셋증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 128000,
+      "latestGoalPrice": 128000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-09-29",
+          "goalPrice": 128000,
+          "title": "MASGA 프리미엄은 회복이 마땅"
         }
       ]
     },

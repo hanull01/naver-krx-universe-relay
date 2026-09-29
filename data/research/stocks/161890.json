@@ -2,31 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "161890",
   "itemName": "한국콜마",
-  "reportCount": 27,
-  "latestReportNid": "96021",
-  "latestWriteDate": "2026-09-07",
+  "reportCount": 28,
+  "latestReportNid": "96345",
+  "latestWriteDate": "2026-09-29",
   "latest": {
-    "nid": "96021",
-    "writeDate": "2026-09-07",
-    "brokerName": "SK증권",
-    "title": "업황 강세에 글로벌 MNC 모멘텀까지",
-    "goalPrice": 180000,
+    "nid": "96345",
+    "writeDate": "2026-09-29",
+    "brokerName": "유안타증권",
+    "title": "튜브 용기 부족에도 견조한 수주, 4분기 기대",
+    "goalPrice": 185000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 7,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 2
+        "수주": 3,
+        "수요": 2,
+        "자동차": 1,
+        "중국": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96345",
     "96021",
     "95575",
     "95573",

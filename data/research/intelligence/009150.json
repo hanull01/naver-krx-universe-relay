@@ -8,54 +8,54 @@
     "from": "2026-03-31",
     "to": "2026-09-29"
   },
-  "reportCount": 62,
+  "reportCount": 65,
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-08-30",
       "to": "2026-09-29",
-      "reportCount": 7,
-      "brokerCount": 4,
+      "reportCount": 10,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 7,
+        "count": 10,
         "min": 1750000,
-        "max": 2800000,
-        "mean": 2185714,
-        "median": 2100000,
-        "stdev": 411195,
-        "range": 1050000
+        "max": 3000000,
+        "mean": 2390000,
+        "median": 2450000,
+        "stdev": 467333,
+        "range": 1250000
       },
       "earningsDirection": {
-        "UNKNOWN": 3,
-        "UP": 3,
+        "UNKNOWN": 4,
+        "UP": 5,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 38,
-        "negative": 9,
-        "net": 29,
-        "netPerReport": 4.143
+        "positive": 49,
+        "negative": 11,
+        "net": 38,
+        "netPerReport": 3.8
       },
       "topics": {
         "AI": {
-          "count": 5,
-          "perReport": 0.714
+          "count": 7,
+          "perReport": 0.7
         },
         "수요": {
-          "count": 4,
-          "perReport": 0.571
+          "count": 5,
+          "perReport": 0.5
         },
         "환율": {
-          "count": 3,
-          "perReport": 0.429
+          "count": 4,
+          "perReport": 0.4
         },
         "CAPEX/생산능력": {
-          "count": 2,
-          "perReport": 0.286
+          "count": 3,
+          "perReport": 0.3
         },
         "원가": {
           "count": 1,
-          "perReport": 0.143
+          "perReport": 0.1
         }
       }
     },
@@ -101,56 +101,56 @@
     "topicAcceleration": [
       {
         "topic": "CAPEX/생산능력",
-        "currentCount": 2,
-        "currentPerReport": 0.286,
+        "currentCount": 3,
+        "currentPerReport": 0.3,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.286,
+        "perReportDelta": 0.3,
         "ratio": null
       },
       {
         "topic": "환율",
-        "currentCount": 3,
-        "currentPerReport": 0.429,
+        "currentCount": 4,
+        "currentPerReport": 0.4,
         "previousCount": 3,
         "previousPerReport": 0.231,
-        "perReportDelta": 0.198,
-        "ratio": 1.86
+        "perReportDelta": 0.169,
+        "ratio": 1.73
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.143,
+        "currentPerReport": 0.1,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.143,
+        "perReportDelta": 0.1,
         "ratio": null
       },
       {
-        "topic": "수요",
-        "currentCount": 4,
-        "currentPerReport": 0.571,
-        "previousCount": 6,
-        "previousPerReport": 0.462,
-        "perReportDelta": 0.109,
-        "ratio": 1.24
-      },
-      {
         "topic": "AI",
-        "currentCount": 5,
-        "currentPerReport": 0.714,
+        "currentCount": 7,
+        "currentPerReport": 0.7,
         "previousCount": 8,
         "previousPerReport": 0.615,
-        "perReportDelta": 0.099,
-        "ratio": 1.16
+        "perReportDelta": 0.085,
+        "ratio": 1.14
+      },
+      {
+        "topic": "수요",
+        "currentCount": 5,
+        "currentPerReport": 0.5,
+        "previousCount": 6,
+        "previousPerReport": 0.462,
+        "perReportDelta": 0.038,
+        "ratio": 1.08
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -6,
-    "targetMeanChangePct": -9.94,
-    "targetMedianChangePct": -8.7,
-    "targetDispersionChangePct": -14.3
+    "reportCountChange": -3,
+    "targetMeanChangePct": -1.52,
+    "targetMedianChangePct": 6.52,
+    "targetDispersionChangePct": -2.6
   },
   "goalPriceRevisions": {
     "total": 27,
@@ -404,48 +404,48 @@
       }
     },
     "2026-09": {
-      "reportCount": 7,
-      "brokerCount": 4,
+      "reportCount": 10,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 7,
+        "count": 10,
         "min": 1750000,
-        "max": 2800000,
-        "mean": 2185714,
-        "median": 2100000,
-        "stdev": 411195,
-        "range": 1050000
+        "max": 3000000,
+        "mean": 2390000,
+        "median": 2450000,
+        "stdev": 467333,
+        "range": 1250000
       },
       "earningsDirection": {
-        "UNKNOWN": 3,
-        "UP": 3,
+        "UNKNOWN": 4,
+        "UP": 5,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 38,
-        "negative": 9,
-        "net": 29,
-        "netPerReport": 4.143
+        "positive": 49,
+        "negative": 11,
+        "net": 38,
+        "netPerReport": 3.8
       },
       "topics": {
         "AI": {
-          "count": 5,
-          "perReport": 0.714
+          "count": 7,
+          "perReport": 0.7
         },
         "수요": {
-          "count": 4,
-          "perReport": 0.571
+          "count": 5,
+          "perReport": 0.5
         },
         "환율": {
-          "count": 3,
-          "perReport": 0.429
+          "count": 4,
+          "perReport": 0.4
         },
         "CAPEX/생산능력": {
-          "count": 2,
-          "perReport": 0.286
+          "count": 3,
+          "perReport": 0.3
         },
         "원가": {
           "count": 1,
-          "perReport": 0.143
+          "perReport": 0.1
         }
       }
     }
@@ -637,8 +637,8 @@
       ]
     },
     "대신증권": {
-      "reportCount": 7,
-      "targetPricePointCount": 7,
+      "reportCount": 8,
+      "targetPricePointCount": 8,
       "firstGoalPrice": 550000,
       "latestGoalPrice": 2800000,
       "changeAmount": 2250000,
@@ -678,6 +678,11 @@
           "date": "2026-09-03",
           "goalPrice": 2800000,
           "title": "3Q 영업이익 상향. 환율 악재는 상쇄, AI 부품 공급부족 심화"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 2800000,
+          "title": "이제 본격화, 이익의 상향!"
         }
       ]
     },
@@ -697,8 +702,8 @@
       ]
     },
     "미래에셋증권": {
-      "reportCount": 6,
-      "targetPricePointCount": 6,
+      "reportCount": 7,
+      "targetPricePointCount": 7,
       "firstGoalPrice": 530000,
       "latestGoalPrice": 2800000,
       "changeAmount": 2270000,
@@ -733,6 +738,11 @@
           "date": "2026-08-03",
           "goalPrice": 2800000,
           "title": "줄은 더 길어졌다"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 2800000,
+          "title": "기판 증설 코멘트: 빙산의 일각"
         }
       ]
     },
@@ -842,8 +852,8 @@
       ]
     },
     "하나증권": {
-      "reportCount": 7,
-      "targetPricePointCount": 7,
+      "reportCount": 8,
+      "targetPricePointCount": 8,
       "firstGoalPrice": 810000,
       "latestGoalPrice": 3000000,
       "changeAmount": 2190000,
@@ -883,6 +893,11 @@
           "date": "2026-08-11",
           "goalPrice": 3000000,
           "title": "[NDR 후기] 수급 불안을 먹고 자라는 중"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 3000000,
+          "title": "다시 이익 상향조정 구간 진입"
         }
       ]
     }

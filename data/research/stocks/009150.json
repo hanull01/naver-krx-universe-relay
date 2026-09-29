@@ -2,31 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "reportCount": 62,
-  "latestReportNid": "96341",
+  "reportCount": 65,
+  "latestReportNid": "96353",
   "latestWriteDate": "2026-09-29",
   "latest": {
-    "nid": "96341",
+    "nid": "96353",
     "writeDate": "2026-09-29",
-    "brokerName": "iM증권",
-    "title": "패키지기판 증설 공시 코멘트: FC-BGA 산업 내 최대 규모",
-    "goalPrice": 2100000,
+    "brokerName": "대신증권",
+    "title": "이제 본격화, 이익의 상향!",
+    "goalPrice": 2800000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 8,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UP",
       "topics": {
+        "환율": 2,
+        "AI": 1,
+        "가격": 1,
         "반도체": 1
       }
     }
   },
   "reportNids": [
+    "96353",
+    "96352",
+    "96348",
     "96341",
     "96340",
     "96339",
