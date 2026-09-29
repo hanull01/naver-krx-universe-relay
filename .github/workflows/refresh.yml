@@ -12,12 +12,11 @@ on:
       - "config/analysis.json"
       - ".github/workflows/refresh.yml"
   schedule:
-    # 08:32 KST Mon-Fri = 23:32 UTC Sun-Thu
-    - cron: "32 23 * * 0-4"
-
-    # 09:32-20:32 KST Mon-Fri = 00:32-11:32 UTC Mon-Fri.
-    # This dedicated price slot leaves :20 snapshots as the :40 report input.
-    - cron: "32 0-11 * * 1-5"
+    # MARKET_DATA_READY is event-driven. Refresh price data on market-hour
+    # boundaries: 08:00 KST Mon-Fri = 23:00 UTC Sun-Thu, then 09:00-20:00
+    # KST = 00:00-11:00 UTC Mon-Fri.
+    - cron: "0 23 * * 0-4"
+    - cron: "0 0-11 * * 1-5"
 
 permissions:
   contents: write
@@ -72,7 +71,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          # :32 KST is the fast intraday path: use cached daily candles and
+          # This is the fast intraday path: use cached daily candles and
           # refresh quotes, technicals, states, and group states without daily
           # NAVER API requests.
           started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)

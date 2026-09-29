@@ -10,13 +10,10 @@ on:
       - "docs/naver-market-data.md"
       - ".github/workflows/refresh-market-snapshots.yml"
   schedule:
-    # :20 KST snapshots are critical-path inputs for the :40 KST report.
-    # Keep :35 KST exclusively for Refresh market data so price freshness is
-    # never delayed behind snapshot collection.
-    # 09:05, :20, :50 through 14:50 KST, Mon-Fri = 00:05, :20, :50 through 05:50 UTC
-    - cron: "5,20,50 0-5 * * 1-5"
-    # 15:05, 15:20 KST, Mon-Fri = 06:05, 06:20 UTC, Mon-Fri
-    - cron: "5,20 6 * * 1-5"
+    # Event-driven reports consume the latest published snapshot. Run at
+    # :10, :30, :50 from 08:10 through 19:50 KST on weekdays.
+    - cron: "10,30,50 23 * * 0-4"
+    - cron: "10,30,50 0-10 * * 1-5"
 
 permissions:
   contents: write
