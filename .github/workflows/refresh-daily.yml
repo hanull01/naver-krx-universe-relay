@@ -3,8 +3,8 @@ name: Refresh daily candles
 on:
   workflow_dispatch:
   schedule:
-    # 15:40 KST Mon-Fri = 06:40 UTC Mon-Fri. This refresh updates history and
-    # stores today's provisional row for the next business day's PRE close.
+    # 15:40 KST Mon-Fri = 06:40 UTC Mon-Fri. This refresh updates raw history,
+    # stores today's provisional row, and writes a separate regular-session bar.
     - cron: "40 6 * * 1-5"
 
 permissions:
@@ -76,7 +76,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # Slow Daily is the sole writer for these paths.
-          git add data/daily data/daily-status.json
+          git add data/daily data/daily-regular data/daily-status.json
           if git diff --cached --quiet; then
             echo "No daily candle changes to commit"
           else

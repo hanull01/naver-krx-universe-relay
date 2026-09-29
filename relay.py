@@ -19,6 +19,7 @@ UNIVERSE_PATH = ROOT / 'config/universe.json'
 QUOTE_URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock/'
 DAILY_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/day'
 MINUTE_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/minute'
+REGULAR_DAILY_DIR = 'data/daily-regular'
 
 
 def validate_universe(universe):
@@ -564,10 +565,80 @@ def collect_daily(code):
     return {k: payload[k] for k in ('itemCode', 'status', 'completedCount')}
 
 
+def build_regular_daily_bar(rows, current):
+    """Build one completed KRX regular-session candle from 09:00--15:30 minutes.
+
+    NAVER minute ``accumulatedTradingVolume`` is per-minute volume, not a
+    running total (verified against consecutive live rows), so the daily
+    volume is its sum.  No endpoint fallback is allowed for the 15:30 close.
+    """
+    day = current.strftime('%Y%m%d')
+    if not isinstance(rows, list):
+        raise ValueError('minute endpoint did not return array')
+    valid = []
+    for row in rows:
+        if not isinstance(row, dict) or not str(row.get('localDateTime', '')).startswith(day):
+            continue
+        try:
+            valid.append({
+                'localDateTime': str(row['localDateTime']),
+                'open': number(row.get('openPrice'), 'minute.openPrice'),
+                'high': number(row.get('highPrice'), 'minute.highPrice'),
+                'low': number(row.get('lowPrice'), 'minute.lowPrice'),
+                'close': number(row.get('currentPrice'), 'minute.currentPrice'),
+                'volume': number(row.get('accumulatedTradingVolume'), 'minute.accumulatedTradingVolume'),
+            })
+        except (KeyError, ValueError):
+            # An incomplete minute cannot safely contribute to a completed bar.
+            continue
+    if not valid:
+        raise ValueError('no valid regular-session minute rows')
+    valid.sort(key=lambda row: row['localDateTime'])
+    close_time = f'{day}153000'
+    close_rows = [row for row in valid if row['localDateTime'] == close_time]
+    if not close_rows:
+        raise ValueError('15:30 minute close is unavailable')
+    close_row = close_rows[-1]
+    return {
+        'date': current.date().isoformat(), 'open': valid[0]['open'],
+        'high': max(row['high'] for row in valid), 'low': min(row['low'] for row in valid),
+        'close': close_row['close'], 'volume': sum(row['volume'] for row in valid),
+        'complete': True, 'noTrading': False, 'session': 'REGULAR',
+        'source': 'NAVER_MINUTE', 'sourceTime': close_time,
+        'barType': 'REGULAR_SESSION',
+    }
+
+
+def collect_regular_daily(code, current=None):
+    """Persist the optional completed regular-session candle separately from raw daily."""
+    current = current or now()
+    day = current.strftime('%Y%m%d')
+    url = (MINUTE_URL.format(code=code)
+           + f'?startDateTime={day}0900&endDateTime={day}1530')
+    payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
+               'source': 'NAVER_MINUTE', 'sourceUrl': url, 'regularDailyStatus': 'unavailable',
+               'status': 'unavailable', 'fresh': False, 'datas': [], 'errors': []}
+    try:
+        bar = build_regular_daily_bar(fetch(url), current)
+        payload.update(status='ok', regularDailyStatus='ok', fresh=True,
+                       sourceTime=bar['sourceTime'], datas=[bar])
+    except Exception as exc:
+        # Raw daily history is deliberately independent from this optional
+        # reconstruction.  Consumers fall back to completed history only.
+        payload['errors'].append({'error': str(exc)})
+    save(f'{REGULAR_DAILY_DIR}/{code}.json', payload)
+    return {'itemCode': code, 'regularDailyStatus': payload['regularDailyStatus']}
+
+
 def collect_all_daily():
     _, codes, _, _ = universe_state()
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(collect_daily, codes))
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        regular_results = list(pool.map(collect_regular_daily, codes))
+    regular_by_code = {row['itemCode']: row['regularDailyStatus'] for row in regular_results}
+    for row in results:
+        row['regularDailyStatus'] = regular_by_code.get(row['itemCode'], 'unavailable')
     save('data/daily-status.json', {'generatedAt': now().isoformat(), 'results': results})
     print(json.dumps(results, ensure_ascii=False))
     return results
@@ -579,9 +650,29 @@ TECHNICAL_LITE_FIELDS = ('itemCode', 'ma5', 'ma20', 'ma60', 'high20', 'high60',
 
 def load_daily_for_technical(code):
     try:
-        return json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
+        daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
         return None
+    try:
+        regular = json.loads((ROOT / f'{REGULAR_DAILY_DIR}/{code}.json').read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        return daily
+    if regular.get('regularDailyStatus') != 'ok' or not isinstance(regular.get('datas'), list):
+        return daily
+    bars = [bar for bar in regular['datas'] if isinstance(bar, dict)
+            and bar.get('complete') is True and bar.get('barType') == 'REGULAR_SESSION']
+    if len(bars) != 1:
+        return daily
+    bar = bars[0]
+    if not isinstance(bar.get('date'), str) or not bar.get('sourceTime'):
+        return daily
+    merged = dict(daily)
+    merged['datas'] = sorted([row for row in daily.get('datas', []) if row.get('date') != bar['date']] + [bar],
+                            key=lambda row: row['date'])
+    merged['regularSessionDate'] = bar['date']
+    merged['regularDailyStatus'] = 'ok'
+    merged['sourceTime'] = bar['sourceTime']
+    return merged
 
 
 def daily_cache_is_current(daily, current=None, expected_completed_date=None):
@@ -598,7 +689,9 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     if source_date is None:
         return True
     try:
-        actual = datetime.fromisoformat(str(source_date)).date()
+        text = str(source_date)
+        actual = (datetime.strptime(text, '%Y%m%d%H%M%S').date()
+                  if re.fullmatch(r'\d{14}', text) else datetime.fromisoformat(text).date())
     except ValueError:
         return False
     current = current or now()
@@ -608,8 +701,10 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
         except ValueError:
             return False
     else:
-        # Today's daily row is intentionally provisional even after 15:40.
-        expected = previous_weekday(current.date())
+        # Today's raw daily row is provisional.  A separately reconstructed
+        # regular-session bar is the only valid same-day technical input.
+        expected = (current.date() if daily.get('regularSessionDate') == current.date().isoformat()
+                    else previous_weekday(current.date()))
     return actual == expected
 
 

@@ -152,9 +152,11 @@ class RelayTests(unittest.TestCase):
         codes = relay.universe_codes(universe)
         with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
              patch.object(relay, 'collect_daily', side_effect=lambda code: {'itemCode': code, 'status': 'ok', 'completedCount': 1}) as daily, \
+             patch.object(relay, 'collect_regular_daily', side_effect=lambda code: {'itemCode': code, 'regularDailyStatus': 'ok'}) as regular, \
              patch.object(relay, 'save'):
             relay.collect_all_daily()
         self.assertEqual(sorted(call.args[0] for call in daily.call_args_list), codes)
+        self.assertEqual(sorted(call.args[0] for call in regular.call_args_list), codes)
 
     def test_previous_krx_business_day_uses_verified_calendar_not_weekday_guess(self):
         no_holidays = lambda year: set()
@@ -509,6 +511,66 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(result['status'], 'insufficient')
         self.assertTrue(saved['datas'][0]['complete'])
         self.assertFalse(saved['datas'][1]['complete'])
+
+    def test_regular_daily_reconstructs_ohlcv_from_minutes_and_uses_me2on_1530_close(self):
+        current = datetime(2026, 9, 29, 15, 40, tzinfo=relay.KST)
+        rows = [
+            {'localDateTime': '20260929090000', 'openPrice': 3665, 'highPrice': 3680,
+             'lowPrice': 3620, 'currentPrice': 3640, 'accumulatedTradingVolume': 43446},
+            {'localDateTime': '20260929090100', 'openPrice': 3630, 'highPrice': 3700,
+             'lowPrice': 3595, 'currentPrice': 3605, 'accumulatedTradingVolume': 62435},
+            {'localDateTime': '20260929153000', 'openPrice': 3385, 'highPrice': 3385,
+             'lowPrice': 3385, 'currentPrice': 3385, 'accumulatedTradingVolume': 34378},
+        ]
+        bar = relay.build_regular_daily_bar(rows, current)
+        self.assertEqual(bar['open'], 3665)
+        self.assertEqual(bar['high'], 3700)
+        self.assertEqual(bar['low'], 3385)
+        self.assertEqual(bar['close'], 3385)  # Me2on verified regular close
+        self.assertEqual(bar['volume'], 140259)  # minute volumes are per-minute, so sum them
+        self.assertTrue(bar['complete'])
+        self.assertEqual((bar['session'], bar['source'], bar['sourceTime']),
+                         ('REGULAR', 'NAVER_MINUTE', '20260929153000'))
+
+    def test_regular_daily_requires_exact_1530_and_keeps_raw_daily_independent_on_failure(self):
+        current = datetime(2026, 9, 29, 15, 40, tzinfo=relay.KST)
+        rows = [{'localDateTime': '20260929152900', 'openPrice': 1, 'highPrice': 1,
+                 'lowPrice': 1, 'currentPrice': 1, 'accumulatedTradingVolume': 1}]
+        with self.assertRaisesRegex(ValueError, '15:30'):
+            relay.build_regular_daily_bar(rows, current)
+        with patch.object(relay, 'fetch', side_effect=ValueError('minute down')), \
+             patch.object(relay, 'save') as save:
+            result = relay.collect_regular_daily('201490', current)
+        self.assertEqual(result['regularDailyStatus'], 'unavailable')
+        self.assertEqual(save.call_args.args[0], 'data/daily-regular/201490.json')
+        self.assertEqual(save.call_args.args[1]['status'], 'unavailable')
+
+    def test_technicals_merge_regular_bar_but_never_raw_provisional_today(self):
+        current = datetime(2026, 9, 29, 16, 0, tzinfo=relay.KST)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily-regular').mkdir(parents=True)
+            raw = {'status': 'ok', 'sourceTime': '2026-09-28', 'datas': [
+                {'date': '2026-09-28', 'close': 100, 'high': 100, 'volume': 10,
+                 'complete': True, 'noTrading': False},
+                {'date': '2026-09-29', 'close': 999, 'high': 999, 'volume': 999,
+                 'complete': False, 'noTrading': False},
+            ]}
+            regular = {'regularDailyStatus': 'ok', 'datas': [{
+                'date': '2026-09-29', 'open': 101, 'high': 110, 'low': 100, 'close': 105,
+                'volume': 20, 'complete': True, 'noTrading': False, 'session': 'REGULAR',
+                'source': 'NAVER_MINUTE', 'sourceTime': '20260929153000',
+                'barType': 'REGULAR_SESSION'}]}
+            (root / 'data/daily/201490.json').write_text(json.dumps(raw), encoding='utf-8')
+            (root / 'data/daily-regular/201490.json').write_text(json.dumps(regular), encoding='utf-8')
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
+                daily = relay.load_daily_for_technical('201490')
+                technical = relay.calculate_technicals('201490', '미투온', daily,
+                                                       {'accumulatedTradingVolume': 20})
+        self.assertEqual([bar['close'] for bar in daily['datas']], [100, 105])
+        self.assertEqual(technical['asOf'], '2026-09-29')
+        self.assertEqual(technical['status'], 'insufficient_history')
 
     def test_daily_workflow_runs_at_1540_kst_and_documents_provisional_policy(self):
         workflow = (Path(__file__).parent / '.github/workflows/refresh-daily.yml').read_text(encoding='utf-8')
