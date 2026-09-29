@@ -341,7 +341,8 @@ class RelayTests(unittest.TestCase):
             relay.validate_universe(broken)
 
     def test_lite_payload_is_minimal(self):
-        payload = {'generatedAt': 'now', 'expectedCount': 1, 'count': 1, 'freshCount': 1,
+        payload = {'generatedAt': 'now', 'sourceTime': 'now', 'sourceTimeLatest': 'now',
+                   'expectedCount': 1, 'count': 1, 'freshCount': 1,
                    'missingCodes': [], 'status': 'ok', 'fresh': True,
                    'datas': [{'itemCode': '051600', 'stockName': '한전KPS', 'closePrice': 1,
                               'fluctuationsRatio': 0, 'accumulatedTradingVolume': 2,
@@ -351,6 +352,8 @@ class RelayTests(unittest.TestCase):
                               'status': 'ok', 'unwanted': 'x'}]}
         result = relay.lite_payload(payload)
         self.assertEqual(set(result['datas'][0]), set(relay.LITE_FIELDS))
+        self.assertEqual(result['sourceTime'], 'now')
+        self.assertEqual(result['sourceTimeLatest'], 'now')
         self.assertNotIn('unwanted', result['datas'][0])
 
     def test_legacy_fresh_count_uses_legacy_codes_only(self):

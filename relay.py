@@ -259,7 +259,8 @@ LITE_FIELDS = ('itemCode', 'stockName', 'closePrice', 'fluctuationsRatio',
 
 
 def lite_payload(payload):
-    keys = ('generatedAt', 'expectedCount', 'count', 'freshCount', 'missingCodes', 'status', 'fresh')
+    keys = ('generatedAt', 'sourceTime', 'sourceTimeLatest', 'expectedCount', 'count',
+            'freshCount', 'missingCodes', 'status', 'fresh')
     result = {key: payload[key] for key in keys}
     result['datas'] = [{key: row.get(key) for key in LITE_FIELDS} for row in payload['datas']]
     return result

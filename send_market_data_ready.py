@@ -24,6 +24,26 @@ def parse_timestamp(value, field):
         raise ReadyValidationError(f'{field} is invalid') from exc
     return parsed.replace(tzinfo=KST) if parsed.tzinfo is None else parsed.astimezone(KST)
 
+def quote_rows(payload):
+    """Return the first supported quote-row container from a payload."""
+    for key in ('datas', 'quotes', 'rows', 'items'):
+        rows = payload.get(key)
+        if isinstance(rows, list):
+            return rows
+    raise ReadyValidationError('quotes rows are incomplete')
+
+def representative_source_time(payload, rows):
+    """Prefer producer metadata; strictly validate legacy row-only payloads."""
+    top_level = payload.get('sourceTime')
+    if top_level:
+        return parse_timestamp(top_level, 'sourceTime')
+    row_values = {row.get('sourceTime') for row in rows if isinstance(row, dict) and row.get('sourceTime')}
+    if not row_values:
+        raise ReadyValidationError('sourceTime is missing')
+    if len(row_values) != 1:
+        raise ReadyValidationError('row sourceTime values differ')
+    return parse_timestamp(row_values.pop(), 'sourceTime')
+
 def validate_quotes(payload, current=None, collection_started_at=None):
     """Return signal metadata only for a complete, fresh current-run payload."""
     if not isinstance(payload, dict):
@@ -36,7 +56,6 @@ def validate_quotes(payload, current=None, collection_started_at=None):
     if payload.get('missingCodes') != []:
         raise ReadyValidationError('quotes payload has missing codes')
     generated = parse_timestamp(payload.get('generatedAt'), 'generatedAt')
-    source_time = parse_timestamp(payload.get('sourceTime'), 'sourceTime')
     current = current or datetime.now(KST)
     if generated.date() != current.astimezone(KST).date():
         raise ReadyValidationError('quotes payload is not from today')
@@ -44,11 +63,12 @@ def validate_quotes(payload, current=None, collection_started_at=None):
         started = parse_timestamp(collection_started_at, 'collectionStartedAt')
         if generated < started:
             raise ReadyValidationError('quotes payload predates this collection run')
-    rows = payload.get('datas')
-    if not isinstance(rows, list) or len(rows) != expected:
+    rows = quote_rows(payload)
+    if len(rows) != expected:
         raise ReadyValidationError('quotes rows are incomplete')
     if any(not isinstance(row, dict) for row in rows):
         raise ReadyValidationError('quotes rows are invalid')
+    source_time = representative_source_time(payload, rows)
     if any(row.get('delayTime') != 0 or not row.get('sourceTime') for row in rows):
         raise ReadyValidationError('quotes contain delayed or incomplete rows')
     sessions = {row.get('session') for row in rows}; bases = {row.get('priceBasis') for row in rows}

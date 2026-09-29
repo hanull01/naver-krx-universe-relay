@@ -26,11 +26,22 @@ class ReadyMailTests(unittest.TestCase):
         metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('[MARKET_DATA_READY]'))
         for line in ('run_id=123','generatedAt=','sourceTime=','count=2','expectedCount=2','freshCount=2','missingCodes=[]','delayTime=0','status=ok'): self.assertIn(line,message.get_content())
     def test_invalid_coverage_status_delay_and_times_are_blocked(self):
-        for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None},{'sourceTime':None}):
+        for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None}):
             payload=self.payload(); payload.update(changes)
             with self.subTest(changes=changes), self.assertRaises(ready.ReadyValidationError): ready.validate_quotes(payload,current=self.current)
         payload=self.payload(); payload['datas'][0]['delayTime']=20
         with self.assertRaises(ready.ReadyValidationError): ready.validate_quotes(payload,current=self.current)
+    def test_source_time_prefers_top_level_then_accepts_uniform_row_fallback(self):
+        payload=self.payload(); payload['sourceTime']='2026-09-29T10:38:00+09:00'
+        self.assertEqual(ready.validate_quotes(payload,current=self.current)['sourceTime'],'2026-09-29T10:38:00+09:00')
+        payload=self.payload(); payload.pop('sourceTime')
+        self.assertEqual(ready.validate_quotes(payload,current=self.current)['sourceTime'],'2026-09-29T10:39:00+09:00')
+    def test_source_time_row_fallback_rejects_differing_or_missing_values(self):
+        payload=self.payload(); payload.pop('sourceTime'); payload['datas'][1]['sourceTime']='2026-09-29T10:39:01+09:00'
+        with self.assertRaisesRegex(ready.ReadyValidationError,'row sourceTime values differ'): ready.validate_quotes(payload,current=self.current)
+        payload=self.payload(); payload.pop('sourceTime')
+        for row in payload['datas']: row.pop('sourceTime')
+        with self.assertRaisesRegex(ready.ReadyValidationError,'sourceTime is missing'): ready.validate_quotes(payload,current=self.current)
     def test_preclose_prior_business_day_is_allowed_but_non_pre_old_source_is_blocked(self):
         payload=self.payload()
         for row in payload['datas']: row.update(session='PRE',priceBasis='PREVIOUS_KRX_CLOSE',sourceTime='2026-09-26T15:30:00+09:00')
