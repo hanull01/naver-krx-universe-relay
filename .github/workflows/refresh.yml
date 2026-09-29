@@ -75,14 +75,19 @@ jobs:
           # :32 KST is the fast intraday path: use cached daily candles and
           # refresh quotes, technicals, states, and group states without daily
           # NAVER API requests.
-          echo "Collection started at $(TZ=Asia/Seoul date --iso-8601=seconds)"
+          started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "Collection started at ${started_at}"
+          echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
           python relay.py intraday
           code=$?
-          echo "Collection finished at $(TZ=Asia/Seoul date --iso-8601=seconds)"
+          finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "Collection finished at ${finished_at}"
+          echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Commit refreshed production data
+        id: publish
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
         shell: bash
         run: |
@@ -101,6 +106,7 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No data changes to commit"
+            echo "published=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Refresh NAVER market data"
             echo "Market data collection succeeded; synchronizing its data commit."
@@ -114,6 +120,8 @@ jobs:
               fi
               if git push origin HEAD:main; then
                 echo "Market data push succeeded."
+                echo "published=true" >> "$GITHUB_OUTPUT"
+                echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
               echo "Push was rejected because main advanced; retrying with latest main."
@@ -121,6 +129,23 @@ jobs:
             echo "::error::Data collection succeeded, but push was rejected after 3 attempts."
             exit 1
           fi
+
+      - name: Send MARKET_DATA_READY signal
+        id: ready_email
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'
+        continue-on-error: true
+        env:
+          MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
+          MARKET_GMAIL_APP_PASSWORD: ${{ secrets.MARKET_GMAIL_APP_PASSWORD }}
+          MARKET_GMAIL_TO: ${{ secrets.MARKET_GMAIL_TO }}
+          MARKET_DATA_COMMIT_SHA: ${{ steps.publish.outputs.production_commit_sha }}
+          MARKET_DATA_COLLECTION_STARTED_AT: ${{ steps.collect.outputs.collection_started_at }}
+          MARKET_DATA_COLLECTION_FINISHED_AT: ${{ steps.collect.outputs.collection_finished_at }}
+        run: python send_market_data_ready.py
+
+      - name: Warn when MARKET_DATA_READY signal fails
+        if: steps.ready_email.outcome == 'failure'
+        run: echo "::warning::MARKET_DATA_READY email was not sent; market data publication remains successful."
 
       - name: Commit collector diagnostic only
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != ''
