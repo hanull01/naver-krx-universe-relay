@@ -135,7 +135,9 @@ class RelayTests(unittest.TestCase):
                     'sourceTime': current.isoformat(), 'closePrice': 1, 'fluctuationsRatio': 0,
                     'accumulatedTradingVolume': 1, 'marketStatus': 'OPEN', 'delayTime': 0,
                     'status': 'ok'}
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
         with patch.object(relay, 'universe_state', return_value=(universe, codes, legacy, sectors)), \
+             patch.object(relay, 'now', return_value=current), \
              patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), \
              patch.object(relay, 'save') as save:
             result = relay.collect_quotes()
@@ -670,7 +672,10 @@ class RelayTests(unittest.TestCase):
             return {'datas': [{'itemCode': codes[0]}]}
         def normalize(row, current):
             return dict(itemCode=row['itemCode'], fresh=True, sourceTime=current.isoformat())
-        with patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), patch.object(relay, 'save') as save:
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        with patch.object(relay, 'now', return_value=current), \
+             patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), \
+             patch.object(relay, 'save') as save:
             result = relay.collect_quotes()
         self.assertEqual(result['count'], result['expectedCount'])
         self.assertEqual(len(set(r['itemCode'] for r in result['datas'])), result['expectedCount'])
