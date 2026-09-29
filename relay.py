@@ -11,6 +11,8 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from krx_market_day import CalendarUnavailable, krx_holidays
+
 KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
 UNIVERSE_PATH = ROOT / 'config/universe.json'
@@ -126,6 +128,24 @@ def previous_weekday(day):
     while day.weekday() > 4:
         day -= timedelta(days=1)
     return day
+
+
+def previous_krx_business_day(day, holiday_loader=krx_holidays):
+    """Return the preceding verified KRX business day, never a weekday guess.
+
+    PRE quotes deliberately use a completed daily bar for this exact date. A
+    KRX calendar lookup failure is allowed to fail collection rather than
+    silently selecting an older candle.
+    """
+    holiday_cache = {}
+    candidate = day - timedelta(days=1)
+    for _ in range(370):
+        if candidate.weekday() < 5:
+            holidays = holiday_cache.setdefault(candidate.year, holiday_loader(candidate.year))
+            if candidate.isoformat() not in holidays:
+                return candidate
+        candidate -= timedelta(days=1)
+    raise CalendarUnavailable('could not determine previous KRX business day')
 
 
 def detect_market_session(current):
@@ -260,9 +280,94 @@ def quote_payload(rows, codes, expected, errors, started):
             'datas': [rows[c] for c in codes if c in rows]}
 
 
+def quote_snapshot_unusable(payload):
+    """A zero-usable collection must not replace the last production snapshot."""
+    return (payload.get('status') == 'error' or payload.get('count', 0) == 0
+            or ('freshCount' in payload and payload.get('freshCount', 0) == 0))
+
+
+def quote_error_diagnostic(payload, current):
+    return {
+        'generatedAt': now().isoformat(), 'status': 'error',
+        'expectedCount': payload.get('expectedCount'), 'count': payload.get('count'),
+        'freshCount': payload.get('freshCount'), 'missingCodes': payload.get('missingCodes', []),
+        'errors': payload.get('errors', []), 'collectionStartedAt': payload.get('collectionStartedAt'),
+        'session': detect_market_session(current), 'preservedProductionSnapshot': True,
+    }
+
+
+def load_previous_business_day_close(code, business_day):
+    """Load only the requested completed daily close; no stale-date fallback."""
+    daily = load_daily_for_technical(code)
+    for bar in (daily or {}).get('datas', []):
+        if (bar.get('date') == business_day.isoformat() and bar.get('complete') is True):
+            close = bar.get('close')
+            if isinstance(close, (int, float)) and not isinstance(close, bool) and close > 0:
+                return close
+            raise ValueError(f'invalid completed daily close for {business_day.isoformat()}')
+    raise ValueError(f'missing completed daily close for {business_day.isoformat()}')
+
+
+def build_preclose_quote(code, stock_name, business_day, close, current, sector=None):
+    """Build the 08:40 PRE quote from the prior KRX regular-session close."""
+    source_time = datetime.combine(business_day, dtime(15, 30), tzinfo=KST)
+    result = {
+        'itemCode': code, 'stockName': stock_name, 'closePrice': close,
+        'compareToPreviousClosePrice': None, 'fluctuationsRatio': None,
+        'openPrice': None, 'highPrice': None, 'lowPrice': None,
+        'accumulatedTradingVolume': None, 'accumulatedTradingValue': None,
+        'source': 'NAVER_KRX', 'sourceTime': source_time.isoformat(),
+        'localTradedAt': source_time.isoformat(), 'marketStatus': None, 'delayTime': 0,
+        'stockExchangeType': {'delayTime': 0}, 'marketSessionType': None,
+        'overMarketPriceInfo': {}, 'ageSeconds': round((current - source_time).total_seconds()),
+        'fresh': True, 'status': 'ok', 'freshnessReason': 'previous_business_day_close',
+        'session': 'PRE', 'priceBasis': 'PREVIOUS_KRX_CLOSE',
+        'previousBusinessDay': business_day.isoformat(),
+    }
+    if sector:
+        result['sector'] = sector
+    return result
+
+
+def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
+    rows, errors = {}, []
+    try:
+        business_day = previous_krx_business_day(current.date())
+    except Exception as exc:
+        errors.append({'stage': 'previous_krx_business_day', 'error': str(exc)})
+        business_day = None
+    names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
+    if business_day:
+        for code in codes:
+            try:
+                close = load_previous_business_day_close(code, business_day)
+                rows[code] = build_preclose_quote(code, names[code], business_day, close, current,
+                                                   sectors.get(code))
+            except Exception as exc:
+                errors.append({'stage': 'previous_business_day_close', 'code': code, 'error': str(exc)})
+    for code in codes:
+        if code not in rows:
+            errors.append({'code': code, 'error': 'no_valid_quote'})
+    payload = quote_payload(rows, codes, len(codes), errors, current)
+    legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)
+    if quote_snapshot_unusable(payload):
+        save('data/status/quotes-error.json', quote_error_diagnostic(payload, current))
+        print('Collector failed; preserving last successful production snapshot.')
+    else:
+        save('data/quotes.json', payload)
+        save('data/quotes-lite.json', lite_payload(payload), compact=True)
+        save('data/core33.json', legacy)
+        save('data/core33-lite.json', lite_payload(legacy), compact=True)
+        write_group_files(universe, rows)
+    print(json.dumps({k: payload[k] for k in ('count', 'freshCount', 'status', 'sourceTime')}))
+    return payload
+
+
 def collect_quotes():
     universe, codes, legacy_codes, sectors = universe_state()
     current = now()
+    if detect_market_session(current) == 'PRE':
+        return collect_preclose_quotes(universe, codes, legacy_codes, sectors, current)
     rows, errors = {}, []
 
     def batch(codes, stage):
@@ -300,11 +405,15 @@ def collect_quotes():
     payload = quote_payload(rows, codes, len(codes), errors, current)
     # Legacy 33-stock compatibility output; data/quotes*.json is the Universe-wide source.
     legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)
-    save('data/quotes.json', payload)
-    save('data/quotes-lite.json', lite_payload(payload), compact=True)
-    save('data/core33.json', legacy)
-    save('data/core33-lite.json', lite_payload(legacy), compact=True)
-    write_group_files(universe, rows)
+    if quote_snapshot_unusable(payload):
+        save('data/status/quotes-error.json', quote_error_diagnostic(payload, current))
+        print('Collector failed; preserving last successful production snapshot.')
+    else:
+        save('data/quotes.json', payload)
+        save('data/quotes-lite.json', lite_payload(payload), compact=True)
+        save('data/core33.json', legacy)
+        save('data/core33-lite.json', lite_payload(legacy), compact=True)
+        write_group_files(universe, rows)
     print(json.dumps({k: payload[k] for k in ('count', 'freshCount', 'status', 'sourceTime')}))
     return payload
 
@@ -396,7 +505,7 @@ def load_daily_for_technical(code):
         return None
 
 
-def daily_cache_is_current(daily, current=None):
+def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     """Accept legacy fixtures, but fail closed for stale saved collector data."""
     if not daily:
         return False
@@ -414,8 +523,14 @@ def daily_cache_is_current(daily, current=None):
     except ValueError:
         return False
     current = current or now()
-    expected = (current.date() if current.weekday() < 5 and current.time() >= dtime(16, 30)
-                else previous_weekday(current.date()))
+    if expected_completed_date is not None:
+        try:
+            expected = datetime.fromisoformat(str(expected_completed_date)).date()
+        except ValueError:
+            return False
+    else:
+        expected = (current.date() if current.weekday() < 5 and current.time() >= dtime(16, 30)
+                    else previous_weekday(current.date()))
     return actual == expected
 
 
@@ -446,7 +561,9 @@ def calculate_technicals(code, stock_name, daily, quote):
         'avgVolume20': avg_volume20,
         'volumeRatio20': round(current_volume / avg_volume20, 2)
                          if avg_volume20 and current_volume is not None else None,
-        'status': 'error' if not daily_cache_is_current(daily) else 'ok' if enough20 else 'insufficient_history',
+        'status': 'error' if not daily_cache_is_current(
+            daily, expected_completed_date=(quote or {}).get('previousBusinessDay'))
+        else 'ok' if enough20 else 'insufficient_history',
     }
 
 
@@ -601,6 +718,9 @@ def run_quote_pipeline():
     result = timed_step('quotes', collect_quotes)
     _, _, legacy_codes, _ = universe_state()
     failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
+    if quote_snapshot_unusable(result):
+        print('Collector failed; preserving last successful production snapshot.')
+        return True
     technicals = timed_step('technicals', build_technicals, result)
     failed |= technicals['count'] != result['expectedCount']
     # A complete-looking row count is not healthy if every daily-derived row

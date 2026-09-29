@@ -156,6 +156,83 @@ class RelayTests(unittest.TestCase):
             relay.collect_all_daily()
         self.assertEqual(sorted(call.args[0] for call in daily.call_args_list), codes)
 
+    def test_previous_krx_business_day_uses_verified_calendar_not_weekday_guess(self):
+        no_holidays = lambda year: set()
+        self.assertEqual(relay.previous_krx_business_day(datetime(2026, 9, 29).date(), no_holidays).isoformat(),
+                         '2026-09-28')
+        self.assertEqual(relay.previous_krx_business_day(datetime(2026, 9, 28).date(), no_holidays).isoformat(),
+                         '2026-09-25')
+        holidays = {'2026-09-28'}
+        loader = lambda year: holidays if year == 2026 else set()
+        self.assertEqual(relay.previous_krx_business_day(datetime(2026, 9, 29).date(), loader).isoformat(),
+                         '2026-09-25')
+
+    def test_preclose_uses_exact_completed_previous_business_day_without_realtime(self):
+        universe = self.expanded_universe(); codes = relay.universe_codes(universe)
+        current = datetime(2026, 9, 29, 8, 40, tzinfo=relay.KST)
+        daily = {'datas': [
+            {'date': '2026-09-28', 'complete': True, 'close': 70000},
+            {'date': '2026-09-29', 'complete': False, 'close': 99999},
+        ]}
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+             patch.object(relay, 'now', return_value=current), \
+             patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()), \
+             patch.object(relay, 'load_daily_for_technical', return_value=daily), \
+             patch.object(relay, 'fetch') as fetch, patch.object(relay, 'save') as save:
+            result = relay.collect_quotes()
+        fetch.assert_not_called()
+        self.assertEqual(result['count'], 3)
+        self.assertTrue(all(row['closePrice'] == 70000 for row in result['datas']))
+        self.assertTrue(all(row['priceBasis'] == 'PREVIOUS_KRX_CLOSE' for row in result['datas']))
+        self.assertTrue(all(row['freshnessReason'] == 'previous_business_day_close' for row in result['datas']))
+        self.assertIn('data/quotes-lite.json', [call.args[0] for call in save.call_args_list])
+
+    def test_preclose_technical_cache_uses_quote_business_day_not_conservative_weekday(self):
+        daily = self.daily_fixture(20)
+        daily.update({'status': 'ok', 'sourceTime': '2026-09-25'})
+        quote = {'accumulatedTradingVolume': 1000, 'previousBusinessDay': '2026-09-25'}
+        result = relay.calculate_technicals('000001', 'A', daily, quote)
+        self.assertEqual(result['status'], 'ok')
+
+    def test_preclose_missing_exact_completed_bar_preserves_production_and_records_diagnostic(self):
+        universe = self.expanded_universe(); codes = relay.universe_codes(universe)
+        current = datetime(2026, 9, 29, 8, 40, tzinfo=relay.KST)
+        daily = {'datas': [{'date': '2026-09-25', 'complete': True, 'close': 70000}]}
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+             patch.object(relay, 'now', return_value=current), \
+             patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()), \
+             patch.object(relay, 'load_daily_for_technical', return_value=daily), \
+             patch.object(relay, 'save') as save:
+            result = relay.collect_quotes()
+        self.assertEqual(result['status'], 'error')
+        self.assertEqual({call.args[0] for call in save.call_args_list}, {'data/status/quotes-error.json'})
+        self.assertTrue(save.call_args.args[1]['preservedProductionSnapshot'])
+
+    def test_realtime_complete_failure_preserves_production_and_pipeline_skips_derived_outputs(self):
+        universe = self.expanded_universe(); codes = relay.universe_codes(universe)
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        def broken_quote(url):
+            requested = url.rsplit('/', 1)[-1].split(',')
+            return {'datas': [{'itemCode': code, 'stockName': code,
+                               'localTradedAt': current.isoformat(), 'closePriceRaw': '100',
+                               'compareToPreviousClosePriceRaw': '0', 'fluctuationsRatioRaw': '0',
+                               'openPriceRaw': '', 'highPriceRaw': '100', 'lowPriceRaw': '100',
+                               'accumulatedTradingVolumeRaw': '1', 'accumulatedTradingValueRaw': '1',
+                               'stockExchangeType': {'delayTime': 0}} for code in requested]}
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+             patch.object(relay, 'now', return_value=current), patch.object(relay, 'fetch', broken_quote), \
+             patch.object(relay, 'save') as save:
+            result = relay.collect_quotes()
+        self.assertEqual((result['count'], result['freshCount'], result['status']), (0, 0, 'error'))
+        self.assertEqual({call.args[0] for call in save.call_args_list}, {'data/status/quotes-error.json'})
+        self.assertTrue(any("field=openPrice, value=''" in error['error'] for error in result['errors']))
+        unusable = {'count': 0, 'expectedCount': 3, 'freshCount': 0, 'status': 'error', 'datas': []}
+        with patch.object(relay, 'collect_quotes', return_value=unusable), \
+             patch.object(relay, 'build_technicals') as technicals, \
+             patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})):
+            self.assertTrue(relay.run_quote_pipeline())
+        technicals.assert_not_called()
+
     def test_intraday_mode_skips_daily_network_collection_and_runs_derived_steps(self):
         quotes = {'count': 3, 'expectedCount': 3, 'datas': []}
         technicals = {'count': 3, 'datas': []}
