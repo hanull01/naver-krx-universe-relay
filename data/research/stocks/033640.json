@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "033640",
   "itemName": "네패스",
-  "reportCount": 2,
-  "latestReportNid": "95789",
-  "latestWriteDate": "2026-08-20",
+  "reportCount": 3,
+  "latestReportNid": "96367",
+  "latestWriteDate": "2026-09-30",
   "latest": {
-    "nid": "95789",
-    "writeDate": "2026-08-20",
-    "brokerName": "교보증권",
-    "title": "달라지고 있는 체급",
-    "goalPrice": 40000,
-    "normalizedOpinion": "BUY",
+    "nid": "96367",
+    "writeDate": "2026-09-30",
+    "brokerName": "한국IR협의회",
+    "title": "[AI] 시스템 반도체 첨단 후공정 패키징 전문기업",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 0,
+        "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1,
-        "자동차": 1
+        "반도체": 9,
+        "배터리": 5,
+        "자동차": 3
       }
     }
   },
   "reportNids": [
+    "96367",
     "95789",
     "93171"
   ]

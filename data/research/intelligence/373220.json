@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "373220",
   "itemName": "LG에너지솔루션",
-  "asOf": "2026-09-29",
+  "asOf": "2026-09-30",
   "dateRange": {
     "from": "2026-03-30",
     "to": "2026-09-21"
@@ -12,8 +12,8 @@
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-08-30",
-      "to": "2026-09-29",
+      "from": "2026-08-31",
+      "to": "2026-09-30",
       "reportCount": 2,
       "brokerCount": 2,
       "targetPrice": {
@@ -50,48 +50,29 @@
       }
     },
     "previous": {
-      "from": "2026-07-31",
-      "to": "2026-08-29",
-      "reportCount": 9,
-      "brokerCount": 9,
+      "from": "2026-08-01",
+      "to": "2026-08-30",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 9,
-        "min": 470000,
-        "max": 600000,
-        "mean": 524444,
-        "median": 510000,
-        "stdev": 40307,
-        "range": 130000
+        "count": 1,
+        "min": 550000,
+        "max": 550000,
+        "mean": 550000,
+        "median": 550000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 6,
-        "MIXED": 2,
-        "UNKNOWN": 1
+        "UP": 1
       },
       "textSignal": {
-        "positive": 81,
-        "negative": 20,
-        "net": 61,
-        "netPerReport": 6.778
+        "positive": 3,
+        "negative": 1,
+        "net": 2,
+        "netPerReport": 2.0
       },
-      "topics": {
-        "수요": {
-          "count": 5,
-          "perReport": 0.556
-        },
-        "AI": {
-          "count": 3,
-          "perReport": 0.333
-        },
-        "중국": {
-          "count": 1,
-          "perReport": 0.111
-        },
-        "원가": {
-          "count": 1,
-          "perReport": 0.111
-        }
-      }
+      "topics": {}
     },
     "topicAcceleration": [
       {
@@ -104,48 +85,30 @@
         "ratio": null
       },
       {
-        "topic": "원가",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": 0.389,
-        "ratio": 4.5
-      },
-      {
         "topic": "수요",
         "currentCount": 1,
         "currentPerReport": 0.5,
-        "previousCount": 5,
-        "previousPerReport": 0.556,
-        "perReportDelta": -0.056,
-        "ratio": 0.9
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
+        "ratio": null
       },
       {
-        "topic": "중국",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": -0.111,
-        "ratio": 0.0
-      },
-      {
-        "topic": "AI",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 3,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
-        "ratio": 0.0
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
+        "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -7,
-    "targetMeanChangePct": 1.06,
-    "targetMedianChangePct": 3.92,
-    "targetDispersionChangePct": -50.38
+    "reportCountChange": 1,
+    "targetMeanChangePct": -3.64,
+    "targetMedianChangePct": -3.64,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 10,
