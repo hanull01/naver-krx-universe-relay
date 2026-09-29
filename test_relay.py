@@ -304,13 +304,13 @@ class RelayTests(unittest.TestCase):
         daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-25T15:30:00+09:00'})
         self.assertTrue(relay.daily_cache_is_current(daily, current))
 
-    def test_daily_cache_requires_current_completed_candle_after_regular_close(self):
+    def test_daily_cache_keeps_today_provisional_after_regular_close(self):
         current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
         current_daily = self.daily_fixture(60)
         current_daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-28T15:30:00+09:00'})
         stale_daily = dict(current_daily, sourceTime='2026-09-25T15:30:00+09:00')
-        self.assertTrue(relay.daily_cache_is_current(current_daily, current))
-        self.assertFalse(relay.daily_cache_is_current(stale_daily, current))
+        self.assertFalse(relay.daily_cache_is_current(current_daily, current))
+        self.assertTrue(relay.daily_cache_is_current(stale_daily, current))
 
     def test_daily_cache_rejects_missing_or_corrupt_metadata(self):
         current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
@@ -348,7 +348,7 @@ class RelayTests(unittest.TestCase):
                               'fluctuationsRatio': 0, 'accumulatedTradingVolume': 2,
                               'sourceTime': 'now', 'marketStatus': 'CLOSE', 'delayTime': 0,
                               'fresh': True, 'freshnessReason': 'after_market_live', 'session': 'AFTER',
-                              'priceBasis': 'AFTER_MARKET', 'marketSessionType': 'AFTER_MARKET',
+                              'priceBasis': 'AFTER_MARKET', 'marketSessionType': 'afterMarket',
                               'status': 'ok', 'unwanted': 'x'}]}
         result = relay.lite_payload(payload)
         self.assertEqual(set(result['datas'][0]), set(relay.LITE_FIELDS))
@@ -442,7 +442,7 @@ class RelayTests(unittest.TestCase):
         current = datetime(2026, 9, 23, 16, 50, tzinfo=relay.KST)
         row = dict(itemCode='005930', stockName='삼성전자',
                    localTradedAt='2026-09-23T16:47:00+09:00', marketStatus='OPEN',
-                   marketSessionType='AFTER_MARKET', stockExchangeType={'delayTime': 0, 'code': 'KRX'},
+                   marketSessionType='afterMarket', stockExchangeType={'delayTime': 0, 'code': 'KRX'},
                    overMarketPriceInfo={'tradingSessionType': 'AFTER_MARKET', 'overPrice': '100500',
                                         'localTradedAt': '2026-09-23T16:47:00+09:00'},
                    closePrice='100500', compareToPreviousClosePrice='0', compareToPreviousPrice={},
@@ -451,10 +451,69 @@ class RelayTests(unittest.TestCase):
         quote = relay.normalize_quote(row, current)
         self.assertEqual(quote['closePrice'], 100500)
         self.assertEqual(quote['priceBasis'], 'AFTER_MARKET')
-        self.assertEqual(quote['marketSessionType'], 'AFTER_MARKET')
+        self.assertEqual(quote['marketSessionType'], 'afterMarket')
         self.assertEqual(quote['stockExchangeType']['code'], 'KRX')
         self.assertEqual(quote['overMarketPriceInfo']['tradingSessionType'], 'AFTER_MARKET')
         self.assertEqual(quote['overMarketPriceInfo']['overPrice'], '100500')
+
+    def test_after_quote_uses_top_level_price_without_over_market_and_marks_no_trade(self):
+        current = datetime(2026, 9, 29, 16, 10, tzinfo=relay.KST)
+        row = dict(itemCode='097800', stockName='윈팩', localTradedAt='2026-09-29T15:30:00+09:00',
+                   marketSessionType='afterMarket', marketStatus='CLOSE',
+                   stockExchangeType={'delayTime': 0}, closePrice='2335',
+                   compareToPreviousClosePrice='0', compareToPreviousPrice={}, fluctuationsRatio='0',
+                   openPrice='1', highPrice='1', lowPrice='1', accumulatedTradingVolume='1',
+                   accumulatedTradingValue='1', overMarketPriceInfo=None)
+        quote = relay.normalize_quote(row, current)
+        self.assertEqual(quote['sessionPrice'], 2335)
+        self.assertEqual(quote['sessionPriceBasis'], 'AFTER_MARKET')
+        self.assertEqual(quote['sessionStatus'], 'NO_AFTER_TRADE')
+        self.assertEqual(quote['overMarketPriceInfo'], {})
+
+    def test_after_reference_uses_exact_1530_minute_and_failure_is_nonfatal(self):
+        current = datetime(2026, 9, 29, 16, 10, tzinfo=relay.KST)
+        row = {'itemCode': '201490', 'session': 'AFTER', 'sessionPrice': 3420}
+        def minute(url):
+            self.assertIn('startDateTime=202609290900&endDateTime=202609291530', url)
+            return [{'localDateTime': '20260929152900', 'currentPrice': 3300},
+                    {'localDateTime': '20260929153000', 'currentPrice': 3385}]
+        with patch.object(relay, 'fetch', minute):
+            relay.attach_after_references({'201490': row}, current)
+        self.assertEqual(row['referencePrice'], 3385)
+        self.assertEqual(row['referenceSourceTime'], '20260929153000')
+        self.assertEqual(row['sessionChange'], 35)
+        self.assertEqual(row['referenceStatus'], 'ok')
+        with patch.object(relay, 'fetch', side_effect=ValueError('minute down')):
+            relay.attach_after_references({'201490': row}, current)
+        self.assertIsNone(row['referencePrice'])
+        self.assertEqual(row['referenceStatus'], 'unavailable')
+
+    def test_after_no_trade_is_covered_and_does_not_make_ready_payload_stale(self):
+        rows = {'000001': {'fresh': False, 'sourceTime': '2026-09-29T15:30:00+09:00',
+                           'sessionStatus': 'NO_AFTER_TRADE'}}
+        payload = relay.quote_payload(rows, ['000001'], 1, [], datetime.now(relay.KST))
+        self.assertEqual((payload['status'], payload['coverageCount'], payload['liveCount'],
+                          payload['noAfterTradeCount']), ('ok', 1, 0, 1))
+        self.assertFalse(relay.quote_snapshot_unusable(payload))
+
+    def test_today_daily_row_remains_provisional_after_1540(self):
+        current = datetime(2026, 9, 29, 15, 40, tzinfo=relay.KST)
+        response = [{'localDate': '20260928', 'openPrice': 1, 'highPrice': 2, 'lowPrice': 1,
+                     'closePrice': 2, 'accumulatedTradingVolume': 10},
+                    {'localDate': '20260929', 'openPrice': 1, 'highPrice': 3, 'lowPrice': 1,
+                     'closePrice': 3, 'accumulatedTradingVolume': 20}]
+        with patch.object(relay, 'now', return_value=current), patch.object(relay, 'fetch', return_value=response), \
+             patch.object(relay, 'save') as save:
+            result = relay.collect_daily('201490')
+        saved = save.call_args.args[1]
+        self.assertEqual(result['status'], 'insufficient')
+        self.assertTrue(saved['datas'][0]['complete'])
+        self.assertFalse(saved['datas'][1]['complete'])
+
+    def test_daily_workflow_runs_at_1540_kst_and_documents_provisional_policy(self):
+        workflow = (Path(__file__).parent / '.github/workflows/refresh-daily.yml').read_text(encoding='utf-8')
+        self.assertIn('cron: "40 6 * * 1-5"', workflow)
+        self.assertIn("today's provisional row", workflow)
 
     def test_breakout_close_confirmation_uses_source_timestamp_not_market_status(self):
         config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}

@@ -52,7 +52,8 @@ def validate_quotes(payload, current=None, collection_started_at=None):
     expected = payload.get('expectedCount'); count = payload.get('count')
     if payload.get('status') != 'ok' or not isinstance(expected, int) or expected <= 0:
         raise ReadyValidationError('quotes payload is not ok')
-    if count != expected or payload.get('freshCount') != expected:
+    coverage = payload.get('coverageCount', count)
+    if count != expected or coverage != expected:
         raise ReadyValidationError('quote coverage is incomplete')
     if payload.get('missingCodes') != []:
         raise ReadyValidationError('quotes payload has missing codes')
@@ -79,7 +80,9 @@ def validate_quotes(payload, current=None, collection_started_at=None):
     elif source_time.date() != generated.date():
         raise ReadyValidationError('quotes source time is not today')
     return {'generatedAt': generated.isoformat(), 'sourceTime': source_time.isoformat(),
-            'count': count, 'expectedCount': expected, 'freshCount': expected,
+            'count': count, 'expectedCount': expected, 'coverageCount': coverage,
+            'freshCount': payload.get('freshCount'), 'liveCount': payload.get('liveCount'),
+            'noAfterTradeCount': payload.get('noAfterTradeCount'),
             'session': next(iter(sessions)) if len(sessions) == 1 else 'MIXED',
             'priceBasis': next(iter(bases)) if len(bases) == 1 else 'MIXED',
             'collectionStartedAt': payload.get('collectionStartedAt')}
@@ -96,8 +99,12 @@ def ready_message(metadata, env):
              f'run_url={server}/{repository}/actions/runs/{run_id}', f'commit_sha={commit_sha}',
              f'generatedAt={metadata["generatedAt"]}', f'sourceTime={metadata["sourceTime"]}',
              f'count={metadata["count"]}', f'expectedCount={metadata["expectedCount"]}',
-             f'freshCount={metadata["freshCount"]}', 'missingCodes=[]', 'delayTime=0', 'status=ok',
+             f'freshCount={metadata["freshCount"]}', f'coverageCount={metadata["coverageCount"]}',
+             'missingCodes=[]', 'delayTime=0', 'status=ok',
              f'session={metadata["session"]}', f'priceBasis={metadata["priceBasis"]}']
+    for key in ('liveCount', 'noAfterTradeCount'):
+        if metadata.get(key) is not None:
+            lines.append(f'{key}={metadata[key]}')
     if metadata.get('collectionStartedAt'): lines.append(f'collectionStartedAt={metadata["collectionStartedAt"]}')
     if env.get('MARKET_DATA_COLLECTION_FINISHED_AT'): lines.append(f'collectionFinishedAt={env["MARKET_DATA_COLLECTION_FINISHED_AT"]}')
     message.set_content('\n'.join(lines) + '\n'); return message

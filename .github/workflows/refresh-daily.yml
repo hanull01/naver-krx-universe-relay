@@ -3,9 +3,9 @@ name: Refresh daily candles
 on:
   workflow_dispatch:
   schedule:
-    # 16:40 KST Mon-Fri = 07:40 UTC Mon-Fri. relay.py marks today's candle
-    # complete after 16:30 KST, so the next intraday run can use this cache.
-    - cron: "40 7 * * 1-5"
+    # 15:40 KST Mon-Fri = 06:40 UTC Mon-Fri. This refresh updates history and
+    # stores today's provisional row for the next business day's PRE close.
+    - cron: "40 6 * * 1-5"
 
 permissions:
   contents: write

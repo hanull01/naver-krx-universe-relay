@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent
 UNIVERSE_PATH = ROOT / 'config/universe.json'
 QUOTE_URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock/'
 DAILY_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/day'
+MINUTE_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/minute'
 
 
 def validate_universe(universe):
@@ -250,18 +251,35 @@ def normalize_quote(row, current, sector=None):
                   ageSeconds=round((current - traded).total_seconds()), fresh=fresh,
                   status='ok' if fresh else 'stale', freshnessReason=reason,
                   session=session, priceBasis=price_basis(session))
+    if session == 'AFTER':
+        # The common after-hours contract is the top-level realtime price.
+        # overMarketPriceInfo is intentionally metadata only: it is absent for
+        # valid rows on some symbols.
+        live = (str(row.get('marketSessionType', '')).lower() == 'aftermarket'
+                and traded.date() == current.date() and traded.time() >= dtime(15, 40)
+                and delay == 0)
+        result.update(sessionPrice=result['closePrice'], sessionSourceTime=traded.isoformat(),
+                      sessionPriceBasis='AFTER_MARKET',
+                      sessionStatus='LIVE' if live else 'NO_AFTER_TRADE',
+                      referencePrice=None, referenceSourceTime=None,
+                      referencePriceBasis='TODAY_REGULAR_CLOSE', referenceStatus='unavailable',
+                      sessionChange=None, sessionChangeRate=None)
     return result
 
 
 LITE_FIELDS = ('itemCode', 'stockName', 'closePrice', 'fluctuationsRatio',
                'accumulatedTradingVolume', 'sourceTime', 'marketStatus', 'delayTime',
-               'fresh', 'freshnessReason', 'session', 'priceBasis', 'marketSessionType', 'status')
+               'fresh', 'freshnessReason', 'session', 'priceBasis', 'marketSessionType', 'status',
+               'sessionPrice', 'sessionSourceTime', 'sessionPriceBasis', 'sessionStatus',
+               'referencePrice', 'referenceSourceTime', 'referencePriceBasis', 'referenceStatus',
+               'sessionChange', 'sessionChangeRate')
 
 
 def lite_payload(payload):
     keys = ('generatedAt', 'sourceTime', 'sourceTimeLatest', 'expectedCount', 'count',
-            'freshCount', 'missingCodes', 'status', 'fresh')
-    result = {key: payload[key] for key in keys}
+            'coverageCount', 'freshCount', 'liveCount', 'noAfterTradeCount', 'missingCodes',
+            'status', 'fresh')
+    result = {key: payload.get(key) for key in keys}
     result['datas'] = [{key: row.get(key) for key in LITE_FIELDS} for row in payload['datas']]
     return result
 
@@ -269,12 +287,21 @@ def lite_payload(payload):
 def quote_payload(rows, codes, expected, errors, started):
     missing = [c for c in codes if c not in rows]
     fresh_count = sum(rows[c]['fresh'] for c in codes if c in rows)
-    status = 'error' if not rows else 'partial' if missing else 'ok' if fresh_count == expected else 'stale'
+    covered = len([c for c in codes if c in rows])
+    live_count = sum(rows[c].get('sessionStatus') == 'LIVE' for c in codes if c in rows)
+    no_after_trade_count = sum(rows[c].get('sessionStatus') == 'NO_AFTER_TRADE'
+                               for c in codes if c in rows)
+    # Coverage is a technical collection result.  During AFTER, a symbol can
+    # validly have no new trade; that must not turn a complete collection into
+    # a collector failure.
+    status = 'error' if not rows else 'partial' if missing else 'ok'
     times = [row['sourceTime'] for row in rows.values()]
     return {'schemaVersion': 1, 'generatedAt': now().isoformat(),
             'collectionStartedAt': started.isoformat(), 'source': 'NAVER_KRX',
-            'count': len([c for c in codes if c in rows]), 'expectedCount': expected,
-            'freshCount': fresh_count, 'status': status, 'fresh': status == 'ok', 'errors': errors,
+            'count': covered, 'expectedCount': expected, 'coverageCount': covered,
+            'freshCount': fresh_count, 'liveCount': live_count,
+            'noAfterTradeCount': no_after_trade_count, 'status': status,
+            'fresh': fresh_count == expected, 'errors': errors,
             'missingCodes': missing, 'sourceTime': min(times) if times else None,
             'sourceTimeLatest': max(times) if times else None,
             'freshnessPolicy': 'previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00',
@@ -284,7 +311,7 @@ def quote_payload(rows, codes, expected, errors, started):
 def quote_snapshot_unusable(payload):
     """A zero-usable collection must not replace the last production snapshot."""
     return (payload.get('status') == 'error' or payload.get('count', 0) == 0
-            or ('freshCount' in payload and payload.get('freshCount', 0) == 0))
+            or payload.get('coverageCount', payload.get('count', 0)) == 0)
 
 
 def quote_error_diagnostic(payload, current):
@@ -364,6 +391,53 @@ def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
     return payload
 
 
+def regular_close_reference(code, current):
+    """Return the exact 15:30 KRX minute close, or raise without harming quotes."""
+    day = current.strftime('%Y%m%d')
+    url = (MINUTE_URL.format(code=code)
+           + f'?startDateTime={day}0900&endDateTime={day}1530')
+    response = fetch(url)
+    rows = response if isinstance(response, list) else response.get('datas', [])
+    if not isinstance(rows, list):
+        raise ValueError('minute endpoint did not return array')
+    expected_time = f'{day}153000'
+    matches = [row for row in rows if isinstance(row, dict)
+               and str(row.get('localDateTime')) == expected_time]
+    if not matches:
+        raise ValueError('15:30 minute close is unavailable')
+    return number(matches[-1].get('currentPrice'), 'minute.currentPrice'), expected_time
+
+
+def attach_after_references(rows, current):
+    """Add optional regular-close references without downgrading realtime coverage."""
+    after_rows = [(code, row) for code, row in rows.items() if row.get('session') == 'AFTER']
+
+    def lookup(code):
+        try:
+            return code, regular_close_reference(code, current)
+        except Exception:
+            return code, None
+
+    # A minute lookup is supplementary.  Keep it bounded so a larger Universe
+    # does not serially delay the current-price collection.
+    with ThreadPoolExecutor(max_workers=min(4, len(after_rows) or 1)) as pool:
+        references = dict(pool.map(lambda pair: lookup(pair[0]), after_rows))
+    for code, row in after_rows:
+        reference = references[code]
+        if reference:
+            reference_price, reference_time = reference
+            row.update(referencePrice=reference_price, referenceSourceTime=reference_time,
+                       referencePriceBasis='TODAY_REGULAR_CLOSE', referenceStatus='ok',
+                       sessionChange=row['sessionPrice'] - reference_price,
+                       sessionChangeRate=round((row['sessionPrice'] / reference_price - 1) * 100, 6))
+        else:
+            # The reference is an additive comparison; the realtime current
+            # price remains a valid covered quote when this endpoint is down.
+            row.update(referencePrice=None, referenceSourceTime=None,
+                       referencePriceBasis='TODAY_REGULAR_CLOSE', referenceStatus='unavailable',
+                       sessionChange=None, sessionChangeRate=None)
+
+
 def collect_quotes():
     universe, codes, legacy_codes, sectors = universe_state()
     current = now()
@@ -403,6 +477,8 @@ def collect_quotes():
     missing = [c for c in codes if c not in rows]
     for code in missing:
         errors.append({'code': code, 'error': 'no_valid_quote'})
+    if detect_market_session(current) == 'AFTER':
+        attach_after_references(rows, current)
     payload = quote_payload(rows, codes, len(codes), errors, current)
     # Legacy 33-stock compatibility output; data/quotes*.json is the Universe-wide source.
     legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)
@@ -465,19 +541,21 @@ def collect_daily(code):
                     and bar['low'] - 1 <= min(bar['open'], bar['close'])
                     <= max(bar['open'], bar['close']) <= bar['high'] + 1) or bar['volume'] < 0):
                 raise ValueError('invalid OHLCV')
-            # Conservatively keep today's candle provisional until 16:30 KST.
-            bar['complete'] = date < current.date() or current.time() >= dtime(16, 30)
+            # NAVER's current-day daily row can still absorb after-hours
+            # trading.  It is never a completed KRX regular-session candle
+            # on the day it is collected.
+            bar['complete'] = date < current.date()
             bars[bar['date']] = bar
         ordered = [bars[d] for d in sorted(bars)]
         completed = [b for b in ordered if b['complete']]
         latest = completed[-1]['date'] if completed else None
-        expected = current.date() if current.weekday() < 5 and current.time() >= dtime(16, 30) else previous_weekday(current.date())
+        expected = previous_weekday(current.date())
         fresh = latest == expected.isoformat()
         status = 'insufficient' if len(completed) < 60 else 'ok' if fresh else 'stale'
         payload.update(count=len(ordered), completedCount=len(completed), datas=ordered,
                        sourceTime=latest, latestDate=ordered[-1]['date'] if ordered else None,
                        fresh=fresh and len(completed) >= 60, status=status,
-                       freshnessPolicy='latest completed date must equal conservative expected weekday; consumer must verify actual KRX calendar')
+                       freshnessPolicy='today is always provisional; latest completed date must equal conservative previous weekday; consumer must verify actual KRX calendar')
         if status != 'ok':
             payload['errors'].append({'error': status, 'expectedCompletedDate': expected.isoformat()})
     except Exception as exc:
@@ -530,8 +608,8 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
         except ValueError:
             return False
     else:
-        expected = (current.date() if current.weekday() < 5 and current.time() >= dtime(16, 30)
-                    else previous_weekday(current.date()))
+        # Today's daily row is intentionally provisional even after 15:40.
+        expected = previous_weekday(current.date())
     return actual == expected
 
 

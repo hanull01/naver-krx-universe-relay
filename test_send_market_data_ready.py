@@ -21,7 +21,7 @@ class ReadyMailTests(unittest.TestCase):
     current = datetime(2026, 9, 29, 10, 40, tzinfo=ready.KST)
     def payload(self):
         timestamp = '2026-09-29T10:39:00+09:00'
-        return {'status':'ok','count':2,'expectedCount':2,'freshCount':2,'missingCodes':[], 'generatedAt':timestamp,'sourceTime':timestamp,'collectionStartedAt':'2026-09-29T10:32:00+09:00','datas':[{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'},{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'}]}
+        return {'status':'ok','count':2,'expectedCount':2,'coverageCount':2,'freshCount':2,'missingCodes':[], 'generatedAt':timestamp,'sourceTime':timestamp,'collectionStartedAt':'2026-09-29T10:32:00+09:00','datas':[{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'},{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'}]}
     def env(self):
         return {'MARKET_GMAIL_USERNAME':'sender@example.com','MARKET_GMAIL_APP_PASSWORD':'secret','MARKET_GMAIL_TO':'trigger@example.com','GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'hanull01/naver-krx-universe-relay','GITHUB_SERVER_URL':'https://github.com','MARKET_DATA_COMMIT_SHA':'abc123','MARKET_DATA_COLLECTION_STARTED_AT':'2026-09-29T10:32:00+09:00'}
     def test_valid_payload_builds_exact_prefix_and_required_lines(self):
@@ -50,6 +50,14 @@ class ReadyMailTests(unittest.TestCase):
         payload['sourceTime']='2026-09-26T15:30:00+09:00'; self.assertEqual(ready.validate_quotes(payload,current=self.current)['session'],'PRE')
         payload['datas'][0]['session']='REGULAR'
         with self.assertRaises(ready.ReadyValidationError): ready.validate_quotes(payload,current=self.current)
+    def test_after_no_trade_uses_coverage_not_fresh_count_for_ready(self):
+        payload = self.payload(); payload.update(freshCount=1, liveCount=1, noAfterTradeCount=1)
+        for row in payload['datas']:
+            row.update(session='AFTER', priceBasis='AFTER_MARKET')
+        metadata = ready.validate_quotes(payload, current=self.current)
+        self.assertEqual(metadata['coverageCount'], 2)
+        self.assertEqual(metadata['noAfterTradeCount'], 1)
+        self.assertIn('coverageCount=2', ready.ready_message(metadata, self.env()).get_content())
     def test_main_sends_with_mock_and_never_exposes_secret_on_failure(self):
         FakeSMTP.messages=[]
         with tempfile.TemporaryDirectory() as directory:
