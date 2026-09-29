@@ -314,6 +314,38 @@ class RelayTests(unittest.TestCase):
         self.assertFalse(relay.daily_cache_is_current(current_daily, current))
         self.assertTrue(relay.daily_cache_is_current(stale_daily, current))
 
+    def test_legacy_raw_today_complete_is_runtime_provisional_and_previous_cache_stays_valid(self):
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        raw = {'status': 'ok', 'sourceTime': '2026-09-29', 'datas': [
+            {'date': '2026-09-28', 'close': 100, 'high': 100, 'volume': 10,
+             'complete': True, 'noTrading': False},
+            {'date': '2026-09-29', 'close': 999, 'high': 999, 'volume': 999,
+             'complete': True, 'noTrading': False},
+        ]}
+        normalized = relay.normalize_raw_daily_for_technical(raw, current)
+        self.assertTrue(raw['datas'][1]['complete'])  # no production rewrite
+        self.assertFalse(normalized['datas'][1]['complete'])
+        self.assertEqual(normalized['sourceTime'], '2026-09-28')
+        self.assertTrue(relay.daily_cache_is_current(normalized, current))
+
+    def test_legacy_raw_today_falls_back_to_previous_history_without_regular_daily(self):
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); (root / 'data/daily').mkdir(parents=True)
+            completed = [{'date': '2026-09-28', 'close': 100, 'high': 100, 'volume': 10,
+                          'complete': True, 'noTrading': False} for _ in range(60)]
+            raw = {'status': 'ok', 'sourceTime': '2026-09-29', 'datas': completed + [
+                {'date': '2026-09-29', 'close': 999, 'high': 999, 'volume': 999,
+                 'complete': True, 'noTrading': False}]}
+            (root / 'data/daily/000001.json').write_text(json.dumps(raw), encoding='utf-8')
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
+                daily = relay.load_daily_for_technical('000001')
+                technical = relay.calculate_technicals('000001', 'A', daily,
+                                                       {'accumulatedTradingVolume': 10})
+        self.assertEqual(len([bar for bar in daily['datas'] if bar['complete']]), 60)
+        self.assertEqual(technical['asOf'], '2026-09-28')
+        self.assertEqual(technical['status'], 'ok')
+
     def test_daily_cache_rejects_missing_or_corrupt_metadata(self):
         current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
         self.assertFalse(relay.daily_cache_is_current({'status': 'ok', 'sourceTime': 'not-a-date'}, current))
@@ -331,6 +363,19 @@ class RelayTests(unittest.TestCase):
              patch.object(relay, 'build_group_states'), \
              patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
             self.assertTrue(relay.run_quote_pipeline())
+
+    def test_intraday_pipeline_succeeds_when_legacy_cache_normalizes_to_previous_completed_day(self):
+        quotes = {'count': 3, 'expectedCount': 3, 'coverageCount': 3,
+                  'status': 'ok', 'datas': []}
+        technicals = {'count': 3, 'expectedCount': 3, 'status': 'ok',
+                      'missingCodes': [], 'datas': []}
+        states = {'count': 3, 'datas': []}; legacy = [f'{index:06d}' for index in range(33)]
+        with patch.object(relay, 'collect_quotes', return_value=quotes), \
+             patch.object(relay, 'build_technicals', return_value=technicals), \
+             patch.object(relay, 'build_states', return_value=states), \
+             patch.object(relay, 'build_group_states'), \
+             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+            self.assertFalse(relay.run_quote_pipeline())
 
     def test_universe_legacy_and_validation(self):
         universe = relay.load_universe()

@@ -648,11 +648,41 @@ TECHNICAL_LITE_FIELDS = ('itemCode', 'ma5', 'ma20', 'ma60', 'high20', 'high60',
                          'high52w', 'volumeRatio20', 'historyCount', 'status')
 
 
+def normalize_raw_daily_for_technical(daily, current=None):
+    """Read legacy raw daily caches under the current provisional-today contract.
+
+    Older production files may have marked today's NAVER daily row complete.
+    That flag is no longer trustworthy because the endpoint can absorb
+    after-hours activity.  This normalizes only the in-memory technical view;
+    it never rewrites the raw cache.
+    """
+    if not isinstance(daily, dict):
+        return daily
+    current = current or now()
+    today = current.date().isoformat()
+    normalized = dict(daily)
+    rows = []
+    for row in daily.get('datas', []):
+        copied = dict(row)
+        if copied.get('date') == today:
+            copied['complete'] = False
+        rows.append(copied)
+    normalized['datas'] = rows
+    completed = [row for row in rows if row.get('complete') is True]
+    if completed:
+        # Source metadata must describe the effective completed history, not
+        # a legacy same-day raw row that was just normalized to provisional.
+        normalized['sourceTime'] = completed[-1].get('date')
+    return normalized
+
+
 def load_daily_for_technical(code):
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
         return None
+    current = now()
+    daily = normalize_raw_daily_for_technical(daily, current)
     try:
         regular = json.loads((ROOT / f'{REGULAR_DAILY_DIR}/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
@@ -664,7 +694,8 @@ def load_daily_for_technical(code):
     if len(bars) != 1:
         return daily
     bar = bars[0]
-    if not isinstance(bar.get('date'), str) or not bar.get('sourceTime'):
+    if (bar.get('date') != current.date().isoformat() or not bar.get('sourceTime')
+            or bar.get('source') != 'NAVER_MINUTE'):
         return daily
     merged = dict(daily)
     merged['datas'] = sorted([row for row in daily.get('datas', []) if row.get('date') != bar['date']] + [bar],
@@ -893,13 +924,15 @@ def run_quote_pipeline():
     _, _, legacy_codes, _ = universe_state()
     failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
     if quote_snapshot_unusable(result):
-        print('Collector failed; preserving last successful production snapshot.')
+        print('Quote collection failed; preserving last successful production snapshot.')
         return True
     technicals = timed_step('technicals', build_technicals, result)
     failed |= technicals['count'] != result['expectedCount']
     # A complete-looking row count is not healthy if every daily-derived row
     # carries an error (for example, a stale completed-candle cache).
     failed |= technicals.get('status') == 'error'
+    if technicals.get('status') == 'error':
+        print('Derived intraday validation failed; preserving last successful production snapshot.')
     if technicals.get('status') == 'partial':
         print(f"WARNING technicals partial missingCodes={len(technicals.get('missingCodes', []))}")
     states = timed_step('states', build_states, result, technicals)
