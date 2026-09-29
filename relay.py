@@ -694,8 +694,7 @@ def load_daily_for_technical(code):
     if len(bars) != 1:
         return daily
     bar = bars[0]
-    if (bar.get('date') != current.date().isoformat() or not bar.get('sourceTime')
-            or bar.get('source') != 'NAVER_MINUTE'):
+    if (not bar.get('sourceTime') or bar.get('source') != 'NAVER_MINUTE'):
         return daily
     merged = dict(daily)
     merged['datas'] = sorted([row for row in daily.get('datas', []) if row.get('date') != bar['date']] + [bar],

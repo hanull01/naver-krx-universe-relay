@@ -592,6 +592,63 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(save.call_args.args[0], 'data/daily-regular/201490.json')
         self.assertEqual(save.call_args.args[1]['status'], 'unavailable')
 
+    def test_preclose_can_merge_previous_day_regular_bar(self):
+        current = datetime(2026, 9, 30, 8, 10, tzinfo=relay.KST)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily-regular').mkdir(parents=True)
+
+            raw = {
+                'status': 'ok',
+                'sourceTime': '2026-09-28',
+                'datas': [
+                    {'date': '2026-09-28', 'close': 270000, 'high': 285500,
+                     'volume': 21346064, 'complete': True, 'noTrading': False},
+                    {'date': '2026-09-29', 'close': 275000, 'high': 276000,
+                     'volume': 15653425, 'complete': False, 'noTrading': False},
+                ],
+            }
+
+            regular = {
+                'regularDailyStatus': 'ok',
+                'datas': [{
+                    'date': '2026-09-29',
+                    'open': 266000,
+                    'high': 276000,
+                    'low': 266000,
+                    'close': 272500,
+                    'volume': 14945615,
+                    'complete': True,
+                    'noTrading': False,
+                    'session': 'REGULAR',
+                    'source': 'NAVER_MINUTE',
+                    'sourceTime': '20260929153000',
+                    'barType': 'REGULAR_SESSION',
+                }],
+            }
+
+            (root / 'data/daily/005930.json').write_text(
+                json.dumps(raw), encoding='utf-8'
+            )
+            (root / 'data/daily-regular/005930.json').write_text(
+                json.dumps(regular), encoding='utf-8'
+            )
+
+            with patch.object(relay, 'ROOT', root), \
+                 patch.object(relay, 'now', return_value=current):
+                daily = relay.load_daily_for_technical('005930')
+                close = relay.load_previous_business_day_close(
+                    '005930', datetime(2026, 9, 29).date()
+                )
+
+        self.assertEqual(daily['regularSessionDate'], '2026-09-29')
+        self.assertEqual(daily['sourceTime'], '20260929153000')
+        self.assertEqual(daily['datas'][-1]['date'], '2026-09-29')
+        self.assertTrue(daily['datas'][-1]['complete'])
+        self.assertEqual(daily['datas'][-1]['close'], 272500)
+        self.assertEqual(close, 272500)
+
     def test_technicals_merge_regular_bar_but_never_raw_provisional_today(self):
         current = datetime(2026, 9, 29, 16, 0, tzinfo=relay.KST)
         with tempfile.TemporaryDirectory() as directory:
