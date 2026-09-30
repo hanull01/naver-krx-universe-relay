@@ -1,16 +1,16 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-09-30",
+  "asOf": "2026-10-01",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
-    "OK": 8,
+    "OK": 7,
     "NO_RESEARCH": 4,
-    "NO_RECENT_RESEARCH": 16,
+    "NO_RECENT_RESEARCH": 17,
     "LOW_SAMPLE": 14
   },
-  "rankingEligibleCount": 8,
+  "rankingEligibleCount": 7,
   "stocks": [
     {
       "itemCode": "005930",
@@ -649,37 +649,21 @@
     {
       "itemCode": "207940",
       "itemName": "삼성바이오로직스",
-      "status": "OK",
-      "rankingEligible": true,
+      "status": "NO_RECENT_RESEARCH",
+      "rankingEligible": false,
       "reportCount": 28,
       "brokerCount": 10,
-      "recentReportCount": 4,
-      "previousReportCount": 0,
-      "recentTargetMean": 1975000,
-      "previousTargetMean": null,
-      "recentTargetMedian": 2000000,
-      "recentTargetStdev": 75000,
+      "recentReportCount": 0,
+      "previousReportCount": 4,
+      "recentTargetMean": null,
+      "previousTargetMean": 1975000,
+      "recentTargetMedian": null,
+      "recentTargetStdev": null,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 0,
       "revisionDown": 5,
-      "risingTopics": [
-        {
-          "topic": "CAPEX/생산능력",
-          "delta": 0.25,
-          "ratio": null
-        },
-        {
-          "topic": "수요",
-          "delta": 0.25,
-          "ratio": null
-        },
-        {
-          "topic": "원가",
-          "delta": 0.25,
-          "ratio": null
-        }
-      ]
+      "risingTopics": []
     },
     {
       "itemCode": "068270",
@@ -1149,41 +1133,6 @@
           {
             "topic": "중국",
             "delta": 0.167,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "207940",
-        "itemName": "삼성바이오로직스",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 28,
-        "brokerCount": 10,
-        "recentReportCount": 4,
-        "previousReportCount": 0,
-        "recentTargetMean": 1975000,
-        "previousTargetMean": null,
-        "recentTargetMedian": 2000000,
-        "recentTargetStdev": 75000,
-        "targetMeanChangePct": null,
-        "targetDispersionChangePct": null,
-        "revisionUp": 0,
-        "revisionDown": 5,
-        "risingTopics": [
-          {
-            "topic": "CAPEX/생산능력",
-            "delta": 0.25,
-            "ratio": null
-          },
-          {
-            "topic": "수요",
-            "delta": 0.25,
-            "ratio": null
-          },
-          {
-            "topic": "원가",
-            "delta": 0.25,
             "ratio": null
           }
         ]
