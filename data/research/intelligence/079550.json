@@ -1,30 +1,45 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "079550",
   "itemName": "LIG디펜스앤에어로스페이스",
   "asOf": "2026-09-30",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-08-10"
+    "to": "2026-09-30"
   },
-  "reportCount": 20,
-  "brokerCount": 10,
+  "reportCount": 21,
+  "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-08-31",
       "to": "2026-09-30",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 1120000,
+        "max": 1120000,
+        "mean": 1120000,
+        "median": 1120000,
+        "stdev": 0,
+        "range": 0
       },
-      "topics": {}
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 1,
+        "negative": 0,
+        "net": 1,
+        "netPerReport": 1.0
+      },
+      "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 2.0
+        }
+      }
     },
     "previous": {
       "from": "2026-08-01",
@@ -68,6 +83,15 @@
     },
     "topicAcceleration": [
       {
+        "topic": "수요",
+        "currentCount": 2,
+        "currentPerReport": 2.0,
+        "previousCount": 3,
+        "previousPerReport": 0.375,
+        "perReportDelta": 1.625,
+        "ratio": 5.33
+      },
+      {
         "topic": "원가",
         "currentCount": 0,
         "currentPerReport": 0,
@@ -84,23 +108,14 @@
         "previousPerReport": 0.25,
         "perReportDelta": -0.25,
         "ratio": 0.0
-      },
-      {
-        "topic": "수요",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 3,
-        "previousPerReport": 0.375,
-        "perReportDelta": -0.375,
-        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -8,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
-    "targetDispersionChangePct": null
+    "reportCountChange": -7,
+    "targetMeanChangePct": -4.17,
+    "targetMedianChangePct": -7.82,
+    "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
     "total": 4,
@@ -256,6 +271,34 @@
           "perReport": 0.125
         }
       }
+    },
+    "2026-09": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 1120000,
+        "max": 1120000,
+        "mean": 1120000,
+        "median": 1120000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 1,
+        "negative": 0,
+        "net": 1,
+        "netPerReport": 1.0
+      },
+      "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 2.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -341,6 +384,21 @@
           "date": "2026-08-10",
           "goalPrice": 990000,
           "title": "2Q26 Review: 고성장에 변함은 없습니다"
+        }
+      ]
+    },
+    "미래에셋증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 1120000,
+      "latestGoalPrice": 1120000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-09-30",
+          "goalPrice": 1120000,
+          "title": "미사일 수요의 종착지"
         }
       ]
     },

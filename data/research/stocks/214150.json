@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "214150",
   "itemName": "클래시스",
-  "reportCount": 18,
-  "latestReportNid": "95917",
-  "latestWriteDate": "2026-08-28",
+  "reportCount": 19,
+  "latestReportNid": "96378",
+  "latestWriteDate": "2026-09-30",
   "latest": {
-    "nid": "95917",
-    "writeDate": "2026-08-28",
-    "brokerName": "신한투자증권",
-    "title": "NDR 후기: 눈높이 하향 반영 완료",
-    "goalPrice": 62000,
-    "normalizedOpinion": "BUY",
+    "nid": "96378",
+    "writeDate": "2026-09-30",
+    "brokerName": "한국IR협의회",
+    "title": "글로벌 EBD 확장 지속, 밸류에이션 부담 완화",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 9,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 1,
+        "수요": 1
+      }
     }
   },
   "reportNids": [
+    "96378",
     "95917",
     "95705",
     "95634",

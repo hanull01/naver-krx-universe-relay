@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "030200",
   "itemName": "KT",
-  "reportCount": 34,
-  "latestReportNid": "95962",
-  "latestWriteDate": "2026-09-01",
+  "reportCount": 35,
+  "latestReportNid": "96389",
+  "latestWriteDate": "2026-09-30",
   "latest": {
-    "nid": "95962",
-    "writeDate": "2026-09-01",
+    "nid": "96389",
+    "writeDate": "2026-09-30",
     "brokerName": "하나증권",
-    "title": "9월 전략 - AI 과금화 전략 긍정적, 확실한 저점은 맞아",
+    "title": "10월 전략 - 매도보단 장기 매수 전략이 유리할 듯",
     "goalPrice": 76000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 1,
+        "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "AI": 1
+        "AI": 1,
+        "금리": 1
       }
     }
   },
   "reportNids": [
+    "96389",
     "95962",
     "95568",
     "95563",

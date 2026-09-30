@@ -1,9 +1,823 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-30T08:16:01.010158+09:00",
-  "reportCount": 5289,
-  "stockCount": 996,
+  "generatedAt": "2026-09-30T12:30:16.585518+09:00",
+  "reportCount": 5313,
+  "stockCount": 1002,
   "latest": [
+    {
+      "nid": "96394",
+      "writeDate": "2026-09-30",
+      "itemCode": "079550",
+      "itemName": "LIG디펜스앤에어로스페이스",
+      "title": "미사일 수요의 종착지",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 1120000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 53,
+      "contentLength": 348,
+      "contentSha256": "d15ae00be754e0c8027dc42d67090c6046b705980eba3d9117894904d4cf03b4",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "방산": 2,
+          "수요": 2,
+          "미국": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96393",
+      "writeDate": "2026-09-30",
+      "itemCode": "214320",
+      "itemName": "이노션",
+      "title": "AI 솔루션과 브랜드 성장 파트너로 도약",
+      "brokerCode": "66",
+      "brokerName": "DS투자증권",
+      "goalPrice": 28000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 694,
+      "contentLength": 431,
+      "contentSha256": "17d924701f87ba8d610d12d00e9eb6b28824900b7d952d30f7dd6a511a16242e",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 7,
+          "negative": 4
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 6,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "수주": 2,
+          "AI": 1,
+          "미국": 1,
+          "환율": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96392",
+      "writeDate": "2026-09-30",
+      "itemCode": "001120",
+      "itemName": "LX인터내셔널",
+      "title": "물류가 큰일 한다",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 66000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 732,
+      "contentLength": 324,
+      "contentSha256": "70812c2ef982aeb18664e98e7ccb2b9ffd07e8f014fa2259c4721328994a865a",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 6,
+          "negative": 3
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 2,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {
+          "가격": 1
+        }
+      },
+      "previousSameBrokerNid": "95037",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96391",
+      "writeDate": "2026-09-30",
+      "itemCode": "017670",
+      "itemName": "SK텔레콤",
+      "title": "10월 전략 - 재료 많아 주가 상승 시도 지속될 전망",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 140000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 699,
+      "contentLength": 478,
+      "contentSha256": "5fce201a49cff92dc688463603fb8b630f1242e2559cbc0e8ccded6c56efbb75",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 1
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 2,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {}
+      },
+      "previousSameBrokerNid": "96054",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96390",
+      "writeDate": "2026-09-30",
+      "itemCode": "032640",
+      "itemName": "LG유플러스",
+      "title": "10월 전략 - 금리 하락 반전 시 주가 오를 것입니다",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 20000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 439,
+      "contentLength": 259,
+      "contentSha256": "b5f7babbfdf6c59c93c671989951f6e5b97d567be06ddb81782a6294c606396f",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 4,
+          "negative": 1
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 3,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {
+          "가격": 1,
+          "금리": 1
+        }
+      },
+      "previousSameBrokerNid": "95960",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96389",
+      "writeDate": "2026-09-30",
+      "itemCode": "030200",
+      "itemName": "KT",
+      "title": "10월 전략 - 매도보단 장기 매수 전략이 유리할 듯",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 76000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 654,
+      "contentLength": 412,
+      "contentSha256": "e1225a7934d9a6a87730a7a35718edffb99eed2ca6df25e5887bc3dec3ce651b",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 2
+        },
+        "earningsTextDirection": "DOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {
+          "AI": 1,
+          "금리": 1
+        }
+      },
+      "previousSameBrokerNid": "95962",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96388",
+      "writeDate": "2026-09-30",
+      "itemCode": "005610",
+      "itemName": "삼립",
+      "title": "2026년 저점, 수익성 회복이 보인다",
+      "brokerCode": "18",
+      "brokerName": "유안타증권",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 444,
+      "contentLength": 463,
+      "contentSha256": "b822c3f21c1770c50ecc8d40a2a081ad8ed34408e9f5d50dfa95d7f1f4839fcc",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 7,
+          "negative": 2
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 4,
+        "earningsNegativeSignalCount": 2,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "가격": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96387",
+      "writeDate": "2026-09-30",
+      "itemCode": "028050",
+      "itemName": "삼성E&A",
+      "title": "잘하는 것도, 잘할 것도 많다",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 72000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 910,
+      "contentLength": 433,
+      "contentSha256": "a1b88345d98dd6accb89d1210d38853bcdaa9634fa0242233a8e8d54a23a08f9",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 4
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 3,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "환율": 2,
+          "자동차": 1
+        }
+      },
+      "previousSameBrokerNid": "94441",
+      "goalPriceChange": {
+        "from": 70000,
+        "to": 72000,
+        "amount": 2000,
+        "pct": 2.86
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96386",
+      "writeDate": "2026-09-30",
+      "itemCode": "000500",
+      "itemName": "가온전선",
+      "title": "고밀도/고전력 AIDC의 전력공급, 냉각 솔루션 제공 업체로 변화",
+      "brokerCode": "15",
+      "brokerName": "대신증권",
+      "goalPrice": 360000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 668,
+      "contentLength": 422,
+      "contentSha256": "f799e37d02858cd3b8c07e03d3104d8e6c7279cedda3430b3579b4df610c2b3b",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 1
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 2,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "AI": 1,
+          "수요": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96385",
+      "writeDate": "2026-09-30",
+      "itemCode": "140860",
+      "itemName": "파크시스템스",
+      "title": "후공정, 계측의 블루오션",
+      "brokerCode": "64",
+      "brokerName": "SK증권",
+      "goalPrice": 390000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 650,
+      "contentLength": 515,
+      "contentSha256": "f43da6669c67adfbad951e3ad9aa6f728f440bf0b191cddcf30aca380d8a7e4b",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "AI": 1,
+          "반도체": 1,
+          "수요": 1,
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": "94576",
+      "goalPriceChange": {
+        "from": 350000,
+        "to": 390000,
+        "amount": 40000,
+        "pct": 11.43
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96384",
+      "writeDate": "2026-09-30",
+      "itemCode": "000660",
+      "itemName": "SK하이닉스",
+      "title": "흔들림 없는 실적 우상향",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": 2700000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 2153,
+      "contentLength": 250,
+      "contentSha256": "82f6f16af5eb4643b594a5bc6ca6890c58977e2ef01f80a0bac67667b6ea893b",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 2
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "AI": 3,
+          "반도체": 3,
+          "가격": 1,
+          "수요": 1
+        }
+      },
+      "previousSameBrokerNid": "94745",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96383",
+      "writeDate": "2026-09-30",
+      "itemCode": "005930",
+      "itemName": "삼성전자",
+      "title": "HBM 시장 침투 준비 완료",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": 450000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 3167,
+      "contentLength": 190,
+      "contentSha256": "7410fcdc614828555cf16cf5f534e2da3c49cf227d624a7e91d1691ccab73649",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 1
+        },
+        "earningsTextDirection": "MIXED",
+        "earningsPositiveSignalCount": 1,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 4,
+          "가격": 1
+        }
+      },
+      "previousSameBrokerNid": "94850",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96382",
+      "writeDate": "2026-09-30",
+      "itemCode": "001120",
+      "itemName": "LX인터내셔널",
+      "title": "순풍에 돛을 달다",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": 66000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 747,
+      "contentLength": 82,
+      "contentSha256": "7494f05940d50d075982aa53a2b744b80e008dc78e1e0518316664af0e1284a1",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": "95020",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96381",
+      "writeDate": "2026-09-30",
+      "itemCode": "005610",
+      "itemName": "삼립",
+      "title": "실적으로 증명할 턴어라운드",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 725,
+      "contentLength": 192,
+      "contentSha256": "17a7f2e853bf958f555d3700359552254d850e5ec4bd738dd8982fb0c5e43389",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 4,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96380",
+      "writeDate": "2026-09-30",
+      "itemCode": "060720",
+      "itemName": "KH바텍",
+      "title": "27년으로 시선 이동",
+      "brokerCode": "39",
+      "brokerName": "키움증권",
+      "goalPrice": 15000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 816,
+      "contentLength": 382,
+      "contentSha256": "2adc3c476739dac1cbb43c098419557cc210900276ac2067c08f2ba393628c79",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 2
+        },
+        "earningsTextDirection": "DOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 2,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "가격": 1,
+          "환율": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96379",
+      "writeDate": "2026-09-30",
+      "itemCode": "402340",
+      "itemName": "SK스퀘어",
+      "title": "하이닉스 자사주 소각 이후가 더 기대",
+      "brokerCode": "64",
+      "brokerName": "SK증권",
+      "goalPrice": 1850000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 2351,
+      "contentLength": 319,
+      "contentSha256": "42a152580040ae7feabad30a033a457b553fceb11c1860c908ae717f9bbcb6e4",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": "93571",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96378",
+      "writeDate": "2026-09-30",
+      "itemCode": "214150",
+      "itemName": "클래시스",
+      "title": "글로벌 EBD 확장 지속, 밸류에이션 부담 완화",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 858,
+      "contentLength": 505,
+      "contentSha256": "7814abe40803418c871d85e66b3b4f391c218fcca4eca1b01b9a7134a2a097f3",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 9,
+          "negative": 5
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 4,
+        "earningsNegativeSignalCount": 3,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "미국": 1,
+          "수요": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96377",
+      "writeDate": "2026-09-30",
+      "itemCode": "042520",
+      "itemName": "한스바이오메드",
+      "title": "셀르디엠·바운스 중심의 성장 본격화",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 775,
+      "contentLength": 337,
+      "contentSha256": "af6e8426e4d335ad547e0cf5f89099ce4075468eaf93c37e10e26a712fe74a55",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96376",
+      "writeDate": "2026-09-30",
+      "itemCode": "482630",
+      "itemName": "삼양엔씨켐",
+      "title": "[AI] 반도체 노광·세정 공정용 정밀화학 소재 기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 528,
+      "contentLength": 670,
+      "contentSha256": "f812cd74ca536a668501e2ec924658376b03ccc7eefc0aed22898c696f0fe3a6",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 4
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96375",
+      "writeDate": "2026-09-30",
+      "itemCode": "053450",
+      "itemName": "세코닉스",
+      "title": "[AI] 차량용 카메라와 램프 중심 광학부품 기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 492,
+      "contentLength": 895,
+      "contentSha256": "3434919081b308a6b859d1b194ac5d1871eae627b36ea51d7fd1b004797b248c",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "자동차": 3
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96374",
+      "writeDate": "2026-09-30",
+      "itemCode": "081150",
+      "itemName": "티플랙스",
+      "title": "[AI] 스테인리스 봉강 절삭가공 소재 전문기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 466,
+      "contentLength": 676,
+      "contentSha256": "8ddffa290869dca123020263e5ad24e38311ddfe44bb1e1162ec4aceb3f3a360",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 1,
+          "방산": 1,
+          "수요": 1,
+          "원가": 1,
+          "조선": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96373",
+      "writeDate": "2026-09-30",
+      "itemCode": "311320",
+      "itemName": "지오엘리먼트",
+      "title": "[AI] 전구체 기화이송 부품·스퍼터링 타겟 기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 437,
+      "contentLength": 526,
+      "contentSha256": "9279102a38781bc37628bed79780c800fe5cc5a347ae9131cf371387013364ea",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 2
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96372",
+      "writeDate": "2026-09-30",
+      "itemCode": "443670",
+      "itemName": "에스피소프트",
+      "title": "[AI] 클라우드 기반 MS 라이선스 유통 전문기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 432,
+      "contentLength": 721,
+      "contentSha256": "18abc65bdcda7b1154c2b0942de57975a1ff115cde0361225ea71713f7703c05",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96371",
+      "writeDate": "2026-09-30",
+      "itemCode": "255440",
+      "itemName": "야스",
+      "title": "[AI] 대형 OLED 증착장비 전문 제조기업",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 467,
+      "contentLength": 813,
+      "contentSha256": "8d42b1220150ad8978371fd41ecdb62f3a2964f47fa228d7084f1064e8472967",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
     {
       "nid": "96370",
       "writeDate": "2026-09-30",
@@ -16,7 +830,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 20,
+      "readCount": 420,
       "contentLength": 637,
       "contentSha256": "58a2fa69eb5c96a20cd47897dbc896f03a86666e08447d20fa3db0d7857fd2f7",
       "analysis": {
@@ -49,7 +863,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 35,
+      "readCount": 442,
       "contentLength": 686,
       "contentSha256": "d0524004f478cdfb9cfd15b4b5914201085fb8d6e0bf875cbdcb7d5bb9971084",
       "analysis": {
@@ -83,7 +897,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 50,
+      "readCount": 480,
       "contentLength": 735,
       "contentSha256": "79c017f0bf05d1802dd586c817ee311ef7c246c1c0d53fbb539de51371081688",
       "analysis": {
@@ -117,7 +931,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 57,
+      "readCount": 556,
       "contentLength": 754,
       "contentSha256": "9f20fa2c25fb54d9b52f787afc2dce38e65f608583b04606894896c2839a5666",
       "analysis": {
@@ -152,7 +966,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 49,
+      "readCount": 436,
       "contentLength": 765,
       "contentSha256": "f2987f0c2e011533502bd1000ebcd85119e325a70801916c7c410d055d99b077",
       "analysis": {
@@ -183,7 +997,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 60,
+      "readCount": 461,
       "contentLength": 830,
       "contentSha256": "e7ec9fc12516fdb0ead644db25534cd63a49dead5781da92af2166462a7db587",
       "analysis": {
@@ -218,7 +1032,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3304,
+      "readCount": 3795,
       "contentLength": 323,
       "contentSha256": "a7b75f31d4f3b5d61fb8e992a0b8a478cb67f9784da5413c5b9ca65e0a9a5b3e",
       "analysis": {
@@ -251,7 +1065,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2634,
+      "readCount": 2884,
       "contentLength": 332,
       "contentSha256": "d0c5f6dad8ba706406b0bac7b2fd746738174628ab375d8c4f6be8585254aed1",
       "analysis": {
@@ -285,7 +1099,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2599,
+      "readCount": 2822,
       "contentLength": 284,
       "contentSha256": "f1772f4cd46703a5b534ad564a6d38074082b3010e1c50e13a0d91420e8c62f0",
       "analysis": {
@@ -316,7 +1130,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2777,
+      "readCount": 3054,
       "contentLength": 305,
       "contentSha256": "2b3174a2f39c00e8f3ddb3c704a82458ecf17d393eb0033f7c3f968ddd4a5add",
       "analysis": {
@@ -353,7 +1167,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3092,
+      "readCount": 3423,
       "contentLength": 319,
       "contentSha256": "6b33a4093df878a9118d83bb36942f8689a1be38025f7678782a095dab5002bf",
       "analysis": {
@@ -388,7 +1202,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3516,
+      "readCount": 3929,
       "contentLength": 316,
       "contentSha256": "acc8c0269657b201ab0303a7ab0aa0e983136b97426f0164e127caa793af79d9",
       "analysis": {
@@ -422,7 +1236,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2853,
+      "readCount": 3106,
       "contentLength": 265,
       "contentSha256": "948d113f153a5838691909c441fa734f205e327adb50cee2ae1fa0c0f7ef2145",
       "analysis": {
@@ -453,7 +1267,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3859,
+      "readCount": 4287,
       "contentLength": 327,
       "contentSha256": "ed31302d24b4f725d262835360e6e8b008c7ea27e8264db4bf02dbacc479dddf",
       "analysis": {
@@ -484,7 +1298,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1434,
+      "readCount": 1541,
       "contentLength": 214,
       "contentSha256": "d1d4c2daccef1bff8b3d8c6f665087431061afe3f13d7bdb43e1d220f3e9e0ab",
       "analysis": {
@@ -517,7 +1331,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2551,
+      "readCount": 2815,
       "contentLength": 324,
       "contentSha256": "2ff7556a9cd38aaaa1c0b30f02756f4b1c025c98dca84aac614c6181f7c7d9e1",
       "analysis": {
@@ -557,7 +1371,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1665,
+      "readCount": 1912,
       "contentLength": 523,
       "contentSha256": "73881ddd535cbab16d235d5c12305bba3cd18d12e5315b40a501762081996717",
       "analysis": {
@@ -597,7 +1411,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 5368,
+      "readCount": 6193,
       "contentLength": 571,
       "contentSha256": "5a319eb9bcc906c9b03e5ba530986c0424fc48538b36f95b70a3556c122df02c",
       "analysis": {
@@ -633,7 +1447,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6556,
+      "readCount": 7223,
       "contentLength": 347,
       "contentSha256": "9cbf4982d9c6249107a863c2dddab7412cb9fd519c53fc4dc977f1fb6e1f2ea8",
       "analysis": {
@@ -664,7 +1478,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3006,
+      "readCount": 3187,
       "contentLength": 410,
       "contentSha256": "aa93af8221839a2656cf3c3e6f913e751998b81b48ec06d649ad356fd987b5f2",
       "analysis": {
@@ -699,7 +1513,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2833,
+      "readCount": 2967,
       "contentLength": 889,
       "contentSha256": "9db4f2f9aa284f3bfc097d91b9f13ae011c5097f81496e187d58d8854cd5d281",
       "analysis": {
@@ -738,7 +1552,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 2739,
+      "readCount": 2881,
       "contentLength": 986,
       "contentSha256": "ef73d5b0d940ca7a7655bcff939e47a591ad36658b38dcf113153f2138b7e3e5",
       "analysis": {
@@ -774,7 +1588,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 5953,
+      "readCount": 6535,
       "contentLength": 667,
       "contentSha256": "5a69ee047700f73311e3ff050de168607f1896bf8e0cbcd4135a3c700b856203",
       "analysis": {
@@ -809,7 +1623,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 2903,
+      "readCount": 3004,
       "contentLength": 574,
       "contentSha256": "7767b39a476ab3b54c7de4f88819b340f3ee2461c0f47184a3100622ac5a482d",
       "analysis": {
@@ -844,7 +1658,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2841,
+      "readCount": 2940,
       "contentLength": 711,
       "contentSha256": "04f2508985c551ad639d83db41c41e4ebe3342fb84a39839a97ce6c75ed58fa0",
       "analysis": {
@@ -884,7 +1698,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1456,
+      "readCount": 1592,
       "contentLength": 654,
       "contentSha256": "2a1cb2400248be1bb2303ff4944401ac23dbc0818831c633ae381b438d19102d",
       "analysis": {
@@ -926,7 +1740,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1319,
+      "readCount": 1484,
       "contentLength": 613,
       "contentSha256": "a27933da1bcad0f90cc469ecb8ecb219ef5c87acff7ef68e09c85e9708b87f7b",
       "analysis": {
@@ -969,7 +1783,7 @@
       "opinionText": "StrongBuy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11738,
+      "readCount": 13123,
       "contentLength": 1505,
       "contentSha256": "0c6ebb60b2c7f27a852ac48d89258f9a3cf7d8ea9810d98011eaa68c909e9406",
       "analysis": {
@@ -1008,7 +1822,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1140,
+      "readCount": 1230,
       "contentLength": 508,
       "contentSha256": "cddf569030e63724047f98b3103b2f9a7120076d2c74136b2ba8bbaf5e31ffd9",
       "analysis": {
@@ -1046,7 +1860,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 4225,
+      "readCount": 4753,
       "contentLength": 1086,
       "contentSha256": "3c76ddb8dfb3564d4942ea8f0dc5d4e0ea69391d94a187a8101f9e7853c47d9c",
       "analysis": {
@@ -1079,7 +1893,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 5502,
+      "readCount": 6016,
       "contentLength": 497,
       "contentSha256": "1404fc19bab27bca616cd3f9853f3ae84e0deeaf1a545f6fff914f23841fb2b0",
       "analysis": {
@@ -1113,7 +1927,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3821,
+      "readCount": 4302,
       "contentLength": 340,
       "contentSha256": "ac2e4e3915d21abfc92831bdd8866140db43fc19f35867f8e2bb8b8d6e3941ce",
       "analysis": {
@@ -1144,7 +1958,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3199,
+      "readCount": 3411,
       "contentLength": 156,
       "contentSha256": "12cf9f4cffb5a748a51b3e5d292641ff2fe40d1fbf205dfe6cb79311c54a2aae",
       "analysis": {
@@ -1184,7 +1998,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3774,
+      "readCount": 3906,
       "contentLength": 262,
       "contentSha256": "0e55424c57f998ea7d0cfddf0d2f6e357299cc551b1ad0902242b7e450ca3b3b",
       "analysis": {
@@ -1217,7 +2031,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2274,
+      "readCount": 2329,
       "contentLength": 460,
       "contentSha256": "2746dd05279335b5abdd8a57d3de467cd562f2d9efdc2c81e54bab338b2831b8",
       "analysis": {
@@ -1251,7 +2065,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2338,
+      "readCount": 2388,
       "contentLength": 273,
       "contentSha256": "ab58285a302522855b83d200d36626620f117e9efabcf81f58e9428226abd525",
       "analysis": {
@@ -1284,7 +2098,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3889,
+      "readCount": 3961,
       "contentLength": 495,
       "contentSha256": "db94ec3c1b42df367f6cba08e936aee487cc438793ea488679beb9a9d0fd2a51",
       "analysis": {
@@ -1319,7 +2133,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 3460,
+      "readCount": 3507,
       "contentLength": 518,
       "contentSha256": "323a5aef944390047a8a087caaf70b114037f100ec4e7bfca0b83ce1ced5239f",
       "analysis": {
@@ -1353,7 +2167,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1743,
+      "readCount": 1797,
       "contentLength": 466,
       "contentSha256": "c6ded2798a0ac243cfbe73cfe2a2b821959e40f4d45e4df52966789d24058c6f",
       "analysis": {
@@ -1390,7 +2204,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1644,
+      "readCount": 1726,
       "contentLength": 532,
       "contentSha256": "9d7ffa2b23e0c4606be645ab1337a008ea7c07bbd6f81e6a682b89de4a4852d9",
       "analysis": {
@@ -1430,7 +2244,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1996,
+      "readCount": 2046,
       "contentLength": 222,
       "contentSha256": "d744ef8a99a61a083b0e953dac028c8df19ec7ebd17c95385ecc245a06d1b4fd",
       "analysis": {
@@ -1464,7 +2278,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1807,
+      "readCount": 1856,
       "contentLength": 608,
       "contentSha256": "6d730655014dfd877c70806801e100ce7caeb7961efc95927d0c7754c7e63d07",
       "analysis": {
@@ -1499,7 +2313,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3293,
+      "readCount": 3334,
       "contentLength": 218,
       "contentSha256": "b9746a09ceb82c7d4f4ca5f8dcb9b98583e8b665536a6093b3d8b96f88a9c2aa",
       "analysis": {
@@ -1530,7 +2344,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 15043,
+      "readCount": 15473,
       "contentLength": 378,
       "contentSha256": "8764e00e25d768e0665576fe59f6c65c3dc16d9a65faab5908cf0a0684eff328",
       "analysis": {
@@ -1565,7 +2379,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 5579,
+      "readCount": 5809,
       "contentLength": 289,
       "contentSha256": "ea356c637b00f10b42328acad99ab76be52c514b7a2bd27faf8edfca2b6a336a",
       "analysis": {
@@ -1603,7 +2417,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3480,
+      "readCount": 3538,
       "contentLength": 97,
       "contentSha256": "6fb2bcf7a73723f0788265c3dce02b30daa3c9d8bbf44f541b47fcbc93c38e0c",
       "analysis": {
@@ -1636,7 +2450,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3363,
+      "readCount": 3430,
       "contentLength": 95,
       "contentSha256": "8f481e8512544f1f0b247e9509120251b018e7075061b4d0116cf1b3e85c87b6",
       "analysis": {
@@ -1674,7 +2488,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1918,
+      "readCount": 1980,
       "contentLength": 388,
       "contentSha256": "a45ea4d5b5266177dbceb9f34d3d0cbd4bba3a8e8ec313d5824ae4f7a179e1f5",
       "analysis": {
@@ -1710,7 +2524,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1765,
+      "readCount": 1820,
       "contentLength": 623,
       "contentSha256": "7469b124bb5e7433f09aea39ff7467886a39725aade2209c050b7ea212a0b691",
       "analysis": {
@@ -1746,7 +2560,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3595,
+      "readCount": 3750,
       "contentLength": 637,
       "contentSha256": "53b3cace73dbf91ab110e0ba85a30d286ea405aad34f8e97eb5349825c0f2453",
       "analysis": {
@@ -1784,7 +2598,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 4015,
+      "readCount": 4165,
       "contentLength": 692,
       "contentSha256": "6a677762ad20819201c2dff00d5e50245a068192204f078a675c9a2106b37128",
       "analysis": {
@@ -1824,7 +2638,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1667,
+      "readCount": 1720,
       "contentLength": 599,
       "contentSha256": "84d12c83c720249a182091fda26644aac1d6990129309c5b9705d409df1f6a3b",
       "analysis": {
@@ -1857,7 +2671,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2171,
+      "readCount": 2235,
       "contentLength": 390,
       "contentSha256": "83b3ffc6f5fd630988bab64bed988981d9b875ab2425ad5eb6b6dcd3d1b30642",
       "analysis": {
@@ -1892,7 +2706,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 3455,
+      "readCount": 3521,
       "contentLength": 472,
       "contentSha256": "b268650dc9485bd98f7bdc6ca5b6bc12a96f0c7f8833a0b12e4131f4cd3a4520",
       "analysis": {
@@ -1927,7 +2741,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1298,
+      "readCount": 1345,
       "contentLength": 588,
       "contentSha256": "b1fc17afa45c2ae3ebfafb93083272e791858b61d7491d2e00fad5dda89421af",
       "analysis": {
@@ -1958,7 +2772,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1644,
+      "readCount": 1704,
       "contentLength": 246,
       "contentSha256": "fa157920c4b6a80f8715998809935959a8617c24097ff779fc707809bac93714",
       "analysis": {
@@ -1989,7 +2803,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1348,
+      "readCount": 1388,
       "contentLength": 719,
       "contentSha256": "0e8eb75b5e34a8bdeb32a87ef8c8a6809e318bb68b3da7d37049887f20f6eb8b",
       "analysis": {
@@ -2024,7 +2838,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1281,
+      "readCount": 1317,
       "contentLength": 731,
       "contentSha256": "feea95f4dd52c94313f05763ef7665b6f7b709578bbee7cb6b20242554bfbb26",
       "analysis": {
@@ -2057,7 +2871,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1424,
+      "readCount": 1472,
       "contentLength": 789,
       "contentSha256": "e3e15d98f822d3d3657a9c15f7fc176b9d92c685be8f71699697b50d38b379f8",
       "analysis": {
@@ -2090,7 +2904,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1247,
+      "readCount": 1283,
       "contentLength": 622,
       "contentSha256": "49eaf840bcdac63610b295f854da816ffe7ffb7facc290ee0cbbd58fb478df24",
       "analysis": {
@@ -2123,7 +2937,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1258,
+      "readCount": 1294,
       "contentLength": 739,
       "contentSha256": "6f9662d5ce0ee5cfbf69b9674f3b5fcf632dbf70c6e5a3818807277f30d6829e",
       "analysis": {
@@ -2154,7 +2968,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 25452,
+      "readCount": 26059,
       "contentLength": 679,
       "contentSha256": "a26bc0e8a12ea148c43a2d26119418e7b7c6571dfdd132f22fa926393c00aa60",
       "analysis": {
@@ -2195,7 +3009,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 4460,
+      "readCount": 4503,
       "contentLength": 709,
       "contentSha256": "11e3e11f0dbb700d9b8d515f51e31d929d90d4e96977110c8dd2222343ffc476",
       "analysis": {
@@ -2230,7 +3044,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3918,
+      "readCount": 3974,
       "contentLength": 591,
       "contentSha256": "28bc70ecdb2ff886b9e40f099840677512a9361755a81e839cfecfe9732a9917",
       "analysis": {
@@ -2265,7 +3079,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 4048,
+      "readCount": 4099,
       "contentLength": 398,
       "contentSha256": "11815b7ec9acc5ea8ab613be58cd1bda7f666f366b6d0db4d0b79b459ebc2403",
       "analysis": {
@@ -2298,7 +3112,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 4012,
+      "readCount": 4109,
       "contentLength": 477,
       "contentSha256": "f38cd5a233fe362270257ea690a0d22cc284d99b50c4a5ecae96811b94a2b320",
       "analysis": {
@@ -2334,7 +3148,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2964,
+      "readCount": 3006,
       "contentLength": 481,
       "contentSha256": "667938a1361bc756d91fcd97760113fc4e7716bc933338704f985f8a70e1daee",
       "analysis": {
@@ -2365,7 +3179,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 5642,
+      "readCount": 5774,
       "contentLength": 666,
       "contentSha256": "ca30ec5425ea1e449d238618255182e3231ddf36be396e9fc44cfb53775e294a",
       "analysis": {
@@ -2407,7 +3221,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3101,
+      "readCount": 3147,
       "contentLength": 538,
       "contentSha256": "f8459e2a9e186d30b42a84824a2d1fcd3abcec0f5cdbf62e66d898ea74743a66",
       "analysis": {
@@ -2440,7 +3254,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3241,
+      "readCount": 3280,
       "contentLength": 936,
       "contentSha256": "7a6b2eeef0553189b5df4a99832d003fdbabdfb325c6f1adeaba1065c2906468",
       "analysis": {
@@ -2474,7 +3288,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9756,
+      "readCount": 9840,
       "contentLength": 242,
       "contentSha256": "beb33e30f440252d6bdb49496c24add965892ffef8ae00b54be51a84fb625188",
       "analysis": {
@@ -2509,7 +3323,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11309,
+      "readCount": 11469,
       "contentLength": 324,
       "contentSha256": "5106ddd90aba8920db5942e8f230731adba5d59b0ec0a791bb4b84e2e0669725",
       "analysis": {
@@ -2545,7 +3359,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12364,
+      "readCount": 12481,
       "contentLength": 579,
       "contentSha256": "5c35ea1f128bc65f05203e9ebae529b4bb87ed654de815af4c0c0dd357f6097e",
       "analysis": {
@@ -2579,7 +3393,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 10157,
+      "readCount": 10203,
       "contentLength": 512,
       "contentSha256": "3f59b979d61aa8b0f71c39d38d8b1818c003f00b78370e16cc9a57f0a11f9c9b",
       "analysis": {
@@ -2616,7 +3430,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 19981,
+      "readCount": 20228,
       "contentLength": 244,
       "contentSha256": "19be9f4f031067064a56758b5db66bd13904a130b859763eefbefca259116bd5",
       "analysis": {
@@ -2649,7 +3463,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 50885,
+      "readCount": 51432,
       "contentLength": 739,
       "contentSha256": "398a006a5cd16f77a66c52fb3962afadc0e75f3e27bb935e3f927752bd5e9f6c",
       "analysis": {
@@ -2689,7 +3503,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9939,
+      "readCount": 9986,
       "contentLength": 261,
       "contentSha256": "690440de5051d3b8941dc56d4a50a681881c90ea05fe4d1c869607942728a06c",
       "analysis": {
@@ -2727,7 +3541,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13086,
+      "readCount": 13276,
       "contentLength": 1501,
       "contentSha256": "00a615eb4aa49debeb8c1f2482d86a7c445151c9dafaa91e69f7cd9ea62f751c",
       "analysis": {
@@ -2764,7 +3578,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 4376,
+      "readCount": 4420,
       "contentLength": 574,
       "contentSha256": "17ad008a8b76618992e1cb6785e62fbf636222affe3e1363626f727057b65182",
       "analysis": {
@@ -2802,7 +3616,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 4022,
+      "readCount": 4055,
       "contentLength": 518,
       "contentSha256": "d355cc5e8b3fa710eb9cf2ba78b82df2348220d04414993dfa0db2f303eec08c",
       "analysis": {
@@ -2836,7 +3650,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12233,
+      "readCount": 12339,
       "contentLength": 576,
       "contentSha256": "ce2cd74426925f36ba4e9d7f203506c2dbad3d2f9c4211231a9e6ac63922611e",
       "analysis": {
@@ -2867,7 +3681,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 39147,
+      "readCount": 39480,
       "contentLength": 451,
       "contentSha256": "310d719fb39ff4ba71b2cd039d14b84c9e6bbbcc7b3584984b45a274bc2d0313",
       "analysis": {
@@ -2907,7 +3721,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 10424,
+      "readCount": 10468,
       "contentLength": 515,
       "contentSha256": "b0f66b146a5675470c20534e9a35a670b48f061e14cc8c3cc35401409deb3f62",
       "analysis": {
@@ -2940,7 +3754,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 10296,
+      "readCount": 10336,
       "contentLength": 951,
       "contentSha256": "b3053346419d011b568a8af6733a1fb8f33b49e504ede0d7f11769f1e5e7edad",
       "analysis": {
@@ -2974,7 +3788,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 22585,
+      "readCount": 22628,
       "contentLength": 249,
       "contentSha256": "58d765b574e1c680be414d057699a865ca18f20ed52089b78cc596f7476eba4a",
       "analysis": {
@@ -3010,7 +3824,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 20525,
+      "readCount": 20564,
       "contentLength": 308,
       "contentSha256": "a12c8b4b85adfc9b6c89cabe4d2d2ebeef842811f09d224d805213dcae03b065",
       "analysis": {
@@ -3041,7 +3855,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 21062,
+      "readCount": 21098,
       "contentLength": 71,
       "contentSha256": "246a5230420917ed25719f9a7a1e09a638f1dfadf4f3622a4199b4857c00c631",
       "analysis": {
@@ -3072,7 +3886,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 21345,
+      "readCount": 21382,
       "contentLength": 97,
       "contentSha256": "6fb2bcf7a73723f0788265c3dce02b30daa3c9d8bbf44f541b47fcbc93c38e0c",
       "analysis": {
@@ -3105,7 +3919,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 30122,
+      "readCount": 30299,
       "contentLength": 232,
       "contentSha256": "93a9d78ade695d88572149311f0c82ce6d76b596812d02b7253006e1ea7e535c",
       "analysis": {
@@ -3139,7 +3953,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 21216,
+      "readCount": 21268,
       "contentLength": 238,
       "contentSha256": "b85736675702cec880defa0027f95712d36a4e6557d28cc9914d4daf2529045e",
       "analysis": {
@@ -3170,7 +3984,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 20353,
+      "readCount": 20386,
       "contentLength": 213,
       "contentSha256": "c309b87ff78da6ab7034ecc081ec577eb3d41e3f03f86db36ccc582026909395",
       "analysis": {
@@ -3201,7 +4015,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12506,
+      "readCount": 12541,
       "contentLength": 234,
       "contentSha256": "916291e7eddef4c2a5b4db73454f8b29ccc52c6784fd0ac94076868c6798100a",
       "analysis": {
@@ -3232,7 +4046,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14662,
+      "readCount": 14733,
       "contentLength": 195,
       "contentSha256": "c2f0833f9ff5bae3d16f2ecf718856f056ccc698314efcfa68bc324cc76e3516",
       "analysis": {
@@ -3268,7 +4082,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 13050,
+      "readCount": 13199,
       "contentLength": 191,
       "contentSha256": "23eb82e6866a1bea4d13602593d1b8a710c6a3c8d35c22e7691c6e31b7f6b4f3",
       "analysis": {
@@ -3304,7 +4118,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 16996,
+      "readCount": 17086,
       "contentLength": 155,
       "contentSha256": "1724be5b9c04351217469cd7acee34c25eea34e1365a6a4870b00483070b9b27",
       "analysis": {
@@ -3337,7 +4151,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13181,
+      "readCount": 13224,
       "contentLength": 246,
       "contentSha256": "80562ed4963e02dabb81425dfe6c962c687dfdaa336056022a4db888f0fed00e",
       "analysis": {
@@ -3368,7 +4182,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12824,
+      "readCount": 12858,
       "contentLength": 345,
       "contentSha256": "da0cf99a1f2ff993b43d87f065fe6d1eed030370f7a6d0d992ed2c3da1bc378e",
       "analysis": {
@@ -3402,7 +4216,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12266,
+      "readCount": 12292,
       "contentLength": 693,
       "contentSha256": "bb65e990538583c5c01c74780ec0520cfb821a0d0b56c5df1a85f4998d62c4a9",
       "analysis": {
@@ -3433,7 +4247,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12309,
+      "readCount": 12334,
       "contentLength": 687,
       "contentSha256": "3affae202940c518b0aee419921d726314088fc75edaa4b05a4005281fa0fbcc",
       "analysis": {
@@ -3467,7 +4281,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12363,
+      "readCount": 12388,
       "contentLength": 713,
       "contentSha256": "7fcd2ba3657328a8ab2d4c1cadea6871a624ab490921a49b4446cd561e5b0637",
       "analysis": {
@@ -3498,7 +4312,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12314,
+      "readCount": 12339,
       "contentLength": 673,
       "contentSha256": "75c6e82b45423b0e6500a41aaf776b65b316acc3a4f6edb4e66a354661092814",
       "analysis": {
@@ -3529,7 +4343,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12088,
+      "readCount": 12114,
       "contentLength": 698,
       "contentSha256": "6f6bd5ede0d23d2ef9746cc5dacb9f4b46f3dd696664ce6130b03a79ad3b965c",
       "analysis": {
@@ -3560,7 +4374,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12191,
+      "readCount": 12216,
       "contentLength": 746,
       "contentSha256": "232f030bceffab91bee74c966123d7daf0639a4e5ba27b1662c5f85005e73df9",
       "analysis": {
@@ -3591,7 +4405,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12236,
+      "readCount": 12263,
       "contentLength": 810,
       "contentSha256": "47fd54d34e60158b171863ee7f166393238fbf6bfe71f813af7ca06ae41c7b78",
       "analysis": {
@@ -3625,7 +4439,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12882,
+      "readCount": 12917,
       "contentLength": 281,
       "contentSha256": "4956a3bd3b64d37b77cb045ab6f466dde48327902b8cf9ede4f1a5ac8e589ddb",
       "analysis": {
@@ -3661,7 +4475,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 13074,
+      "readCount": 13100,
       "contentLength": 282,
       "contentSha256": "d5a1190dc8a52911d075d2c1b5e2a1e0c7f48cdbd1229163a38fa3acad20a362",
       "analysis": {
@@ -3692,7 +4506,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12509,
+      "readCount": 12532,
       "contentLength": 422,
       "contentSha256": "bbb55c3408ae95c9b8efb2877ca38e44bbffff5dcd30b211e6eeeb7a5cfb6cd2",
       "analysis": {
@@ -3723,7 +4537,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13695,
+      "readCount": 13729,
       "contentLength": 425,
       "contentSha256": "1283c83afc3c00243e9c3e37999d676c63f541deb428ef243d74473885057c59",
       "analysis": {
@@ -3754,7 +4568,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13216,
+      "readCount": 13241,
       "contentLength": 348,
       "contentSha256": "aff49853e6889acc8939762b982ad29d52bf712369bfb950609838f10a558241",
       "analysis": {
@@ -3787,7 +4601,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14576,
+      "readCount": 14641,
       "contentLength": 264,
       "contentSha256": "f6b15dffd2f5e08651fde9e1cac26e7d3318841c3baa96123465cb76a0ba8d25",
       "analysis": {
@@ -3821,7 +4635,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14915,
+      "readCount": 14969,
       "contentLength": 352,
       "contentSha256": "25b46f510ea32843c4e54e7cf64f211cbb765873f62f13a187fa7be704c5a964",
       "analysis": {
@@ -3855,7 +4669,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14260,
+      "readCount": 14310,
       "contentLength": 407,
       "contentSha256": "9fff9f9c7e72e6a82c1492dd5b2ebe45464ff7776f8b34639049570eed9f436a",
       "analysis": {
@@ -3894,7 +4708,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13783,
+      "readCount": 13823,
       "contentLength": 412,
       "contentSha256": "f5f38f83a3ecd699a4c71a7e223fe7d7b1113b30eeec04e25fb3cd31d495592d",
       "analysis": {
@@ -3927,7 +4741,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12225,
+      "readCount": 12257,
       "contentLength": 325,
       "contentSha256": "f672f6492bb6b61542c9393dcd24b62132d827b623968182091e03b573ddd709",
       "analysis": {
@@ -3960,7 +4774,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12324,
+      "readCount": 12353,
       "contentLength": 1498,
       "contentSha256": "e248ab75746ac23a1c92c6a55f83839905801d3d4d6610335496160184fab4a1",
       "analysis": {
@@ -3998,7 +4812,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11624,
+      "readCount": 11649,
       "contentLength": 71,
       "contentSha256": "246a5230420917ed25719f9a7a1e09a638f1dfadf4f3622a4199b4857c00c631",
       "analysis": {
@@ -4029,7 +4843,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11633,
+      "readCount": 11656,
       "contentLength": 97,
       "contentSha256": "6fb2bcf7a73723f0788265c3dce02b30daa3c9d8bbf44f541b47fcbc93c38e0c",
       "analysis": {
@@ -4062,7 +4876,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12318,
+      "readCount": 12350,
       "contentLength": 433,
       "contentSha256": "36cd30c09779ac8363db279dc50aeb37ee5947d3bc42907e0d6573d249bf6d5a",
       "analysis": {
@@ -4096,7 +4910,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14523,
+      "readCount": 14580,
       "contentLength": 658,
       "contentSha256": "8a7050cafaf42bf264d63d2e4604a0fc3df6fadffa967e03c925056370852f7e",
       "analysis": {
@@ -4132,7 +4946,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11161,
+      "readCount": 11189,
       "contentLength": 1125,
       "contentSha256": "843fb555b6f6f87bf7ede08816d55725f849768c27935fd13f87732240cf13c3",
       "analysis": {
@@ -4173,7 +4987,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12399,
+      "readCount": 12436,
       "contentLength": 405,
       "contentSha256": "b333ba097324a65404dbbd2fd74c1b873aada67ec33ca72c0b73484f55d2c403",
       "analysis": {
@@ -4206,7 +5020,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10138,
+      "readCount": 10164,
       "contentLength": 692,
       "contentSha256": "379511fa66002641ae93898e6464e529f0c9deaad5e29cb8ad7781a868ea777d",
       "analysis": {
@@ -4242,7 +5056,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 10395,
+      "readCount": 10433,
       "contentLength": 361,
       "contentSha256": "5ca2f2e6ae4f5d77cc959c11c2ed7ff85e7a42ac8104f8af236782005dd5d853",
       "analysis": {
@@ -4275,7 +5089,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9405,
+      "readCount": 9430,
       "contentLength": 214,
       "contentSha256": "c8e1c245aea788a284284657589ee5b803e272d46637dc8dad29932e8eaf6311",
       "analysis": {
@@ -4306,7 +5120,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9661,
+      "readCount": 9701,
       "contentLength": 415,
       "contentSha256": "9d00debb4bbdc29847ec23f1f6ec551dfd53f8f6e26938fb7c23ceae2806cc09",
       "analysis": {
@@ -4346,7 +5160,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8598,
+      "readCount": 8622,
       "contentLength": 331,
       "contentSha256": "c851f1aacee8e28b325f22e8c923dc54a897470e0357c7b788b470598b9c7aae",
       "analysis": {
@@ -4377,7 +5191,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9244,
+      "readCount": 9291,
       "contentLength": 1401,
       "contentSha256": "7fda1dd6bbee6e8a9a17bb7e49bd022d4cd7d3de8811450ca455c26745243a23",
       "analysis": {
@@ -4413,7 +5227,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 12981,
+      "readCount": 13070,
       "contentLength": 377,
       "contentSha256": "d4bfbbae4e2611d25415b6810647098404c1249d5133b0db6177768358f25701",
       "analysis": {
@@ -4446,7 +5260,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8834,
+      "readCount": 8872,
       "contentLength": 526,
       "contentSha256": "dbbd2428a7eb9a54ef63fc75e86673f4924449f80eedbe4439ee15c3e2848ad4",
       "analysis": {
@@ -4483,7 +5297,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 13176,
+      "readCount": 13267,
       "contentLength": 738,
       "contentSha256": "9355de2a2a7d0923b9ba3433b816679d4c5cb8e475be0b3584f2dc8d2ed49e78",
       "analysis": {
@@ -4527,7 +5341,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9246,
+      "readCount": 9307,
       "contentLength": 694,
       "contentSha256": "aa2e2105a6f87c89170d3ad559bdbd1fb17f2554721a7f05e7b4518b1ea7b0c3",
       "analysis": {
@@ -4570,7 +5384,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11505,
+      "readCount": 11599,
       "contentLength": 357,
       "contentSha256": "bc8344dd2d401e43444e9a77572c08727d08e1b15c9acf9a1086713884b07b1a",
       "analysis": {
@@ -4603,7 +5417,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7752,
+      "readCount": 7773,
       "contentLength": 175,
       "contentSha256": "44ee56280024fbde17416447a7b16eaeb352c34f7bab5b2b638b195ded360bcb",
       "analysis": {
@@ -4636,7 +5450,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8123,
+      "readCount": 8157,
       "contentLength": 379,
       "contentSha256": "d41fdcfbe7af680cd0733154566f77c03018b8cdb68ba6f8bb9f214c06fd1eba",
       "analysis": {
@@ -4674,7 +5488,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9306,
+      "readCount": 9362,
       "contentLength": 338,
       "contentSha256": "d66a0e5dc73a8fbc7d5eb596306b07b826c831a22186fc1a2ad5bd5641f09a67",
       "analysis": {
@@ -4707,7 +5521,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10789,
+      "readCount": 10830,
       "contentLength": 389,
       "contentSha256": "3a843851c82af9212c6721e76173d6223cfb7d931201667fddc226131abc8c96",
       "analysis": {
@@ -4741,7 +5555,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8733,
+      "readCount": 8757,
       "contentLength": 377,
       "contentSha256": "928feb8e2f0794602f16f6520f1114dd41f19760b649e9b5989855536a0069c8",
       "analysis": {
@@ -4775,7 +5589,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9858,
+      "readCount": 9897,
       "contentLength": 377,
       "contentSha256": "928feb8e2f0794602f16f6520f1114dd41f19760b649e9b5989855536a0069c8",
       "analysis": {
@@ -4814,7 +5628,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 18195,
+      "readCount": 18320,
       "contentLength": 377,
       "contentSha256": "928feb8e2f0794602f16f6520f1114dd41f19760b649e9b5989855536a0069c8",
       "analysis": {
@@ -4848,7 +5662,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 11265,
+      "readCount": 11331,
       "contentLength": 548,
       "contentSha256": "b263a28d5bd5793c6ed8b8fe079926c12735f42d4839819182f4c2fddbc49e26",
       "analysis": {
@@ -4883,7 +5697,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8363,
+      "readCount": 8395,
       "contentLength": 357,
       "contentSha256": "ea3eb5100be077b44854f1d52b9422ec58980a82c820b4059e55bf871f9ca29d",
       "analysis": {
@@ -4917,7 +5731,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10122,
+      "readCount": 10149,
       "contentLength": 372,
       "contentSha256": "d82b95bdcad08e954626ccdd9cf82e01421a4168e23ef5d649257c91d14ac74f",
       "analysis": {
@@ -4954,7 +5768,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8878,
+      "readCount": 8900,
       "contentLength": 572,
       "contentSha256": "18ad99192de506d9a777958fca37688a8b779f368e21bb7d85f3116b89eee486",
       "analysis": {
@@ -4987,7 +5801,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9768,
+      "readCount": 9807,
       "contentLength": 268,
       "contentSha256": "a2750475d7412d8aa59cfdc2b50a77f1cb1d084160ca1cf718a58dc9da549b68",
       "analysis": {
@@ -5021,7 +5835,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 25035,
+      "readCount": 25070,
       "contentLength": 1331,
       "contentSha256": "3a2f5c3ab1036cd03382b042f063ea44aa846fd9f37092dfab2c4f1d9509dba2",
       "analysis": {
@@ -5064,7 +5878,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7953,
+      "readCount": 7975,
       "contentLength": 325,
       "contentSha256": "aa306fcb58230ecb1aec602dd1965e1b625813924a366b3f9e325b811d2ba254",
       "analysis": {
@@ -5095,7 +5909,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9962,
+      "readCount": 10005,
       "contentLength": 467,
       "contentSha256": "3d76893c9332858d750ad6221088c8f05842f3323eae40c4870194a5706b8070",
       "analysis": {
@@ -5130,7 +5944,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8703,
+      "readCount": 8727,
       "contentLength": 857,
       "contentSha256": "d44fd629a50c66a9493f215be6556725cc5502695225ebd255993b0d7a5bb043",
       "analysis": {
@@ -5165,7 +5979,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7629,
+      "readCount": 7650,
       "contentLength": 415,
       "contentSha256": "c86bafd2a9d93407ea3e0a621836f49c25c8c8f92b615ca7bfad25d5c354e296",
       "analysis": {
@@ -5198,7 +6012,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7831,
+      "readCount": 7854,
       "contentLength": 641,
       "contentSha256": "3d9d18217959e146c1ae21dc383d001352b941f3e6be18c961a2ae06bc52eae7",
       "analysis": {
@@ -5234,7 +6048,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7365,
+      "readCount": 7385,
       "contentLength": 149,
       "contentSha256": "ac5ef070a643ded965f4ddc51302817af66ee16eb5bfb5e162ce4f67945a96f0",
       "analysis": {
@@ -5268,7 +6082,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7305,
+      "readCount": 7326,
       "contentLength": 122,
       "contentSha256": "7ef291b9ac072ec2343ff310e8fab302d2fef513b336ef33445a3080791d4af6",
       "analysis": {
@@ -5303,7 +6117,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7632,
+      "readCount": 7655,
       "contentLength": 119,
       "contentSha256": "f12b087ccefa78b415f5e6eea60f080a127c0bad97465a7c9ed72640a0949850",
       "analysis": {
@@ -5334,7 +6148,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10427,
+      "readCount": 10465,
       "contentLength": 352,
       "contentSha256": "e30563cc9946e0fd9f577155dd9a6b2f989be3076a5dd75dd69454897e685f10",
       "analysis": {
@@ -5369,7 +6183,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8652,
+      "readCount": 8673,
       "contentLength": 647,
       "contentSha256": "92b3b64c6a25b8dc8bef2965df25dbacd51829eca764f1f0deec25ed6da611c9",
       "analysis": {
@@ -5403,7 +6217,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8197,
+      "readCount": 8220,
       "contentLength": 856,
       "contentSha256": "7d6410159e13ffc6baadca3a9170b3c4ee7c487cba7358c35aeb298e06afa0da",
       "analysis": {
@@ -5437,7 +6251,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 8435,
+      "readCount": 8471,
       "contentLength": 265,
       "contentSha256": "3c79b8e4d18dad80bc7c8d6dd3657fcf5d7038e870fc3e4a558de99e7748aa0c",
       "analysis": {
@@ -5468,7 +6282,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 9305,
+      "readCount": 9334,
       "contentLength": 461,
       "contentSha256": "1e4272b8c6ff84fc0a3b587503c22340afae6c95ebd05a762451ee4a67191d1f",
       "analysis": {
@@ -5503,7 +6317,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7735,
+      "readCount": 7760,
       "contentLength": 512,
       "contentSha256": "3bf463ae8d17efc4d9ab0885ab4f01c3fc0f518b48da238a6ab8add0803b5f94",
       "analysis": {
@@ -5534,7 +6348,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8285,
+      "readCount": 8316,
       "contentLength": 430,
       "contentSha256": "6a21c558dae8cea37051035a93814484543628fab6fadcf48c68f7cd4dcf1e8c",
       "analysis": {
@@ -5565,7 +6379,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8633,
+      "readCount": 8663,
       "contentLength": 468,
       "contentSha256": "8bc8c74ff3016b460b0596079a54cb986865b73283b05ff8f6b237ad106d701d",
       "analysis": {
@@ -5606,7 +6420,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 15151,
+      "readCount": 15228,
       "contentLength": 477,
       "contentSha256": "027d7829f8386131c62e4ab877d51fd222a9e84d4c530e05cbaaf1c79f97e86e",
       "analysis": {
@@ -5639,7 +6453,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10533,
+      "readCount": 10570,
       "contentLength": 223,
       "contentSha256": "5f957016608ef9c3a501c6f0ca32c1b770a262efd903736f3f83aede82debb7d",
       "analysis": {
@@ -5672,7 +6486,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7627,
+      "readCount": 7649,
       "contentLength": 668,
       "contentSha256": "d547ab8ac8f2cfb83a6f205bad68a591ef27244ea8e292b805064e75b55363e6",
       "analysis": {
@@ -5703,7 +6517,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12551,
+      "readCount": 12612,
       "contentLength": 551,
       "contentSha256": "a93e6608fc659feb2af601fbaa8572ef95a392edf1bc19f03b436f72c9d623be",
       "analysis": {
@@ -5738,7 +6552,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7642,
+      "readCount": 7667,
       "contentLength": 716,
       "contentSha256": "dd270bbb8bf1c40e8a6f6503a7639d08aa5b75a1c5c063e2c437867df8d0e443",
       "analysis": {
@@ -5772,7 +6586,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 10005,
+      "readCount": 10042,
       "contentLength": 612,
       "contentSha256": "acb16464bcf743ce23c99a0f0620fca6e4e15aca38ab4beb32cf744f22e165c5",
       "analysis": {
@@ -5808,7 +6622,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 12227,
+      "readCount": 12267,
       "contentLength": 746,
       "contentSha256": "c50ef6e7ee7699dcbe48f651e4ea68931b9cadb7ac36c3ea9b06a9160c7ba0cc",
       "analysis": {
@@ -5844,7 +6658,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7559,
+      "readCount": 7586,
       "contentLength": 199,
       "contentSha256": "341c6ecf07ef291c27a4e4bd858260609f219a5dc4e4148a13bfac5e6df703f8",
       "analysis": {
@@ -5875,7 +6689,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7499,
+      "readCount": 7529,
       "contentLength": 1546,
       "contentSha256": "0ed77750822de6730c50017f08e342d130df77d2d3c1a5aaaa8630d8c73ea8f5",
       "analysis": {
@@ -5911,7 +6725,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8213,
+      "readCount": 8284,
       "contentLength": 96,
       "contentSha256": "8bef3297758cca6ea570373ec4121425b4af1982ff7c5d93b17e8ff22d4bd414",
       "analysis": {
@@ -5942,7 +6756,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7674,
+      "readCount": 7697,
       "contentLength": 107,
       "contentSha256": "1bf321e93125ecdcdaa09da915ecd609065d442c07ce82eb32ef7bba27913e01",
       "analysis": {
@@ -5975,7 +6789,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 6934,
+      "readCount": 6956,
       "contentLength": 577,
       "contentSha256": "f936887cefbc60125b44c6f1f822db6edf1ad66497a81033e95b3923cf6ea589",
       "analysis": {
@@ -6006,7 +6820,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 6986,
+      "readCount": 7008,
       "contentLength": 205,
       "contentSha256": "c75a8cbe09fd43390ecdd5a0fc111776c1145aa9e1e014f84a0b154c565bdb67",
       "analysis": {
@@ -6037,7 +6851,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 7963,
+      "readCount": 8005,
       "contentLength": 433,
       "contentSha256": "3fd794b0fc8885860041b6e11ba3900d9a46f8daeffb881c78cf69893dde9850",
       "analysis": {
@@ -6073,7 +6887,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 6653,
+      "readCount": 6674,
       "contentLength": 693,
       "contentSha256": "5e47a60d46be532f6cab04fbb39e755a0fce0a58ad919cf8fc84f37495d32bbb",
       "analysis": {
@@ -6083,818 +6897,6 @@
         },
         "earningsTextDirection": "UNKNOWN",
         "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {}
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96194",
-      "writeDate": "2026-09-17",
-      "itemCode": "474610",
-      "itemName": "RF시스템즈",
-      "title": "[AI] 딥 브레이징 기반 방산 시스템 전문기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6936,
-      "contentLength": 808,
-      "contentSha256": "fe8fad48bfb6a33f010fd4657174943ed7502246ce39ad9be29657df57dc93fe",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "방산": 7
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96193",
-      "writeDate": "2026-09-17",
-      "itemCode": "473980",
-      "itemName": "노머스",
-      "title": "[AI] 아티스트 IP 기반 엔터테크 종합 솔루션 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6733,
-      "contentLength": 736,
-      "contentSha256": "1578e9e65418fae24319551c275c207d867da6bb48f3b1326fa1e8d01b906571",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "AI": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96192",
-      "writeDate": "2026-09-17",
-      "itemCode": "048910",
-      "itemName": "대원미디어",
-      "title": "[AI] 애니메이션 IP 기반 종합 엔터테인먼트 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6702,
-      "contentLength": 750,
-      "contentSha256": "2a34506baa85ba2645a93953d2e4a6560e7411c50ea209db27fdb5e0bf891796",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {}
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96191",
-      "writeDate": "2026-09-17",
-      "itemCode": "462860",
-      "itemName": "더즌",
-      "title": "[AI] 디지털 뱅킹·FX 솔루션 전자금융 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6680,
-      "contentLength": 835,
-      "contentSha256": "b440d755a3e74249adedabeedcfcb1b2bdf7d1ac7ea14c4a7a6a9ec5d08c552d",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "수요": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96190",
-      "writeDate": "2026-09-17",
-      "itemCode": "083930",
-      "itemName": "아바코",
-      "title": "[AI] 디스플레이·이차전지 핵심장비 제조기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6711,
-      "contentLength": 828,
-      "contentSha256": "fb539d0853b2e1a610ebdc920b77bda236318e04c560b440dd9f52a05e900e84",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "배터리": 8,
-          "수주": 1,
-          "중국": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96189",
-      "writeDate": "2026-09-17",
-      "itemCode": "136150",
-      "itemName": "원일티엔아이",
-      "title": "[AI] 수소저장합금과 LNG기화기 국산화 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6642,
-      "contentLength": 626,
-      "contentSha256": "a55f8690fe18cb24154f3047f9a25c99e5314eaae4768d3f429f2ec083f849ac",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "원전": 1,
-          "조선": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96188",
-      "writeDate": "2026-09-17",
-      "itemCode": "101160",
-      "itemName": "월덱스",
-      "title": "[AI] 반도체 식각공정용 실리콘·쿼츠 부품 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6829,
-      "contentLength": 773,
-      "contentSha256": "cc6ee49d8801af59b28ca6bc790deb733685cc0475d682010bbad29f7dec1d52",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 2,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "반도체": 7,
-          "미국": 1,
-          "수요": 1,
-          "원가": 1
-        }
-      },
-      "previousSameBrokerNid": "96008",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96187",
-      "writeDate": "2026-09-17",
-      "itemCode": "274090",
-      "itemName": "켄코아에어로스페이스",
-      "title": "[AI] 한미 거점 기반 우주항공 부품·MRO 기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 7600,
-      "contentLength": 755,
-      "contentSha256": "f6e21bb7cf9c3d9d1cf65c0ad9e72622df18e6c0f2b16b9bfa2dee9f95aee0d1",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "수주": 4,
-          "미국": 2,
-          "방산": 2,
-          "AI": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96186",
-      "writeDate": "2026-09-17",
-      "itemCode": "060280",
-      "itemName": "큐렉소",
-      "title": "[AI] 정형외과 수술로봇 및 재활로봇 전문기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6761,
-      "contentLength": 765,
-      "contentSha256": "4f4e0b61db0c6b2b13a487030061ec77a3a6986834cd9214402be877d0435d2f",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "로봇": 13
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96185",
-      "writeDate": "2026-09-17",
-      "itemCode": "013030",
-      "itemName": "하이록코리아",
-      "title": "[AI] 계장용 관이음쇠·밸브 제조 전문기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6626,
-      "contentLength": 743,
-      "contentSha256": "7f8ad8903a97ff9498064ba35bb30b215b1d63811762f34971e6bf3384a518eb",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "반도체": 2,
-          "조선": 2,
-          "방산": 1,
-          "수요": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96184",
-      "writeDate": "2026-09-17",
-      "itemCode": "099750",
-      "itemName": "이지케어텍",
-      "title": "[AI] 대형병원 의료정보시스템(HIS) 전문기업",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 6519,
-      "contentLength": 793,
-      "contentSha256": "cfbec7d127294a7ece084146c85a1719cd51b2241ff2a74870dc8a1a3b33def8",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "미국": 2
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96183",
-      "writeDate": "2026-09-16",
-      "itemCode": "068270",
-      "itemName": "셀트리온",
-      "title": "더욱 강하게 밟는 가속성장페달, 2027년",
-      "brokerCode": "66",
-      "brokerName": "DS투자증권",
-      "goalPrice": 320000,
-      "opinionText": "매수",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 13195,
-      "contentLength": 468,
-      "contentSha256": "fd302ef4a41c161511b17ef869f2b40adc653265c285ae0ebea6cc4bd606a16a",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 4,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "가격": 1,
-          "미국": 1
-        }
-      },
-      "previousSameBrokerNid": "94641",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96182",
-      "writeDate": "2026-09-16",
-      "itemCode": "290550",
-      "itemName": "디케이티",
-      "title": "탈중국 공급망이 선택한 Turn-key 양산 플랫폼",
-      "brokerCode": "62",
-      "brokerName": "교보증권",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 7731,
-      "contentLength": 288,
-      "contentSha256": "b38e97eafc230c6bd89b7b0c201c1680125e7db84dbe2e8a9fe0c0d07e593127",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "자동차": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96181",
-      "writeDate": "2026-09-16",
-      "itemCode": "251970",
-      "itemName": "펌텍코리아",
-      "title": "작년과 다른 수주 흐름+ 가격 인상 + CAPA 증설",
-      "brokerCode": "62",
-      "brokerName": "교보증권",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 7479,
-      "contentLength": 586,
-      "contentSha256": "d7825c089e35f21437c9284a7703b4a72ab3460032d301c7933b32e7303a0e84",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 6,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 2,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "가격": 5,
-          "수주": 5
-        }
-      },
-      "previousSameBrokerNid": "95511",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96180",
-      "writeDate": "2026-09-16",
-      "itemCode": "086710",
-      "itemName": "선진뷰티사이언스",
-      "title": "25년은 준비기, 26년부터 도약기!",
-      "brokerCode": "62",
-      "brokerName": "교보증권",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 7182,
-      "contentLength": 273,
-      "contentSha256": "b0eeadad76803918469a04b005640558f4652bf5a9d7aff3c0aa79d7cdb52689",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "미국": 1,
-          "중국": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96179",
-      "writeDate": "2026-09-16",
-      "itemCode": "138080",
-      "itemName": "오이솔루션",
-      "title": "이미 쇼티지는 시작됐다",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 60000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 9451,
-      "contentLength": 308,
-      "contentSha256": "0331e9137ef613a80a809835fb29cdb18c43ad4be8cb3e16368a34d6d78df16b",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {
-          "가격": 1,
-          "미국": 1,
-          "원가": 1
-        }
-      },
-      "previousSameBrokerNid": "95785",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96178",
-      "writeDate": "2026-09-16",
-      "itemCode": "230240",
-      "itemName": "에치에프알",
-      "title": "2027년에는 내수와 수출 실적 모두 개선됩니다",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 50000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 7795,
-      "contentLength": 265,
-      "contentSha256": "f4b7c71612c8fae904a57b9ce06af91ab496ef5d08b21b3dcabd20db26ff9174",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {
-          "미국": 1
-        }
-      },
-      "previousSameBrokerNid": "95834",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96177",
-      "writeDate": "2026-09-16",
-      "itemCode": "050890",
-      "itemName": "쏠리드",
-      "title": "수급 정상화되면서 향후 1년간 주가 크게 오를 것",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 30000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 9493,
-      "contentLength": 431,
-      "contentSha256": "ef78d1c830953f7257de0b9f63b2e4071904a74deae7318c5368ee4aa02483c5",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 0
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {
-          "미국": 2,
-          "가격": 1
-        }
-      },
-      "previousSameBrokerNid": "94456",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96176",
-      "writeDate": "2026-09-16",
-      "itemCode": "218410",
-      "itemName": "RFHIC",
-      "title": "쇼티지 발생 유력, 높은 Multiple 형성될 것",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 150000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 11923,
-      "contentLength": 411,
-      "contentSha256": "12dd7fb8362f99d377a0025b1a2427ae60e09703430bc58e50890331c11e2160",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 1
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {
-          "미국": 1,
-          "방산": 1,
-          "수주": 1
-        }
-      },
-      "previousSameBrokerNid": "95978",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96175",
-      "writeDate": "2026-09-16",
-      "itemCode": "073490",
-      "itemName": "LIG아큐버",
-      "title": "재료 많은데 이 가격이라면 망설일 이유는 없다",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 80000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 7730,
-      "contentLength": 338,
-      "contentSha256": "217d3a89ca5e16e59e87bd61715d279fe65622d3ee4ed5ca7ec1e00d5068b073",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 2,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 2,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {}
-      },
-      "previousSameBrokerNid": "94213",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96174",
-      "writeDate": "2026-09-16",
-      "itemCode": "032500",
-      "itemName": "케이엠더블유",
-      "title": "2027년에는 새로운 역사 쓸 가능성이 높다",
-      "brokerCode": "57",
-      "brokerName": "하나증권",
-      "goalPrice": 70000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 9572,
-      "contentLength": 439,
-      "contentSha256": "13fc717154f54da7df580779f9cb07c3fdaac920c3d119e19602b3e10be31517",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 1,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNCHANGED",
-        "topics": {
-          "미국": 2
-        }
-      },
-      "previousSameBrokerNid": "95805",
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96173",
-      "writeDate": "2026-09-16",
-      "itemCode": "437730",
-      "itemName": "삼현",
-      "title": "휴머노이드 장기 눈높이 상향에 따른 주가 급등 코멘트",
-      "brokerCode": "39",
-      "brokerName": "키움증권",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 9983,
-      "contentLength": 859,
-      "contentSha256": "2913a9c499ef2c850661776d1e4bffd33a854d2557affdfea22666806379c149",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 10,
-          "negative": 2
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 4,
-        "earningsNegativeSignalCount": 1,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "수주": 6,
-          "수요": 4,
-          "가격": 1,
-          "원가": 1
-        }
-      },
-      "previousSameBrokerNid": null,
-      "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96172",
-      "writeDate": "2026-09-16",
-      "itemCode": "000880",
-      "itemName": "한화",
-      "title": "쪼갠 후 증가한 시가총액",
-      "brokerCode": "64",
-      "brokerName": "SK증권",
-      "goalPrice": 170000,
-      "opinionText": "매수",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 7903,
-      "contentLength": 388,
-      "contentSha256": "2f9b8877e86bce1ad87dafbaf736c0f57e3c1a9aa7367edda9ac4c4e433c7721",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 3,
-          "negative": 1
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {}
-      },
-      "previousSameBrokerNid": "94285",
-      "goalPriceChange": {
-        "from": 130000,
-        "to": 170000,
-        "amount": 40000,
-        "pct": 30.77
-      },
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "96171",
-      "writeDate": "2026-09-16",
-      "itemCode": "287840",
-      "itemName": "인투셀",
-      "title": "IntoCell, 이제는 IntoHuman: 데이터와 L/O로 증명할 시간",
-      "brokerCode": "74",
-      "brokerName": "한국IR협의회",
-      "goalPrice": null,
-      "opinionText": "없음",
-      "opinionType": "neutral",
-      "normalizedOpinion": "NONE",
-      "readCount": 7165,
-      "contentLength": 321,
-      "contentSha256": "ca4b053943b35c4a1046155d2232b1297499cc1c53cb0a5996441624a4258858",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 2,
-          "negative": 0
-        },
-        "earningsTextDirection": "UP",
-        "earningsPositiveSignalCount": 1,
         "earningsNegativeSignalCount": 0,
         "targetPriceMentionDirection": "UNKNOWN",
         "topics": {}

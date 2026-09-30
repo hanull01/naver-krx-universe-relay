@@ -1,52 +1,57 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
   "asOf": "2026-09-30",
   "dateRange": {
     "from": "2026-04-01",
-    "to": "2026-09-28"
+    "to": "2026-09-30"
   },
-  "reportCount": 64,
+  "reportCount": 65,
   "brokerCount": 15,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-08-31",
       "to": "2026-09-30",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 3100000,
+        "count": 3,
+        "min": 2700000,
         "max": 3200000,
-        "mean": 3150000,
-        "median": 3150000,
-        "stdev": 50000,
-        "range": 100000
+        "mean": 3000000,
+        "median": 3100000,
+        "stdev": 216025,
+        "range": 500000
       },
       "earningsDirection": {
         "DOWN": 1,
-        "UP": 1
+        "UP": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 7,
-        "negative": 3,
-        "net": 4,
-        "netPerReport": 2.0
+        "positive": 10,
+        "negative": 5,
+        "net": 5,
+        "netPerReport": 1.667
       },
       "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 0.667
+        },
         "HBM": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
         "환율": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
-        "수요": {
+        "AI": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     },
@@ -95,31 +100,40 @@
     },
     "topicAcceleration": [
       {
+        "topic": "수요",
+        "currentCount": 2,
+        "currentPerReport": 0.667,
+        "previousCount": 1,
+        "previousPerReport": 0.143,
+        "perReportDelta": 0.524,
+        "ratio": 4.66
+      },
+      {
         "topic": "HBM",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
-        "topic": "수요",
+        "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 1,
-        "previousPerReport": 0.143,
-        "perReportDelta": 0.357,
-        "ratio": 3.5
+        "currentPerReport": 0.333,
+        "previousCount": 2,
+        "previousPerReport": 0.286,
+        "perReportDelta": 0.047,
+        "ratio": 1.16
       },
       {
         "topic": "주주환원",
@@ -138,23 +152,14 @@
         "previousPerReport": 0.143,
         "perReportDelta": -0.143,
         "ratio": 0.0
-      },
-      {
-        "topic": "AI",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": -0.286,
-        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -5,
-    "targetMeanChangePct": -1.78,
-    "targetMedianChangePct": 0.0,
-    "targetDispersionChangePct": -88.36
+    "reportCountChange": -4,
+    "targetMeanChangePct": -6.46,
+    "targetMedianChangePct": -1.59,
+    "targetDispersionChangePct": -49.72
   },
   "goalPriceRevisions": {
     "total": 25,
@@ -397,39 +402,44 @@
       }
     },
     "2026-09": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 3100000,
+        "count": 3,
+        "min": 2700000,
         "max": 3200000,
-        "mean": 3150000,
-        "median": 3150000,
-        "stdev": 50000,
-        "range": 100000
+        "mean": 3000000,
+        "median": 3100000,
+        "stdev": 216025,
+        "range": 500000
       },
       "earningsDirection": {
         "DOWN": 1,
-        "UP": 1
+        "UP": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 7,
-        "negative": 3,
-        "net": 4,
-        "netPerReport": 2.0
+        "positive": 10,
+        "negative": 5,
+        "net": 5,
+        "netPerReport": 1.667
       },
       "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 0.667
+        },
         "HBM": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
         "환율": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
-        "수요": {
+        "AI": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     }
@@ -711,8 +721,8 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 1500000,
       "latestGoalPrice": 2700000,
       "changeAmount": 1200000,
@@ -742,6 +752,11 @@
           "date": "2026-07-30",
           "goalPrice": 2700000,
           "title": "숨 고르기 후 반등 기대"
+        },
+        {
+          "date": "2026-09-30",
+          "goalPrice": 2700000,
+          "title": "흔들림 없는 실적 우상향"
         }
       ]
     },

@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "001120",
   "itemName": "LX인터내셔널",
-  "reportCount": 14,
-  "latestReportNid": "95037",
-  "latestWriteDate": "2026-08-04",
+  "reportCount": 16,
+  "latestReportNid": "96392",
+  "latestWriteDate": "2026-09-30",
   "latest": {
-    "nid": "95037",
-    "writeDate": "2026-08-04",
+    "nid": "96392",
+    "writeDate": "2026-09-30",
     "brokerName": "하나증권",
-    "title": "하반기에도 이어질 증익 기조",
+    "title": "물류가 큰일 한다",
     "goalPrice": 66000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 6,
+        "negative": 3
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "topics": {
+        "가격": 1
+      }
     }
   },
   "reportNids": [
+    "96392",
+    "96382",
     "95037",
     "95025",
     "95023",

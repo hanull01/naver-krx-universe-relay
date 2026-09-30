@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "itemCode": "032640",
   "itemName": "LG유플러스",
-  "reportCount": 37,
-  "latestReportNid": "95960",
-  "latestWriteDate": "2026-09-01",
+  "reportCount": 38,
+  "latestReportNid": "96390",
+  "latestWriteDate": "2026-09-30",
   "latest": {
-    "nid": "95960",
-    "writeDate": "2026-09-01",
+    "nid": "96390",
+    "writeDate": "2026-09-30",
     "brokerName": "하나증권",
-    "title": "9월 전략 - 3개월 이상 내다보면 주가 전망 밝습니다",
+    "title": "10월 전략 - 금리 하락 반전 시 주가 오를 것입니다",
     "goalPrice": 20000,
     "normalizedOpinion": "BUY",
     "analysis": {
@@ -19,12 +19,16 @@
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "topics": {
+        "가격": 1,
+        "금리": 1
+      }
     }
   },
   "reportNids": [
+    "96390",
     "95960",
     "95439",
     "95315",
