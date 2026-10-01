@@ -2,6 +2,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -86,6 +87,23 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         rows = update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher)
         self.assertEqual({"000001", "000002"}, set(rows))
         self.assertTrue(rows["000001"]["ohlcValid"])
+
+    def test_collect_today_rows_reports_complete_missing_diagnostic(self):
+        def fetcher(_code, _start, _end):
+            return {"raw": json.dumps({"priceInfos": []}).encode()}
+        with self.assertRaises(update.TodayRowsNotReady) as caught:
+            update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher)
+        self.assertEqual(2, caught.exception.diagnostics["missingTodayCount"])
+        self.assertEqual(["000001", "000002"], caught.exception.diagnostics["firstMissingCodes"])
+
+    def test_closing_window_uses_explicit_kst_boundary(self):
+        midnight = update.closing_window(datetime(2026, 10, 1, 15, 22, tzinfo=timezone.utc))
+        self.assertEqual("BEFORE_REGULAR_CLOSE", midnight["status"])
+        self.assertEqual("2026-10-02", midnight["targetDate"])
+        before = update.closing_window(datetime(2026, 10, 2, 15, 29, tzinfo=update.KST))
+        after = update.closing_window(datetime(2026, 10, 2, 15, 30, tzinfo=update.KST))
+        self.assertFalse(before["eligible"])
+        self.assertTrue(after["eligible"])
 
     def test_reader_preserves_rows_and_shared_baseline_calculation(self):
         state = update.load_state(self.state_dir, self.universe)

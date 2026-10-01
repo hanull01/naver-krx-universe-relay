@@ -72,20 +72,32 @@ def main():
     p.add_argument('--fetch-today', action='store_true', help='collect one current daily row per authoritative code from NAVER')
     p.add_argument('--date', help='target KRX trading day (YYYY-MM-DD) for update-latest')
     p.add_argument('--baseline-output', default=str(ROOT/'data/monitoring-baseline/latest.json'))
+    p.add_argument('--closing-window', action='store_true', help='print KST final-daily eligibility without collecting data')
     p.add_argument('--no-write',action='store_true'); a=p.parse_args()
+    if a.closing_window:
+        from monitoring_daily_state_update import closing_window
+        print(json.dumps(closing_window(), ensure_ascii=False))
+        return 0
     if a.command == 'update-latest':
         if not a.date or bool(a.daily_input) == bool(a.fetch_today):
             p.error('update-latest requires --date and exactly one of --daily-input or --fetch-today')
-        from monitoring_daily_state_update import (collect_today_rows, load_state, update_from_file, update_from_rows)
-        if a.fetch_today:
-            outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
-                                       collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
-                                       a.universe_file, a.baseline_output, no_write=a.no_write)
-        else:
-            outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
-                                       a.baseline_output, no_write=a.no_write)
+        from monitoring_daily_state_update import (TodayRowsNotReady, collect_today_rows, load_state, update_from_file, update_from_rows)
+        try:
+            if a.fetch_today:
+                outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
+                                           collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
+                                           a.universe_file, a.baseline_output, no_write=a.no_write)
+            else:
+                outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
+                                           a.baseline_output, no_write=a.no_write)
+        except TodayRowsNotReady as exc:
+            print(json.dumps(exc.diagnostics, ensure_ascii=False))
+            return 2
+        except ValueError as exc:
+            print(json.dumps({'status': 'ERROR', 'errorType': type(exc).__name__, 'message': str(exc)}, ensure_ascii=False))
+            return 3
         print(json.dumps({key:value for key,value in outcome.items() if key != 'baseline'},ensure_ascii=False))
-        return
+        return 0
     state=build(a.canonical_dir,a.universe_file)
     if not a.no_write:
         for market,stocks in state['markets'].items():
@@ -93,4 +105,5 @@ def main():
             atomic(Path(a.output_dir)/f'{market.lower()}.json',{'schemaVersion':1,'format':'COLUMN_ARRAY_V1','market':market,'retainedObservations':KEEP,'asOfDate':as_of,'publicationStatus':'FINAL','stocks':stocks})
         atomic(Path(a.output_dir)/'quality.json',{'schemaVersion':1,'authoritativeCount':state['authoritativeCount'],'marketCounts':{k:len(v) for k,v in state['markets'].items()}})
     print(json.dumps({'authoritativeCount':state['authoritativeCount'],'marketCounts':{k:len(v) for k,v in state['markets'].items()}},ensure_ascii=False))
-if __name__=='__main__': main()
+    return 0
+if __name__=='__main__': raise SystemExit(main())

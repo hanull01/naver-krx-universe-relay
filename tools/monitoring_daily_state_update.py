@@ -9,13 +9,52 @@ from __future__ import annotations
 import json
 import os
 import tempfile
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
 KEEP = 301
 FORMAT = "COLUMN_ARRAY_V1"
 MARKETS = ("KOSPI", "KOSDAQ")
+KST = ZoneInfo("Asia/Seoul")
+REGULAR_CLOSE_KST = time(15, 30)
+
+
+class TodayRowsNotReady(ValueError):
+    """The authoritative response is structurally valid but incomplete."""
+
+    def __init__(self, target_date, missing_codes):
+        self.target_date = compact_date(target_date)
+        self.missing_codes = tuple(sorted(missing_codes))
+        self.diagnostics = {
+            "status": "NOT_READY",
+            "targetDate": self.target_date,
+            "missingTodayCount": len(self.missing_codes),
+            "firstMissingCodes": list(self.missing_codes[:10]),
+        }
+        super().__init__(
+            f"today daily rows unavailable: missingTodayCount={len(self.missing_codes)}, "
+            f"firstMissingCodes={','.join(self.missing_codes[:10])}"
+        )
+
+
+def closing_window(now=None):
+    """Return the KST-only eligibility decision for a same-day FINAL update."""
+    if now is None:
+        now = datetime.now(KST)
+    elif now.tzinfo is None:
+        raise ValueError("closing-window time must be timezone-aware")
+    else:
+        now = now.astimezone(KST)
+    after_close = now.time() >= REGULAR_CLOSE_KST
+    return {
+        "status": "AFTER_REGULAR_CLOSE" if after_close else "BEFORE_REGULAR_CLOSE",
+        "eligible": after_close,
+        "nowKst": now.isoformat(),
+        "targetDate": now.date().isoformat(),
+        "regularCloseKst": "15:30",
+    }
 
 
 def compact_date(value):
@@ -155,21 +194,28 @@ def collect_today_rows(target_date, universe_file, fetcher=None):
     target = compact_date(target_date)
     target_dt = datetime.strptime(target, "%Y%m%d")
     fetcher = fetcher or daily.fetch
-    output = []
+    output, missing = [], []
     for market, assets in authoritative_groups(universe_file).items():
         for code in sorted(assets):
             response = fetcher(code, target_dt, target_dt)
             payload = json.loads(response["raw"].decode("utf-8"))
             rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
+            if not isinstance(rows, list):
+                raise ValueError(f"invalid daily response collection: {code}")
             candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
+            if not candidates:
+                missing.append(code)
+                continue
             if len(candidates) != 1:
-                raise ValueError(f"today daily row unavailable: {code}")
+                raise ValueError(f"duplicate today daily row: {code}")
             row = candidates[0]
             reasons = daily.row_validation_reasons(row)
             output.append({"code": code, "date": target, "close": row.get("closePrice"), "high": row.get("highPrice"),
                            "volume": row.get("accumulatedTradingVolume"), "closeValid": not any("close" in item for item in reasons),
                            "ohlcValid": not reasons, "volumeValid": not any("volume" in item for item in reasons),
                            "market": market})
+    if missing:
+        raise TodayRowsNotReady(target, missing)
     return normalize_daily_rows({"rows": output}, target)
 
 

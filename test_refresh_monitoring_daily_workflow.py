@@ -22,6 +22,13 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('--fetch-today --date', self.text)
         self.assertIn('preserving prior rolling state and baseline', self.text)
 
+    def test_before_close_skips_fetch_and_only_incomplete_rows_retry(self):
+        self.assertIn('Check KST regular-close window', self.text)
+        self.assertIn('BEFORE_REGULAR_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
+        self.assertIn("steps.closing_window.outputs.eligible == 'true'", self.text)
+        self.assertIn('if [ "$code" -ne 2 ]', self.text)
+        self.assertIn('nowKst=', self.text)
+
     def test_publish_stages_only_three_artifacts_without_force_push(self):
         for path in ('data/monitoring-daily/kospi.json', 'data/monitoring-daily/kosdaq.json',
                      'data/monitoring-baseline/latest.json'):

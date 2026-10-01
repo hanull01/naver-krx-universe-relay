@@ -61,25 +61,44 @@ jobs:
             test_monitoring_daily_state_update.py \
             test_daily_monitoring_baseline.py -v
 
-      - name: Sync latest main before collection
+      - name: Check KST regular-close window
+        id: closing_window
         if: steps.market_day.outputs.run == 'true'
+        shell: bash
+        run: |
+          window=$(python tools/build_monitoring_daily_state.py --closing-window)
+          echo "$window"
+          status=$(python -c 'import json,sys; print(json.load(sys.stdin)["status"])' <<<"$window")
+          target_date=$(python -c 'import json,sys; print(json.load(sys.stdin)["targetDate"])' <<<"$window")
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
+          if [ "$status" = "AFTER_REGULAR_CLOSE" ]; then
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::BEFORE_REGULAR_CLOSE: skipping NAVER fetch, retry, and publish."
+          fi
+
+      - name: Sync latest main before collection
+        if: steps.market_day.outputs.run == 'true' && steps.closing_window.outputs.eligible == 'true'
         run: |
           git fetch origin main
           git rebase origin/main
 
       - name: Collect, validate, and update rolling state
         id: update
-        if: steps.market_day.outputs.run == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.closing_window.outputs.eligible == 'true'
         shell: bash
         env:
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
         run: |
           set +e
-          target_date=$(TZ=Asia/Seoul date +%F)
+          target_date='${{ steps.closing_window.outputs.target_date }}'
           extra=()
           if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
           for attempt in 1 2 3; do
-            echo "Full-market daily readiness attempt ${attempt}/3 for ${target_date}"
+            now_kst=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat())')
+            echo "Full-market daily readiness attempt ${attempt}/3: targetDate=${target_date}, nowKst=${now_kst}"
             python tools/build_monitoring_daily_state.py update-latest \
               --fetch-today --date "$target_date" "${extra[@]}"
             code=$?
@@ -88,7 +107,11 @@ jobs:
               echo "attempt=$attempt" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            echo "NOT_READY: no production files were published on attempt ${attempt}."
+            if [ "$code" -ne 2 ]; then
+              echo "::error::Non-retryable daily update failure (exit=${code}); preserving prior rolling state and baseline."
+              exit "$code"
+            fi
+            echo "NOT_READY: incomplete today rows; no production files were published on attempt ${attempt}."
             if [ "$attempt" -lt 3 ]; then sleep 300; fi
           done
           echo "ready=false" >> "$GITHUB_OUTPUT"
