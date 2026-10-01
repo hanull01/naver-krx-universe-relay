@@ -1,7 +1,7 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-10-01",
+  "asOf": "2026-10-02",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
@@ -411,8 +411,8 @@
       "rankingEligible": false,
       "reportCount": 27,
       "brokerCount": 13,
-      "recentReportCount": 2,
-      "previousReportCount": 9,
+      "recentReportCount": 1,
+      "previousReportCount": 10,
       "recentTargetMean": 1550000,
       "previousTargetMean": 1638889,
       "recentTargetMedian": 1550000,
@@ -421,13 +421,7 @@
       "targetDispersionChangePct": -100.0,
       "revisionUp": 2,
       "revisionDown": 8,
-      "risingTopics": [
-        {
-          "topic": "원가",
-          "delta": 0.5,
-          "ratio": null
-        }
-      ]
+      "risingTopics": []
     },
     {
       "itemCode": "064350",
@@ -791,28 +785,17 @@
       "rankingEligible": false,
       "reportCount": 18,
       "brokerCount": 6,
-      "recentReportCount": 2,
-      "previousReportCount": 3,
-      "recentTargetMean": 195000,
-      "previousTargetMean": 193333,
-      "recentTargetMedian": 195000,
-      "recentTargetStdev": 5000,
-      "targetMeanChangePct": 0.86,
-      "targetDispersionChangePct": 6.07,
+      "recentReportCount": 1,
+      "previousReportCount": 4,
+      "recentTargetMean": 200000,
+      "previousTargetMean": 192500,
+      "recentTargetMedian": 200000,
+      "recentTargetStdev": 0,
+      "targetMeanChangePct": 3.9,
+      "targetDispersionChangePct": -100.0,
       "revisionUp": 4,
       "revisionDown": 0,
-      "risingTopics": [
-        {
-          "topic": "AI",
-          "delta": 0.5,
-          "ratio": null
-        },
-        {
-          "topic": "수요",
-          "delta": 0.5,
-          "ratio": null
-        }
-      ]
+      "risingTopics": []
     },
     {
       "itemCode": "034020",

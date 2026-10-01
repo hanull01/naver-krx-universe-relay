@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "096770",
   "itemName": "SK이노베이션",
-  "asOf": "2026-10-01",
+  "asOf": "2026-10-02",
   "dateRange": {
     "from": "2026-04-02",
     "to": "2026-09-15"
@@ -12,105 +12,104 @@
   "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-01",
-      "to": "2026-10-01",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-02",
+      "to": "2026-10-02",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 2,
-        "min": 190000,
+        "count": 1,
+        "min": 200000,
         "max": 200000,
-        "mean": 195000,
-        "median": 195000,
-        "stdev": 5000,
-        "range": 10000
+        "mean": 200000,
+        "median": 200000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UNKNOWN": 2
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 6,
-        "negative": 2,
-        "net": 4,
-        "netPerReport": 2.0
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0.0
       },
-      "topics": {
-        "AI": {
-          "count": 1,
-          "perReport": 0.5
-        },
-        "수요": {
-          "count": 1,
-          "perReport": 0.5
-        }
-      }
+      "topics": {}
     },
     "previous": {
-      "from": "2026-08-02",
-      "to": "2026-08-31",
-      "reportCount": 3,
+      "from": "2026-08-03",
+      "to": "2026-09-01",
+      "reportCount": 4,
       "brokerCount": 3,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 190000,
         "max": 200000,
-        "mean": 193333,
+        "mean": 192500,
         "median": 190000,
-        "stdev": 4714,
+        "stdev": 4330,
         "range": 10000
       },
       "earningsDirection": {
-        "UNKNOWN": 2,
+        "UNKNOWN": 3,
         "UP": 1
       },
       "textSignal": {
-        "positive": 4,
-        "negative": 2,
-        "net": 2,
-        "netPerReport": 0.667
+        "positive": 10,
+        "negative": 4,
+        "net": 6,
+        "netPerReport": 1.5
       },
       "topics": {
         "원가": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.25
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.25
         }
       }
     },
     "topicAcceleration": [
       {
         "topic": "AI",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.25,
+        "perReportDelta": -0.25,
+        "ratio": 0.0
       },
       {
         "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.25,
+        "perReportDelta": -0.25,
+        "ratio": 0.0
       },
       {
         "topic": "원가",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
+        "previousPerReport": 0.25,
+        "perReportDelta": -0.25,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": 0.86,
-    "targetMedianChangePct": 2.63,
-    "targetDispersionChangePct": 6.07
+    "reportCountChange": -3,
+    "targetMeanChangePct": 3.9,
+    "targetMedianChangePct": 5.26,
+    "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
     "total": 4,

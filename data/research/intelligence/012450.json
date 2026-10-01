@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "012450",
   "itemName": "한화에어로스페이스",
-  "asOf": "2026-10-01",
+  "asOf": "2026-10-02",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-10-01"
@@ -12,10 +12,10 @@
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-01",
-      "to": "2026-10-01",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-02",
+      "to": "2026-10-02",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
         "count": 1,
         "min": 1550000,
@@ -26,26 +26,21 @@
         "range": 0
       },
       "earningsDirection": {
-        "UNKNOWN": 2
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 8,
+        "positive": 3,
         "negative": 0,
-        "net": 8,
-        "netPerReport": 4.0
+        "net": 3,
+        "netPerReport": 3.0
       },
-      "topics": {
-        "원가": {
-          "count": 1,
-          "perReport": 0.5
-        }
-      }
+      "topics": {}
     },
     "previous": {
-      "from": "2026-08-02",
-      "to": "2026-08-31",
-      "reportCount": 9,
-      "brokerCount": 8,
+      "from": "2026-08-03",
+      "to": "2026-09-01",
+      "reportCount": 10,
+      "brokerCount": 9,
       "targetPrice": {
         "count": 9,
         "min": 1380000,
@@ -56,43 +51,47 @@
         "range": 480000
       },
       "earningsDirection": {
-        "UNKNOWN": 2,
+        "UNKNOWN": 3,
         "UP": 7
       },
       "textSignal": {
-        "positive": 44,
+        "positive": 49,
         "negative": 3,
-        "net": 41,
-        "netPerReport": 4.556
+        "net": 46,
+        "netPerReport": 4.6
       },
       "topics": {
         "환율": {
           "count": 2,
-          "perReport": 0.222
+          "perReport": 0.2
         },
         "수요": {
           "count": 1,
-          "perReport": 0.111
+          "perReport": 0.1
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.1
         }
       }
     },
     "topicAcceleration": [
       {
-        "topic": "원가",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
-      },
-      {
         "topic": "수요",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.111,
-        "perReportDelta": -0.111,
+        "previousPerReport": 0.1,
+        "perReportDelta": -0.1,
+        "ratio": 0.0
+      },
+      {
+        "topic": "원가",
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.1,
+        "perReportDelta": -0.1,
         "ratio": 0.0
       },
       {
@@ -100,14 +99,14 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 2,
-        "previousPerReport": 0.222,
-        "perReportDelta": -0.222,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -7,
+    "reportCountChange": -9,
     "targetMeanChangePct": -5.42,
     "targetMedianChangePct": -3.12,
     "targetDispersionChangePct": -100.0
