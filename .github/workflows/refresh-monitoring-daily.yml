@@ -1,0 +1,141 @@
+name: Refresh full-market rolling daily state
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate collection and baseline without publishing files
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # 15:45 KST (06:45 UTC) follows the existing 15:40 42-stock daily job.
+    # Time starts collection only; NAVER's complete 2,768-row daily response
+    # and KRX calendar validation decide whether a FINAL state may publish.
+    - cron: "45 6 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generated-data-write
+  cancel-in-progress: false
+
+jobs:
+  refresh-full-market-daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check KRX trading day
+        id: market_day
+        shell: bash
+        run: |
+          set +e
+          python krx_market_day.py
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "KRX trading day confirmed."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::KRX calendar unavailable or market closed; preserving rolling state and baseline."
+          fi
+          exit 0
+
+      - name: Run rolling-state tests
+        if: steps.market_day.outputs.run == 'true'
+        run: |
+          python -m py_compile \
+            tools/build_monitoring_daily_state.py \
+            tools/monitoring_daily_state_update.py \
+            tools/daily_monitoring_baseline.py
+          python -m unittest \
+            test_monitoring_daily_state_update.py \
+            test_daily_monitoring_baseline.py -v
+
+      - name: Sync latest main before collection
+        if: steps.market_day.outputs.run == 'true'
+        run: |
+          git fetch origin main
+          git rebase origin/main
+
+      - name: Collect, validate, and update rolling state
+        id: update
+        if: steps.market_day.outputs.run == 'true'
+        shell: bash
+        env:
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          set +e
+          target_date=$(TZ=Asia/Seoul date +%F)
+          extra=()
+          if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
+          for attempt in 1 2 3; do
+            echo "Full-market daily readiness attempt ${attempt}/3 for ${target_date}"
+            python tools/build_monitoring_daily_state.py update-latest \
+              --fetch-today --date "$target_date" "${extra[@]}"
+            code=$?
+            if [ "$code" -eq 0 ]; then
+              echo "ready=true" >> "$GITHUB_OUTPUT"
+              echo "attempt=$attempt" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "NOT_READY: no production files were published on attempt ${attempt}."
+            if [ "$attempt" -lt 3 ]; then sleep 300; fi
+          done
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          echo "::error::Full-market daily data was not ready after 3 attempts; preserving prior rolling state and baseline."
+          exit 1
+
+      - name: Commit final rolling state and baseline
+        id: publish
+        if: steps.market_day.outputs.run == 'true' && steps.update.outputs.ready == 'true' && inputs.dry_run != true
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Whitelist only the three reviewed production artifacts.  Never
+          # stage raw NAVER rows, canonical history, temporary files, or code.
+          git add -- \
+            data/monitoring-daily/kospi.json \
+            data/monitoring-daily/kosdaq.json \
+            data/monitoring-baseline/latest.json
+          expected=$'data/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/kospi.json'
+          actual=$(git diff --cached --name-only | LC_ALL=C sort)
+          if [ -z "$actual" ]; then
+            echo "No rolling-state changes to commit (same-day NOOP)."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::Unexpected staged paths; refusing commit."
+            exit 1
+          fi
+          git commit -m "Refresh full-market rolling daily state"
+          for attempt in 1 2 3; do
+            echo "Push synchronization attempt ${attempt}/3"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "::error::Rolling-state commit conflicts with newer main. No automatic resolution or force push was attempted."
+              git rebase --abort || true
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::error::Push rejected after 3 attempts; no force push was attempted."
+          exit 1
+
+      - name: Report dry-run success
+        if: steps.market_day.outputs.run == 'true' && steps.update.outputs.ready == 'true' && inputs.dry_run == true
+        run: echo "Dry-run succeeded; no rolling state or baseline was published."
