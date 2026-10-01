@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "005610",
   "itemName": "삼립",
-  "reportCount": 2,
-  "latestReportNid": "96388",
-  "latestWriteDate": "2026-09-30",
+  "reportCount": 3,
+  "latestReportNid": "96410",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "96388",
-    "writeDate": "2026-09-30",
-    "brokerName": "유안타증권",
-    "title": "2026년 저점, 수익성 회복이 보인다",
+    "nid": "96410",
+    "writeDate": "2026-10-01",
+    "brokerName": "DS투자증권",
+    "title": "대표이사 주관 IR 후기: 삼립의 변신은 무죄",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
+        "positive": 1,
         "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1
+        "가격": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96410",
     "96388",
     "96381"
   ]

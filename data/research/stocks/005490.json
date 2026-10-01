@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "005490",
   "itemName": "POSCO홀딩스",
-  "reportCount": 16,
-  "latestReportNid": "94957",
-  "latestWriteDate": "2026-08-03",
+  "reportCount": 17,
+  "latestReportNid": "96403",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "94957",
-    "writeDate": "2026-08-03",
+    "nid": "96403",
+    "writeDate": "2026-10-01",
     "brokerName": "신한투자증권",
-    "title": "2분기는 예고편. 본 편은 4분기 이후부터",
+    "title": "철강은 개선, 연결은 숨고르기",
     "goalPrice": 490000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 2,
+        "negative": 1
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "가격": 1,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "96403",
     "94957",
     "94900",
     "94898",

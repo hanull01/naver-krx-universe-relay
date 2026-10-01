@@ -7,8 +7,8 @@
   "statusCounts": {
     "OK": 7,
     "NO_RESEARCH": 4,
-    "NO_RECENT_RESEARCH": 17,
-    "LOW_SAMPLE": 14
+    "NO_RECENT_RESEARCH": 15,
+    "LOW_SAMPLE": 16
   },
   "rankingEligibleCount": 7,
   "stocks": [
@@ -17,42 +17,42 @@
       "itemName": "삼성전자",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 73,
+      "reportCount": 74,
       "brokerCount": 14,
-      "recentReportCount": 6,
+      "recentReportCount": 7,
       "previousReportCount": 4,
-      "recentTargetMean": 491667,
+      "recentTargetMean": 490000,
       "previousTargetMean": 387500,
-      "recentTargetMedian": 505000,
-      "recentTargetStdev": 98897,
-      "targetMeanChangePct": 26.88,
-      "targetDispersionChangePct": 226.27,
+      "recentTargetMedian": 480000,
+      "recentTargetStdev": 91652,
+      "targetMeanChangePct": 26.45,
+      "targetDispersionChangePct": 202.37,
       "revisionUp": 22,
       "revisionDown": 4,
       "risingTopics": [
         {
           "topic": "환율",
-          "delta": 0.667,
-          "ratio": null
-        },
-        {
-          "topic": "사이클",
-          "delta": 0.333,
+          "delta": 0.714,
           "ratio": null
         },
         {
           "topic": "HBM",
-          "delta": 0.25,
-          "ratio": 2.0
+          "delta": 0.321,
+          "ratio": 2.28
         },
         {
-          "topic": "메모리",
-          "delta": 0.167,
+          "topic": "사이클",
+          "delta": 0.286,
           "ratio": null
         },
         {
-          "topic": "메모리 가격",
-          "delta": 0.167,
+          "topic": "원가",
+          "delta": 0.286,
+          "ratio": null
+        },
+        {
+          "topic": "메모리",
+          "delta": 0.143,
           "ratio": null
         }
       ]
@@ -409,22 +409,22 @@
       "itemName": "한화에어로스페이스",
       "status": "LOW_SAMPLE",
       "rankingEligible": false,
-      "reportCount": 26,
-      "brokerCount": 12,
-      "recentReportCount": 1,
+      "reportCount": 27,
+      "brokerCount": 13,
+      "recentReportCount": 2,
       "previousReportCount": 9,
-      "recentTargetMean": null,
+      "recentTargetMean": 1550000,
       "previousTargetMean": 1638889,
-      "recentTargetMedian": null,
-      "recentTargetStdev": null,
-      "targetMeanChangePct": null,
-      "targetDispersionChangePct": null,
+      "recentTargetMedian": 1550000,
+      "recentTargetStdev": 0,
+      "targetMeanChangePct": -5.42,
+      "targetDispersionChangePct": -100.0,
       "revisionUp": 2,
       "revisionDown": 8,
       "risingTopics": [
         {
           "topic": "원가",
-          "delta": 1.0,
+          "delta": 0.5,
           "ratio": null
         }
       ]
@@ -432,16 +432,16 @@
     {
       "itemCode": "064350",
       "itemName": "현대로템",
-      "status": "NO_RECENT_RESEARCH",
+      "status": "LOW_SAMPLE",
       "rankingEligible": false,
-      "reportCount": 22,
-      "brokerCount": 11,
-      "recentReportCount": 0,
+      "reportCount": 23,
+      "brokerCount": 12,
+      "recentReportCount": 1,
       "previousReportCount": 0,
-      "recentTargetMean": null,
+      "recentTargetMean": 167000,
       "previousTargetMean": null,
-      "recentTargetMedian": null,
-      "recentTargetStdev": null,
+      "recentTargetMedian": 167000,
+      "recentTargetStdev": 0,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 0,
@@ -556,20 +556,20 @@
     {
       "itemCode": "012330",
       "itemName": "현대모비스",
-      "status": "NO_RECENT_RESEARCH",
+      "status": "LOW_SAMPLE",
       "rankingEligible": false,
-      "reportCount": 33,
+      "reportCount": 34,
       "brokerCount": 12,
-      "recentReportCount": 0,
+      "recentReportCount": 1,
       "previousReportCount": 0,
-      "recentTargetMean": null,
+      "recentTargetMean": 580000,
       "previousTargetMean": null,
-      "recentTargetMedian": null,
-      "recentTargetStdev": null,
+      "recentTargetMedian": 580000,
+      "recentTargetStdev": 0,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 10,
-      "revisionDown": 3,
+      "revisionDown": 4,
       "risingTopics": []
     },
     {
@@ -1138,6 +1138,51 @@
         ]
       },
       {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 74,
+        "brokerCount": 14,
+        "recentReportCount": 7,
+        "previousReportCount": 4,
+        "recentTargetMean": 490000,
+        "previousTargetMean": 387500,
+        "recentTargetMedian": 480000,
+        "recentTargetStdev": 91652,
+        "targetMeanChangePct": 26.45,
+        "targetDispersionChangePct": 202.37,
+        "revisionUp": 22,
+        "revisionDown": 4,
+        "risingTopics": [
+          {
+            "topic": "환율",
+            "delta": 0.714,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.321,
+            "ratio": 2.28
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.286,
+            "ratio": null
+          },
+          {
+            "topic": "원가",
+            "delta": 0.286,
+            "ratio": null
+          },
+          {
+            "topic": "메모리",
+            "delta": 0.143,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "010140",
         "itemName": "삼성중공업",
         "status": "OK",
@@ -1158,51 +1203,6 @@
           {
             "topic": "AI",
             "delta": 0.333,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "005930",
-        "itemName": "삼성전자",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 73,
-        "brokerCount": 14,
-        "recentReportCount": 6,
-        "previousReportCount": 4,
-        "recentTargetMean": 491667,
-        "previousTargetMean": 387500,
-        "recentTargetMedian": 505000,
-        "recentTargetStdev": 98897,
-        "targetMeanChangePct": 26.88,
-        "targetDispersionChangePct": 226.27,
-        "revisionUp": 22,
-        "revisionDown": 4,
-        "risingTopics": [
-          {
-            "topic": "환율",
-            "delta": 0.667,
-            "ratio": null
-          },
-          {
-            "topic": "사이클",
-            "delta": 0.333,
-            "ratio": null
-          },
-          {
-            "topic": "HBM",
-            "delta": 0.25,
-            "ratio": 2.0
-          },
-          {
-            "topic": "메모리",
-            "delta": 0.167,
-            "ratio": null
-          },
-          {
-            "topic": "메모리 가격",
-            "delta": 0.167,
             "ratio": null
           }
         ]
@@ -1298,42 +1298,42 @@
         "itemName": "삼성전자",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 73,
+        "reportCount": 74,
         "brokerCount": 14,
-        "recentReportCount": 6,
+        "recentReportCount": 7,
         "previousReportCount": 4,
-        "recentTargetMean": 491667,
+        "recentTargetMean": 490000,
         "previousTargetMean": 387500,
-        "recentTargetMedian": 505000,
-        "recentTargetStdev": 98897,
-        "targetMeanChangePct": 26.88,
-        "targetDispersionChangePct": 226.27,
+        "recentTargetMedian": 480000,
+        "recentTargetStdev": 91652,
+        "targetMeanChangePct": 26.45,
+        "targetDispersionChangePct": 202.37,
         "revisionUp": 22,
         "revisionDown": 4,
         "risingTopics": [
           {
             "topic": "환율",
-            "delta": 0.667,
-            "ratio": null
-          },
-          {
-            "topic": "사이클",
-            "delta": 0.333,
+            "delta": 0.714,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.25,
-            "ratio": 2.0
+            "delta": 0.321,
+            "ratio": 2.28
           },
           {
-            "topic": "메모리",
-            "delta": 0.167,
+            "topic": "사이클",
+            "delta": 0.286,
             "ratio": null
           },
           {
-            "topic": "메모리 가격",
-            "delta": 0.167,
+            "topic": "원가",
+            "delta": 0.286,
+            "ratio": null
+          },
+          {
+            "topic": "메모리",
+            "delta": 0.143,
             "ratio": null
           }
         ]
@@ -1469,42 +1469,42 @@
         "itemName": "삼성전자",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 73,
+        "reportCount": 74,
         "brokerCount": 14,
-        "recentReportCount": 6,
+        "recentReportCount": 7,
         "previousReportCount": 4,
-        "recentTargetMean": 491667,
+        "recentTargetMean": 490000,
         "previousTargetMean": 387500,
-        "recentTargetMedian": 505000,
-        "recentTargetStdev": 98897,
-        "targetMeanChangePct": 26.88,
-        "targetDispersionChangePct": 226.27,
+        "recentTargetMedian": 480000,
+        "recentTargetStdev": 91652,
+        "targetMeanChangePct": 26.45,
+        "targetDispersionChangePct": 202.37,
         "revisionUp": 22,
         "revisionDown": 4,
         "risingTopics": [
           {
             "topic": "환율",
-            "delta": 0.667,
-            "ratio": null
-          },
-          {
-            "topic": "사이클",
-            "delta": 0.333,
+            "delta": 0.714,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.25,
-            "ratio": 2.0
+            "delta": 0.321,
+            "ratio": 2.28
           },
           {
-            "topic": "메모리",
-            "delta": 0.167,
+            "topic": "사이클",
+            "delta": 0.286,
             "ratio": null
           },
           {
-            "topic": "메모리 가격",
-            "delta": 0.167,
+            "topic": "원가",
+            "delta": 0.286,
+            "ratio": null
+          },
+          {
+            "topic": "메모리",
+            "delta": 0.143,
             "ratio": null
           }
         ]

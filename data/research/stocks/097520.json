@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "097520",
   "itemName": "엠씨넥스",
-  "reportCount": 3,
-  "latestReportNid": "93064",
-  "latestWriteDate": "2026-05-18",
+  "reportCount": 4,
+  "latestReportNid": "96402",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "93064",
-    "writeDate": "2026-05-18",
-    "brokerName": "SK증권",
-    "title": "모바일 부진은 선반영, 전장 기대감을 반영할 차례",
+    "nid": "96402",
+    "writeDate": "2026-10-01",
+    "brokerName": "키움증권",
+    "title": "반등 시점을 주목",
     "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 0,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "자동차": 1
+        "가격": 2,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96402",
     "93064",
     "92873",
     "91363"

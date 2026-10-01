@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "251270",
   "itemName": "넷마블",
-  "reportCount": 17,
-  "latestReportNid": "95394",
-  "latestWriteDate": "2026-08-11",
+  "reportCount": 18,
+  "latestReportNid": "96406",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "95394",
-    "writeDate": "2026-08-11",
-    "brokerName": "IBK투자증권",
-    "title": "전략적 전환: 다작(多作)에서 명작(名作)으로",
-    "goalPrice": 58000,
+    "nid": "96406",
+    "writeDate": "2026-10-01",
+    "brokerName": "하나증권",
+    "title": "쉬어가는 분기, 신작 출시 확정 필요",
+    "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 2,
         "negative": 1
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "96406",
     "95394",
     "95236",
     "95188",

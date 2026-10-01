@@ -1,31 +1,32 @@
 {
   "schemaVersion": 1,
-  "itemCode": "093320",
-  "itemName": "케이아이엔엑스",
-  "reportCount": 2,
-  "latestReportNid": "96412",
+  "itemCode": "041920",
+  "itemName": "메디아나",
+  "reportCount": 1,
+  "latestReportNid": "96400",
   "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "96412",
+    "nid": "96400",
     "writeDate": "2026-10-01",
-    "brokerName": "신한투자증권",
-    "title": "다음은 DBO다",
+    "brokerName": "한국IR협의회",
+    "title": "웨어러블은 거들 뿐, 핵심은 PMD까지 잇는 통합 모니터링",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 6,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "재고": 1
+      }
     }
   },
   "reportNids": [
-    "96412",
-    "92239"
+    "96400"
   ]
 }

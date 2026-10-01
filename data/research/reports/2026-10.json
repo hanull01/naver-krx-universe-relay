@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 1,
+  "month": "2026-10",
+  "count": 18,
+  "reports": [
+    {
+      "nid": "96412",
+      "writeDate": "2026-10-01",
+      "itemCode": "093320",
+      "itemName": "케이아이엔엑스",
+      "title": "다음은 DBO다",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 337,
+      "contentLength": 123,
+      "contentSha256": "229365420a1193fbc50e2040a47c1c89fc3bfb78ef1246b3fe63d45aaf307fae",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 1,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96411",
+      "writeDate": "2026-10-01",
+      "itemCode": "030000",
+      "itemName": "제일기획",
+      "title": "보릿고개에도 주주환원 확대",
+      "brokerCode": "66",
+      "brokerName": "DS투자증권",
+      "goalPrice": 25000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 847,
+      "contentLength": 426,
+      "contentSha256": "a2ce3282bec693e49173a77d34289ed28e058e6fadda49721f43e6e37d1603d4",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 6
+        },
+        "earningsTextDirection": "DOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 3,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "원가": 4,
+          "AI": 2,
+          "가격": 1
+        }
+      },
+      "previousSameBrokerNid": "91229",
+      "goalPriceChange": {
+        "from": 26000,
+        "to": 25000,
+        "amount": -1000,
+        "pct": -3.85
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96410",
+      "writeDate": "2026-10-01",
+      "itemCode": "005610",
+      "itemName": "삼립",
+      "title": "대표이사 주관 IR 후기: 삼립의 변신은 무죄",
+      "brokerCode": "66",
+      "brokerName": "DS투자증권",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 535,
+      "contentLength": 409,
+      "contentSha256": "f3cb47cc51fb1cee55145910b0b9655b0c8ef67f4860c7020fc0439099a1ed1d",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 2
+        },
+        "earningsTextDirection": "DOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "가격": 1,
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96409",
+      "writeDate": "2026-10-01",
+      "itemCode": "005930",
+      "itemName": "삼성전자",
+      "title": "견조한 실적에 HBM이 가세",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 480000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 2701,
+      "contentLength": 574,
+      "contentSha256": "c7dbc26085ac19159835cb824c18d52bcfbb261baaa5335b36328bc8e46dcd42",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 5,
+          "negative": 7
+        },
+        "earningsTextDirection": "MIXED",
+        "earningsPositiveSignalCount": 1,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 5,
+          "수요": 3,
+          "환율": 3,
+          "가격": 1,
+          "원가": 1,
+          "자동차": 1
+        }
+      },
+      "previousSameBrokerNid": "94887",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96408",
+      "writeDate": "2026-10-01",
+      "itemCode": "047050",
+      "itemName": "포스코인터내셔널",
+      "title": "에너지 위기에서 돈을 버는 실력",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 105000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 978,
+      "contentLength": 285,
+      "contentSha256": "df9e5063f4378e00269c38506d23b9dc5d03c6191b2c26fbac33a7c6514a270c",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 1
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 1,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {
+          "가격": 1,
+          "환율": 1
+        }
+      },
+      "previousSameBrokerNid": "96213",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96407",
+      "writeDate": "2026-10-01",
+      "itemCode": "028670",
+      "itemName": "팬오션",
+      "title": "3Q26 Pre: 점점 더 탄탄해지는 이익 체력",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 9000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 779,
+      "contentLength": 624,
+      "contentSha256": "b44541fd9a2601d2a50b73e5b83b7b593334471f5b547aff5f4de750dda17548",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 4,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 4,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "수요": 1,
+          "조선": 1,
+          "환율": 1
+        }
+      },
+      "previousSameBrokerNid": "95264",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96406",
+      "writeDate": "2026-10-01",
+      "itemCode": "251270",
+      "itemName": "넷마블",
+      "title": "쉬어가는 분기, 신작 출시 확정 필요",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 50000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 730,
+      "contentLength": 544,
+      "contentSha256": "adcd8c7e8744c3ef1ecb67ed454d152a96da8aa89b6dc2291349e6f454c529f1",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 1
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": "95165",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96405",
+      "writeDate": "2026-10-01",
+      "itemCode": "061090",
+      "itemName": "세나테크놀로지",
+      "title": "세나가 피지컬 AI 통신 기술의 주축이 될 것입니다",
+      "brokerCode": "57",
+      "brokerName": "하나증권",
+      "goalPrice": 80000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 888,
+      "contentLength": 325,
+      "contentSha256": "5edf3ba74399965024068c0e650b4d9bee92811c8ef3f3afcb7bf5abc80e9717",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 2,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNCHANGED",
+        "topics": {
+          "로봇": 3,
+          "AI": 2,
+          "수요": 1
+        }
+      },
+      "previousSameBrokerNid": "94116",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96404",
+      "writeDate": "2026-10-01",
+      "itemCode": "012330",
+      "itemName": "현대모비스",
+      "title": "램프사업 매각 가시화, 그래서 주가와 실적은?",
+      "brokerCode": "15",
+      "brokerName": "대신증권",
+      "goalPrice": 580000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1447,
+      "contentLength": 365,
+      "contentSha256": "9542e6d88969eebaba032e867a0a25fa85c1e863a600b74499ee901b3b269c66",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 1
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": "94529",
+      "goalPriceChange": {
+        "from": 690000,
+        "to": 580000,
+        "amount": -110000,
+        "pct": -15.94
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96403",
+      "writeDate": "2026-10-01",
+      "itemCode": "005490",
+      "itemName": "POSCO홀딩스",
+      "title": "철강은 개선, 연결은 숨고르기",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": 490000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1128,
+      "contentLength": 108,
+      "contentSha256": "166af66c9f969263393ac373c8a91b1291f65f799374b6e3b6217210acc17f1a",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 2,
+          "negative": 1
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "가격": 1,
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": "94957",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96402",
+      "writeDate": "2026-10-01",
+      "itemCode": "097520",
+      "itemName": "엠씨넥스",
+      "title": "반등 시점을 주목",
+      "brokerCode": "39",
+      "brokerName": "키움증권",
+      "goalPrice": 30000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 892,
+      "contentLength": 456,
+      "contentSha256": "a92e943103b32d5c7cd87529cd4b69e573c2a964f9c20efddae40da054944a1a",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 1
+        },
+        "earningsTextDirection": "DOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 1,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "가격": 2,
+          "환율": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96401",
+      "writeDate": "2026-10-01",
+      "itemCode": "131290",
+      "itemName": "티에스이",
+      "title": "DRAM과 HBM으로 넓어지는 Probe Card",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 1002,
+      "contentLength": 329,
+      "contentSha256": "9cc5031ff0cfb157a1486f49d4d5fb101a86d8ee470fb1ccbf26a624ecb8bdab",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 10,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 6,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "반도체": 5,
+          "중국": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96400",
+      "writeDate": "2026-10-01",
+      "itemCode": "041920",
+      "itemName": "메디아나",
+      "title": "웨어러블은 거들 뿐, 핵심은 PMD까지 잇는 통합 모니터링",
+      "brokerCode": "74",
+      "brokerName": "한국IR협의회",
+      "goalPrice": null,
+      "opinionText": "없음",
+      "opinionType": "neutral",
+      "normalizedOpinion": "NONE",
+      "readCount": 823,
+      "contentLength": 386,
+      "contentSha256": "1061d21d1a32c95e3372646e0e2f4c5aff2a4fc540034c06c05e520016451583",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 6,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 2,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "재고": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96399",
+      "writeDate": "2026-10-01",
+      "itemCode": "056190",
+      "itemName": "SFA",
+      "title": "완전 무인화 실현의 Hidden Champion",
+      "brokerCode": "40",
+      "brokerName": "IBK투자증권",
+      "goalPrice": 39000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 735,
+      "contentLength": 362,
+      "contentSha256": "300ad256a2a5020c84bf2a6150e68817ffadf71311afcf2dd23e3122c9a2f92b",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "수요": 2,
+          "AI": 1,
+          "반도체": 1,
+          "배터리": 1
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96398",
+      "writeDate": "2026-10-01",
+      "itemCode": "043610",
+      "itemName": "KT지니뮤직",
+      "title": "순현금보다도 낮은 시가총액",
+      "brokerCode": "21",
+      "brokerName": "신한투자증권",
+      "goalPrice": 1600,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 882,
+      "contentLength": 100,
+      "contentSha256": "0aa6e5705d70e3b47e63ee882305b7ef97bb9f94dab48cd8a0cc1ef7bb3348c6",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UP",
+        "earningsPositiveSignalCount": 1,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": "91132",
+      "goalPriceChange": {
+        "from": 2500,
+        "to": 1600,
+        "amount": -900,
+        "pct": -36.0
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96397",
+      "writeDate": "2026-10-01",
+      "itemCode": "047810",
+      "itemName": "한국항공우주",
+      "title": "결국 해주는 것도, 해야하는 것도 KF-21",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 186000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1003,
+      "contentLength": 229,
+      "contentSha256": "bd7df9c820a166053b46079c59a67f91803bac61f37fbe187adf2a378fdabe3d",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 1,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96396",
+      "writeDate": "2026-10-01",
+      "itemCode": "064350",
+      "itemName": "현대로템",
+      "title": "글로벌 전차 Player로의 도약을 앞두다",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 167000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1147,
+      "contentLength": 254,
+      "contentSha256": "08561c984adf89195359e7c5f4d968bf538eefd670cf0daf7b55520591ac3963",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 1
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {}
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "96395",
+      "writeDate": "2026-10-01",
+      "itemCode": "012450",
+      "itemName": "한화에어로스페이스",
+      "title": "손이 뻗치지 않는 곳이 없다",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 1550000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1541,
+      "contentLength": 262,
+      "contentSha256": "48eece93e2e1eef813ed81e7bb17ae2cc340ea82871aa55b03fab9498abc2fac",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 3,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "방산": 5,
+          "미국": 2
+        }
+      },
+      "previousSameBrokerNid": null,
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    }
+  ]
+}

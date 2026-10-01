@@ -1,28 +1,38 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "012330",
   "itemName": "현대모비스",
   "asOf": "2026-10-01",
   "dateRange": {
     "from": "2026-04-09",
-    "to": "2026-07-27"
+    "to": "2026-10-01"
   },
-  "reportCount": 33,
+  "reportCount": 34,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-01",
       "to": "2026-10-01",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 580000,
+        "max": 580000,
+        "mean": 580000,
+        "median": 580000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
       "textSignal": {
-        "positive": 0,
-        "negative": 0,
+        "positive": 1,
+        "negative": 1,
         "net": 0,
-        "netPerReport": 0
+        "netPerReport": 0.0
       },
       "topics": {}
     },
@@ -44,15 +54,15 @@
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": 0,
+    "reportCountChange": 1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 13,
+    "total": 14,
     "up": 10,
-    "down": 3,
+    "down": 4,
     "flat": 0
   },
   "monthly": {
@@ -205,6 +215,29 @@
           "perReport": 0.062
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 580000,
+        "max": 580000,
+        "mean": 580000,
+        "median": 580000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 1,
+        "negative": 1,
+        "net": 0,
+        "netPerReport": 0.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
@@ -269,12 +302,12 @@
       ]
     },
     "대신증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 570000,
-      "latestGoalPrice": 690000,
-      "changeAmount": 120000,
-      "changePct": 21.05,
+      "latestGoalPrice": 580000,
+      "changeAmount": 10000,
+      "changePct": 1.75,
       "trajectory": [
         {
           "date": "2026-04-27",
@@ -285,6 +318,11 @@
           "date": "2026-07-27",
           "goalPrice": 690000,
           "title": "여전히 Physical AI 대장주"
+        },
+        {
+          "date": "2026-10-01",
+          "goalPrice": 580000,
+          "title": "램프사업 매각 가시화, 그래서 주가와 실적은?"
         }
       ]
     },

@@ -6,30 +6,38 @@
   "asOf": "2026-10-01",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-09-01"
+    "to": "2026-10-01"
   },
-  "reportCount": 26,
-  "brokerCount": 12,
+  "reportCount": 27,
+  "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-01",
       "to": "2026-10-01",
-      "reportCount": 1,
-      "brokerCount": 1,
-      "targetPrice": {},
+      "reportCount": 2,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 1,
+        "min": 1550000,
+        "max": 1550000,
+        "mean": 1550000,
+        "median": 1550000,
+        "stdev": 0,
+        "range": 0
+      },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 5,
+        "positive": 8,
         "negative": 0,
-        "net": 5,
-        "netPerReport": 5.0
+        "net": 8,
+        "netPerReport": 4.0
       },
       "topics": {
         "원가": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
         }
       }
     },
@@ -72,10 +80,10 @@
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.5,
         "ratio": null
       },
       {
@@ -99,10 +107,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -8,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
-    "targetDispersionChangePct": null
+    "reportCountChange": -7,
+    "targetMeanChangePct": -5.42,
+    "targetMedianChangePct": -3.12,
+    "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
     "total": 10,
@@ -282,6 +290,29 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 1550000,
+        "max": 1550000,
+        "mean": 1550000,
+        "median": 1550000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 3,
+        "negative": 0,
+        "net": 3,
+        "netPerReport": 3.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
@@ -372,6 +403,21 @@
           "date": "2026-07-09",
           "goalPrice": 1720000,
           "title": "2Q26 Preview: 조용한 지금이 기회"
+        }
+      ]
+    },
+    "미래에셋증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 1550000,
+      "latestGoalPrice": 1550000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-01",
+          "goalPrice": 1550000,
+          "title": "손이 뻗치지 않는 곳이 없다"
         }
       ]
     },

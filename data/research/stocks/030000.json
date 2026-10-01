@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "030000",
   "itemName": "제일기획",
-  "reportCount": 12,
-  "latestReportNid": "96200",
-  "latestWriteDate": "2026-09-17",
+  "reportCount": 13,
+  "latestReportNid": "96411",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "96200",
-    "writeDate": "2026-09-17",
-    "brokerName": "신한투자증권",
-    "title": "눈높이 하향에도 배당수익률 6.5%",
-    "goalPrice": 21000,
+    "nid": "96411",
+    "writeDate": "2026-10-01",
+    "brokerName": "DS투자증권",
+    "title": "보릿고개에도 주주환원 확대",
+    "goalPrice": 25000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 1,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 4,
+        "AI": 2,
+        "가격": 1
+      }
     }
   },
   "reportNids": [
+    "96411",
     "96200",
     "94530",
     "94519",

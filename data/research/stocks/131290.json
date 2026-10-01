@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "131290",
   "itemName": "티에스이",
-  "reportCount": 3,
-  "latestReportNid": "95681",
-  "latestWriteDate": "2026-08-18",
+  "reportCount": 4,
+  "latestReportNid": "96401",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "95681",
-    "writeDate": "2026-08-18",
-    "brokerName": "신한투자증권",
-    "title": "탑픽의 이유",
-    "goalPrice": 400000,
-    "normalizedOpinion": "BUY",
+    "nid": "96401",
+    "writeDate": "2026-10-01",
+    "brokerName": "한국IR협의회",
+    "title": "DRAM과 HBM으로 넓어지는 Probe Card",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
+        "positive": 10,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsPositiveSignalCount": 6,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "반도체": 5,
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "96401",
     "95681",
     "93843",
     "93034"

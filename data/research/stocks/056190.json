@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "056190",
   "itemName": "SFA",
-  "reportCount": 1,
-  "latestReportNid": "95660",
-  "latestWriteDate": "2026-08-18",
+  "reportCount": 2,
+  "latestReportNid": "96399",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "95660",
-    "writeDate": "2026-08-18",
-    "brokerName": "한국IR협의회",
-    "title": "완전 무인화를 선도하는 AI 자율제조 로보틱스 기업",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96399",
+    "writeDate": "2026-10-01",
+    "brokerName": "IBK투자증권",
+    "title": "완전 무인화 실현의 Hidden Champion",
+    "goalPrice": 39000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
+        "positive": 1,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 4,
-        "AI": 3,
-        "로봇": 1,
+        "수요": 2,
+        "AI": 1,
+        "반도체": 1,
         "배터리": 1
       }
     }
   },
   "reportNids": [
+    "96399",
     "95660"
   ]
 }

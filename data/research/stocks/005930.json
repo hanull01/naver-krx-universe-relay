@@ -2,32 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "reportCount": 73,
-  "latestReportNid": "96383",
-  "latestWriteDate": "2026-09-30",
+  "reportCount": 74,
+  "latestReportNid": "96409",
+  "latestWriteDate": "2026-10-01",
   "latest": {
-    "nid": "96383",
-    "writeDate": "2026-09-30",
-    "brokerName": "신한투자증권",
-    "title": "HBM 시장 침투 준비 완료",
-    "goalPrice": 450000,
+    "nid": "96409",
+    "writeDate": "2026-10-01",
+    "brokerName": "하나증권",
+    "title": "견조한 실적에 HBM이 가세",
+    "goalPrice": 480000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 5,
+        "negative": 7
       },
       "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 4,
-        "가격": 1
+        "반도체": 5,
+        "수요": 3,
+        "환율": 3,
+        "가격": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96409",
     "96383",
     "96343",
     "96295",
