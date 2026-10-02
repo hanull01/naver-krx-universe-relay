@@ -58,8 +58,18 @@ jobs:
       - name: Run tests
         if: steps.market_day.outputs.run == 'true'
         run: |
-          python -m py_compile relay.py test_relay.py krx_market_day.py test_krx_market_day.py
+          python -m py_compile \
+            relay.py test_relay.py krx_market_day.py test_krx_market_day.py \
+            tools/naver_full_market_current.py \
+            tools/daily_monitoring_baseline.py \
+            tools/full_market_monitoring_evidence.py \
+            tools/run_full_market_monitoring.py
           python -m unittest test_relay.py test_krx_market_day.py -v
+          python -m unittest \
+            test_naver_full_market_current.py \
+            test_full_market_monitoring_evidence.py \
+            test_daily_monitoring_baseline.py \
+            test_monitoring_production.py -v
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
@@ -85,9 +95,64 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Collect full-market monitoring evidence
+        id: full_market
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          target_date=$(TZ=Asia/Seoul date +%Y%m%d)
+          readiness=$(python3 - "$target_date" <<'PY'
+          import json, sys
+          from pathlib import Path
+          target = sys.argv[1]
+          try:
+              baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
+          except (OSError, ValueError, json.JSONDecodeError):
+              print("BASELINE_UNAVAILABLE")
+              raise SystemExit
+          if baseline.get("asOfDate") != target:
+              print("BASELINE_DATE_MISMATCH")
+          elif baseline.get("publicationStatus") != "FINAL":
+              print("BASELINE_NOT_FINAL")
+          elif baseline.get("count") != baseline.get("authoritativeCount") or baseline.get("coveragePct") != 100.0:
+              print("BASELINE_COVERAGE_INVALID")
+          else:
+              print("READY")
+          PY
+          )
+          echo "baseline targetDate=${target_date} readiness=${readiness}"
+          if [ "$readiness" != "READY" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "exit_code=0" >> "$GITHUB_OUTPUT"
+            echo "Full-market evidence skipped: ${readiness}; preserving prior evidence."
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          # The authoritative 2,768-stock snapshot is runner-temporary only.
+          # It is collected once, exact-set validated by the collector, then
+          # reused by the compact evidence builder without another API call.
+          started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "Full-market collection started at ${started_at}"
+          echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
+          python tools/naver_full_market_current.py \
+            --output "$RUNNER_TEMP/full-market-current.json" \
+            --diagnostic "$RUNNER_TEMP/full-market-current-error.json"
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            python tools/run_full_market_monitoring.py \
+              --current-file "$RUNNER_TEMP/full-market-current.json"
+            code=$?
+          fi
+          finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "Full-market collection finished at ${finished_at}"
+          echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Commit refreshed production data
         id: publish
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -102,6 +167,19 @@ jobs:
             data/technicals.json data/technicals-lite.json \
             data/states.json data/states-lite.json \
             data/group-states.json data/group-states-lite.json
+
+          if [ "${{ steps.full_market.outputs.ready }}" = "true" ]; then
+            git add \
+              data/monitoring/latest-breadth.json \
+              data/monitoring/latest-stock-signals.json \
+              data/monitoring/latest-industries.json \
+              data/monitoring/latest-leaders.json \
+              data/monitoring/latest-changes.json \
+              data/monitoring/latest-quality.json \
+              data/monitoring/latest-summary.json
+          else
+            echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
+          fi
 
           if git diff --cached --quiet; then
             echo "No data changes to commit"
@@ -131,7 +209,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
@@ -150,7 +228,7 @@ jobs:
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != ''
         shell: bash
         run: |
-          echo "Intraday pipeline failed; preserving last successful production snapshot."
+          echo "Collector failed; preserving last successful production snapshot."
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- data/status/quotes-error.json
@@ -170,5 +248,11 @@ jobs:
       - name: Fail after preserving production snapshot
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0'
         run: |
-          echo "Intraday pipeline failed; preserving last successful production snapshot."
+          echo "Collector failed; preserving last successful production snapshot."
+          exit 1
+
+      - name: Fail after preserving production snapshot on evidence error
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code != '0'
+        run: |
+          echo "Full-market evidence failed; preserving last successful combined production snapshot."
           exit 1

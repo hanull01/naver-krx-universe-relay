@@ -1,9 +1,45 @@
 import unittest
+import json
+import tempfile
+from pathlib import Path
 
 import daily_report
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_full_market_evidence_requires_final_same_day_complete_set(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            names = daily_report.FULL_MARKET_FILES
+            for name in names:
+                (root / name).write_text(json.dumps({"generatedAt": "2026-10-02T16:20:00+09:00"}), encoding="utf-8")
+            quality = {
+                "generatedAt": "2026-10-02T16:20:00+09:00", "baselineAsOfDate": "20261002",
+                "publicationStatus": "FINAL", "authoritativeCount": 2768,
+                "currentCount": 2768, "currentCoveragePct": 100.0,
+                "duplicateCodes": [], "missingCurrentCodes": [],
+            }
+            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
+            breadth = {"TOTAL": {"advancers": 1, "decliners": 2, "unchanged": 3}}
+            (root / "latest-breadth.json").write_text(json.dumps({"generatedAt": quality["generatedAt"], "breadth": breadth}), encoding="utf-8")
+            got = daily_report.full_market_evidence("2026-10-02", root)
+            self.assertEqual(got["status"], "AVAILABLE")
+            self.assertEqual(got["breadth"]["advancers"], 1)
+
+    def test_full_market_evidence_rejects_stale_or_incomplete_quality(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in daily_report.FULL_MARKET_FILES:
+                (root / name).write_text(json.dumps({"generatedAt": "t"}), encoding="utf-8")
+            (root / "latest-quality.json").write_text(json.dumps({
+                "publicationStatus": "FINAL", "baselineAsOfDate": "20261001",
+                "authoritativeCount": 2768, "currentCount": 2767,
+                "currentCoveragePct": 99.96,
+            }), encoding="utf-8")
+            got = daily_report.full_market_evidence("2026-10-02", root)
+            self.assertEqual(got["status"], "UNAVAILABLE")
+            self.assertIn(got["reason"], {"BASELINE_DATE_MISMATCH", "CURRENT_COVERAGE_INVALID"})
+
     def test_quote_summary(self):
         row = {
             "price": 100,

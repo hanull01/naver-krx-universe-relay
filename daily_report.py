@@ -17,10 +17,81 @@ TECHNICALS_PATH = DATA / "technicals.json"
 STATES_PATH = DATA / "states.json"
 GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
+MONITORING_PATH = DATA / "monitoring"
+FULL_MARKET_FILES = (
+    "latest-breadth.json",
+    "latest-stock-signals.json",
+    "latest-industries.json",
+    "latest-leaders.json",
+    "latest-changes.json",
+    "latest-quality.json",
+    "latest-summary.json",
+)
 
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def full_market_evidence(as_of=None, root=MONITORING_PATH):
+    """Read full-market evidence only when its publication contract is valid.
+
+    This is deliberately separate from the monitored-universe inputs.  A
+    missing, stale, partial, or mismatched evidence set is unavailable; no
+    monitored-universe value is promoted as a full-market estimate.
+    """
+    root = Path(root)
+    try:
+        payloads = {name: load_json(root / name) for name in FULL_MARKET_FILES}
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {"status": "UNAVAILABLE", "reason": "MISSING_EVIDENCE_FILE"}
+
+    quality = payloads["latest-quality.json"]
+    expected_date = str(as_of or "").replace("-", "")
+    baseline_date = str(quality.get("baselineAsOfDate") or "")
+    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS"):
+        return {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"}
+    if expected_date and baseline_date != expected_date:
+        return {"status": "UNAVAILABLE", "reason": "BASELINE_DATE_MISMATCH"}
+    if quality.get("currentCount") != quality.get("authoritativeCount"):
+        return {"status": "UNAVAILABLE", "reason": "CURRENT_COVERAGE_INVALID"}
+    if quality.get("currentCoveragePct") != 100.0:
+        return {"status": "UNAVAILABLE", "reason": "CURRENT_COVERAGE_INVALID"}
+    if quality.get("duplicateCodes") or quality.get("missingCurrentCodes"):
+        return {"status": "UNAVAILABLE", "reason": "CURRENT_QUALITY_INVALID"}
+
+    generated = {payload.get("generatedAt") for payload in payloads.values()
+                 if payload.get("generatedAt")}
+    if len(generated) > 1:
+        return {"status": "UNAVAILABLE", "reason": "EVIDENCE_GENERATED_AT_MISMATCH"}
+    breadth = payloads["latest-breadth.json"].get("breadth")
+    if not isinstance(breadth, dict) or not isinstance(breadth.get("TOTAL"), dict):
+        return {"status": "UNAVAILABLE", "reason": "BREADTH_SCHEMA_INVALID"}
+
+    total = breadth["TOTAL"]
+    leaders = payloads["latest-leaders.json"]
+    return {
+        "status": "AVAILABLE",
+        "asOfDate": baseline_date,
+        "generatedAt": next(iter(generated), None),
+        "sourceTime": quality.get("currentSnapshotGeneratedAt"),
+        "quality": quality,
+        "breadth": {
+            "advancers": total.get("advancers"),
+            "decliners": total.get("decliners"),
+            "unchanged": total.get("unchanged"),
+            "aboveMA20": {"count": total.get("aboveMA20Count"), "eligibleCount": total.get("aboveMA20EligibleCount"), "pct": total.get("pctAboveMA20")},
+            "aboveMA60": {"count": total.get("aboveMA60Count"), "eligibleCount": total.get("aboveMA60EligibleCount"), "pct": total.get("pctAboveMA60")},
+            "aboveMA120": {"count": total.get("aboveMA120Count"), "eligibleCount": total.get("aboveMA120EligibleCount"), "pct": total.get("pctAboveMA120")},
+            "breakout20": {"count": total.get("breakout20Count"), "eligibleCount": total.get("breakout20EligibleCount"), "pct": total.get("pctBreakout20")},
+            "breakout60": {"count": total.get("breakout60Count"), "eligibleCount": total.get("breakout60EligibleCount"), "pct": total.get("pctBreakout60")},
+            "near52wHigh": total.get("pctNear52WeekHigh"),
+            "medianReturn1D": total.get("medianReturn1D"),
+        },
+        "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates", []),
+        "industries": payloads["latest-industries.json"].get("industries", []),
+        "changes": payloads["latest-changes.json"],
+    }
 
 
 def stock_code(row):
@@ -496,6 +567,7 @@ def build_report(as_of=None):
     )
 
     report_date = as_of or datetime.now(KST).date().isoformat()
+    full_market = full_market_evidence(report_date)
 
     missing_market = [
         {
@@ -582,6 +654,11 @@ def build_report(as_of=None):
                 for row in reversed(market_movers[-10:])
             ],
         },
+        "monitoredUniverse": {
+            "breadth": breadth,
+            "scope": "MONITORED_UNIVERSE",
+        },
+        "fullMarket": full_market,
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
         "researchSummary": research_overview,
@@ -650,6 +727,23 @@ def write_markdown(report, path):
             f"- {row['itemName']} ({row['itemCode']}): "
             f"{row['changeRate']:+.2f}%"
         )
+
+    full_market = report.get("fullMarket", {})
+    lines.extend(["", "## 1-A. Full-market evidence", ""])
+    if full_market.get("status") != "AVAILABLE":
+        lines.append(f"- 상태: UNAVAILABLE ({full_market.get('reason', 'UNKNOWN')})")
+    else:
+        fb = full_market["breadth"]
+        lines.extend([
+            f"- 기준일: {full_market['asOfDate']}",
+            f"- 상승/하락/보합: {fb['advancers']}/{fb['decliners']}/{fb['unchanged']}",
+            f"- MA20 위: {fb['aboveMA20']['count']} ({fb['aboveMA20']['pct']}%)",
+            f"- MA60 위: {fb['aboveMA60']['count']} ({fb['aboveMA60']['pct']}%)",
+            f"- MA120 위: {fb['aboveMA120']['count']} ({fb['aboveMA120']['pct']}%)",
+            f"- 20일 돌파: {fb['breakout20']['count']} ({fb['breakout20']['pct']}%)",
+            f"- 52주 고점 근접: {fb['near52wHigh']}%",
+            f"- Full-market leaders: {len(full_market['leaders'])}종목",
+        ])
 
     lines.extend(
         [
