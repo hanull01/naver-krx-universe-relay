@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "035420",
   "itemName": "NAVER",
-  "reportCount": 36,
-  "latestReportNid": "96232",
-  "latestWriteDate": "2026-09-18",
+  "reportCount": 38,
+  "latestReportNid": "96428",
+  "latestWriteDate": "2026-10-02",
   "latest": {
-    "nid": "96232",
-    "writeDate": "2026-09-18",
-    "brokerName": "미래에셋증권",
-    "title": "대형 테넌트 계약이 필요",
-    "goalPrice": 280000,
+    "nid": "96428",
+    "writeDate": "2026-10-02",
+    "brokerName": "한화투자증권",
+    "title": "비용 압박은 하반기가 정점",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 6,
+        "negative": 1
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 5,
-        "수요": 4
+        "원가": 3,
+        "AI": 1
       }
     }
   },
   "reportNids": [
+    "96428",
+    "96425",
     "96232",
     "96209",
     "96033",

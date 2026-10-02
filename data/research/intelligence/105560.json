@@ -6,27 +6,28 @@
   "asOf": "2026-10-02",
   "dateRange": {
     "from": "2026-04-15",
-    "to": "2026-09-14"
+    "to": "2026-10-02"
   },
-  "reportCount": 23,
+  "reportCount": 24,
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-02",
       "to": "2026-10-02",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
-        "min": 235000,
+        "count": 2,
+        "min": 205000,
         "max": 235000,
-        "mean": 235000,
-        "median": 235000,
-        "stdev": 0,
-        "range": 0
+        "mean": 220000,
+        "median": 220000,
+        "stdev": 15000,
+        "range": 30000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 7,
@@ -37,11 +38,11 @@
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
         },
         "원가": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
         }
       }
     },
@@ -64,25 +65,25 @@
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.5,
         "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.5,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -238,12 +239,35 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 205000,
+        "max": 205000,
+        "mean": 205000,
+        "median": 205000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
     "iM증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 190000,
       "latestGoalPrice": 205000,
       "changeAmount": 15000,
@@ -258,6 +282,11 @@
           "date": "2026-07-24",
           "goalPrice": 205000,
           "title": "이익과 주주환원 모두 가장 편안한 선택지"
+        },
+        {
+          "date": "2026-10-02",
+          "goalPrice": 205000,
+          "title": "다각화된 사업구조의 힘"
         }
       ]
     },

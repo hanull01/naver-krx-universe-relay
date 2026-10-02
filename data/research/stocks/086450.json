@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "086450",
   "itemName": "동국제약",
-  "reportCount": 2,
-  "latestReportNid": "94239",
-  "latestWriteDate": "2026-07-16",
+  "reportCount": 3,
+  "latestReportNid": "96417",
+  "latestWriteDate": "2026-10-02",
   "latest": {
-    "nid": "94239",
-    "writeDate": "2026-07-16",
-    "brokerName": "하나증권",
-    "title": "해외 산업 탄력을 받다",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96417",
+    "writeDate": "2026-10-02",
+    "brokerName": "IBK투자증권",
+    "title": "마데카솔~ No! 피부미용 마데카크림!!",
+    "goalPrice": 30000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 4
+        "positive": 6,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 7,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 1,
+        "수요": 1
+      }
     }
   },
   "reportNids": [
+    "96417",
     "94239",
     "92654"
   ]

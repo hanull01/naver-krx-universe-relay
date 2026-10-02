@@ -2,34 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "003230",
   "itemName": "삼양식품",
-  "reportCount": 22,
-  "latestReportNid": "95879",
-  "latestWriteDate": "2026-08-26",
+  "reportCount": 23,
+  "latestReportNid": "96427",
+  "latestWriteDate": "2026-10-02",
   "latest": {
-    "nid": "95879",
-    "writeDate": "2026-08-26",
-    "brokerName": "하나증권",
-    "title": "NDR후기: 지역 다변화 + 신공장 가동 기대감",
-    "goalPrice": 1800000,
+    "nid": "96427",
+    "writeDate": "2026-10-02",
+    "brokerName": "교보증권",
+    "title": "환율 하락에 따른 실적 우려, 예상 대비 제한적",
+    "goalPrice": 1860000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 9,
+        "negative": 9
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 5,
-        "중국": 3,
-        "원가": 1,
+        "중국": 5,
+        "환율": 4,
+        "원가": 3,
+        "미국": 2,
+        "수요": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96427",
     "95879",
     "95734",
     "95724",
