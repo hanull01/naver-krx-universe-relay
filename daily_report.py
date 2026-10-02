@@ -746,7 +746,8 @@ def write_markdown(report, path):
             f"- MA60 위: {fb['aboveMA60']['count']} ({fb['aboveMA60']['pct']}%)",
             f"- MA120 위: {fb['aboveMA120']['count']} ({fb['aboveMA120']['pct']}%)",
             f"- 20일 돌파: {fb['breakout20']['count']} ({fb['breakout20']['pct']}%)",
-            f"- 52주 고점 근접: {fb['near52wHigh']}%",
+            f"- 52주 고점 근접: {fb['near52wHigh']['count']} ({fb['near52wHigh']['pct']}%)",
+            f"- 거래량 확산: {fb['volumeAbove20DayAverage']['count']} ({fb['volumeAbove20DayAverage']['pct']}%)",
             f"- Full-market leaders: {len(full_market['leaders'])}종목",
         ])
 
