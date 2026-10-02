@@ -67,6 +67,45 @@ class EvidenceTests(unittest.TestCase):
         total = evidence.breadth(rows, "TOTAL")
         self.assertIn("aboveMA20Count", total)
         self.assertIn("breakout20Count", total)
+        for prefix in ("aboveMA120", "near52WeekHigh", "volumeAbove20DayAverage"):
+            self.assertIn(prefix + "Count", total)
+            self.assertIn(prefix + "EligibleCount", total)
+            eligible = total[prefix + "EligibleCount"]
+            self.assertEqual(total["pct" + prefix[0].upper() + prefix[1:]],
+                             round(total[prefix + "Count"] * 100 / eligible, 4) if eligible else None)
+
+    def test_baseline_and_canonical_history_coverage_are_distinct(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current()]}
+        baseline_stock = {"code": "005930", "lastTradingDate": "20261001",
+                          "returnBases": {}, "rollingHighCounts": {}, "rollingHighs": {},
+                          "volumeState20": {}, "previousMa20": None, "previousMa60": None}
+        baseline = {"asOfDate": "20261001", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK", "stocks": [baseline_stock]}
+        with tempfile.TemporaryDirectory() as directory:
+            built, _ = evidence.build_evidence(
+                snapshot, Path(directory), baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_CURRENT_DAY_FINAL"},
+                today="20261001")
+        quality = built["latest-quality.json"]
+        self.assertEqual(quality["productionBaselineCoveragePct"], 100.0)
+        self.assertEqual(quality["productionBaselineCount"], 1)
+        self.assertEqual(quality["canonicalHistoryFileCoveragePct"], 0.0)
+        self.assertEqual(quality["missingCanonicalHistoryCodes"], ["005930"])
+        self.assertEqual(quality["historyCoverageSource"], "CANONICAL_HISTORY_FILES_DEPRECATED_ALIAS")
+
+    def test_incomplete_baseline_reports_degraded_production_coverage(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current()]}
+        baseline = {"asOfDate": "20261001", "count": 0, "authoritativeCount": 1,
+                    "coveragePct": 0.0, "historyStatus": "PARTIAL", "stocks": []}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(ValueError):
+                evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                        publication_context={"baselineFreshnessStatus": "VALID_CURRENT_DAY_FINAL"},
+                                        today="20261001")
 
     def test_explicit_full_market_scope_does_not_share_monitored_universe_metrics(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 2, "coverageCount": 2,

@@ -183,6 +183,10 @@ def breadth(rows, market="TOTAL"):
     above60_count, above60_eligible = true_count("above_ma60"), eligible_count("above_ma60")
     breakout20_count, breakout20_eligible = true_count("breakout_20_intraday"), eligible_count("breakout_20_intraday")
     breakout60_count, breakout60_eligible = true_count("breakout_60_intraday"), eligible_count("breakout_60_intraday")
+    above120_count, above120_eligible = true_count("above_ma120"), eligible_count("above_ma120")
+    near_high_count, near_high_eligible = true_count("near_52week_high"), eligible_count("near_52week_high")
+    volume_count = sum((row["current_volume_ratio_20"] or 0) > 1 for row in valid)
+    volume_eligible = sum(row["current_volume_ratio_20"] is not None for row in valid)
     return {
         "market": market, "stockCount": len(selected), "validCount": len(valid),
         "advancers": sum(value > 0 for value in changes), "decliners": sum(value < 0 for value in changes),
@@ -191,14 +195,17 @@ def breadth(rows, market="TOTAL"):
         "pctAboveMA20": pct(above20_count, above20_eligible),
         "aboveMA60Count": above60_count, "aboveMA60EligibleCount": above60_eligible,
         "pctAboveMA60": pct(above60_count, above60_eligible),
-        "pctAboveMA120": pct(true_count("above_ma120"), sum(row["above_ma120"] is not None for row in valid)),
+        "aboveMA120Count": above120_count, "aboveMA120EligibleCount": above120_eligible,
+        "pctAboveMA120": pct(above120_count, above120_eligible),
         "breakout20Count": breakout20_count, "breakout20EligibleCount": breakout20_eligible,
         "pctBreakout20": pct(breakout20_count, breakout20_eligible),
         "breakout60Count": breakout60_count, "breakout60EligibleCount": breakout60_eligible,
         "pctBreakout60": pct(breakout60_count, breakout60_eligible),
-        "pctNear52WeekHigh": pct(true_count("near_52week_high"), sum(row["near_52week_high"] is not None for row in valid)),
-        "pctVolumeAbove20DayAverage": pct(sum((row["current_volume_ratio_20"] or 0) > 1 for row in valid),
-                                          sum(row["current_volume_ratio_20"] is not None for row in valid)),
+        "near52WeekHighCount": near_high_count, "near52WeekHighEligibleCount": near_high_eligible,
+        "pctNear52WeekHigh": pct(near_high_count, near_high_eligible),
+        "volumeAbove20DayAverageCount": volume_count,
+        "volumeAbove20DayAverageEligibleCount": volume_eligible,
+        "pctVolumeAbove20DayAverage": pct(volume_count, volume_eligible),
         "medianReturn1D": median([row["ret_1d"] for row in valid if row["ret_1d"] is not None]),
         "medianReturn5D": median([row["ret_5d"] for row in valid if row["ret_5d"] is not None]),
         "medianReturn20D": median([row["ret_20d"] for row in valid if row["ret_20d"] is not None]),
@@ -318,6 +325,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     quality, industry_rows = aggregate_industries(features, industries, membership, previous_good_industries)
     leaders = sorted(features, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
                                                   item["current_volume_ratio_20"] or -1), reverse=True)[:30]
+    baseline_count = baseline.get("count") if baseline else None
+    baseline_authoritative = baseline.get("authoritativeCount") if baseline else None
+    baseline_coverage = baseline.get("coveragePct") if baseline else None
+    baseline_history_status = baseline.get("historyStatus") if baseline else None
+    canonical_coverage = pct(len(current_codes & history_codes), current_snapshot["expectedCount"])
     evidence = {
         "latest-breadth.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
                                   "fullMarket": full_market, "breadth": breadth_data,
@@ -336,9 +348,18 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         "latest-changes.json": compare_breadth(previous_summary, summary),
         "latest-quality.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                                 "currentCount": len(current_codes), "currentCoveragePct": pct(len(current_codes), current_snapshot["expectedCount"]),
-                                "historyCoveragePct": pct(len(current_codes & history_codes), current_snapshot["expectedCount"]),
+                                # Deprecated compatibility alias: this is the
+                                # canonical file diagnostic, never baseline coverage.
+                                "historyCoveragePct": canonical_coverage,
+                                "historyCoverageSource": "CANONICAL_HISTORY_FILES_DEPRECATED_ALIAS",
+                                "productionBaselineCoveragePct": baseline_coverage,
+                                "productionBaselineCount": baseline_count,
+                                "productionBaselineAuthoritativeCount": baseline_authoritative,
+                                "productionBaselineHistoryStatus": baseline_history_status,
+                                "canonicalHistoryFileCoveragePct": canonical_coverage,
                                 "duplicateCodes": current_snapshot.get("duplicateCodes", []), "missingCurrentCodes": current_snapshot.get("missingCodes", []),
                                 "missingHistoryCodes": sorted(current_codes - history_codes),
+                                "missingCanonicalHistoryCodes": sorted(current_codes - history_codes),
                                 "closeValidCount": sum(item["close_valid"] for item in features),
                                 "featureValidCount": sum(item["traded_bar"] for item in features),
                                 "ohlcInvalidCount": sum(not item["ohlc_valid"] for item in features), "volumeInvalidCount": sum(not item["volume_valid"] for item in features),
