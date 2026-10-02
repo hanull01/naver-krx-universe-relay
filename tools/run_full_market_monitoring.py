@@ -199,6 +199,34 @@ def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day
     return False, "BASELINE_STALE", previous
 
 
+def baseline_readiness(baseline, target_date):
+    """Validate the scalar daily baseline publication contract.
+
+    Rolling KOSPI/KOSDAQ state files may have their own publicationStatus;
+    this compact scalar baseline intentionally does not.  Its authoritative
+    readiness is expressed by the fields produced by daily_monitoring_baseline.
+    """
+    target = str(target_date).replace("-", "")
+    if not isinstance(baseline, dict):
+        return False, "BASELINE_UNAVAILABLE"
+    if baseline.get("asOfDate") != target:
+        return False, "BASELINE_DATE_MISMATCH"
+    if baseline.get("historyStatus") != "OK":
+        return False, "BASELINE_HISTORY_INVALID"
+    if baseline.get("count") != baseline.get("authoritativeCount"):
+        return False, "BASELINE_COVERAGE_INVALID"
+    if baseline.get("coveragePct") != 100.0:
+        return False, "BASELINE_COVERAGE_INVALID"
+    diagnostics = baseline.get("refreshDiagnostics") or {}
+    if diagnostics.get("missingCodes"):
+        return False, "BASELINE_MISSING_CODES"
+    if diagnostics.get("extraCodes"):
+        return False, "BASELINE_EXTRA_CODES"
+    if diagnostics.get("targetDate") and str(diagnostics["targetDate"]).replace("-", "") != target:
+        return False, "BASELINE_DIAGNOSTIC_DATE_MISMATCH"
+    return True, "READY"
+
+
 def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,

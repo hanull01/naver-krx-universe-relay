@@ -105,20 +105,15 @@ jobs:
           readiness=$(python3 - "$target_date" <<'PY'
           import json, sys
           from pathlib import Path
+          sys.path.insert(0, "tools")
+          from run_full_market_monitoring import baseline_readiness
           target = sys.argv[1]
           try:
               baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
           except (OSError, ValueError, json.JSONDecodeError):
               print("BASELINE_UNAVAILABLE")
               raise SystemExit
-          if baseline.get("asOfDate") != target:
-              print("BASELINE_DATE_MISMATCH")
-          elif baseline.get("publicationStatus") != "FINAL":
-              print("BASELINE_NOT_FINAL")
-          elif baseline.get("count") != baseline.get("authoritativeCount") or baseline.get("coveragePct") != 100.0:
-              print("BASELINE_COVERAGE_INVALID")
-          else:
-              print("READY")
+          print(baseline_readiness(baseline, target)[1])
           PY
           )
           echo "baseline targetDate=${target_date} readiness=${readiness}"

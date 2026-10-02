@@ -79,6 +79,27 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertFalse(runner.baseline_freshness(current, regular, open_day)[0])
         self.assertEqual(runner.baseline_freshness(current, after, open_day)[1], "VALID_CURRENT_DAY_FINAL")
 
+    def test_scalar_baseline_readiness_accepts_valid_without_publication_status(self):
+        baseline = {"asOfDate": "20261002", "historyStatus": "OK", "count": 2,
+                    "authoritativeCount": 2, "coveragePct": 100.0,
+                    "refreshDiagnostics": {"targetDate": "2026-10-02",
+                                           "missingCodes": [], "extraCodes": []}}
+        self.assertEqual(runner.baseline_readiness(baseline, "2026-10-02"), (True, "READY"))
+
+    def test_scalar_baseline_readiness_rejects_invalid_contract(self):
+        valid = {"asOfDate": "20261002", "historyStatus": "OK", "count": 2,
+                 "authoritativeCount": 2, "coveragePct": 100.0,
+                 "refreshDiagnostics": {"missingCodes": [], "extraCodes": []}}
+        cases = [
+            (dict(valid, historyStatus="ERROR"), "BASELINE_HISTORY_INVALID"),
+            (dict(valid, asOfDate="20261001"), "BASELINE_DATE_MISMATCH"),
+            (dict(valid, coveragePct=99.0), "BASELINE_COVERAGE_INVALID"),
+            (dict(valid, refreshDiagnostics={"missingCodes": ["000001"], "extraCodes": []}), "BASELINE_MISSING_CODES"),
+            (dict(valid, refreshDiagnostics={"missingCodes": [], "extraCodes": ["000002"]}), "BASELINE_EXTRA_CODES"),
+        ]
+        for baseline, reason in cases:
+            self.assertEqual(runner.baseline_readiness(baseline, "2026-10-02"), (False, reason))
+
     def test_incomplete_current_never_publishes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); baseline = root / "baseline.json"; output = root / "evidence"
