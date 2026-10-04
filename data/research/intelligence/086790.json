@@ -1,9 +1,9 @@
 {
-  "status": "LOW_SAMPLE",
+  "status": "NO_RECENT_RESEARCH",
   "rankingEligible": false,
   "itemCode": "086790",
   "itemName": "하나금융지주",
-  "asOf": "2026-10-02",
+  "asOf": "2026-10-05",
   "dateRange": {
     "from": "2026-04-27",
     "to": "2026-09-02"
@@ -12,8 +12,23 @@
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-02",
-      "to": "2026-10-02",
+      "from": "2026-09-05",
+      "to": "2026-10-05",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
+      "textSignal": {
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
+      },
+      "topics": {}
+    },
+    "previous": {
+      "from": "2026-08-06",
+      "to": "2026-09-04",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -41,35 +56,20 @@
         }
       }
     },
-    "previous": {
-      "from": "2026-08-03",
-      "to": "2026-09-01",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
-      },
-      "topics": {}
-    },
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 1.0,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 1.0,
-        "ratio": null
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
+        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": -1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

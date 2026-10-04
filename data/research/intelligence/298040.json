@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "asOf": "2026-10-02",
+  "asOf": "2026-10-05",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-08-24"
@@ -12,8 +12,8 @@
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-02",
-      "to": "2026-10-02",
+      "from": "2026-09-05",
+      "to": "2026-10-05",
       "reportCount": 0,
       "brokerCount": 0,
       "targetPrice": {},
@@ -27,103 +27,76 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-08-03",
-      "to": "2026-09-01",
-      "reportCount": 10,
-      "brokerCount": 8,
+      "from": "2026-08-06",
+      "to": "2026-09-04",
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 10,
-        "min": 3400000,
-        "max": 5000000,
-        "mean": 4230000,
-        "median": 4150000,
-        "stdev": 449555,
-        "range": 1600000
+        "count": 2,
+        "min": 4000000,
+        "max": 4200000,
+        "mean": 4100000,
+        "median": 4100000,
+        "stdev": 100000,
+        "range": 200000
       },
       "earningsDirection": {
-        "UNKNOWN": 4,
-        "UP": 5,
-        "DOWN": 1
+        "UP": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 29,
-        "negative": 16,
-        "net": 13,
-        "netPerReport": 1.3
+        "positive": 7,
+        "negative": 6,
+        "net": 1,
+        "netPerReport": 0.5
       },
       "topics": {
-        "수요": {
-          "count": 4,
-          "perReport": 0.4
-        },
         "AI": {
-          "count": 3,
-          "perReport": 0.3
+          "count": 2,
+          "perReport": 1.0
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.5
         },
         "환율": {
-          "count": 2,
-          "perReport": 0.2
-        },
-        "재고": {
           "count": 1,
-          "perReport": 0.1
-        },
-        "원가": {
-          "count": 1,
-          "perReport": 0.1
+          "perReport": 0.5
         }
       }
     },
     "topicAcceleration": [
       {
-        "topic": "원가",
+        "topic": "수요",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.1,
-        "perReportDelta": -0.1,
-        "ratio": 0.0
-      },
-      {
-        "topic": "재고",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.1,
-        "perReportDelta": -0.1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
         "ratio": 0.0
       },
       {
         "topic": "환율",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 2,
-        "previousPerReport": 0.2,
-        "perReportDelta": -0.2,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
         "ratio": 0.0
       },
       {
         "topic": "AI",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 3,
-        "previousPerReport": 0.3,
-        "perReportDelta": -0.3,
-        "ratio": 0.0
-      },
-      {
-        "topic": "수요",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 4,
-        "previousPerReport": 0.4,
-        "perReportDelta": -0.4,
+        "previousCount": 2,
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -10,
+    "reportCountChange": -2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

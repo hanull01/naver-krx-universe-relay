@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "196170",
   "itemName": "알테오젠",
-  "asOf": "2026-10-02",
+  "asOf": "2026-10-05",
   "dateRange": {
     "from": "2026-03-26",
     "to": "2026-09-21"
@@ -12,67 +12,67 @@
   "brokerCount": 4,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-02",
-      "to": "2026-10-02",
-      "reportCount": 6,
+      "from": "2026-09-05",
+      "to": "2026-10-05",
+      "reportCount": 4,
       "brokerCount": 4,
       "targetPrice": {
-        "count": 6,
+        "count": 4,
         "min": 400000,
-        "max": 540000,
-        "mean": 468333,
+        "max": 520000,
+        "mean": 455000,
         "median": 450000,
-        "stdev": 47405,
-        "range": 140000
+        "stdev": 42720,
+        "range": 120000
       },
       "earningsDirection": {
-        "UNKNOWN": 6
-      },
-      "textSignal": {
-        "positive": 10,
-        "negative": 2,
-        "net": 8,
-        "netPerReport": 1.333
-      },
-      "topics": {
-        "수요": {
-          "count": 1,
-          "perReport": 0.167
-        }
-      }
-    },
-    "previous": {
-      "from": "2026-08-03",
-      "to": "2026-09-01",
-      "reportCount": 5,
-      "brokerCount": 3,
-      "targetPrice": {
-        "count": 5,
-        "min": 410000,
-        "max": 580000,
-        "mean": 472000,
-        "median": 480000,
-        "stdev": 62418,
-        "range": 170000
-      },
-      "earningsDirection": {
-        "UP": 1,
         "UNKNOWN": 4
       },
       "textSignal": {
         "positive": 7,
+        "negative": 2,
+        "net": 5,
+        "netPerReport": 1.25
+      },
+      "topics": {
+        "수요": {
+          "count": 1,
+          "perReport": 0.25
+        }
+      }
+    },
+    "previous": {
+      "from": "2026-08-06",
+      "to": "2026-09-04",
+      "reportCount": 7,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 7,
+        "min": 410000,
+        "max": 580000,
+        "mean": 478571,
+        "median": 480000,
+        "stdev": 58902,
+        "range": 170000
+      },
+      "earningsDirection": {
+        "UP": 1,
+        "UNKNOWN": 6
+      },
+      "textSignal": {
+        "positive": 10,
         "negative": 1,
-        "net": 6,
-        "netPerReport": 1.2
+        "net": 9,
+        "netPerReport": 1.286
       },
       "topics": {
         "수요": {
           "count": 2,
-          "perReport": 0.4
+          "perReport": 0.286
         },
         "환율": {
           "count": 2,
-          "perReport": 0.4
+          "perReport": 0.286
         }
       }
     },
@@ -80,28 +80,28 @@
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.167,
+        "currentPerReport": 0.25,
         "previousCount": 2,
-        "previousPerReport": 0.4,
-        "perReportDelta": -0.233,
-        "ratio": 0.42
+        "previousPerReport": 0.286,
+        "perReportDelta": -0.036,
+        "ratio": 0.87
       },
       {
         "topic": "환율",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 2,
-        "previousPerReport": 0.4,
-        "perReportDelta": -0.4,
+        "previousPerReport": 0.286,
+        "perReportDelta": -0.286,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": -0.78,
+    "reportCountChange": -3,
+    "targetMeanChangePct": -4.93,
     "targetMedianChangePct": -6.25,
-    "targetDispersionChangePct": -24.05
+    "targetDispersionChangePct": -27.47
   },
   "goalPriceRevisions": {
     "total": 7,

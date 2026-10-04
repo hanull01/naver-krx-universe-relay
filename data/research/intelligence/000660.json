@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "asOf": "2026-10-02",
+  "asOf": "2026-10-05",
   "dateRange": {
     "from": "2026-04-01",
     "to": "2026-09-30"
@@ -12,8 +12,8 @@
   "brokerCount": 15,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-02",
-      "to": "2026-10-02",
+      "from": "2026-09-05",
+      "to": "2026-10-05",
       "reportCount": 3,
       "brokerCount": 3,
       "targetPrice": {
@@ -56,45 +56,45 @@
       }
     },
     "previous": {
-      "from": "2026-08-03",
-      "to": "2026-09-01",
-      "reportCount": 7,
-      "brokerCount": 5,
+      "from": "2026-08-06",
+      "to": "2026-09-04",
+      "reportCount": 5,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 7,
+        "count": 5,
         "min": 2800000,
-        "max": 4000000,
-        "mean": 3207143,
-        "median": 3150000,
-        "stdev": 429642,
-        "range": 1200000
+        "max": 3600000,
+        "mean": 3030000,
+        "median": 2800000,
+        "stdev": 315595,
+        "range": 800000
       },
       "earningsDirection": {
-        "UNKNOWN": 6,
+        "UNKNOWN": 4,
         "UP": 1
       },
       "textSignal": {
-        "positive": 16,
-        "negative": 10,
-        "net": 6,
-        "netPerReport": 0.857
+        "positive": 15,
+        "negative": 6,
+        "net": 9,
+        "netPerReport": 1.8
       },
       "topics": {
         "AI": {
           "count": 2,
-          "perReport": 0.286
+          "perReport": 0.4
         },
         "주주환원": {
           "count": 1,
-          "perReport": 0.143
+          "perReport": 0.2
         },
         "수요": {
           "count": 1,
-          "perReport": 0.143
+          "perReport": 0.2
         },
         "중국": {
           "count": 1,
-          "perReport": 0.143
+          "perReport": 0.2
         }
       }
     },
@@ -104,9 +104,9 @@
         "currentCount": 2,
         "currentPerReport": 0.667,
         "previousCount": 1,
-        "previousPerReport": 0.143,
-        "perReportDelta": 0.524,
-        "ratio": 4.66
+        "previousPerReport": 0.2,
+        "perReportDelta": 0.467,
+        "ratio": 3.33
       },
       {
         "topic": "HBM",
@@ -131,17 +131,17 @@
         "currentCount": 1,
         "currentPerReport": 0.333,
         "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": 0.047,
-        "ratio": 1.16
+        "previousPerReport": 0.4,
+        "perReportDelta": -0.067,
+        "ratio": 0.83
       },
       {
         "topic": "주주환원",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.143,
-        "perReportDelta": -0.143,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       },
       {
@@ -149,17 +149,17 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.143,
-        "perReportDelta": -0.143,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -4,
-    "targetMeanChangePct": -6.46,
-    "targetMedianChangePct": -1.59,
-    "targetDispersionChangePct": -49.72
+    "reportCountChange": -2,
+    "targetMeanChangePct": -0.99,
+    "targetMedianChangePct": 10.71,
+    "targetDispersionChangePct": -31.55
   },
   "goalPriceRevisions": {
     "total": 25,
