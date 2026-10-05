@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "012450",
   "itemName": "한화에어로스페이스",
-  "asOf": "2026-10-05",
+  "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-10-01"
@@ -12,8 +12,8 @@
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-05",
-      "to": "2026-10-05",
+      "from": "2026-09-06",
+      "to": "2026-10-06",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -37,37 +37,37 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-08-06",
-      "to": "2026-09-04",
-      "reportCount": 4,
-      "brokerCount": 4,
+      "from": "2026-08-07",
+      "to": "2026-09-05",
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 3,
-        "min": 1580000,
+        "count": 2,
+        "min": 1830000,
         "max": 1860000,
-        "mean": 1756667,
-        "median": 1830000,
-        "stdev": 125521,
-        "range": 280000
+        "mean": 1845000,
+        "median": 1845000,
+        "stdev": 15000,
+        "range": 30000
       },
       "earningsDirection": {
-        "UP": 2,
+        "UP": 1,
         "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 19,
-        "negative": 1,
-        "net": 18,
-        "netPerReport": 4.5
+        "positive": 9,
+        "negative": 0,
+        "net": 9,
+        "netPerReport": 3.0
       },
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.333
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.333
         }
       }
     },
@@ -77,8 +77,8 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
+        "previousPerReport": 0.333,
+        "perReportDelta": -0.333,
         "ratio": 0.0
       },
       {
@@ -86,16 +86,16 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
+        "previousPerReport": 0.333,
+        "perReportDelta": -0.333,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -3,
-    "targetMeanChangePct": -11.76,
-    "targetMedianChangePct": -15.3,
+    "reportCountChange": -2,
+    "targetMeanChangePct": -15.99,
+    "targetMedianChangePct": -15.99,
     "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {

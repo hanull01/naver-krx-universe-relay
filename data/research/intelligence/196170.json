@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "196170",
   "itemName": "알테오젠",
-  "asOf": "2026-10-05",
+  "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-03-26",
     "to": "2026-09-21"
@@ -12,8 +12,8 @@
   "brokerCount": 4,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-05",
-      "to": "2026-10-05",
+      "from": "2026-09-06",
+      "to": "2026-10-06",
       "reportCount": 4,
       "brokerCount": 4,
       "targetPrice": {
@@ -42,37 +42,32 @@
       }
     },
     "previous": {
-      "from": "2026-08-06",
-      "to": "2026-09-04",
-      "reportCount": 7,
-      "brokerCount": 3,
+      "from": "2026-08-07",
+      "to": "2026-09-05",
+      "reportCount": 5,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 7,
+        "count": 5,
         "min": 410000,
-        "max": 580000,
-        "mean": 478571,
-        "median": 480000,
-        "stdev": 58902,
-        "range": 170000
+        "max": 540000,
+        "mean": 458000,
+        "median": 450000,
+        "stdev": 48744,
+        "range": 130000
       },
       "earningsDirection": {
-        "UP": 1,
-        "UNKNOWN": 6
+        "UNKNOWN": 5
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 1,
+        "positive": 9,
+        "negative": 0,
         "net": 9,
-        "netPerReport": 1.286
+        "netPerReport": 1.8
       },
       "topics": {
-        "수요": {
-          "count": 2,
-          "perReport": 0.286
-        },
         "환율": {
           "count": 2,
-          "perReport": 0.286
+          "perReport": 0.4
         }
       }
     },
@@ -81,27 +76,27 @@
         "topic": "수요",
         "currentCount": 1,
         "currentPerReport": 0.25,
-        "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": -0.036,
-        "ratio": 0.87
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.25,
+        "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": -0.286,
+        "previousPerReport": 0.4,
+        "perReportDelta": -0.4,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -3,
-    "targetMeanChangePct": -4.93,
-    "targetMedianChangePct": -6.25,
-    "targetDispersionChangePct": -27.47
+    "reportCountChange": -1,
+    "targetMeanChangePct": -0.66,
+    "targetMedianChangePct": 0.0,
+    "targetDispersionChangePct": -12.36
   },
   "goalPriceRevisions": {
     "total": 7,

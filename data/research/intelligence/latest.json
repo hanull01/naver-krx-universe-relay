@@ -1,7 +1,7 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-10-05",
+  "asOf": "2026-10-06",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
@@ -231,20 +231,20 @@
       "reportCount": 20,
       "brokerCount": 8,
       "recentReportCount": 1,
-      "previousReportCount": 2,
+      "previousReportCount": 1,
       "recentTargetMean": 190000,
-      "previousTargetMean": 210000,
+      "previousTargetMean": 180000,
       "recentTargetMedian": 190000,
       "recentTargetStdev": 0,
-      "targetMeanChangePct": -9.52,
-      "targetDispersionChangePct": -100.0,
+      "targetMeanChangePct": 5.56,
+      "targetDispersionChangePct": null,
       "revisionUp": 7,
       "revisionDown": 2,
       "risingTopics": [
         {
           "topic": "환율",
-          "delta": 0.5,
-          "ratio": 2.0
+          "delta": 1.0,
+          "ratio": null
         }
       ]
     },
@@ -397,12 +397,12 @@
       "reportCount": 27,
       "brokerCount": 13,
       "recentReportCount": 1,
-      "previousReportCount": 4,
+      "previousReportCount": 3,
       "recentTargetMean": 1550000,
-      "previousTargetMean": 1756667,
+      "previousTargetMean": 1845000,
       "recentTargetMedian": 1550000,
       "recentTargetStdev": 0,
-      "targetMeanChangePct": -11.76,
+      "targetMeanChangePct": -15.99,
       "targetDispersionChangePct": -100.0,
       "revisionUp": 2,
       "revisionDown": 8,
@@ -671,16 +671,22 @@
       "reportCount": 19,
       "brokerCount": 4,
       "recentReportCount": 4,
-      "previousReportCount": 7,
+      "previousReportCount": 5,
       "recentTargetMean": 455000,
-      "previousTargetMean": 478571,
+      "previousTargetMean": 458000,
       "recentTargetMedian": 450000,
       "recentTargetStdev": 42720,
-      "targetMeanChangePct": -4.93,
-      "targetDispersionChangePct": -27.47,
+      "targetMeanChangePct": -0.66,
+      "targetDispersionChangePct": -12.36,
       "revisionUp": 3,
       "revisionDown": 4,
-      "risingTopics": []
+      "risingTopics": [
+        {
+          "topic": "수요",
+          "delta": 0.25,
+          "ratio": null
+        }
+      ]
     },
     {
       "itemCode": "373220",
@@ -1180,6 +1186,31 @@
         ]
       },
       {
+        "itemCode": "196170",
+        "itemName": "알테오젠",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 19,
+        "brokerCount": 4,
+        "recentReportCount": 4,
+        "previousReportCount": 5,
+        "recentTargetMean": 455000,
+        "previousTargetMean": 458000,
+        "recentTargetMedian": 450000,
+        "recentTargetStdev": 42720,
+        "targetMeanChangePct": -0.66,
+        "targetDispersionChangePct": -12.36,
+        "revisionUp": 3,
+        "revisionDown": 4,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.25,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "000660",
         "itemName": "SK하이닉스",
         "status": "OK",
@@ -1213,25 +1244,6 @@
             "ratio": null
           }
         ]
-      },
-      {
-        "itemCode": "196170",
-        "itemName": "알테오젠",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 19,
-        "brokerCount": 4,
-        "recentReportCount": 4,
-        "previousReportCount": 7,
-        "recentTargetMean": 455000,
-        "previousTargetMean": 478571,
-        "recentTargetMedian": 450000,
-        "recentTargetStdev": 42720,
-        "targetMeanChangePct": -4.93,
-        "targetDispersionChangePct": -27.47,
-        "revisionUp": 3,
-        "revisionDown": 4,
-        "risingTopics": []
       }
     ],
     "targetMeanChange": [
@@ -1311,6 +1323,31 @@
         ]
       },
       {
+        "itemCode": "196170",
+        "itemName": "알테오젠",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 19,
+        "brokerCount": 4,
+        "recentReportCount": 4,
+        "previousReportCount": 5,
+        "recentTargetMean": 455000,
+        "previousTargetMean": 458000,
+        "recentTargetMedian": 450000,
+        "recentTargetStdev": 42720,
+        "targetMeanChangePct": -0.66,
+        "targetDispersionChangePct": -12.36,
+        "revisionUp": 3,
+        "revisionDown": 4,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.25,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "000660",
         "itemName": "SK하이닉스",
         "status": "OK",
@@ -1344,25 +1381,6 @@
             "ratio": null
           }
         ]
-      },
-      {
-        "itemCode": "196170",
-        "itemName": "알테오젠",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 19,
-        "brokerCount": 4,
-        "recentReportCount": 4,
-        "previousReportCount": 7,
-        "recentTargetMean": 455000,
-        "previousTargetMean": 478571,
-        "recentTargetMedian": 450000,
-        "recentTargetStdev": 42720,
-        "targetMeanChangePct": -4.93,
-        "targetDispersionChangePct": -27.47,
-        "revisionUp": 3,
-        "revisionDown": 4,
-        "risingTopics": []
       }
     ],
     "targetDispersionIncrease": [
@@ -1404,16 +1422,22 @@
         "reportCount": 19,
         "brokerCount": 4,
         "recentReportCount": 4,
-        "previousReportCount": 7,
+        "previousReportCount": 5,
         "recentTargetMean": 455000,
-        "previousTargetMean": 478571,
+        "previousTargetMean": 458000,
         "recentTargetMedian": 450000,
         "recentTargetStdev": 42720,
-        "targetMeanChangePct": -4.93,
-        "targetDispersionChangePct": -27.47,
+        "targetMeanChangePct": -0.66,
+        "targetDispersionChangePct": -12.36,
         "revisionUp": 3,
         "revisionDown": 4,
-        "risingTopics": []
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.25,
+            "ratio": null
+          }
+        ]
       },
       {
         "itemCode": "000660",

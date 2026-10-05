@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "353200",
   "itemName": "대덕전자",
-  "asOf": "2026-10-05",
+  "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-08",
     "to": "2026-09-28"
@@ -12,8 +12,8 @@
   "brokerCount": 8,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-05",
-      "to": "2026-10-05",
+      "from": "2026-09-06",
+      "to": "2026-10-06",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -42,40 +42,36 @@
       }
     },
     "previous": {
-      "from": "2026-08-06",
-      "to": "2026-09-04",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-08-07",
+      "to": "2026-09-05",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 2,
+        "count": 1,
         "min": 180000,
-        "max": 240000,
-        "mean": 210000,
-        "median": 210000,
-        "stdev": 30000,
-        "range": 60000
+        "max": 180000,
+        "mean": 180000,
+        "median": 180000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 1
       },
       "textSignal": {
-        "positive": 13,
+        "positive": 5,
         "negative": 1,
-        "net": 12,
-        "netPerReport": 6.0
+        "net": 4,
+        "netPerReport": 4.0
       },
       "topics": {
         "수요": {
-          "count": 2,
-          "perReport": 1.0
-        },
-        "환율": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 1.0
         },
         "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 1.0
         }
       }
     },
@@ -84,25 +80,25 @@
         "topic": "환율",
         "currentCount": 1,
         "currentPerReport": 1.0,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 1.0,
+        "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 0,
+        "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.5,
-        "perReportDelta": 0.5,
-        "ratio": 2.0
+        "previousPerReport": 1.0,
+        "perReportDelta": -1.0,
+        "ratio": 0.0
       },
       {
         "topic": "원가",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.5,
-        "perReportDelta": -0.5,
-        "ratio": 0.0
-      },
-      {
-        "topic": "수요",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 2,
         "previousPerReport": 1.0,
         "perReportDelta": -1.0,
         "ratio": 0.0
@@ -110,10 +106,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": -9.52,
-    "targetMedianChangePct": -9.52,
-    "targetDispersionChangePct": -100.0
+    "reportCountChange": 0,
+    "targetMeanChangePct": 5.56,
+    "targetMedianChangePct": 5.56,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 9,
