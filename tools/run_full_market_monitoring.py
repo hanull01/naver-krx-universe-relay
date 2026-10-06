@@ -99,9 +99,27 @@ def cross_check_universe_snapshot(universe_subset, relay_quotes_file=RELAY_QUOTE
     }
 
 
+def previous_completed_close(daily, target_date):
+    """Return the latest completed close strictly before the target date."""
+    candidates = []
+    for row in (daily or {}).get("datas", []):
+        if not isinstance(row, dict) or row.get("complete") is not True or row.get("noTrading") is True:
+            continue
+        close = row.get("close")
+        if not isinstance(close, (int, float)) or isinstance(close, bool):
+            continue
+        try:
+            row_date = date.fromisoformat(str(row.get("date")))
+        except ValueError:
+            continue
+        if row_date < target_date:
+            candidates.append((row_date, close))
+    return max(candidates, default=(None, None), key=lambda item: item[0])
+
+
 def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_FILE,
                                relay_states_file=RELAY_STATES_FILE,
-                               regular_daily_dir=None):
+                               regular_daily_dir=None, daily_dir=None):
     """Create an explicitly scoped 42-stock view from relay-owned artifacts.
 
     It is intentionally independent from full-market breadth.  `current` is
@@ -116,6 +134,7 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
     codes = [str(row.get("code")) for row in universe_subset]
     rows = [(code, quote_by_code.get(code), state_by_code.get(code)) for code in codes]
     regular_daily_dir = Path(regular_daily_dir or Path(relay_states_file).parent / "daily-regular")
+    daily_dir = Path(daily_dir or Path(relay_states_file).parent / "daily")
     regular_by_code = {}
     for code, quote, state in rows:
         if not quote or not state:
@@ -149,14 +168,18 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
             continue
         if state_date != target.date():
             continue
+        previous_date, previous_close = previous_completed_close(
+            load_json(daily_dir / f"{code}.json"), target.date())
+        regular_change = (bar["close"] - previous_close
+                          if previous_date is not None and previous_close is not None else None)
         regular_by_code[code] = {
             "status": "CONFIRMED", "sourceDate": bar["date"],
             "sourceTime": bar["sourceTime"],
             "priceVsMA20": relay.compare(bar["close"], current_state.get("ma20")),
             "priceVsMA60": relay.compare(bar["close"], current_state.get("ma60")),
             "breakout20": relay.breakout(bar["close"], bar["high"], current_state.get("priorHigh20"), True),
-            # No authoritative regular-session change rate is published here.
-            "fluctuationsRatio": None,
+            "previousCloseDate": previous_date.isoformat() if previous_date else None,
+            "previousClose": previous_close, "regularChange": regular_change,
         }
 
     def above_ma(state, period):
@@ -175,7 +198,9 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
             if view == "regularSession" and selected.get("status") != "CONFIRMED":
                 continue
             values.append((quote if view == "current" else selected, selected))
-        changes = [quote.get("fluctuationsRatio") for quote, _ in values if isinstance(quote.get("fluctuationsRatio"), (int, float))]
+        change_key = "regularChange" if view == "regularSession" else "fluctuationsRatio"
+        changes = [source.get(change_key) for source, _ in values
+                   if isinstance(source.get(change_key), (int, float)) and not isinstance(source.get(change_key), bool)]
         above20 = [above_ma(state, 20) for _, state in values if above_ma(state, 20) is not None]
         above60 = [above_ma(state, 60) for _, state in values if above_ma(state, 60) is not None]
         breakout20 = [state.get("breakout20") for _, state in values if state.get("breakout20") not in (None, "unknown")]

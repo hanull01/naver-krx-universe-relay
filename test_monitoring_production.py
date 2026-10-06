@@ -167,6 +167,7 @@ class MonitoringProductionTests(unittest.TestCase):
     def test_flat_current_and_strict_regular_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); regular = root / "daily-regular"; regular.mkdir()
+            daily = root / "daily"; daily.mkdir()
             quotes = root / "quotes.json"; states = root / "states.json"
             codes = [f"{i:06d}" for i in range(42)]
             quotes.write_text(json.dumps({"datas": [{"itemCode": code,
@@ -179,8 +180,16 @@ class MonitoringProductionTests(unittest.TestCase):
             bar = {"date": "2026-10-06", "complete": True, "session": "REGULAR",
                    "barType": "REGULAR_SESSION", "source": "NAVER_MINUTE",
                    "sourceTime": "20261006153000", "close": 110, "high": 116}
-            for code in codes:
+            previous_closes = [100, 120, 110, None] + [100] * 38
+            for code, previous_close in zip(codes, previous_closes):
                 (regular / f"{code}.json").write_text(json.dumps({"regularDailyStatus": "ok", "datas": [bar]}))
+                rows = [] if previous_close is None else [
+                    {"date": "2026-10-02", "close": previous_close,
+                     "complete": True, "noTrading": False},
+                    {"date": "2026-10-01", "close": 999,
+                     "complete": True, "noTrading": False},
+                ]
+                (daily / f"{code}.json").write_text(json.dumps({"datas": rows}))
             subset = [{"code": code} for code in codes]
             result = runner.monitored_universe_summary(subset, quotes, states)
             self.assertEqual(result["current"]["aboveMA20EligibleCount"], 42)
@@ -190,8 +199,14 @@ class MonitoringProductionTests(unittest.TestCase):
             self.assertEqual(result["regularSession"]["status"], "AVAILABLE")
             self.assertEqual(result["regularSession"]["confirmedCount"], 42)
             self.assertEqual(result["regularSession"]["breakout20Count"], 0)
-            self.assertEqual(result["regularSession"]["changeEligibleCount"], 0)
-            self.assertIsNone(result["regularSession"]["advancerPct"])
+            self.assertEqual(result["regularSession"]["changeEligibleCount"], 41)
+            self.assertEqual(result["regularSession"]["advancers"], 39)
+            self.assertEqual(result["regularSession"]["decliners"], 1)
+            self.assertEqual(result["regularSession"]["unchanged"], 1)
+            self.assertEqual(result["regularSession"]["advancerPct"], round(39 / 41 * 100, 4))
+            self.assertEqual(result["regularSession"]["advancers"]
+                             + result["regularSession"]["decliners"]
+                             + result["regularSession"]["unchanged"], 41)
             for change in ({"sourceTime": "bad"}, {"date": "2026-10-05"},
                            {"complete": False}, {"session": "AFTER"},
                            {"barType": "RAW"}, {"source": "OTHER"}):
@@ -199,8 +214,11 @@ class MonitoringProductionTests(unittest.TestCase):
                     (regular / f"{codes[0]}.json").write_text(json.dumps({"regularDailyStatus": "ok", "datas": [dict(bar, **change)]}))
                     result = runner.monitored_universe_summary(subset, quotes, states)
                     self.assertEqual(result["regularSession"]["confirmedCount"], 41)
+                    self.assertEqual(result["regularSession"]["changeEligibleCount"], 40)
             (regular / f"{codes[0]}.json").write_text(json.dumps({"regularDailyStatus": "unavailable", "datas": [bar]}))
-            self.assertEqual(runner.monitored_universe_summary(subset, quotes, states)["regularSession"]["confirmedCount"], 41)
+            unavailable = runner.monitored_universe_summary(subset, quotes, states)["regularSession"]
+            self.assertEqual(unavailable["confirmedCount"], 41)
+            self.assertEqual(unavailable["changeEligibleCount"], 40)
 
     def test_hourly_workflow_collects_full_snapshot_once_and_publishes_compact_evidence(self):
         workflow = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
