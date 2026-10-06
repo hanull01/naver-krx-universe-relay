@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "251270",
   "itemName": "넷마블",
-  "reportCount": 18,
-  "latestReportNid": "96406",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 19,
+  "latestReportNid": "96442",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96406",
-    "writeDate": "2026-10-01",
-    "brokerName": "하나증권",
-    "title": "쉬어가는 분기, 신작 출시 확정 필요",
-    "goalPrice": 50000,
+    "nid": "96442",
+    "writeDate": "2026-10-06",
+    "brokerName": "유진투자증권",
+    "title": "신작 공백이 만든 실적 하향",
+    "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 3,
+        "negative": 14
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 8,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "환율": 4,
         "원가": 1
       }
     }
   },
   "reportNids": [
+    "96442",
     "96406",
     "95394",
     "95236",

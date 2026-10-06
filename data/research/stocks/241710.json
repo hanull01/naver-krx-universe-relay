@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "241710",
   "itemName": "코스메카코리아",
-  "reportCount": 13,
-  "latestReportNid": "96331",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 14,
+  "latestReportNid": "96459",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96331",
-    "writeDate": "2026-09-28",
-    "brokerName": "유안타증권",
-    "title": "3분기 눈높이 조정, 성장 기대는 유효",
+    "nid": "96459",
+    "writeDate": "2026-10-06",
+    "brokerName": "교보증권",
+    "title": "변함없이 순항 중",
     "goalPrice": 150000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 13,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수주": 3,
         "미국": 2,
+        "환율": 2,
+        "수요": 1,
         "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "96459",
     "96331",
     "96288",
     "95434",

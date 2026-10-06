@@ -2,29 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "207940",
   "itemName": "삼성바이오로직스",
-  "reportCount": 28,
-  "latestReportNid": "95945",
-  "latestWriteDate": "2026-08-31",
+  "reportCount": 31,
+  "latestReportNid": "96453",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "95945",
-    "writeDate": "2026-08-31",
-    "brokerName": "DS투자증권",
-    "title": "유상증자, 기존 주주 가치 희석 제한적",
-    "goalPrice": 1850000,
+    "nid": "96453",
+    "writeDate": "2026-10-06",
+    "brokerName": "하나증권",
+    "title": "환율도 꺾지 못한 성장세 (3Q26 Preview)",
+    "goalPrice": 1950000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 4,
         "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 3,
+        "미국": 1,
+        "원가": 1,
+        "파업": 1
+      }
     }
   },
   "reportNids": [
+    "96453",
+    "96446",
+    "96440",
     "95945",
     "95944",
     "95939",

@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "051600",
   "itemName": "한전KPS",
-  "reportCount": 10,
-  "latestReportNid": "95428",
-  "latestWriteDate": "2026-08-11",
+  "reportCount": 11,
+  "latestReportNid": "96435",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "95428",
-    "writeDate": "2026-08-11",
-    "brokerName": "하나증권",
-    "title": "선행 지표가 없는 실적",
-    "goalPrice": 68000,
+    "nid": "96435",
+    "writeDate": "2026-10-06",
+    "brokerName": "신한투자증권",
+    "title": "외형 둔화 속 비용 정상화 예상",
+    "goalPrice": 75000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 2,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "원전": 2,
+        "수주": 1
+      }
     }
   },
   "reportNids": [
+    "96435",
     "95428",
     "95418",
     "95413",

@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "reportCount": 75,
-  "latestReportNid": "96418",
-  "latestWriteDate": "2026-10-02",
+  "reportCount": 78,
+  "latestReportNid": "96456",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96418",
-    "writeDate": "2026-10-02",
-    "brokerName": "IBK투자증권",
-    "title": "분기 영업이익 100조 시대가 열렸다",
-    "goalPrice": 460000,
+    "nid": "96456",
+    "writeDate": "2026-10-06",
+    "brokerName": "교보증권",
+    "title": "3Q26 Preview HBM이 만들고, 메모리가 이어간다",
+    "goalPrice": 500000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 4
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 3
+        "반도체": 5,
+        "가격": 3,
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96456",
+    "96444",
+    "96443",
     "96418",
     "96409",
     "96383",

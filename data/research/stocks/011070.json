@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "011070",
   "itemName": "LG이노텍",
-  "reportCount": 43,
-  "latestReportNid": "96354",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 44,
+  "latestReportNid": "96432",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96354",
-    "writeDate": "2026-09-29",
-    "brokerName": "대신증권",
-    "title": "3Q 애플 효과는 존재, 다만 환율 부담이 가중",
-    "goalPrice": 920000,
+    "nid": "96432",
+    "writeDate": "2026-10-06",
+    "brokerName": "키움증권",
+    "title": "환율 우려를 걷어내면 보이는 바닥 시그널",
+    "goalPrice": 1100000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 2,
-        "negative": 8
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 5,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "반도체": 2,
-        "원가": 1
+        "환율": 5,
+        "가격": 3,
+        "수요": 3,
+        "원가": 3,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96432",
     "96354",
     "96351",
     "94975",

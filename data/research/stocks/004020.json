@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "004020",
   "itemName": "현대제철",
-  "reportCount": 18,
-  "latestReportNid": "95105",
-  "latestWriteDate": "2026-08-06",
+  "reportCount": 20,
+  "latestReportNid": "96462",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "95105",
-    "writeDate": "2026-08-06",
-    "brokerName": "키움증권",
-    "title": "2분기 실적 반등 성공",
-    "goalPrice": 46000,
+    "nid": "96462",
+    "writeDate": "2026-10-06",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview: 물량 부진에 늦어지는 회복",
+    "goalPrice": 43000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 3
+        "positive": 4,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "가격": 5,
-        "수요": 1,
-        "원가": 1
+        "수요": 2,
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96462",
+    "96452",
     "95105",
     "95042",
     "95038",

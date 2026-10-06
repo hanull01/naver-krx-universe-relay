@@ -1,30 +1,55 @@
 {
-  "status": "NO_RECENT_RESEARCH",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "207940",
   "itemName": "삼성바이오로직스",
   "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-08-31"
+    "to": "2026-10-06"
   },
-  "reportCount": 28,
-  "brokerCount": 10,
+  "reportCount": 31,
+  "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-06",
       "to": "2026-10-06",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 3,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 3,
+        "min": 1950000,
+        "max": 2000000,
+        "mean": 1983333,
+        "median": 2000000,
+        "stdev": 23570,
+        "range": 50000
       },
-      "topics": {}
+      "earningsDirection": {
+        "UP": 1,
+        "MIXED": 1,
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 10,
+        "negative": 4,
+        "net": 6,
+        "netPerReport": 2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 6,
+          "perReport": 2.0
+        },
+        "원가": {
+          "count": 2,
+          "perReport": 0.667
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     },
     "previous": {
       "from": "2026-08-07",
@@ -66,25 +91,34 @@
     },
     "topicAcceleration": [
       {
-        "topic": "CAPEX/생산능력",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
-        "ratio": 0.0
-      },
-      {
-        "topic": "수요",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
-        "ratio": 0.0
+        "topic": "환율",
+        "currentCount": 6,
+        "currentPerReport": 2.0,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 2.0,
+        "ratio": null
       },
       {
         "topic": "원가",
+        "currentCount": 2,
+        "currentPerReport": 0.667,
+        "previousCount": 1,
+        "previousPerReport": 0.25,
+        "perReportDelta": 0.417,
+        "ratio": 2.67
+      },
+      {
+        "topic": "수요",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 1,
+        "previousPerReport": 0.25,
+        "perReportDelta": 0.083,
+        "ratio": 1.33
+      },
+      {
+        "topic": "CAPEX/생산능력",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
@@ -95,15 +129,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -4,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
-    "targetDispersionChangePct": null
+    "reportCountChange": -1,
+    "targetMeanChangePct": 0.42,
+    "targetMedianChangePct": 0.0,
+    "targetDispersionChangePct": -68.57
   },
   "goalPriceRevisions": {
-    "total": 5,
+    "total": 7,
     "up": 0,
-    "down": 5,
+    "down": 7,
     "flat": 0
   },
   "monthly": {
@@ -267,6 +301,44 @@
           "perReport": 0.25
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 3,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 3,
+        "min": 1950000,
+        "max": 2000000,
+        "mean": 1983333,
+        "median": 2000000,
+        "stdev": 23570,
+        "range": 50000
+      },
+      "earningsDirection": {
+        "UP": 1,
+        "MIXED": 1,
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 10,
+        "negative": 4,
+        "net": 6,
+        "netPerReport": 2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 6,
+          "perReport": 2.0
+        },
+        "원가": {
+          "count": 2,
+          "perReport": 0.667
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -317,6 +389,21 @@
           "date": "2026-07-24",
           "goalPrice": 2090000,
           "title": "미국 생산거점과 5공장, 그리고 펩타이드"
+        }
+      ]
+    },
+    "SK증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 2000000,
+      "latestGoalPrice": 2000000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-06",
+          "goalPrice": 2000000,
+          "title": "3Q26 Pre: 파업과 환율 부담에도 컨센 부합"
         }
       ]
     },
@@ -426,17 +513,22 @@
       ]
     },
     "유안타증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 2100000,
-      "latestGoalPrice": 2100000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 2000000,
+      "changeAmount": -100000,
+      "changePct": -4.76,
       "trajectory": [
         {
           "date": "2026-04-02",
           "goalPrice": 2100000,
           "title": "1Q26Pre: 안정적인 성장"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 2000000,
+          "title": "환율 하락에도 견조한 흐름"
         }
       ]
     },
@@ -466,12 +558,12 @@
       ]
     },
     "하나증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 2050000,
-      "latestGoalPrice": 2050000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 1950000,
+      "changeAmount": -100000,
+      "changePct": -4.88,
       "trajectory": [
         {
           "date": "2026-04-02",
@@ -492,6 +584,11 @@
           "date": "2026-08-31",
           "goalPrice": 2050000,
           "title": "큰 성장을 위해서는 과감한 투자가 필요하다"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 1950000,
+          "title": "환율도 꺾지 못한 성장세 (3Q26 Preview)"
         }
       ]
     }

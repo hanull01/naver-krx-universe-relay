@@ -1,30 +1,45 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "272210",
   "itemName": "한화시스템",
   "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-07-29"
+    "to": "2026-10-06"
   },
-  "reportCount": 15,
+  "reportCount": 16,
   "brokerCount": 8,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-06",
       "to": "2026-10-06",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 136000,
+        "max": 136000,
+        "mean": 136000,
+        "median": 136000,
+        "stdev": 0,
+        "range": 0
       },
-      "topics": {}
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 3,
+        "negative": 0,
+        "net": 3,
+        "netPerReport": 3.0
+      },
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     },
     "previous": {
       "from": "2026-08-07",
@@ -41,10 +56,20 @@
       },
       "topics": {}
     },
-    "topicAcceleration": []
+    "topicAcceleration": [
+      {
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 1.0,
+        "ratio": null
+      }
+    ]
   },
   "comparison": {
-    "reportCountChange": 0,
+    "reportCountChange": 1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -148,6 +173,34 @@
           "perReport": 0.111
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 136000,
+        "max": 136000,
+        "mean": 136000,
+        "median": 136000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 3,
+        "negative": 0,
+        "net": 3,
+        "netPerReport": 3.0
+      },
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -227,8 +280,8 @@
       ]
     },
     "유안타증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 169000,
       "latestGoalPrice": 136000,
       "changeAmount": -33000,
@@ -243,6 +296,11 @@
           "date": "2026-07-29",
           "goalPrice": 136000,
           "title": "2Q26 Re: 역대 최고 분기 OP 기록"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 136000,
+          "title": "제주우주센터 탐방기(ft. CEO 간담회)"
         }
       ]
     },

@@ -2,35 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "097950",
   "itemName": "CJ제일제당",
-  "reportCount": 18,
-  "latestReportNid": "96423",
-  "latestWriteDate": "2026-10-02",
+  "reportCount": 19,
+  "latestReportNid": "96458",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96423",
-    "writeDate": "2026-10-02",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre: 바이오 견조 VS. 식품 부진",
-    "goalPrice": 370000,
+    "nid": "96458",
+    "writeDate": "2026-10-06",
+    "brokerName": "교보증권",
+    "title": "점진적으로 나아지는 과정",
+    "goalPrice": 270000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 4
+        "positive": 18,
+        "negative": 10
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 3,
-        "미국": 1,
-        "수요": 1,
-        "원가": 1,
+        "원가": 5,
+        "가격": 2,
+        "미국": 2,
+        "환율": 2,
+        "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "96458",
     "96423",
     "95497",
     "95493",

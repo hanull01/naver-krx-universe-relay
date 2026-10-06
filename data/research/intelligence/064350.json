@@ -6,35 +6,41 @@
   "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-10-01"
+    "to": "2026-10-06"
   },
-  "reportCount": 23,
+  "reportCount": 24,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-06",
       "to": "2026-10-06",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 167000,
-        "max": 167000,
-        "mean": 167000,
-        "median": 167000,
-        "stdev": 0,
-        "range": 0
+        "max": 226000,
+        "mean": 196500,
+        "median": 196500,
+        "stdev": 29500,
+        "range": 59000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 0,
-        "negative": 1,
+        "positive": 2,
+        "negative": 3,
         "net": -1,
-        "netPerReport": -1.0
+        "netPerReport": -0.5
       },
-      "topics": {}
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 0.5
+        }
+      }
     },
     "previous": {
       "from": "2026-08-07",
@@ -51,18 +57,28 @@
       },
       "topics": {}
     },
-    "topicAcceleration": []
+    "topicAcceleration": [
+      {
+        "topic": "환율",
+        "currentCount": 1,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
+        "ratio": null
+      }
+    ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 4,
+    "total": 5,
     "up": 0,
-    "down": 4,
+    "down": 5,
     "flat": 0
   },
   "monthly": {
@@ -194,42 +210,53 @@
       "topics": {}
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 167000,
-        "max": 167000,
-        "mean": 167000,
-        "median": 167000,
-        "stdev": 0,
-        "range": 0
+        "max": 226000,
+        "mean": 196500,
+        "median": 196500,
+        "stdev": 29500,
+        "range": 59000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 0,
-        "negative": 1,
+        "positive": 2,
+        "negative": 3,
         "net": -1,
-        "netPerReport": -1.0
+        "netPerReport": -0.5
       },
-      "topics": {}
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 0.5
+        }
+      }
     }
   },
   "brokerTrajectory": {
     "DS투자증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 236000,
-      "latestGoalPrice": 236000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 226000,
+      "changeAmount": -10000,
+      "changePct": -4.24,
       "trajectory": [
         {
           "date": "2026-07-27",
           "goalPrice": 236000,
           "title": "수주를 기다리며"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 226000,
+          "title": "27F 영업이익 성장률 대비 저평가 국면 진입"
         }
       ]
     },

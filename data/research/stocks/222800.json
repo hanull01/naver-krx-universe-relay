@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "222800",
   "itemName": "심텍",
-  "reportCount": 21,
-  "latestReportNid": "96053",
-  "latestWriteDate": "2026-09-09",
+  "reportCount": 22,
+  "latestReportNid": "96434",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96053",
-    "writeDate": "2026-09-09",
-    "brokerName": "대신증권",
-    "title": "3Q 실적 상향, 소캠2 매출은 예상 상회",
-    "goalPrice": 170000,
+    "nid": "96434",
+    "writeDate": "2026-10-06",
+    "brokerName": "iM증권",
+    "title": "CPU, LPDDR 수요 확대의 중심",
+    "goalPrice": 250000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 12,
+        "positive": 18,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 6,
+      "earningsPositiveSignalCount": 9,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "반도체": 3
+        "AI": 3,
+        "수요": 3,
+        "수주": 3,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96434",
     "96053",
     "95880",
     "95876",

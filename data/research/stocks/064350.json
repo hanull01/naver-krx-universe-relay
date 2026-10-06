@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "064350",
   "itemName": "현대로템",
-  "reportCount": 23,
-  "latestReportNid": "96396",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 24,
+  "latestReportNid": "96461",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96396",
-    "writeDate": "2026-10-01",
-    "brokerName": "미래에셋증권",
-    "title": "글로벌 전차 Player로의 도약을 앞두다",
-    "goalPrice": 167000,
+    "nid": "96461",
+    "writeDate": "2026-10-06",
+    "brokerName": "DS투자증권",
+    "title": "27F 영업이익 성장률 대비 저평가 국면 진입",
+    "goalPrice": 226000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 2,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 3
+      }
     }
   },
   "reportNids": [
+    "96461",
     "96396",
     "94805",
     "94561",

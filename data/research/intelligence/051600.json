@@ -1,28 +1,38 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "051600",
   "itemName": "한전KPS",
   "asOf": "2026-10-06",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-08-11"
+    "to": "2026-10-06"
   },
-  "reportCount": 10,
+  "reportCount": 11,
   "brokerCount": 5,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-06",
       "to": "2026-10-06",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 75000,
+        "max": 75000,
+        "mean": 75000,
+        "median": 75000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UP": 1
+      },
       "textSignal": {
-        "positive": 0,
+        "positive": 2,
         "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+        "net": 2,
+        "netPerReport": 2.0
       },
       "topics": {}
     },
@@ -55,10 +65,10 @@
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": -4,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
-    "targetDispersionChangePct": null
+    "reportCountChange": -3,
+    "targetMeanChangePct": 14.5,
+    "targetMedianChangePct": 13.64,
+    "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
     "total": 2,
@@ -165,6 +175,29 @@
         "netPerReport": 3.0
       },
       "topics": {}
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 75000,
+        "max": 75000,
+        "mean": 75000,
+        "median": 75000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 2,
+        "negative": 0,
+        "net": 2,
+        "netPerReport": 2.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
@@ -214,8 +247,8 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 75000,
       "latestGoalPrice": 75000,
       "changeAmount": 0,
@@ -225,6 +258,11 @@
           "date": "2026-08-11",
           "goalPrice": 75000,
           "title": "비용 부담은 아쉬웠지만 방향성은 유효"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 75000,
+          "title": "외형 둔화 속 비용 정상화 예상"
         }
       ]
     },

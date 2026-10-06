@@ -2,32 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "005490",
   "itemName": "POSCO홀딩스",
-  "reportCount": 17,
-  "latestReportNid": "96403",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 18,
+  "latestReportNid": "96450",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96403",
-    "writeDate": "2026-10-01",
-    "brokerName": "신한투자증권",
-    "title": "철강은 개선, 연결은 숨고르기",
-    "goalPrice": 490000,
+    "nid": "96450",
+    "writeDate": "2026-10-06",
+    "brokerName": "하나증권",
+    "title": "안정적인 영업실적 달성 중",
+    "goalPrice": 740000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 4,
+        "negative": 7
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 6,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "원가": 1
+        "가격": 4,
+        "수요": 2,
+        "원가": 2,
+        "환율": 2,
+        "자동차": 1,
+        "조선": 1
       }
     }
   },
   "reportNids": [
+    "96450",
     "96403",
     "94957",
     "94900",
