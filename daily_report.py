@@ -422,6 +422,200 @@ def technical_events(rows, state_key="state"):
     }
 
 
+NEXT_SESSION_BUCKETS = (
+    "REGULAR_BREAKOUT_STRONG",
+    "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY",
+    "REGULAR_ABOVE_MA_MOMENTUM",
+    "NEAR_BREAKOUT_WATCH",
+    "PULLBACK_WATCH",
+)
+
+
+def next_session_candidates(rows, as_of):
+    """Build deterministic, descriptive candidates from existing state labels.
+
+    Regular-session technical labels decide the primary technical buckets.
+    Current/CLOSED values are retained only as observation, volume, and
+    after-session context; they never replace an unavailable regular state.
+    """
+    bucket_members = {name: [] for name in NEXT_SESSION_BUCKETS}
+    candidates = []
+    excluded = []
+
+    breakout_rank = {"20_60": 0, "60": 1, "20": 2, "none": 3}
+    volume_rank = {"surge": 0, "elevated": 1, "normal": 2, "unknown": 3}
+
+    for row in rows:
+        code = row["itemCode"]
+        name = row["itemName"]
+        regular = row.get("regularSessionState")
+        current = row.get("currentState")
+        market = row.get("market")
+        regular = regular if isinstance(regular, dict) else {}
+        current = current if isinstance(current, dict) else {}
+        market = market if isinstance(market, dict) else {}
+
+        if regular.get("status") != "CONFIRMED":
+            excluded.append({
+                "itemCode": code,
+                "itemName": name,
+                "reason": "REGULAR_SESSION_UNAVAILABLE",
+            })
+            continue
+
+        breakout20 = regular.get("breakout20")
+        breakout60 = regular.get("breakout60")
+        if breakout20 == "confirmed" and breakout60 == "confirmed":
+            strength = "20_60"
+        elif breakout60 == "confirmed":
+            strength = "60"
+        elif breakout20 == "confirmed":
+            strength = "20"
+        else:
+            strength = "none"
+
+        session_rate = safe_number(market.get("sessionChangeRate"))
+        buckets = []
+        if strength != "none":
+            buckets.append("REGULAR_BREAKOUT_STRONG")
+        if (
+            breakout20 == "failed" or breakout60 == "failed"
+        ) and session_rate is not None and session_rate > 0:
+            buckets.append("REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY")
+        if (
+            regular.get("priceVsMA20") == "above"
+            and regular.get("priceVsMA60") == "above"
+        ):
+            buckets.append("REGULAR_ABOVE_MA_MOMENTUM")
+
+        pullback_state = current.get("pullbackState")
+        if pullback_state in ("near_breakout20", "near_breakout60"):
+            buckets.append("NEAR_BREAKOUT_WATCH")
+        elif isinstance(pullback_state, str) and pullback_state.startswith("pullback"):
+            buckets.append("PULLBACK_WATCH")
+
+        if not buckets:
+            continue
+
+        volume_state = current.get("volumeState")
+        if volume_state not in volume_rank:
+            volume_state = "unknown"
+        tags = []
+        above20 = regular.get("priceVsMA20") == "above"
+        above60 = regular.get("priceVsMA60") == "above"
+        if above20 and above60:
+            tags.append("ABOVE_MA20_MA60")
+        else:
+            if above20:
+                tags.append("ABOVE_MA20")
+            if above60:
+                tags.append("ABOVE_MA60")
+        volume_tags = {
+            "surge": "VOLUME_SURGE",
+            "elevated": "VOLUME_ELEVATED",
+            "normal": "VOLUME_NORMAL",
+        }
+        if volume_state in volume_tags:
+            tags.append(volume_tags[volume_state])
+        if session_rate is not None:
+            tags.append(
+                "AFTER_UP" if session_rate > 0
+                else "AFTER_DOWN" if session_rate < 0
+                else "AFTER_FLAT"
+            )
+
+        candidate = {
+            "itemCode": code,
+            "itemName": name,
+            "primaryBucket": buckets[0],
+            "allBuckets": buckets,
+            "breakoutStrength": strength,
+            "regularSession": compact_dict(regular, [
+                "price", "ma20", "ma60", "priceVsMA20", "priceVsMA60",
+                "priorHigh20", "priorHigh60", "breakout20", "breakout60",
+                "sourceDate", "sourceTime",
+            ]),
+            "current": compact_dict(current, ["price", "sourceTime", "pullbackState"]),
+            "afterSession": {
+                "referencePrice": market.get("referencePrice"),
+                "referenceSourceTime": market.get("referenceSourceTime"),
+                "sessionChange": market.get("sessionChange"),
+                "sessionChangeRate": session_rate,
+            },
+            "volume": {
+                "volumeRatio20": current.get("volumeRatio20"),
+                "volumeState": volume_state,
+            },
+            "tags": tags,
+            "metadata": {
+                "technicalBasis": "REGULAR_SESSION",
+                "volumeBasis": "CURRENT_DAILY_TECHNICAL",
+                "afterBasis": "CLOSED_REFERENCE",
+                "bucketBasis": {
+                    bucket: "CURRENT_OBSERVATION"
+                    for bucket in buckets
+                    if bucket in ("NEAR_BREAKOUT_WATCH", "PULLBACK_WATCH")
+                },
+            },
+        }
+        candidate["_sort"] = (
+            NEXT_SESSION_BUCKETS.index(candidate["primaryBucket"]),
+            breakout_rank[strength],
+            volume_rank[volume_state],
+            -(session_rate if session_rate is not None else float("-inf")),
+            -(safe_number(market.get("changeRate"))
+              if safe_number(market.get("changeRate")) is not None
+              else float("-inf")),
+            code,
+        )
+        candidates.append(candidate)
+        for bucket in buckets:
+            bucket_members[bucket].append({"itemCode": code, "itemName": name})
+
+    candidates.sort(key=lambda item: item["_sort"])
+    for rank, candidate in enumerate(candidates, 1):
+        candidate.pop("_sort")
+        candidate["rank"] = rank
+    for members in bucket_members.values():
+        members.sort(key=lambda item: item["itemCode"])
+
+    confirmed_count = len(rows) - len(excluded)
+    if not confirmed_count:
+        status = "UNAVAILABLE"
+    elif excluded:
+        status = "PARTIAL"
+    else:
+        status = "AVAILABLE"
+    return {
+        "status": status,
+        "asOf": as_of,
+        "candidateCount": len(candidates),
+        "excludedCount": len(excluded),
+        "buckets": {
+            name: {
+                "count": len(bucket_members[name]),
+                "basis": (
+                    "CURRENT_OBSERVATION"
+                    if name in ("NEAR_BREAKOUT_WATCH", "PULLBACK_WATCH")
+                    else "REGULAR_SESSION"
+                ),
+                "stocks": bucket_members[name],
+            }
+            for name in NEXT_SESSION_BUCKETS
+        },
+        "priority": candidates,
+        "excluded": excluded,
+        "methodology": {
+            "priority": "LEXICOGRAPHIC",
+            "weightedScoreUsed": False,
+            "investmentRecommendation": False,
+            "technicalBasis": "REGULAR_SESSION",
+            "volumeBasis": "CURRENT_DAILY_TECHNICAL",
+            "afterBasis": "CLOSED_REFERENCE",
+        },
+    }
+
+
 def research_summary(rows, source):
     active = [row for row in rows if row["research"]["rankingEligible"]]
     active.sort(
@@ -720,6 +914,7 @@ def build_report(as_of=None):
         "technicalEventsRegularSession": technical_events(
             rows, "regularSessionState"
         ),
+        "nextSessionCandidates": next_session_candidates(rows, report_date),
         "researchSummary": research_overview,
         "marketResearchCross": market_research_cross(rows),
         "stocks": rows,

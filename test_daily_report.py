@@ -262,6 +262,122 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(after["breakout20FailedCount"], 1)
         self.assertEqual(after["directionObservedCount"], 0)
 
+    @staticmethod
+    def candidate_row(code, regular=None, current=None, session_rate=0, change_rate=0):
+        return {
+            "itemCode": code,
+            "itemName": f"Stock {code}",
+            "regularSessionState": regular or {},
+            "currentState": current or {},
+            "market": {
+                "changeRate": change_rate,
+                "referencePrice": 100,
+                "referenceSourceTime": "20261006153000",
+                "sessionChange": session_rate,
+                "sessionChangeRate": session_rate,
+            },
+        }
+
+    def test_next_candidates_confirmed_breakout_is_top_bucket(self):
+        row = self.candidate_row("000001", {
+            "status": "CONFIRMED", "breakout20": "confirmed",
+            "breakout60": "none", "priceVsMA20": "above",
+            "priceVsMA60": "above",
+        })
+        got = daily_report.next_session_candidates([row], "2026-10-06")
+        self.assertEqual(got["priority"][0]["primaryBucket"], "REGULAR_BREAKOUT_STRONG")
+        self.assertEqual(got["priority"][0]["breakoutStrength"], "20")
+        self.assertIn("REGULAR_ABOVE_MA_MOMENTUM", got["priority"][0]["allBuckets"])
+
+    def test_next_candidates_failed_after_up_is_recovery_not_confirmed(self):
+        row = self.candidate_row("000001", {
+            "status": "CONFIRMED", "breakout20": "failed", "breakout60": "failed",
+        }, session_rate=0.5)
+        got = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        self.assertEqual(got["primaryBucket"], "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY")
+        self.assertNotIn("REGULAR_BREAKOUT_STRONG", got["allBuckets"])
+        self.assertEqual(got["regularSession"]["breakout20"], "failed")
+
+    def test_next_candidates_above_both_ma_is_momentum(self):
+        row = self.candidate_row("000001", {
+            "status": "CONFIRMED", "breakout20": "none", "breakout60": "none",
+            "priceVsMA20": "above", "priceVsMA60": "above",
+        })
+        got = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        self.assertEqual(got["primaryBucket"], "REGULAR_ABOVE_MA_MOMENTUM")
+        self.assertIn("ABOVE_MA20_MA60", got["tags"])
+
+    def test_next_candidates_excludes_unavailable_regular_state(self):
+        row = self.candidate_row("000001", {}, {
+            "breakout20": "confirmed", "pullbackState": "near_breakout20",
+        })
+        got = daily_report.next_session_candidates([row], "2026-10-06")
+        self.assertEqual(got["status"], "UNAVAILABLE")
+        self.assertEqual(got["candidateCount"], 0)
+        self.assertEqual(got["excluded"][0]["reason"], "REGULAR_SESSION_UNAVAILABLE")
+
+    def test_next_candidates_volume_then_after_ordering(self):
+        regular = {"status": "CONFIRMED", "breakout20": "confirmed", "breakout60": "none"}
+        rows = [
+            self.candidate_row("000003", regular, {"volumeState": "normal"}, 10),
+            self.candidate_row("000002", regular, {"volumeState": "surge"}, 1),
+            self.candidate_row("000001", regular, {"volumeState": "elevated"}, 20),
+        ]
+        got = daily_report.next_session_candidates(rows, "2026-10-06")["priority"]
+        self.assertEqual([row["itemCode"] for row in got], ["000002", "000001", "000003"])
+
+    def test_next_candidates_after_then_market_then_code_ordering_is_deterministic(self):
+        regular = {"status": "CONFIRMED", "priceVsMA20": "above", "priceVsMA60": "above"}
+        current = {"volumeState": "normal"}
+        rows = [
+            self.candidate_row("000003", regular, current, 1, 9),
+            self.candidate_row("000002", regular, current, 2, 1),
+            self.candidate_row("000001", regular, current, 1, 9),
+        ]
+        first = daily_report.next_session_candidates(rows, "2026-10-06")["priority"]
+        second = daily_report.next_session_candidates(list(reversed(rows)), "2026-10-06")["priority"]
+        expected = ["000002", "000001", "000003"]
+        self.assertEqual([row["itemCode"] for row in first], expected)
+        self.assertEqual([row["itemCode"] for row in second], expected)
+
+    def test_next_candidates_current_price_does_not_change_regular_bucket(self):
+        regular = {"status": "CONFIRMED", "breakout20": "failed", "breakout60": "none"}
+        row = self.candidate_row("000001", regular, {"price": 100}, session_rate=1)
+        before = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        row["currentState"]["price"] = 999
+        after = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        self.assertEqual(before["primaryBucket"], after["primaryBucket"])
+        self.assertEqual(after["regularSession"]["breakout20"], "failed")
+
+    def test_next_candidates_regular_breakout_change_changes_bucket(self):
+        regular = {"status": "CONFIRMED", "breakout20": "failed", "breakout60": "none"}
+        row = self.candidate_row("000001", regular, session_rate=1)
+        before = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        row["regularSessionState"]["breakout20"] = "confirmed"
+        after = daily_report.next_session_candidates([row], "2026-10-06")["priority"][0]
+        self.assertEqual(before["primaryBucket"], "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY")
+        self.assertEqual(after["primaryBucket"], "REGULAR_BREAKOUT_STRONG")
+
+    def test_next_candidates_current_observation_buckets_use_existing_labels_only(self):
+        rows = [
+            self.candidate_row("000001", {"status": "CONFIRMED"}, {
+                "pullbackState": "near_breakout60", "volumeState": "normal",
+            }),
+            self.candidate_row("000002", {"status": "CONFIRMED"}, {
+                "pullbackState": "pullback_ma20", "volumeState": "normal",
+            }),
+            self.candidate_row("000003", {"status": "CONFIRMED"}, {
+                "pullbackState": "near_ma20", "volumeState": "normal",
+            }),
+        ]
+        got = daily_report.next_session_candidates(rows, "2026-10-06")
+        self.assertEqual(got["buckets"]["NEAR_BREAKOUT_WATCH"]["count"], 1)
+        self.assertEqual(got["buckets"]["PULLBACK_WATCH"]["count"], 1)
+        self.assertEqual(got["candidateCount"], 2)
+        self.assertEqual(
+            got["buckets"]["NEAR_BREAKOUT_WATCH"]["basis"], "CURRENT_OBSERVATION"
+        )
+
     def test_build_report_preserves_flat_current_and_regular_views(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -270,6 +386,9 @@ class DailyReportTests(unittest.TestCase):
                                   "sectors": {}, "themes": {}, "watchlists": {}},
                 "quotes.json": {"status": "ok", "fresh": True, "datas": [{
                     "itemCode": "000001", "closePrice": 103, "fluctuationsRatio": 3,
+                    "referencePrice": 99, "referenceSourceTime": "20261006153000",
+                    "referenceStatus": "ok", "sessionChange": 4,
+                    "sessionChangeRate": 4.040404,
                 }]},
                 "technicals.json": {"datas": [{"itemCode": "000001", "ma20": 100}]},
                 "states.json": {"datas": [{
@@ -296,6 +415,11 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(stock["regularSessionState"]["breakout20"], "failed")
             self.assertEqual(len(report["technicalEventsCurrent"]["breakout20Confirmed"]), 1)
             self.assertEqual(len(report["technicalEventsRegularSession"]["breakout20Failed"]), 1)
+            self.assertEqual(
+                report["nextSessionCandidates"]["priority"][0]["primaryBucket"],
+                "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY",
+            )
+            self.assertEqual(report["nextSessionCandidates"]["asOf"], "2026-10-06")
 
     def test_research_summary_requires_ranking_eligible_for_active_stocks(self):
         rows = [
