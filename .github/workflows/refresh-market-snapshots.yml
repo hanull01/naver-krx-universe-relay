@@ -90,7 +90,10 @@ jobs:
             echo "Market snapshot collection succeeded; synchronizing its data commit."
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
+              pre_rebase_head="$(git rev-parse HEAD)"
               git fetch origin main
+              origin_main="$(git rev-parse origin/main)"
+              echo "Push diagnostics attempt=${attempt} originMain=${origin_main} preRebaseHead=${pre_rebase_head}"
               # The commit contains only freshly collected data/market files.
               # If another generated-data writer advanced main, preserve this
               # successful snapshot while replaying it onto the newest main.
@@ -99,11 +102,35 @@ jobs:
                 git rebase --abort || true
                 exit 1
               fi
-              if git push origin HEAD:main; then
+              post_rebase_head="$(git rev-parse HEAD)"
+              echo "Push diagnostics attempt=${attempt} postRebaseHead=${post_rebase_head}"
+              push_log="$(mktemp)"
+              set +e
+              git push origin HEAD:main 2> >(tee "$push_log" >&2)
+              push_exit=$?
+              set -e
+              echo "Push diagnostics attempt=${attempt} exitCode=${push_exit}"
+              if [ "$push_exit" -eq 0 ]; then
+                rm -f "$push_log"
                 echo "Market snapshot data push succeeded."
                 exit 0
               fi
-              echo "Push was rejected because main advanced; retrying with latest main."
+              if grep -Eqi 'non-fast-forward|fetch first|rejected.*non-fast-forward' "$push_log"; then
+                push_classification="NON_FAST_FORWARD"
+              elif grep -Eqi 'authentication failed|permission denied|could not read username|403|write access.*not granted' "$push_log"; then
+                push_classification="AUTH_PERMISSION"
+              elif grep -Eqi 'protected branch|repository rule|GH006|GH013' "$push_log"; then
+                push_classification="BRANCH_POLICY"
+              elif grep -Eqi 'HTTP (502|503|504)|remote end hung up|connection reset|timed out|temporarily unavailable' "$push_log"; then
+                push_classification="TRANSIENT_GITHUB"
+              else
+                push_classification="UNKNOWN_PUSH_FAILURE"
+              fi
+              rm -f "$push_log"
+              echo "Push failed; classification=${push_classification}; retrying with latest main."
+              if [ "$attempt" -lt 3 ]; then
+                sleep 2
+              fi
             done
             echo "::error::Data collection succeeded, but push was rejected after 3 attempts."
             exit 1
