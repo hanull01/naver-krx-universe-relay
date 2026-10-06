@@ -797,8 +797,13 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     else:
         # Today's raw daily row is provisional.  A separately reconstructed
         # regular-session bar is the only valid same-day technical input.
-        expected = (current.date() if daily.get('regularSessionDate') == current.date().isoformat()
-                    else previous_weekday(current.date()))
+        if daily.get('regularSessionDate') == current.date().isoformat():
+            expected = current.date()
+        else:
+            try:
+                expected = previous_krx_business_day(current.date())
+            except (CalendarUnavailable, OSError, ValueError):
+                return False
     return actual == expected
 
 

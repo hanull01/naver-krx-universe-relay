@@ -306,7 +306,25 @@ class RelayTests(unittest.TestCase):
         current = datetime(2026, 9, 28, 15, 32, tzinfo=relay.KST)
         daily = self.daily_fixture(60)
         daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-25T15:30:00+09:00'})
-        self.assertTrue(relay.daily_cache_is_current(daily, current))
+        with patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 25).date()):
+            self.assertTrue(relay.daily_cache_is_current(daily, current))
+
+    def test_daily_cache_uses_krx_business_day_across_holiday_gap(self):
+        current = datetime(2026, 10, 6, 11, 5, tzinfo=relay.KST)
+        daily = self.daily_fixture(60)
+        daily.update({'status': 'ok', 'latestDate': '2026-10-02',
+                      'sourceTime': '2026-10-02T15:30:00+09:00'})
+        with patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 10, 2).date()):
+            self.assertTrue(relay.daily_cache_is_current(daily, current))
+            stale = dict(daily, sourceTime='2026-10-01T15:30:00+09:00')
+            self.assertFalse(relay.daily_cache_is_current(stale, current))
+
+    def test_daily_cache_fails_closed_when_krx_business_day_unavailable(self):
+        current = datetime(2026, 10, 6, 11, 5, tzinfo=relay.KST)
+        daily = self.daily_fixture(60)
+        daily.update({'status': 'ok', 'sourceTime': '2026-10-02T15:30:00+09:00'})
+        with patch.object(relay, 'previous_krx_business_day', side_effect=relay.CalendarUnavailable('unavailable')):
+            self.assertFalse(relay.daily_cache_is_current(daily, current))
 
     def test_daily_cache_keeps_today_provisional_after_regular_close(self):
         current = datetime(2026, 9, 28, 16, 31, tzinfo=relay.KST)
@@ -314,7 +332,8 @@ class RelayTests(unittest.TestCase):
         current_daily.update({'status': 'ok', 'latestDate': '2026-09-28', 'sourceTime': '2026-09-28T15:30:00+09:00'})
         stale_daily = dict(current_daily, sourceTime='2026-09-25T15:30:00+09:00')
         self.assertFalse(relay.daily_cache_is_current(current_daily, current))
-        self.assertTrue(relay.daily_cache_is_current(stale_daily, current))
+        with patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 25).date()):
+            self.assertTrue(relay.daily_cache_is_current(stale_daily, current))
 
     def test_legacy_raw_today_complete_is_runtime_provisional_and_previous_cache_stays_valid(self):
         current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
@@ -328,7 +347,8 @@ class RelayTests(unittest.TestCase):
         self.assertTrue(raw['datas'][1]['complete'])  # no production rewrite
         self.assertFalse(normalized['datas'][1]['complete'])
         self.assertEqual(normalized['sourceTime'], '2026-09-28')
-        self.assertTrue(relay.daily_cache_is_current(normalized, current))
+        with patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()):
+            self.assertTrue(relay.daily_cache_is_current(normalized, current))
 
     def test_legacy_raw_today_falls_back_to_previous_history_without_regular_daily(self):
         current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
@@ -340,7 +360,8 @@ class RelayTests(unittest.TestCase):
                 {'date': '2026-09-29', 'close': 999, 'high': 999, 'volume': 999,
                  'complete': True, 'noTrading': False}]}
             (root / 'data/daily/000001.json').write_text(json.dumps(raw), encoding='utf-8')
-            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current), \
+                 patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()):
                 daily = relay.load_daily_for_technical('000001')
                 technical = relay.calculate_technicals('000001', 'A', daily,
                                                        {'accumulatedTradingVolume': 10})
