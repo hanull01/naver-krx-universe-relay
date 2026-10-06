@@ -309,6 +309,31 @@ class RelayTests(unittest.TestCase):
         with patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 25).date()):
             self.assertTrue(relay.daily_cache_is_current(daily, current))
 
+    def test_stale_raw_daily_accepts_strict_same_day_regular_override(self):
+        current = datetime(2026, 10, 6, 17, 13, tzinfo=relay.KST)
+        daily = {'status': 'stale', 'sourceTime': '2026-10-02',
+                 'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
+                 'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
+                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+                            'sourceTime': '20261006153000', 'close': 100,
+                            'high': 100, 'volume': 1000}]}
+        self.assertTrue(relay.daily_cache_is_current(daily, current))
+
+    def test_stale_raw_daily_rejects_invalid_regular_override(self):
+        current = datetime(2026, 10, 6, 17, 13, tzinfo=relay.KST)
+        base = {'status': 'stale', 'sourceTime': '2026-10-02',
+                'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
+                'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
+                           'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+                           'sourceTime': '20261006153000', 'close': 100}]}
+        for field, value in [('regularDailyStatus', 'unavailable'),
+                             ('regularSessionDate', '2026-10-05')]:
+            self.assertFalse(relay.daily_cache_is_current(dict(base, **{field: value}), current))
+        for field, value in [('complete', False), ('session', 'AFTER'),
+                             ('barType', 'DAILY'), ('sourceTime', '20261006153100')]:
+            invalid = dict(base, datas=[dict(base['datas'][0], **{field: value})])
+            self.assertFalse(relay.daily_cache_is_current(invalid, current))
+
     def test_daily_cache_uses_krx_business_day_across_holiday_gap(self):
         current = datetime(2026, 10, 6, 11, 5, tzinfo=relay.KST)
         daily = self.daily_fixture(60)

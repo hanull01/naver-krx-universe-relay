@@ -769,12 +769,32 @@ def load_daily_for_technical(code):
     return merged
 
 
+def _valid_same_day_regular_override(daily, current):
+    """Return whether a strict verified regular-session bar may override raw metadata."""
+    if (daily.get('regularDailyStatus') != 'ok'
+            or daily.get('regularSessionDate') != current.date().isoformat()):
+        return False
+    bars = [bar for bar in daily.get('datas', [])
+            if isinstance(bar, dict) and bar.get('date') == current.date().isoformat()]
+    if len(bars) != 1:
+        return False
+    bar = bars[0]
+    source_time = str(bar.get('sourceTime') or daily.get('sourceTime') or '')
+    return (bar.get('complete') is True
+            and bar.get('session') == 'REGULAR'
+            and bar.get('barType') == 'REGULAR_SESSION'
+            and bar.get('source') == 'NAVER_MINUTE'
+            and source_time == current.strftime('%Y%m%d153000'))
+
+
 def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     """Accept legacy fixtures, but fail closed for stale saved collector data."""
     if not daily:
         return False
+    current = current or now()
+    regular_override = _valid_same_day_regular_override(daily, current)
     if daily.get('status') in ('error', 'insufficient', 'stale'):
-        return False
+        return regular_override
     # ``latestDate`` may include a provisional current-day candle.  Technical
     # indicators must instead be keyed to the latest completed candle.
     source_date = daily.get('sourceTime') or daily.get('latestDate')
@@ -788,7 +808,6 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
                   if re.fullmatch(r'\d{14}', text) else datetime.fromisoformat(text).date())
     except ValueError:
         return False
-    current = current or now()
     if expected_completed_date is not None:
         try:
             expected = datetime.fromisoformat(str(expected_completed_date)).date()
