@@ -91,7 +91,10 @@ jobs:
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
               git fetch origin main
-              if ! git rebase origin/main; then
+              # The commit contains only freshly collected data/market files.
+              # If another generated-data writer advanced main, preserve this
+              # successful snapshot while replaying it onto the newest main.
+              if ! git rebase -X theirs origin/main; then
                 echo "::error::Data commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
                 git rebase --abort || true
                 exit 1
