@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "240810",
   "itemName": "원익IPS",
-  "asOf": "2026-10-06",
+  "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-05-11",
     "to": "2026-08-07"
@@ -12,8 +12,8 @@
   "brokerCount": 1,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-06",
-      "to": "2026-10-06",
+      "from": "2026-09-07",
+      "to": "2026-10-07",
       "reportCount": 0,
       "brokerCount": 0,
       "targetPrice": {},
@@ -27,49 +27,24 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-08-07",
-      "to": "2026-09-05",
-      "reportCount": 1,
-      "brokerCount": 1,
-      "targetPrice": {
-        "count": 1,
-        "min": 190000,
-        "max": 190000,
-        "mean": 190000,
-        "median": 190000,
-        "stdev": 0,
-        "range": 0
-      },
-      "earningsDirection": {
-        "UNKNOWN": 1
-      },
+      "from": "2026-08-08",
+      "to": "2026-09-06",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
       "textSignal": {
         "positive": 0,
         "negative": 0,
         "net": 0,
-        "netPerReport": 0.0
+        "netPerReport": 0
       },
-      "topics": {
-        "중국": {
-          "count": 1,
-          "perReport": 1.0
-        }
-      }
+      "topics": {}
     },
-    "topicAcceleration": [
-      {
-        "topic": "중국",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
-        "ratio": 0.0
-      }
-    ]
+    "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": -1,
+    "reportCountChange": 0,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

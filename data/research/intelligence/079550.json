@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "079550",
   "itemName": "LIG디펜스앤에어로스페이스",
-  "asOf": "2026-10-06",
+  "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-09-30"
@@ -12,8 +12,8 @@
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-06",
-      "to": "2026-10-06",
+      "from": "2026-09-07",
+      "to": "2026-10-07",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -42,42 +42,32 @@
       }
     },
     "previous": {
-      "from": "2026-08-07",
-      "to": "2026-09-05",
-      "reportCount": 8,
-      "brokerCount": 8,
+      "from": "2026-08-08",
+      "to": "2026-09-06",
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 8,
-        "min": 980000,
-        "max": 1350000,
-        "mean": 1168750,
-        "median": 1215000,
-        "stdev": 133738,
-        "range": 370000
+        "count": 2,
+        "min": 990000,
+        "max": 1300000,
+        "mean": 1145000,
+        "median": 1145000,
+        "stdev": 155000,
+        "range": 310000
       },
       "earningsDirection": {
-        "UP": 5,
-        "DOWN": 2,
-        "MIXED": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 45,
-        "negative": 15,
-        "net": 30,
-        "netPerReport": 3.75
+        "positive": 11,
+        "negative": 4,
+        "net": 7,
+        "netPerReport": 3.5
       },
       "topics": {
-        "수요": {
-          "count": 3,
-          "perReport": 0.375
-        },
         "CAPEX/생산능력": {
-          "count": 2,
-          "perReport": 0.25
-        },
-        "원가": {
           "count": 1,
-          "perReport": 0.125
+          "perReport": 0.5
         }
       }
     },
@@ -86,35 +76,26 @@
         "topic": "수요",
         "currentCount": 2,
         "currentPerReport": 2.0,
-        "previousCount": 3,
-        "previousPerReport": 0.375,
-        "perReportDelta": 1.625,
-        "ratio": 5.33
-      },
-      {
-        "topic": "원가",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.125,
-        "perReportDelta": -0.125,
-        "ratio": 0.0
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 2.0,
+        "ratio": null
       },
       {
         "topic": "CAPEX/생산능력",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 2,
-        "previousPerReport": 0.25,
-        "perReportDelta": -0.25,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -7,
-    "targetMeanChangePct": -4.17,
-    "targetMedianChangePct": -7.82,
+    "reportCountChange": -1,
+    "targetMeanChangePct": -2.18,
+    "targetMedianChangePct": -2.18,
     "targetDispersionChangePct": -100.0
   },
   "goalPriceRevisions": {
