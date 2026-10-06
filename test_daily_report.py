@@ -2,6 +2,7 @@ import unittest
 import json
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import daily_report
 
@@ -22,9 +23,18 @@ class DailyReportTests(unittest.TestCase):
             (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
             breadth = {"TOTAL": {"advancers": 1, "decliners": 2, "unchanged": 3}}
             (root / "latest-breadth.json").write_text(json.dumps({"generatedAt": quality["generatedAt"], "breadth": breadth}), encoding="utf-8")
+            (root / "latest-summary.json").write_text(json.dumps({
+                "generatedAt": quality["generatedAt"],
+                "monitoredUniverse": {
+                    "current": {"aboveMA20Count": 22},
+                    "regularSession": {"status": "AVAILABLE", "aboveMA20Count": 21},
+                },
+            }), encoding="utf-8")
             got = daily_report.full_market_evidence("2026-10-02", root)
             self.assertEqual(got["status"], "AVAILABLE")
             self.assertEqual(got["breadth"]["advancers"], 1)
+            self.assertEqual(got["monitoredUniverse"]["current"]["aboveMA20Count"], 22)
+            self.assertEqual(got["monitoredUniverse"]["regularSession"]["aboveMA20Count"], 21)
 
     def test_full_market_evidence_rejects_stale_or_incomplete_quality(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -48,11 +58,18 @@ class DailyReportTests(unittest.TestCase):
             "tradingValue": 9999,
             "sourceTime": "2026-09-26T15:30:00+09:00",
             "fresh": True,
+            "referencePrice": 99,
+            "referenceSourceTime": "20260926153000",
+            "referenceStatus": "ok",
+            "sessionChange": 1,
+            "sessionChangeRate": 1.010101,
         }
         got = daily_report.quote_summary(row)
         self.assertEqual(got["price"], 100)
         self.assertEqual(got["changeRate"], 2.5)
         self.assertEqual(got["volume"], 1234)
+        self.assertEqual(got["referencePrice"], 99)
+        self.assertEqual(got["sessionChange"], 1)
 
     def test_enabled_universe(self):
         payload = {
@@ -210,6 +227,75 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(len(got["breakout60Attempt"]), 1)
         self.assertEqual(len(got["volumeElevated"]), 1)
         self.assertEqual(len(got["nearBreakout"]), 1)
+
+    def test_regular_events_do_not_fallback_to_current(self):
+        rows = [
+            {
+                "itemCode": "000001", "itemName": "Confirmed",
+                "market": {"changeRate": 1.0},
+                "currentState": {"breakout20": "confirmed"},
+                "regularSessionState": {"breakout20": "failed"},
+            },
+            {
+                "itemCode": "000002", "itemName": "Unavailable",
+                "market": {"changeRate": 2.0},
+                "currentState": {"breakout20": "confirmed"},
+                "regularSessionState": {},
+            },
+        ]
+        current = daily_report.technical_events(rows, "currentState")
+        regular = daily_report.technical_events(rows, "regularSessionState")
+        self.assertEqual(len(current["breakout20Confirmed"]), 2)
+        self.assertEqual(len(regular["breakout20Confirmed"]), 0)
+        self.assertEqual([row["itemCode"] for row in regular["breakout20Failed"]], ["000001"])
+
+    def test_regular_breadth_is_independent_of_current_state(self):
+        row = {
+            "marketObserved": True, "market": {"changeRate": 3.0},
+            "currentState": {"priceVsMA20": "above", "breakout20": "confirmed"},
+            "regularSessionState": {"priceVsMA20": "below", "breakout20": "failed"},
+        }
+        before = daily_report.market_breadth([row], "regularSessionState", False)
+        row["currentState"] = {"priceVsMA20": "below", "breakout20": "none"}
+        after = daily_report.market_breadth([row], "regularSessionState", False)
+        self.assertEqual(before, after)
+        self.assertEqual(after["breakout20FailedCount"], 1)
+        self.assertEqual(after["directionObservedCount"], 0)
+
+    def test_build_report_preserves_flat_current_and_regular_views(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            files = {
+                "universe.json": {"stocks": [{"itemCode": "000001", "stockName": "A", "enabled": True}],
+                                  "sectors": {}, "themes": {}, "watchlists": {}},
+                "quotes.json": {"status": "ok", "fresh": True, "datas": [{
+                    "itemCode": "000001", "closePrice": 103, "fluctuationsRatio": 3,
+                }]},
+                "technicals.json": {"datas": [{"itemCode": "000001", "ma20": 100}]},
+                "states.json": {"datas": [{
+                    "itemCode": "000001", "priceVsMA20": "above", "breakout20": "confirmed",
+                    "current": {"status": "ok", "price": 103, "priceVsMA20": "above",
+                                "breakout20": "confirmed"},
+                    "regularSession": {"status": "CONFIRMED", "price": 99,
+                                       "priceVsMA20": "below", "breakout20": "failed"},
+                }]},
+                "research.json": {"stocks": []},
+            }
+            for name, payload in files.items():
+                (root / name).write_text(json.dumps(payload), encoding="utf-8")
+            with patch.multiple(
+                    daily_report,
+                    UNIVERSE_PATH=root / "universe.json", QUOTES_PATH=root / "quotes.json",
+                    TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
+                    RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
+                    MONITORING_PATH=root / "missing-monitoring"):
+                report = daily_report.build_report("2026-10-06")
+            stock = report["stocks"][0]
+            self.assertEqual(stock["state"]["breakout20"], "confirmed")
+            self.assertEqual(stock["currentState"]["breakout20"], "confirmed")
+            self.assertEqual(stock["regularSessionState"]["breakout20"], "failed")
+            self.assertEqual(len(report["technicalEventsCurrent"]["breakout20Confirmed"]), 1)
+            self.assertEqual(len(report["technicalEventsRegularSession"]["breakout20Failed"]), 1)
 
     def test_research_summary_requires_ranking_eligible_for_active_stocks(self):
         rows = [

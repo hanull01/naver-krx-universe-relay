@@ -910,6 +910,48 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(payload['datas'], [])
         self.assertTrue(payload['errors'])
 
+    def test_group_state_keeps_flat_current_and_separate_regular_metrics(self):
+        states = {
+            '000001': {
+                'priceVsMA20': 'above', 'priceVsMA60': 'above',
+                'breakout20': 'confirmed', 'breakout60': 'none',
+                'regularSession': {'status': 'CONFIRMED', 'priceVsMA20': 'below',
+                                   'priceVsMA60': 'above', 'breakout20': 'failed',
+                                   'breakout60': 'failed'},
+            },
+            '000002': {
+                'priceVsMA20': 'above', 'priceVsMA60': 'below',
+                'breakout20': 'attempt', 'breakout60': 'none',
+                'regularSession': {'status': 'UNAVAILABLE'},
+            },
+        }
+        config = {'groupBroadRatio': 0.6, 'groupModerateRatio': 0.4}
+        result = relay.calculate_group_state(
+            'theme', 'A', ['000001', '000002'], ['000001'], {'000001', '000002'},
+            {'000001': {'fluctuationsRatio': 1}, '000002': {'fluctuationsRatio': -1}},
+            {}, states, config,
+        )
+        self.assertEqual(result['aboveMA20Count'], 2)
+        self.assertEqual(result['current']['aboveMA20Count'], 2)
+        self.assertEqual(result['regularSession']['status'], 'PARTIAL')
+        self.assertEqual(result['regularSession']['confirmedCount'], 1)
+        self.assertEqual(result['regularSession']['aboveMA20Count'], 0)
+        self.assertEqual(result['regularSession']['breakout20FailedCount'], 1)
+
+    def test_group_regular_metrics_do_not_change_with_current_price_state(self):
+        regular = {'status': 'CONFIRMED', 'priceVsMA20': 'below',
+                   'priceVsMA60': 'below', 'breakout20': 'failed', 'breakout60': 'failed'}
+        config = {'groupBroadRatio': 0.6, 'groupModerateRatio': 0.4}
+        def calculate(current):
+            return relay.calculate_group_state(
+                'theme', 'A', ['000001'], ['000001'], {'000001'},
+                {'000001': {'fluctuationsRatio': 1}}, {},
+                {'000001': {**current, 'regularSession': regular}}, config,
+            )['regularSession']
+        before = calculate({'priceVsMA20': 'above', 'breakout20': 'confirmed'})
+        after = calculate({'priceVsMA20': 'below', 'breakout20': 'none'})
+        self.assertEqual(before, after)
+
 
 class UniverseCliTests(unittest.TestCase):
     def setUp(self):

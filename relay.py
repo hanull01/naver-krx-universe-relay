@@ -1078,22 +1078,103 @@ def classify_diffusion(m, config):
     return 'mixed'
 
 
+def group_state_view(state_rows, leader_state_rows, denominator, status=None):
+    """Summarize one explicit state view without borrowing another view."""
+    ratio = lambda count: round(count / denominator, 2) if denominator else None
+    result = {
+        'aboveMA20Count': sum(s.get('priceVsMA20') == 'above' for s in state_rows),
+        'aboveMA60Count': sum(s.get('priceVsMA60') == 'above' for s in state_rows),
+        'ma20AboveMa60Count': sum(s.get('maAlignment') == 'ma20_above_ma60'
+                                     for s in state_rows),
+        'breakout20AttemptCount': sum(s.get('breakout20') == 'attempt' for s in state_rows),
+        'breakout20ConfirmedCount': sum(s.get('breakout20') == 'confirmed' for s in state_rows),
+        'breakout20FailedCount': sum(s.get('breakout20') == 'failed' for s in state_rows),
+        'breakout60AttemptCount': sum(s.get('breakout60') == 'attempt' for s in state_rows),
+        'breakout60ConfirmedCount': sum(s.get('breakout60') == 'confirmed' for s in state_rows),
+        'breakout60FailedCount': sum(s.get('breakout60') == 'failed' for s in state_rows),
+        'volumeElevatedCount': sum(s.get('volumeState') == 'elevated' for s in state_rows),
+        'volumeSurgeCount': sum(s.get('volumeState') == 'surge' for s in state_rows),
+        'leaderAboveMA20Count': sum(s.get('priceVsMA20') == 'above'
+                                           for s in leader_state_rows),
+        'leaderBreakoutCount': sum(s.get('breakout20') in ('attempt', 'confirmed')
+                                          for s in leader_state_rows),
+    }
+    for key in ('aboveMA20Count', 'aboveMA60Count', 'ma20AboveMa60Count'):
+        result[key + 'Ratio'] = ratio(result[key])
+    if status is not None:
+        result['status'] = status
+    return result
+
+
 def calculate_group_state(kind, name, members, leaders, enabled, quotes, technicals, states, config):
-    codes = [c for c in members if c in enabled]; rows = [(c, quotes.get(c), technicals.get(c), states.get(c)) for c in codes]
-    changes = [q.get('fluctuationsRatio') for _, q, _, _ in rows if q and q.get('fluctuationsRatio') is not None]
-    up = sum(1 for x in changes if x > 0); down = sum(1 for x in changes if x < 0); flat = sum(1 for x in changes if x == 0); n=len(codes)
-    state_rows = [s for _,_,_,s in rows if s]; leader_rows=[r for r in rows if r[0] in leaders]
-    ratio=lambda x: round(x/n,2) if n else None
-    m={'groupType':kind,'groupName':name,'members':len(members),'enabledMembers':n,'upCount':up,'downCount':down,'flatCount':flat,'upRatio':ratio(up),'downRatio':ratio(down),'aboveMA20Count':sum(s.get('priceVsMA20')=='above' for s in state_rows),'aboveMA60Count':sum(s.get('priceVsMA60')=='above' for s in state_rows),'ma20AboveMa60Count':sum(s.get('maAlignment')=='ma20_above_ma60' for s in state_rows),'breakout20AttemptCount':sum(s.get('breakout20')=='attempt' for s in state_rows),'breakout20ConfirmedCount':sum(s.get('breakout20')=='confirmed' for s in state_rows),'breakout20FailedCount':sum(s.get('breakout20')=='failed' for s in state_rows),'volumeElevatedCount':sum(s.get('volumeState')=='elevated' for s in state_rows),'volumeSurgeCount':sum(s.get('volumeState')=='surge' for s in state_rows),'unknownCount':n-len(state_rows),'leaderCount':len(leader_rows),'leaderUpCount':sum(q and q.get('fluctuationsRatio',0)>0 for _,q,_,_ in leader_rows),'leaderAboveMA20Count':sum(s and s.get('priceVsMA20')=='above' for _,_,_,s in leader_rows),'leaderBreakoutCount':sum(s and s.get('breakout20') in ('attempt','confirmed') for _,_,_,s in leader_rows),'averageChangePct':round(sum(changes)/len(changes),2) if changes else None,'medianChangePct':round(statistics.median(changes),2) if changes else None,'maxChangePct':max(changes) if changes else None,'minChangePct':min(changes) if changes else None}
-    for key in ('aboveMA20Count','aboveMA60Count','ma20AboveMa60Count'): m[key+'Ratio']=ratio(m[key])
-    m['changeSpreadPct']=round(m['maxChangePct']-m['minChangePct'],2) if changes else None; m['diffusionState']=classify_diffusion(m,config); m['evidence']={'upRatio':m['upRatio'],'aboveMA20Ratio':m['aboveMA20CountRatio'],'breakout20Count':m['breakout20AttemptCount']+m['breakout20ConfirmedCount'],'volumeSurgeCount':m['volumeSurgeCount'],'leaderUpCount':m['leaderUpCount']}; m['status']='ok' if n else 'partial'; return m
+    codes = [code for code in members if code in enabled]
+    rows = [(code, quotes.get(code), technicals.get(code), states.get(code)) for code in codes]
+    changes = [quote.get('fluctuationsRatio') for _, quote, _, _ in rows
+               if quote and quote.get('fluctuationsRatio') is not None]
+    n = len(codes)
+    ratio = lambda count: round(count / n, 2) if n else None
+    state_rows = [state for _, _, _, state in rows if state]
+    leader_rows = [row for row in rows if row[0] in leaders]
+    current_view = group_state_view(
+        state_rows,
+        [state for _, _, _, state in leader_rows if state],
+        n,
+    )
+    regular_pairs = [
+        (code, state['regularSession']) for code, _, _, state in rows
+        if isinstance(state, dict)
+        and isinstance(state.get('regularSession'), dict)
+        and state['regularSession'].get('status') == 'CONFIRMED'
+    ]
+    regular_rows = [state for _, state in regular_pairs]
+    regular_leaders = [state for code, state in regular_pairs if code in leaders]
+    confirmed = len(regular_rows)
+    regular_status = ('AVAILABLE' if confirmed == n and n else
+                      'PARTIAL' if confirmed else 'UNAVAILABLE')
+    regular_view = group_state_view(
+        regular_rows, regular_leaders, confirmed, regular_status
+    )
+    regular_view['confirmedCount'] = confirmed
+
+    result = {
+        'groupType': kind, 'groupName': name, 'members': len(members),
+        'enabledMembers': n,
+        'upCount': sum(change > 0 for change in changes),
+        'downCount': sum(change < 0 for change in changes),
+        'flatCount': sum(change == 0 for change in changes),
+        'unknownCount': n - len(state_rows), 'leaderCount': len(leader_rows),
+        'leaderUpCount': sum(quote and quote.get('fluctuationsRatio', 0) > 0
+                             for _, quote, _, _ in leader_rows),
+        'averageChangePct': round(sum(changes) / len(changes), 2) if changes else None,
+        'medianChangePct': round(statistics.median(changes), 2) if changes else None,
+        'maxChangePct': max(changes) if changes else None,
+        'minChangePct': min(changes) if changes else None,
+        **current_view,
+        'current': current_view,
+        'regularSession': regular_view,
+    }
+    result['upRatio'] = ratio(result['upCount'])
+    result['downRatio'] = ratio(result['downCount'])
+    result['changeSpreadPct'] = (round(result['maxChangePct'] - result['minChangePct'], 2)
+                                 if changes else None)
+    result['diffusionState'] = classify_diffusion(result, config)
+    result['evidence'] = {
+        'upRatio': result['upRatio'],
+        'aboveMA20Ratio': result['aboveMA20CountRatio'],
+        'breakout20Count': (result['breakout20AttemptCount']
+                            + result['breakout20ConfirmedCount']),
+        'volumeSurgeCount': result['volumeSurgeCount'],
+        'leaderUpCount': result['leaderUpCount'],
+    }
+    result['status'] = 'ok' if n else 'partial'
+    return result
 
 
 def build_group_states(quote_payload, technical_payload, state_payload):
     universe,codes,_,_=universe_state(); config=load_analysis_config(); enabled=set(codes); q={x['itemCode']:x for x in quote_payload['datas']}; t={x['itemCode']:x for x in technical_payload['datas']}; s={x['itemCode']:x for x in state_payload['datas']}; groups=[]
     for plural,kind in (('sectors','sector'),('themes','theme'),('watchlists','watchlist')):
         for name,members in universe[plural].items(): groups.append(calculate_group_state(kind,name,members,universe.get('leaders',{}).get(kind,{}).get(name,[]),enabled,q,t,s,config))
-    payload={'generatedAt':now().isoformat(),'groupCount':len(groups),'status':'ok','groups':groups}; save('data/group-states.json',payload); fields=('groupType','groupName','enabledMembers','upRatio','aboveMA20CountRatio','aboveMA60CountRatio','breakout20AttemptCount','breakout20ConfirmedCount','volumeSurgeCount','leaderUpCount','averageChangePct','diffusionState','status'); save('data/group-states-lite.json',{**{k:payload[k] for k in ('generatedAt','groupCount','status')},'groups':[{k:g[k] for k in fields} for g in groups]},compact=True); return payload
+    payload={'generatedAt':now().isoformat(),'groupCount':len(groups),'status':'ok','groups':groups}; save('data/group-states.json',payload); fields=('groupType','groupName','enabledMembers','upRatio','aboveMA20CountRatio','aboveMA60CountRatio','breakout20AttemptCount','breakout20ConfirmedCount','volumeSurgeCount','leaderUpCount','averageChangePct','diffusionState','status','current','regularSession'); save('data/group-states-lite.json',{**{k:payload[k] for k in ('generatedAt','groupCount','status')},'groups':[{k:g[k] for k in fields} for g in groups]},compact=True); return payload
 
 
 def timed_step(name, fn, *args):

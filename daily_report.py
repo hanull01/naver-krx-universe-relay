@@ -70,6 +70,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
 
     total = breadth["TOTAL"]
     leaders = payloads["latest-leaders.json"]
+    summary = payloads["latest-summary.json"]
     return {
         "status": "AVAILABLE",
         "asOfDate": baseline_date,
@@ -96,6 +97,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates", []),
         "industries": payloads["latest-industries.json"].get("industries", []),
         "changes": payloads["latest-changes.json"],
+        "monitoredUniverse": summary.get("monitoredUniverse", {}),
     }
 
 
@@ -195,6 +197,11 @@ def quote_summary(row):
             "tradingValue": None,
             "sourceTime": None,
             "fresh": None,
+            "referencePrice": None,
+            "referenceSourceTime": None,
+            "referenceStatus": None,
+            "sessionChange": None,
+            "sessionChangeRate": None,
         }
 
     return {
@@ -221,6 +228,11 @@ def quote_summary(row):
         ),
         "sourceTime": row.get("sourceTime") or row.get("localTradedAt"),
         "fresh": row.get("fresh"),
+        "referencePrice": first_number(row, ["referencePrice"]),
+        "referenceSourceTime": row.get("referenceSourceTime"),
+        "referenceStatus": row.get("referenceStatus"),
+        "sessionChange": first_number(row, ["sessionChange"]),
+        "sessionChangeRate": first_number(row, ["sessionChangeRate"]),
     }
 
 
@@ -296,23 +308,28 @@ def event_stock(row):
     }
 
 
-def market_breadth(rows):
+def market_breadth(rows, state_key="state", include_directions=True):
     """Summarize only observed market/state values; absent values stay absent."""
     observed = [row for row in rows if row.get("marketObserved")]
-    directions = [row["market"]["changeRate"] for row in observed]
+    directions = ([row["market"]["changeRate"] for row in observed]
+                  if include_directions else [])
     directions = [value for value in directions if value is not None]
+
+    def state(row):
+        value = row.get(state_key)
+        return value if isinstance(value, dict) else {}
 
     ma20_observed = [
         row for row in observed
-        if row["state"].get("priceVsMA20") is not None
+        if state(row).get("priceVsMA20") is not None
     ]
     ma60_observed = [
         row for row in observed
-        if row["state"].get("priceVsMA60") is not None
+        if state(row).get("priceVsMA60") is not None
     ]
 
     def state_count(key, value):
-        return sum(row["state"].get(key) == value for row in observed)
+        return sum(state(row).get(key) == value for row in observed)
 
     up_count = sum(value > 0 for value in directions)
     down_count = sum(value < 0 for value in directions)
@@ -349,11 +366,11 @@ def market_breadth(rows):
         "volumeSurgeCount": state_count("volumeState", "surge"),
         "volumeElevatedCount": state_count("volumeState", "elevated"),
         "pullbackCount": sum(
-            str(row["state"].get("pullbackState", "")).startswith("pullback")
+            str(state(row).get("pullbackState", "")).startswith("pullback")
             for row in observed
         ),
         "nearBreakoutCount": sum(
-            str(row["state"].get("pullbackState", "")).startswith("near_breakout")
+            str(state(row).get("pullbackState", "")).startswith("near_breakout")
             for row in observed
         ),
     }
@@ -371,6 +388,7 @@ def normalized_group_summary(payload):
         "breakout20AttemptCount", "breakout20ConfirmedCount",
         "breakout20FailedCount", "volumeSurgeCount", "volumeElevatedCount",
         "leaderUpCount", "averageChangePct", "diffusionState", "status",
+        "current", "regularSession",
     ]
     return [
         {field: group.get(field) for field in fields}
@@ -379,7 +397,7 @@ def normalized_group_summary(payload):
     ]
 
 
-def technical_events(rows):
+def technical_events(rows, state_key="state"):
     """Classify existing state values only; this is not a ranking or score."""
     predicates = {
         "breakout20Confirmed": lambda s: s.get("breakout20") == "confirmed",
@@ -398,7 +416,8 @@ def technical_events(rows):
         "ma60Below": lambda s: s.get("priceVsMA60") == "below",
     }
     return {
-        name: [event_stock(row) for row in rows if predicate(row["state"])]
+        name: [event_stock(row) for row in rows
+               if predicate(row.get(state_key) if isinstance(row.get(state_key), dict) else {})]
         for name, predicate in predicates.items()
     }
 
@@ -496,6 +515,15 @@ def build_report(as_of=None):
     member_idx = memberships(universe)
 
     rows = []
+    state_fields = [
+        "status", "source", "sourceDate", "sourceTime", "price", "close",
+        "priceVsMA20", "priceVsMA60", "maAlignment", "distanceMA20Pct",
+        "distanceMA60Pct", "priorHigh20", "priorHigh60",
+        "distancePriorHigh20Pct", "distancePriorHigh60Pct", "breakout20",
+        "breakout60", "volumeRatio20", "volumeState", "pullbackState",
+        "referencePrice", "referenceSourceTime", "referencePriceBasis",
+        "referenceStatus", "sessionChange", "sessionChangeRate",
+    ]
 
     for item in enabled:
         code = item["itemCode"]
@@ -504,6 +532,11 @@ def build_report(as_of=None):
         t = tech_idx.get(code, {})
         s = state_idx.get(code, {})
         r = research_idx.get(code, {})
+        current_state = s.get("current") if isinstance(s.get("current"), dict) else s
+        regular_state = (s.get("regularSession")
+                         if isinstance(s.get("regularSession"), dict)
+                         and s["regularSession"].get("status") == "CONFIRMED"
+                         else {})
 
         rows.append(
             {
@@ -544,6 +577,8 @@ def build_report(as_of=None):
                         "pullbackState",
                     ],
                 ),
+                "currentState": compact_dict(current_state, state_fields),
+                "regularSessionState": compact_dict(regular_state, state_fields),
                 "research": {
                     "status": r.get("status"),
                     "rankingEligible": r.get("rankingEligible", False),
@@ -596,8 +631,21 @@ def build_report(as_of=None):
         quotes.get("fresh"),
     )
     breadth = market_breadth(rows)
+    current_breadth = market_breadth(rows, "currentState")
+    regular_breadth = market_breadth(
+        rows, "regularSessionState", include_directions=False
+    )
+    regular_confirmed = sum(bool(row["regularSessionState"]) for row in rows)
+    regular_breadth.update({
+        "status": "AVAILABLE" if regular_confirmed == len(enabled)
+        else "PARTIAL" if regular_confirmed else "UNAVAILABLE",
+        "confirmedCount": regular_confirmed,
+    })
     groups = normalized_group_summary(group_states)
     research_overview = research_summary(rows, research)
+    monitored_evidence = full_market.get("monitoredUniverse", {})
+    monitored_current = monitored_evidence.get("current", current_breadth)
+    monitored_regular = monitored_evidence.get("regularSession", regular_breadth)
 
     return {
         "status": "OK" if coverage_state == "OK" else "DEGRADED",
@@ -662,10 +710,16 @@ def build_report(as_of=None):
         "monitoredUniverse": {
             "breadth": breadth,
             "scope": "MONITORED_UNIVERSE",
+            "current": monitored_current,
+            "regularSession": monitored_regular,
         },
         "fullMarket": full_market,
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
+        "technicalEventsCurrent": technical_events(rows, "currentState"),
+        "technicalEventsRegularSession": technical_events(
+            rows, "regularSessionState"
+        ),
         "researchSummary": research_overview,
         "marketResearchCross": market_research_cross(rows),
         "stocks": rows,
@@ -767,7 +821,7 @@ def write_markdown(report, path):
             f"확산 {group['diffusionState']}, 상태 {group['status']}"
         )
 
-    lines.extend(["", "## 3. 기술 이벤트", ""])
+    lines.extend(["", "## 3. 정규장 확정 기술 이벤트", ""])
     for label, key in (
         ("20일 돌파 확인", "breakout20Confirmed"),
         ("20일 돌파 시도", "breakout20Attempt"),
@@ -780,7 +834,7 @@ def write_markdown(report, path):
         ("근접 돌파", "nearBreakout"),
         ("눌림목", "pullback"),
     ):
-        stocks = report["technicalEvents"][key]
+        stocks = report["technicalEventsRegularSession"][key]
         names = ", ".join(
             f"{stock['itemName']}({stock['itemCode']})" for stock in stocks[:10]
         )
