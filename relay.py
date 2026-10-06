@@ -503,6 +503,63 @@ def attach_after_references(rows, current):
                        sessionChange=None, sessionChangeRate=None)
 
 
+def quote_date(quote):
+    """Return the quote's KST calendar date in compact form."""
+    if not quote or not quote.get('sourceTime'):
+        return None
+    try:
+        value = datetime.fromisoformat(str(quote['sourceTime']))
+    except ValueError:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=KST)
+    return value.astimezone(KST).date().strftime('%Y%m%d')
+
+
+def confirmed_regular_bar(daily, quote):
+    """Return only a completed, same-day regular reference bar."""
+    target = quote_date(quote)
+    if not target or not daily:
+        return None
+    for bar in reversed(daily.get('datas', [])):
+        bar_date = ''.join(ch for ch in str(bar.get('date') or '') if ch.isdigit())
+        if (bar_date == target and bar.get('complete') is True
+                and not bar.get('noTrading')):
+            return bar
+    return None
+
+
+def regular_reference(regular_bar, current_price):
+    """Describe current AFTER/CLOSED movement from the verified regular close."""
+    unavailable = {'referencePrice': None, 'referenceSourceTime': None,
+                   'referencePriceBasis': 'TODAY_REGULAR_CLOSE',
+                   'referenceStatus': 'unavailable', 'sessionChange': None,
+                   'sessionChangeRate': None}
+    if not regular_bar or regular_bar.get('close') is None:
+        return unavailable
+    try:
+        reference = number(regular_bar.get('close'), 'referencePrice')
+    except ValueError:
+        return unavailable
+    source_date = ''.join(ch for ch in str(regular_bar.get('date') or '') if ch.isdigit())
+    if len(source_date) != 8:
+        return unavailable
+    current = (current_price if isinstance(current_price, (int, float))
+               and not isinstance(current_price, bool) else None)
+    change = current - reference if current is not None else None
+    rate = round(change / reference * 100, 6) if change is not None and reference else None
+    return {'referencePrice': reference, 'referenceSourceTime': source_date + '153000',
+            'referencePriceBasis': 'TODAY_REGULAR_CLOSE', 'referenceStatus': 'ok',
+            'sessionChange': change, 'sessionChangeRate': rate}
+
+
+def quote_regular_reference(code, quote):
+    """Load and attach the durable same-day regular close for a quote."""
+    regular_bar = confirmed_regular_bar(load_daily_for_technical(code), quote)
+    current_price = quote.get('closePrice') if quote else None
+    return regular_reference(regular_bar, current_price)
+
+
 def collect_quotes():
     universe, codes, legacy_codes, sectors = universe_state()
     current = now()
@@ -523,6 +580,8 @@ def collect_quotes():
                     normalized = normalize_quote(row, now())
                     if sectors.get(code):
                         normalized['sector'] = sectors[code]
+                    if normalized.get('session') in ('AFTER', 'CLOSED'):
+                        normalized.update(quote_regular_reference(code, normalized))
                     rows[code] = normalized
                 except Exception as exc:
                     errors.append({'stage': stage, 'code': code, 'error': str(exc)})
@@ -542,8 +601,6 @@ def collect_quotes():
     missing = [c for c in codes if c not in rows]
     for code in missing:
         errors.append({'code': code, 'error': 'no_valid_quote'})
-    if detect_market_session(current) == 'AFTER':
-        attach_after_references(rows, current)
     payload = quote_payload(rows, codes, len(codes), errors, current)
     # Legacy 33-stock compatibility output; data/quotes*.json is the Universe-wide source.
     legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)

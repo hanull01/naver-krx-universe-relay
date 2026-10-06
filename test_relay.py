@@ -633,6 +633,66 @@ class RelayTests(unittest.TestCase):
         self.assertIsNone(row['referencePrice'])
         self.assertEqual(row['referenceStatus'], 'unavailable')
 
+    def test_quote_regular_reference_accepts_hyphenated_same_day_bar(self):
+        quote = {'closePrice': 273000, 'session': 'CLOSED',
+                 'sourceTime': '2026-10-06T20:00:00+09:00'}
+        daily = {'datas': [{'date': '2026-10-06', 'close': 272000,
+                            'complete': True, 'noTrading': False}]}
+        with patch.object(relay, 'load_daily_for_technical', return_value=daily):
+            reference = relay.quote_regular_reference('005930', quote)
+        self.assertEqual(reference['referencePrice'], 272000)
+        self.assertEqual(reference['referenceSourceTime'], '20261006153000')
+        self.assertEqual(reference['sessionChange'], 1000)
+        self.assertEqual(reference['sessionChangeRate'], round(1000 / 272000 * 100, 6))
+
+    def test_quote_regular_reference_does_not_promote_previous_day(self):
+        quote = {'closePrice': 273000, 'session': 'CLOSED',
+                 'sourceTime': '2026-10-06T20:00:00+09:00'}
+        daily = {'datas': [{'date': '2026-10-02', 'close': 272000,
+                            'complete': True, 'noTrading': False}]}
+        with patch.object(relay, 'load_daily_for_technical', return_value=daily):
+            reference = relay.quote_regular_reference('005930', quote)
+        self.assertEqual(reference['referenceStatus'], 'unavailable')
+        self.assertIsNone(reference['referencePrice'])
+        self.assertIsNone(reference['sessionChange'])
+
+    def test_quote_regular_reference_rejects_incomplete_same_day_bar(self):
+        quote = {'closePrice': 273000, 'session': 'AFTER',
+                 'sourceTime': '2026-10-06T18:00:00+09:00'}
+        daily = {'datas': [{'date': '20261006', 'close': 272000,
+                            'complete': False, 'noTrading': False}]}
+        with patch.object(relay, 'load_daily_for_technical', return_value=daily):
+            reference = relay.quote_regular_reference('005930', quote)
+        self.assertEqual(reference['referenceStatus'], 'unavailable')
+
+    def test_lite_payload_preserves_closed_regular_reference(self):
+        row = {key: None for key in relay.LITE_FIELDS}
+        row.update(itemCode='005930', closePrice=273000, session='CLOSED',
+                   referencePrice=272000, referenceSourceTime='20261006153000',
+                   referencePriceBasis='TODAY_REGULAR_CLOSE', referenceStatus='ok',
+                   sessionChange=1000, sessionChangeRate=round(1000 / 272000 * 100, 6))
+        payload = {'generatedAt': 'now', 'sourceTime': 'now', 'sourceTimeLatest': 'now',
+                   'expectedCount': 1, 'count': 1, 'coverageCount': 1, 'freshCount': 1,
+                   'liveCount': 0, 'noAfterTradeCount': 0, 'missingCodes': [],
+                   'status': 'ok', 'fresh': True, 'datas': [row]}
+        lite = relay.lite_payload(payload)['datas'][0]
+        self.assertEqual(lite['closePrice'], 273000)
+        self.assertEqual(lite['referencePrice'], 272000)
+        self.assertEqual(lite['referenceStatus'], 'ok')
+        self.assertEqual(lite['sessionChange'], 1000)
+
+    def test_after_and_closed_keep_current_price_when_reference_is_attached(self):
+        daily = {'datas': [{'date': '2026-10-06', 'close': 272000,
+                            'complete': True, 'noTrading': False}]}
+        for session, current_price, source_time in (
+                ('AFTER', 273000, '2026-10-06T18:00:00+09:00'),
+                ('CLOSED', 274000, '2026-10-06T20:00:00+09:00')):
+            quote = {'closePrice': current_price, 'session': session, 'sourceTime': source_time}
+            with patch.object(relay, 'load_daily_for_technical', return_value=daily):
+                quote.update(relay.quote_regular_reference('005930', quote))
+            self.assertEqual(quote['closePrice'], current_price)
+            self.assertEqual(quote['referencePrice'], 272000)
+
     def test_after_no_trade_is_covered_and_does_not_make_ready_payload_stale(self):
         rows = {'000001': {'fresh': False, 'sourceTime': '2026-09-29T15:30:00+09:00',
                            'sessionStatus': 'NO_AFTER_TRADE'}}
