@@ -5,6 +5,7 @@ import math
 import re
 import time
 import statistics
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, time as dtime
 from pathlib import Path
@@ -144,7 +145,9 @@ def previous_krx_business_day(day, holiday_loader=krx_holidays):
     for _ in range(370):
         if candidate.weekday() < 5:
             holidays = holiday_cache.setdefault(candidate.year, holiday_loader(candidate.year))
+            print(f'CALENDAR_CHECK date={candidate.isoformat()} result={"HOLIDAY" if candidate.isoformat() in holidays else "OPEN"} source=krx_holidays')
             if candidate.isoformat() not in holidays:
+                print(f'PREVIOUS_BUSINESS_DAY selected={candidate.isoformat()}')
                 return candidate
         candidate -= timedelta(days=1)
     raise CalendarUnavailable('could not determine previous KRX business day')
@@ -327,14 +330,72 @@ def quote_error_diagnostic(payload, current):
 
 def load_previous_business_day_close(code, business_day):
     """Load only the requested completed daily close; no stale-date fallback."""
+    path = ROOT / f'data/daily/{code}.json'
     daily = load_daily_for_technical(code)
+    rows = (daily or {}).get('datas', [])
+    matches = [bar for bar in rows if bar.get('date') == business_day.isoformat()]
     for bar in (daily or {}).get('datas', []):
         if (bar.get('date') == business_day.isoformat() and bar.get('complete') is True):
             close = bar.get('close')
             if isinstance(close, (int, float)) and not isinstance(close, bool) and close > 0:
                 return close
+            print(f'DAILY_CLOSE_LOOKUP code={code} date={business_day.isoformat()} path={path} exists={path.exists()} rowFound=true complete={bar.get("complete")} numericClose={isinstance(close, (int, float)) and not isinstance(close, bool)}')
             raise ValueError(f'invalid completed daily close for {business_day.isoformat()}')
+    print(f'DAILY_CLOSE_LOOKUP code={code} date={business_day.isoformat()} path={path} exists={path.exists()} rowFound={bool(matches)} complete={matches[0].get("complete") if matches else None} numericClose={isinstance(matches[0].get("close"), (int, float)) and not isinstance(matches[0].get("close"), bool) if matches else False}')
     raise ValueError(f'missing completed daily close for {business_day.isoformat()}')
+
+
+def log_daily_close_runtime(codes, business_day):
+    """Log bounded, non-sensitive visibility into the preclose input files."""
+    counts = {'fileExists': 0, 'rowFound': 0, 'complete': 0, 'numericClose': 0,
+              'missingFile': 0, 'missingRow': 0, 'incomplete': 0, 'malformed': 0}
+    for code in codes:
+        path = ROOT / f'data/daily/{code}.json'
+        if not path.exists():
+            counts['missingFile'] += 1
+            continue
+        counts['fileExists'] += 1
+        try:
+            payload = json.loads(path.read_text(encoding='utf-8'))
+            rows = payload.get('datas', [])
+            matches = [row for row in rows if row.get('date') == business_day.isoformat()]
+            if not matches:
+                counts['missingRow'] += 1
+                continue
+            counts['rowFound'] += 1
+            row = matches[0]
+            if row.get('complete') is True:
+                counts['complete'] += 1
+            else:
+                counts['incomplete'] += 1
+            if isinstance(row.get('close'), (int, float)) and not isinstance(row.get('close'), bool):
+                counts['numericClose'] += 1
+        except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+            counts['malformed'] += 1
+    print('DAILY_CLOSE_COVERAGE ' + ' '.join([f'date={business_day.isoformat()}', f'required={len(codes)}'] +
+          [f'{key}={value}' for key, value in counts.items()]))
+    for code in ('005930', '000660', '042700'):
+        path = ROOT / f'data/daily/{code}.json'
+        exists = path.exists()
+        row = None
+        digest = None
+        size = None
+        mtime = None
+        if exists:
+            try:
+                raw = path.read_bytes()
+                digest = hashlib.sha256(raw).hexdigest()[:16]
+                stat = path.stat()
+                size, mtime = stat.st_size, int(stat.st_mtime)
+                payload = json.loads(raw)
+                row = next((item for item in payload.get('datas', [])
+                            if item.get('date') == business_day.isoformat()), None)
+            except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+                pass
+        print(f'DAILY_CLOSE_SAMPLE code={code} path={path} exists={str(exists).lower()} size={size} mtime={mtime} '
+              f'sha256={digest} targetDate={business_day.isoformat()} rowFound={str(row is not None).lower()} '
+              f'complete={row.get("complete") if row else None} '
+              f'numericClose={str(isinstance(row.get("close"), (int, float)) and not isinstance(row.get("close"), bool) if row else False).lower()}')
 
 
 def build_preclose_quote(code, stock_name, business_day, close, current, sector=None):
@@ -365,6 +426,9 @@ def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
     except Exception as exc:
         errors.append({'stage': 'previous_krx_business_day', 'error': str(exc)})
         business_day = None
+    print(f'RUNTIME_CONTEXT nowKst={current.isoformat()} cwd={Path.cwd()} root={ROOT} dailyDir={ROOT / "data/daily"} dailyDirExists={(ROOT / "data/daily").is_dir()}')
+    if business_day:
+        log_daily_close_runtime(codes, business_day)
     names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
     if business_day:
         for code in codes:
