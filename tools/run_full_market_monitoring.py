@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import krx_market_day
+import relay
 
 sys.path.insert(0, str(Path(__file__).parent))
 import full_market_monitoring_evidence as evidence
@@ -99,7 +100,8 @@ def cross_check_universe_snapshot(universe_subset, relay_quotes_file=RELAY_QUOTE
 
 
 def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_FILE,
-                               relay_states_file=RELAY_STATES_FILE):
+                               relay_states_file=RELAY_STATES_FILE,
+                               regular_daily_dir=None):
     """Create an explicitly scoped 42-stock view from relay-owned artifacts.
 
     It is intentionally independent from full-market breadth.  `current` is
@@ -113,24 +115,75 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
     state_by_code = {str(row.get("itemCode")): row for row in states.get("datas", []) if row.get("itemCode")}
     codes = [str(row.get("code")) for row in universe_subset]
     rows = [(code, quote_by_code.get(code), state_by_code.get(code)) for code in codes]
+    regular_daily_dir = Path(regular_daily_dir or Path(relay_states_file).parent / "daily-regular")
+    regular_by_code = {}
+    for code, quote, state in rows:
+        if not quote or not state:
+            continue
+        try:
+            target = datetime.fromisoformat(str(quote.get("sourceTime"))).astimezone(KST)
+        except (ValueError, TypeError):
+            continue
+        if target.time() < time(15, 30):
+            continue
+        daily = load_json(regular_daily_dir / f"{code}.json")
+        if not isinstance(daily, dict) or not isinstance(daily.get("datas"), list):
+            continue
+        daily = dict(daily, regularSessionDate=target.date().isoformat())
+        if not relay._valid_same_day_regular_override(daily, target):
+            continue
+        bar = daily["datas"][0] if len(daily["datas"]) == 1 else next(
+            row for row in daily["datas"] if row.get("date") == target.date().isoformat())
+        if bar.get("sourceTime") != target.strftime("%Y%m%d153000"):
+            continue
+        if any(not isinstance(bar.get(key), (int, float)) for key in ("close", "high")):
+            continue
+        # Relay's published thresholds are the source for this view.  Reuse
+        # its comparisons/breakout classifier with the verified regular bar.
+        current_state = state.get("current") or state
+        if state.get("status") != "ok":
+            continue
+        try:
+            state_date = datetime.fromisoformat(str(state.get("sourceTime"))).astimezone(KST).date()
+        except (ValueError, TypeError):
+            continue
+        if state_date != target.date():
+            continue
+        regular_by_code[code] = {
+            "status": "CONFIRMED", "sourceDate": bar["date"],
+            "sourceTime": bar["sourceTime"],
+            "priceVsMA20": relay.compare(bar["close"], current_state.get("ma20")),
+            "priceVsMA60": relay.compare(bar["close"], current_state.get("ma60")),
+            "breakout20": relay.breakout(bar["close"], bar["high"], current_state.get("priorHigh20"), True),
+            # No authoritative regular-session change rate is published here.
+            "fluctuationsRatio": None,
+        }
+
+    def above_ma(state, period):
+        value = state.get(f"aboveMA{period}")
+        if isinstance(value, bool):
+            return value
+        return {"above": True, "below": False, "equal": False}.get(state.get(f"priceVsMA{period}"))
 
     def scoped_metrics(view):
         values = []
-        for _, quote, state in rows:
+        for code, quote, state in rows:
             if not quote or not state:
                 continue
-            selected = (state.get(view) if view else state) or {}
+            selected = ((state.get("current") or state) if view == "current"
+                        else regular_by_code.get(code) or {})
             if view == "regularSession" and selected.get("status") != "CONFIRMED":
                 continue
-            values.append((quote, selected))
+            values.append((quote if view == "current" else selected, selected))
         changes = [quote.get("fluctuationsRatio") for quote, _ in values if isinstance(quote.get("fluctuationsRatio"), (int, float))]
-        above20 = [state.get("aboveMA20") for _, state in values if state.get("aboveMA20") is not None]
-        above60 = [state.get("aboveMA60") for _, state in values if state.get("aboveMA60") is not None]
+        above20 = [above_ma(state, 20) for _, state in values if above_ma(state, 20) is not None]
+        above60 = [above_ma(state, 60) for _, state in values if above_ma(state, 60) is not None]
         breakout20 = [state.get("breakout20") for _, state in values if state.get("breakout20") not in (None, "unknown")]
         return {
             "stockCount": len(codes), "validCount": len(values),
             "advancers": sum(value > 0 for value in changes), "decliners": sum(value < 0 for value in changes),
             "unchanged": sum(value == 0 for value in changes),
+            "changeEligibleCount": len(changes),
             "advancerPct": round(sum(value > 0 for value in changes) / len(changes) * 100, 4) if changes else None,
             "aboveMA20Count": sum(value is True for value in above20), "aboveMA20EligibleCount": len(above20),
             "pctAboveMA20": round(sum(value is True for value in above20) / len(above20) * 100, 4) if above20 else None,
@@ -147,8 +200,7 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
          for code, quote, state in rows if quote and state],
         key=lambda row: row["changeRate"] if isinstance(row["changeRate"], (int, float)) else -float("inf"), reverse=True,
     )[:30]
-    regular_available = [(quote, state.get("regularSession") or {}) for _, quote, state in rows
-                         if quote and state and (state.get("regularSession") or {}).get("status") == "CONFIRMED"]
+    regular_available = list(regular_by_code.values())
     return {
         "scope": "MONITORED_UNIVERSE", "configuredCount": len(codes),
         "relayQuoteGeneratedAt": quotes.get("generatedAt"), "relaySourceTime": quotes.get("sourceTime"),

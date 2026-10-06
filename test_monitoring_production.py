@@ -155,13 +155,52 @@ class MonitoringProductionTests(unittest.TestCase):
                 "current": {"aboveMA20": True, "aboveMA60": True, "breakout20": "attempt"},
                 "regularSession": {"status": "CONFIRMED", "aboveMA20": False,
                                    "aboveMA60": False, "breakout20": "failed"}}]}), encoding="utf-8")
+            # An unverified nested object cannot certify a regular close.
             result = runner.monitored_universe_summary([{"code": "000001"}], quotes, states)
         self.assertEqual(result["scope"], "MONITORED_UNIVERSE")
         self.assertEqual(result["current"]["advancers"], 1)
         self.assertEqual(result["current"]["aboveMA20Count"], 1)
-        self.assertEqual(result["regularSession"]["confirmedCount"], 1)
+        self.assertEqual(result["regularSession"]["confirmedCount"], 0)
         self.assertEqual(result["regularSession"]["aboveMA20Count"], 0)
         self.assertEqual(result["regularSession"]["breakout20Count"], 0)
+
+    def test_flat_current_and_strict_regular_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); regular = root / "daily-regular"; regular.mkdir()
+            quotes = root / "quotes.json"; states = root / "states.json"
+            codes = [f"{i:06d}" for i in range(42)]
+            quotes.write_text(json.dumps({"datas": [{"itemCode": code,
+                "sourceTime": "2026-10-06T17:35:00+09:00", "closePrice": 200,
+                "fluctuationsRatio": 10} for code in codes]}))
+            states.write_text(json.dumps({"datas": [{"itemCode": code,
+                "status": "ok", "sourceTime": "2026-10-06T17:35:00+09:00",
+                "priceVsMA20": "above", "priceVsMA60": "below", "breakout20": "confirmed",
+                "ma20": 100, "ma60": 120, "priorHigh20": 115} for code in codes]}))
+            bar = {"date": "2026-10-06", "complete": True, "session": "REGULAR",
+                   "barType": "REGULAR_SESSION", "source": "NAVER_MINUTE",
+                   "sourceTime": "20261006153000", "close": 110, "high": 116}
+            for code in codes:
+                (regular / f"{code}.json").write_text(json.dumps({"regularDailyStatus": "ok", "datas": [bar]}))
+            subset = [{"code": code} for code in codes]
+            result = runner.monitored_universe_summary(subset, quotes, states)
+            self.assertEqual(result["current"]["aboveMA20EligibleCount"], 42)
+            self.assertEqual(result["current"]["aboveMA20Count"], 42)
+            self.assertEqual(result["current"]["aboveMA60Count"], 0)
+            self.assertEqual(result["current"]["breakout20Count"], 42)
+            self.assertEqual(result["regularSession"]["status"], "AVAILABLE")
+            self.assertEqual(result["regularSession"]["confirmedCount"], 42)
+            self.assertEqual(result["regularSession"]["breakout20Count"], 0)
+            self.assertEqual(result["regularSession"]["changeEligibleCount"], 0)
+            self.assertIsNone(result["regularSession"]["advancerPct"])
+            for change in ({"sourceTime": "bad"}, {"date": "2026-10-05"},
+                           {"complete": False}, {"session": "AFTER"},
+                           {"barType": "RAW"}, {"source": "OTHER"}):
+                with self.subTest(change=change):
+                    (regular / f"{codes[0]}.json").write_text(json.dumps({"regularDailyStatus": "ok", "datas": [dict(bar, **change)]}))
+                    result = runner.monitored_universe_summary(subset, quotes, states)
+                    self.assertEqual(result["regularSession"]["confirmedCount"], 41)
+            (regular / f"{codes[0]}.json").write_text(json.dumps({"regularDailyStatus": "unavailable", "datas": [bar]}))
+            self.assertEqual(runner.monitored_universe_summary(subset, quotes, states)["regularSession"]["confirmedCount"], 41)
 
     def test_hourly_workflow_collects_full_snapshot_once_and_publishes_compact_evidence(self):
         workflow = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
