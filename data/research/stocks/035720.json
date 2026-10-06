@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "035720",
   "itemName": "카카오",
-  "reportCount": 29,
-  "latestReportNid": "96236",
-  "latestWriteDate": "2026-09-21",
+  "reportCount": 30,
+  "latestReportNid": "96463",
+  "latestWriteDate": "2026-10-06",
   "latest": {
-    "nid": "96236",
-    "writeDate": "2026-09-21",
-    "brokerName": "IBK투자증권",
-    "title": "중요한 것은 탁월한 계획보다 완벽한 실행",
-    "goalPrice": 53000,
+    "nid": "96463",
+    "writeDate": "2026-10-06",
+    "brokerName": "한화투자증권",
+    "title": "미래 전략 가시화 필요",
+    "goalPrice": 54000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 7,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 8
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96463",
     "96236",
     "95843",
     "95840",
