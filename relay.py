@@ -918,6 +918,30 @@ def volume_state(ratio, config):
     return 'normal'
 
 
+def verified_regular_session_bar(daily, quote):
+    """Return the strict same-day 15:30 regular bar for a relay quote."""
+    if not daily or not quote or not quote.get('sourceTime'):
+        return None
+    try:
+        target = datetime.fromisoformat(str(quote['sourceTime']))
+    except ValueError:
+        return None
+    if target.tzinfo is None:
+        target = target.replace(tzinfo=KST)
+    target = target.astimezone(KST)
+    if target.time() < dtime(15, 30) or not _valid_same_day_regular_override(daily, target):
+        return None
+    bars = [bar for bar in daily.get('datas', [])
+            if isinstance(bar, dict) and bar.get('date') == target.date().isoformat()]
+    if len(bars) != 1:
+        return None
+    bar = bars[0]
+    if (bar.get('sourceTime') != target.strftime('%Y%m%d153000')
+            or any(not isinstance(bar.get(key), (int, float)) for key in ('close', 'high'))):
+        return None
+    return bar
+
+
 def calculate_state(code, stock_name, technical, daily, quote, config):
     prior20, prior60 = prior_highs(daily)
     price = quote.get('closePrice') if quote else None
@@ -927,7 +951,7 @@ def calculate_state(code, stock_name, technical, daily, quote, config):
     def distance(value): return round((price - value) / value * 100, 2) if price is not None and value else None
     def near(value): return value is not None and price is not None and abs((price-value)/value*100) <= config['nearPct']
     pullback = 'near_breakout20' if near(prior20) else 'near_breakout60' if near(prior60) else 'near_ma20' if near(ma20) else 'none' if price is not None else 'unknown'
-    return {'itemCode': code, 'stockName': stock_name, 'sourceTime': quote.get('sourceTime') if quote else None,
+    current = {'sourceTime': quote.get('sourceTime') if quote else None,
             'price': price, 'ma20': ma20, 'ma60': ma60,
             'priceVsMA20': compare(price, ma20), 'priceVsMA60': compare(price, ma60),
             'maAlignment': 'unknown' if ma20 is None or ma60 is None else 'ma20_above_ma60' if ma20 > ma60 else 'ma20_below_ma60' if ma20 < ma60 else 'equal',
@@ -936,7 +960,26 @@ def calculate_state(code, stock_name, technical, daily, quote, config):
             'distancePriorHigh20Pct': distance(prior20), 'distancePriorHigh60Pct': distance(prior60),
             'breakout20': breakout(price, session_high, prior20, final), 'breakout60': breakout(price, session_high, prior60, final),
             'volumeRatio20': technical.get('volumeRatio20'), 'volumeState': volume_state(technical.get('volumeRatio20'), config),
-            'pullbackState': pullback, 'status': 'ok' if technical.get('status') == 'ok' and quote else 'partial'}
+            'pullbackState': pullback}
+    regular_bar = verified_regular_session_bar(daily, quote)
+    if regular_bar:
+        regular = {
+            'status': 'CONFIRMED', 'source': 'COMPLETED_DAILY_REGULAR_BAR',
+            'sourceDate': regular_bar['date'], 'sourceTime': regular_bar['sourceTime'],
+            'price': regular_bar['close'], 'ma20': ma20, 'ma60': ma60,
+            'priceVsMA20': compare(regular_bar['close'], ma20),
+            'priceVsMA60': compare(regular_bar['close'], ma60),
+            'priorHigh20': prior20, 'priorHigh60': prior60,
+            'breakout20': breakout(regular_bar['close'], regular_bar['high'], prior20, True),
+            'breakout60': breakout(regular_bar['close'], regular_bar['high'], prior60, True),
+        }
+    else:
+        regular = {'status': 'UNAVAILABLE'}
+    status = 'ok' if technical.get('status') == 'ok' and quote else 'partial'
+    # Keep the flat contract while consumers migrate to the explicit views.
+    return {'itemCode': code, 'stockName': stock_name, **current,
+            'status': status, 'current': {**current, 'status': status},
+            'regularSession': regular}
 
 
 def regular_close_confirmed(quote):

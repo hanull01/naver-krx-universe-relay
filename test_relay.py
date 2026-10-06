@@ -85,6 +85,54 @@ class RelayTests(unittest.TestCase):
         quote = {'closePrice': 101, 'highPrice': 101, 'marketStatus': 'OPEN', 'sourceTime': 'now'}
         self.assertEqual(relay.calculate_state('000001', 'A', technical, daily, quote, config)['pullbackState'], 'near_ma20')
 
+    def test_state_publishes_flat_current_and_strict_regular_session(self):
+        config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}
+        technical = {'ma20': 100, 'ma60': 90, 'volumeRatio20': 1.0, 'status': 'ok'}
+        quote = {'closePrice': 110, 'highPrice': 112, 'sourceTime': '2026-10-06T17:35:00+09:00'}
+        history = self.daily_fixture(61)['datas']
+        bar = {'date': '2026-10-06', 'close': 105, 'high': 111, 'volume': 1000,
+               'complete': True, 'noTrading': False, 'session': 'REGULAR',
+               'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+               'sourceTime': '20261006153000'}
+        daily = {'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
+                 'datas': history + [bar]}
+        result = relay.calculate_state('000001', 'A', technical, daily, quote, config)
+        self.assertEqual(result['price'], 110)
+        self.assertEqual(result['current']['price'], 110)
+        self.assertEqual(result['current']['priceVsMA20'], result['priceVsMA20'])
+        self.assertEqual(result['regularSession']['status'], 'CONFIRMED')
+        self.assertEqual(result['regularSession']['price'], 105)
+        self.assertEqual(result['regularSession']['sourceTime'], '20261006153000')
+        self.assertNotEqual(result['current']['price'], result['regularSession']['price'])
+
+    def test_state_rejects_invalid_regular_session_artifacts(self):
+        config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}
+        technical = {'ma20': 100, 'ma60': 90, 'volumeRatio20': 1.0, 'status': 'ok'}
+        quote = {'closePrice': 110, 'highPrice': 112, 'sourceTime': '2026-10-06T17:35:00+09:00'}
+        bar = {'date': '2026-10-06', 'close': 105, 'high': 111, 'volume': 1000,
+               'complete': True, 'noTrading': False, 'session': 'REGULAR',
+               'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+               'sourceTime': '20261006153000'}
+        cases = [
+            ({}, None),
+            ({'date': '2026-10-05'}, None),
+            ({'complete': False}, None),
+            ({'session': 'AFTER'}, None),
+            ({'barType': 'DAILY'}, None),
+            ({'source': 'OTHER'}, None),
+            ({'sourceTime': 'bad'}, None),
+            ({}, 'unavailable'),
+        ]
+        for changed, daily_status in cases:
+            with self.subTest(changed=changed, daily_status=daily_status):
+                daily = {'regularDailyStatus': daily_status or 'ok',
+                         'regularSessionDate': '2026-10-06',
+                         'datas': [] if changed == {} and daily_status is None
+                         else [dict(bar, **changed)]}
+                result = relay.calculate_state('000001', 'A', technical, daily, quote, config)
+                self.assertEqual(result['regularSession'], {'status': 'UNAVAILABLE'})
+                self.assertEqual(result['current']['price'], 110)
+
     def test_build_states_lite_and_enabled_only(self):
         universe = self.expanded_universe(); codes = relay.universe_codes(universe)
         tech = {'datas': [{'itemCode': code, 'ma20': 10, 'ma60': 9, 'volumeRatio20': 1.0, 'status': 'ok'} for code in codes]}
@@ -92,6 +140,8 @@ class RelayTests(unittest.TestCase):
         with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), patch.object(relay, 'load_analysis_config', return_value={'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}), patch.object(relay, 'load_daily_for_technical', return_value=self.daily_fixture(21)), patch.object(relay, 'save') as save:
             result = relay.build_states(quotes, tech)
         self.assertEqual(result['count'], 3)
+        self.assertTrue(all('current' in row and 'regularSession' in row for row in result['datas']))
+        self.assertTrue(all(row['price'] == row['current']['price'] for row in result['datas']))
         self.assertEqual(save.call_args_list[-1].args[0], 'data/states-lite.json')
 
     def test_diffusion_classification(self):
