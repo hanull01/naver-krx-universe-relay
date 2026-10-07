@@ -1,7 +1,7 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-10-07",
+  "asOf": "2026-10-08",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
@@ -19,40 +19,40 @@
       "rankingEligible": true,
       "reportCount": 79,
       "brokerCount": 14,
-      "recentReportCount": 12,
-      "previousReportCount": 3,
-      "recentTargetMean": 498333,
-      "previousTargetMean": 370000,
-      "recentTargetMedian": 490000,
-      "recentTargetStdev": 86394,
-      "targetMeanChangePct": 34.68,
-      "targetDispersionChangePct": null,
+      "recentReportCount": 11,
+      "previousReportCount": 4,
+      "recentTargetMean": 507273,
+      "previousTargetMean": 377500,
+      "recentTargetMedian": 500000,
+      "recentTargetStdev": 84755,
+      "targetMeanChangePct": 34.38,
+      "targetDispersionChangePct": 552.46,
       "revisionUp": 23,
       "revisionDown": 4,
       "risingTopics": [
         {
+          "topic": "수요",
+          "delta": 0.386,
+          "ratio": 2.54
+        },
+        {
           "topic": "환율",
-          "delta": 0.667,
+          "delta": 0.386,
+          "ratio": 2.54
+        },
+        {
+          "topic": "원가",
+          "delta": 0.273,
           "ratio": null
         },
         {
           "topic": "HBM",
-          "delta": 0.5,
-          "ratio": null
-        },
-        {
-          "topic": "수요",
-          "delta": 0.25,
-          "ratio": 1.75
-        },
-        {
-          "topic": "원가",
-          "delta": 0.25,
-          "ratio": null
+          "delta": 0.205,
+          "ratio": 1.82
         },
         {
           "topic": "메모리",
-          "delta": 0.167,
+          "delta": 0.182,
           "ratio": null
         }
       ]
@@ -64,36 +64,31 @@
       "rankingEligible": true,
       "reportCount": 67,
       "brokerCount": 15,
-      "recentReportCount": 5,
-      "previousReportCount": 5,
-      "recentTargetMean": 3220000,
-      "previousTargetMean": 3030000,
-      "recentTargetMedian": 3100000,
-      "recentTargetStdev": 426146,
-      "targetMeanChangePct": 6.27,
-      "targetDispersionChangePct": 35.03,
+      "recentReportCount": 4,
+      "previousReportCount": 6,
+      "recentTargetMean": 3250000,
+      "previousTargetMean": 3041667,
+      "recentTargetMedian": 3150000,
+      "recentTargetStdev": 471699,
+      "targetMeanChangePct": 6.85,
+      "targetDispersionChangePct": 63.06,
       "revisionUp": 21,
       "revisionDown": 4,
       "risingTopics": [
         {
           "topic": "수요",
-          "delta": 0.4,
-          "ratio": 3.0
-        },
-        {
-          "topic": "환율",
-          "delta": 0.4,
-          "ratio": null
-        },
-        {
-          "topic": "HBM",
-          "delta": 0.2,
-          "ratio": null
+          "delta": 0.583,
+          "ratio": 4.49
         },
         {
           "topic": "원가",
-          "delta": 0.2,
+          "delta": 0.25,
           "ratio": null
+        },
+        {
+          "topic": "환율",
+          "delta": 0.083,
+          "ratio": 1.5
         }
       ]
     },
@@ -1099,40 +1094,40 @@
         "rankingEligible": true,
         "reportCount": 79,
         "brokerCount": 14,
-        "recentReportCount": 12,
-        "previousReportCount": 3,
-        "recentTargetMean": 498333,
-        "previousTargetMean": 370000,
-        "recentTargetMedian": 490000,
-        "recentTargetStdev": 86394,
-        "targetMeanChangePct": 34.68,
-        "targetDispersionChangePct": null,
+        "recentReportCount": 11,
+        "previousReportCount": 4,
+        "recentTargetMean": 507273,
+        "previousTargetMean": 377500,
+        "recentTargetMedian": 500000,
+        "recentTargetStdev": 84755,
+        "targetMeanChangePct": 34.38,
+        "targetDispersionChangePct": 552.46,
         "revisionUp": 23,
         "revisionDown": 4,
         "risingTopics": [
           {
+            "topic": "수요",
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
             "topic": "환율",
-            "delta": 0.667,
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
+            "topic": "원가",
+            "delta": 0.273,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.5,
-            "ratio": null
-          },
-          {
-            "topic": "수요",
-            "delta": 0.25,
-            "ratio": 1.75
-          },
-          {
-            "topic": "원가",
-            "delta": 0.25,
-            "ratio": null
+            "delta": 0.205,
+            "ratio": 1.82
           },
           {
             "topic": "메모리",
-            "delta": 0.167,
+            "delta": 0.182,
             "ratio": null
           }
         ]
@@ -1383,41 +1378,26 @@
         ]
       },
       {
-        "itemCode": "000660",
-        "itemName": "SK하이닉스",
+        "itemCode": "196170",
+        "itemName": "알테오젠",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 67,
-        "brokerCount": 15,
-        "recentReportCount": 5,
+        "reportCount": 19,
+        "brokerCount": 4,
+        "recentReportCount": 4,
         "previousReportCount": 5,
-        "recentTargetMean": 3220000,
-        "previousTargetMean": 3030000,
-        "recentTargetMedian": 3100000,
-        "recentTargetStdev": 426146,
-        "targetMeanChangePct": 6.27,
-        "targetDispersionChangePct": 35.03,
-        "revisionUp": 21,
+        "recentTargetMean": 455000,
+        "previousTargetMean": 458000,
+        "recentTargetMedian": 450000,
+        "recentTargetStdev": 42720,
+        "targetMeanChangePct": -0.66,
+        "targetDispersionChangePct": -12.36,
+        "revisionUp": 3,
         "revisionDown": 4,
         "risingTopics": [
           {
             "topic": "수요",
-            "delta": 0.4,
-            "ratio": 3.0
-          },
-          {
-            "topic": "환율",
-            "delta": 0.4,
-            "ratio": null
-          },
-          {
-            "topic": "HBM",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
-            "topic": "원가",
-            "delta": 0.2,
+            "delta": 0.25,
             "ratio": null
           }
         ]
@@ -1431,40 +1411,40 @@
         "rankingEligible": true,
         "reportCount": 79,
         "brokerCount": 14,
-        "recentReportCount": 12,
-        "previousReportCount": 3,
-        "recentTargetMean": 498333,
-        "previousTargetMean": 370000,
-        "recentTargetMedian": 490000,
-        "recentTargetStdev": 86394,
-        "targetMeanChangePct": 34.68,
-        "targetDispersionChangePct": null,
+        "recentReportCount": 11,
+        "previousReportCount": 4,
+        "recentTargetMean": 507273,
+        "previousTargetMean": 377500,
+        "recentTargetMedian": 500000,
+        "recentTargetStdev": 84755,
+        "targetMeanChangePct": 34.38,
+        "targetDispersionChangePct": 552.46,
         "revisionUp": 23,
         "revisionDown": 4,
         "risingTopics": [
           {
+            "topic": "수요",
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
             "topic": "환율",
-            "delta": 0.667,
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
+            "topic": "원가",
+            "delta": 0.273,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.5,
-            "ratio": null
-          },
-          {
-            "topic": "수요",
-            "delta": 0.25,
-            "ratio": 1.75
-          },
-          {
-            "topic": "원가",
-            "delta": 0.25,
-            "ratio": null
+            "delta": 0.205,
+            "ratio": 1.82
           },
           {
             "topic": "메모리",
-            "delta": 0.167,
+            "delta": 0.182,
             "ratio": null
           }
         ]
@@ -1495,6 +1475,41 @@
         ]
       },
       {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 67,
+        "brokerCount": 15,
+        "recentReportCount": 4,
+        "previousReportCount": 6,
+        "recentTargetMean": 3250000,
+        "previousTargetMean": 3041667,
+        "recentTargetMedian": 3150000,
+        "recentTargetStdev": 471699,
+        "targetMeanChangePct": 6.85,
+        "targetDispersionChangePct": 63.06,
+        "revisionUp": 21,
+        "revisionDown": 4,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.583,
+            "ratio": 4.49
+          },
+          {
+            "topic": "원가",
+            "delta": 0.25,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.083,
+            "ratio": 1.5
+          }
+        ]
+      },
+      {
         "itemCode": "009150",
         "itemName": "삼성전기",
         "status": "OK",
@@ -1520,46 +1535,6 @@
           {
             "topic": "원가",
             "delta": 0.111,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "000660",
-        "itemName": "SK하이닉스",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 67,
-        "brokerCount": 15,
-        "recentReportCount": 5,
-        "previousReportCount": 5,
-        "recentTargetMean": 3220000,
-        "previousTargetMean": 3030000,
-        "recentTargetMedian": 3100000,
-        "recentTargetStdev": 426146,
-        "targetMeanChangePct": 6.27,
-        "targetDispersionChangePct": 35.03,
-        "revisionUp": 21,
-        "revisionDown": 4,
-        "risingTopics": [
-          {
-            "topic": "수요",
-            "delta": 0.4,
-            "ratio": 3.0
-          },
-          {
-            "topic": "환율",
-            "delta": 0.4,
-            "ratio": null
-          },
-          {
-            "topic": "HBM",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
-            "topic": "원가",
-            "delta": 0.2,
             "ratio": null
           }
         ]
@@ -1622,42 +1597,82 @@
     ],
     "targetDispersionIncrease": [
       {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 79,
+        "brokerCount": 14,
+        "recentReportCount": 11,
+        "previousReportCount": 4,
+        "recentTargetMean": 507273,
+        "previousTargetMean": 377500,
+        "recentTargetMedian": 500000,
+        "recentTargetStdev": 84755,
+        "targetMeanChangePct": 34.38,
+        "targetDispersionChangePct": 552.46,
+        "revisionUp": 23,
+        "revisionDown": 4,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
+            "topic": "환율",
+            "delta": 0.386,
+            "ratio": 2.54
+          },
+          {
+            "topic": "원가",
+            "delta": 0.273,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.205,
+            "ratio": 1.82
+          },
+          {
+            "topic": "메모리",
+            "delta": 0.182,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "000660",
         "itemName": "SK하이닉스",
         "status": "OK",
         "rankingEligible": true,
         "reportCount": 67,
         "brokerCount": 15,
-        "recentReportCount": 5,
-        "previousReportCount": 5,
-        "recentTargetMean": 3220000,
-        "previousTargetMean": 3030000,
-        "recentTargetMedian": 3100000,
-        "recentTargetStdev": 426146,
-        "targetMeanChangePct": 6.27,
-        "targetDispersionChangePct": 35.03,
+        "recentReportCount": 4,
+        "previousReportCount": 6,
+        "recentTargetMean": 3250000,
+        "previousTargetMean": 3041667,
+        "recentTargetMedian": 3150000,
+        "recentTargetStdev": 471699,
+        "targetMeanChangePct": 6.85,
+        "targetDispersionChangePct": 63.06,
         "revisionUp": 21,
         "revisionDown": 4,
         "risingTopics": [
           {
             "topic": "수요",
-            "delta": 0.4,
-            "ratio": 3.0
-          },
-          {
-            "topic": "환율",
-            "delta": 0.4,
-            "ratio": null
-          },
-          {
-            "topic": "HBM",
-            "delta": 0.2,
-            "ratio": null
+            "delta": 0.583,
+            "ratio": 4.49
           },
           {
             "topic": "원가",
-            "delta": 0.2,
+            "delta": 0.25,
             "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.083,
+            "ratio": 1.5
           }
         ]
       },
