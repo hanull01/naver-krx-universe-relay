@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "006800",
   "itemName": "미래에셋증권",
-  "reportCount": 22,
-  "latestReportNid": "96079",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 23,
+  "latestReportNid": "96502",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96079",
-    "writeDate": "2026-09-10",
-    "brokerName": "유안타증권",
-    "title": "11월 신규 기업가치 제고 계획 발표",
-    "goalPrice": 61000,
+    "nid": "96502",
+    "writeDate": "2026-10-07",
+    "brokerName": "하나증권",
+    "title": "3Q26 Pre - SpaceX 평가손실로 인한 적자는 불가피",
+    "goalPrice": 67000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 2
+        "positive": 1,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 5
+        "환율": 3
       }
     }
   },
   "reportNids": [
+    "96502",
     "96079",
     "95576",
     "95566",

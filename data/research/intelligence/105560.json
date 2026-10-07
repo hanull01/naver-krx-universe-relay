@@ -1,33 +1,33 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "105560",
   "itemName": "KB금융",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-15",
-    "to": "2026-10-02"
+    "to": "2026-10-07"
   },
-  "reportCount": 24,
-  "brokerCount": 9,
+  "reportCount": 25,
+  "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 205000,
         "max": 235000,
-        "mean": 220000,
-        "median": 220000,
-        "stdev": 15000,
+        "mean": 217667,
+        "median": 213000,
+        "stdev": 12684,
         "range": 30000
       },
       "earningsDirection": {
         "UP": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
         "positive": 7,
@@ -38,11 +38,11 @@
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
         "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     },
@@ -65,25 +65,25 @@
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 2,
+    "reportCountChange": 3,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -241,19 +241,19 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 205000,
-        "max": 205000,
-        "mean": 205000,
-        "median": 205000,
-        "stdev": 0,
-        "range": 0
+        "max": 213000,
+        "mean": 209000,
+        "median": 209000,
+        "stdev": 4000,
+        "range": 8000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
         "positive": 0,
@@ -265,6 +265,21 @@
     }
   },
   "brokerTrajectory": {
+    "SK증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 213000,
+      "latestGoalPrice": 213000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-07",
+          "goalPrice": 213000,
+          "title": "육각형의 정석"
+        }
+      ]
+    },
     "iM증권": {
       "reportCount": 3,
       "targetPricePointCount": 3,

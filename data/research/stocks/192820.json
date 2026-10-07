@@ -2,29 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "192820",
   "itemName": "코스맥스",
-  "reportCount": 28,
-  "latestReportNid": "96023",
-  "latestWriteDate": "2026-09-07",
+  "reportCount": 33,
+  "latestReportNid": "96509",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96023",
-    "writeDate": "2026-09-07",
-    "brokerName": "SK증권",
-    "title": "On Track",
-    "goalPrice": 350000,
+    "nid": "96509",
+    "writeDate": "2026-10-07",
+    "brokerName": "교보증권",
+    "title": "여전히 매수 추천: 이런 실적은 처음인데, 성수기 going on!",
+    "goalPrice": 410000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 28,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 3,
+        "중국": 2,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96509",
+    "96508",
+    "96492",
+    "96487",
+    "96474",
     "96023",
     "95993",
     "95991",

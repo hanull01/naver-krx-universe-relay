@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "023530",
   "itemName": "롯데쇼핑",
-  "reportCount": 22,
-  "latestReportNid": "96035",
-  "latestWriteDate": "2026-09-08",
+  "reportCount": 23,
+  "latestReportNid": "96515",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96035",
-    "writeDate": "2026-09-08",
-    "brokerName": "키움증권",
-    "title": "연말로 갈수록 기대 요인이 늘어날 것",
-    "goalPrice": 190000,
+    "nid": "96515",
+    "writeDate": "2026-10-07",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview : 방어력 높은 백화점과 강세를 보인 할인점",
+    "goalPrice": 200000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 7,
-        "negative": 3
+        "negative": 4
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsPositiveSignalCount": 7,
       "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96515",
     "96035",
     "95391",
     "95341",

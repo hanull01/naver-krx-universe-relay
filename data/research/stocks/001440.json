@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "001440",
   "itemName": "대한전선",
-  "reportCount": 9,
-  "latestReportNid": "94904",
-  "latestWriteDate": "2026-07-31",
+  "reportCount": 10,
+  "latestReportNid": "96498",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "94904",
-    "writeDate": "2026-07-31",
-    "brokerName": "하나증권",
-    "title": "본질적인 성장이 지속되는 중",
-    "goalPrice": 60000,
+    "nid": "96498",
+    "writeDate": "2026-10-07",
+    "brokerName": "유안타증권",
+    "title": "환율 영향에도 고수익 믹스는 개선",
+    "goalPrice": 48500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 2,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "수주": 3,
-        "가격": 2
+        "환율": 2,
+        "가격": 1,
+        "수주": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96498",
     "94904",
     "94883",
     "94246",

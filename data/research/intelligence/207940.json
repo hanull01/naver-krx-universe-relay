@@ -6,48 +6,48 @@
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-06"
+    "to": "2026-10-07"
   },
-  "reportCount": 31,
+  "reportCount": 33,
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 3,
+        "count": 5,
         "min": 1950000,
         "max": 2000000,
-        "mean": 1983333,
+        "mean": 1990000,
         "median": 2000000,
-        "stdev": 23570,
+        "stdev": 20000,
         "range": 50000
       },
       "earningsDirection": {
-        "UP": 1,
+        "UP": 2,
         "MIXED": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 4,
-        "net": 6,
-        "netPerReport": 2.0
+        "positive": 16,
+        "negative": 5,
+        "net": 11,
+        "netPerReport": 2.2
       },
       "topics": {
         "환율": {
           "count": 6,
-          "perReport": 2.0
+          "perReport": 1.2
         },
         "원가": {
-          "count": 2,
-          "perReport": 0.667
+          "count": 3,
+          "perReport": 0.6
         },
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.2
         }
       }
     },
@@ -93,29 +93,29 @@
       {
         "topic": "환율",
         "currentCount": 6,
-        "currentPerReport": 2.0,
+        "currentPerReport": 1.2,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 2.0,
+        "perReportDelta": 1.2,
         "ratio": null
       },
       {
         "topic": "원가",
-        "currentCount": 2,
-        "currentPerReport": 0.667,
+        "currentCount": 3,
+        "currentPerReport": 0.6,
         "previousCount": 1,
         "previousPerReport": 0.25,
-        "perReportDelta": 0.417,
-        "ratio": 2.67
+        "perReportDelta": 0.35,
+        "ratio": 2.4
       },
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.2,
         "previousCount": 1,
         "previousPerReport": 0.25,
-        "perReportDelta": 0.083,
-        "ratio": 1.33
+        "perReportDelta": -0.05,
+        "ratio": 0.8
       },
       {
         "topic": "CAPEX/생산능력",
@@ -129,15 +129,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": 0.42,
+    "reportCountChange": 1,
+    "targetMeanChangePct": 0.76,
     "targetMedianChangePct": 0.0,
-    "targetDispersionChangePct": -68.57
+    "targetDispersionChangePct": -73.33
   },
   "goalPriceRevisions": {
-    "total": 7,
+    "total": 8,
     "up": 0,
-    "down": 7,
+    "down": 8,
     "flat": 0
   },
   "monthly": {
@@ -303,40 +303,40 @@
       }
     },
     "2026-10": {
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 3,
+        "count": 5,
         "min": 1950000,
         "max": 2000000,
-        "mean": 1983333,
+        "mean": 1990000,
         "median": 2000000,
-        "stdev": 23570,
+        "stdev": 20000,
         "range": 50000
       },
       "earningsDirection": {
-        "UP": 1,
+        "UP": 2,
         "MIXED": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 4,
-        "net": 6,
-        "netPerReport": 2.0
+        "positive": 16,
+        "negative": 5,
+        "net": 11,
+        "netPerReport": 2.2
       },
       "topics": {
         "환율": {
           "count": 6,
-          "perReport": 2.0
+          "perReport": 1.2
         },
         "원가": {
-          "count": 2,
-          "perReport": 0.667
+          "count": 3,
+          "perReport": 0.6
         },
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.2
         }
       }
     }
@@ -368,12 +368,12 @@
       ]
     },
     "IBK투자증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 2090000,
-      "latestGoalPrice": 2090000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 2000000,
+      "changeAmount": -90000,
+      "changePct": -4.31,
       "trajectory": [
         {
           "date": "2026-04-23",
@@ -389,6 +389,11 @@
           "date": "2026-07-24",
           "goalPrice": 2090000,
           "title": "미국 생산거점과 5공장, 그리고 펩타이드"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 2000000,
+          "title": "신규 공장이 채운 실적, 수주가 더할 모멘텀"
         }
       ]
     },
@@ -443,8 +448,8 @@
       ]
     },
     "대신증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 2000000,
       "latestGoalPrice": 2000000,
       "changeAmount": 0,
@@ -469,6 +474,11 @@
           "date": "2026-08-31",
           "goalPrice": 2000000,
           "title": "3조원 유상증자, 중장기 투자계획을 고려한 자금조달"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 2000000,
+          "title": "단기 부담에도 컨센서스 부합 기대"
         }
       ]
     },

@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "069960",
   "itemName": "현대백화점",
-  "reportCount": 29,
-  "latestReportNid": "96447",
-  "latestWriteDate": "2026-10-06",
+  "reportCount": 31,
+  "latestReportNid": "96517",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96447",
-    "writeDate": "2026-10-06",
-    "brokerName": "유안타증권",
-    "title": "대만 NDR 후기 및 3Q26 Preview",
-    "goalPrice": 120000,
+    "nid": "96517",
+    "writeDate": "2026-10-07",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview : 4분기로 미뤄진 지누스 관세 환급",
+    "goalPrice": 160000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 7,
+        "negative": 7
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96517",
+    "96511",
     "96447",
     "95477",
     "95389",

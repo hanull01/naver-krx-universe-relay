@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "000500",
   "itemName": "가온전선",
-  "reportCount": 3,
-  "latestReportNid": "96386",
-  "latestWriteDate": "2026-09-30",
+  "reportCount": 4,
+  "latestReportNid": "96499",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96386",
-    "writeDate": "2026-09-30",
-    "brokerName": "대신증권",
-    "title": "고밀도/고전력 AIDC의 전력공급, 냉각 솔루션 제공 업체로 변화",
-    "goalPrice": 360000,
-    "normalizedOpinion": "BUY",
+    "nid": "96499",
+    "writeDate": "2026-10-07",
+    "brokerName": "유안타증권",
+    "title": "빅테크 배전이 이익을 바꾼다",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 19,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsPositiveSignalCount": 9,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "AI": 1,
-        "수요": 1
+        "미국": 2,
+        "수요": 2
       }
     }
   },
   "reportNids": [
+    "96499",
     "96386",
     "95204",
     "93916"

@@ -1,44 +1,48 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "064350",
   "itemName": "현대로템",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-10-06"
+    "to": "2026-10-07"
   },
-  "reportCount": 24,
+  "reportCount": 25,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 167000,
+        "count": 3,
+        "min": 150000,
         "max": 226000,
-        "mean": 196500,
-        "median": 196500,
-        "stdev": 29500,
-        "range": 59000
+        "mean": 181000,
+        "median": 167000,
+        "stdev": 32568,
+        "range": 76000
       },
       "earningsDirection": {
-        "UNKNOWN": 1,
+        "UNKNOWN": 2,
         "UP": 1
       },
       "textSignal": {
         "positive": 2,
-        "negative": 3,
-        "net": -1,
-        "netPerReport": -0.5
+        "negative": 5,
+        "net": -3,
+        "netPerReport": -1.0
       },
       "topics": {
         "환율": {
+          "count": 2,
+          "perReport": 0.667
+        },
+        "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     },
@@ -60,25 +64,34 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentCount": 2,
+        "currentPerReport": 0.667,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.667,
+        "ratio": null
+      },
+      {
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.333,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 2,
+    "reportCountChange": 3,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 5,
+    "total": 6,
     "up": 0,
-    "down": 5,
+    "down": 6,
     "flat": 0
   },
   "monthly": {
@@ -210,31 +223,35 @@
       "topics": {}
     },
     "2026-10": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 167000,
+        "count": 3,
+        "min": 150000,
         "max": 226000,
-        "mean": 196500,
-        "median": 196500,
-        "stdev": 29500,
-        "range": 59000
+        "mean": 181000,
+        "median": 167000,
+        "stdev": 32568,
+        "range": 76000
       },
       "earningsDirection": {
-        "UNKNOWN": 1,
+        "UNKNOWN": 2,
         "UP": 1
       },
       "textSignal": {
         "positive": 2,
-        "negative": 3,
-        "net": -1,
-        "netPerReport": -0.5
+        "negative": 5,
+        "net": -3,
+        "netPerReport": -1.0
       },
       "topics": {
         "환율": {
+          "count": 2,
+          "perReport": 0.667
+        },
+        "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     }
@@ -376,17 +393,22 @@
       ]
     },
     "유안타증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 300000,
-      "latestGoalPrice": 300000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 150000,
+      "changeAmount": -150000,
+      "changePct": -50.0,
       "trajectory": [
         {
           "date": "2026-04-27",
           "goalPrice": 300000,
           "title": "1Q26 Review 양호한 실적"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 150000,
+          "title": "3Q Pre: 컨센서스 부합 전망"
         }
       ]
     },

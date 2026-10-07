@@ -6,39 +6,47 @@
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-17",
-    "to": "2026-09-29"
+    "to": "2026-10-07"
   },
-  "reportCount": 24,
+  "reportCount": 25,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 3,
+      "reportCount": 4,
       "brokerCount": 3,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 33000,
         "max": 40000,
-        "mean": 36667,
+        "mean": 36750,
         "median": 37000,
-        "stdev": 2867,
+        "stdev": 2487,
         "range": 7000
       },
       "earningsDirection": {
         "UNKNOWN": 2,
-        "UP": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 6,
+        "positive": 11,
         "negative": 0,
-        "net": 6,
-        "netPerReport": 2.0
+        "net": 11,
+        "netPerReport": 2.75
       },
       "topics": {
         "AI": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.25
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.25
         }
       }
     },
@@ -61,16 +69,34 @@
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.25,
+        "ratio": null
+      },
+      {
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 0.25,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.25,
+        "ratio": null
+      },
+      {
+        "topic": "환율",
+        "currentCount": 1,
+        "currentPerReport": 0.25,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.25,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 3,
+    "reportCountChange": 4,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -257,6 +283,38 @@
           "perReport": 0.333
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 37000,
+        "max": 37000,
+        "mean": 37000,
+        "median": 37000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 5,
+        "negative": 0,
+        "net": 5,
+        "netPerReport": 5.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -291,8 +349,8 @@
       ]
     },
     "IBK투자증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 37000,
       "latestGoalPrice": 37000,
       "changeAmount": 0,
@@ -302,6 +360,11 @@
           "date": "2026-09-15",
           "goalPrice": 37000,
           "title": "‘LNG운반선 + FLNG’의 진짜 가치는 분산효과"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 37000,
+          "title": "3Q26 Preview: 환헤지 효과가 극대화되는 시점"
         }
       ]
     },

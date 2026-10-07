@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "016360",
   "itemName": "삼성증권",
-  "reportCount": 22,
-  "latestReportNid": "96078",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 23,
+  "latestReportNid": "96501",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96078",
-    "writeDate": "2026-09-10",
-    "brokerName": "유안타증권",
-    "title": "코스피 장세 수혜주",
-    "goalPrice": 155000,
+    "nid": "96501",
+    "writeDate": "2026-10-07",
+    "brokerName": "하나증권",
+    "title": "3Q26 Pre - 컨센 9% 하회 전망",
+    "goalPrice": 168000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 8
+        "positive": 2,
+        "negative": 5
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "금리": 2
+        "금리": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96501",
     "96078",
     "95259",
     "95081",

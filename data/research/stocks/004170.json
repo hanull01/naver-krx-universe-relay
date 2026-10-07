@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "004170",
   "itemName": "신세계",
-  "reportCount": 32,
-  "latestReportNid": "96093",
-  "latestWriteDate": "2026-09-11",
+  "reportCount": 34,
+  "latestReportNid": "96516",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96093",
-    "writeDate": "2026-09-11",
-    "brokerName": "신한투자증권",
-    "title": "실적보다 앞서간 우려",
-    "goalPrice": 700000,
+    "nid": "96516",
+    "writeDate": "2026-10-07",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview : 명품 성장률의 일시적 둔화 영향이 큰 편",
+    "goalPrice": 630000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 3
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96516",
+    "96510",
     "96093",
     "96037",
     "95513",

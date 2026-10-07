@@ -1,30 +1,45 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-08-24"
+    "to": "2026-10-07"
   },
-  "reportCount": 23,
+  "reportCount": 25,
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 2,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 2,
+        "min": 270000,
+        "max": 300000,
+        "mean": 285000,
+        "median": 285000,
+        "stdev": 15000,
+        "range": 30000
       },
-      "topics": {}
+      "earningsDirection": {
+        "UP": 2
+      },
+      "textSignal": {
+        "positive": 10,
+        "negative": 1,
+        "net": 9,
+        "netPerReport": 4.5
+      },
+      "topics": {
+        "환율": {
+          "count": 2,
+          "perReport": 1.0
+        }
+      }
     },
     "previous": {
       "from": "2026-08-08",
@@ -58,6 +73,15 @@
     },
     "topicAcceleration": [
       {
+        "topic": "환율",
+        "currentCount": 2,
+        "currentPerReport": 1.0,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 1.0,
+        "ratio": null
+      },
+      {
         "topic": "AI",
         "currentCount": 0,
         "currentPerReport": 0,
@@ -69,9 +93,9 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
+    "reportCountChange": 1,
+    "targetMeanChangePct": -8.06,
+    "targetMedianChangePct": -8.06,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
@@ -234,6 +258,34 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 2,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 2,
+        "min": 270000,
+        "max": 300000,
+        "mean": 285000,
+        "median": 285000,
+        "stdev": 15000,
+        "range": 30000
+      },
+      "earningsDirection": {
+        "UP": 2
+      },
+      "textSignal": {
+        "positive": 10,
+        "negative": 1,
+        "net": 9,
+        "netPerReport": 4.5
+      },
+      "topics": {
+        "환율": {
+          "count": 2,
+          "perReport": 1.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -383,8 +435,8 @@
       ]
     },
     "유안타증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 260000,
       "latestGoalPrice": 300000,
       "changeAmount": 40000,
@@ -414,6 +466,11 @@
           "date": "2026-07-24",
           "goalPrice": 300000,
           "title": "더 커진 수주, 더 빨라진 실적"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 300000,
+          "title": "실적 서프라이즈 기대"
         }
       ]
     },
@@ -433,8 +490,8 @@
       ]
     },
     "하나증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 220000,
       "latestGoalPrice": 270000,
       "changeAmount": 50000,
@@ -449,6 +506,11 @@
           "date": "2026-07-24",
           "goalPrice": 270000,
           "title": "멈추지 않는 실적 성장"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 270000,
+          "title": "Hakuna Matata"
         }
       ]
     }

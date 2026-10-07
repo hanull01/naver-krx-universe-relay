@@ -6,38 +6,43 @@
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-03-31",
-    "to": "2026-10-06"
+    "to": "2026-10-07"
   },
-  "reportCount": 5,
-  "brokerCount": 5,
+  "reportCount": 6,
+  "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 100000,
-        "max": 100000,
-        "mean": 100000,
-        "median": 100000,
-        "stdev": 0,
-        "range": 0
+        "max": 115000,
+        "mean": 107500,
+        "median": 107500,
+        "stdev": 7500,
+        "range": 15000
       },
       "earningsDirection": {
-        "DOWN": 1
+        "DOWN": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 2,
-        "negative": 3,
-        "net": -1,
+        "negative": 4,
+        "net": -2,
         "netPerReport": -1.0
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     },
@@ -60,16 +65,25 @@
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.5,
+        "ratio": null
+      },
+      {
+        "topic": "환율",
+        "currentCount": 1,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -166,30 +180,35 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 100000,
-        "max": 100000,
-        "mean": 100000,
-        "median": 100000,
-        "stdev": 0,
-        "range": 0
+        "max": 115000,
+        "mean": 107500,
+        "median": 107500,
+        "stdev": 7500,
+        "range": 15000
       },
       "earningsDirection": {
-        "DOWN": 1
+        "DOWN": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 2,
-        "negative": 3,
-        "net": -1,
+        "negative": 4,
+        "net": -2,
         "netPerReport": -1.0
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     }
@@ -207,6 +226,21 @@
           "date": "2026-10-06",
           "goalPrice": 100000,
           "title": "반등의 서막"
+        }
+      ]
+    },
+    "SK증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 115000,
+      "latestGoalPrice": 115000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-07",
+          "goalPrice": 115000,
+          "title": "4분기 생산 극대화"
         }
       ]
     },

@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "017670",
   "itemName": "SK텔레콤",
-  "reportCount": 48,
-  "latestReportNid": "96391",
-  "latestWriteDate": "2026-09-30",
+  "reportCount": 49,
+  "latestReportNid": "96476",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96391",
-    "writeDate": "2026-09-30",
-    "brokerName": "하나증권",
-    "title": "10월 전략 - 재료 많아 주가 상승 시도 지속될 전망",
-    "goalPrice": 140000,
+    "nid": "96476",
+    "writeDate": "2026-10-07",
+    "brokerName": "미래에셋증권",
+    "title": "지속되는 호실적. 시장 컨센서스 상회 예상",
+    "goalPrice": 150000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 3,
-        "negative": 1
+        "negative": 0
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96476",
     "96391",
     "96054",
     "96031",

@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "103590",
   "itemName": "일진전기",
-  "reportCount": 8,
-  "latestReportNid": "95826",
-  "latestWriteDate": "2026-08-24",
+  "reportCount": 10,
+  "latestReportNid": "96497",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "95826",
-    "writeDate": "2026-08-24",
-    "brokerName": "SK증권",
-    "title": "투자를 먼저 끝낸 회사의 수확기의 모습",
-    "goalPrice": 124000,
+    "nid": "96497",
+    "writeDate": "2026-10-07",
+    "brokerName": "유안타증권",
+    "title": "비수기에도 중전기 체력은 개선",
+    "goalPrice": 125000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 7,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 7,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "수요": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96497",
+    "96479",
     "95826",
     "95489",
     "95479",

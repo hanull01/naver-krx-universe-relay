@@ -1,30 +1,45 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "086790",
   "itemName": "하나금융지주",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-27",
-    "to": "2026-09-02"
+    "to": "2026-10-07"
   },
-  "reportCount": 21,
-  "brokerCount": 9,
+  "reportCount": 22,
+  "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 167000,
+        "max": 167000,
+        "mean": 167000,
+        "median": 167000,
+        "stdev": 0,
+        "range": 0
       },
-      "topics": {}
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 3,
+        "negative": 1,
+        "net": 2,
+        "netPerReport": 2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     },
     "previous": {
       "from": "2026-08-08",
@@ -59,19 +74,19 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
+        "currentCount": 1,
+        "currentPerReport": 1.0,
         "previousCount": 1,
         "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
-        "ratio": 0.0
+        "perReportDelta": 0.0,
+        "ratio": 1.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
+    "reportCountChange": 0,
+    "targetMeanChangePct": 4.37,
+    "targetMedianChangePct": 4.37,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
@@ -184,9 +199,52 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 167000,
+        "max": 167000,
+        "mean": 167000,
+        "median": 167000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 3,
+        "negative": 1,
+        "net": 2,
+        "netPerReport": 2.0
+      },
+      "topics": {
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
+    "SK증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 167000,
+      "latestGoalPrice": 167000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-07",
+          "goalPrice": 167000,
+          "title": "금리 오르고 환율 내려가고, 오히려 좋아"
+        }
+      ]
+    },
     "iM증권": {
       "reportCount": 2,
       "targetPricePointCount": 2,

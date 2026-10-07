@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
-  "reportCount": 23,
-  "latestReportNid": "95823",
-  "latestWriteDate": "2026-08-24",
+  "reportCount": 25,
+  "latestReportNid": "96505",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "95823",
-    "writeDate": "2026-08-24",
-    "brokerName": "SK증권",
-    "title": "전력은 속도가 생명, 단납기 생산이 강점",
-    "goalPrice": 310000,
+    "nid": "96505",
+    "writeDate": "2026-10-07",
+    "brokerName": "하나증권",
+    "title": "Hakuna Matata",
+    "goalPrice": 270000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 5,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "AI": 1,
-        "미국": 1
+        "수주": 3,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96505",
+    "96494",
     "95823",
     "94466",
     "94462",

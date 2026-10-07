@@ -2,32 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "035760",
   "itemName": "CJ ENM",
-  "reportCount": 15,
-  "latestReportNid": "95437",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 16,
+  "latestReportNid": "96481",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "95437",
-    "writeDate": "2026-08-12",
-    "brokerName": "삼성증권",
-    "title": "티빙이 바꾼 손익의 무게",
-    "goalPrice": 47000,
+    "nid": "96481",
+    "writeDate": "2026-10-07",
+    "brokerName": "대신증권",
+    "title": "이 구간만 지나면 레버리지",
+    "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 16,
-        "negative": 6
+        "positive": 0,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 8,
-      "earningsNegativeSignalCount": 4,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "원가": 1,
-        "자동차": 1
-      }
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "96481",
     "95437",
     "95268",
     "95254",

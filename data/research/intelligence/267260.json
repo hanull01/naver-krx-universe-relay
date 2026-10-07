@@ -1,30 +1,54 @@
 {
-  "status": "NO_RECENT_RESEARCH",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "267260",
   "itemName": "HD현대일렉트릭",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-08",
-    "to": "2026-08-24"
+    "to": "2026-10-07"
   },
-  "reportCount": 24,
+  "reportCount": 27,
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 3,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 3,
+        "min": 1020000,
+        "max": 1165000,
+        "mean": 1111667,
+        "median": 1150000,
+        "stdev": 65107,
+        "range": 145000
       },
-      "topics": {}
+      "earningsDirection": {
+        "DOWN": 2,
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 6,
+        "negative": 9,
+        "net": -3,
+        "netPerReport": -1.0
+      },
+      "topics": {
+        "환율": {
+          "count": 5,
+          "perReport": 1.667
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.333
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     },
     "previous": {
       "from": "2026-08-08",
@@ -66,25 +90,34 @@
     },
     "topicAcceleration": [
       {
-        "topic": "AI",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
-        "ratio": 0.0
+        "topic": "환율",
+        "currentCount": 5,
+        "currentPerReport": 1.667,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 1.667,
+        "ratio": null
       },
       {
-        "topic": "CAPEX/생산능력",
-        "currentCount": 0,
-        "currentPerReport": 0,
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
         "previousCount": 1,
         "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
-        "ratio": 0.0
+        "perReportDelta": -0.667,
+        "ratio": 0.33
       },
       {
         "topic": "수요",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 1,
+        "previousPerReport": 1.0,
+        "perReportDelta": -0.667,
+        "ratio": 0.33
+      },
+      {
+        "topic": "CAPEX/생산능력",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
@@ -95,15 +128,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
+    "reportCountChange": 2,
+    "targetMeanChangePct": 23.52,
+    "targetMedianChangePct": 27.78,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 10,
+    "total": 12,
     "up": 3,
-    "down": 7,
+    "down": 9,
     "flat": 0
   },
   "monthly": {
@@ -270,6 +303,43 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 3,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 3,
+        "min": 1020000,
+        "max": 1165000,
+        "mean": 1111667,
+        "median": 1150000,
+        "stdev": 65107,
+        "range": 145000
+      },
+      "earningsDirection": {
+        "DOWN": 2,
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 6,
+        "negative": 9,
+        "net": -3,
+        "netPerReport": -1.0
+      },
+      "topics": {
+        "환율": {
+          "count": 5,
+          "perReport": 1.667
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.333
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.333
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -339,12 +409,12 @@
       ]
     },
     "대신증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 1100000,
-      "latestGoalPrice": 1150000,
-      "changeAmount": 50000,
-      "changePct": 4.55,
+      "latestGoalPrice": 1020000,
+      "changeAmount": -80000,
+      "changePct": -7.27,
       "trajectory": [
         {
           "date": "2026-04-08",
@@ -365,6 +435,11 @@
           "date": "2026-07-29",
           "goalPrice": 1150000,
           "title": "주가는 하락했지만, 펀더멘털은 강화 중"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 1020000,
+          "title": "3Q26 실적 부진은 주가에 선반영"
         }
       ]
     },
@@ -414,8 +489,8 @@
       ]
     },
     "유안타증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 1320000,
       "latestGoalPrice": 1165000,
       "changeAmount": -155000,
@@ -445,6 +520,11 @@
           "date": "2026-07-29",
           "goalPrice": 1165000,
           "title": "주가는 빠졌지만, 실적은 흔들리지 않았다"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 1165000,
+          "title": "환율 부담에도 수익성 유지"
         }
       ]
     },
@@ -464,12 +544,12 @@
       ]
     },
     "하나증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 1440000,
-      "latestGoalPrice": 1440000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 1150000,
+      "changeAmount": -290000,
+      "changePct": -20.14,
       "trajectory": [
         {
           "date": "2026-04-29",
@@ -480,6 +560,11 @@
           "date": "2026-07-29",
           "goalPrice": 1440000,
           "title": "이제 배전도 성장 국면 진입"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 1150000,
+          "title": "환율 영향은 피할 수 없지만"
         }
       ]
     }

@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "035420",
   "itemName": "NAVER",
-  "reportCount": 39,
-  "latestReportNid": "96454",
-  "latestWriteDate": "2026-10-06",
+  "reportCount": 40,
+  "latestReportNid": "96469",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96454",
-    "writeDate": "2026-10-06",
-    "brokerName": "교보증권",
-    "title": "핵심 성장 스토리 유지",
-    "goalPrice": 390000,
+    "nid": "96469",
+    "writeDate": "2026-10-07",
+    "brokerName": "유진투자증권",
+    "title": "기대 보단 우려가 더 컸던 3분기",
+    "goalPrice": 320000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 0
+        "positive": 16,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "원가": 4,
-        "자동차": 1
+        "AI": 6,
+        "원가": 3,
+        "환율": 2,
+        "미국": 1,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "96469",
     "96454",
     "96428",
     "96425",

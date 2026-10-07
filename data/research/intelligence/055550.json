@@ -1,30 +1,45 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "055550",
   "itemName": "신한지주",
   "asOf": "2026-10-07",
   "dateRange": {
     "from": "2026-04-24",
-    "to": "2026-07-24"
+    "to": "2026-10-07"
   },
-  "reportCount": 19,
-  "brokerCount": 8,
+  "reportCount": 20,
+  "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-07",
       "to": "2026-10-07",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 134000,
+        "max": 134000,
+        "mean": 134000,
+        "median": 134000,
+        "stdev": 0,
+        "range": 0
       },
-      "topics": {}
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 5,
+        "negative": 0,
+        "net": 5,
+        "netPerReport": 5.0
+      },
+      "topics": {
+        "주주환원": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     },
     "previous": {
       "from": "2026-08-08",
@@ -41,10 +56,20 @@
       },
       "topics": {}
     },
-    "topicAcceleration": []
+    "topicAcceleration": [
+      {
+        "topic": "주주환원",
+        "currentCount": 1,
+        "currentPerReport": 1.0,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 1.0,
+        "ratio": null
+      }
+    ]
   },
   "comparison": {
-    "reportCountChange": 0,
+    "reportCountChange": 1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -160,9 +185,52 @@
           "perReport": 0.364
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 134000,
+        "max": 134000,
+        "mean": 134000,
+        "median": 134000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 5,
+        "negative": 0,
+        "net": 5,
+        "netPerReport": 5.0
+      },
+      "topics": {
+        "주주환원": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
     }
   },
   "brokerTrajectory": {
+    "SK증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 134000,
+      "latestGoalPrice": 134000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-07",
+          "goalPrice": 134000,
+          "title": "ROE 10%와 예측 가능한 주주환원"
+        }
+      ]
+    },
     "iM증권": {
       "reportCount": 2,
       "targetPricePointCount": 2,

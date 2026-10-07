@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "005940",
   "itemName": "NH투자증권",
-  "reportCount": 24,
-  "latestReportNid": "96080",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 25,
+  "latestReportNid": "96503",
+  "latestWriteDate": "2026-10-07",
   "latest": {
-    "nid": "96080",
-    "writeDate": "2026-09-10",
-    "brokerName": "유안타증권",
-    "title": "하반기 배당 매력도 부각",
-    "goalPrice": 35000,
+    "nid": "96503",
+    "writeDate": "2026-10-07",
+    "brokerName": "하나증권",
+    "title": "3Q26 Pre - 컨센 12% 하회 전망",
+    "goalPrice": 39000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 8
+        "positive": 1,
+        "negative": 4
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "금리": 1
+      }
     }
   },
   "reportNids": [
+    "96503",
     "96080",
     "95851",
     "94531",
