@@ -826,22 +826,37 @@ def load_daily_for_technical(code):
     return merged
 
 
-def _valid_same_day_regular_override(daily, current):
-    """Return whether a strict verified regular-session bar may override raw metadata."""
+def _valid_regular_override_for_date(daily, target_date):
+    """Validate one verified 15:30 regular-session bar for an exact date."""
+    try:
+        target = datetime.fromisoformat(str(target_date)).date()
+    except (TypeError, ValueError):
+        return False
+    target_text = target.isoformat()
     if (daily.get('regularDailyStatus') != 'ok'
-            or daily.get('regularSessionDate') != current.date().isoformat()):
+            or daily.get('regularSessionDate') != target_text):
         return False
     bars = [bar for bar in daily.get('datas', [])
-            if isinstance(bar, dict) and bar.get('date') == current.date().isoformat()]
+            if isinstance(bar, dict) and bar.get('date') == target_text]
     if len(bars) != 1:
         return False
     bar = bars[0]
-    source_time = str(bar.get('sourceTime') or daily.get('sourceTime') or '')
+    source_time = str(bar.get('sourceTime') or '')
     return (bar.get('complete') is True
             and bar.get('session') == 'REGULAR'
             and bar.get('barType') == 'REGULAR_SESSION'
             and bar.get('source') == 'NAVER_MINUTE'
-            and source_time == current.strftime('%Y%m%d153000'))
+            and source_time == target.strftime('%Y%m%d153000'))
+
+
+def _valid_same_day_regular_override(daily, current):
+    """Return whether today's strict regular bar may override raw metadata."""
+    return _valid_regular_override_for_date(daily, current.date())
+
+
+def _valid_expected_regular_override(daily, expected_completed_date):
+    """Return whether the exact expected completed day's strict bar is usable."""
+    return _valid_regular_override_for_date(daily, expected_completed_date)
 
 
 def daily_cache_is_current(daily, current=None, expected_completed_date=None):
@@ -849,7 +864,9 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     if not daily:
         return False
     current = current or now()
-    regular_override = _valid_same_day_regular_override(daily, current)
+    regular_override = (_valid_expected_regular_override(daily, expected_completed_date)
+                        if expected_completed_date is not None
+                        else _valid_same_day_regular_override(daily, current))
     if daily.get('status') in ('error', 'insufficient', 'stale'):
         return regular_override
     # ``latestDate`` may include a provisional current-day candle.  Technical

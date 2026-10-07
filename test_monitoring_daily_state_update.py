@@ -1,7 +1,10 @@
 import importlib.util
 import json
 import tempfile
+import threading
+import time
 import unittest
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -95,6 +98,117 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
             update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher)
         self.assertEqual(2, caught.exception.diagnostics["missingTodayCount"])
         self.assertEqual(["000001", "000002"], caught.exception.diagnostics["firstMissingCodes"])
+
+    @staticmethod
+    def _daily_response(date="20260101", close=11):
+        return {"raw": json.dumps({"priceInfos": [{"localDate": date, "openPrice": 10,
+                "highPrice": 12, "lowPrice": 9, "closePrice": close,
+                "accumulatedTradingVolume": 3}]}).encode()}
+
+    def test_concurrent_collection_is_deterministic_and_fetches_each_code_once(self):
+        calls = Counter()
+        delays = {"000001": 0.02, "000002": 0.001}
+
+        def fetcher(code, _start, _end):
+            calls[code] += 1
+            time.sleep(delays[code])
+            return self._daily_response(close=int(code))
+
+        first = update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                          max_workers=2, retry_sleep=0)
+        second = update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                           max_workers=2, retry_sleep=0)
+        self.assertEqual(first, second)
+        self.assertEqual(["000001", "000002"], list(first))
+        self.assertEqual({"000001": 2, "000002": 2}, dict(calls))
+
+    def test_concurrent_collection_retries_only_the_failing_code(self):
+        calls = Counter()
+
+        def fetcher(code, _start, _end):
+            calls[code] += 1
+            if code == "000001" and calls[code] == 1:
+                raise OSError("temporary")
+            return self._daily_response()
+
+        rows = update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                         max_workers=2, retries=2, retry_sleep=0)
+        self.assertEqual({"000001", "000002"}, set(rows))
+        self.assertEqual(2, calls["000001"])
+        self.assertEqual(1, calls["000002"])
+
+    def test_concurrent_collection_propagates_permanent_worker_failure(self):
+        calls = Counter()
+
+        def fetcher(code, _start, _end):
+            calls[code] += 1
+            if code == "000001":
+                raise OSError("permanent")
+            return self._daily_response()
+
+        with self.assertRaisesRegex(RuntimeError, "000001"):
+            update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                      max_workers=2, retries=2, retry_sleep=0)
+        self.assertEqual(2, calls["000001"])
+        self.assertEqual(1, calls["000002"])
+
+    def test_concurrent_collection_retries_missing_then_fails_closed(self):
+        calls = Counter()
+
+        def fetcher(code, _start, _end):
+            calls[code] += 1
+            if code == "000001":
+                return {"raw": b'{"priceInfos":[]}'}
+            return self._daily_response()
+
+        with self.assertRaises(update.TodayRowsNotReady) as caught:
+            update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                      max_workers=2, retries=2, retry_sleep=0)
+        self.assertEqual(("000001",), caught.exception.missing_codes)
+        self.assertEqual(2, calls["000001"])
+        self.assertEqual(1, calls["000002"])
+
+    def test_concurrent_collection_rejects_duplicate_response_rows(self):
+        row = json.loads(self._daily_response()["raw"])["priceInfos"][0]
+
+        def fetcher(_code, _start, _end):
+            return {"raw": json.dumps({"priceInfos": [row, row]}).encode()}
+
+        with self.assertRaisesRegex(ValueError, "duplicate today daily row"):
+            update.collect_today_rows("2026-01-01", self.universe, fetcher=fetcher,
+                                      max_workers=2, retry_sleep=0)
+
+    def test_concurrent_collection_enforces_bounded_worker_count_for_full_universe(self):
+        assets = [{"code": f"{index:06d}", "name": str(index),
+                   "market": "KOSPI" if index % 2 else "KOSDAQ", "assetType": "STOCK"}
+                  for index in range(1, 2769)]
+        full_universe = self.root / "full-universe.json"
+        full_universe.write_text(json.dumps({"assets": assets}), encoding="utf-8")
+        lock = threading.Lock(); active = 0; peak = 0; calls = Counter()
+
+        def fetcher(code, _start, _end):
+            nonlocal active, peak
+            with lock:
+                calls[code] += 1; active += 1; peak = max(peak, active)
+            time.sleep(0.0002)
+            with lock:
+                active -= 1
+            return self._daily_response(close=int(code) + 1)
+
+        rows = update.collect_today_rows("2026-01-01", full_universe, fetcher=fetcher,
+                                         max_workers=4, retry_sleep=0)
+        self.assertEqual(2768, len(rows))
+        self.assertEqual(2768, len(calls))
+        self.assertTrue(all(count == 1 for count in calls.values()))
+        self.assertGreater(peak, 1)
+        self.assertLessEqual(peak, 4)
+        self.assertEqual(sorted(rows), list(rows))
+
+    def test_concurrent_collection_rejects_unbounded_worker_configuration(self):
+        with self.assertRaisesRegex(ValueError, "max_workers"):
+            update.collect_today_rows("2026-01-01", self.universe,
+                                      fetcher=lambda *_args: self._daily_response(),
+                                      max_workers=9, retry_sleep=0)
 
     def test_closing_window_uses_explicit_kst_boundary(self):
         midnight = update.closing_window(datetime(2026, 10, 1, 15, 22, tzinfo=timezone.utc))

@@ -384,6 +384,53 @@ class RelayTests(unittest.TestCase):
             invalid = dict(base, datas=[dict(base['datas'][0], **{field: value})])
             self.assertFalse(relay.daily_cache_is_current(invalid, current))
 
+    def test_stale_raw_daily_accepts_strict_expected_completed_regular_override(self):
+        current = datetime(2026, 10, 7, 8, 5, tzinfo=relay.KST)
+        daily = {'status': 'stale', 'sourceTime': '2026-10-05',
+                 'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
+                 'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
+                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+                            'sourceTime': '20261006153000', 'close': 100,
+                            'high': 100, 'volume': 1000}]}
+        self.assertTrue(relay.daily_cache_is_current(
+            daily, current, expected_completed_date='2026-10-06'))
+        self.assertFalse(relay.daily_cache_is_current(
+            daily, current, expected_completed_date='2026-10-07'))
+
+    def test_expected_completed_regular_override_is_strict_and_date_scoped(self):
+        current = datetime(2026, 10, 7, 8, 5, tzinfo=relay.KST)
+        base = {'status': 'stale', 'sourceTime': '2026-10-05',
+                'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
+                'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
+                           'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+                           'sourceTime': '20261006153000', 'close': 100}]}
+        top_level_cases = [('regularDailyStatus', 'unavailable'),
+                           ('regularSessionDate', '2026-10-05')]
+        for field, value in top_level_cases:
+            invalid = dict(base, **{field: value})
+            self.assertFalse(relay.daily_cache_is_current(
+                invalid, current, expected_completed_date='2026-10-06'))
+        bar_cases = [('date', '2026-10-05'), ('sourceTime', '20261006152900'),
+                     ('sourceTime', '20261006153100'), ('complete', False),
+                     ('session', 'AFTER'), ('barType', 'DAILY'),
+                     ('source', 'NAVER_DAILY')]
+        for field, value in bar_cases:
+            invalid = dict(base, datas=[dict(base['datas'][0], **{field: value})])
+            self.assertFalse(relay.daily_cache_is_current(
+                invalid, current, expected_completed_date='2026-10-06'))
+
+    def test_same_day_and_expected_regular_overrides_do_not_cross_dates(self):
+        current = datetime(2026, 10, 7, 17, 13, tzinfo=relay.KST)
+        daily = {'status': 'stale', 'regularDailyStatus': 'ok',
+                 'regularSessionDate': '2026-10-07',
+                 'datas': [{'date': '2026-10-07', 'complete': True, 'session': 'REGULAR',
+                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
+                            'sourceTime': '20261007153000'}]}
+        self.assertTrue(relay.daily_cache_is_current(daily, current))
+        self.assertFalse(relay.daily_cache_is_current(
+            daily, current, expected_completed_date='2026-10-06'))
+        self.assertFalse(relay._valid_expected_regular_override(daily, '2026-10-06'))
+
     def test_daily_cache_uses_krx_business_day_across_holiday_gap(self):
         current = datetime(2026, 10, 6, 11, 5, tzinfo=relay.KST)
         daily = self.daily_fixture(60)

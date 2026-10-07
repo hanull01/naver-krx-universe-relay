@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import time as time_module
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -19,6 +21,11 @@ FORMAT = "COLUMN_ARRAY_V1"
 MARKETS = ("KOSPI", "KOSDAQ")
 KST = ZoneInfo("Asia/Seoul")
 REGULAR_CLOSE_KST = time(15, 30)
+COLLECT_MAX_WORKERS = 4
+COLLECT_MAX_WORKERS_LIMIT = 8
+COLLECT_RETRIES = 3
+COLLECT_TIMEOUT_SECONDS = 30
+COLLECT_RETRY_SLEEP_SECONDS = 0.5
 
 
 class TodayRowsNotReady(ValueError):
@@ -179,7 +186,11 @@ def normalize_daily_rows(payload, target_date):
     return rows
 
 
-def collect_today_rows(target_date, universe_file, fetcher=None):
+def collect_today_rows(target_date, universe_file, fetcher=None, *,
+                       max_workers=COLLECT_MAX_WORKERS,
+                       retries=COLLECT_RETRIES,
+                       timeout=COLLECT_TIMEOUT_SECONDS,
+                       retry_sleep=COLLECT_RETRY_SLEEP_SECONDS):
     """Collect one observed daily row per authoritative code from NAVER.
 
     This is intentionally a bounded source adapter, not a publisher.  A
@@ -193,29 +204,71 @@ def collect_today_rows(target_date, universe_file, fetcher=None):
     import naver_daily_backfill as daily
     target = compact_date(target_date)
     target_dt = datetime.strptime(target, "%Y%m%d")
-    fetcher = fetcher or daily.fetch
-    output, missing = [], []
-    for market, assets in authoritative_groups(universe_file).items():
-        for code in sorted(assets):
-            response = fetcher(code, target_dt, target_dt)
+    if not isinstance(max_workers, int) or not 1 <= max_workers <= COLLECT_MAX_WORKERS_LIMIT:
+        raise ValueError(f"max_workers must be between 1 and {COLLECT_MAX_WORKERS_LIMIT}")
+    if not isinstance(retries, int) or retries < 1:
+        raise ValueError("retries must be a positive integer")
+    if retry_sleep < 0:
+        raise ValueError("retry_sleep must be non-negative")
+    source_fetcher = fetcher
+    groups = authoritative_groups(universe_file)
+    targets = sorted((code, market) for market, assets in groups.items() for code in assets)
+
+    def fetch_one(code, market):
+        last_error = None
+        for attempt in range(1, retries + 1):
+            try:
+                if source_fetcher is None:
+                    response = daily.fetch(code, target_dt, target_dt, timeout=timeout,
+                                           retries=1, sleep=0)
+                else:
+                    response = source_fetcher(code, target_dt, target_dt)
+            except Exception as error:
+                last_error = error
+                if attempt < retries:
+                    if retry_sleep:
+                        time_module.sleep(retry_sleep)
+                    continue
+                raise RuntimeError(f"daily fetch failed after {retries} attempts: {code}") from error
             payload = json.loads(response["raw"].decode("utf-8"))
             rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
             if not isinstance(rows, list):
                 raise ValueError(f"invalid daily response collection: {code}")
             candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
             if not candidates:
-                missing.append(code)
-                continue
+                if attempt < retries:
+                    if retry_sleep:
+                        time_module.sleep(retry_sleep)
+                    continue
+                return code, None
             if len(candidates) != 1:
                 raise ValueError(f"duplicate today daily row: {code}")
             row = candidates[0]
             reasons = daily.row_validation_reasons(row)
-            output.append({"code": code, "date": target, "close": row.get("closePrice"), "high": row.get("highPrice"),
-                           "volume": row.get("accumulatedTradingVolume"), "closeValid": not any("close" in item for item in reasons),
-                           "ohlcValid": not reasons, "volumeValid": not any("volume" in item for item in reasons),
-                           "market": market})
+            return code, {"code": code, "date": target, "close": row.get("closePrice"),
+                          "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
+                          "closeValid": not any("close" in item for item in reasons),
+                          "ohlcValid": not reasons,
+                          "volumeValid": not any("volume" in item for item in reasons),
+                          "market": market}
+        raise RuntimeError(f"daily fetch failed without result: {code}") from last_error
+
+    collected = {}
+    worker_count = min(max_workers, len(targets))
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        futures = {executor.submit(fetch_one, code, market): code for code, market in targets}
+        for future in as_completed(futures):
+            code, row = future.result()
+            if code in collected:
+                raise ValueError(f"duplicate collected daily code: {code}")
+            collected[code] = row
+    missing = [code for code, _market in targets if collected.get(code) is None]
     if missing:
         raise TodayRowsNotReady(target, missing)
+    expected = {code for code, _market in targets}
+    if set(collected) != expected:
+        raise ValueError("collected authoritative code mismatch")
+    output = [collected[code] for code in sorted(collected)]
     return normalize_daily_rows({"rows": output}, target)
 
 
