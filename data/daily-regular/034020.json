@@ -1,28 +1,16 @@
 {
   "schemaVersion": 1,
   "itemCode": "034020",
-  "generatedAt": "2026-10-07T15:56:43.624542+09:00",
+  "generatedAt": "2026-10-08T15:58:30.200650+09:00",
   "source": "NAVER_MINUTE",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/034020/minute?startDateTime=202610070900&endDateTime=202610071530",
-  "regularDailyStatus": "ok",
-  "status": "ok",
-  "fresh": true,
-  "datas": [
+  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/034020/minute?startDateTime=202610080900&endDateTime=202610081530",
+  "regularDailyStatus": "unavailable",
+  "status": "unavailable",
+  "fresh": false,
+  "datas": [],
+  "errors": [
     {
-      "date": "2026-10-07",
-      "open": 83500,
-      "high": 84300,
-      "low": 80200,
-      "close": 80500,
-      "volume": 2182545,
-      "complete": true,
-      "noTrading": false,
-      "session": "REGULAR",
-      "source": "NAVER_MINUTE",
-      "sourceTime": "20261007153000",
-      "barType": "REGULAR_SESSION"
+      "error": "15:30 minute close is unavailable"
     }
-  ],
-  "errors": [],
-  "sourceTime": "20261007153000"
+  ]
 }
