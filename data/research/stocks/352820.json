@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "352820",
   "itemName": "하이브",
-  "reportCount": 30,
-  "latestReportNid": "96278",
-  "latestWriteDate": "2026-09-22",
+  "reportCount": 31,
+  "latestReportNid": "96554",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96278",
-    "writeDate": "2026-09-22",
-    "brokerName": "SK증권",
-    "title": "BTS로 만든 외형 성장, 앞으로 핵심은 의존도 완화",
-    "goalPrice": 290000,
+    "nid": "96554",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Preview: 컨센서스 부합 전망",
+    "goalPrice": 265000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 10,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 5,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "수요": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96554",
     "96278",
     "94701",
     "94699",

@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "011070",
   "itemName": "LG이노텍",
-  "reportCount": 45,
-  "latestReportNid": "96490",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 46,
+  "latestReportNid": "96546",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96490",
-    "writeDate": "2026-10-07",
-    "brokerName": "미래에셋증권",
-    "title": "It's tek time!",
-    "goalPrice": 1100000,
+    "nid": "96546",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Pre: 잠시 흐린 렌즈, 선명할 기판",
+    "goalPrice": 1200000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 1,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1
+        "환율": 5,
+        "원가": 3,
+        "수요": 2,
+        "가격": 1,
+        "수주": 1,
+        "자동차": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "96546",
     "96490",
     "96432",
     "96354",

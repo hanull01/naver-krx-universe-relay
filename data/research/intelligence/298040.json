@@ -1,43 +1,44 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "298040",
   "itemName": "효성중공업",
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-10-07"
+    "to": "2026-10-08"
   },
-  "reportCount": 30,
+  "reportCount": 31,
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 4300000,
+        "count": 3,
+        "min": 4000000,
         "max": 5000000,
-        "mean": 4650000,
-        "median": 4650000,
-        "stdev": 350000,
-        "range": 700000
+        "mean": 4433333,
+        "median": 4300000,
+        "stdev": 418994,
+        "range": 1000000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 2,
+        "MIXED": 1
       },
       "textSignal": {
-        "positive": 5,
-        "negative": 0,
-        "net": 5,
-        "netPerReport": 2.5
+        "positive": 6,
+        "negative": 3,
+        "net": 3,
+        "netPerReport": 1.0
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     },
@@ -84,11 +85,11 @@
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 1,
         "previousPerReport": 0.5,
-        "perReportDelta": 0.0,
-        "ratio": 1.0
+        "perReportDelta": -0.167,
+        "ratio": 0.67
       },
       {
         "topic": "환율",
@@ -111,15 +112,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 0,
-    "targetMeanChangePct": 13.41,
-    "targetMedianChangePct": 13.41,
-    "targetDispersionChangePct": 250.0
+    "reportCountChange": 1,
+    "targetMeanChangePct": 8.13,
+    "targetMedianChangePct": 4.88,
+    "targetDispersionChangePct": 318.99
   },
   "goalPriceRevisions": {
-    "total": 10,
+    "total": 11,
     "up": 5,
-    "down": 5,
+    "down": 6,
     "flat": 0
   },
   "monthly": {
@@ -275,30 +276,31 @@
       }
     },
     "2026-10": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 4300000,
+        "count": 3,
+        "min": 4000000,
         "max": 5000000,
-        "mean": 4650000,
-        "median": 4650000,
-        "stdev": 350000,
-        "range": 700000
+        "mean": 4433333,
+        "median": 4300000,
+        "stdev": 418994,
+        "range": 1000000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 2,
+        "MIXED": 1
       },
       "textSignal": {
-        "positive": 5,
-        "negative": 0,
-        "net": 5,
-        "netPerReport": 2.5
+        "positive": 6,
+        "negative": 3,
+        "net": 3,
+        "netPerReport": 1.0
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     }
@@ -390,12 +392,12 @@
       ]
     },
     "대신증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 4000000,
-      "latestGoalPrice": 4200000,
-      "changeAmount": 200000,
-      "changePct": 5.0,
+      "latestGoalPrice": 4000000,
+      "changeAmount": 0,
+      "changePct": 0.0,
       "trajectory": [
         {
           "date": "2026-04-13",
@@ -416,6 +418,11 @@
           "date": "2026-08-10",
           "goalPrice": 4200000,
           "title": "주가만 후퇴. 펀더멘털은 전진 앞으로!"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 4000000,
+          "title": "3Q26 일시적 부진. 업황 호조는 지속"
         }
       ]
     },

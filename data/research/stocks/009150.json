@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "reportCount": 67,
-  "latestReportNid": "96512",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 68,
+  "latestReportNid": "96548",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96512",
-    "writeDate": "2026-10-07",
-    "brokerName": "DS투자증권",
-    "title": "매 분기 레벨 업",
-    "goalPrice": 2600000,
+    "nid": "96548",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Pre: 공시가 증명하는 성장",
+    "goalPrice": 2300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 4,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "가격": 2,
-        "수요": 1
+        "가격": 5,
+        "환율": 3,
+        "수요": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96548",
     "96512",
     "96491",
     "96353",

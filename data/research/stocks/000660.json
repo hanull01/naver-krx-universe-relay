@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "reportCount": 67,
-  "latestReportNid": "96468",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 68,
+  "latestReportNid": "96537",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96468",
-    "writeDate": "2026-10-07",
-    "brokerName": "IBK투자증권",
-    "title": "실적에 수급을 더한다",
-    "goalPrice": 4000000,
+    "nid": "96537",
+    "writeDate": "2026-10-08",
+    "brokerName": "유진투자증권",
+    "title": "증명의 시간",
+    "goalPrice": 3700000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 7,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 4,
-        "반도체": 3,
-        "환율": 2
+        "가격": 18,
+        "반도체": 15,
+        "환율": 3,
+        "AI": 1,
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96537",
     "96468",
     "96445",
     "96384",

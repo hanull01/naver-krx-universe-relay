@@ -1,56 +1,61 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "000270",
   "itemName": "기아",
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-03",
-    "to": "2026-09-29"
+    "to": "2026-10-08"
   },
-  "reportCount": 44,
+  "reportCount": 45,
   "brokerCount": 14,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 170000,
-        "max": 195000,
-        "mean": 182500,
-        "median": 182500,
-        "stdev": 12500,
-        "range": 25000
+        "max": 260000,
+        "mean": 208333,
+        "median": 195000,
+        "stdev": 37933,
+        "range": 90000
       },
       "earningsDirection": {
         "DOWN": 1,
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 4,
-        "negative": 4,
-        "net": 0,
-        "netPerReport": 0.0
+        "positive": 16,
+        "negative": 7,
+        "net": 9,
+        "netPerReport": 3.0
       },
       "topics": {
+        "환율": {
+          "count": 2,
+          "perReport": 0.667
+        },
         "원가": {
           "count": 2,
-          "perReport": 1.0
-        },
-        "환율": {
-          "count": 1,
-          "perReport": 0.5
+          "perReport": 0.667
         },
         "중국": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
         "주주환원": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.333
         }
       }
     },
@@ -73,51 +78,60 @@
       {
         "topic": "원가",
         "currentCount": 2,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.667,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.667,
+        "ratio": null
+      },
+      {
+        "topic": "환율",
+        "currentCount": 2,
+        "currentPerReport": 0.667,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.667,
+        "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
         "topic": "주주환원",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
         "topic": "중국",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
-      },
-      {
-        "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
+        "perReportDelta": 0.333,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 2,
+    "reportCountChange": 3,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 11,
+    "total": 12,
     "up": 6,
-    "down": 5,
+    "down": 6,
     "flat": 0
   },
   "monthly": {
@@ -305,6 +319,38 @@
         "주주환원": {
           "count": 1,
           "perReport": 0.5
+        }
+      }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 260000,
+        "max": 260000,
+        "mean": 260000,
+        "median": 260000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 12,
+        "negative": 3,
+        "net": 9,
+        "netPerReport": 9.0
+      },
+      "topics": {
+        "수요": {
+          "count": 1,
+          "perReport": 1.0
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 1.0
         }
       }
     }
@@ -626,12 +672,12 @@
       ]
     },
     "한화투자증권": {
-      "reportCount": 6,
-      "targetPricePointCount": 6,
+      "reportCount": 7,
+      "targetPricePointCount": 7,
       "firstGoalPrice": 245000,
-      "latestGoalPrice": 280000,
-      "changeAmount": 35000,
-      "changePct": 14.29,
+      "latestGoalPrice": 260000,
+      "changeAmount": 15000,
+      "changePct": 6.12,
       "trajectory": [
         {
           "date": "2026-04-07",
@@ -662,6 +708,11 @@
           "date": "2026-07-27",
           "goalPrice": 280000,
           "title": "판매 경쟁력은 견조, 신차 효과는 기대 대비 저조"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 260000,
+          "title": "물량 확대는 증익으로 귀결"
         }
       ]
     }

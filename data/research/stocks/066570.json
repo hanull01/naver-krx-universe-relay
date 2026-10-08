@@ -2,32 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "066570",
   "itemName": "LG전자",
-  "reportCount": 33,
-  "latestReportNid": "96420",
-  "latestWriteDate": "2026-10-02",
+  "reportCount": 39,
+  "latestReportNid": "96560",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96420",
-    "writeDate": "2026-10-02",
-    "brokerName": "신한투자증권",
-    "title": "지금부터 달라진다",
-    "goalPrice": 290000,
+    "nid": "96560",
+    "writeDate": "2026-10-08",
+    "brokerName": "하나증권",
+    "title": "지나간 단기 실적 말고 방향성을 보자",
+    "goalPrice": 260000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 5,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "로봇": 2,
-        "수주": 1
+        "원가": 3,
+        "수요": 2,
+        "환율": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96560",
+    "96547",
+    "96539",
+    "96528",
+    "96527",
+    "96518",
     "96420",
     "96355",
     "95721",

@@ -2,32 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "reportCount": 30,
-  "latestReportNid": "96506",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 31,
+  "latestReportNid": "96543",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96506",
-    "writeDate": "2026-10-07",
-    "brokerName": "하나증권",
-    "title": "매출 이연으로 단기 실적 변동성 확대",
-    "goalPrice": 4300000,
+    "nid": "96543",
+    "writeDate": "2026-10-08",
+    "brokerName": "대신증권",
+    "title": "3Q26 일시적 부진. 업황 호조는 지속",
+    "goalPrice": 4000000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 1,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {
-        "수주": 4,
-        "미국": 1
-      }
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "96543",
     "96506",
     "96493",
     "95820",

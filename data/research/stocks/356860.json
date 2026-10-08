@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "356860",
   "itemName": "티엘비",
-  "reportCount": 13,
-  "latestReportNid": "96484",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 14,
+  "latestReportNid": "96552",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96484",
-    "writeDate": "2026-10-07",
-    "brokerName": "대신증권",
-    "title": "3Q 실적 상향!",
-    "goalPrice": 60000,
+    "nid": "96552",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Pre: 작은 모듈, 큰 레버리지",
+    "goalPrice": 90000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
+        "positive": 4,
         "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 7,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UP",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 3
+        "가격": 2,
+        "환율": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96552",
     "96484",
     "96052",
     "95930",

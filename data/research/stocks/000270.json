@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "000270",
   "itemName": "기아",
-  "reportCount": 44,
-  "latestReportNid": "96338",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 45,
+  "latestReportNid": "96570",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96338",
-    "writeDate": "2026-09-29",
-    "brokerName": "신한투자증권",
-    "title": "피하기 어려운 원가 부담과 경쟁 심화",
-    "goalPrice": 195000,
+    "nid": "96570",
+    "writeDate": "2026-10-08",
+    "brokerName": "한화투자증권",
+    "title": "물량 확대는 증익으로 귀결",
+    "goalPrice": 260000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 12,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 5,
-        "미국": 1,
-        "원가": 1
+        "수요": 2,
+        "자동차": 2,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96570",
     "96338",
     "96303",
     "94566",

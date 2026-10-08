@@ -6,33 +6,34 @@
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-09-15"
+    "to": "2026-10-08"
   },
-  "reportCount": 18,
+  "reportCount": 19,
   "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 200000,
-        "max": 200000,
-        "mean": 200000,
-        "median": 200000,
-        "stdev": 0,
-        "range": 0
+        "max": 240000,
+        "mean": 220000,
+        "median": 220000,
+        "stdev": 20000,
+        "range": 40000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 0,
+        "positive": 2,
         "negative": 0,
-        "net": 0,
-        "netPerReport": 0.0
+        "net": 2,
+        "netPerReport": 1.0
       },
       "topics": {}
     },
@@ -106,14 +107,14 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -3,
-    "targetMeanChangePct": 3.9,
-    "targetMedianChangePct": 5.26,
-    "targetDispersionChangePct": -100.0
+    "reportCountChange": -2,
+    "targetMeanChangePct": 14.29,
+    "targetMedianChangePct": 15.79,
+    "targetDispersionChangePct": 361.89
   },
   "goalPriceRevisions": {
-    "total": 4,
-    "up": 4,
+    "total": 5,
+    "up": 5,
     "down": 0,
     "flat": 0
   },
@@ -293,6 +294,29 @@
           "perReport": 0.5
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 240000,
+        "max": 240000,
+        "mean": 240000,
+        "median": 240000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UP": 1
+      },
+      "textSignal": {
+        "positive": 2,
+        "negative": 0,
+        "net": 2,
+        "netPerReport": 2.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
@@ -337,12 +361,12 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 170000,
-      "latestGoalPrice": 190000,
-      "changeAmount": 20000,
-      "changePct": 11.76,
+      "latestGoalPrice": 240000,
+      "changeAmount": 70000,
+      "changePct": 41.18,
       "trajectory": [
         {
           "date": "2026-05-14",
@@ -358,6 +382,11 @@
           "date": "2026-08-27",
           "goalPrice": 190000,
           "title": "SKIET 흡수합병, 단순화를 넘어 정상화로"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 240000,
+          "title": "탐방 후기: 다윈 LNG, 이익의 근거"
         }
       ]
     },

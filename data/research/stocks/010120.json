@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
-  "reportCount": 25,
-  "latestReportNid": "96505",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 26,
+  "latestReportNid": "96536",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96505",
-    "writeDate": "2026-10-07",
-    "brokerName": "하나증권",
-    "title": "Hakuna Matata",
-    "goalPrice": 270000,
+    "nid": "96536",
+    "writeDate": "2026-10-08",
+    "brokerName": "미래에셋증권",
+    "title": "수주 가이던스 달성 이상 무",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 4,
         "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 3,
-        "환율": 2
+        "가격": 2,
+        "환율": 2,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96536",
     "96505",
     "96494",
     "95823",

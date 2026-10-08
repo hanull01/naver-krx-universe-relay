@@ -2,39 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "005380",
   "itemName": "현대차",
-  "reportCount": 43,
-  "latestReportNid": "96309",
-  "latestWriteDate": "2026-09-23",
+  "reportCount": 44,
+  "latestReportNid": "96571",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96309",
-    "writeDate": "2026-09-23",
-    "brokerName": "삼성증권",
-    "title": "로봇 사업, 조연을 선택하다",
-    "goalPrice": 500000,
+    "nid": "96571",
+    "writeDate": "2026-10-08",
+    "brokerName": "한화투자증권",
+    "title": "실적 부진의 깊이는 실적 반등의 강도로",
+    "goalPrice": 670000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 4
+        "positive": 6,
+        "negative": 9
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 5,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "자동차": 3,
-        "중국": 3,
-        "로봇": 2,
-        "AI": 1,
-        "미국": 1,
-        "반도체": 1,
+        "파업": 2,
+        "환율": 2,
+        "수요": 1,
         "원가": 1,
-        "파업": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96571",
     "96309",
     "95922",
     "95906",

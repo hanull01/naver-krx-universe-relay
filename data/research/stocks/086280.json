@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "086280",
   "itemName": "현대글로비스",
-  "reportCount": 15,
-  "latestReportNid": "96356",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 16,
+  "latestReportNid": "96535",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96356",
-    "writeDate": "2026-09-29",
-    "brokerName": "대신증권",
-    "title": "PCTC 전성시대",
-    "goalPrice": 320000,
+    "nid": "96535",
+    "writeDate": "2026-10-08",
+    "brokerName": "iM증권",
+    "title": "타이트한 PCC 시황, 벨류에이션 매력도 확대",
+    "goalPrice": 325000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 4,
-        "negative": 0
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
+        "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "96535",
     "96356",
     "94480",
     "94452",

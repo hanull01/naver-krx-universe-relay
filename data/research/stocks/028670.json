@@ -2,33 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "028670",
   "itemName": "팬오션",
-  "reportCount": 20,
-  "latestReportNid": "96407",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 21,
+  "latestReportNid": "96545",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96407",
-    "writeDate": "2026-10-01",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre: 점점 더 탄탄해지는 이익 체력",
-    "goalPrice": 9000,
+    "nid": "96545",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "VLCC 확대, 사업구조 다변화에 주목",
+    "goalPrice": 8500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 4,
-        "negative": 0
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1,
-        "조선": 1,
-        "환율": 1
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96545",
     "96407",
     "96201",
     "96013",

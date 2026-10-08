@@ -6,38 +6,43 @@
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-24",
-    "to": "2026-10-07"
+    "to": "2026-10-08"
   },
-  "reportCount": 20,
+  "reportCount": 21,
   "brokerCount": 9,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 134000,
-        "max": 134000,
-        "mean": 134000,
-        "median": 134000,
-        "stdev": 0,
-        "range": 0
+        "max": 135000,
+        "mean": 134500,
+        "median": 134500,
+        "stdev": 500,
+        "range": 1000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 5,
-        "negative": 0,
-        "net": 5,
-        "netPerReport": 5.0
+        "positive": 9,
+        "negative": 9,
+        "net": 0,
+        "netPerReport": 0.0
       },
       "topics": {
         "주주환원": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     },
@@ -58,18 +63,27 @@
     },
     "topicAcceleration": [
       {
-        "topic": "주주환원",
+        "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.5,
+        "ratio": null
+      },
+      {
+        "topic": "주주환원",
+        "currentCount": 1,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -187,30 +201,35 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 134000,
-        "max": 134000,
-        "mean": 134000,
-        "median": 134000,
-        "stdev": 0,
-        "range": 0
+        "max": 135000,
+        "mean": 134500,
+        "median": 134500,
+        "stdev": 500,
+        "range": 1000
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 5,
-        "negative": 0,
-        "net": 5,
-        "netPerReport": 5.0
+        "positive": 9,
+        "negative": 9,
+        "net": 0,
+        "netPerReport": 0.0
       },
       "topics": {
         "주주환원": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     }
@@ -362,8 +381,8 @@
       ]
     },
     "하나증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 126000,
       "latestGoalPrice": 135000,
       "changeAmount": 9000,
@@ -383,6 +402,11 @@
           "date": "2026-07-24",
           "goalPrice": 135000,
           "title": "M&A 이슈가 단기 주가 흐름에 영향을 미칠 전망"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 135000,
+          "title": "증권계열사 부진 등으로 3분기는 전분기대비 감익 예상"
         }
       ]
     },

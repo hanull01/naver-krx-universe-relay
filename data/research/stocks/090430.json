@@ -2,34 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "090430",
   "itemName": "아모레퍼시픽",
-  "reportCount": 30,
-  "latestReportNid": "96350",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 31,
+  "latestReportNid": "96534",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96350",
-    "writeDate": "2026-09-29",
-    "brokerName": "교보증권",
-    "title": "문제없이 순항 중",
-    "goalPrice": 210000,
+    "nid": "96534",
+    "writeDate": "2026-10-08",
+    "brokerName": "SK증권",
+    "title": "영점조절 완료",
+    "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 19,
-        "negative": 3
+        "positive": 0,
+        "negative": 1
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 2,
-        "원가": 1,
-        "자동차": 1,
-        "중국": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96534",
     "96350",
     "96142",
     "96140",

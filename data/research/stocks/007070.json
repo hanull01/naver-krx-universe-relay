@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "007070",
   "itemName": "GS리테일",
-  "reportCount": 22,
-  "latestReportNid": "96130",
-  "latestWriteDate": "2026-09-14",
+  "reportCount": 23,
+  "latestReportNid": "96566",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96130",
-    "writeDate": "2026-09-14",
-    "brokerName": "대신증권",
-    "title": "편의점, 슈퍼 모두 좋다",
-    "goalPrice": 33000,
+    "nid": "96566",
+    "writeDate": "2026-10-08",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview : 수퍼의 강한 반등",
+    "goalPrice": 32000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 5,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96566",
     "96130",
     "95438",
     "95396",

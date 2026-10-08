@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "055550",
   "itemName": "신한지주",
-  "reportCount": 20,
-  "latestReportNid": "96475",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 21,
+  "latestReportNid": "96557",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96475",
-    "writeDate": "2026-10-07",
-    "brokerName": "SK증권",
-    "title": "ROE 10%와 예측 가능한 주주환원",
-    "goalPrice": 134000,
+    "nid": "96557",
+    "writeDate": "2026-10-08",
+    "brokerName": "하나증권",
+    "title": "증권계열사 부진 등으로 3분기는 전분기대비 감익 예상",
+    "goalPrice": 135000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 4,
+        "negative": 9
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsNegativeSignalCount": 5,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "원가": 3,
+        "금리": 1
+      }
     }
   },
   "reportNids": [
+    "96557",
     "96475",
     "94478",
     "94467",

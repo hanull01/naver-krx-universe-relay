@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "006360",
   "itemName": "GS건설",
-  "reportCount": 34,
-  "latestReportNid": "96263",
-  "latestWriteDate": "2026-09-21",
+  "reportCount": 37,
+  "latestReportNid": "96558",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96263",
-    "writeDate": "2026-09-21",
-    "brokerName": "유안타증권",
-    "title": "데이터센터의 전통 강자",
-    "goalPrice": 45000,
+    "nid": "96558",
+    "writeDate": "2026-10-08",
+    "brokerName": "하나증권",
+    "title": "주택과 데이터센터가 만들어줄 턴어라운드",
+    "goalPrice": 46000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 2
+        "positive": 5,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3
+      }
     }
   },
   "reportNids": [
+    "96558",
+    "96544",
+    "96522",
     "96263",
     "95919",
     "95552",

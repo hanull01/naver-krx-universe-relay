@@ -1,28 +1,38 @@
 {
-  "status": "NO_RECENT_RESEARCH",
+  "status": "LOW_SAMPLE",
   "rankingEligible": false,
   "itemCode": "240810",
   "itemName": "원익IPS",
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-05-11",
-    "to": "2026-08-07"
+    "to": "2026-10-08"
   },
-  "reportCount": 3,
-  "brokerCount": 1,
+  "reportCount": 4,
+  "brokerCount": 2,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 165000,
+        "max": 165000,
+        "mean": 165000,
+        "median": 165000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
       "textSignal": {
         "positive": 0,
         "negative": 0,
         "net": 0,
-        "netPerReport": 0
+        "netPerReport": 0.0
       },
       "topics": {}
     },
@@ -44,7 +54,7 @@
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": 0,
+    "reportCountChange": 1,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -134,6 +144,29 @@
           "perReport": 1.0
         }
       }
+    },
+    "2026-10": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 165000,
+        "max": 165000,
+        "mean": 165000,
+        "median": 165000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0.0
+      },
+      "topics": {}
     }
   },
   "brokerTrajectory": {
@@ -159,6 +192,21 @@
           "date": "2026-08-07",
           "goalPrice": 190000,
           "title": "수주가 쌓이기 시작했습니다"
+        }
+      ]
+    },
+    "신한투자증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 165000,
+      "latestGoalPrice": 165000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-08",
+          "goalPrice": 165000,
+          "title": "준비된 자는 두려울 것이 없다"
         }
       ]
     }

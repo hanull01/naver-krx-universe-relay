@@ -6,48 +6,49 @@
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-07"
+    "to": "2026-10-08"
   },
-  "reportCount": 33,
+  "reportCount": 34,
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 5,
-      "brokerCount": 5,
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 5,
-        "min": 1950000,
+        "count": 6,
+        "min": 1900000,
         "max": 2000000,
-        "mean": 1990000,
+        "mean": 1975000,
         "median": 2000000,
-        "stdev": 20000,
-        "range": 50000
+        "stdev": 38188,
+        "range": 100000
       },
       "earningsDirection": {
         "UP": 2,
         "MIXED": 1,
-        "UNKNOWN": 2
+        "UNKNOWN": 2,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 16,
-        "negative": 5,
-        "net": 11,
-        "netPerReport": 2.2
+        "positive": 20,
+        "negative": 7,
+        "net": 13,
+        "netPerReport": 2.167
       },
       "topics": {
         "환율": {
-          "count": 6,
-          "perReport": 1.2
+          "count": 8,
+          "perReport": 1.333
         },
         "원가": {
           "count": 3,
-          "perReport": 0.6
+          "perReport": 0.5
         },
         "수요": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.167
         }
       }
     },
@@ -92,30 +93,30 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 6,
-        "currentPerReport": 1.2,
+        "currentCount": 8,
+        "currentPerReport": 1.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.2,
+        "perReportDelta": 1.333,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 3,
-        "currentPerReport": 0.6,
+        "currentPerReport": 0.5,
         "previousCount": 1,
         "previousPerReport": 0.25,
-        "perReportDelta": 0.35,
-        "ratio": 2.4
+        "perReportDelta": 0.25,
+        "ratio": 2.0
       },
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.2,
+        "currentPerReport": 0.167,
         "previousCount": 1,
         "previousPerReport": 0.25,
-        "perReportDelta": -0.05,
-        "ratio": 0.8
+        "perReportDelta": -0.083,
+        "ratio": 0.67
       },
       {
         "topic": "CAPEX/생산능력",
@@ -129,10 +130,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": 0.76,
+    "reportCountChange": 2,
+    "targetMeanChangePct": 0.0,
     "targetMedianChangePct": 0.0,
-    "targetDispersionChangePct": -73.33
+    "targetDispersionChangePct": -49.08
   },
   "goalPriceRevisions": {
     "total": 8,
@@ -303,40 +304,41 @@
       }
     },
     "2026-10": {
-      "reportCount": 5,
-      "brokerCount": 5,
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 5,
-        "min": 1950000,
+        "count": 6,
+        "min": 1900000,
         "max": 2000000,
-        "mean": 1990000,
+        "mean": 1975000,
         "median": 2000000,
-        "stdev": 20000,
-        "range": 50000
+        "stdev": 38188,
+        "range": 100000
       },
       "earningsDirection": {
         "UP": 2,
         "MIXED": 1,
-        "UNKNOWN": 2
+        "UNKNOWN": 2,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 16,
-        "negative": 5,
-        "net": 11,
-        "netPerReport": 2.2
+        "positive": 20,
+        "negative": 7,
+        "net": 13,
+        "netPerReport": 2.167
       },
       "topics": {
         "환율": {
-          "count": 6,
-          "perReport": 1.2
+          "count": 8,
+          "perReport": 1.333
         },
         "원가": {
           "count": 3,
-          "perReport": 0.6
+          "perReport": 0.5
         },
         "수요": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.167
         }
       }
     }
@@ -433,8 +435,8 @@
       ]
     },
     "교보증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 1900000,
       "latestGoalPrice": 1900000,
       "changeAmount": 0,
@@ -444,6 +446,11 @@
           "date": "2026-07-24",
           "goalPrice": 1900000,
           "title": "2Q26 Review; 방향성을 믿고 갈 때"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 1900000,
+          "title": "3Q26 Preview: 수주 재개 기대, 환율 하락에도 컨센 부합"
         }
       ]
     },

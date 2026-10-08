@@ -1,43 +1,47 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-07"
+    "to": "2026-10-08"
   },
-  "reportCount": 25,
+  "reportCount": 26,
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 270000,
         "max": 300000,
-        "mean": 285000,
-        "median": 285000,
-        "stdev": 15000,
+        "mean": 283333,
+        "median": 280000,
+        "stdev": 12472,
         "range": 30000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 3
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 1,
-        "net": 9,
-        "netPerReport": 4.5
+        "positive": 14,
+        "negative": 2,
+        "net": 12,
+        "netPerReport": 4.0
       },
       "topics": {
         "환율": {
-          "count": 2,
+          "count": 3,
           "perReport": 1.0
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.333
         }
       }
     },
@@ -74,11 +78,20 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 2,
+        "currentCount": 3,
         "currentPerReport": 1.0,
         "previousCount": 0,
         "previousPerReport": 0,
         "perReportDelta": 1.0,
+        "ratio": null
+      },
+      {
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.333,
         "ratio": null
       },
       {
@@ -93,9 +106,9 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": -8.06,
-    "targetMedianChangePct": -8.06,
+    "reportCountChange": 2,
+    "targetMeanChangePct": -8.6,
+    "targetMedianChangePct": -9.68,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
@@ -260,30 +273,34 @@
       }
     },
     "2026-10": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 270000,
         "max": 300000,
-        "mean": 285000,
-        "median": 285000,
-        "stdev": 15000,
+        "mean": 283333,
+        "median": 280000,
+        "stdev": 12472,
         "range": 30000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 3
       },
       "textSignal": {
-        "positive": 10,
-        "negative": 1,
-        "net": 9,
-        "netPerReport": 4.5
+        "positive": 14,
+        "negative": 2,
+        "net": 12,
+        "netPerReport": 4.0
       },
       "topics": {
         "환율": {
-          "count": 2,
+          "count": 3,
           "perReport": 1.0
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.333
         }
       }
     }
@@ -395,8 +412,8 @@
       ]
     },
     "미래에셋증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 230000,
       "latestGoalPrice": 280000,
       "changeAmount": 50000,
@@ -411,6 +428,11 @@
           "date": "2026-07-24",
           "goalPrice": 280000,
           "title": "2Q26 Review: Hyperscaler를 의심하지 말자"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 280000,
+          "title": "수주 가이던스 달성 이상 무"
         }
       ]
     },

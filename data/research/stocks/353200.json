@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "353200",
   "itemName": "대덕전자",
-  "reportCount": 20,
-  "latestReportNid": "96321",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 21,
+  "latestReportNid": "96550",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96321",
-    "writeDate": "2026-09-28",
-    "brokerName": "iM증권",
-    "title": "실적 시즌 가까워질수록 Peer를 캐치업할 전망",
-    "goalPrice": 190000,
+    "nid": "96550",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Pre: 오늘은 믹스, 내일은 캐파",
+    "goalPrice": 200000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 2
+        "positive": 5,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4
+        "수요": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96550",
     "96321",
     "95423",
     "95092",

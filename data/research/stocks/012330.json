@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "012330",
   "itemName": "현대모비스",
-  "reportCount": 34,
-  "latestReportNid": "96404",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 35,
+  "latestReportNid": "96559",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96404",
-    "writeDate": "2026-10-01",
-    "brokerName": "대신증권",
-    "title": "램프사업 매각 가시화, 그래서 주가와 실적은?",
+    "nid": "96559",
+    "writeDate": "2026-10-08",
+    "brokerName": "하나증권",
+    "title": "3Q26 프리뷰: 실적은 AS가 지키고, 재편은 로봇이 이끈다",
     "goalPrice": 580000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 3,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "로봇": 2,
+        "미국": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96559",
     "96404",
     "94565",
     "94564",

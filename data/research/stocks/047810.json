@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "047810",
   "itemName": "한국항공우주",
-  "reportCount": 16,
-  "latestReportNid": "96397",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 17,
+  "latestReportNid": "96553",
+  "latestWriteDate": "2026-10-08",
   "latest": {
-    "nid": "96397",
-    "writeDate": "2026-10-01",
-    "brokerName": "미래에셋증권",
-    "title": "결국 해주는 것도, 해야하는 것도 KF-21",
-    "goalPrice": 186000,
+    "nid": "96553",
+    "writeDate": "2026-10-08",
+    "brokerName": "유안타증권",
+    "title": "3Q Pre: 컨센 소폭 하회하나, YoY 성장은 견고",
+    "goalPrice": 182000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 2,
+        "negative": 1
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 2,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "96553",
     "96397",
     "94912",
     "94761",

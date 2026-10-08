@@ -6,18 +6,18 @@
   "asOf": "2026-10-08",
   "dateRange": {
     "from": "2026-04-09",
-    "to": "2026-10-01"
+    "to": "2026-10-08"
   },
-  "reportCount": 34,
+  "reportCount": 35,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-08",
       "to": "2026-10-08",
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 580000,
         "max": 580000,
         "mean": 580000,
@@ -26,13 +26,14 @@
         "range": 0
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 1,
-        "negative": 1,
-        "net": 0,
-        "netPerReport": 0.0
+        "positive": 4,
+        "negative": 3,
+        "net": 1,
+        "netPerReport": 0.5
       },
       "topics": {}
     },
@@ -54,15 +55,15 @@
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": 1,
+    "reportCountChange": 2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 14,
+    "total": 15,
     "up": 10,
-    "down": 4,
+    "down": 5,
     "flat": 0
   },
   "monthly": {
@@ -217,10 +218,10 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 580000,
         "max": 580000,
         "mean": 580000,
@@ -229,13 +230,14 @@
         "range": 0
       },
       "earningsDirection": {
-        "UNKNOWN": 1
+        "UNKNOWN": 1,
+        "DOWN": 1
       },
       "textSignal": {
-        "positive": 1,
-        "negative": 1,
-        "net": 0,
-        "netPerReport": 0.0
+        "positive": 4,
+        "negative": 3,
+        "net": 1,
+        "netPerReport": 0.5
       },
       "topics": {}
     }
@@ -477,12 +479,12 @@
       ]
     },
     "하나증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 570000,
-      "latestGoalPrice": 680000,
-      "changeAmount": 110000,
-      "changePct": 19.3,
+      "latestGoalPrice": 580000,
+      "changeAmount": 10000,
+      "changePct": 1.75,
       "trajectory": [
         {
           "date": "2026-04-27",
@@ -498,6 +500,11 @@
           "date": "2026-07-27",
           "goalPrice": 680000,
           "title": "하반기 견조한 수익성. 로봇 부품의 확대 모멘텀"
+        },
+        {
+          "date": "2026-10-08",
+          "goalPrice": 580000,
+          "title": "3Q26 프리뷰: 실적은 AS가 지키고, 재편은 로봇이 이끈다"
         }
       ]
     },
