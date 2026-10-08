@@ -96,27 +96,24 @@ jobs:
           target_date='${{ steps.closing_window.outputs.target_date }}'
           extra=()
           if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
-          for attempt in 1 2 3; do
-            now_kst=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat())')
-            echo "Full-market daily readiness attempt ${attempt}/3: targetDate=${target_date}, nowKst=${now_kst}"
-            python tools/build_monitoring_daily_state.py update-latest \
-              --fetch-today --date "$target_date" "${extra[@]}"
-            code=$?
-            if [ "$code" -eq 0 ]; then
-              echo "ready=true" >> "$GITHUB_OUTPUT"
-              echo "attempt=$attempt" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            if [ "$code" -ne 2 ]; then
-              echo "::error::Non-retryable daily update failure (exit=${code}); preserving prior rolling state and baseline."
-              exit "$code"
-            fi
-            echo "NOT_READY: incomplete today rows; no production files were published on attempt ${attempt}."
-            if [ "$attempt" -lt 3 ]; then sleep 300; fi
-          done
+          now_kst=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat())')
+          echo "Full-market daily collection: targetDate=${target_date}, nowKst=${now_kst}"
+          python tools/build_monitoring_daily_state.py update-latest \
+            --fetch-today --refresh-universe --date "$target_date" "${extra[@]}"
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "ready=false" >> "$GITHUB_OUTPUT"
-          echo "::error::Full-market daily data was not ready after 3 attempts; preserving prior rolling state and baseline."
-          exit 1
+          if [ "$code" -eq 2 ]; then
+            echo "::error::Daily rows remained incomplete after per-code bounded retries; preserving prior universe, rolling state, and baseline."
+          elif [ "$code" -eq 4 ]; then
+            echo "::error::UNIVERSE_HISTORY_REQUIRED: new authoritative stocks require explicit history bootstrap; preserving all production artifacts."
+          else
+            echo "::error::Non-retryable daily update failure (exit=${code}); preserving all production artifacts."
+          fi
+          exit "$code"
 
       - name: Commit final rolling state and baseline
         id: publish
@@ -125,13 +122,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Whitelist only the three reviewed production artifacts.  Never
+          # Whitelist only the five lifecycle generation artifacts.  Never
           # stage raw NAVER rows, canonical history, temporary files, or code.
           git add -- \
+            data/market-universe/all-assets.json \
             data/monitoring-daily/kospi.json \
             data/monitoring-daily/kosdaq.json \
+            data/monitoring-daily/universe-lifecycle.json \
             data/monitoring-baseline/latest.json
-          expected=$'data/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/kospi.json'
+          expected=$'data/market-universe/all-assets.json\ndata/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/kospi.json\ndata/monitoring-daily/universe-lifecycle.json'
           actual=$(git diff --cached --name-only | LC_ALL=C sort)
           if [ -z "$actual" ]; then
             echo "No rolling-state changes to commit (same-day NOOP)."

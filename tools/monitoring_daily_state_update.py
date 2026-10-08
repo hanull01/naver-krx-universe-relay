@@ -46,6 +46,14 @@ class TodayRowsNotReady(ValueError):
         )
 
 
+class UniverseHistoryRequired(ValueError):
+    """A newly listed stock needs an explicit historical-state bootstrap."""
+
+    def __init__(self, diagnostics):
+        self.diagnostics = diagnostics
+        super().__init__("UNIVERSE_HISTORY_REQUIRED")
+
+
 def closing_window(now=None):
     """Return the KST-only eligibility decision for a same-day FINAL update."""
     if now is None:
@@ -136,8 +144,14 @@ def encode_stock(code, rows):
             "validity": [mask(row) for row in rows]}
 
 
-def authoritative_groups(universe_file):
-    assets = json.loads(Path(universe_file).read_text(encoding="utf-8")).get("assets", [])
+def _universe_payload(universe):
+    if isinstance(universe, dict):
+        return universe
+    return json.loads(Path(universe).read_text(encoding="utf-8"))
+
+
+def authoritative_groups(universe):
+    assets = _universe_payload(universe).get("assets", [])
     groups = {market: {} for market in MARKETS}; seen = set()
     for asset in assets:
         if asset.get("assetType", "STOCK") != "STOCK": continue
@@ -146,6 +160,86 @@ def authoritative_groups(universe_file):
         seen.add(code); groups[market][code] = asset
     if not all(groups.values()): raise ValueError("empty authoritative market")
     return groups
+
+
+def refresh_stock_universe(previous_universe, stock_payload, target_date):
+    """Replace only STOCK rows after validating an exact NAVER stocklist result."""
+    previous = _universe_payload(previous_universe)
+    metadata = stock_payload.get("metadata") or {}
+    stocks = stock_payload.get("stocks")
+    if not isinstance(stocks, list) or metadata.get("failedCount") != 0:
+        raise ValueError("authoritative stock source incomplete")
+    source_counts = metadata.get("markets") or {}
+    if any(source_counts.get(market) != sum(row.get("market") == market for row in stocks)
+           for market in MARKETS):
+        raise ValueError("authoritative stock source market count mismatch")
+
+    old_groups = authoritative_groups(previous)
+    current = {market: {} for market in MARKETS}
+    for row in stocks:
+        code, market = str(row.get("code") or ""), row.get("market")
+        if not code or market not in current or code in current[market]:
+            raise ValueError("invalid current authoritative stock universe")
+        current[market][code] = row
+    if not all(current.values()):
+        raise ValueError("empty current authoritative market")
+    old_codes = set().union(*(set(group) for group in old_groups.values()))
+    new_codes = set().union(*(set(group) for group in current.values()))
+    removed_codes, added_codes = sorted(old_codes - new_codes), sorted(new_codes - old_codes)
+    market_changed = sorted(code for code in old_codes & new_codes
+                            if next(m for m in MARKETS if code in old_groups[m]) !=
+                               next(m for m in MARKETS if code in current[m]))
+    old_assets = {str(row.get("code")): row for row in previous.get("assets", [])
+                  if row.get("assetType", "STOCK") == "STOCK"}
+    diagnostics = {
+        "date": str(target_date), "status": "UNIVERSE_HISTORY_REQUIRED" if added_codes or market_changed else "READY",
+        "previousCount": len(old_codes), "currentCount": len(new_codes),
+        "previousMarketCounts": {market: len(old_groups[market]) for market in MARKETS},
+        "currentMarketCounts": {market: len(current[market]) for market in MARKETS},
+        "removed": [{"code": code, "name": old_assets.get(code, {}).get("name"),
+                     "reason": "REMOVED_FROM_AUTHORITATIVE_SOURCE"} for code in removed_codes],
+        "added": [{"code": code, "name": next(current[m][code].get("name") for m in MARKETS if code in current[m]),
+                   "reason": "HISTORY_BOOTSTRAP_REQUIRED"} for code in added_codes],
+        "marketChanged": market_changed,
+    }
+    if added_codes or market_changed:
+        raise UniverseHistoryRequired(diagnostics)
+    if not removed_codes:
+        # A same-set refresh is a lifecycle NOOP.  Preserve the committed
+        # universe bytes so a same-day rerun does not create metadata-only
+        # publications or break the atomic five-artifact whitelist.
+        return previous, diagnostics
+    nonstocks = [row for row in previous.get("assets", []) if row.get("assetType", "STOCK") != "STOCK"]
+    new_stocks = sorted(stocks, key=lambda row: (row.get("market") or "", str(row.get("code") or "")))
+    output = dict(previous)
+    output["assets"] = new_stocks + nonstocks
+    output_metadata = dict(previous.get("metadata") or {})
+    counts = dict(output_metadata.get("counts") or {})
+    counts.update({"KOSPI": len(current["KOSPI"]), "KOSDAQ": len(current["KOSDAQ"]),
+                   "STOCK": len(new_codes)})
+    output_metadata.update({"generatedAt": metadata.get("generatedAt") or datetime.now(KST).isoformat(),
+                            "counts": counts, "stockSource": metadata, "lifecycle": diagnostics})
+    output["metadata"] = output_metadata
+    return output, diagnostics
+
+
+def reconcile_authoritative_universe(existing, previous_universe, current_universe, diagnostics):
+    """Remove retired stocks while preserving every unchanged stock history byte-for-byte."""
+    previous_groups = authoritative_groups(previous_universe)
+    current_groups = authoritative_groups(current_universe)
+    previous_codes = set().union(*(set(group) for group in previous_groups.values()))
+    current_codes = set().union(*(set(group) for group in current_groups.values()))
+    if current_codes - previous_codes:
+        raise UniverseHistoryRequired(diagnostics)
+    output = {}
+    for market in MARKETS:
+        payload = dict(existing[market])
+        by_code = {str(stock.get("code")): stock for stock in payload["stocks"]}
+        if set(by_code) != set(previous_groups[market]):
+            raise ValueError(f"previous authoritative code mismatch: {market}")
+        payload["stocks"] = [by_code[code] for code in sorted(current_groups[market])]
+        output[market] = payload
+    return output
 
 
 def load_state(state_dir, universe_file):
@@ -336,3 +430,38 @@ def update_from_rows(existing, incoming, state_dir, target_date, universe_file, 
                                Path(baseline_output): baseline})
     return {"status": "SUCCESS", "changed": changed, "asOfDate": compact_date(target_date),
             "coverage": sum(len(value["stocks"]) for value in updated.values()), "baseline": baseline}
+
+
+def update_with_universe_refresh(state_dir, universe_file, baseline_output, lifecycle_output,
+                                 target_date, stock_payload, fetcher=None, no_write=False,
+                                 **collection_options):
+    """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
+    previous_universe = _universe_payload(universe_file)
+    existing = load_state(state_dir, previous_universe)
+    current_universe, diagnostics = refresh_stock_universe(
+        previous_universe, stock_payload, target_date)
+    reconciled = reconcile_authoritative_universe(
+        existing, previous_universe, current_universe, diagnostics)
+    incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
+                                  **collection_options)
+    updated, changed = update_state(reconciled, incoming, target_date, current_universe)
+    baseline = baseline_from_state(updated, target_date, current_universe, baseline_output)
+    groups = authoritative_groups(current_universe)
+    expected = set().union(*(set(group) for group in groups.values()))
+    state_codes = {str(stock["code"]) for market in MARKETS for stock in updated[market]["stocks"]}
+    baseline_codes = {str(stock["code"]) for stock in baseline["stocks"]}
+    if expected != state_codes or expected != baseline_codes:
+        raise ValueError("atomic authoritative set validation failed")
+    baseline.setdefault("refreshDiagnostics", {})["universeLifecycle"] = diagnostics
+    publication_changed = changed or bool(diagnostics["removed"])
+    if publication_changed and not no_write:
+        transactional_publish({
+            Path(universe_file): current_universe,
+            Path(state_dir) / "kospi.json": updated["KOSPI"],
+            Path(state_dir) / "kosdaq.json": updated["KOSDAQ"],
+            Path(baseline_output): baseline,
+            Path(lifecycle_output): diagnostics,
+        })
+    return {"status": "SUCCESS", "changed": publication_changed,
+            "asOfDate": compact_date(target_date), "coverage": len(expected),
+            "lifecycle": diagnostics, "baseline": baseline}

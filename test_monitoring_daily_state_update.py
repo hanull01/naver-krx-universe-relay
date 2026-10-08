@@ -4,6 +4,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest.mock import patch
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -238,6 +239,163 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             update.transactional_publish({first: {"ok": True}, second: {"bad": {1, 2}}})
         self.assertEqual('{"old":true}\n', first.read_text(encoding="utf-8"))
+
+    def _lifecycle_fixture(self):
+        previous = {"metadata": {"counts": {"STOCK": 3}}, "assets": [
+            {"code": "000001", "name": "A", "market": "KOSPI", "assetType": "STOCK"},
+            {"code": "000003", "name": "C", "market": "KOSPI", "assetType": "STOCK"},
+            {"code": "000002", "name": "B", "market": "KOSDAQ", "assetType": "STOCK"},
+            {"code": "ETF001", "name": "ETF", "market": "KOSPI", "assetType": "ETF"},
+        ]}
+        def stock(code, name, market):
+            return {"code": code, "name": name, "market": market, "assetType": "STOCK",
+                    "source": "naver_stocklist"}
+        return previous, stock
+
+    def _state_for_payload(self, payload):
+        groups = update.authoritative_groups(payload); state = {}
+        for market in update.MARKETS:
+            stocks = []
+            for index, code in enumerate(sorted(groups[market])):
+                row = {"date": "20261007", "close": 100 + index, "high": 110 + index,
+                       "volume": 10 + index, "closeValid": True, "ohlcValid": True,
+                       "volumeValid": True}
+                stocks.append(update.encode_stock(code, [row]))
+            state[market] = {"schemaVersion": 1, "format": update.FORMAT, "market": market,
+                             "retainedObservations": 301, "publicationStatus": "FINAL", "stocks": stocks}
+        return state
+
+    def test_removed_stock_reconciles_without_mutating_remaining_history(self):
+        previous, stock = self._lifecycle_fixture()
+        source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
+                  "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1},
+                               "generatedAt": "t"}}
+        current, diagnostics = update.refresh_stock_universe(previous, source, "2026-10-08")
+        before = self._state_for_payload(previous)
+        result = update.reconcile_authoritative_universe(before, previous, current, diagnostics)
+        self.assertEqual(["000003"], [item["code"] for item in diagnostics["removed"]])
+        self.assertEqual("REMOVED_FROM_AUTHORITATIVE_SOURCE", diagnostics["removed"][0]["reason"])
+        self.assertEqual(2, diagnostics["currentCount"])
+        self.assertEqual(before["KOSPI"]["stocks"][0], result["KOSPI"]["stocks"][0])
+        self.assertEqual({"000001", "000002"}, {s["code"] for m in update.MARKETS for s in result[m]["stocks"]})
+        self.assertIn("ETF001", {item["code"] for item in current["assets"]})
+
+    def test_added_and_mixed_universe_fail_closed(self):
+        previous, stock = self._lifecycle_fixture()
+        added = stock("000004", "D", "KOSDAQ")
+        for stocks in (
+            [stock("000001", "A", "KOSPI"), stock("000003", "C", "KOSPI"),
+             stock("000002", "B", "KOSDAQ"), added],
+            [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ"), added],
+        ):
+            source = {"stocks": stocks, "metadata": {"failedCount": 0,
+                "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS}}}
+            with self.assertRaises(update.UniverseHistoryRequired) as caught:
+                update.refresh_stock_universe(previous, source, "2026-10-08")
+            self.assertEqual("UNIVERSE_HISTORY_REQUIRED", caught.exception.diagnostics["status"])
+            self.assertEqual(["000004"], [item["code"] for item in caught.exception.diagnostics["added"]])
+
+    def test_universe_source_failure_is_rejected_before_transition(self):
+        previous, stock = self._lifecycle_fixture()
+        source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
+                  "metadata": {"failedCount": 1, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
+        original = json.dumps(previous, sort_keys=True)
+        with self.assertRaisesRegex(ValueError, "source incomplete"):
+            update.refresh_stock_universe(previous, source, "2026-10-08")
+        self.assertEqual(original, json.dumps(previous, sort_keys=True))
+
+    def test_lifecycle_publish_is_atomic_and_exact_against_new_set(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "lifecycle-universe.json"
+        universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "lifecycle-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "baseline.json"; baseline_path.write_text('{"old":true}', encoding="utf-8")
+        lifecycle_path = self.root / "lifecycle.json"
+        source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
+                  "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
+
+        def fetcher(_code, _start, _end): return self._daily_response("20261008")
+        def fake_baseline(state, target, current, _output):
+            assets = update.authoritative_groups(current)
+            return {"asOfDate": update.compact_date(target), "authoritativeCount": 2, "count": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "market": market} for market in update.MARKETS for code in sorted(assets[market])],
+                    "refreshDiagnostics": {}}
+
+        with patch.object(update, "baseline_from_state", side_effect=fake_baseline):
+            outcome = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                fetcher=fetcher, retry_sleep=0)
+        self.assertEqual(2, outcome["coverage"])
+        self.assertEqual(2, json.loads(baseline_path.read_text())["authoritativeCount"])
+        self.assertEqual({"000001", "000002"}, set().union(*(
+            set(update.authoritative_groups(universe)[market]) for market in update.MARKETS)))
+
+    def test_lifecycle_validation_failure_leaves_every_artifact_unchanged(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "atomic-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "atomic-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "atomic-baseline.json"; baseline_path.write_text('{"old":true}', encoding="utf-8")
+        lifecycle_path = self.root / "atomic-lifecycle.json"
+        before = {path: path.read_bytes() for path in (universe, baseline_path, state_dir / "kospi.json", state_dir / "kosdaq.json")}
+        source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
+                  "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
+        with self.assertRaises(update.TodayRowsNotReady):
+            update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                fetcher=lambda *_args: {"raw": b'{"priceInfos":[]}'}, retries=1, retry_sleep=0)
+        self.assertFalse(lifecycle_path.exists())
+        self.assertTrue(all(path.read_bytes() == content for path, content in before.items()))
+
+    def test_real_regression_shape_removes_196490_without_special_case(self):
+        previous, stock = self._lifecycle_fixture()
+        previous["assets"].append(stock("196490", "디에이테크놀로지", "KOSDAQ"))
+        stocks = [row for row in previous["assets"] if row.get("assetType") == "STOCK" and row["code"] != "196490"]
+        source = {"stocks": stocks, "metadata": {"failedCount": 0,
+                  "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS}}}
+        _current, diagnostics = update.refresh_stock_universe(previous, source, "2026-10-08")
+        self.assertEqual(["196490"], [item["code"] for item in diagnostics["removed"]])
+
+    def test_universe_transition_is_deterministic_across_source_order(self):
+        previous, stock = self._lifecycle_fixture()
+        stocks = [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")]
+        metadata = {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}, "generatedAt": "t"}
+        first = update.refresh_stock_universe(previous, {"stocks": stocks, "metadata": metadata}, "2026-10-08")
+        second = update.refresh_stock_universe(previous, {"stocks": list(reversed(stocks)), "metadata": metadata}, "2026-10-08")
+        self.assertEqual(first, second)
+
+    def test_same_set_universe_refresh_is_metadata_noop(self):
+        previous, _stock = self._lifecycle_fixture()
+        stocks = [row for row in previous["assets"] if row.get("assetType") == "STOCK"]
+        source = {"stocks": list(reversed(stocks)), "metadata": {"failedCount": 0,
+                  "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS},
+                  "generatedAt": "new-runtime-time"}}
+        current, diagnostics = update.refresh_stock_universe(previous, source, "2026-10-08")
+        self.assertEqual(previous, current)
+        self.assertEqual([], diagnostics["removed"])
+        self.assertEqual([], diagnostics["added"])
+
+    def test_concurrent_collection_2767_calls_each_active_code_once(self):
+        assets = [{"code": f"{index:06d}", "name": str(index),
+                   "market": "KOSPI" if index % 2 else "KOSDAQ", "assetType": "STOCK"}
+                  for index in range(1, 2768)]
+        universe = self.root / "active-2767.json"
+        universe.write_text(json.dumps({"assets": assets}), encoding="utf-8")
+        calls = Counter()
+        def fetcher(code, _start, _end):
+            calls[code] += 1
+            return self._daily_response(close=int(code) + 1)
+        started = time.perf_counter()
+        rows = update.collect_today_rows("2026-01-01", universe, fetcher=fetcher,
+                                         max_workers=4, retry_sleep=0)
+        self.performance_elapsed = time.perf_counter() - started
+        self.assertEqual(2767, len(rows))
+        self.assertEqual(2767, sum(calls.values()))
+        self.assertTrue(all(count == 1 for count in calls.values()))
 
 
 if __name__ == "__main__": unittest.main()

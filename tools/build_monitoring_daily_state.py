@@ -70,8 +70,11 @@ def main():
     p.add_argument('--canonical-dir',default=str(CANONICAL)); p.add_argument('--universe-file',default=str(UNIVERSE))
     p.add_argument('--daily-input', help='complete validated whole-market daily rows JSON for update-latest')
     p.add_argument('--fetch-today', action='store_true', help='collect one current daily row per authoritative code from NAVER')
+    p.add_argument('--refresh-universe', action='store_true',
+                   help='refresh NAVER STOCK universe and atomically reconcile removed stocks')
     p.add_argument('--date', help='target KRX trading day (YYYY-MM-DD) for update-latest')
     p.add_argument('--baseline-output', default=str(ROOT/'data/monitoring-baseline/latest.json'))
+    p.add_argument('--lifecycle-output', default=str(ROOT/'data/monitoring-daily/universe-lifecycle.json'))
     p.add_argument('--closing-window', action='store_true', help='print KST final-daily eligibility without collecting data')
     p.add_argument('--no-write',action='store_true'); a=p.parse_args()
     if a.closing_window:
@@ -81,18 +84,33 @@ def main():
     if a.command == 'update-latest':
         if not a.date or bool(a.daily_input) == bool(a.fetch_today):
             p.error('update-latest requires --date and exactly one of --daily-input or --fetch-today')
-        from monitoring_daily_state_update import (TodayRowsNotReady, collect_today_rows, load_state, update_from_file, update_from_rows)
+        from monitoring_daily_state_update import (TodayRowsNotReady, UniverseHistoryRequired,
+            collect_today_rows, load_state, update_from_file, update_from_rows,
+            update_with_universe_refresh)
         try:
             if a.fetch_today:
-                outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
-                                           collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
-                                           a.universe_file, a.baseline_output, no_write=a.no_write)
+                if a.refresh_universe:
+                    from naver_market_universe_builder import collect_stocklist, ensure_complete
+                    stock_payload = collect_stocklist()
+                    ensure_complete(stock_payload)
+                    outcome = update_with_universe_refresh(
+                        a.output_dir, a.universe_file, a.baseline_output,
+                        a.lifecycle_output, a.date, stock_payload, no_write=a.no_write)
+                else:
+                    outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
+                                               collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
+                                               a.universe_file, a.baseline_output, no_write=a.no_write)
             else:
+                if a.refresh_universe:
+                    p.error('--refresh-universe requires --fetch-today')
                 outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
                                            a.baseline_output, no_write=a.no_write)
         except TodayRowsNotReady as exc:
             print(json.dumps(exc.diagnostics, ensure_ascii=False))
             return 2
+        except UniverseHistoryRequired as exc:
+            print(json.dumps(exc.diagnostics, ensure_ascii=False))
+            return 4
         except ValueError as exc:
             print(json.dumps({'status': 'ERROR', 'errorType': type(exc).__name__, 'message': str(exc)}, ensure_ascii=False))
             return 3

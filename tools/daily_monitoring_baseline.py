@@ -90,7 +90,8 @@ def read_history(code, history_dir=HISTORY_DIR, max_rows=300, before_date=None):
 
 
 def asset_map(universe_file=UNIVERSE_FILE):
-    payload = json.loads(Path(universe_file).read_text(encoding="utf-8"))
+    payload = (universe_file if isinstance(universe_file, dict)
+               else json.loads(Path(universe_file).read_text(encoding="utf-8")))
     return {str(row["code"]): row for row in payload.get("assets", []) if row.get("assetType") == "STOCK"}
 
 
