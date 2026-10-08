@@ -192,19 +192,19 @@ def refresh_stock_universe(previous_universe, stock_payload, target_date):
     old_assets = {str(row.get("code")): row for row in previous.get("assets", [])
                   if row.get("assetType", "STOCK") == "STOCK"}
     diagnostics = {
-        "date": str(target_date), "status": "UNIVERSE_HISTORY_REQUIRED" if added_codes or market_changed else "READY",
+        "date": str(target_date), "status": "UNIVERSE_HISTORY_REQUIRED" if market_changed else "READY",
         "previousCount": len(old_codes), "currentCount": len(new_codes),
         "previousMarketCounts": {market: len(old_groups[market]) for market in MARKETS},
         "currentMarketCounts": {market: len(current[market]) for market in MARKETS},
         "removed": [{"code": code, "name": old_assets.get(code, {}).get("name"),
                      "reason": "REMOVED_FROM_AUTHORITATIVE_SOURCE"} for code in removed_codes],
         "added": [{"code": code, "name": next(current[m][code].get("name") for m in MARKETS if code in current[m]),
-                   "reason": "HISTORY_BOOTSTRAP_REQUIRED"} for code in added_codes],
+                   "reason": "ADDED_TO_AUTHORITATIVE_SOURCE"} for code in added_codes],
         "marketChanged": market_changed,
     }
-    if added_codes or market_changed:
+    if market_changed:
         raise UniverseHistoryRequired(diagnostics)
-    if not removed_codes:
+    if not removed_codes and not added_codes:
         # A same-set refresh is a lifecycle NOOP.  Preserve the committed
         # universe bytes so a same-day rerun does not create metadata-only
         # publications or break the atomic five-artifact whitelist.
@@ -224,20 +224,17 @@ def refresh_stock_universe(previous_universe, stock_payload, target_date):
 
 
 def reconcile_authoritative_universe(existing, previous_universe, current_universe, diagnostics):
-    """Remove retired stocks while preserving every unchanged stock history byte-for-byte."""
+    """Preserve unchanged histories, remove retired stocks, and add empty observed-only states."""
     previous_groups = authoritative_groups(previous_universe)
     current_groups = authoritative_groups(current_universe)
-    previous_codes = set().union(*(set(group) for group in previous_groups.values()))
-    current_codes = set().union(*(set(group) for group in current_groups.values()))
-    if current_codes - previous_codes:
-        raise UniverseHistoryRequired(diagnostics)
     output = {}
     for market in MARKETS:
         payload = dict(existing[market])
         by_code = {str(stock.get("code")): stock for stock in payload["stocks"]}
         if set(by_code) != set(previous_groups[market]):
             raise ValueError(f"previous authoritative code mismatch: {market}")
-        payload["stocks"] = [by_code[code] for code in sorted(current_groups[market])]
+        payload["stocks"] = [by_code.get(code, encode_stock(code, []))
+                             for code in sorted(current_groups[market])]
         output[market] = payload
     return output
 
@@ -442,6 +439,20 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
         previous_universe, stock_payload, target_date)
     reconciled = reconcile_authoritative_universe(
         existing, previous_universe, current_universe, diagnostics)
+    target = compact_date(target_date)
+    lifecycle_changed = bool(diagnostics["removed"] or diagnostics["added"])
+    if not lifecycle_changed and all(
+            state.get("publicationStatus", "FINAL") == "FINAL" and
+            compact_date(state.get("asOfDate")) == target for state in existing.values()):
+        baseline = json.loads(Path(baseline_output).read_text(encoding="utf-8"))
+        expected = set().union(*(set(group) for group in authoritative_groups(current_universe).values()))
+        baseline_codes = {str(stock.get("code")) for stock in baseline.get("stocks", [])}
+        if (compact_date(baseline.get("asOfDate")) != target or baseline_codes != expected or
+                baseline.get("authoritativeCount") != len(expected) or baseline.get("count") != len(expected) or
+                baseline.get("coveragePct") != 100.0 or baseline.get("historyStatus") != "OK"):
+            raise ValueError("same-day final generation baseline mismatch")
+        return {"status": "SUCCESS", "changed": False, "asOfDate": target,
+                "coverage": len(expected), "lifecycle": diagnostics, "baseline": baseline}
     incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
                                   **collection_options)
     updated, changed = update_state(reconciled, incoming, target_date, current_universe)
@@ -453,7 +464,7 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
     if expected != state_codes or expected != baseline_codes:
         raise ValueError("atomic authoritative set validation failed")
     baseline.setdefault("refreshDiagnostics", {})["universeLifecycle"] = diagnostics
-    publication_changed = changed or bool(diagnostics["removed"])
+    publication_changed = changed or lifecycle_changed
     if publication_changed and not no_write:
         transactional_publish({
             Path(universe_file): current_universe,

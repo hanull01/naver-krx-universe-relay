@@ -109,7 +109,7 @@ jobs:
           if [ "$code" -eq 2 ]; then
             echo "::error::Daily rows remained incomplete after per-code bounded retries; preserving prior universe, rolling state, and baseline."
           elif [ "$code" -eq 4 ]; then
-            echo "::error::UNIVERSE_HISTORY_REQUIRED: new authoritative stocks require explicit history bootstrap; preserving all production artifacts."
+            echo "::error::UNIVERSE_HISTORY_REQUIRED: authoritative market membership changed; preserving all production artifacts."
           else
             echo "::error::Non-retryable daily update failure (exit=${code}); preserving all production artifacts."
           fi

@@ -280,7 +280,7 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual({"000001", "000002"}, {s["code"] for m in update.MARKETS for s in result[m]["stocks"]})
         self.assertIn("ETF001", {item["code"] for item in current["assets"]})
 
-    def test_added_and_mixed_universe_fail_closed(self):
+    def test_added_and_mixed_universe_create_empty_observed_only_state(self):
         previous, stock = self._lifecycle_fixture()
         added = stock("000004", "D", "KOSDAQ")
         for stocks in (
@@ -290,10 +290,13 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         ):
             source = {"stocks": stocks, "metadata": {"failedCount": 0,
                 "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS}}}
-            with self.assertRaises(update.UniverseHistoryRequired) as caught:
-                update.refresh_stock_universe(previous, source, "2026-10-08")
-            self.assertEqual("UNIVERSE_HISTORY_REQUIRED", caught.exception.diagnostics["status"])
-            self.assertEqual(["000004"], [item["code"] for item in caught.exception.diagnostics["added"]])
+            current, diagnostics = update.refresh_stock_universe(previous, source, "2026-10-08")
+            reconciled = update.reconcile_authoritative_universe(
+                self._state_for_payload(previous), previous, current, diagnostics)
+            self.assertEqual("READY", diagnostics["status"])
+            self.assertEqual(["000004"], [item["code"] for item in diagnostics["added"]])
+            added_state = next(item for item in reconciled["KOSDAQ"]["stocks"] if item["code"] == "000004")
+            self.assertEqual([], update.decode_stock(added_state))
 
     def test_universe_source_failure_is_rejected_before_transition(self):
         previous, stock = self._lifecycle_fixture()
@@ -332,6 +335,63 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual(2, json.loads(baseline_path.read_text())["authoritativeCount"])
         self.assertEqual({"000001", "000002"}, set().union(*(
             set(update.authoritative_groups(universe)[market]) for market in update.MARKETS)))
+
+    def test_added_stock_publishes_with_only_observed_target_row(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "added-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "added-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "added-baseline.json"; baseline_path.write_text('{"old":true}', encoding="utf-8")
+        lifecycle_path = self.root / "added-lifecycle.json"
+        stocks = [row for row in previous["assets"] if row.get("assetType") == "STOCK"]
+        stocks.append(stock("000004", "D", "KOSDAQ"))
+        source = {"stocks": stocks, "metadata": {"failedCount": 0,
+                  "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS}}}
+        captured = {}
+        def fake_baseline(state, target, current, _output):
+            captured["addedRows"] = update.decode_stock(next(
+                item for item in state["KOSDAQ"]["stocks"] if item["code"] == "000004"))
+            assets = update.authoritative_groups(current)
+            rows = [{"code": code, "market": market} for market in update.MARKETS for code in sorted(assets[market])]
+            return {"asOfDate": update.compact_date(target), "authoritativeCount": 4, "count": 4,
+                    "coveragePct": 100.0, "historyStatus": "OK", "stocks": rows,
+                    "refreshDiagnostics": {}}
+        with patch.object(update, "baseline_from_state", side_effect=fake_baseline):
+            outcome = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                fetcher=lambda *_args: self._daily_response("20261008"), retry_sleep=0)
+        self.assertEqual(4, outcome["coverage"])
+        self.assertEqual(1, len(captured["addedRows"]))
+        self.assertEqual("20261008", captured["addedRows"][0]["date"])
+        self.assertEqual(4, json.loads(baseline_path.read_text())["count"])
+        compact = baseline.baseline_stock(
+            {"code": "000004", "name": "D", "market": "KOSDAQ"}, captured["addedRows"])
+        self.assertEqual(1, compact["closeState"]["20"]["count"])
+        self.assertLess(compact["closeState"]["20"]["count"], 19)
+
+    def test_same_day_final_generation_is_noop_without_daily_fetch(self):
+        previous, _stock = self._lifecycle_fixture()
+        universe = self.root / "noop-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "noop-state"; state_dir.mkdir()
+        state = self._state_for_payload(previous)
+        for market, payload in state.items():
+            payload["asOfDate"] = "20261008"
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        codes = [row["code"] for row in previous["assets"] if row.get("assetType") == "STOCK"]
+        baseline_path = self.root / "noop-baseline.json"
+        baseline_path.write_text(json.dumps({"asOfDate": "20261008", "authoritativeCount": 3,
+            "count": 3, "coveragePct": 100.0, "historyStatus": "OK",
+            "stocks": [{"code": code} for code in codes]}), encoding="utf-8")
+        calls = Counter()
+        def forbidden_fetch(code, *_args): calls[code] += 1; raise AssertionError("must not fetch")
+        source = {"stocks": [row for row in previous["assets"] if row.get("assetType") == "STOCK"],
+                  "metadata": {"failedCount": 0, "markets": {"KOSPI": 2, "KOSDAQ": 1}}}
+        outcome = update.update_with_universe_refresh(
+            state_dir, universe, baseline_path, self.root / "noop-lifecycle.json",
+            "2026-10-08", source, fetcher=forbidden_fetch, retry_sleep=0)
+        self.assertFalse(outcome["changed"])
+        self.assertEqual({}, dict(calls))
 
     def test_lifecycle_validation_failure_leaves_every_artifact_unchanged(self):
         previous, stock = self._lifecycle_fixture()
