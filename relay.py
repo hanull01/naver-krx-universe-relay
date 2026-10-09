@@ -730,17 +730,98 @@ def build_regular_daily_bar(rows, current):
     }
 
 
+VERIFIED_REGULAR_CLOSE_SOURCE = 'NAVER_VERIFIED_REGULAR_CLOSE'
+VERIFIED_REGULAR_CLOSE_METHOD = 'DAILY_REALTIME_MATCH'
+
+
+def build_verified_regular_daily_bar(daily, realtime, current, code):
+    """Verify NAVER's exact-date regular close through daily and realtime views."""
+    target_date = current.date()
+    target_text = target_date.isoformat()
+    daily_rows = [row for row in (daily or {}).get('datas', [])
+                  if isinstance(row, dict) and row.get('date') == target_text]
+    if len(daily_rows) != 1:
+        raise ValueError('exact-date NAVER daily close is unavailable')
+    daily_row = daily_rows[0]
+    daily_close = number(daily_row.get('close'), 'daily.close')
+    if daily_close <= 0:
+        raise ValueError('daily.close must be positive')
+
+    realtime_rows = (realtime or {}).get('datas', [])
+    matches = [row for row in realtime_rows if isinstance(row, dict)
+               and row.get('itemCode') == code]
+    if len(matches) != 1:
+        raise ValueError('exact realtime quote is unavailable')
+    quote = matches[0]
+    if quote.get('marketStatus') != 'CLOSE':
+        raise ValueError('realtime marketStatus is not CLOSE')
+    if quote.get('marketStatusDetailType') != 'close':
+        raise ValueError('realtime marketStatusDetailType is not close')
+    exchange = quote.get('stockExchangeType', {})
+    delay = exchange.get('delayTime')
+    if number(delay, 'realtime.delayTime') != 0:
+        raise ValueError('realtime quote is delayed')
+    if str(exchange.get('endTime')) != '1530':
+        raise ValueError('realtime regular-session endTime mismatch')
+    close_send_time = str(exchange.get('closePriceSendTime') or '')
+    if not re.fullmatch(r'\d{4}', close_send_time):
+        raise ValueError('invalid realtime closePriceSendTime')
+    close_send = dtime(int(close_send_time[:2]), int(close_send_time[2:]))
+    if current.astimezone(KST).time() < close_send:
+        raise ValueError('NAVER final regular close is not published yet')
+    try:
+        traded = datetime.fromisoformat(str(quote.get('localTradedAt')))
+    except ValueError as exc:
+        raise ValueError('invalid realtime.localTradedAt') from exc
+    if traded.tzinfo is None:
+        traded = traded.replace(tzinfo=KST)
+    traded = traded.astimezone(KST)
+    if traded.date() != target_date:
+        raise ValueError('realtime quote date mismatch')
+    realtime_close = number(quote.get('closePrice'), 'realtime.closePrice')
+    if realtime_close <= 0:
+        raise ValueError('realtime.closePrice must be positive')
+    if daily_close != realtime_close:
+        raise ValueError('NAVER daily/realtime regular close mismatch')
+
+    values = {}
+    for key in ('open', 'high', 'low', 'volume'):
+        values[key] = number(daily_row.get(key), f'daily.{key}')
+    no_trading = bool(daily_row.get('noTrading', False))
+    valid_ohlcv = (values['open'] == values['high'] == values['low'] == values['volume'] == 0
+                   if no_trading else
+                   0 < values['low'] <= daily_close <= values['high']
+                   and values['low'] <= values['open'] <= values['high']
+                   and values['volume'] >= 0)
+    if not valid_ohlcv:
+        raise ValueError('invalid exact-date NAVER daily OHLCV')
+    return {
+        'date': target_text, **values, 'close': daily_close,
+        'complete': True, 'noTrading': no_trading,
+        'session': 'REGULAR', 'barType': 'REGULAR_SESSION',
+        'source': VERIFIED_REGULAR_CLOSE_SOURCE,
+        'verification': VERIFIED_REGULAR_CLOSE_METHOD,
+        'sourceDate': target_text,
+        'sourceTime': traded.isoformat(),
+        'sessionCloseTime': '15:30',
+        'marketStatus': quote['marketStatus'],
+        'marketStatusDetailType': quote['marketStatusDetailType'],
+        'delayTime': 0, 'closePriceSendTime': close_send_time,
+    }
+
+
 def collect_regular_daily(code, current=None):
-    """Persist the optional completed regular-session candle separately from raw daily."""
+    """Persist a NAVER daily/realtime cross-verified regular-session candle."""
     current = current or now()
-    day = current.strftime('%Y%m%d')
-    url = (MINUTE_URL.format(code=code)
-           + f'?startDateTime={day}0900&endDateTime={day}1530')
+    url = QUOTE_URL + code
     payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
-               'source': 'NAVER_MINUTE', 'sourceUrl': url, 'regularDailyStatus': 'unavailable',
+               'source': VERIFIED_REGULAR_CLOSE_SOURCE, 'sourceUrl': url,
+               'verification': VERIFIED_REGULAR_CLOSE_METHOD,
+               'regularDailyStatus': 'unavailable',
                'status': 'unavailable', 'fresh': False, 'datas': [], 'errors': []}
     try:
-        bar = build_regular_daily_bar(fetch(url), current)
+        daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
+        bar = build_verified_regular_daily_bar(daily, fetch(url), current, code)
         payload.update(status='ok', regularDailyStatus='ok', fresh=True,
                        sourceTime=bar['sourceTime'], datas=[bar])
     except Exception as exc:
@@ -815,7 +896,7 @@ def load_daily_for_technical(code):
     if len(bars) != 1:
         return daily
     bar = bars[0]
-    if (not bar.get('sourceTime') or bar.get('source') != 'NAVER_MINUTE'):
+    if (not bar.get('sourceTime') or bar.get('source') != VERIFIED_REGULAR_CLOSE_SOURCE):
         return daily
     merged = dict(daily)
     merged['datas'] = sorted([row for row in daily.get('datas', []) if row.get('date') != bar['date']] + [bar],
@@ -842,11 +923,21 @@ def _valid_regular_override_for_date(daily, target_date):
         return False
     bar = bars[0]
     source_time = str(bar.get('sourceTime') or '')
+    try:
+        realtime_date = datetime.fromisoformat(source_time).astimezone(KST).date()
+    except (TypeError, ValueError):
+        return False
     return (bar.get('complete') is True
             and bar.get('session') == 'REGULAR'
             and bar.get('barType') == 'REGULAR_SESSION'
-            and bar.get('source') == 'NAVER_MINUTE'
-            and source_time == target.strftime('%Y%m%d153000'))
+            and bar.get('source') == VERIFIED_REGULAR_CLOSE_SOURCE
+            and bar.get('verification') == VERIFIED_REGULAR_CLOSE_METHOD
+            and bar.get('sourceDate') == target_text
+            and realtime_date == target
+            and bar.get('sessionCloseTime') == '15:30'
+            and bar.get('marketStatus') == 'CLOSE'
+            and bar.get('marketStatusDetailType') == 'close'
+            and bar.get('delayTime') == 0)
 
 
 def _valid_same_day_regular_override(daily, current):
@@ -1010,7 +1101,7 @@ def verified_regular_session_bar(daily, quote):
     if len(bars) != 1:
         return None
     bar = bars[0]
-    if (bar.get('sourceTime') != target.strftime('%Y%m%d153000')
+    if (not _valid_same_day_regular_override(daily, target)
             or any(not isinstance(bar.get(key), (int, float)) for key in ('close', 'high'))):
         return None
     return bar

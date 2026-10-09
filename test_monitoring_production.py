@@ -178,8 +178,14 @@ class MonitoringProductionTests(unittest.TestCase):
                 "priceVsMA20": "above", "priceVsMA60": "below", "breakout20": "confirmed",
                 "ma20": 100, "ma60": 120, "priorHigh20": 115} for code in codes]}))
             bar = {"date": "2026-10-06", "complete": True, "session": "REGULAR",
-                   "barType": "REGULAR_SESSION", "source": "NAVER_MINUTE",
-                   "sourceTime": "20261006153000", "close": 110, "high": 116}
+                   "barType": "REGULAR_SESSION",
+                   "source": "NAVER_VERIFIED_REGULAR_CLOSE",
+                   "verification": "DAILY_REALTIME_MATCH",
+                   "sourceDate": "2026-10-06",
+                   "sourceTime": "2026-10-06T20:00:00+09:00",
+                   "sessionCloseTime": "15:30", "marketStatus": "CLOSE",
+                   "marketStatusDetailType": "close", "delayTime": 0,
+                   "close": 110, "high": 116}
             previous_closes = [100, 120, 110, None] + [100] * 38
             for code, previous_close in zip(codes, previous_closes):
                 (regular / f"{code}.json").write_text(json.dumps({"regularDailyStatus": "ok", "datas": [bar]}))
@@ -240,7 +246,7 @@ class MonitoringProductionTests(unittest.TestCase):
         report = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
         self.assertIn('cron: "10,30,50 23 * * 0-4"', snapshots)
         self.assertIn('cron: "10,30,50 0-10 * * 1-5"', snapshots)
-        self.assertIn('cron: "40 6 * * 1-5"', daily)
+        self.assertIn('cron: "35 7 * * 1-5"', daily)
         self.assertIn("cron: '40 11 * * 1-5'", report)
 
 

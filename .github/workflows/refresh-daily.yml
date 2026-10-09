@@ -3,9 +3,9 @@ name: Refresh daily candles
 on:
   workflow_dispatch:
   schedule:
-    # 15:40 KST Mon-Fri = 06:40 UTC Mon-Fri. This refresh updates raw history,
-    # stores today's provisional row, and writes a separate regular-session bar.
-    - cron: "40 6 * * 1-5"
+    # NAVER declares the regular close publish time as 16:30 KST. Run five
+    # minutes later so daily/realtime cross-validation uses the final close.
+    - cron: "35 7 * * 1-5"
 
 permissions:
   contents: write

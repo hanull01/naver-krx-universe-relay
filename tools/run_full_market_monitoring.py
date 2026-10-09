@@ -153,8 +153,6 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
             continue
         bar = daily["datas"][0] if len(daily["datas"]) == 1 else next(
             row for row in daily["datas"] if row.get("date") == target.date().isoformat())
-        if bar.get("sourceTime") != target.strftime("%Y%m%d153000"):
-            continue
         if any(not isinstance(bar.get(key), (int, float)) for key in ("close", "high")):
             continue
         # Relay's published thresholds are the source for this view.  Reuse

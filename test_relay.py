@@ -8,6 +8,19 @@ import relay
 import universe_cli
 
 
+def verified_regular_fields(day, source_time=None):
+    return {
+        'source': relay.VERIFIED_REGULAR_CLOSE_SOURCE,
+        'verification': relay.VERIFIED_REGULAR_CLOSE_METHOD,
+        'sourceDate': day,
+        'sourceTime': source_time or f'{day}T20:00:00+09:00',
+        'sessionCloseTime': '15:30',
+        'marketStatus': 'CLOSE',
+        'marketStatusDetailType': 'close',
+        'delayTime': 0,
+    }
+
+
 class RelayTests(unittest.TestCase):
     @staticmethod
     def daily_fixture(count, incomplete=False, no_trading=False):
@@ -92,8 +105,7 @@ class RelayTests(unittest.TestCase):
         history = self.daily_fixture(61)['datas']
         bar = {'date': '2026-10-06', 'close': 105, 'high': 111, 'volume': 1000,
                'complete': True, 'noTrading': False, 'session': 'REGULAR',
-               'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-               'sourceTime': '20261006153000'}
+               'barType': 'REGULAR_SESSION', **verified_regular_fields('2026-10-06')}
         daily = {'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
                  'datas': history + [bar]}
         result = relay.calculate_state('000001', 'A', technical, daily, quote, config)
@@ -102,7 +114,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(result['current']['priceVsMA20'], result['priceVsMA20'])
         self.assertEqual(result['regularSession']['status'], 'CONFIRMED')
         self.assertEqual(result['regularSession']['price'], 105)
-        self.assertEqual(result['regularSession']['sourceTime'], '20261006153000')
+        self.assertEqual(result['regularSession']['sourceTime'], '2026-10-06T20:00:00+09:00')
         self.assertNotEqual(result['current']['price'], result['regularSession']['price'])
 
     def test_state_rejects_invalid_regular_session_artifacts(self):
@@ -111,8 +123,7 @@ class RelayTests(unittest.TestCase):
         quote = {'closePrice': 110, 'highPrice': 112, 'sourceTime': '2026-10-06T17:35:00+09:00'}
         bar = {'date': '2026-10-06', 'close': 105, 'high': 111, 'volume': 1000,
                'complete': True, 'noTrading': False, 'session': 'REGULAR',
-               'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-               'sourceTime': '20261006153000'}
+               'barType': 'REGULAR_SESSION', **verified_regular_fields('2026-10-06')}
         cases = [
             ({}, None),
             ({'date': '2026-10-05'}, None),
@@ -364,8 +375,8 @@ class RelayTests(unittest.TestCase):
         daily = {'status': 'stale', 'sourceTime': '2026-10-02',
                  'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
                  'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
-                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-                            'sourceTime': '20261006153000', 'close': 100,
+                            'barType': 'REGULAR_SESSION', 'close': 100,
+                            **verified_regular_fields('2026-10-06'),
                             'high': 100, 'volume': 1000}]}
         self.assertTrue(relay.daily_cache_is_current(daily, current))
 
@@ -374,13 +385,14 @@ class RelayTests(unittest.TestCase):
         base = {'status': 'stale', 'sourceTime': '2026-10-02',
                 'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
                 'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
-                           'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-                           'sourceTime': '20261006153000', 'close': 100}]}
+                           'barType': 'REGULAR_SESSION', 'close': 100,
+                           **verified_regular_fields('2026-10-06')}]}
         for field, value in [('regularDailyStatus', 'unavailable'),
                              ('regularSessionDate', '2026-10-05')]:
             self.assertFalse(relay.daily_cache_is_current(dict(base, **{field: value}), current))
         for field, value in [('complete', False), ('session', 'AFTER'),
-                             ('barType', 'DAILY'), ('sourceTime', '20261006153100')]:
+                             ('barType', 'DAILY'),
+                             ('sourceTime', '2026-10-05T20:00:00+09:00')]:
             invalid = dict(base, datas=[dict(base['datas'][0], **{field: value})])
             self.assertFalse(relay.daily_cache_is_current(invalid, current))
 
@@ -389,8 +401,8 @@ class RelayTests(unittest.TestCase):
         daily = {'status': 'stale', 'sourceTime': '2026-10-05',
                  'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
                  'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
-                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-                            'sourceTime': '20261006153000', 'close': 100,
+                            'barType': 'REGULAR_SESSION', 'close': 100,
+                            **verified_regular_fields('2026-10-06'),
                             'high': 100, 'volume': 1000}]}
         self.assertTrue(relay.daily_cache_is_current(
             daily, current, expected_completed_date='2026-10-06'))
@@ -402,18 +414,21 @@ class RelayTests(unittest.TestCase):
         base = {'status': 'stale', 'sourceTime': '2026-10-05',
                 'regularDailyStatus': 'ok', 'regularSessionDate': '2026-10-06',
                 'datas': [{'date': '2026-10-06', 'complete': True, 'session': 'REGULAR',
-                           'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-                           'sourceTime': '20261006153000', 'close': 100}]}
+                           'barType': 'REGULAR_SESSION', 'close': 100,
+                           **verified_regular_fields('2026-10-06')}]}
         top_level_cases = [('regularDailyStatus', 'unavailable'),
                            ('regularSessionDate', '2026-10-05')]
         for field, value in top_level_cases:
             invalid = dict(base, **{field: value})
             self.assertFalse(relay.daily_cache_is_current(
                 invalid, current, expected_completed_date='2026-10-06'))
-        bar_cases = [('date', '2026-10-05'), ('sourceTime', '20261006152900'),
-                     ('sourceTime', '20261006153100'), ('complete', False),
+        bar_cases = [('date', '2026-10-05'),
+                     ('sourceTime', '2026-10-05T20:00:00+09:00'),
+                     ('sourceDate', '2026-10-05'), ('complete', False),
                      ('session', 'AFTER'), ('barType', 'DAILY'),
-                     ('source', 'NAVER_DAILY')]
+                     ('source', 'NAVER_DAILY'), ('verification', 'NONE'),
+                     ('marketStatus', 'OPEN'), ('marketStatusDetailType', 'open'),
+                     ('delayTime', 1)]
         for field, value in bar_cases:
             invalid = dict(base, datas=[dict(base['datas'][0], **{field: value})])
             self.assertFalse(relay.daily_cache_is_current(
@@ -424,8 +439,8 @@ class RelayTests(unittest.TestCase):
         daily = {'status': 'stale', 'regularDailyStatus': 'ok',
                  'regularSessionDate': '2026-10-07',
                  'datas': [{'date': '2026-10-07', 'complete': True, 'session': 'REGULAR',
-                            'barType': 'REGULAR_SESSION', 'source': 'NAVER_MINUTE',
-                            'sourceTime': '20261007153000'}]}
+                            'barType': 'REGULAR_SESSION',
+                            **verified_regular_fields('2026-10-07')}]}
         self.assertTrue(relay.daily_cache_is_current(daily, current))
         self.assertFalse(relay.daily_cache_is_current(
             daily, current, expected_completed_date='2026-10-06'))
@@ -795,6 +810,112 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(save.call_args.args[0], 'data/daily-regular/201490.json')
         self.assertEqual(save.call_args.args[1]['status'], 'unavailable')
 
+    def test_verified_regular_close_uses_daily_realtime_match_not_minute_or_overmarket(self):
+        current = datetime(2026, 10, 8, 20, 1, tzinfo=relay.KST)
+        daily = {'datas': [{'date': '2026-10-08', 'open': 269500, 'high': 270000,
+                            'low': 262000, 'close': 263000, 'volume': 20157893,
+                            'complete': False, 'noTrading': False}]}
+        realtime = {'datas': [{'itemCode': '005930', 'closePrice': '263,000',
+                               'marketStatus': 'CLOSE', 'marketStatusDetailType': 'close',
+                               'localTradedAt': '2026-10-08T20:00:00+09:00',
+                               'stockExchangeType': {'delayTime': 0, 'endTime': '1530',
+                                                     'closePriceSendTime': '1630'},
+                               'overMarketPriceInfo': {'overPrice': '262500'}}]}
+        bar = relay.build_verified_regular_daily_bar(daily, realtime, current, '005930')
+        self.assertEqual(bar['close'], 263000)
+        self.assertNotEqual(bar['close'], 264500)  # 15:19 is never an input.
+        self.assertNotEqual(bar['close'], 262500)  # after-market price stays separate.
+        self.assertEqual(bar['source'], relay.VERIFIED_REGULAR_CLOSE_SOURCE)
+        self.assertEqual(bar['verification'], relay.VERIFIED_REGULAR_CLOSE_METHOD)
+        self.assertEqual(bar['sourceTime'], '2026-10-08T20:00:00+09:00')
+        self.assertEqual(bar['sessionCloseTime'], '15:30')
+
+    def test_verified_regular_close_rejects_date_status_delay_price_and_value_mismatches(self):
+        current = datetime(2026, 10, 8, 20, 1, tzinfo=relay.KST)
+        daily_row = {'date': '2026-10-08', 'open': 99, 'high': 101, 'low': 98,
+                     'close': 100, 'volume': 10, 'complete': False, 'noTrading': False}
+        quote = {'itemCode': '000001', 'closePrice': '100', 'marketStatus': 'CLOSE',
+                 'marketStatusDetailType': 'close',
+                 'localTradedAt': '2026-10-08T20:00:00+09:00',
+                 'stockExchangeType': {'delayTime': 0, 'endTime': '1530',
+                                       'closePriceSendTime': '1630'},
+                 'overMarketPriceInfo': {'overPrice': '999'}}
+        cases = [
+            ('daily date', {'date': '2026-10-07'}, {}),
+            ('daily zero', {'close': 0}, {}),
+            ('daily nonnumeric', {'close': 'bad'}, {}),
+            ('realtime date', {}, {'localTradedAt': '2026-10-07T20:00:00+09:00'}),
+            ('market status', {}, {'marketStatus': 'OPEN'}),
+            ('market detail', {}, {'marketStatusDetailType': 'open'}),
+            ('delay', {}, {'stockExchangeType': {'delayTime': 1}}),
+            ('session end', {}, {'stockExchangeType': {'delayTime': 0,
+                                                       'endTime': '1520',
+                                                       'closePriceSendTime': '1630'}}),
+            ('close send missing', {}, {'stockExchangeType': {'delayTime': 0,
+                                                              'endTime': '1530'}}),
+            ('price mismatch', {}, {'closePrice': '101'}),
+            ('realtime zero', {}, {'closePrice': '0'}),
+            ('realtime nonnumeric', {}, {'closePrice': 'bad'}),
+        ]
+        for label, daily_change, quote_change in cases:
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                relay.build_verified_regular_daily_bar(
+                    {'datas': [dict(daily_row, **daily_change)]},
+                    {'datas': [dict(quote, **quote_change)]}, current, '000001')
+        with self.assertRaisesRegex(ValueError, 'not published yet'):
+            relay.build_verified_regular_daily_bar(
+                {'datas': [daily_row]}, {'datas': [quote]},
+                datetime(2026, 10, 8, 16, 29, tzinfo=relay.KST), '000001')
+
+    def test_verified_close_regressions_and_pre_rollover_cover_all_42(self):
+        current = datetime(2026, 10, 12, 8, 5, tzinfo=relay.KST)
+        unavailable_regressions = {
+            '005930', '240810', '012450', '079550', '373220',
+            '034020', '052690', '272210', '006800'}
+        minute_mismatch_regressions = {'000660', '042700', '009150', '006400'}
+        codes = sorted(unavailable_regressions | minute_mismatch_regressions)
+        codes += [f'8{i:05d}' for i in range(42 - len(codes))]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily-regular').mkdir(parents=True)
+            for index, code in enumerate(codes):
+                history = [{'date': f'2026-08-{day:02d}', 'open': 90, 'high': 110,
+                            'low': 80, 'close': 100, 'volume': 10,
+                            'complete': True, 'noTrading': False}
+                           for day in range(1, 32)]
+                history += [{'date': f'2026-09-{day:02d}', 'open': 90, 'high': 110,
+                             'low': 80, 'close': 100, 'volume': 10,
+                             'complete': True, 'noTrading': False}
+                            for day in range(1, 30)]
+                target_close = 100 + index
+                raw = {'status': 'ok', 'sourceTime': '2026-10-07', 'datas': history + [
+                    {'date': '2026-10-08', 'open': 99, 'high': target_close + 1,
+                     'low': 98, 'close': target_close, 'volume': 20,
+                     'complete': False, 'noTrading': False}]}
+                realtime = {'datas': [{'itemCode': code, 'closePrice': str(target_close),
+                                       'marketStatus': 'CLOSE',
+                                       'marketStatusDetailType': 'close',
+                                       'localTradedAt': '2026-10-08T20:00:00+09:00',
+                                       'stockExchangeType': {'delayTime': 0, 'endTime': '1530',
+                                                             'closePriceSendTime': '1630'},
+                                       'overMarketPriceInfo': {'overPrice': str(target_close + 99)}}]}
+                bar = relay.build_verified_regular_daily_bar(
+                    raw, realtime, datetime(2026, 10, 8, 20, 1, tzinfo=relay.KST), code)
+                regular = {'regularDailyStatus': 'ok', 'datas': [bar]}
+                (root / f'data/daily/{code}.json').write_text(json.dumps(raw))
+                (root / f'data/daily-regular/{code}.json').write_text(json.dumps(regular))
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
+                for index, code in enumerate(codes):
+                    merged = relay.load_daily_for_technical(code)
+                    self.assertEqual(relay.load_previous_business_day_close(
+                        code, datetime(2026, 10, 8).date()), 100 + index)
+                    result = relay.calculate_technicals(
+                        code, code, merged,
+                        {'accumulatedTradingVolume': 20,
+                         'previousBusinessDay': '2026-10-08'})
+                    self.assertNotEqual(result['status'], 'error')
+
     def test_preclose_can_merge_previous_day_regular_bar(self):
         current = datetime(2026, 9, 30, 8, 10, tzinfo=relay.KST)
         with tempfile.TemporaryDirectory() as directory:
@@ -825,9 +946,8 @@ class RelayTests(unittest.TestCase):
                     'complete': True,
                     'noTrading': False,
                     'session': 'REGULAR',
-                    'source': 'NAVER_MINUTE',
-                    'sourceTime': '20260929153000',
                     'barType': 'REGULAR_SESSION',
+                    **verified_regular_fields('2026-09-29'),
                 }],
             }
 
@@ -846,7 +966,7 @@ class RelayTests(unittest.TestCase):
                 )
 
         self.assertEqual(daily['regularSessionDate'], '2026-09-29')
-        self.assertEqual(daily['sourceTime'], '20260929153000')
+        self.assertEqual(daily['sourceTime'], '2026-09-29T20:00:00+09:00')
         self.assertEqual(daily['datas'][-1]['date'], '2026-09-29')
         self.assertTrue(daily['datas'][-1]['complete'])
         self.assertEqual(daily['datas'][-1]['close'], 272500)
@@ -867,8 +987,8 @@ class RelayTests(unittest.TestCase):
             regular = {'regularDailyStatus': 'ok', 'datas': [{
                 'date': '2026-09-29', 'open': 101, 'high': 110, 'low': 100, 'close': 105,
                 'volume': 20, 'complete': True, 'noTrading': False, 'session': 'REGULAR',
-                'source': 'NAVER_MINUTE', 'sourceTime': '20260929153000',
-                'barType': 'REGULAR_SESSION'}]}
+                'barType': 'REGULAR_SESSION',
+                **verified_regular_fields('2026-09-29')}]}
             (root / 'data/daily/201490.json').write_text(json.dumps(raw), encoding='utf-8')
             (root / 'data/daily-regular/201490.json').write_text(json.dumps(regular), encoding='utf-8')
             with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
@@ -879,10 +999,10 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(technical['asOf'], '2026-09-29')
         self.assertEqual(technical['status'], 'insufficient_history')
 
-    def test_daily_workflow_runs_at_1540_kst_and_documents_provisional_policy(self):
+    def test_daily_workflow_runs_after_naver_final_close_publish_time(self):
         workflow = (Path(__file__).parent / '.github/workflows/refresh-daily.yml').read_text(encoding='utf-8')
-        self.assertIn('cron: "40 6 * * 1-5"', workflow)
-        self.assertIn("today's provisional row", workflow)
+        self.assertIn('cron: "35 7 * * 1-5"', workflow)
+        self.assertIn('close publish time as 16:30 KST', workflow)
 
     def test_breakout_close_confirmation_uses_source_timestamp_not_market_status(self):
         config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}
