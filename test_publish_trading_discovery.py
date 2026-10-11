@@ -119,7 +119,10 @@ class SafePublisherTests(unittest.TestCase):
     def test_supplemental_collection_is_optional_and_does_not_change_mail_gate(self):
         workflow = (Path(__file__).parent / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
         self.assertIn("id: discovery_quotes", workflow)
-        self.assertIn("exit 0", workflow[workflow.index("id: discovery_quotes"):])
+        optional = workflow[workflow.index("id: discovery_quotes"):]
+        self.assertIn("continue-on-error: true", optional[:500])
+        self.assertIn("timeout-minutes: 2", optional[:500])
+        self.assertIn("exit 0", optional)
         mail = workflow[workflow.index("id: ready_email"):]
         self.assertIn("steps.collect.outputs.exit_code == '0'", mail[:600])
         self.assertIn("steps.full_market.outputs.exit_code == '0'", mail[:600])

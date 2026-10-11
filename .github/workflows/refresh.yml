@@ -151,6 +151,8 @@ jobs:
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0'
+        continue-on-error: true
+        timeout-minutes: 2
         shell: bash
         run: |
           set +e
