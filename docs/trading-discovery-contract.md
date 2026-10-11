@@ -54,9 +54,13 @@ Production URLs after deployment:
 - `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/YYYY-MM-DD.json`
 
 Work must select the dated file whose `monitoringDate` equals the current KRX
-trading date. It verifies `sourceSha256` by canonical JSON hashing of
-`source`, `sourceGroup`, `groupId`, `selectionDate`, and `symbols`; keys are
-sorted, UTF-8 is preserved, and separators are `,` and `:` without spaces.
+trading date. It verifies `sourceSha256` by first mapping the published
+camelCase values to the exact snake_case object keys `source`, `source_group`,
+`group_id`, `selection_date`, and `symbols`. Serialize with
+`ensure_ascii=False`, `sort_keys=True`, and `separators=(",", ":")`, encode
+as UTF-8, then calculate SHA-256. The 2026-10-12 production snapshot recomputes
+to `09616de26156b84977af7c1f7c4b1710364ddc5a12a43a1efe1235da3d141aa8`;
+this example is not a substitute for recomputing each payload.
 `AVAILABLE_EMPTY` is a valid zero-candidate state. Missing, malformed,
 hash-mismatched, or wrong-date data maps to `UNAVAILABLE`, `INVALID`, or
 `STALE` only within the Kiwoom section.
@@ -67,3 +71,24 @@ discovery against its dated path plus `sourceSha256`; it must not require both
 artifacts to come from one commit. Repeated emails or Work runs may occur, so
 the report comparison key is `(monitoringDate, sourceSha256, market source
 time)`, not email count.
+
+## Supplemental candidate quotes
+
+The hourly market workflow may publish only candidate symbols absent from both
+the 42-stock quotes and current compact full-market signals:
+
+- `data/trading-discovery/quotes/latest.json`
+- `data/trading-discovery/quotes/YYYY-MM-DD.json`
+
+The payload binds its rows to `monitoringDate`, `candidateSourceSha256`, and
+the core quote file's `marketSourceTime`. Consumers must require all three to
+match their current candidate and market inputs. Rows retain NAVER source time,
+session, price basis, price, change rate, volume, and trading value. Technical
+indicators are not fabricated. `PARTIAL` may contain verified rows plus explicit
+missing symbols; `UNAVAILABLE` is not published over a prior valid file.
+
+Collection runs after core and full-market collection, requests at most 50
+remaining candidates in one batch, and performs no call when all candidates
+are already covered or the same candidate hash and market source time were
+previously published. Its failure is optional: core market publication and the
+existing `MARKET_DATA_READY` condition remain unchanged.

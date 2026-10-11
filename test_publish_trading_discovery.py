@@ -108,12 +108,23 @@ class SafePublisherTests(unittest.TestCase):
         root = Path(__file__).parent
         for name in ("refresh.yml", "refresh-market-snapshots.yml"):
             workflow = (root / ".github/workflows" / name).read_text(encoding="utf-8")
-            self.assertNotIn("data/trading-discovery", workflow)
-            self.assertNotIn("trading_discovery.py", workflow)
+            trigger_paths = workflow.split("schedule:", 1)[0]
+            self.assertNotIn("data/trading-discovery", trigger_paths)
+            self.assertNotIn("trading_discovery.py", trigger_paths)
             self.assertNotIn("publish_trading_discovery.py", workflow)
         mail = (root / "send_market_data_ready.py").read_text(encoding="utf-8")
         self.assertIn("[MARKET_DATA_READY]", mail)
         self.assertNotIn("trading-discovery", mail)
+
+    def test_supplemental_collection_is_optional_and_does_not_change_mail_gate(self):
+        workflow = (Path(__file__).parent / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("id: discovery_quotes", workflow)
+        self.assertIn("exit 0", workflow[workflow.index("id: discovery_quotes"):])
+        mail = workflow[workflow.index("id: ready_email"):]
+        self.assertIn("steps.collect.outputs.exit_code == '0'", mail[:600])
+        self.assertIn("steps.full_market.outputs.exit_code == '0'", mail[:600])
+        self.assertIn("steps.publish.outputs.published == 'true'", mail[:600])
+        self.assertNotIn("steps.discovery_quotes", mail[:600])
 
 
 if __name__ == "__main__":

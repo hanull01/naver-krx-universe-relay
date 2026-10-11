@@ -63,13 +63,16 @@ jobs:
             tools/naver_full_market_current.py \
             tools/daily_monitoring_baseline.py \
             tools/full_market_monitoring_evidence.py \
-            tools/run_full_market_monitoring.py
+            tools/run_full_market_monitoring.py \
+            tools/collect_trading_discovery_quotes.py \
+            trading_discovery.py test_trading_discovery_quotes.py
           python -m unittest test_relay.py test_krx_market_day.py -v
           python -m unittest \
             test_naver_full_market_current.py \
             test_full_market_monitoring_evidence.py \
             test_daily_monitoring_baseline.py \
-            test_monitoring_production.py -v
+            test_monitoring_production.py \
+            test_trading_discovery_quotes.py -v
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
@@ -145,6 +148,20 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Collect optional Kiwoom discovery quotes
+        id: discovery_quotes
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          python tools/collect_trading_discovery_quotes.py
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::Kiwoom supplemental quote collection failed; core market publication and MARKET_DATA_READY remain eligible."
+          fi
+          exit 0
+
       - name: Commit refreshed production data
         id: publish
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0'
@@ -174,6 +191,12 @@ jobs:
               data/monitoring/latest-summary.json
           else
             echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
+          fi
+
+          if [ "${{ steps.discovery_quotes.outputs.exit_code }}" = "0" ]; then
+            git add -- data/trading-discovery/quotes
+          else
+            echo "Kiwoom supplemental quotes are not eligible for this market commit; preserving prior files."
           fi
 
           if git diff --cached --quiet; then

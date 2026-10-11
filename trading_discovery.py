@@ -21,6 +21,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
 DISCOVERY_DIR = ROOT / "data" / "trading-discovery"
+DISCOVERY_QUOTES_DIR = DISCOVERY_DIR / "quotes"
 SYMBOL = re.compile(r"(?=.*\d)[0-9A-Z]{6}")
 SNAPSHOT_KEYS = {
     "schema_version", "status", "selection_date", "monitoring_date", "source",
@@ -339,6 +340,115 @@ def fetch_naver_missing_quotes(symbols, existing_codes, limit=50, *, fetcher=Non
     clock = clock or (lambda: datetime.now(KST))
     return fetch_missing_quotes(
         symbols, existing_codes, fetcher, normalizer, clock, limit=limit)
+
+
+SUPPLEMENTAL_QUOTE_FIELDS = (
+    "itemCode", "stockName", "closePrice", "fluctuationsRatio",
+    "accumulatedTradingVolume", "accumulatedTradingValue", "source",
+    "sourceTime", "marketStatus", "session", "priceBasis", "fresh", "status",
+)
+SUPPLEMENTAL_QUOTE_KEYS = set(SUPPLEMENTAL_QUOTE_FIELDS)
+SUPPLEMENTAL_KEYS = {
+    "schemaVersion", "status", "monitoringDate", "candidateSourceSha256",
+    "marketSourceTime", "generatedAt", "source", "requestedCount", "quoteCount",
+    "missingSymbols", "errors", "datas",
+}
+
+
+def _same_market_date(value, monitoring_date):
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(KST).date().isoformat() == monitoring_date
+    except (TypeError, ValueError):
+        return False
+
+
+def current_signal_codes(payload, monitoring_date):
+    if not isinstance(payload, dict) or not _same_market_date(payload.get("generatedAt"), monitoring_date):
+        return set()
+    return set(_index(payload))
+
+
+def supplemental_quote_row(row):
+    return {key: row.get(key) for key in SUPPLEMENTAL_QUOTE_FIELDS}
+
+
+def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
+                              fetcher=None, normalizer=None, clock=None, limit=50):
+    if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
+        raise DiscoveryError("DISCOVERY_NOT_AVAILABLE")
+    monitoring_date = discovery.get("monitoringDate")
+    market_source_time = quotes.get("sourceTime") if isinstance(quotes, dict) else None
+    if (not market_source_time or quotes.get("status") != "ok"
+            or quotes.get("fresh") is not True):
+        raise DiscoveryError("MARKET_QUOTES_NOT_READY")
+    existing = set(_index(quotes)) | current_signal_codes(full_market_signals, monitoring_date)
+    result = fetch_naver_missing_quotes(
+        discovery.get("symbols", []), existing, limit=limit, fetcher=fetcher,
+        normalizer=normalizer, clock=clock)
+    rows = [supplemental_quote_row(row) for row in result["datas"]]
+    returned = {row["itemCode"] for row in rows}
+    missing = [code for code in result["requestedSymbols"] if code not in returned]
+    errors = list(result["errors"])
+    errors.extend({"itemCode": code, "reason": "QUOTE_MISSING"} for code in missing
+                  if not any(error.get("itemCode") == code for error in errors))
+    if not result["requestedSymbols"]:
+        status = "AVAILABLE_EMPTY"
+    elif not rows:
+        status = "UNAVAILABLE"
+    elif missing or errors:
+        status = "PARTIAL"
+    else:
+        status = "AVAILABLE"
+    now_value = (clock or (lambda: datetime.now(KST)))()
+    generated_at = now_value.isoformat() if hasattr(now_value, "isoformat") else str(now_value)
+    return {
+        "schemaVersion": 1, "status": status, "monitoringDate": monitoring_date,
+        "candidateSourceSha256": discovery.get("sourceSha256"),
+        "marketSourceTime": market_source_time, "generatedAt": generated_at,
+        "source": "NAVER_KRX", "requestedCount": len(result["requestedSymbols"]),
+        "quoteCount": len(rows), "missingSymbols": missing, "errors": errors,
+        "datas": rows, "networkCalls": result["networkCalls"],
+    }
+
+
+def validate_supplemental_quotes(payload, discovery, market_source_time):
+    if not isinstance(payload, dict) or set(payload) != SUPPLEMENTAL_KEYS:
+        raise DiscoveryError("SUPPLEMENTAL_SCHEMA_INVALID")
+    if (payload.get("schemaVersion") != 1 or payload.get("source") != "NAVER_KRX"
+            or payload.get("monitoringDate") != discovery.get("monitoringDate")
+            or payload.get("candidateSourceSha256") != discovery.get("sourceSha256")):
+        raise DiscoveryError("SUPPLEMENTAL_CONTRACT_MISMATCH")
+    if payload.get("marketSourceTime") != market_source_time:
+        raise DiscoveryError("SUPPLEMENTAL_MARKET_TIME_MISMATCH")
+    if payload.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY", "PARTIAL"}:
+        raise DiscoveryError("SUPPLEMENTAL_STATUS_INVALID")
+    rows = payload.get("datas")
+    if not isinstance(rows, list) or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_QUOTE_KEYS for row in rows):
+        raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
+    codes = [row.get("itemCode") for row in rows]
+    missing = payload.get("missingSymbols")
+    if (len(codes) != len(set(codes)) or any(code not in discovery.get("symbols", []) for code in codes)
+            or payload.get("quoteCount") != len(rows)
+            or not isinstance(payload.get("requestedCount"), int)
+            or not isinstance(missing, list) or len(missing) != len(set(missing))
+            or any(code not in discovery.get("symbols", []) for code in missing)
+            or set(codes) & set(missing) or not isinstance(payload.get("errors"), list)):
+        raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
+    return payload
+
+
+def supplemental_quotes_status(discovery, market_source_time, path=None):
+    path = Path(path or DISCOVERY_QUOTES_DIR / "latest.json")
+    try:
+        return validate_supplemental_quotes(load_json(path), discovery, market_source_time)
+    except FileNotFoundError:
+        return {"status": "UNAVAILABLE", "reason": "SUPPLEMENTAL_MISSING", "datas": []}
+    except DiscoveryError as exc:
+        reason = str(exc)
+        status = "STALE" if reason == "SUPPLEMENTAL_MARKET_TIME_MISMATCH" else "INVALID"
+        return {"status": status, "reason": reason, "datas": []}
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {"status": "INVALID", "reason": "SUPPLEMENTAL_UNREADABLE", "datas": []}
 
 
 def main():

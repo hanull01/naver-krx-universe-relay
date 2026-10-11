@@ -21,6 +21,7 @@ GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
+TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
@@ -821,8 +822,15 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         previous_discovery = {}
     supplemental_quotes = {"datas": []}
     lookup = {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
+    published_supplemental = trading_discovery.supplemental_quotes_status(
+        discovery, quotes.get("sourceTime"), TRADING_DISCOVERY_QUOTES_PATH)
+    supplemental_quotes = {"datas": [
+        {**row, "_discoveryAdditionalLookup": True}
+        for row in published_supplemental.get("datas", [])
+    ]}
     if fetch_discovery_missing and discovery.get("status") == "AVAILABLE":
         existing_codes = set(quote_idx) | set(trading_discovery._index(full_market_signals))
+        existing_codes |= set(trading_discovery._index(supplemental_quotes))
         try:
             lookup = trading_discovery.fetch_naver_missing_quotes(
                 discovery["symbols"], existing_codes,
@@ -830,10 +838,11 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 normalizer=discovery_quote_normalizer,
                 clock=discovery_clock,
             )
-            supplemental_quotes = {"datas": [
+            live_rows = [
                 {**row, "_discoveryAdditionalLookup": True}
                 for row in lookup["datas"]
-            ]}
+            ]
+            supplemental_quotes["datas"].extend(live_rows)
         except Exception as exc:
             lookup = {
                 "networkCalls": 0, "requestedSymbols": [], "datas": [],
@@ -852,6 +861,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "networkCalls": lookup["networkCalls"],
         "requestedSymbols": lookup["requestedSymbols"],
         "errors": lookup["errors"],
+        "publishedStatus": published_supplemental.get("status"),
+        "publishedReason": published_supplemental.get("reason"),
     }
 
     missing_market = [

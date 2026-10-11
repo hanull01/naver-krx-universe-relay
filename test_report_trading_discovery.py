@@ -35,7 +35,8 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def build(self, discovery_path, previous_path):
         with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery_path,
-                            PREVIOUS_REPORT_PATH=previous_path):
+                            PREVIOUS_REPORT_PATH=previous_path,
+                            TRADING_DISCOVERY_QUOTES_PATH=Path(str(discovery_path) + ".quotes")):
             return daily_report.build_report("2026-10-08")
 
     def test_missing_corrupt_stale_and_empty_do_not_change_core_report(self):
@@ -111,6 +112,38 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(lookup["networkCalls"], 1)
             self.assertEqual(lookup["requestedSymbols"], ["999999"])
             self.assertEqual(lookup["errors"][0]["reason"], "OSError")
+
+    def test_published_supplemental_quote_is_reused_without_network(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            supplemental = root / "supplemental.json"
+            published = self.published(["999999"])
+            discovery.write_text(json.dumps(published), encoding="utf-8")
+            row = {
+                "itemCode": "999999", "stockName": "추가", "closePrice": 10,
+                "fluctuationsRatio": 1, "accumulatedTradingVolume": 2,
+                "accumulatedTradingValue": 20, "source": "NAVER_KRX",
+                "sourceTime": "2026-10-08T10:00:00+09:00", "marketStatus": "OPEN",
+                "session": "REGULAR", "priceBasis": "REALTIME", "fresh": True, "status": "ok",
+            }
+            payload = {
+                "schemaVersion": 1, "status": "AVAILABLE", "monitoringDate": "2026-10-08",
+                "candidateSourceSha256": published["sourceSha256"],
+                "marketSourceTime": "2026-10-08T20:00:00+09:00",
+                "generatedAt": "2026-10-08T20:00:01+09:00", "source": "NAVER_KRX",
+                "requestedCount": 1, "quoteCount": 1, "missingSymbols": [], "errors": [],
+                "datas": [row],
+            }
+            supplemental.write_text(json.dumps(payload), encoding="utf-8")
+            with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
+                                PREVIOUS_REPORT_PATH=previous,
+                                TRADING_DISCOVERY_QUOTES_PATH=supplemental):
+                report = daily_report.build_report("2026-10-08")
+            section = report["kiwoomPreviousCandidates"]
+            self.assertEqual(section["stocks"][0]["source"], "DISCOVERY_NAVER_LOOKUP")
+            self.assertEqual(section["stocks"][0]["price"], 10)
+            self.assertEqual(section["additionalQuoteLookup"]["networkCalls"], 0)
+            self.assertEqual(section["additionalQuoteLookup"]["publishedStatus"], "AVAILABLE")
 
 
 if __name__ == "__main__":

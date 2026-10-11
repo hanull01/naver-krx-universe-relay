@@ -15,10 +15,12 @@
    `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/YYYY-MM-DD.json`
 5. 날짜별 파일의 `monitoringDate`도 리포트 대상일과 같아야 한다. 오늘 날짜가
    아니라는 이유로 후보 날짜를 추정·보정하지 않는다.
-6. `sourceSha256`은 `source`, `sourceGroup`, `groupId`, `selectionDate`,
-   `symbols`만 사용해 키 정렬, UTF-8, 공백 없는 `,`/`:` 구분자의 canonical
-   JSON으로 다시 계산해 검증한다. 스키마, 후보 수, 중복, 해시, validation이
-   하나라도 맞지 않으면 키움 섹션만 `INVALID`로 처리한다.
+6. `sourceSha256`은 게시 JSON의 camelCase 값을 다음 snake_case 객체로 먼저
+   변환해 계산한다: `source`, `source_group`, `group_id`, `selection_date`,
+   `symbols`. `ensure_ascii=False`, `sort_keys=True`, `separators=(",", ":")`로
+   JSON 직렬화하고 UTF-8 바이트의 SHA-256을 계산한다. 게시 JSON 키 이름을
+   그대로 해시하지 않는다. 스키마, 후보 수, 중복, 해시, validation이 하나라도
+   맞지 않으면 키움 섹션만 `INVALID`로 처리한다.
 7. `AVAILABLE_EMPTY`는 검증된 0종목이다. 파일 없음·읽기 실패인
    `UNAVAILABLE`과 구분하고, 후보를 임의 생성하지 않는다.
 
@@ -29,10 +31,13 @@
    매시간 갱신한다.
 9. 기존 42종목 데이터의 종목코드가 후보에 있으면 그 시세·기술지표·상태를
    재사용한다. 전체시장 신호에 이미 있는 코드도 재사용한다.
-10. 두 데이터셋에 모두 없는 후보만 NAVER 국내주식 실시간 조회로 한 번에
-    제한 조회한다. 후보 코드 외 종목은 요청하지 않고, 전체시장 2,767종목을
-    다시 조회하지 않는다. 최대 50종목을 넘으면 추가 조회를 중단하고 해당
-    종목을 `UNAVAILABLE`로 남긴다.
+10. 두 데이터셋에 모두 없는 후보는 먼저 다음 GitHub 보조 시세를 읽는다.
+    `data/trading-discovery/quotes/latest.json`과
+    `data/trading-discovery/quotes/YYYY-MM-DD.json`. `monitoringDate`,
+    `candidateSourceSha256`, `marketSourceTime`이 현재 후보·시장 데이터와 모두
+    일치하는 행만 사용한다. Relay는 누락 후보만 한 번에 최대 50종목 조회하며
+    전체시장을 다시 수집하지 않는다. 보조 시세에도 없으면 해당 종목을
+    `UNAVAILABLE`로 남긴다.
 11. 조회 가능한 등락률, 거래량, 거래대금, MA5·MA20·MA60, 거래량비율,
     20일 돌파 상태를 표시한다. 제공되지 않은 값, VWAP, 장중 고저는 추정하지
     않고 `UNAVAILABLE`로 표시한다.
@@ -47,8 +52,9 @@
 
 14. 실제 Work 환경에서 두 GitHub URL 접근, 날짜별 파일 고정, 해시 재계산,
     동일 후보의 시간대별 재분석, 이전 리포트 비교를 각각 확인한다.
-15. 추가 조회가 후보 누락분으로만 제한되는지 호출 종목 목록과 호출 횟수로
-    확인한다. 네트워크 실패 시 키움 섹션에만 오류를 기록하고 기존 리포트가
+15. Relay 보조 시세의 `requestedCount`, `quoteCount`, `missingSymbols`, `errors`로
+    조회 범위와 실패를 확인한다. Work가 외부 시세 사이트를 직접 호출하지
+    않는다. 보조 시세 실패 시 키움 섹션에만 오류를 기록하고 기존 리포트가
     정상 생성되는지 확인한다.
 
 Relay 로컬 실행 경로에서는 `daily_report.py --fetch-discovery-missing`을 지정한
