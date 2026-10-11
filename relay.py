@@ -21,6 +21,8 @@ QUOTE_URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock/'
 DAILY_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/day'
 MINUTE_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/minute'
 REGULAR_DAILY_DIR = 'data/daily-regular'
+MONITORING_DAILY_DIR = 'data/monitoring-daily'
+MONITORING_DAILY_SOURCE = 'NAVER_MONITORING_DAILY_FINAL'
 
 
 def validate_universe(universe):
@@ -345,6 +347,80 @@ def load_previous_business_day_close(code, business_day):
     raise ValueError(f'missing completed daily close for {business_day.isoformat()}')
 
 
+def load_monitoring_daily_final(codes, business_day):
+    """Load one exact, validated FINAL regular-session row for every code.
+
+    The full-market rolling daily workflow is an existing authoritative close
+    producer.  Reusing its immutable FINAL generation closes the holiday gap
+    between a trading day and the next per-universe daily refresh without
+    promoting provisional ``data/daily`` rows or after-market prices.
+    """
+    target = business_day.strftime('%Y%m%d')
+    requested = set(codes)
+    rows = {}
+    for market in ('kospi', 'kosdaq'):
+        path = ROOT / f'{MONITORING_DAILY_DIR}/{market}.json'
+        payload = json.loads(path.read_text(encoding='utf-8'))
+        if (payload.get('schemaVersion') != 1
+                or payload.get('format') != 'COLUMN_ARRAY_V1'
+                or payload.get('publicationStatus') != 'FINAL'
+                or str(payload.get('asOfDate')) != target
+                or str(payload.get('market', '')).lower() != market):
+            raise ValueError(f'invalid monitoring daily FINAL contract: {market}')
+        for stock in payload.get('stocks', []):
+            code = str(stock.get('code') or '')
+            if code not in requested:
+                continue
+            if code in rows:
+                raise ValueError(f'duplicate monitoring daily code: {code}')
+            columns = ('dates', 'close', 'high', 'volume', 'validity')
+            if any(not isinstance(stock.get(key), list) for key in columns):
+                raise ValueError(f'malformed monitoring daily columns: {code}')
+            lengths = {len(stock[key]) for key in columns}
+            if len(lengths) != 1:
+                raise ValueError(f'monitoring daily column length mismatch: {code}')
+            matches = [index for index, day in enumerate(stock['dates']) if str(day) == target]
+            if len(matches) != 1:
+                raise ValueError(f'missing exact monitoring daily row: {code}')
+            index = matches[0]
+            if stock['validity'][index] != 0:
+                raise ValueError(f'invalid monitoring daily row: {code}')
+            close = stock['close'][index]
+            high = stock['high'][index]
+            volume = stock['volume'][index]
+            numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool)
+            if (not all(numeric(value) for value in (close, high, volume))
+                    or close <= 0 or high < close or volume < 0):
+                raise ValueError(f'invalid monitoring daily values: {code}')
+            rows[code] = {
+                'date': business_day.isoformat(), 'close': close, 'high': high,
+                'volume': volume, 'complete': True, 'noTrading': volume == 0,
+                'session': 'REGULAR', 'barType': 'REGULAR_SESSION',
+                'source': MONITORING_DAILY_SOURCE, 'sourceDate': business_day.isoformat(),
+                'sourceTime': datetime.combine(business_day, dtime(15, 30), tzinfo=KST).isoformat(),
+                'publicationStatus': 'FINAL', 'format': 'COLUMN_ARRAY_V1',
+            }
+    missing = sorted(requested - set(rows))
+    if missing:
+        raise ValueError(f'monitoring daily FINAL coverage missing: {len(missing)}')
+    print(f'MONITORING_DAILY_COVERAGE date={business_day.isoformat()} required={len(requested)} verified={len(rows)} status=FINAL')
+    return rows
+
+
+def merge_verified_completed_bar(daily, bar):
+    """Merge an already-validated exact-date bar into an in-memory view only."""
+    if not isinstance(daily, dict) or not isinstance(bar, dict):
+        return daily
+    merged = dict(daily)
+    merged['datas'] = sorted(
+        [row for row in daily.get('datas', []) if row.get('date') != bar['date']] + [bar],
+        key=lambda row: row['date'])
+    merged['regularSessionDate'] = bar['date']
+    merged['regularDailyStatus'] = 'ok'
+    merged['sourceTime'] = bar['date']
+    return merged
+
+
 def log_daily_close_runtime(codes, business_day):
     """Log bounded, non-sensitive visibility into the preclose input files."""
     counts = {'fileExists': 0, 'rowFound': 0, 'complete': 0, 'numericClose': 0,
@@ -430,10 +506,17 @@ def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
     if business_day:
         log_daily_close_runtime(codes, business_day)
     names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
+    monitoring_rows = None
+    if business_day:
+        try:
+            monitoring_rows = load_monitoring_daily_final(codes, business_day)
+        except Exception as exc:
+            print(f'MONITORING_DAILY_PRE unavailable={exc}')
     if business_day:
         for code in codes:
             try:
-                close = load_previous_business_day_close(code, business_day)
+                close = (monitoring_rows[code]['close'] if monitoring_rows is not None
+                         else load_previous_business_day_close(code, business_day))
                 rows[code] = build_preclose_quote(code, names[code], business_day, close, current,
                                                    sectors.get(code))
             except Exception as exc:
@@ -878,13 +961,15 @@ def normalize_raw_daily_for_technical(daily, current=None):
     return normalized
 
 
-def load_daily_for_technical(code):
+def load_daily_for_technical(code, verified_bar=None):
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
         return None
     current = now()
     daily = normalize_raw_daily_for_technical(daily, current)
+    if verified_bar is not None:
+        daily = merge_verified_completed_bar(daily, verified_bar)
     try:
         regular = json.loads((ROOT / f'{REGULAR_DAILY_DIR}/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
@@ -927,17 +1012,25 @@ def _valid_regular_override_for_date(daily, target_date):
         realtime_date = datetime.fromisoformat(source_time).astimezone(KST).date()
     except (TypeError, ValueError):
         return False
+    monitoring_final = (
+        bar.get('source') == MONITORING_DAILY_SOURCE
+        and bar.get('sourceDate') == target_text
+        and bar.get('sourceTime') == datetime.combine(target, dtime(15, 30), tzinfo=KST).isoformat()
+        and bar.get('publicationStatus') == 'FINAL'
+        and bar.get('format') == 'COLUMN_ARRAY_V1')
+    verified_realtime = (
+        bar.get('source') == VERIFIED_REGULAR_CLOSE_SOURCE
+        and bar.get('verification') == VERIFIED_REGULAR_CLOSE_METHOD
+        and bar.get('sourceDate') == target_text
+        and realtime_date == target
+        and bar.get('sessionCloseTime') == '15:30'
+        and bar.get('marketStatus') == 'CLOSE'
+        and bar.get('marketStatusDetailType') == 'close'
+        and bar.get('delayTime') == 0)
     return (bar.get('complete') is True
             and bar.get('session') == 'REGULAR'
             and bar.get('barType') == 'REGULAR_SESSION'
-            and bar.get('source') == VERIFIED_REGULAR_CLOSE_SOURCE
-            and bar.get('verification') == VERIFIED_REGULAR_CLOSE_METHOD
-            and bar.get('sourceDate') == target_text
-            and realtime_date == target
-            and bar.get('sessionCloseTime') == '15:30'
-            and bar.get('marketStatus') == 'CLOSE'
-            and bar.get('marketStatusDetailType') == 'close'
-            and bar.get('delayTime') == 0)
+            and (monitoring_final or verified_realtime))
 
 
 def _valid_same_day_regular_override(daily, current):
@@ -1033,7 +1126,18 @@ def build_technicals(quote_payload=None):
             quote_payload = {'datas': []}
     quotes = {row['itemCode']: row for row in quote_payload.get('datas', [])}
     names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
-    datas = [calculate_technicals(code, names[code], load_daily_for_technical(code), quotes.get(code))
+    business_days = {row.get('previousBusinessDay') for row in quotes.values()
+                     if row.get('previousBusinessDay')}
+    monitoring_rows = {}
+    if len(business_days) == 1:
+        try:
+            monitoring_rows = load_monitoring_daily_final(
+                codes, datetime.fromisoformat(next(iter(business_days))).date())
+        except Exception as exc:
+            print(f'MONITORING_DAILY_TECHNICALS unavailable={exc}')
+    datas = [calculate_technicals(code, names[code],
+                                  load_daily_for_technical(code, monitoring_rows.get(code)),
+                                  quotes.get(code))
              for code in codes]
     missing = [row['itemCode'] for row in datas if row['status'] == 'error']
     payload = {'generatedAt': now().isoformat(), 'expectedCount': len(codes), 'count': len(datas),
@@ -1167,7 +1271,18 @@ def build_states(quote_payload=None, technical_payload=None):
     if technical_payload is None: technical_payload = json.loads((ROOT / 'data/technicals.json').read_text(encoding='utf-8'))
     quotes = {row['itemCode']: row for row in quote_payload.get('datas', [])}; technicals = {row['itemCode']: row for row in technical_payload.get('datas', [])}
     names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
-    datas = [calculate_state(code, names[code], technicals.get(code, {}), load_daily_for_technical(code), quotes.get(code), config) for code in codes]
+    business_days = {row.get('previousBusinessDay') for row in quotes.values()
+                     if row.get('previousBusinessDay')}
+    monitoring_rows = {}
+    if len(business_days) == 1:
+        try:
+            monitoring_rows = load_monitoring_daily_final(
+                codes, datetime.fromisoformat(next(iter(business_days))).date())
+        except Exception as exc:
+            print(f'MONITORING_DAILY_STATES unavailable={exc}')
+    datas = [calculate_state(code, names[code], technicals.get(code, {}),
+                             load_daily_for_technical(code, monitoring_rows.get(code)),
+                             quotes.get(code), config) for code in codes]
     missing = [row['itemCode'] for row in datas if row['status'] != 'ok']
     payload = {'generatedAt': now().isoformat(), 'expectedCount': len(codes), 'count': len(datas), 'missingCodes': missing, 'status': 'ok' if not missing else 'partial', 'datas': datas}
     save('data/states.json', payload)

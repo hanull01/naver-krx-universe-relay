@@ -972,6 +972,79 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(daily['datas'][-1]['close'], 272500)
         self.assertEqual(close, 272500)
 
+    def test_preclose_recovers_holiday_gap_from_final_monitoring_daily(self):
+        business_day = datetime(2026, 10, 8).date()
+        current = datetime(2026, 10, 12, 8, 40, tzinfo=relay.KST)
+        codes = ['000001', '000002', '100001']
+        analysis = relay.load_analysis_config()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily-regular').mkdir(parents=True)
+            (root / 'data/monitoring-daily').mkdir(parents=True)
+            for index, code in enumerate(codes):
+                history = [{'date': f'2026-09-{day:02d}', 'close': 90 + day,
+                            'high': 100 + day, 'volume': 1000 + day,
+                            'complete': True, 'noTrading': False}
+                           for day in range(1, 29)]
+                history += [{'date': f'2026-10-{day:02d}', 'close': 120 + day,
+                             'high': 130 + day, 'volume': 2000 + day,
+                             'complete': True, 'noTrading': False}
+                            for day in range(1, 8)]
+                history.append({'date': '2026-10-08', 'close': 9999, 'high': 9999,
+                                'volume': 9999, 'complete': False, 'noTrading': False})
+                (root / f'data/daily/{code}.json').write_text(json.dumps({
+                    'status': 'ok', 'sourceTime': '2026-10-07', 'datas': history}), encoding='utf-8')
+            def state(market, members):
+                return {'schemaVersion': 1, 'format': 'COLUMN_ARRAY_V1', 'market': market,
+                        'publicationStatus': 'FINAL', 'asOfDate': '20261008', 'stocks': [
+                            {'code': code, 'dates': ['20261008'], 'close': [100 + index],
+                             'high': [110 + index], 'volume': [3000 + index], 'validity': [0]}
+                            for index, code in enumerate(members)]}
+            (root / 'data/monitoring-daily/kospi.json').write_text(
+                json.dumps(state('KOSPI', codes[:2])), encoding='utf-8')
+            (root / 'data/monitoring-daily/kosdaq.json').write_text(
+                json.dumps(state('KOSDAQ', codes[2:])), encoding='utf-8')
+            universe = {'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True}
+                                   for code in codes], 'sectors': {}, 'themes': {},
+                        'watchlists': {'legacy33': codes}, 'leaders': {}}
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current), \
+                 patch.object(relay, 'previous_krx_business_day', return_value=business_day), \
+                 patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+                 patch.object(relay, 'load_analysis_config', return_value=analysis), \
+                 patch.object(relay, 'save') as save:
+                result = relay.collect_preclose_quotes(universe, codes, codes, {}, current)
+                technicals = relay.build_technicals(result)
+                states = relay.build_states(result, technicals)
+        self.assertEqual(result['status'], 'ok')
+        self.assertEqual([row['closePrice'] for row in result['datas']], [100, 101, 100])
+        self.assertTrue(all(row['sourceTime'] == '2026-10-08T15:30:00+09:00'
+                            for row in result['datas']))
+        self.assertEqual(technicals['status'], 'ok')
+        self.assertTrue(all(row['asOf'] == '2026-10-08' for row in technicals['datas']))
+        self.assertEqual(states['status'], 'ok')
+        self.assertTrue(all(row['regularSession']['status'] == 'CONFIRMED'
+                            for row in states['datas']))
+        self.assertNotIn(9999, [row['closePrice'] for row in result['datas']])
+        self.assertIn('data/quotes.json', [call.args[0] for call in save.call_args_list])
+
+    def test_monitoring_daily_recovery_fails_closed_on_unverified_generation(self):
+        business_day = datetime(2026, 10, 8).date()
+        valid = {'schemaVersion': 1, 'format': 'COLUMN_ARRAY_V1', 'publicationStatus': 'FINAL',
+                 'asOfDate': '20261008', 'stocks': []}
+        cases = [('stale', {'asOfDate': '20261007'}),
+                 ('not-final', {'publicationStatus': 'PROVISIONAL'}),
+                 ('bad-format', {'format': 'UNKNOWN'})]
+        for label, change in cases:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); (root / 'data/monitoring-daily').mkdir(parents=True)
+                for market in ('kospi', 'kosdaq'):
+                    payload = dict(valid, market=market.upper(), **change)
+                    (root / f'data/monitoring-daily/{market}.json').write_text(
+                        json.dumps(payload), encoding='utf-8')
+                with patch.object(relay, 'ROOT', root), self.assertRaises(ValueError):
+                    relay.load_monitoring_daily_final(['000001'], business_day)
+
     def test_technicals_merge_regular_bar_but_never_raw_provisional_today(self):
         current = datetime(2026, 9, 29, 16, 0, tzinfo=relay.KST)
         with tempfile.TemporaryDirectory() as directory:
