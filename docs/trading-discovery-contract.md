@@ -42,9 +42,11 @@ CALENDAR --repository RELAY`. It accepts the exact paths supplied by the
 caller, performs no polling or date calculation, serializes concurrent runs,
 and delegates validation, idempotency, isolated commit, non-force push, and
 remote hash verification to `tools/publish_trading_discovery.py`. Trading
-Console invokes this command from the common successful post-sync handler;
-publication remains disabled until explicitly activated. No scheduler or
-background watcher is installed.
+Console invokes this command only after the 21:00 KST condition search has
+successfully finalized the next-session snapshot. Manual `전일후보군` sync may
+update the console's mutable candidates but does not create or publish an
+official snapshot. Publication remains disabled until explicitly activated.
+No scheduler or background watcher is installed.
 
 Production URLs after deployment:
 
