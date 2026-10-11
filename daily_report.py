@@ -6,6 +6,8 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import trading_discovery
+
 KST = ZoneInfo("Asia/Seoul")
 
 ROOT = Path(__file__).resolve().parent
@@ -18,6 +20,9 @@ STATES_PATH = DATA / "states.json"
 GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
 MONITORING_PATH = DATA / "monitoring"
+TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
+FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
+PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
     "latest-breadth.json",
     "latest-stock-signals.json",
@@ -802,6 +807,20 @@ def build_report(as_of=None):
 
     report_date = as_of or datetime.now(KST).date().isoformat()
     full_market = full_market_evidence(report_date)
+    discovery = trading_discovery.discovery_status(report_date, TRADING_DISCOVERY_PATH)
+    try:
+        full_market_signals = load_json(FULL_MARKET_SIGNALS_PATH)
+    except (OSError, ValueError, json.JSONDecodeError):
+        full_market_signals = {}
+    try:
+        previous_report = load_json(PREVIOUS_REPORT_PATH)
+        previous_discovery = previous_report.get("kiwoomPreviousCandidates", {})
+    except (OSError, ValueError, json.JSONDecodeError, AttributeError):
+        previous_discovery = {}
+    kiwoom_section = trading_discovery.analyze(
+        report_date, discovery, quotes, technicals, states,
+        full_market_signals, previous_discovery,
+    )
 
     missing_market = [
         {
@@ -917,6 +936,7 @@ def build_report(as_of=None):
         "nextSessionCandidates": next_session_candidates(rows, report_date),
         "researchSummary": research_overview,
         "marketResearchCross": market_research_cross(rows),
+        "kiwoomPreviousCandidates": kiwoom_section,
         "stocks": rows,
         "methodology": {
             "investmentRecommendation": False,
@@ -1077,6 +1097,26 @@ def write_markdown(report, path):
     )
     for bucket, detail in report["marketResearchCross"].items():
         lines.append(f"- {bucket}: {detail['count']}종목")
+
+    kiwoom = report.get("kiwoomPreviousCandidates", {})
+    lines.extend(["", "## 🟪 키움 전일후보군 — 당일 추적", ""])
+    lines.append(f"- 상태: {kiwoom.get('status', 'UNAVAILABLE')}")
+    if kiwoom.get("reason"):
+        lines.append(f"- 사유: {kiwoom['reason']}")
+    if kiwoom.get("status") in ("AVAILABLE", "AVAILABLE_EMPTY"):
+        lines.extend([
+            f"- 감시 거래일: {kiwoom.get('monitoringDate')}",
+            f"- 동기화 시각: {kiwoom.get('syncedAt')}",
+            f"- 총 감시종목: {kiwoom.get('candidateCount', 0)}종목",
+        ])
+        for row in kiwoom.get("stocks", []):
+            rate = row.get("changeRate")
+            rate_text = f"{rate:+.2f}%" if isinstance(rate, (int, float)) else "UNAVAILABLE"
+            lines.append(
+                f"- {row.get('itemName') or '이름 미확인'} ({row['itemCode']}): "
+                f"등락률 {rate_text}, 상태 {row['dataStatus']}, "
+                f"돌파 {row.get('breakout20') if row.get('breakout20') is not None else 'UNAVAILABLE'}"
+            )
 
     lines.extend([
         "",
