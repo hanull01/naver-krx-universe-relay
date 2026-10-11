@@ -23,6 +23,7 @@ MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
+MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
     "latest-breadth.json",
@@ -816,6 +817,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     except (OSError, ValueError, json.JSONDecodeError):
         full_market_signals = {}
     try:
+        monitoring_baseline = load_json(MONITORING_BASELINE_PATH)
+    except (OSError, ValueError, json.JSONDecodeError):
+        monitoring_baseline = {}
+    try:
         previous_report = load_json(PREVIOUS_REPORT_PATH)
         previous_discovery = previous_report.get("kiwoomPreviousCandidates", {})
     except (OSError, ValueError, json.JSONDecodeError, AttributeError):
@@ -854,7 +859,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     }
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes, technicals, states,
-        full_market_signals, previous_discovery,
+        full_market_signals, previous_discovery, monitoring_baseline,
     )
     kiwoom_section["additionalQuoteLookup"] = {
         "enabled": bool(fetch_discovery_missing),

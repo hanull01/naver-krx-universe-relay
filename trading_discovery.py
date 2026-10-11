@@ -247,23 +247,62 @@ def _index(payload, keys=("itemCode", "code")):
     return result
 
 
-def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None, previous=None):
+def verified_final_baseline(discovery, baseline):
+    """Return immutable stock closes only from the selected-day FINAL baseline."""
+    if not isinstance(baseline, dict):
+        return {"status": "UNAVAILABLE", "reason": "FINAL_BASELINE_MISSING", "stocks": []}
+    selection_date = str(discovery.get("selectionDate") or "")
+    expected_date = selection_date.replace("-", "")
+    diagnostics = baseline.get("refreshDiagnostics") or {}
+    if (baseline.get("asOfDate") != expected_date
+            or baseline.get("historyStatus") != "OK"
+            or baseline.get("count") != baseline.get("authoritativeCount")
+            or baseline.get("coveragePct") != 100.0
+            or diagnostics.get("missingCodes") or diagnostics.get("extraCodes")):
+        return {"status": "INVALID", "reason": "FINAL_BASELINE_CONTRACT_INVALID", "stocks": []}
+    rows = []
+    for row in baseline.get("stocks") or []:
+        if (not isinstance(row, dict) or row.get("lastTradingDate") != expected_date
+                or row.get("closeValid") is not True or row.get("ohlcValid") is not True
+                or not isinstance(row.get("lastClose"), (int, float))
+                or isinstance(row.get("lastClose"), bool)):
+            continue
+        rows.append({
+            **row, "sourceDate": selection_date,
+            "priceBasis": "VERIFIED_FULL_MARKET_FINAL",
+        })
+    return {"status": "AVAILABLE", "sourceDate": selection_date, "stocks": rows}
+
+
+def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
+            previous=None, final_baseline=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
     qidx, tidx, sidx = _index(quotes), _index(technicals), _index(states)
     fidx = _index(full_market_signals or {})
+    baseline = verified_final_baseline(discovery, final_baseline)
+    bidx = _index(baseline)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     rows = []
     for code in discovery["symbols"]:
         quote, technical, state, signal = qidx.get(code), tidx.get(code), sidx.get(code), fidx.get(code)
-        market = quote or signal or {}
-        technical = technical or signal or {}
+        identity_quote = quote
+        rejected_quote = bool(quote and quote.get("_discoveryAdditionalLookup")
+                              and (quote.get("status") not in (None, "ok")
+                                   or quote.get("fresh") is False))
+        if rejected_quote:
+            quote = None
+        final = bidx.get(code)
+        market = quote or final or signal or {}
+        technical = technical or final or signal or {}
         state = state or {}
         current = state.get("current") if isinstance(state.get("current"), dict) else state
         row = {
             "itemCode": code,
-            "itemName": market.get("stockName") or market.get("name") or technical.get("stockName"),
-            "price": market.get("closePrice", market.get("currentPrice")),
+            "itemName": (market.get("stockName") or market.get("name")
+                         or technical.get("stockName")
+                         or (identity_quote or {}).get("stockName")),
+            "price": market.get("closePrice", market.get("currentPrice", market.get("lastClose"))),
             "changeRate": market.get("fluctuationsRatio", market.get("changeRate")),
             "volume": market.get("accumulatedTradingVolume"),
             "tradingValue": market.get("accumulatedTradingValue"),
@@ -275,10 +314,22 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "pullbackState": current.get("pullbackState"),
             "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
                        else "MONITORED_UNIVERSE" if quote
+                       else "FULL_MARKET_FINAL" if final
                        else "FULL_MARKET_SIGNAL" if signal else None),
+            "priceSourceDate": final.get("sourceDate") if final and not quote else None,
+            "priceSourceTime": market.get("sourceTime"),
+            "priceBasis": market.get("priceBasis"),
+            "rejectedQuoteReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
+            "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
+                                  if rejected_quote and not final and not signal else None),
         }
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
         row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
+        row["priceStatus"] = "AVAILABLE" if row["price"] is not None else "UNAVAILABLE"
+        row["technicalStatus"] = ("AVAILABLE" if all(row[key] is not None for key in ("ma5", "ma20", "ma60"))
+                                  else "PARTIAL" if any(row[key] is not None for key in ("ma5", "ma20", "ma60"))
+                                  else "UNAVAILABLE")
+        row["analysisStatus"] = row["dataStatus"]
         prior = previous_rows.get(code, {})
         row["previousReportChange"] = {
             "available": bool(prior),
@@ -294,6 +345,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         "asOf": as_of, "observedCount": available + partial,
         "missingCount": len(rows) - available - partial, "stocks": rows,
         "metrics": {"vwap": "UNAVAILABLE", "intradayHighLow": "UNAVAILABLE"},
+        "finalBaseline": {key: baseline.get(key) for key in ("status", "reason", "sourceDate") if baseline.get(key) is not None},
     }
 
 

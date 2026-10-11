@@ -142,6 +142,51 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
+    def test_final_baseline_replaces_stale_after_quote_and_leaves_etf_unavailable(self):
+        discovery = td.published_payload(snapshot(["051910", "0197X0"]))
+        stale_rows = [{
+            "itemCode": code, "stockName": code, "closePrice": price,
+            "sourceTime": "2026-10-09T20:00:00+09:00",
+            "fresh": False, "status": "stale", "priceBasis": "PREVIOUS_KRX_CLOSE",
+            "_discoveryAdditionalLookup": True,
+        } for code, price in (("051910", 281500), ("0197X0", 6515))]
+        baseline = {
+            "asOfDate": "20261009", "historyStatus": "OK", "count": 1,
+            "authoritativeCount": 1, "coveragePct": 100.0,
+            "refreshDiagnostics": {"missingCodes": [], "extraCodes": []},
+            "stocks": [{
+                "code": "051910", "name": "LG화학", "lastTradingDate": "20261009",
+                "lastClose": 282500, "closeValid": True, "ohlcValid": True,
+                "ma5": 265700, "ma20": 267475, "ma60": 265191.67,
+            }],
+        }
+        result = td.analyze("2026-10-12", discovery, {"datas": stale_rows}, {}, {},
+                            final_baseline=baseline)
+        stock, etf = result["stocks"]
+        self.assertEqual(stock["source"], "FULL_MARKET_FINAL")
+        self.assertEqual(stock["price"], 282500)
+        self.assertEqual(stock["priceSourceDate"], "2026-10-09")
+        self.assertEqual(stock["priceBasis"], "VERIFIED_FULL_MARKET_FINAL")
+        self.assertEqual(stock["priceStatus"], "AVAILABLE")
+        self.assertEqual(stock["technicalStatus"], "AVAILABLE")
+        self.assertEqual(stock["analysisStatus"], "PARTIAL")
+        self.assertEqual(etf["dataStatus"], "UNAVAILABLE")
+        self.assertEqual(etf["rejectedQuoteReason"], "STALE_OR_UNVERIFIED_QUOTE")
+        self.assertIsNone(etf["price"])
+
+    def test_invalid_or_wrong_date_final_baseline_is_not_used(self):
+        discovery = td.published_payload(snapshot(["051910"]))
+        baseline = {
+            "asOfDate": "20261008", "historyStatus": "OK", "count": 1,
+            "authoritativeCount": 1, "coveragePct": 100.0,
+            "refreshDiagnostics": {"missingCodes": [], "extraCodes": []},
+            "stocks": [{"code": "051910", "lastTradingDate": "20261008",
+                         "lastClose": 282500, "closeValid": True, "ohlcValid": True}],
+        }
+        result = td.analyze("2026-10-12", discovery, {}, {}, {}, final_baseline=baseline)
+        self.assertEqual(result["finalBaseline"]["status"], "INVALID")
+        self.assertEqual(result["stocks"][0]["dataStatus"], "UNAVAILABLE")
+
     def test_previous_report_change(self):
         discovery = td.published_payload(snapshot(["005930"]))
         quote = {"datas": [{"itemCode": "005930", "closePrice": 110}]}
