@@ -6,12 +6,15 @@ from pathlib import Path
 import trading_discovery as td
 
 
-def snapshot(symbols=None, monitoring="2026-10-12"):
+def snapshot(symbols=None, monitoring="2026-10-12", source="KIWOOM_WATCHLIST"):
     symbols = ["005930", "000660"] if symbols is None else symbols
     payload = {
         "schema_version": 1, "status": "AVAILABLE" if symbols else "AVAILABLE_EMPTY",
         "selection_date": "2026-10-09", "monitoring_date": monitoring,
-        "source": "KIWOOM_WATCHLIST", "source_group": "전일후보군", "group_id": "001",
+        "source": source,
+        "source_group": ("전일후보군" if source == "KIWOOM_WATCHLIST"
+                         else "장종료후 단타후보군 탐색"),
+        "group_id": "001" if source == "KIWOOM_WATCHLIST" else "CONDITION:0",
         "synced_at": "2026-10-09T16:10:00+09:00", "candidate_count": len(symbols),
         "symbols": symbols, "source_sha256": "0" * 64,
         "validation": {"status": "VALID", "calendar_source": "KRX_OFFICIAL", "immutable": True},
@@ -64,6 +67,55 @@ class TradingDiscoveryTests(unittest.TestCase):
             got = td.discovery_status("2026-10-12", root / "out/latest.json")
             self.assertEqual(got["status"], "AVAILABLE_EMPTY")
             self.assertEqual(got["candidateCount"], 0)
+
+    def test_condition_search_contract_preserves_alphanumeric_and_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            payload = snapshot(["0197X0", "005930"], source="KIWOOM_CONDITION_SEARCH")
+            original_hash = payload["source_sha256"]
+            td.validate_snapshot(payload, cal)
+            published = td.published_payload(payload, cal)
+            self.assertEqual(published["source"], "KIWOOM_CONDITION_SEARCH")
+            self.assertEqual(published["sourceGroup"], "장종료후 단타후보군 탐색")
+            self.assertEqual(published["groupId"], "CONDITION:0")
+            self.assertEqual(published["symbols"], ["0197X0", "005930"])
+            self.assertEqual(published["sourceSha256"], original_hash)
+
+    def test_condition_search_rejects_wrong_group_sequence_and_time(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            cases = []
+            wrong_group = snapshot(source="KIWOOM_CONDITION_SEARCH")
+            wrong_group["source_group"] = "전일후보군"; cases.append(wrong_group)
+            wrong_sequence = snapshot(source="KIWOOM_CONDITION_SEARCH")
+            wrong_sequence["group_id"] = "001"; cases.append(wrong_sequence)
+            wrong_time = snapshot(source="KIWOOM_CONDITION_SEARCH")
+            wrong_time["synced_at"] = "2026-10-09T07:10:00+00:00"; cases.append(wrong_time)
+            for payload in cases:
+                payload["source_sha256"] = td.source_hash(payload)
+                with self.assertRaises(td.DiscoveryError):
+                    td.validate_snapshot(payload, cal)
+
+    def test_sources_with_same_membership_have_distinct_hashes_and_conflict(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            watchlist = snapshot(["005930"])
+            condition = snapshot(["005930"], source="KIWOOM_CONDITION_SEARCH")
+            self.assertNotEqual(watchlist["source_sha256"], condition["source_sha256"])
+            one = root / "watchlist.json"; one.write_text(json.dumps(watchlist))
+            two = root / "condition.json"; two.write_text(json.dumps(condition))
+            td.publish_snapshot(one, root / "out", cal)
+            before = (root / "out/2026-10-12.json").read_bytes()
+            with self.assertRaisesRegex(td.DiscoveryError, "CONFLICT"):
+                td.publish_snapshot(two, root / "out", cal)
+            self.assertEqual((root / "out/2026-10-12.json").read_bytes(), before)
+
+    def test_condition_search_empty_is_valid(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            payload = snapshot([], source="KIWOOM_CONDITION_SEARCH")
+            td.validate_snapshot(payload, cal)
+            self.assertEqual(payload["status"], "AVAILABLE_EMPTY")
 
     def test_missing_stale_and_corrupt_are_section_local(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -64,6 +64,21 @@ class SafePublisherTests(unittest.TestCase):
         raw = git(self.repo, "show", "origin/main:data/trading-discovery/2026-10-12.json")
         self.assertEqual(json.loads(raw)["sourceSha256"], json.loads(self.snapshot.read_text())["source_sha256"])
 
+    def test_condition_search_success_and_repeat_noop(self):
+        payload = json.loads(self.snapshot.read_text())
+        payload.update({"source": "KIWOOM_CONDITION_SEARCH",
+                        "source_group": "장종료후 단타후보군 탐색",
+                        "group_id": "CONDITION:0",
+                        "symbols": ["0197X0"], "candidate_count": 1})
+        payload["source_sha256"] = td.source_hash(payload)
+        self.snapshot.write_text(json.dumps(payload), encoding="utf-8")
+        first = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
+        second = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
+        self.assertEqual(first["publishStatus"], "PUSHED")
+        self.assertEqual(second["publishStatus"], "NOOP")
+        raw = git(self.repo, "show", "origin/main:data/trading-discovery/2026-10-12.json")
+        self.assertEqual(json.loads(raw)["symbols"], ["0197X0"])
+
     def test_remote_advance_aborts_without_overwrite(self):
         competitor = self.root / "competitor"
         def advance(_base):
