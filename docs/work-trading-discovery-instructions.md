@@ -1,0 +1,56 @@
+# 국내증시 Work — 키움 전일후보군 연동 지시문
+
+아래 내용을 국내증시 Work의 기존 지시문에 추가한다. 기존 시장 리포트,
+`MARKET_DATA_READY` 처리, 핵심 데이터 검증, 정규장 종가 정책은 변경하지 않는다.
+
+## 입력과 검증
+
+1. 시장 데이터의 기준은 `MARKET_DATA_READY` 이메일에 기록된 commit SHA다.
+2. 키움 후보 데이터는 시장 데이터와 별도 commit일 수 있다. 두 SHA가 같다고
+   가정하거나 같아질 때까지 대기하지 않는다.
+3. 먼저 다음 고정 URL을 읽는다.
+   `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/latest.json`
+4. `latest.json`의 `monitoringDate`가 리포트 대상 KRX 거래일과 같을 때만 다음
+   날짜별 URL을 읽는다.
+   `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/YYYY-MM-DD.json`
+5. 날짜별 파일의 `monitoringDate`도 리포트 대상일과 같아야 한다. 오늘 날짜가
+   아니라는 이유로 후보 날짜를 추정·보정하지 않는다.
+6. `sourceSha256`은 `source`, `sourceGroup`, `groupId`, `selectionDate`,
+   `symbols`만 사용해 키 정렬, UTF-8, 공백 없는 `,`/`:` 구분자의 canonical
+   JSON으로 다시 계산해 검증한다. 스키마, 후보 수, 중복, 해시, validation이
+   하나라도 맞지 않으면 키움 섹션만 `INVALID`로 처리한다.
+7. `AVAILABLE_EMPTY`는 검증된 0종목이다. 파일 없음·읽기 실패인
+   `UNAVAILABLE`과 구분하고, 후보를 임의 생성하지 않는다.
+
+## 매시간 분석
+
+8. 동일한 `(monitoringDate, sourceSha256)` 후보군을 매 실행마다 유지하고 최신
+   NAVER 시장 데이터로 다시 분석한다. 후보 파일이 바뀌지 않아도 시장 값은
+   매시간 갱신한다.
+9. 기존 42종목 데이터의 종목코드가 후보에 있으면 그 시세·기술지표·상태를
+   재사용한다. 전체시장 신호에 이미 있는 코드도 재사용한다.
+10. 두 데이터셋에 모두 없는 후보만 NAVER 국내주식 실시간 조회로 한 번에
+    제한 조회한다. 후보 코드 외 종목은 요청하지 않고, 전체시장 2,767종목을
+    다시 조회하지 않는다. 최대 50종목을 넘으면 추가 조회를 중단하고 해당
+    종목을 `UNAVAILABLE`로 남긴다.
+11. 조회 가능한 등락률, 거래량, 거래대금, MA5·MA20·MA60, 거래량비율,
+    20일 돌파 상태를 표시한다. 제공되지 않은 값, VWAP, 장중 고저는 추정하지
+    않고 `UNAVAILABLE`로 표시한다.
+12. 직전 리포트의 같은 종목과 가격, 데이터 상태, 돌파 상태 변화를 비교한다.
+    반복 이메일 횟수가 아니라 `(monitoringDate, sourceSha256, 시장 sourceTime)`을
+    비교 키로 사용한다.
+13. 기존 본문과 독립된 `🟪 키움 전일후보군 — 당일 추적` 섹션을 만든다.
+    후보 오류, 날짜 불일치, 일부 시세 누락, 맥북 오프라인, 게시 실패가 기존
+    시장 리포트의 생성·상태·전송을 저하시키면 안 된다.
+
+## 운영 확인
+
+14. 실제 Work 환경에서 두 GitHub URL 접근, 날짜별 파일 고정, 해시 재계산,
+    동일 후보의 시간대별 재분석, 이전 리포트 비교를 각각 확인한다.
+15. 추가 조회가 후보 누락분으로만 제한되는지 호출 종목 목록과 호출 횟수로
+    확인한다. 네트워크 실패 시 키움 섹션에만 오류를 기록하고 기존 리포트가
+    정상 생성되는지 확인한다.
+
+Relay 로컬 실행 경로에서는 `daily_report.py --fetch-discovery-missing`을 지정한
+경우에만 누락 후보 추가 조회가 활성화된다. 이 옵션 없이 실행하면 네트워크
+추가 호출은 0건이다.

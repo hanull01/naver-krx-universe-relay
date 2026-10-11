@@ -116,6 +116,15 @@ class TradingDiscoveryTests(unittest.TestCase):
                                          lambda row, now: row, lambda: "now")
         self.assertEqual(result["networkCalls"], 0)
 
+    def test_missing_quote_network_failure_is_returned_not_raised(self):
+        def fail(_codes):
+            raise OSError("offline")
+        result = td.fetch_missing_quotes(
+            ["999999"], set(), fail, lambda row, now: row, lambda: "now")
+        self.assertEqual(result["networkCalls"], 1)
+        self.assertEqual(result["requestedSymbols"], ["999999"])
+        self.assertEqual(result["errors"], [{"reason": "OSError"}])
+
     def test_hash_count_duplicate_date_and_sensitive_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); cal = calendar(root / "calendar.json")

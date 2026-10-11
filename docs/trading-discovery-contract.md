@@ -17,14 +17,24 @@ must not alter market coverage, full-market validation, regular-close policy,
 email eligibility, or report delivery.
 
 The report reuses `quotes.json`, `technicals.json`, and `states.json` first,
-then compact full-market signals. A bounded helper can request only remaining
-symbols in one batch when an operator explicitly enables that step. VWAP and
+then compact full-market signals. `daily_report.py --fetch-discovery-missing`
+requests only remaining symbols in one batch (maximum 50); it never refreshes
+the full market, and failures remain in the optional section. VWAP and
 intraday high/low remain `UNAVAILABLE` unless an audited source supplies them.
 
 Production activation still requires two reviewed operations that are not
 part of this change: publishing the validated discovery files to GitHub and
 updating the ChatGPT Work instructions to consume this contract. The existing
 `MARKET_DATA_READY` email and its send conditions remain unchanged.
+
+After Trading Console has created a finalized immutable snapshot, the one-shot
+event entrypoint is `tools/on_trading_discovery_snapshot.py SNAPSHOT --calendar
+CALENDAR --repository RELAY`. It accepts the exact paths supplied by the
+caller, performs no polling or date calculation, serializes concurrent runs,
+and delegates validation, idempotency, isolated commit, non-force push, and
+remote hash verification to `tools/publish_trading_discovery.py`. Connecting
+this command to Trading Console's successful post-sync event remains an
+external deployment step; no scheduler or background watcher is installed.
 
 Production URLs after deployment:
 

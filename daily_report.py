@@ -694,7 +694,9 @@ def market_research_cross(rows):
     return {name: {"count": len(items), "stocks": items} for name, items in buckets.items()}
 
 
-def build_report(as_of=None):
+def build_report(as_of=None, fetch_discovery_missing=False,
+                 discovery_quote_fetcher=None, discovery_quote_normalizer=None,
+                 discovery_clock=None):
     universe = load_json(UNIVERSE_PATH)
     quotes = load_json(QUOTES_PATH)
     technicals = load_json(TECHNICALS_PATH)
@@ -817,10 +819,40 @@ def build_report(as_of=None):
         previous_discovery = previous_report.get("kiwoomPreviousCandidates", {})
     except (OSError, ValueError, json.JSONDecodeError, AttributeError):
         previous_discovery = {}
+    supplemental_quotes = {"datas": []}
+    lookup = {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
+    if fetch_discovery_missing and discovery.get("status") == "AVAILABLE":
+        existing_codes = set(quote_idx) | set(trading_discovery._index(full_market_signals))
+        try:
+            lookup = trading_discovery.fetch_naver_missing_quotes(
+                discovery["symbols"], existing_codes,
+                fetcher=discovery_quote_fetcher,
+                normalizer=discovery_quote_normalizer,
+                clock=discovery_clock,
+            )
+            supplemental_quotes = {"datas": [
+                {**row, "_discoveryAdditionalLookup": True}
+                for row in lookup["datas"]
+            ]}
+        except Exception as exc:
+            lookup = {
+                "networkCalls": 0, "requestedSymbols": [], "datas": [],
+                "errors": [{"reason": type(exc).__name__}],
+            }
+    discovery_quotes = {
+        **quotes,
+        "datas": list(quotes.get("datas") or []) + supplemental_quotes["datas"],
+    }
     kiwoom_section = trading_discovery.analyze(
-        report_date, discovery, quotes, technicals, states,
+        report_date, discovery, discovery_quotes, technicals, states,
         full_market_signals, previous_discovery,
     )
+    kiwoom_section["additionalQuoteLookup"] = {
+        "enabled": bool(fetch_discovery_missing),
+        "networkCalls": lookup["networkCalls"],
+        "requestedSymbols": lookup["requestedSymbols"],
+        "errors": lookup["errors"],
+    }
 
     missing_market = [
         {
@@ -1158,12 +1190,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--as-of")
     parser.add_argument(
+        "--fetch-discovery-missing",
+        action="store_true",
+        help="fetch only Kiwoom candidates absent from existing report evidence",
+    )
+    parser.add_argument(
         "--output-dir",
         default="data/reports",
     )
     args = parser.parse_args()
 
-    report = build_report(args.as_of)
+    report = build_report(args.as_of, fetch_discovery_missing=args.fetch_discovery_missing)
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

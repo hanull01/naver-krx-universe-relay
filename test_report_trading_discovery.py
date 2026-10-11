@@ -68,6 +68,50 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(section["missingCount"], 1)
             self.assertEqual(section["stocks"][1]["dataStatus"], "UNAVAILABLE")
 
+    def test_opt_in_lookup_requests_only_candidates_missing_from_both_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            discovery.write_text(json.dumps(self.published(["005930", "035420", "999999"])), encoding="utf-8")
+            signals = root / "signals.json"
+            signals.write_text(json.dumps({"stocks": [{"code": "035420", "currentPrice": 1}]}), encoding="utf-8")
+            calls = []
+            def fetcher(codes):
+                calls.append(codes)
+                return {"datas": [{"itemCode": "999999", "stockName": "추가", "closePrice": 10,
+                                    "fluctuationsRatio": 1, "accumulatedTradingVolume": 2,
+                                    "accumulatedTradingValue": 20}]}
+            with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
+                                PREVIOUS_REPORT_PATH=previous, FULL_MARKET_SIGNALS_PATH=signals):
+                report = daily_report.build_report(
+                    "2026-10-08", fetch_discovery_missing=True,
+                    discovery_quote_fetcher=fetcher,
+                    discovery_quote_normalizer=lambda row, _now: row,
+                    discovery_clock=lambda: "now")
+            self.assertEqual(calls, [["999999"]])
+            section = report["kiwoomPreviousCandidates"]
+            self.assertEqual(section["additionalQuoteLookup"]["networkCalls"], 1)
+            self.assertEqual(section["stocks"][2]["source"], "DISCOVERY_NAVER_LOOKUP")
+            self.assertEqual(report["status"], "OK")
+
+    def test_lookup_failure_is_section_local(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            discovery.write_text(json.dumps(self.published(["999999"])), encoding="utf-8")
+            def fail(_codes):
+                raise OSError("offline")
+            with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
+                                PREVIOUS_REPORT_PATH=previous):
+                report = daily_report.build_report(
+                    "2026-10-08", fetch_discovery_missing=True,
+                    discovery_quote_fetcher=fail,
+                    discovery_quote_normalizer=lambda row, _now: row)
+            self.assertEqual(report["status"], "OK")
+            self.assertEqual(report["kiwoomPreviousCandidates"]["stocks"][0]["dataStatus"], "UNAVAILABLE")
+            lookup = report["kiwoomPreviousCandidates"]["additionalQuoteLookup"]
+            self.assertEqual(lookup["networkCalls"], 1)
+            self.assertEqual(lookup["requestedSymbols"], ["999999"])
+            self.assertEqual(lookup["errors"][0]["reason"], "OSError")
+
 
 if __name__ == "__main__":
     unittest.main()

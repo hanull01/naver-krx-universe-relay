@@ -13,7 +13,11 @@ import json
 import os
 import re
 import tempfile
+from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
+
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
 DISCOVERY_DIR = ROOT / "data" / "trading-discovery"
@@ -29,6 +33,7 @@ PUBLISHED_KEYS = {
     "sourceSha256", "validation",
 }
 SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
+KST = ZoneInfo("Asia/Seoul")
 
 
 class DiscoveryError(ValueError):
@@ -248,7 +253,9 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "volumeRatio20": technical.get("volumeRatio20", signal.get("current_volume_ratio_20") if signal else None),
             "breakout20": current.get("breakout20", signal.get("breakout_20_intraday") if signal else None),
             "pullbackState": current.get("pullbackState"),
-            "source": "MONITORED_UNIVERSE" if quote else "FULL_MARKET_SIGNAL" if signal else None,
+            "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
+                       else "MONITORED_UNIVERSE" if quote
+                       else "FULL_MARKET_SIGNAL" if signal else None),
         }
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
         row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
@@ -276,7 +283,13 @@ def fetch_missing_quotes(symbols, existing_codes, fetcher, normalizer, clock, li
         raise DiscoveryError("MISSING_QUOTE_LIMIT_EXCEEDED")
     if not missing:
         return {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
-    payload = fetcher(missing)
+    try:
+        payload = fetcher(missing)
+    except Exception as exc:
+        return {
+            "networkCalls": 1, "requestedSymbols": missing, "datas": [],
+            "errors": [{"reason": type(exc).__name__}],
+        }
     source_rows = payload.get("datas") if isinstance(payload, dict) else None
     if not isinstance(source_rows, list):
         return {"networkCalls": 1, "requestedSymbols": missing, "datas": [], "errors": [{"reason": "RESPONSE_SCHEMA_INVALID"}]}
@@ -290,6 +303,23 @@ def fetch_missing_quotes(symbols, existing_codes, fetcher, normalizer, clock, li
         except Exception as exc:
             errors.append({"itemCode": code, "reason": type(exc).__name__})
     return {"networkCalls": 1, "requestedSymbols": missing, "datas": rows, "errors": errors}
+
+
+def fetch_naver_missing_quotes(symbols, existing_codes, limit=50, *, fetcher=None,
+                               normalizer=None, clock=None):
+    """Fetch only discovery symbols absent from existing report evidence.
+
+    Imports are local so ordinary report generation remains offline and keeps
+    the existing market-data path untouched.  Callers must opt in explicitly.
+    """
+    if fetcher is None or normalizer is None:
+        import relay
+        fetcher = fetcher or (lambda codes: relay.fetch(
+            relay.QUOTE_URL + quote(",".join(codes), safe=",")))
+        normalizer = normalizer or relay.normalize_quote
+    clock = clock or (lambda: datetime.now(KST))
+    return fetch_missing_quotes(
+        symbols, existing_codes, fetcher, normalizer, clock, limit=limit)
 
 
 def main():
