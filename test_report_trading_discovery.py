@@ -18,14 +18,20 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def published(self, symbols=None, monitoring="2026-10-08"):
         symbols = ["005930"] if symbols is None else symbols
-        return {
+        payload = {
             "schemaVersion": 1, "status": "AVAILABLE" if symbols else "AVAILABLE_EMPTY",
             "monitoringDate": monitoring, "selectionDate": "2026-10-07",
             "source": "KIWOOM_WATCHLIST", "sourceGroup": "전일후보군", "groupId": "001",
             "syncedAt": "2026-10-07T16:00:00+09:00", "candidateCount": len(symbols),
-            "symbols": symbols, "sourceSha256": "a" * 64,
+            "symbols": symbols, "sourceSha256": "0" * 64,
             "validation": {"status": "VALID", "calendarSource": "KRX_OFFICIAL", "immutable": True},
         }
+        payload["sourceSha256"] = td.source_hash({
+            "source": payload["source"], "source_group": payload["sourceGroup"],
+            "group_id": payload["groupId"], "selection_date": payload["selectionDate"],
+            "symbols": payload["symbols"],
+        })
+        return payload
 
     def build(self, discovery_path, previous_path):
         with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery_path,

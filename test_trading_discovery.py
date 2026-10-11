@@ -8,14 +8,22 @@ import trading_discovery as td
 
 def snapshot(symbols=None, monitoring="2026-10-12"):
     symbols = ["005930", "000660"] if symbols is None else symbols
-    return {
+    payload = {
         "schema_version": 1, "status": "AVAILABLE" if symbols else "AVAILABLE_EMPTY",
         "selection_date": "2026-10-09", "monitoring_date": monitoring,
         "source": "KIWOOM_WATCHLIST", "source_group": "전일후보군", "group_id": "001",
         "synced_at": "2026-10-09T16:10:00+09:00", "candidate_count": len(symbols),
-        "symbols": symbols, "source_sha256": "a" * 64,
+        "symbols": symbols, "source_sha256": "0" * 64,
         "validation": {"status": "VALID", "calendar_source": "KRX_OFFICIAL", "immutable": True},
     }
+    payload["source_sha256"] = td.source_hash(payload)
+    return payload
+
+
+def calendar(path):
+    path.write_text(json.dumps({"source": "KRX_OFFICIAL",
+                                "dates": ["2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13", "2026-10-15"]}), encoding="utf-8")
+    return path
 
 
 class TradingDiscoveryTests(unittest.TestCase):
@@ -24,8 +32,9 @@ class TradingDiscoveryTests(unittest.TestCase):
             root = Path(directory)
             source = root / "source.json"
             source.write_text(json.dumps(snapshot()), encoding="utf-8")
-            first = td.publish_snapshot(source, root / "out")
-            second = td.publish_snapshot(source, root / "out")
+            cal = calendar(root / "calendar.json")
+            first = td.publish_snapshot(source, root / "out", cal)
+            second = td.publish_snapshot(source, root / "out", cal)
             self.assertEqual(first["result"], "CREATED")
             self.assertEqual(second["result"], "IDEMPOTENT")
             payload = json.loads((root / "out/latest.json").read_text())
@@ -38,19 +47,20 @@ class TradingDiscoveryTests(unittest.TestCase):
             root = Path(directory)
             one, two = root / "one.json", root / "two.json"
             one.write_text(json.dumps(snapshot()), encoding="utf-8")
-            changed = snapshot(["035420"]); changed["source_sha256"] = "b" * 64
+            changed = snapshot(["035420"])
             two.write_text(json.dumps(changed), encoding="utf-8")
-            td.publish_snapshot(one, root / "out")
+            cal = calendar(root / "calendar.json")
+            td.publish_snapshot(one, root / "out", cal)
             before = (root / "out/2026-10-12.json").read_bytes()
             with self.assertRaisesRegex(td.DiscoveryError, "CONFLICT"):
-                td.publish_snapshot(two, root / "out")
+                td.publish_snapshot(two, root / "out", cal)
             self.assertEqual((root / "out/2026-10-12.json").read_bytes(), before)
 
     def test_empty_is_available_empty(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); source = root / "source.json"
             source.write_text(json.dumps(snapshot([])), encoding="utf-8")
-            td.publish_snapshot(source, root / "out")
+            td.publish_snapshot(source, root / "out", calendar(root / "calendar.json"))
             got = td.discovery_status("2026-10-12", root / "out/latest.json")
             self.assertEqual(got["status"], "AVAILABLE_EMPTY")
             self.assertEqual(got["candidateCount"], 0)
@@ -105,6 +115,30 @@ class TradingDiscoveryTests(unittest.TestCase):
                                          lambda _: self.fail("network called"),
                                          lambda row, now: row, lambda: "now")
         self.assertEqual(result["networkCalls"], 0)
+
+    def test_hash_count_duplicate_date_and_sensitive_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            cases = []
+            bad_hash = snapshot(); bad_hash["source_sha256"] = "f" * 64; cases.append(bad_hash)
+            bad_count = snapshot(); bad_count["candidate_count"] = 99; cases.append(bad_count)
+            duplicate = snapshot(["005930", "005930"]); cases.append(duplicate)
+            bad_date = snapshot(monitoring="2026-10-13"); cases.append(bad_date)
+            sensitive = snapshot(); sensitive["accountToken"] = "do-not-publish"; cases.append(sensitive)
+            for index, payload in enumerate(cases):
+                source = root / f"bad-{index}.json"
+                source.write_text(json.dumps(payload), encoding="utf-8")
+                with self.assertRaises(td.DiscoveryError):
+                    td.publish_snapshot(source, root / f"out-{index}", cal)
+
+    def test_friday_monday_and_holiday_next_session(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            td.validate_snapshot(snapshot(), cal)
+            holiday = snapshot(monitoring="2026-10-15")
+            holiday["selection_date"] = "2026-10-13"
+            holiday["source_sha256"] = td.source_hash(holiday)
+            td.validate_snapshot(holiday, cal)
 
 
 if __name__ == "__main__":

@@ -25,3 +25,23 @@ Production activation still requires two reviewed operations that are not
 part of this change: publishing the validated discovery files to GitHub and
 updating the ChatGPT Work instructions to consume this contract. The existing
 `MARKET_DATA_READY` email and its send conditions remain unchanged.
+
+Production URLs after deployment:
+
+- `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/latest.json`
+- `https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/trading-discovery/YYYY-MM-DD.json`
+
+Work must select the dated file whose `monitoringDate` equals the current KRX
+trading date. It verifies `sourceSha256` by canonical JSON hashing of
+`source`, `sourceGroup`, `groupId`, `selectionDate`, and `symbols`; keys are
+sorted, UTF-8 is preserved, and separators are `,` and `:` without spaces.
+`AVAILABLE_EMPTY` is a valid zero-candidate state. Missing, malformed,
+hash-mismatched, or wrong-date data maps to `UNAVAILABLE`, `INVALID`, or
+`STALE` only within the Kiwoom section.
+
+The market-data email commit SHA and the discovery publisher commit SHA are
+independent. Work must validate market artifacts against the email SHA and
+discovery against its dated path plus `sourceSha256`; it must not require both
+artifacts to come from one commit. Repeated emails or Work runs may occur, so
+the report comparison key is `(monitoringDate, sourceSha256, market source
+time)`, not email count.

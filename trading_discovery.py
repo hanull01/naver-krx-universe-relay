@@ -8,6 +8,7 @@ report status, coverage, or MARKET_DATA_READY policy.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -17,6 +18,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DISCOVERY_DIR = ROOT / "data" / "trading-discovery"
 SYMBOL = re.compile(r"(?=.*\d)[0-9A-Z]{6}")
+SNAPSHOT_KEYS = {
+    "schema_version", "status", "selection_date", "monitoring_date", "source",
+    "source_group", "group_id", "synced_at", "candidate_count", "symbols",
+    "source_sha256", "validation",
+}
+PUBLISHED_KEYS = {
+    "schemaVersion", "status", "monitoringDate", "selectionDate", "source",
+    "sourceGroup", "groupId", "syncedAt", "candidateCount", "symbols",
+    "sourceSha256", "validation",
+}
+SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
 
 
 class DiscoveryError(ValueError):
@@ -27,9 +39,57 @@ def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
-def validate_snapshot(payload):
-    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+def source_hash(payload):
+    material = {
+        "source": payload.get("source"), "source_group": payload.get("source_group"),
+        "group_id": payload.get("group_id"), "selection_date": payload.get("selection_date"),
+        "symbols": payload.get("symbols"),
+    }
+    raw = json.dumps(material, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def contains_sensitive_key(value):
+    if isinstance(value, dict):
+        return any(SENSITIVE_KEY.search(str(key)) or contains_sensitive_key(item) for key, item in value.items())
+    if isinstance(value, list):
+        return any(contains_sensitive_key(item) for item in value)
+    return False
+
+
+def load_official_sessions(path):
+    try:
+        payload = load_json(path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise DiscoveryError("KRX_CALENDAR_UNAVAILABLE") from exc
+    dates = payload.get("dates") if isinstance(payload, dict) else None
+    if payload.get("source") != "KRX_OFFICIAL" or not isinstance(dates, list):
+        raise DiscoveryError("KRX_CALENDAR_INVALID")
+    normalized = []
+    for value in dates:
+        if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            raise DiscoveryError("KRX_CALENDAR_INVALID")
+        normalized.append(value)
+    if normalized != sorted(set(normalized)):
+        raise DiscoveryError("KRX_CALENDAR_INVALID")
+    return normalized
+
+
+def validate_date_relation(payload, calendar_path):
+    sessions = load_official_sessions(calendar_path)
+    selection = payload.get("selection_date")
+    if selection not in sessions:
+        raise DiscoveryError("SELECTION_DATE_NOT_CONFIRMED")
+    index = sessions.index(selection) + 1
+    if index >= len(sessions) or sessions[index] != payload.get("monitoring_date"):
+        raise DiscoveryError("MONITORING_DATE_NOT_NEXT_KRX_SESSION")
+
+
+def validate_snapshot(payload, calendar_path=None):
+    if not isinstance(payload, dict) or set(payload) != SNAPSHOT_KEYS or payload.get("schema_version") != 1:
         raise DiscoveryError("SNAPSHOT_SCHEMA_INVALID")
+    if contains_sensitive_key(payload):
+        raise DiscoveryError("SNAPSHOT_SENSITIVE_DATA_REJECTED")
     if payload.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         raise DiscoveryError("SNAPSHOT_STATUS_INVALID")
     symbols = payload.get("symbols")
@@ -46,11 +106,15 @@ def validate_snapshot(payload):
         raise DiscoveryError("SNAPSHOT_SOURCE_INVALID")
     if not re.fullmatch(r"[0-9a-f]{64}", str(payload.get("source_sha256") or "")):
         raise DiscoveryError("SNAPSHOT_HASH_INVALID")
+    if payload["source_sha256"] != source_hash(payload):
+        raise DiscoveryError("SNAPSHOT_HASH_MISMATCH")
+    if calendar_path is not None:
+        validate_date_relation(payload, calendar_path)
     return payload
 
 
-def published_payload(snapshot):
-    validate_snapshot(snapshot)
+def published_payload(snapshot, calendar_path=None):
+    validate_snapshot(snapshot, calendar_path)
     return {
         "schemaVersion": 1,
         "status": snapshot["status"],
@@ -88,8 +152,10 @@ def atomic_json(path, payload):
             os.unlink(temporary)
 
 
-def publish_snapshot(snapshot_path, output_dir=DISCOVERY_DIR):
-    snapshot = validate_snapshot(load_json(snapshot_path))
+def publish_snapshot(snapshot_path, output_dir=DISCOVERY_DIR, calendar_path=None):
+    if calendar_path is None:
+        raise DiscoveryError("KRX_CALENDAR_REQUIRED")
+    snapshot = validate_snapshot(load_json(snapshot_path), calendar_path)
     payload = published_payload(snapshot)
     output_dir = Path(output_dir)
     dated = output_dir / f"{payload['monitoringDate']}.json"
@@ -120,8 +186,7 @@ def discovery_status(as_of, path=None):
         return {"status": "UNAVAILABLE", "reason": "SNAPSHOT_MISSING", "candidateCount": 0, "symbols": []}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"status": "INVALID", "reason": "SNAPSHOT_UNREADABLE", "candidateCount": 0, "symbols": []}
-    required = {"schemaVersion", "status", "monitoringDate", "sourceGroup", "syncedAt", "candidateCount", "symbols", "sourceSha256", "validation"}
-    if not required.issubset(payload) or payload.get("schemaVersion") != 1:
+    if set(payload) != PUBLISHED_KEYS or payload.get("schemaVersion") != 1 or contains_sensitive_key(payload):
         return {"status": "INVALID", "reason": "SNAPSHOT_SCHEMA_INVALID", "candidateCount": 0, "symbols": []}
     symbols = payload.get("symbols")
     if (not isinstance(symbols, list) or len(symbols) != len(set(symbols))
@@ -130,6 +195,13 @@ def discovery_status(as_of, path=None):
         return {"status": "INVALID", "reason": "SNAPSHOT_SYMBOLS_INVALID", "candidateCount": 0, "symbols": []}
     if payload.get("monitoringDate") != as_of:
         return {**payload, "status": "STALE", "reason": "MONITORING_DATE_MISMATCH"}
+    material = {
+        "source": payload.get("source"), "source_group": payload.get("sourceGroup"),
+        "group_id": payload.get("groupId"), "selection_date": payload.get("selectionDate"),
+        "symbols": payload.get("symbols"),
+    }
+    if payload.get("sourceSha256") != source_hash(material):
+        return {**payload, "status": "INVALID", "reason": "SNAPSHOT_HASH_MISMATCH"}
     expected = "AVAILABLE" if symbols else "AVAILABLE_EMPTY"
     if payload.get("status") != expected or payload.get("validation", {}).get("status") != "VALID":
         return {**payload, "status": "INVALID", "reason": "SNAPSHOT_VALIDATION_INVALID"}
@@ -224,8 +296,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("snapshot")
     parser.add_argument("--output-dir", default=str(DISCOVERY_DIR))
+    parser.add_argument("--calendar", required=True)
     args = parser.parse_args()
-    print(json.dumps(publish_snapshot(args.snapshot, args.output_dir), ensure_ascii=False))
+    print(json.dumps(publish_snapshot(args.snapshot, args.output_dir, args.calendar), ensure_ascii=False))
 
 
 if __name__ == "__main__":
