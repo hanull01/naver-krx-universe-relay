@@ -11,6 +11,15 @@ selection date, group identity, synchronization time, symbols, count,
 validation metadata, and source hash. Broker credentials, tokens, account
 data, names, and order state are not accepted by the schema.
 
+The source contract is deliberately allow-listed. `KIWOOM_WATCHLIST` requires
+`source_group=전일후보군`. `KIWOOM_CONDITION_SEARCH` requires
+`source_group=장종료후 단타후보군 탐색`, a `group_id` of
+`CONDITION:<numeric sequence>`, and a KST synchronization timestamp. Both
+sources use the same immutable file and hash contract. Because the source,
+group, and group id are hash inputs, two sources with identical symbols have
+different hashes and therefore conflict instead of overwriting one another on
+the same monitoring date.
+
 Consumer states are `AVAILABLE`, `AVAILABLE_EMPTY`, `UNAVAILABLE`, `STALE`,
 and `INVALID`. Every state is section-local. Missing or invalid discovery data
 must not alter market coverage, full-market validation, regular-close policy,
@@ -32,9 +41,12 @@ event entrypoint is `tools/on_trading_discovery_snapshot.py SNAPSHOT --calendar
 CALENDAR --repository RELAY`. It accepts the exact paths supplied by the
 caller, performs no polling or date calculation, serializes concurrent runs,
 and delegates validation, idempotency, isolated commit, non-force push, and
-remote hash verification to `tools/publish_trading_discovery.py`. Connecting
-this command to Trading Console's successful post-sync event remains an
-external deployment step; no scheduler or background watcher is installed.
+remote hash verification to `tools/publish_trading_discovery.py`. Trading
+Console invokes this command only after the 21:00 KST condition search has
+successfully finalized the next-session snapshot. Manual `전일후보군` sync may
+update the console's mutable candidates but does not create or publish an
+official snapshot. Publication remains disabled until explicitly activated.
+No scheduler or background watcher is installed.
 
 Production URLs after deployment:
 

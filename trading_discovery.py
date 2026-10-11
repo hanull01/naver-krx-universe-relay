@@ -13,7 +13,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import quote
 
@@ -34,6 +34,13 @@ PUBLISHED_KEYS = {
 }
 SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
 KST = ZoneInfo("Asia/Seoul")
+SOURCE_CONTRACTS = {
+    "KIWOOM_WATCHLIST": {"source_group": "전일후보군", "group_id": re.compile(r"\S+")},
+    "KIWOOM_CONDITION_SEARCH": {
+        "source_group": "장종료후 단타후보군 탐색",
+        "group_id": re.compile(r"CONDITION:[0-9]{1,3}"),
+    },
+}
 
 
 class DiscoveryError(ValueError):
@@ -105,10 +112,22 @@ def validate_snapshot(payload, calendar_path=None):
     if payload["status"] != ("AVAILABLE" if symbols else "AVAILABLE_EMPTY"):
         raise DiscoveryError("SNAPSHOT_EMPTY_STATUS_INVALID")
     validation = payload.get("validation")
-    if not isinstance(validation, dict) or validation.get("status") != "VALID" or validation.get("immutable") is not True:
+    if (not isinstance(validation, dict) or validation.get("status") != "VALID"
+            or validation.get("calendar_source") != "KRX_OFFICIAL"
+            or validation.get("immutable") is not True):
         raise DiscoveryError("SNAPSHOT_VALIDATION_INVALID")
-    if payload.get("source") != "KIWOOM_WATCHLIST" or payload.get("source_group") != "전일후보군":
+    contract = SOURCE_CONTRACTS.get(payload.get("source"))
+    if (contract is None or payload.get("source_group") != contract["source_group"]
+            or not isinstance(payload.get("group_id"), str)
+            or not contract["group_id"].fullmatch(payload["group_id"])):
         raise DiscoveryError("SNAPSHOT_SOURCE_INVALID")
+    if payload.get("source") == "KIWOOM_CONDITION_SEARCH":
+        try:
+            synced_at = datetime.fromisoformat(payload["synced_at"])
+        except (TypeError, ValueError, KeyError) as exc:
+            raise DiscoveryError("SNAPSHOT_SYNC_TIME_INVALID") from exc
+        if synced_at.utcoffset() != timedelta(hours=9):
+            raise DiscoveryError("SNAPSHOT_SYNC_TIME_INVALID")
     if not re.fullmatch(r"[0-9a-f]{64}", str(payload.get("source_sha256") or "")):
         raise DiscoveryError("SNAPSHOT_HASH_INVALID")
     if payload["source_sha256"] != source_hash(payload):
