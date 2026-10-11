@@ -265,9 +265,10 @@ def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day
     as_of = str(baseline.get("asOfDate") or "")
     if baseline.get("count") != baseline.get("authoritativeCount") or baseline.get("coveragePct") != 100.0:
         return False, "BASELINE_COVERAGE_INVALID", previous
-    if as_of == previous:
+    session = session_at(now)
+    if as_of == previous and session not in {"AFTER", "CLOSED"}:
         return True, "VALID_PREVIOUS_TRADING_DAY", previous
-    if as_of == today.strftime("%Y%m%d") and session_at(now) in {"AFTER", "CLOSED"}:
+    if as_of == today.strftime("%Y%m%d") and session in {"AFTER", "CLOSED"}:
         return True, "VALID_CURRENT_DAY_FINAL", previous
     if as_of == today.strftime("%Y%m%d"):
         return False, "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION", previous
@@ -300,6 +301,13 @@ def baseline_readiness(baseline, target_date):
     if diagnostics.get("targetDate") and str(diagnostics["targetDate"]).replace("-", "") != target:
         return False, "BASELINE_DIAGNOSTIC_DATE_MISMATCH"
     return True, "READY"
+
+
+def collection_readiness(baseline, now=None, market_day_check=krx_market_day.market_day):
+    """Apply the collector's session-aware baseline policy before network I/O."""
+    now = now or datetime.now(KST)
+    fresh, reason, previous = baseline_freshness(baseline, now, market_day_check)
+    return fresh, "READY" if fresh else reason, previous
 
 
 def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,

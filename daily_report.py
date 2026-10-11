@@ -59,7 +59,14 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
     if quality.get("publicationStatus") not in ("FINAL", "SUCCESS"):
         return {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"}
     if expected_date and baseline_date != expected_date:
-        return {"status": "UNAVAILABLE", "reason": "BASELINE_DATE_MISMATCH"}
+        snapshot_time = quality.get("currentSnapshotGeneratedAt")
+        try:
+            snapshot_date = datetime.fromisoformat(str(snapshot_time).replace("Z", "+00:00")).astimezone(KST).strftime("%Y%m%d")
+        except (TypeError, ValueError):
+            snapshot_date = None
+        if (quality.get("baselineFreshnessStatus") != "VALID_PREVIOUS_TRADING_DAY"
+                or snapshot_date != expected_date):
+            return {"status": "UNAVAILABLE", "reason": "BASELINE_DATE_MISMATCH"}
     if quality.get("currentCount") != quality.get("authoritativeCount"):
         return {"status": "UNAVAILABLE", "reason": "CURRENT_COVERAGE_INVALID"}
     if quality.get("currentCoveragePct") != 100.0:

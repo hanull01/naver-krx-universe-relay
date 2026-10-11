@@ -100,6 +100,32 @@ class MonitoringProductionTests(unittest.TestCase):
         for baseline, reason in cases:
             self.assertEqual(runner.baseline_readiness(baseline, "2026-10-02"), (False, reason))
 
+    def test_collection_readiness_matches_session_aware_runtime_policy(self):
+        baseline = {"asOfDate": "20261008", "historyStatus": "OK",
+                    "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0}
+        sessions = {date(2026, 10, 8), date(2026, 10, 12)}
+        market_day = lambda value: (value in sessions, "OPEN" if value in sessions else "HOLIDAY")
+        for hour in (8, 10, 15):
+            ready = runner.collection_readiness(
+                baseline, datetime(2026, 10, 12, hour, 0, tzinfo=KST), market_day)
+            self.assertEqual(ready, (True, "READY", "20261008"))
+        stale = dict(baseline, asOfDate="20261007")
+        self.assertEqual(runner.collection_readiness(
+            stale, datetime(2026, 10, 12, 10, 0, tzinfo=KST), market_day)[1],
+            "BASELINE_STALE")
+
+    def test_collection_readiness_requires_current_final_after_close(self):
+        sessions = {date(2026, 10, 8), date(2026, 10, 12)}
+        market_day = lambda value: (value in sessions, "OPEN" if value in sessions else "HOLIDAY")
+        prior = {"asOfDate": "20261008", "historyStatus": "OK",
+                 "count": 2, "authoritativeCount": 2,
+                 "coveragePct": 100.0}
+        current = dict(prior, asOfDate="20261012")
+        after = datetime(2026, 10, 12, 16, 0, tzinfo=KST)
+        self.assertEqual(runner.collection_readiness(prior, after, market_day)[1], "BASELINE_STALE")
+        self.assertEqual(runner.collection_readiness(current, after, market_day)[1], "READY")
+
     def test_incomplete_current_never_publishes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); baseline = root / "baseline.json"; output = root / "evidence"

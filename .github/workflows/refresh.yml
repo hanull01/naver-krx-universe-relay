@@ -105,18 +105,20 @@ jobs:
         run: |
           set +e
           target_date=$(TZ=Asia/Seoul date +%Y%m%d)
-          readiness=$(python3 - "$target_date" <<'PY'
+          readiness=$(python3 - <<'PY'
           import json, sys
+          from datetime import datetime
           from pathlib import Path
+          from zoneinfo import ZoneInfo
           sys.path.insert(0, "tools")
-          from run_full_market_monitoring import baseline_readiness
-          target = sys.argv[1]
+          from run_full_market_monitoring import collection_readiness
           try:
               baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
           except (OSError, ValueError, json.JSONDecodeError):
               print("BASELINE_UNAVAILABLE")
               raise SystemExit
-          print(baseline_readiness(baseline, target)[1])
+          now = datetime.now(ZoneInfo("Asia/Seoul"))
+          print(collection_readiness(baseline, now)[1])
           PY
           )
           echo "baseline targetDate=${target_date} readiness=${readiness}"

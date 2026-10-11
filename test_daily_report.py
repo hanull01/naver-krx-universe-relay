@@ -50,6 +50,31 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(got["status"], "UNAVAILABLE")
             self.assertIn(got["reason"], {"BASELINE_DATE_MISMATCH", "CURRENT_COVERAGE_INVALID"})
 
+    def test_full_market_evidence_accepts_previous_session_baseline_with_current_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            generated = "2026-10-12T10:00:00+09:00"
+            for name in daily_report.FULL_MARKET_FILES:
+                (root / name).write_text(json.dumps({"generatedAt": generated}), encoding="utf-8")
+            quality = {
+                "generatedAt": generated, "baselineAsOfDate": "20261008",
+                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
+                "currentSnapshotGeneratedAt": generated, "publicationStatus": "SUCCESS",
+                "authoritativeCount": 2767, "currentCount": 2767,
+                "currentCoveragePct": 100.0, "duplicateCodes": [], "missingCurrentCodes": [],
+            }
+            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
+            (root / "latest-breadth.json").write_text(json.dumps({
+                "generatedAt": generated,
+                "breadth": {"TOTAL": {"advancers": 1, "decliners": 1, "unchanged": 0}},
+            }), encoding="utf-8")
+            self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
+                             "AVAILABLE")
+            quality["currentSnapshotGeneratedAt"] = "2026-10-08T10:00:00+09:00"
+            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
+            self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
+                             "UNAVAILABLE")
+
     def test_quote_summary(self):
         row = {
             "price": 100,
