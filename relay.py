@@ -365,10 +365,12 @@ def load_monitoring_daily_final(codes, business_day):
     for market in ('kospi', 'kosdaq'):
         path = ROOT / f'{MONITORING_DAILY_DIR}/{market}.json'
         payload = json.loads(path.read_text(encoding='utf-8'))
+        as_of_date = str(payload.get('asOfDate') or '')
         if (payload.get('schemaVersion') != 1
                 or payload.get('format') != 'COLUMN_ARRAY_V1'
                 or payload.get('publicationStatus') != 'FINAL'
-                or str(payload.get('asOfDate')) != target
+                or not as_of_date.isdigit() or len(as_of_date) != 8
+                or as_of_date < target
                 or str(payload.get('market', '')).lower() != market.lower()):
             raise ValueError(f'invalid monitoring daily FINAL contract: {market}')
         for stock in payload.get('stocks', []):

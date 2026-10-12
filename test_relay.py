@@ -1045,6 +1045,29 @@ class RelayTests(unittest.TestCase):
                 with patch.object(relay, 'ROOT', root), self.assertRaises(ValueError):
                     relay.load_monitoring_daily_final(['000001'], business_day)
 
+    def test_monitoring_daily_latest_final_selects_requested_historical_row(self):
+        business_day = datetime(2026, 10, 8).date()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); (root / 'data/monitoring-daily').mkdir(parents=True)
+            for market in ('kospi', 'kosdaq'):
+                code = '000001' if market == 'kospi' else '000002'
+                payload = {
+                    'schemaVersion': 1, 'format': 'COLUMN_ARRAY_V1',
+                    'publicationStatus': 'FINAL', 'asOfDate': '20261012',
+                    'market': market.upper(), 'stocks': [{
+                        'code': code, 'dates': ['20261008', '20261012'],
+                        'close': [100, 110], 'high': [105, 115],
+                        'volume': [1000, 1200], 'validity': [0, 0],
+                    }],
+                }
+                (root / f'data/monitoring-daily/{market}.json').write_text(
+                    json.dumps(payload), encoding='utf-8')
+            with patch.object(relay, 'ROOT', root):
+                result = relay.load_monitoring_daily_final(['000001', '000002'], business_day)
+        self.assertEqual(set(result), {'000001', '000002'})
+        self.assertEqual({row['close'] for row in result.values()}, {100})
+        self.assertTrue(all(row['sourceDate'] == '2026-10-08' for row in result.values()))
+
     def test_technicals_merge_regular_bar_but_never_raw_provisional_today(self):
         current = datetime(2026, 9, 29, 16, 0, tzinfo=relay.KST)
         with tempfile.TemporaryDirectory() as directory:
