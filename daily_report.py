@@ -766,6 +766,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                         "high60",
                         "avgVolume20",
                         "volumeRatio20",
+                        "confirmedStatus",
+                        "provisional",
                     ],
                 ),
                 "state": compact_dict(

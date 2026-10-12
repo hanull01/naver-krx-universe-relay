@@ -1095,7 +1095,7 @@ def daily_cache_is_current(daily, current=None, expected_completed_date=None):
     regular_override = (_valid_expected_regular_override(daily, expected_completed_date)
                         if expected_completed_date is not None
                         else _valid_same_day_regular_override(daily, current))
-    if daily.get('status') in ('error', 'insufficient', 'stale'):
+    if daily.get('status') in ('error', 'insufficient', 'stale', 'unavailable'):
         return regular_override
     # ``latestDate`` may include a provisional current-day candle.  Technical
     # indicators must instead be keyed to the latest completed candle.
@@ -1142,6 +1142,23 @@ def calculate_technicals(code, stock_name, daily, quote):
     enough20 = history_count >= 20
     avg_volume20 = technical_average(volumes[-20:]) if enough20 else None
     current_volume = quote.get('accumulatedTradingVolume') if quote else None
+    completed_current = daily_cache_is_current(
+        daily, expected_completed_date=(quote or {}).get('previousBusinessDay'))
+    provisional_price = quote.get('closePrice') if quote else None
+    provisional_closes = closes + [provisional_price] if provisional_price is not None else closes
+    provisional = None
+    if not completed_current and provisional_price is not None:
+        provisional = {
+            'status': 'provisional',
+            'basis': 'VERIFIED_HISTORY_PLUS_NAVER_CURRENT_PRICE',
+            'sourceTime': quote.get('sourceTime'), 'session': quote.get('session'),
+            'asOf': quote.get('sourceTime'),
+            'ma5': technical_average(provisional_closes[-5:]) if len(provisional_closes) >= 5 else None,
+            'ma20': technical_average(provisional_closes[-20:]) if len(provisional_closes) >= 20 else None,
+            'ma60': technical_average(provisional_closes[-60:]) if len(provisional_closes) >= 60 else None,
+            'price': provisional_price, 'confirmed': False,
+            'note': 'current price is not a completed regular-session OHLCV bar',
+        }
     return {
         'itemCode': code, 'stockName': stock_name, 'asOf': bars[-1]['date'] if bars else None,
         'historyCount': history_count,
@@ -1155,9 +1172,11 @@ def calculate_technicals(code, stock_name, daily, quote):
         'avgVolume20': avg_volume20,
         'volumeRatio20': round(current_volume / avg_volume20, 2)
                          if avg_volume20 and current_volume is not None else None,
-        'status': 'error' if not daily_cache_is_current(
-            daily, expected_completed_date=(quote or {}).get('previousBusinessDay'))
-        else 'ok' if enough20 else 'insufficient_history',
+        'status': 'ok' if completed_current and enough20 else
+                  'provisional' if provisional and len(provisional_closes) >= 20 else
+                  'error' if not completed_current else 'insufficient_history',
+        'confirmedStatus': 'ok' if completed_current and enough20 else 'unavailable',
+        'provisional': provisional,
     }
 
 
