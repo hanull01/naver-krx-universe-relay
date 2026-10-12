@@ -11,6 +11,98 @@ import naver_market as market
 
 THEME_LIST_PATH = '/api/domestic/market/theme/list'
 THEME_MEMBER_PATH = '/api/domestic/market/theme/{theme_id}/stocklist'
+PC_THEME_RANKING_PATH = '/api/stockSecurity/rankings/v2/domestic/themes'
+PC_THEME_PERIODS = ('daily', 'weekly', 'monthly')
+PC_THEME_PAGE_SIZE = 20
+PC_THEME_MAX_PAGES = 50
+
+
+def _normalize_pc_theme(row):
+    market.require_fields(row, ('code', 'name', 'ranking', 'changeRate', 'updatedAt'), 'pc theme')
+    return {
+        'id': str(row['code']), 'name': row['name'], 'ranking': market.numeric(row['ranking']),
+        'changeRate': market.numeric(row['changeRate']),
+        'risingCount': market.numeric(row.get('risingCount')),
+        'fallingCount': market.numeric(row.get('fallingCount')),
+        'unchangedCount': market.numeric(row.get('unchangedCount')),
+        'totalTradingValue': market.numeric(row.get('totalTradingValue')),
+        'totalTradingVolume': market.numeric(row.get('totalTradingVolume')),
+        'totalMarketCap': market.numeric(row.get('totalMarketCap')),
+        'naverTopByChangeRate': list(row.get('topByChangeRate') or []),
+        'naverTopByTradingValue': list(row.get('topByTradingValue') or []),
+        'naverTopByTradingVolume': list(row.get('topByTradingVolume') or []),
+        'updatedAt': row['updatedAt'], 'source': dict(row),
+    }
+
+
+def collect_pc_theme_ranking(period, fetcher=market.fetch_json, clock=market.generated_at,
+                             max_pages=PC_THEME_MAX_PAGES):
+    """Read the PC cursor ranking, failing closed on cursor/ID/time anomalies."""
+    if period not in PC_THEME_PERIODS:
+        raise ValueError(f'unsupported PC theme period: {period}')
+    themes, seen_ids, seen_cursors, diagnostics, source_times = [], set(), set(), [], set()
+    cursor = None
+    error = None
+    completed = False
+    for page in range(max_pages):
+        params = {'sortType': 'changeRate', 'size': PC_THEME_PAGE_SIZE,
+                  'excludeCodes': '25', 'period': period}
+        if cursor is not None:
+            params['cursor'] = cursor
+        try:
+            payload = fetcher(PC_THEME_RANKING_PATH, params, dict)
+            if not isinstance(payload.get('items'), list) or not isinstance(payload.get('hasNext'), bool):
+                raise market.MarketApiError('pc theme response missing items/hasNext contract')
+            rows = [_normalize_pc_theme(row) for row in payload['items']]
+            ids = [row['id'] for row in rows]
+            duplicate = seen_ids.intersection(ids)
+            source_times.update(row['updatedAt'] for row in rows)
+            next_cursor = payload.get('cursor')
+            diagnostics.append({'page': page, 'count': len(rows),
+                                'duplicateCount': len(duplicate),
+                                'hasNext': payload['hasNext'],
+                                'cursorPresent': bool(next_cursor)})
+            if duplicate or len(ids) != len(set(ids)):
+                raise market.MarketApiError(f'pc theme duplicate code: {sorted(duplicate or set(ids))[:3]}')
+            seen_ids.update(ids)
+            themes.extend(rows)
+            if not payload['hasNext']:
+                completed = True
+                break
+            if not isinstance(next_cursor, str) or not next_cursor:
+                raise market.MarketApiError('pc theme hasNext without cursor')
+            if next_cursor in seen_cursors:
+                raise market.MarketApiError('pc theme cursor repeated')
+            seen_cursors.add(next_cursor)
+            cursor = next_cursor
+        except Exception as exc:
+            error = market.error_payload(exc)
+            break
+    if not completed and error is None:
+        error = market.error_payload(market.MarketApiError(
+            f'pc theme max pages reached: {max_pages}'))
+    time_consistent = len(source_times) <= 1
+    status = ('OK' if time_consistent else 'PARTIAL') if completed else ('PARTIAL' if themes else 'ERROR')
+    payload = {'generatedAt': clock(), 'source': 'NAVER', 'status': status,
+               'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL',
+               'period': period, 'count': len(themes), 'uniqueThemeCount': len(seen_ids),
+               'updatedAt': sorted(source_times),
+               'updatedAtConsistent': time_consistent,
+               'pagination': {'type': 'CURSOR', 'parameter': 'cursor', 'pagesFetched': len(diagnostics),
+                              'endCondition': 'HAS_NEXT_FALSE' if completed else 'UNCONFIRMED'},
+               'pageDiagnostics': diagnostics, 'themes': themes}
+    if error:
+        payload['error'] = error
+    return payload
+
+
+def collect_pc_theme_periods(fetcher=market.fetch_json, clock=market.generated_at,
+                             max_pages=PC_THEME_MAX_PAGES):
+    """Collect periods independently; no failing period is relabelled as success."""
+    periods = {period: collect_pc_theme_ranking(period, fetcher, clock, max_pages)
+               for period in PC_THEME_PERIODS}
+    return {'generatedAt': clock(), 'source': 'NAVER', 'status': market.status_from(periods.values()),
+            'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL', 'periods': periods}
 
 
 def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,

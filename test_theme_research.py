@@ -69,6 +69,45 @@ class ThemeResearchTests(unittest.TestCase):
         result = theme.analyze_dynamic_themes({'themes': []})
         self.assertIsNone(result['changes'])
 
+    def test_pc_cursor_periods_complete_and_preserve_metrics(self):
+        def row(code, name, updated='2026-10-12T12:00:00+09:00'):
+            return {'code': code, 'name': name, 'ranking': '1', 'changeRate': '2.5',
+                    'risingCount': '2', 'fallingCount': '1', 'unchangedCount': '0',
+                    'totalTradingValue': '10', 'totalTradingVolume': '20', 'totalMarketCap': '30',
+                    'topByChangeRate': [], 'topByTradingValue': [], 'topByTradingVolume': [],
+                    'updatedAt': updated}
+        def fetch(path, params, expected):
+            self.assertEqual(path, theme.PC_THEME_RANKING_PATH)
+            return ({'items': [row('1', 'A')], 'hasNext': True, 'cursor': 'next'}
+                    if 'cursor' not in params else {'items': [row('2', 'B')], 'hasNext': False})
+        result = theme.collect_pc_theme_ranking('daily', fetch, self.CLOCK)
+        self.assertEqual(result['status'], 'OK')
+        self.assertEqual(result['uniqueThemeCount'], 2)
+        self.assertEqual(result['themes'][0]['totalTradingValue'], 10)
+        self.assertEqual(result['pagination']['endCondition'], 'HAS_NEXT_FALSE')
+
+    def test_pc_cursor_missing_repeated_duplicate_and_time_change_fail_closed(self):
+        base = {'code': '1', 'name': 'A', 'ranking': '1', 'changeRate': '1',
+                'updatedAt': 't'}
+        def missing(path, params, expected): return {'items': [base], 'hasNext': True}
+        self.assertEqual(theme.collect_pc_theme_ranking('daily', missing, self.CLOCK)['status'], 'PARTIAL')
+        def repeated(path, params, expected): return {'items': [base], 'hasNext': True, 'cursor': 'same'}
+        self.assertEqual(theme.collect_pc_theme_ranking('daily', repeated, self.CLOCK)['status'], 'PARTIAL')
+        def duplicate(path, params, expected):
+            return ({'items': [base], 'hasNext': True, 'cursor': 'next'} if 'cursor' not in params
+                    else {'items': [base], 'hasNext': False})
+        self.assertEqual(theme.collect_pc_theme_ranking('daily', duplicate, self.CLOCK)['status'], 'PARTIAL')
+
+        def time_change(path, params, expected):
+            row = dict(base)
+            row['code'] = '1' if 'cursor' not in params else '2'
+            row['updatedAt'] = 'first' if 'cursor' not in params else 'second'
+            return ({'items': [row], 'hasNext': True, 'cursor': 'next'} if 'cursor' not in params
+                    else {'items': [row], 'hasNext': False})
+        changed = theme.collect_pc_theme_ranking('daily', time_change, self.CLOCK)
+        self.assertEqual(changed['status'], 'PARTIAL')
+        self.assertFalse(changed['updatedAtConsistent'])
+
 
 if __name__ == '__main__':
     unittest.main()
