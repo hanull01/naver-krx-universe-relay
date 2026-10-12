@@ -56,6 +56,14 @@ class DynamicMonitoringTests(unittest.TestCase):
         self.assertEqual(result['industries']['validation'], 'QUALITY_FULL')
         self.assertEqual(result['networkCalls'], 0)
 
+    def test_published_industry_avg_return_drives_strong_selection(self):
+        result = monitor.build_context(
+            {}, {'quality': {'sourceStatus': 'OK', 'industryEvidenceUsable': 'FULL'},
+                 'industries': [{'name': '반도체', 'avgReturn1D': 4.0, 'leaders': []},
+                                {'name': '약세', 'avgReturn1D': -1.0, 'leaders': []}]},
+            {}, {'datas': []}, {'datas': []}, {'datas': []})
+        self.assertEqual([row['name'] for row in result['industries']['strong']], ['반도체'])
+
 
 if __name__ == '__main__':
     unittest.main()

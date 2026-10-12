@@ -69,6 +69,14 @@ def _theme_payload(snapshot):
         return None
 
 
+def _industry_strength(row):
+    value = row.get('changeRate')
+    if isinstance(value, (int, float)):
+        return value
+    value = row.get('avgReturn1D')
+    return value if isinstance(value, (int, float)) else None
+
+
 def _rank_changes(current, previous):
     if not isinstance(previous, dict):
         return {'status': 'UNAVAILABLE', 'reason': 'NO_PREVIOUS_CONTEXT', 'changes': []}
@@ -126,8 +134,8 @@ def build_context(theme_snapshot, full_market, universe, quotes, technicals, sta
 
     industries, industry_validation = _published_industries(full_market)
     strong_industries = sorted(
-        [row for row in industries if isinstance(row.get('changeRate'), (int, float)) and row['changeRate'] > 0],
-        key=lambda row: row['changeRate'], reverse=True)
+        [row for row in industries if _industry_strength(row) is not None and _industry_strength(row) > 0],
+        key=_industry_strength, reverse=True)
 
     related = {}
     for code in set(universe_members) | kiwoom_codes:
