@@ -6,6 +6,7 @@ It deliberately excludes theme APIs until their pagination contract is revalidat
 import argparse
 import json
 import os
+import ssl
 import sys
 import time
 from datetime import datetime
@@ -13,6 +14,11 @@ from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
+
+try:
+    import certifi
+except ImportError:  # pragma: no cover - production environments may provide system roots.
+    certifi = None
 
 
 ROOT = Path(__file__).resolve().parent
@@ -26,6 +32,7 @@ PAGE_SIZE = 20
 MAX_CATEGORY_PAGES = 20
 MAX_MEMBER_PAGES = 100
 MEMBERSHIP_TTL_HOURS = 24
+TLS_CONTEXT = ssl.create_default_context(cafile=certifi.where()) if certifi else None
 
 RANKINGS = {
     'market_cap': 'marketSum',
@@ -68,7 +75,12 @@ def fetch_json(path, params=None, expected_type=None, opener=urlopen, sleep=time
                 'Accept': 'application/json, text/plain, */*',
                 'Referer': 'https://stock.naver.com/',
             })
-            with opener(request, timeout=TIMEOUT_SECONDS) as response:
+            open_kwargs = {'timeout': TIMEOUT_SECONDS}
+            # Keep injected test openers backward-compatible; only the real
+            # urllib opener receives the explicit, verified CA bundle.
+            if opener is urlopen and TLS_CONTEXT is not None:
+                open_kwargs['context'] = TLS_CONTEXT
+            with opener(request, **open_kwargs) as response:
                 status = getattr(response, 'status', response.getcode())
                 if status < 200 or status >= 300:
                     raise MarketApiError(f'HTTP {status}: {path}')
