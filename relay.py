@@ -1128,10 +1128,18 @@ def build_technicals(quote_payload=None):
             quote_payload = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
         except (OSError, json.JSONDecodeError):
             quote_payload = {'datas': []}
-    quotes = {row['itemCode']: row for row in quote_payload.get('datas', [])}
+    quotes = {row['itemCode']: dict(row) for row in quote_payload.get('datas', [])}
     names = {stock['itemCode']: stock['stockName'] for stock in universe['stocks']}
     business_days = {row.get('previousBusinessDay') for row in quotes.values()
                      if row.get('previousBusinessDay')}
+    if not business_days and quotes:
+        try:
+            expected = previous_krx_business_day(now().date()).isoformat()
+            for row in quotes.values():
+                row['previousBusinessDay'] = expected
+            business_days = {expected}
+        except (CalendarUnavailable, OSError, ValueError) as exc:
+            print(f'MONITORING_DAILY_TECHNICALS unavailable=previous_business_day:{exc}')
     monitoring_rows = {}
     if len(business_days) == 1:
         try:
