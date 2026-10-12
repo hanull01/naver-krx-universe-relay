@@ -27,6 +27,16 @@ class ThemeResearchTests(unittest.TestCase):
         self.assertIn('repeated page', result['error']['message'])
         self.assertEqual(result['pagination']['endCondition'], 'UNCONFIRMED')
 
+    def test_partial_page_overlap_is_recorded_and_not_success(self):
+        def fetch(path, params, expected):
+            return ([category(1), category(2)] if params['startIdx'] == 0
+                    else [category(2), category(3)] if params['startIdx'] == 1
+                    else [])
+        result = theme.collect_themes(fetch, self.CLOCK)
+        self.assertEqual(result['status'], 'PARTIAL')
+        self.assertEqual(result['pageDiagnostics'][1]['duplicateCount'], 1)
+        self.assertIn('duplicate', result['error']['message'])
+
     def test_member_duplicates_and_missing_fields_fail_closed(self):
         def duplicate(path, params, expected):
             return [stock('000001'), stock('000001')] if params['startIdx'] == 0 else []

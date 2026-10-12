@@ -18,6 +18,7 @@ def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
     """Collect theme pages, failing closed on repeats or unconfirmed end."""
     themes, seen_ids, seen_pages = [], set(), set()
     error = None
+    page_diagnostics = []
     finished = False
     for page_index in range(max_pages):
         try:
@@ -27,6 +28,8 @@ def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
             }, list)
             signature = tuple(row.get('no') for row in rows if isinstance(row, dict))
             if signature in seen_pages:
+                page_diagnostics.append({'startIdx': page_index, 'count': len(rows),
+                                         'repeatedPage': True, 'duplicateCount': len(signature)})
                 raise market.MarketApiError(
                     f'theme repeated page at startIdx={page_index}')
             seen_pages.add(signature)
@@ -36,6 +39,8 @@ def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
             normalized = [market.normalize_category(row) for row in rows]
             ids = [row['id'] for row in normalized]
             duplicate = seen_ids.intersection(ids)
+            page_diagnostics.append({'startIdx': page_index, 'count': len(ids),
+                                     'repeatedPage': False, 'duplicateCount': len(duplicate)})
             if duplicate or len(ids) != len(set(ids)):
                 raise market.MarketApiError(
                     f'theme duplicate no: {sorted(duplicate or set(ids))[:3]}')
@@ -56,6 +61,7 @@ def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
             'endCondition': 'EMPTY_ARRAY' if finished else 'UNCONFIRMED',
             'pagesFetched': len(seen_pages),
         },
+        'pageDiagnostics': page_diagnostics,
         'count': len(themes), 'themes': themes,
     }
     if error:
