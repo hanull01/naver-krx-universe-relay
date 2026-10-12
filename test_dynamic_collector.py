@@ -29,6 +29,16 @@ class DynamicCollectorTests(unittest.TestCase):
         self.assertEqual(result['optionalAcceptedCount'], 1)
         self.assertEqual(result['optionalStatus'], 'PARTIAL')
 
+    def test_prepares_bounded_batches_for_existing_fetch_contract(self):
+        result = dynamic_collector.prepare_optional_stage(
+            {'selectedCodes': [f'O{index:02d}' for index in range(78)]},
+            ['B1'] + [f'O{index:02d}' for index in range(3)],
+            max_batch_size=50, timeout_seconds=10, max_retries=1)
+        self.assertEqual([len(batch) for batch in result['optionalBatches']], [50, 25])
+        self.assertEqual(result['requestUpperBound'], 2)
+        self.assertEqual(result['networkCalls'], 0)
+        self.assertEqual(result['fetchContract'], 'relay.fetch_existing_quote_endpoint')
+
     def test_source_time_mismatch_isolated(self):
         result = dynamic_collector.merge_optional_dataset(
             {'datas': [{'itemCode': 'B1'}]},

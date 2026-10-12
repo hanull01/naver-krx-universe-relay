@@ -45,6 +45,26 @@ def split_collection_targets(plan, baseline_codes):
     }
 
 
+def prepare_optional_stage(plan, baseline_codes, max_batch_size=50,
+                           timeout_seconds=10, max_retries=1):
+    """Prepare bounded optional batches for the existing relay fetch contract."""
+    if max_batch_size < 1 or timeout_seconds <= 0 or max_retries < 0:
+        raise ValueError('invalid optional collection limits')
+    split = split_collection_targets(plan, baseline_codes)
+    targets = split['optionalTargets']
+    batches = [targets[index:index + max_batch_size]
+               for index in range(0, len(targets), max_batch_size)]
+    return {
+        **split,
+        'optionalBatches': batches,
+        'requestUpperBound': len(batches),
+        'timeoutSeconds': timeout_seconds,
+        'maxRetries': max_retries,
+        'fetchContract': 'relay.fetch_existing_quote_endpoint',
+        'publishPolicy': 'OPTIONAL_ONLY_AFTER_ALL_BATCHES_VALID',
+    }
+
+
 def merge_optional_dataset(base_payload, optional_payload, optional_targets,
                            reference_time=None):
     """Merge only compatible optional rows, leaving baseline rows untouched."""
