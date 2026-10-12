@@ -105,8 +105,9 @@ class ThemeResearchTests(unittest.TestCase):
             return ({'items': [row], 'hasNext': True, 'cursor': 'next'} if 'cursor' not in params
                     else {'items': [row], 'hasNext': False})
         changed = theme.collect_pc_theme_ranking('daily', time_change, self.CLOCK)
-        self.assertEqual(changed['status'], 'PARTIAL')
+        self.assertEqual(changed['status'], 'OK')
         self.assertFalse(changed['updatedAtConsistent'])
+        self.assertEqual(changed['quality']['snapshotConsistency'], 'NON_ATOMIC')
 
     def test_pc_analysis_keeps_naver_and_system_leaders_separate(self):
         ranking = {'period': 'daily', 'status': 'OK', 'themes': [{
@@ -124,6 +125,18 @@ class ThemeResearchTests(unittest.TestCase):
         self.assertEqual(row['naverTopByChangeRate'], [{'code': '000001'}])
         self.assertEqual(row['systemLeaders'][0]['code'], '000001')
         self.assertEqual(row['membershipStatus'], 'OK')
+
+    def test_period_comparison_and_work_contract_do_not_treat_difference_as_removal(self):
+        row = {'id': '1', 'name': 'A', 'ranking': 1, 'changeRate': 1, 'risingCount': 1,
+               'fallingCount': 0, 'totalTradingValue': 1, 'totalTradingVolume': 1,
+               'naverTopByChangeRate': [], 'updatedAt': 't'}
+        periods = {
+            'daily': {'themes': [row], 'quality': {'snapshotConsistency': 'NON_ATOMIC'}},
+            'weekly': {'themes': [dict(row, id='2')], 'quality': {'snapshotConsistency': 'CONSISTENT'}},
+        }
+        contract = theme.build_work_theme_contract(periods)
+        self.assertEqual(contract['comparison']['commonCodeCount'], 0)
+        self.assertEqual(contract['membershipPolicy'], 'TOP_THEMES_CACHED_OR_ON_DEMAND_ONLY')
 
 
 if __name__ == '__main__':

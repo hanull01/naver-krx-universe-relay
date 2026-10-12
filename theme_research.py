@@ -40,6 +40,7 @@ def collect_pc_theme_ranking(period, fetcher=market.fetch_json, clock=market.gen
     """Read the PC cursor ranking, failing closed on cursor/ID/time anomalies."""
     if period not in PC_THEME_PERIODS:
         raise ValueError(f'unsupported PC theme period: {period}')
+    started_at = clock()
     themes, seen_ids, seen_cursors, diagnostics, source_times = [], set(), set(), [], set()
     cursor = None
     error = None
@@ -82,12 +83,20 @@ def collect_pc_theme_ranking(period, fetcher=market.fetch_json, clock=market.gen
         error = market.error_payload(market.MarketApiError(
             f'pc theme max pages reached: {max_pages}'))
     time_consistent = len(source_times) <= 1
-    status = ('OK' if time_consistent else 'PARTIAL') if completed else ('PARTIAL' if themes else 'ERROR')
-    payload = {'generatedAt': clock(), 'source': 'NAVER', 'status': status,
+    status = 'OK' if completed else ('PARTIAL' if themes else 'ERROR')
+    payload = {'generatedAt': clock(), 'collectionStartedAt': started_at,
+               'collectionCompletedAt': clock(), 'source': 'NAVER', 'status': status,
                'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL',
                'period': period, 'count': len(themes), 'uniqueThemeCount': len(seen_ids),
                'updatedAt': sorted(source_times),
                'updatedAtConsistent': time_consistent,
+               'updatedAtMeaning': 'UNKNOWN',
+               'quality': {
+                   'pageCompletion': 'COMPLETE' if completed else 'INCOMPLETE',
+                   'duplicateCodes': len(themes) - len(seen_ids),
+                   'cursorIntegrity': 'OK' if completed else 'FAILED',
+                   'snapshotConsistency': 'CONSISTENT' if time_consistent else 'NON_ATOMIC',
+               },
                'pagination': {'type': 'CURSOR', 'parameter': 'cursor', 'pagesFetched': len(diagnostics),
                               'endCondition': 'HAS_NEXT_FALSE' if completed else 'UNCONFIRMED'},
                'pageDiagnostics': diagnostics, 'themes': themes}
@@ -103,6 +112,35 @@ def collect_pc_theme_periods(fetcher=market.fetch_json, clock=market.generated_a
                for period in PC_THEME_PERIODS}
     return {'generatedAt': clock(), 'source': 'NAVER', 'status': market.status_from(periods.values()),
             'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL', 'periods': periods}
+
+
+def compare_pc_theme_periods(periods):
+    """Describe period set differences without treating absence as deletion."""
+    codes = {period: {row['id'] for row in payload.get('themes', [])}
+             for period, payload in periods.items()}
+    common = set.intersection(*codes.values()) if codes else set()
+    return {'commonCodeCount': len(common),
+            'periodCodeCounts': {period: len(values) for period, values in codes.items()},
+            'onlyByPeriod': {period: sorted(values - common) for period, values in codes.items()}}
+
+
+def build_work_theme_contract(periods):
+    """Return only the fields Work may present, with source-quality context."""
+    comparison = compare_pc_theme_periods(periods)
+    return {'source': 'NAVER_PC_THEME_RANKING',
+            'quality': {period: payload['quality'] for period, payload in periods.items()},
+            'periods': {period: [{'id': row['id'], 'name': row['name'], 'ranking': row['ranking'],
+                                  'changeRate': row['changeRate'], 'risingCount': row['risingCount'],
+                                  'fallingCount': row['fallingCount'],
+                                  'totalTradingValue': row['totalTradingValue'],
+                                  'totalTradingVolume': row['totalTradingVolume'],
+                                  'naverTopByChangeRate': row['naverTopByChangeRate'],
+                                  'updatedAt': row['updatedAt']}
+                                 for row in payload.get('themes', [])]
+                        for period, payload in periods.items()},
+            'comparison': comparison,
+            'membershipPolicy': 'TOP_THEMES_CACHED_OR_ON_DEMAND_ONLY',
+            'systemLeaderPolicy': 'UNKNOWN_WITHOUT_VERIFIED_MEMBERSHIP_AND_QUOTES'}
 
 
 def attach_pc_theme_analysis(ranking, membership, quotes=None, technicals=None,
