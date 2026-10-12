@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import ssl
 from pathlib import Path
 
 import dynamic_collector
@@ -84,6 +85,22 @@ class DynamicCollectorTests(unittest.TestCase):
         adapter = dynamic_collector.make_relay_pilot_fetcher(Relay, 'CERTIFI_CONTEXT')
         self.assertEqual(adapter(['O1'])['datas'], [])
         self.assertEqual(calls, [('https://example/O1', 0, 'CERTIFI_CONTEXT')])
+
+    def test_tls_certificate_failure_is_not_retried_by_optional_stage(self):
+        stage = dynamic_collector.prepare_optional_stage(
+            {'selectedCodes': ['O1', 'O2', 'O3']}, [], max_retries=1)
+        calls = []
+
+        def fetch(batch):
+            calls.append(list(batch))
+            raise ssl.SSLCertVerificationError('CERTIFICATE_VERIFY_FAILED')
+
+        result = dynamic_collector.collect_optional_with_existing_fetch(
+            stage, fetch, allow_network=True)
+        self.assertEqual(result['status'], 'ERROR')
+        self.assertEqual(result['networkCalls'], 1)
+        self.assertEqual(len(result['attempts']), 1)
+        self.assertEqual(calls, [['O1', 'O2', 'O3']])
 
     def test_pilot_requires_three_to_five_explicit_optional_codes(self):
         stage = dynamic_collector.prepare_pilot_stage(

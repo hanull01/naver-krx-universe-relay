@@ -7,6 +7,7 @@ publish the optional result only after a separate operations approval.
 
 import json
 import os
+import ssl
 import time
 from pathlib import Path
 
@@ -28,6 +29,18 @@ def _source_time(row):
     if not isinstance(row, dict):
         return None
     return row.get('sourceTime') or row.get('asOf') or row.get('sourceDate')
+
+
+def _is_tls_certificate_error(exc):
+    """Certificate trust failures are deterministic and must not be retried."""
+    current = exc
+    while current is not None:
+        if isinstance(current, ssl.SSLCertVerificationError):
+            return True
+        if 'CERTIFICATE_VERIFY_FAILED' in str(current):
+            return True
+        current = current.__cause__ or current.__context__
+    return False
 
 
 def split_collection_targets(plan, baseline_codes):
@@ -122,6 +135,8 @@ def collect_optional_with_existing_fetch(stage_plan, fetch_batch, allow_network=
                 attempts.append({'codes': list(batch), 'attempt': attempt + 1,
                                  'elapsedSeconds': round(time.monotonic() - started, 6),
                                  'status': 'ERROR'})
+                if _is_tls_certificate_error(exc):
+                    break
         if batch_error is not None:
             errors.append({'codes': list(batch), 'error': batch_error})
     status = 'OK' if not errors else ('PARTIAL' if rows else 'ERROR')
