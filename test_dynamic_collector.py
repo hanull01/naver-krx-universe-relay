@@ -41,6 +41,31 @@ class DynamicCollectorTests(unittest.TestCase):
         self.assertEqual(result['networkCalls'], 0)
         self.assertEqual(result['fetchContract'], 'relay.fetch_existing_quote_endpoint')
 
+    def test_existing_fetch_connection_uses_batches_and_records_attempts(self):
+        stage = dynamic_collector.prepare_optional_stage(
+            {'selectedCodes': [f'O{index:02d}' for index in range(3)]}, ['B1'],
+            max_batch_size=2, max_retries=1)
+        calls = []
+        def fetch(batch):
+            calls.append(list(batch))
+            return {'datas': [{'itemCode': code, 'sourceTime': 't'} for code in batch]}
+        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch)
+        self.assertEqual(calls, [['O00', 'O01'], ['O02']])
+        self.assertEqual(result['status'], 'OK')
+        self.assertEqual(result['networkCalls'], 2)
+
+    def test_existing_fetch_connection_isolates_failed_batch(self):
+        stage = dynamic_collector.prepare_optional_stage(
+            {'selectedCodes': ['O1', 'O2']}, [], max_batch_size=1, max_retries=1)
+        def fetch(batch):
+            if batch == ['O1']:
+                raise RuntimeError('fixture failure')
+            return {'datas': [{'itemCode': 'O2', 'sourceTime': 't'}]}
+        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch)
+        self.assertEqual(result['status'], 'PARTIAL')
+        self.assertEqual(result['errors'][0]['codes'], ['O1'])
+        self.assertEqual(result['networkCalls'], 3)
+
     def test_source_time_mismatch_isolated(self):
         result = dynamic_collector.merge_optional_dataset(
             {'datas': [{'itemCode': 'B1'}]},

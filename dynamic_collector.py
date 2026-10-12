@@ -7,6 +7,7 @@ publish the optional result only after a separate operations approval.
 
 import json
 import os
+import time
 from pathlib import Path
 
 
@@ -67,6 +68,43 @@ def prepare_optional_stage(plan, baseline_codes, max_batch_size=50,
         'fetchContract': 'relay.fetch_existing_quote_endpoint',
         'publishPolicy': 'OPTIONAL_ONLY_AFTER_ALL_BATCHES_VALID',
     }
+
+
+def collect_optional_with_existing_fetch(stage_plan, fetch_batch):
+    """Call an injected existing relay fetch once per bounded optional batch.
+
+    ``fetch_batch`` must be the existing relay fetch adapter.  No network
+    client or endpoint is created here, and callers must not enable this stage
+    without an operations approval.
+    """
+    if not callable(fetch_batch):
+        raise TypeError('fetch_batch must be callable')
+    rows, errors, attempts = [], [], []
+    for batch in stage_plan.get('optionalBatches', []):
+        batch_error = None
+        for attempt in range(stage_plan.get('maxRetries', 0) + 1):
+            started = time.monotonic()
+            try:
+                payload = fetch_batch(batch)
+                if not isinstance(payload, dict) or not isinstance(payload.get('datas'), list):
+                    raise ValueError('missing datas array')
+                rows.extend(payload['datas'])
+                attempts.append({'codes': list(batch), 'attempt': attempt + 1,
+                                 'elapsedSeconds': round(time.monotonic() - started, 6),
+                                 'status': 'OK'})
+                batch_error = None
+                break
+            except Exception as exc:
+                batch_error = str(exc)
+                attempts.append({'codes': list(batch), 'attempt': attempt + 1,
+                                 'elapsedSeconds': round(time.monotonic() - started, 6),
+                                 'status': 'ERROR'})
+        if batch_error is not None:
+            errors.append({'codes': list(batch), 'error': batch_error})
+    status = 'OK' if not errors else ('PARTIAL' if rows else 'ERROR')
+    return {'status': status, 'datas': rows, 'errors': errors,
+            'requestedCount': len(stage_plan.get('optionalTargets', [])),
+            'attempts': attempts, 'networkCalls': len(attempts)}
 
 
 def merge_optional_dataset(base_payload, optional_payload, optional_targets,
