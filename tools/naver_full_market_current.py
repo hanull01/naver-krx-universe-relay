@@ -145,9 +145,11 @@ def collect_attempt(expected, fetcher=fetch_page, page_size=200, sleep_seconds=0
     page_counts, terminal = {}, {}
     for market in MARKETS:
         index, pages, signatures = 0, 0, set()
+        pending_page = None
         while True:
             try:
-                page = fetcher(market, index, page_size)
+                page = pending_page if pending_page is not None else fetcher(market, index, page_size)
+                pending_page = None
             except Exception as exc:
                 errors.append(f"{market}[{index}]: {type(exc).__name__}")
                 break
@@ -179,9 +181,15 @@ def collect_attempt(expected, fetcher=fetch_page, page_size=200, sleep_seconds=0
             if len(page) < page_size:
                 try:
                     next_page = fetcher(market, index + 1, page_size)
-                    terminal[market] = len(next_page) == 0
-                    if next_page:
-                        errors.append(f"{market}: short page followed by non-empty page")
+                    if not next_page:
+                        terminal[market] = True
+                        break
+                    # NAVER may return a short page before the final page.
+                    # Continue processing it; completeness is decided below
+                    # against the authoritative code set.
+                    index += 1
+                    pending_page = next_page
+                    continue
                 except Exception as exc:
                     terminal[market] = False
                     errors.append(f"{market}: terminal check {type(exc).__name__}")

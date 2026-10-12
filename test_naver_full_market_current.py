@@ -59,6 +59,27 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertEqual(result["missingCodes"], ["123456"])
         self.assertEqual(result["extraCodes"], ["999999"])
 
+    def test_short_page_followed_by_non_empty_page_continues_and_can_pass(self):
+        fetch = paged({
+            "KOSPI": [[raw("005930")], [raw("0088M0")], []],
+            "KOSDAQ": [[raw("000660"), raw("123456")], []],
+        })
+        result = current.collect_attempt(self.expected, fetch, page_size=2, sleep_seconds=0)
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["count"], 4)
+        self.assertEqual(result["missingCodes"], [])
+        self.assertEqual(result["extraCodes"], [])
+
+    def test_short_page_followed_by_non_empty_page_still_rejects_incomplete_set(self):
+        fetch = paged({
+            "KOSPI": [[raw("005930")], [raw("0088M0")], []],
+            "KOSDAQ": [[raw("000660")], [raw("999999")], []],
+        })
+        result = current.collect_attempt(self.expected, fetch, page_size=2, sleep_seconds=0)
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["missingCodes"], ["123456"])
+        self.assertEqual(result["extraCodes"], ["999999"])
+
     def test_duplicate_and_page_boundary_duplicate_fail(self):
         fetch = paged({
             "KOSPI": [[raw("005930"), raw("0088M0")], []],
