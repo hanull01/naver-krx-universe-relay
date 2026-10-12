@@ -1,4 +1,7 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import theme_research as theme
 from test_naver_market import category, stock
@@ -137,6 +140,22 @@ class ThemeResearchTests(unittest.TestCase):
         contract = theme.build_work_theme_contract(periods)
         self.assertEqual(contract['comparison']['commonCodeCount'], 0)
         self.assertEqual(contract['membershipPolicy'], 'TOP_THEMES_CACHED_OR_ON_DEMAND_ONLY')
+
+    def test_snapshot_validation_and_atomic_preservation(self):
+        period = {'status': 'OK', 'count': 1, 'uniqueThemeCount': 1,
+                  'pagination': {'endCondition': 'HAS_NEXT_FALSE'},
+                  'quality': {'snapshotConsistency': 'NON_ATOMIC'}, 'themes': []}
+        payload = {'status': 'OK', 'periods': {name: dict(period) for name in theme.PC_THEME_PERIODS}}
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            result = theme.write_pc_theme_snapshot(payload, output)
+            self.assertEqual(result['status'], 'OK')
+            before = (output / 'latest.json').read_text(encoding='utf-8')
+            invalid = {'status': 'PARTIAL', 'periods': payload['periods']}
+            with self.assertRaises(theme.market.MarketApiError):
+                theme.write_pc_theme_snapshot(invalid, output)
+            self.assertEqual((output / 'latest.json').read_text(encoding='utf-8'), before)
+            self.assertEqual(json.loads(before)['workContract']['source'], 'NAVER_PC_THEME_RANKING')
 
 
 if __name__ == '__main__':

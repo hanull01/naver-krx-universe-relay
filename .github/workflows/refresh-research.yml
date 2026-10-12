@@ -111,6 +111,19 @@ jobs:
           print("intelligence validation: OK")
           PY
 
+      - name: Stage PC theme rankings
+        id: pc_theme_rankings
+        continue-on-error: true
+        run: |
+          python3 tools/collect_pc_theme_research.py \
+            --output-dir data/research/theme-ranking
+
+      - name: Report optional PC theme staging result
+        if: always()
+        run: |
+          echo "PC theme staging outcome: ${{ steps.pc_theme_rankings.outcome }}"
+          # This optional dataset never controls research/intelligence validity.
+
       - name: Run tests
         run: python3 -m unittest discover -s . -p 'test_*.py'
 

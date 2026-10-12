@@ -5,6 +5,7 @@ list pagination contract remains under research until a live sample proves a
 complete, non-repeating termination condition.
 """
 from collections import defaultdict
+from pathlib import Path
 
 import naver_market as market
 
@@ -141,6 +142,37 @@ def build_work_theme_contract(periods):
             'comparison': comparison,
             'membershipPolicy': 'TOP_THEMES_CACHED_OR_ON_DEMAND_ONLY',
             'systemLeaderPolicy': 'UNKNOWN_WITHOUT_VERIFIED_MEMBERSHIP_AND_QUOTES'}
+
+
+def validate_pc_theme_snapshot(payload):
+    """Validate staged PC rankings before they may replace a prior good file."""
+    if payload.get('status') != 'OK':
+        raise market.MarketApiError('pc theme periods are not all complete')
+    periods = payload.get('periods')
+    if not isinstance(periods, dict) or set(periods) != set(PC_THEME_PERIODS):
+        raise market.MarketApiError('pc theme periods are incomplete')
+    for period, row in periods.items():
+        if row.get('status') != 'OK':
+            raise market.MarketApiError(f'pc theme {period} is not valid')
+        if row.get('pagination', {}).get('endCondition') != 'HAS_NEXT_FALSE':
+            raise market.MarketApiError(f'pc theme {period} did not terminate')
+        if row.get('count') != row.get('uniqueThemeCount'):
+            raise market.MarketApiError(f'pc theme {period} has duplicate codes')
+    return True
+
+
+def write_pc_theme_snapshot(payload, output_dir):
+    """Atomically publish only a validated staged research snapshot."""
+    validate_pc_theme_snapshot(payload)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    snapshot = {'version': 'naver-pc-theme-research-v1',
+                'source': 'NAVER_PC_THEME_RANKING',
+                'status': 'OK', 'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL',
+                'generatedAt': market.generated_at(), 'collection': payload,
+                'workContract': build_work_theme_contract(payload['periods'])}
+    market.atomic_write(output_dir / 'latest.json', snapshot)
+    return snapshot
 
 
 def attach_pc_theme_analysis(ranking, membership, quotes=None, technicals=None,
