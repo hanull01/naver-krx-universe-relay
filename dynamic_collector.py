@@ -130,6 +130,14 @@ def collect_optional_with_existing_fetch(stage_plan, fetch_batch, allow_network=
             'attempts': attempts, 'networkCalls': len(attempts)}
 
 
+def make_relay_pilot_fetcher(relay_module, tls_context):
+    """Adapt relay.fetch for a pilot: certifi context and no inner retry."""
+    def fetch_batch(batch):
+        return relay_module.fetch(relay_module.QUOTE_URL + ','.join(batch),
+                                  retries=0, context=tls_context)
+    return fetch_batch
+
+
 def merge_optional_dataset(base_payload, optional_payload, optional_targets,
                            reference_time=None):
     """Merge only compatible optional rows, leaving baseline rows untouched."""

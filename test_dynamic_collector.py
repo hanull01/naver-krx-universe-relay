@@ -73,6 +73,18 @@ class DynamicCollectorTests(unittest.TestCase):
         self.assertEqual(result['status'], 'DISABLED')
         self.assertEqual(result['networkCalls'], 0)
 
+    def test_relay_pilot_adapter_uses_cert_context_and_zero_inner_retry(self):
+        calls = []
+        class Relay:
+            QUOTE_URL = 'https://example/'
+            @staticmethod
+            def fetch(url, retries=2, context=None):
+                calls.append((url, retries, context))
+                return {'datas': []}
+        adapter = dynamic_collector.make_relay_pilot_fetcher(Relay, 'CERTIFI_CONTEXT')
+        self.assertEqual(adapter(['O1'])['datas'], [])
+        self.assertEqual(calls, [('https://example/O1', 0, 'CERTIFI_CONTEXT')])
+
     def test_pilot_requires_three_to_five_explicit_optional_codes(self):
         stage = dynamic_collector.prepare_pilot_stage(
             {'selectedCodes': ['O1', 'O2', 'O3', 'O4'],

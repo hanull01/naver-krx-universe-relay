@@ -84,16 +84,20 @@ def now():
     return datetime.now(KST)
 
 
-def fetch(url):
-    for attempt in range(3):
+def fetch(url, retries=2, opener=urlopen, context=None):
+    """Fetch JSON with the production retry default and optional pilot controls."""
+    for attempt in range(retries + 1):
         try:
             req = Request(url, headers={'User-Agent': 'Mozilla/5.0',
                                         'Accept': 'application/json',
                                         'Referer': 'https://stock.naver.com/'})
-            with urlopen(req, timeout=20) as response:
+            kwargs = {'timeout': 20}
+            if opener is urlopen and context is not None:
+                kwargs['context'] = context
+            with opener(req, **kwargs) as response:
                 return json.load(response)
         except Exception:
-            if attempt == 2:
+            if attempt == retries:
                 raise
             time.sleep(attempt + 1)
 
