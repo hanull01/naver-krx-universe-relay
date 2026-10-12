@@ -1,65 +1,66 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "005380",
   "itemName": "현대차",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-03",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 44,
+  "reportCount": 48,
   "brokerCount": 14,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 2,
-        "min": 500000,
+        "count": 6,
+        "min": 410000,
         "max": 670000,
-        "mean": 585000,
-        "median": 585000,
-        "stdev": 85000,
-        "range": 170000
+        "mean": 568333,
+        "median": 600000,
+        "stdev": 87448,
+        "range": 260000
       },
       "earningsDirection": {
-        "DOWN": 2
+        "DOWN": 5,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 11,
-        "negative": 13,
-        "net": -2,
-        "netPerReport": -1.0
+        "positive": 15,
+        "negative": 42,
+        "net": -27,
+        "netPerReport": -4.5
       },
       "topics": {
         "환율": {
-          "count": 2,
-          "perReport": 1.0
+          "count": 7,
+          "perReport": 1.167
         },
         "원가": {
+          "count": 4,
+          "perReport": 0.667
+        },
+        "수요": {
+          "count": 4,
+          "perReport": 0.667
+        },
+        "중국": {
           "count": 2,
-          "perReport": 1.0
+          "perReport": 0.333
         },
         "AI": {
           "count": 1,
-          "perReport": 0.5
-        },
-        "중국": {
-          "count": 1,
-          "perReport": 0.5
-        },
-        "수요": {
-          "count": 1,
-          "perReport": 0.5
+          "perReport": 0.167
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
+      "from": "2026-08-13",
+      "to": "2026-09-11",
       "reportCount": 7,
       "brokerCount": 7,
       "targetPrice": {
@@ -103,61 +104,61 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 2,
-        "currentPerReport": 1.0,
+        "currentCount": 7,
+        "currentPerReport": 1.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 1.167,
         "ratio": null
       },
       {
+        "topic": "수요",
+        "currentCount": 4,
+        "currentPerReport": 0.667,
+        "previousCount": 2,
+        "previousPerReport": 0.286,
+        "perReportDelta": 0.381,
+        "ratio": 2.33
+      },
+      {
         "topic": "원가",
-        "currentCount": 2,
-        "currentPerReport": 1.0,
+        "currentCount": 4,
+        "currentPerReport": 0.667,
         "previousCount": 4,
         "previousPerReport": 0.571,
-        "perReportDelta": 0.429,
-        "ratio": 1.75
+        "perReportDelta": 0.096,
+        "ratio": 1.17
       },
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentPerReport": 0.167,
         "previousCount": 2,
         "previousPerReport": 0.286,
-        "perReportDelta": 0.214,
-        "ratio": 1.75
-      },
-      {
-        "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": 0.214,
-        "ratio": 1.75
+        "perReportDelta": -0.119,
+        "ratio": 0.58
       },
       {
         "topic": "중국",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentCount": 2,
+        "currentPerReport": 0.333,
         "previousCount": 4,
         "previousPerReport": 0.571,
-        "perReportDelta": -0.071,
-        "ratio": 0.88
+        "perReportDelta": -0.238,
+        "ratio": 0.58
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -5,
-    "targetMeanChangePct": -17.8,
-    "targetMedianChangePct": -15.83,
-    "targetDispersionChangePct": 13.11
+    "reportCountChange": -1,
+    "targetMeanChangePct": -20.14,
+    "targetMedianChangePct": -13.67,
+    "targetDispersionChangePct": 16.37
   },
   "goalPriceRevisions": {
-    "total": 13,
+    "total": 16,
     "up": 7,
-    "down": 6,
+    "down": 9,
     "flat": 0
   },
   "monthly": {
@@ -406,38 +407,43 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 1,
-        "min": 670000,
+        "count": 5,
+        "min": 410000,
         "max": 670000,
-        "mean": 670000,
-        "median": 670000,
-        "stdev": 0,
-        "range": 0
+        "mean": 582000,
+        "median": 600000,
+        "stdev": 89755,
+        "range": 260000
       },
       "earningsDirection": {
-        "DOWN": 1
+        "DOWN": 4,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 6,
-        "negative": 9,
-        "net": -3,
-        "netPerReport": -3.0
+        "positive": 10,
+        "negative": 38,
+        "net": -28,
+        "netPerReport": -5.6
       },
       "topics": {
-        "수요": {
-          "count": 1,
-          "perReport": 1.0
-        },
         "환율": {
-          "count": 1,
-          "perReport": 1.0
+          "count": 6,
+          "perReport": 1.2
+        },
+        "수요": {
+          "count": 4,
+          "perReport": 0.8
         },
         "원가": {
+          "count": 3,
+          "perReport": 0.6
+        },
+        "중국": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.2
         }
       }
     }
@@ -604,12 +610,12 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 670000,
-      "latestGoalPrice": 780000,
-      "changeAmount": 110000,
-      "changePct": 16.42,
+      "latestGoalPrice": 630000,
+      "changeAmount": -40000,
+      "changePct": -5.97,
       "trajectory": [
         {
           "date": "2026-04-07",
@@ -635,16 +641,21 @@
           "date": "2026-07-24",
           "goalPrice": 780000,
           "title": "본업 실적 회복 위에 올라설 로봇·SDV의 가치"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 630000,
+          "title": "당장은 실적"
         }
       ]
     },
     "유안타증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 690000,
-      "latestGoalPrice": 570000,
-      "changeAmount": -120000,
-      "changePct": -17.39,
+      "latestGoalPrice": 410000,
+      "changeAmount": -280000,
+      "changePct": -40.58,
       "trajectory": [
         {
           "date": "2026-06-16",
@@ -655,16 +666,21 @@
           "date": "2026-07-24",
           "goalPrice": 570000,
           "title": "2Q26 Re: 하반기 OPM 회복 발판 마련"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 410000,
+          "title": "3Q26 Pre: 실적보다 환율이 향후의 리스크"
         }
       ]
     },
     "유진투자증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 600000,
-      "latestGoalPrice": 900000,
-      "changeAmount": 300000,
-      "changePct": 50.0,
+      "latestGoalPrice": 600000,
+      "changeAmount": 0,
+      "changePct": 0.0,
       "trajectory": [
         {
           "date": "2026-04-13",
@@ -685,16 +701,21 @@
           "date": "2026-07-24",
           "goalPrice": 900000,
           "title": "2Q26 Review: 연간 가이던스 유지, 미래 전략은 8월 CID에서"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 600000,
+          "title": "3Q26 Preview: 환율의 역습"
         }
       ]
     },
     "키움증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 4,
+      "reportCount": 6,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 650000,
-      "latestGoalPrice": 700000,
-      "changeAmount": 50000,
-      "changePct": 7.69,
+      "latestGoalPrice": 600000,
+      "changeAmount": -50000,
+      "changePct": -7.69,
       "trajectory": [
         {
           "date": "2026-04-14",
@@ -715,6 +736,11 @@
           "date": "2026-07-24",
           "goalPrice": 700000,
           "title": "상반기의 부진을 딛고 수익성 가이던스 유지"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 600000,
+          "title": "파업 생산차질 여파 반영으로 목표주가 하향"
         }
       ]
     },

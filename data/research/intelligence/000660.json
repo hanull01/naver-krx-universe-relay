@@ -3,154 +3,154 @@
   "rankingEligible": true,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-01",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 68,
+  "reportCount": 69,
   "brokerCount": 15,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 5,
-      "brokerCount": 5,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 5,
+        "count": 6,
         "min": 2700000,
         "max": 4000000,
-        "mean": 3340000,
-        "median": 3200000,
-        "stdev": 458694,
+        "mean": 3450000,
+        "median": 3450000,
+        "stdev": 485627,
         "range": 1300000
       },
       "earningsDirection": {
         "UP": 2,
-        "UNKNOWN": 2,
+        "UNKNOWN": 3,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 22,
-        "negative": 14,
-        "net": 8,
-        "netPerReport": 1.6
-      },
-      "topics": {
-        "수요": {
-          "count": 4,
-          "perReport": 0.8
-        },
-        "AI": {
-          "count": 2,
-          "perReport": 0.4
-        },
-        "원가": {
-          "count": 2,
-          "perReport": 0.4
-        },
-        "환율": {
-          "count": 2,
-          "perReport": 0.4
-        }
-      }
-    },
-    "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 6,
-      "brokerCount": 3,
-      "targetPrice": {
-        "count": 6,
-        "min": 2800000,
-        "max": 3600000,
-        "mean": 3041667,
-        "median": 2950000,
-        "stdev": 289276,
-        "range": 800000
-      },
-      "earningsDirection": {
-        "UNKNOWN": 4,
-        "UP": 1,
-        "DOWN": 1
-      },
-      "textSignal": {
-        "positive": 18,
-        "negative": 9,
+        "positive": 26,
+        "negative": 17,
         "net": 9,
         "netPerReport": 1.5
       },
       "topics": {
+        "수요": {
+          "count": 5,
+          "perReport": 0.833
+        },
+        "환율": {
+          "count": 4,
+          "perReport": 0.667
+        },
         "AI": {
           "count": 2,
           "perReport": 0.333
         },
+        "원가": {
+          "count": 2,
+          "perReport": 0.333
+        }
+      }
+    },
+    "previous": {
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 5,
+      "brokerCount": 3,
+      "targetPrice": {
+        "count": 5,
+        "min": 2800000,
+        "max": 3600000,
+        "mean": 3090000,
+        "median": 3100000,
+        "stdev": 293939,
+        "range": 800000
+      },
+      "earningsDirection": {
+        "UP": 1,
+        "UNKNOWN": 3,
+        "DOWN": 1
+      },
+      "textSignal": {
+        "positive": 16,
+        "negative": 6,
+        "net": 10,
+        "netPerReport": 2.0
+      },
+      "topics": {
+        "AI": {
+          "count": 1,
+          "perReport": 0.2
+        },
         "주주환원": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.2
         },
         "수요": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.2
         },
         "중국": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.2
         },
         "HBM": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.2
         },
         "환율": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.2
         }
       }
     },
     "topicAcceleration": [
       {
         "topic": "수요",
-        "currentCount": 4,
-        "currentPerReport": 0.8,
+        "currentCount": 5,
+        "currentPerReport": 0.833,
         "previousCount": 1,
-        "previousPerReport": 0.167,
+        "previousPerReport": 0.2,
         "perReportDelta": 0.633,
-        "ratio": 4.79
+        "ratio": 4.16
+      },
+      {
+        "topic": "환율",
+        "currentCount": 4,
+        "currentPerReport": 0.667,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": 0.467,
+        "ratio": 3.33
       },
       {
         "topic": "원가",
         "currentCount": 2,
-        "currentPerReport": 0.4,
+        "currentPerReport": 0.333,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.4,
+        "perReportDelta": 0.333,
         "ratio": null
-      },
-      {
-        "topic": "환율",
-        "currentCount": 2,
-        "currentPerReport": 0.4,
-        "previousCount": 1,
-        "previousPerReport": 0.167,
-        "perReportDelta": 0.233,
-        "ratio": 2.4
       },
       {
         "topic": "AI",
         "currentCount": 2,
-        "currentPerReport": 0.4,
-        "previousCount": 2,
-        "previousPerReport": 0.333,
-        "perReportDelta": 0.067,
-        "ratio": 1.2
+        "currentPerReport": 0.333,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": 0.133,
+        "ratio": 1.67
       },
       {
         "topic": "HBM",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.167,
-        "perReportDelta": -0.167,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       },
       {
@@ -158,8 +158,8 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.167,
-        "perReportDelta": -0.167,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       },
       {
@@ -167,17 +167,17 @@
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.167,
-        "perReportDelta": -0.167,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
         "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": 9.81,
-    "targetMedianChangePct": 8.47,
-    "targetDispersionChangePct": 58.57
+    "reportCountChange": 1,
+    "targetMeanChangePct": 11.65,
+    "targetMedianChangePct": 11.29,
+    "targetDispersionChangePct": 65.21
   },
   "goalPriceRevisions": {
     "total": 25,
@@ -462,44 +462,44 @@
       }
     },
     "2026-10": {
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 3100000,
         "max": 4000000,
-        "mean": 3600000,
-        "median": 3700000,
-        "stdev": 374166,
+        "mean": 3700000,
+        "median": 3850000,
+        "stdev": 367423,
         "range": 900000
       },
       "earningsDirection": {
         "UP": 1,
-        "UNKNOWN": 1,
+        "UNKNOWN": 2,
         "DOWN": 1
       },
       "textSignal": {
-        "positive": 15,
-        "negative": 12,
-        "net": 3,
+        "positive": 19,
+        "negative": 15,
+        "net": 4,
         "netPerReport": 1.0
       },
       "topics": {
+        "환율": {
+          "count": 4,
+          "perReport": 1.0
+        },
         "수요": {
-          "count": 2,
-          "perReport": 0.667
+          "count": 3,
+          "perReport": 0.75
         },
         "원가": {
           "count": 2,
-          "perReport": 0.667
-        },
-        "환율": {
-          "count": 2,
-          "perReport": 0.667
+          "perReport": 0.5
         },
         "AI": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         }
       }
     }
@@ -566,8 +566,8 @@
       ]
     },
     "SK증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 3,
+      "reportCount": 5,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 2000000,
       "latestGoalPrice": 4000000,
       "changeAmount": 2000000,
@@ -587,6 +587,11 @@
           "date": "2026-08-03",
           "goalPrice": 4000000,
           "title": "2Q26 NDR 후기: 오해와 본질"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 4000000,
+          "title": "환율을 이기는 호실적 예상"
         }
       ]
     },

@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "052710",
   "itemName": "아모텍",
-  "reportCount": 3,
-  "latestReportNid": "96091",
-  "latestWriteDate": "2026-09-11",
+  "reportCount": 4,
+  "latestReportNid": "96574",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96091",
-    "writeDate": "2026-09-11",
-    "brokerName": "IBK투자증권",
-    "title": "고객들 줄서기가 시작되었다",
-    "goalPrice": 30000,
-    "normalizedOpinion": "BUY",
+    "nid": "96574",
+    "writeDate": "2026-10-12",
+    "brokerName": "한국IR협의회",
+    "title": "AI 고도화가 이끄는 MLCC 시대",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 9,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 7,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 3
+        "로봇": 4,
+        "AI": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96574",
     "96091",
     "93853",
     "93280"

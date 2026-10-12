@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "051600",
   "itemName": "한전KPS",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-10-06"
@@ -12,8 +12,8 @@
   "brokerCount": 5,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
+      "from": "2026-09-12",
+      "to": "2026-10-12",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -37,38 +37,27 @@
       "topics": {}
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 4,
-      "brokerCount": 4,
-      "targetPrice": {
-        "count": 4,
-        "min": 55000,
-        "max": 75000,
-        "mean": 65500,
-        "median": 66000,
-        "stdev": 7228,
-        "range": 20000
-      },
-      "earningsDirection": {
-        "UP": 3,
-        "DOWN": 1
-      },
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
       "textSignal": {
-        "positive": 22,
-        "negative": 10,
-        "net": 12,
-        "netPerReport": 3.0
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
       },
       "topics": {}
     },
     "topicAcceleration": []
   },
   "comparison": {
-    "reportCountChange": -3,
-    "targetMeanChangePct": 14.5,
-    "targetMedianChangePct": 13.64,
-    "targetDispersionChangePct": -100.0
+    "reportCountChange": 1,
+    "targetMeanChangePct": null,
+    "targetMedianChangePct": null,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 2,

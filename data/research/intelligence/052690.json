@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "052690",
   "itemName": "한전기술",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-05-11",
     "to": "2026-09-14"
@@ -12,8 +12,8 @@
   "brokerCount": 7,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
+      "from": "2026-09-12",
+      "to": "2026-10-12",
       "reportCount": 2,
       "brokerCount": 2,
       "targetPrice": {
@@ -43,66 +43,37 @@
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 3,
-      "brokerCount": 3,
-      "targetPrice": {
-        "count": 3,
-        "min": 160000,
-        "max": 220000,
-        "mean": 193333,
-        "median": 200000,
-        "stdev": 24944,
-        "range": 60000
-      },
-      "earningsDirection": {
-        "DOWN": 2,
-        "MIXED": 1
-      },
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
       "textSignal": {
-        "positive": 18,
-        "negative": 10,
-        "net": 8,
-        "netPerReport": 2.667
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
       },
-      "topics": {
-        "환율": {
-          "count": 1,
-          "perReport": 0.333
-        },
-        "원가": {
-          "count": 1,
-          "perReport": 0.333
-        }
-      }
+      "topics": {}
     },
     "topicAcceleration": [
       {
         "topic": "환율",
         "currentCount": 1,
         "currentPerReport": 0.5,
-        "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": 0.167,
-        "ratio": 1.5
-      },
-      {
-        "topic": "원가",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
-        "ratio": 0.0
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
+        "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": -17.24,
-    "targetMedianChangePct": -20.0,
-    "targetDispersionChangePct": -100.0
+    "reportCountChange": 2,
+    "targetMeanChangePct": null,
+    "targetMedianChangePct": null,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 1,

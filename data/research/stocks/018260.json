@@ -2,31 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "018260",
   "itemName": "삼성에스디에스",
-  "reportCount": 19,
-  "latestReportNid": "96567",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 21,
+  "latestReportNid": "96628",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96567",
-    "writeDate": "2026-10-08",
-    "brokerName": "한화투자증권",
-    "title": "컨센서스 부합 추정",
-    "goalPrice": 300000,
+    "nid": "96628",
+    "writeDate": "2026-10-12",
+    "brokerName": "교보증권",
+    "title": "헬릭스 투자를 통한 중장기 추가 업사이드 기대",
+    "goalPrice": 250000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 9,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "AI": 1,
+        "수요": 1,
+        "자동차": 1,
+        "조선": 1
       }
     }
   },
   "reportNids": [
+    "96628",
+    "96621",
     "96567",
     "96233",
     "96124",

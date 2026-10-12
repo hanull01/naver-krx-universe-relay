@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "036800",
   "itemName": "나이스정보통신",
-  "reportCount": 1,
-  "latestReportNid": "93300",
-  "latestWriteDate": "2026-05-28",
+  "reportCount": 2,
+  "latestReportNid": "96595",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "93300",
-    "writeDate": "2026-05-28",
-    "brokerName": "한국IR협의회",
-    "title": "[AI] 전자결제 및 VAN 서비스 전문기업",
+    "nid": "96595",
+    "writeDate": "2026-10-12",
+    "brokerName": "신한투자증권",
+    "title": "KIS 편입, TRS 성장, 주주환원의 조합",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 5,
         "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "96595",
     "93300"
   ]
 }

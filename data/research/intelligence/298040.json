@@ -3,81 +3,77 @@
   "rankingEligible": true,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 31,
-  "brokerCount": 9,
+  "reportCount": 32,
+  "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 4000000,
         "max": 5000000,
-        "mean": 4433333,
-        "median": 4300000,
-        "stdev": 418994,
+        "mean": 4450000,
+        "median": 4400000,
+        "stdev": 364005,
         "range": 1000000
       },
       "earningsDirection": {
         "UP": 2,
-        "MIXED": 1
+        "MIXED": 1,
+        "DOWN": 1
       },
       "textSignal": {
         "positive": 6,
-        "negative": 3,
-        "net": 3,
-        "netPerReport": 1.0
+        "negative": 4,
+        "net": 2,
+        "netPerReport": 0.5
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.25
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 2,
+        "count": 1,
         "min": 4000000,
-        "max": 4200000,
-        "mean": 4100000,
-        "median": 4100000,
-        "stdev": 100000,
-        "range": 200000
+        "max": 4000000,
+        "mean": 4000000,
+        "median": 4000000,
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UP": 1,
         "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 7,
-        "negative": 6,
-        "net": 1,
-        "netPerReport": 0.5
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0.0
       },
       "topics": {
         "AI": {
-          "count": 2,
+          "count": 1,
           "perReport": 1.0
-        },
-        "수요": {
-          "count": 1,
-          "perReport": 0.5
-        },
-        "환율": {
-          "count": 1,
-          "perReport": 0.5
         }
       }
     },
@@ -85,26 +81,26 @@
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.333,
-        "previousCount": 1,
-        "previousPerReport": 0.5,
-        "perReportDelta": -0.167,
-        "ratio": 0.67
+        "currentPerReport": 0.25,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.25,
+        "ratio": null
       },
       {
         "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.5,
-        "perReportDelta": -0.5,
-        "ratio": 0.0
+        "currentCount": 1,
+        "currentPerReport": 0.25,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.25,
+        "ratio": null
       },
       {
         "topic": "AI",
         "currentCount": 0,
         "currentPerReport": 0,
-        "previousCount": 2,
+        "previousCount": 1,
         "previousPerReport": 1.0,
         "perReportDelta": -1.0,
         "ratio": 0.0
@@ -112,10 +108,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": 8.13,
-    "targetMedianChangePct": 4.88,
-    "targetDispersionChangePct": 318.99
+    "reportCountChange": 3,
+    "targetMeanChangePct": 11.25,
+    "targetMedianChangePct": 10.0,
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 11,
@@ -276,31 +272,36 @@
       }
     },
     "2026-10": {
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 4000000,
         "max": 5000000,
-        "mean": 4433333,
-        "median": 4300000,
-        "stdev": 418994,
+        "mean": 4450000,
+        "median": 4400000,
+        "stdev": 364005,
         "range": 1000000
       },
       "earningsDirection": {
         "UP": 2,
-        "MIXED": 1
+        "MIXED": 1,
+        "DOWN": 1
       },
       "textSignal": {
         "positive": 6,
-        "negative": 3,
-        "net": 3,
-        "netPerReport": 1.0
+        "negative": 4,
+        "net": 2,
+        "netPerReport": 0.5
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.25
         }
       }
     }
@@ -548,6 +549,21 @@
           "date": "2026-10-07",
           "goalPrice": 4300000,
           "title": "매출 이연으로 단기 실적 변동성 확대"
+        }
+      ]
+    },
+    "한화투자증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 4500000,
+      "latestGoalPrice": 4500000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-12",
+          "goalPrice": 4500000,
+          "title": "3Q26 Preview: 일회성은 지나가고"
         }
       ]
     }

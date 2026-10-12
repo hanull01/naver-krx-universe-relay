@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "280360",
   "itemName": "롯데웰푸드",
-  "reportCount": 19,
-  "latestReportNid": "96266",
-  "latestWriteDate": "2026-09-21",
+  "reportCount": 20,
+  "latestReportNid": "96629",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96266",
-    "writeDate": "2026-09-21",
-    "brokerName": "한화투자증권",
-    "title": "재조명될 해외 사업",
-    "goalPrice": 200000,
+    "nid": "96629",
+    "writeDate": "2026-10-12",
+    "brokerName": "교보증권",
+    "title": "너무 매력적인 구간",
+    "goalPrice": 175000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 15,
+        "negative": 7
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "가격": 3,
+        "원가": 3,
+        "수요": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96629",
     "96266",
     "95385",
     "95384",

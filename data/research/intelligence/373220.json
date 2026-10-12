@@ -3,55 +3,61 @@
   "rankingEligible": true,
   "itemCode": "373220",
   "itemName": "LG에너지솔루션",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-03-30",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 35,
+  "reportCount": 40,
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 8,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 3,
-        "min": 500000,
-        "max": 550000,
-        "mean": 520000,
-        "median": 510000,
-        "stdev": 21602,
-        "range": 50000
+        "count": 8,
+        "min": 480000,
+        "max": 560000,
+        "mean": 522500,
+        "median": 520000,
+        "stdev": 27272,
+        "range": 80000
       },
       "earningsDirection": {
-        "UP": 3
+        "UP": 6,
+        "UNKNOWN": 1,
+        "MIXED": 1
       },
       "textSignal": {
-        "positive": 24,
-        "negative": 5,
-        "net": 19,
-        "netPerReport": 6.333
+        "positive": 68,
+        "negative": 17,
+        "net": 51,
+        "netPerReport": 6.375
       },
       "topics": {
+        "수요": {
+          "count": 5,
+          "perReport": 0.625
+        },
         "환율": {
-          "count": 2,
-          "perReport": 0.667
+          "count": 3,
+          "perReport": 0.375
         },
         "원가": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.125
         },
-        "수요": {
+        "AI": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.125
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
+      "from": "2026-08-13",
+      "to": "2026-09-11",
       "reportCount": 0,
       "brokerCount": 0,
       "targetPrice": {},
@@ -66,43 +72,52 @@
     },
     "topicAcceleration": [
       {
-        "topic": "환율",
-        "currentCount": 2,
-        "currentPerReport": 0.667,
+        "topic": "수요",
+        "currentCount": 5,
+        "currentPerReport": 0.625,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.667,
+        "perReportDelta": 0.625,
         "ratio": null
       },
       {
-        "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.333,
+        "topic": "환율",
+        "currentCount": 3,
+        "currentPerReport": 0.375,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.375,
+        "ratio": null
+      },
+      {
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 0.125,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.125,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.125,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.125,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 3,
+    "reportCountChange": 8,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 10,
-    "up": 4,
+    "total": 11,
+    "up": 5,
     "down": 6,
     "flat": 0
   },
@@ -380,27 +395,42 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 6,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 1,
-        "min": 500000,
-        "max": 500000,
-        "mean": 500000,
-        "median": 500000,
-        "stdev": 0,
-        "range": 0
+        "count": 6,
+        "min": 480000,
+        "max": 560000,
+        "mean": 520000,
+        "median": 515000,
+        "stdev": 28868,
+        "range": 80000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 4,
+        "UNKNOWN": 1,
+        "MIXED": 1
       },
       "textSignal": {
-        "positive": 6,
-        "negative": 0,
-        "net": 6,
-        "netPerReport": 6.0
+        "positive": 50,
+        "negative": 12,
+        "net": 38,
+        "netPerReport": 6.333
       },
-      "topics": {}
+      "topics": {
+        "수요": {
+          "count": 4,
+          "perReport": 0.667
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.167
+        }
+      }
     }
   },
   "brokerTrajectory": {
@@ -425,8 +455,8 @@
       ]
     },
     "IBK투자증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 3,
+      "reportCount": 5,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 560000,
       "latestGoalPrice": 560000,
       "changeAmount": 0,
@@ -446,12 +476,17 @@
           "date": "2026-07-31",
           "goalPrice": 560000,
           "title": "90 - 20 = 70"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 560000,
+          "title": "3Q26 잠정 실적 코멘트"
         }
       ]
     },
     "iM증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 560000,
       "latestGoalPrice": 550000,
       "changeAmount": -10000,
@@ -481,6 +516,11 @@
           "date": "2026-09-21",
           "goalPrice": 550000,
           "title": "원-달러 환율 하락에도 실적 개선세 지속"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 550000,
+          "title": "3Q26 일회성 요인 제외하더라도 호실적"
         }
       ]
     },
@@ -545,8 +585,8 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 6,
-      "targetPricePointCount": 6,
+      "reportCount": 7,
+      "targetPricePointCount": 7,
       "firstGoalPrice": 510000,
       "latestGoalPrice": 500000,
       "changeAmount": -10000,
@@ -581,16 +621,21 @@
           "date": "2026-10-08",
           "goalPrice": 500000,
           "title": "회복의 이유가 더 많아졌다"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 500000,
+          "title": "LG에너지솔루션 3Q26 잠정실적 발표"
         }
       ]
     },
     "유진투자증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 550000,
-      "latestGoalPrice": 470000,
-      "changeAmount": -80000,
-      "changePct": -14.55,
+      "latestGoalPrice": 530000,
+      "changeAmount": -20000,
+      "changePct": -3.64,
       "trajectory": [
         {
           "date": "2026-05-06",
@@ -606,6 +651,11 @@
           "date": "2026-07-31",
           "goalPrice": 470000,
           "title": "ESS가 이끄는 외형 성장"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 530000,
+          "title": "보상금 제외해도 호실적"
         }
       ]
     },
@@ -630,8 +680,8 @@
       ]
     },
     "하나증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 518000,
       "latestGoalPrice": 480000,
       "changeAmount": -38000,
@@ -656,6 +706,11 @@
           "date": "2026-07-31",
           "goalPrice": 480000,
           "title": "하반기 강한 증익 모멘텀"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 480000,
+          "title": "북미 ESS 물량 증가 지속"
         }
       ]
     },

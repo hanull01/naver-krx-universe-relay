@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "000270",
   "itemName": "기아",
-  "reportCount": 45,
-  "latestReportNid": "96570",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 47,
+  "latestReportNid": "96604",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96570",
-    "writeDate": "2026-10-08",
-    "brokerName": "한화투자증권",
-    "title": "물량 확대는 증익으로 귀결",
-    "goalPrice": 260000,
+    "nid": "96604",
+    "writeDate": "2026-10-12",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Preview: 아쉬운 매크로 변수",
+    "goalPrice": 160000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 12,
-        "negative": 3
+        "positive": 13,
+        "negative": 7
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsNegativeSignalCount": 4,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수요": 2,
-        "자동차": 2,
-        "환율": 1
+        "환율": 7,
+        "자동차": 6,
+        "중국": 4,
+        "가격": 1,
+        "미국": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96604",
+    "96579",
     "96570",
     "96338",
     "96303",

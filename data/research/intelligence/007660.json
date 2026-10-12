@@ -1,53 +1,57 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "007660",
   "itemName": "이수페타시스",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-05-18",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 11,
+  "reportCount": 12,
   "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 170000,
-        "max": 180000,
-        "mean": 175000,
-        "median": 175000,
-        "stdev": 5000,
-        "range": 10000
+        "max": 190000,
+        "mean": 180000,
+        "median": 180000,
+        "stdev": 8165,
+        "range": 20000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 3
       },
       "textSignal": {
-        "positive": 6,
-        "negative": 0,
-        "net": 6,
-        "netPerReport": 3.0
+        "positive": 9,
+        "negative": 1,
+        "net": 8,
+        "netPerReport": 2.667
       },
       "topics": {
         "수요": {
           "count": 2,
-          "perReport": 1.0
+          "perReport": 0.667
         },
         "환율": {
+          "count": 2,
+          "perReport": 0.667
+        },
+        "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
+      "from": "2026-08-13",
+      "to": "2026-09-11",
       "reportCount": 3,
       "brokerCount": 3,
       "targetPrice": {
@@ -93,22 +97,31 @@
     },
     "topicAcceleration": [
       {
-        "topic": "수요",
-        "currentCount": 2,
-        "currentPerReport": 1.0,
-        "previousCount": 2,
-        "previousPerReport": 0.667,
-        "perReportDelta": 0.333,
-        "ratio": 1.5
-      },
-      {
         "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
+        "currentCount": 2,
+        "currentPerReport": 0.667,
         "previousCount": 1,
         "previousPerReport": 0.333,
-        "perReportDelta": 0.167,
-        "ratio": 1.5
+        "perReportDelta": 0.334,
+        "ratio": 2.0
+      },
+      {
+        "topic": "원가",
+        "currentCount": 1,
+        "currentPerReport": 0.333,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.333,
+        "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 2,
+        "currentPerReport": 0.667,
+        "previousCount": 2,
+        "previousPerReport": 0.667,
+        "perReportDelta": 0.0,
+        "ratio": 1.0
       },
       {
         "topic": "사이클",
@@ -140,10 +153,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -1,
-    "targetMeanChangePct": -4.55,
-    "targetMedianChangePct": -2.78,
-    "targetDispersionChangePct": 6.07
+    "reportCountChange": 0,
+    "targetMeanChangePct": -1.82,
+    "targetMedianChangePct": 0.0,
+    "targetDispersionChangePct": 73.21
   },
   "goalPriceRevisions": {
     "total": 0,
@@ -301,34 +314,38 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 180000,
-        "max": 180000,
-        "mean": 180000,
-        "median": 180000,
-        "stdev": 0,
-        "range": 0
+        "max": 190000,
+        "mean": 185000,
+        "median": 185000,
+        "stdev": 5000,
+        "range": 10000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 1,
-        "negative": 0,
-        "net": 1,
-        "netPerReport": 1.0
+        "positive": 4,
+        "negative": 1,
+        "net": 3,
+        "netPerReport": 1.5
       },
       "topics": {
-        "수요": {
-          "count": 1,
+        "환율": {
+          "count": 2,
           "perReport": 1.0
         },
-        "환율": {
+        "수요": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     }
@@ -415,8 +432,8 @@
       ]
     },
     "키움증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 190000,
       "latestGoalPrice": 190000,
       "changeAmount": 0,
@@ -426,6 +443,11 @@
           "date": "2026-08-19",
           "goalPrice": 190000,
           "title": "디레이팅 요소 해소, 다시 펴는 날개"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 190000,
+          "title": "3Q는 무난, 4Q부터 폭발. 멀리보면 더 매력적인 기업"
         }
       ]
     },

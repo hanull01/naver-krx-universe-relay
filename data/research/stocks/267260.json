@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "itemCode": "267260",
   "itemName": "HD현대일렉트릭",
-  "reportCount": 27,
-  "latestReportNid": "96504",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 28,
+  "latestReportNid": "96637",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96504",
-    "writeDate": "2026-10-07",
-    "brokerName": "하나증권",
-    "title": "환율 영향은 피할 수 없지만",
-    "goalPrice": 1150000,
+    "nid": "96637",
+    "writeDate": "2026-10-12",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview: 환율 부담이 아쉽지만",
+    "goalPrice": 1000000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
@@ -19,15 +19,17 @@
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 2,
-        "수주": 1
+        "환율": 5,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96637",
     "96504",
     "96495",
     "96482",

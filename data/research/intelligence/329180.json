@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "329180",
   "itemName": "HD현대중공업",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-01",
     "to": "2026-09-29"
@@ -12,107 +12,126 @@
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 6,
-      "brokerCount": 6,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 6,
-        "min": 650000,
+        "count": 4,
+        "min": 800000,
         "max": 970000,
-        "mean": 821000,
+        "mean": 854000,
         "median": 823000,
-        "stdev": 94860,
-        "range": 320000
+        "stdev": 68688,
+        "range": 170000
       },
       "earningsDirection": {
-        "UNKNOWN": 5,
-        "UP": 1
+        "UP": 1,
+        "UNKNOWN": 3
       },
       "textSignal": {
-        "positive": 14,
-        "negative": 1,
-        "net": 13,
-        "netPerReport": 2.167
+        "positive": 7,
+        "negative": 0,
+        "net": 7,
+        "netPerReport": 1.75
       },
       "topics": {
         "수요": {
-          "count": 5,
-          "perReport": 0.833
+          "count": 3,
+          "perReport": 0.75
         },
         "CAPEX/생산능력": {
-          "count": 3,
+          "count": 2,
           "perReport": 0.5
-        },
-        "중국": {
-          "count": 1,
-          "perReport": 0.167
         },
         "AI": {
           "count": 1,
-          "perReport": 0.167
+          "perReport": 0.25
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 2,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 2,
+        "min": 650000,
+        "max": 860000,
+        "mean": 755000,
+        "median": 755000,
+        "stdev": 105000,
+        "range": 210000
       },
-      "topics": {}
+      "earningsDirection": {
+        "UNKNOWN": 2
+      },
+      "textSignal": {
+        "positive": 7,
+        "negative": 1,
+        "net": 6,
+        "netPerReport": 3.0
+      },
+      "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 1.0
+        },
+        "CAPEX/생산능력": {
+          "count": 1,
+          "perReport": 0.5
+        },
+        "중국": {
+          "count": 1,
+          "perReport": 0.5
+        }
+      }
     },
     "topicAcceleration": [
       {
-        "topic": "수요",
-        "currentCount": 5,
-        "currentPerReport": 0.833,
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.833,
+        "perReportDelta": 0.25,
         "ratio": null
       },
       {
         "topic": "CAPEX/생산능력",
-        "currentCount": 3,
+        "currentCount": 2,
         "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": 0.0,
+        "ratio": 1.0
       },
       {
-        "topic": "AI",
-        "currentCount": 1,
-        "currentPerReport": 0.167,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.167,
-        "ratio": null
+        "topic": "수요",
+        "currentCount": 3,
+        "currentPerReport": 0.75,
+        "previousCount": 2,
+        "previousPerReport": 1.0,
+        "perReportDelta": -0.25,
+        "ratio": 0.75
       },
       {
         "topic": "중국",
-        "currentCount": 1,
-        "currentPerReport": 0.167,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.167,
-        "ratio": null
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
+        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 6,
-    "targetMeanChangePct": null,
-    "targetMedianChangePct": null,
-    "targetDispersionChangePct": null
+    "reportCountChange": 2,
+    "targetMeanChangePct": 13.11,
+    "targetMedianChangePct": 9.01,
+    "targetDispersionChangePct": -34.58
   },
   "goalPriceRevisions": {
     "total": 3,

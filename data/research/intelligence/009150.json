@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-03-31",
     "to": "2026-10-08"
@@ -12,8 +12,8 @@
   "brokerCount": 13,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
+      "from": "2026-09-12",
+      "to": "2026-10-12",
       "reportCount": 10,
       "brokerCount": 8,
       "targetPrice": {
@@ -60,41 +60,41 @@
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 5,
-      "brokerCount": 5,
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 5,
+        "count": 3,
         "min": 1750000,
-        "max": 3000000,
-        "mean": 2370000,
-        "median": 2300000,
-        "stdev": 470744,
-        "range": 1250000
+        "max": 2800000,
+        "mean": 2183333,
+        "median": 2000000,
+        "stdev": 447834,
+        "range": 1050000
       },
       "earningsDirection": {
-        "UNKNOWN": 4,
+        "UNKNOWN": 2,
         "UP": 1
       },
       "textSignal": {
-        "positive": 32,
+        "positive": 26,
         "negative": 4,
-        "net": 28,
-        "netPerReport": 5.6
+        "net": 22,
+        "netPerReport": 7.333
       },
       "topics": {
         "AI": {
-          "count": 5,
+          "count": 3,
           "perReport": 1.0
         },
         "수요": {
-          "count": 4,
-          "perReport": 0.8
+          "count": 2,
+          "perReport": 0.667
         },
         "환율": {
           "count": 2,
-          "perReport": 0.4
+          "perReport": 0.667
         }
       }
     },
@@ -118,28 +118,28 @@
         "ratio": null
       },
       {
+        "topic": "수요",
+        "currentCount": 6,
+        "currentPerReport": 0.6,
+        "previousCount": 2,
+        "previousPerReport": 0.667,
+        "perReportDelta": -0.067,
+        "ratio": 0.9
+      },
+      {
         "topic": "환율",
         "currentCount": 4,
         "currentPerReport": 0.4,
         "previousCount": 2,
-        "previousPerReport": 0.4,
-        "perReportDelta": 0.0,
-        "ratio": 1.0
-      },
-      {
-        "topic": "수요",
-        "currentCount": 6,
-        "currentPerReport": 0.6,
-        "previousCount": 4,
-        "previousPerReport": 0.8,
-        "perReportDelta": -0.2,
-        "ratio": 0.75
+        "previousPerReport": 0.667,
+        "perReportDelta": -0.267,
+        "ratio": 0.6
       },
       {
         "topic": "AI",
         "currentCount": 5,
         "currentPerReport": 0.5,
-        "previousCount": 5,
+        "previousCount": 3,
         "previousPerReport": 1.0,
         "perReportDelta": -0.5,
         "ratio": 0.5
@@ -147,10 +147,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 5,
-    "targetMeanChangePct": 5.7,
-    "targetMedianChangePct": 17.39,
-    "targetDispersionChangePct": -16.58
+    "reportCountChange": 7,
+    "targetMeanChangePct": 14.73,
+    "targetMedianChangePct": 35.0,
+    "targetDispersionChangePct": -12.31
   },
   "goalPriceRevisions": {
     "total": 28,

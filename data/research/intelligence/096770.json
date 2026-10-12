@@ -1,45 +1,45 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "096770",
   "itemName": "SK이노베이션",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 19,
+  "reportCount": 20,
   "brokerCount": 6,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 200000,
         "max": 240000,
         "mean": 220000,
         "median": 220000,
-        "stdev": 20000,
+        "stdev": 16330,
         "range": 40000
       },
       "earningsDirection": {
-        "UNKNOWN": 1,
+        "UNKNOWN": 2,
         "UP": 1
       },
       "textSignal": {
         "positive": 2,
         "negative": 0,
         "net": 2,
-        "netPerReport": 1.0
+        "netPerReport": 0.667
       },
       "topics": {}
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
+      "from": "2026-08-13",
+      "to": "2026-09-11",
       "reportCount": 4,
       "brokerCount": 3,
       "targetPrice": {
@@ -107,14 +107,14 @@
     ]
   },
   "comparison": {
-    "reportCountChange": -2,
+    "reportCountChange": -1,
     "targetMeanChangePct": 14.29,
     "targetMedianChangePct": 15.79,
-    "targetDispersionChangePct": 361.89
+    "targetDispersionChangePct": 277.14
   },
   "goalPriceRevisions": {
-    "total": 5,
-    "up": 5,
+    "total": 6,
+    "up": 6,
     "down": 0,
     "flat": 0
   },
@@ -296,25 +296,26 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
-        "min": 240000,
+        "count": 2,
+        "min": 220000,
         "max": 240000,
-        "mean": 240000,
-        "median": 240000,
-        "stdev": 0,
-        "range": 0
+        "mean": 230000,
+        "median": 230000,
+        "stdev": 10000,
+        "range": 20000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 2,
         "negative": 0,
         "net": 2,
-        "netPerReport": 2.0
+        "netPerReport": 1.0
       },
       "topics": {}
     }
@@ -431,12 +432,12 @@
       ]
     },
     "하나증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 170000,
-      "latestGoalPrice": 200000,
-      "changeAmount": 30000,
-      "changePct": 17.65,
+      "latestGoalPrice": 220000,
+      "changeAmount": 50000,
+      "changePct": 29.41,
       "trajectory": [
         {
           "date": "2026-05-14",
@@ -457,6 +458,11 @@
           "date": "2026-08-27",
           "goalPrice": 200000,
           "title": "SKIET 흡수합병에 따른 기존 주주 보호정책 필요"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 220000,
+          "title": "E&S 재평가 필요. 그 핵심인 호주 DLNG를 가다"
         }
       ]
     },

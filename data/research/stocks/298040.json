@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "reportCount": 31,
-  "latestReportNid": "96543",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 32,
+  "latestReportNid": "96639",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96543",
-    "writeDate": "2026-10-08",
-    "brokerName": "대신증권",
-    "title": "3Q26 일시적 부진. 업황 호조는 지속",
-    "goalPrice": 4000000,
+    "nid": "96639",
+    "writeDate": "2026-10-12",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Preview: 일회성은 지나가고",
+    "goalPrice": 4500000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 3
+        "positive": 0,
+        "negative": 1
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "환율": 2,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96639",
     "96543",
     "96506",
     "96493",

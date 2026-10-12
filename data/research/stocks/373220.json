@@ -2,31 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "373220",
   "itemName": "LG에너지솔루션",
-  "reportCount": 35,
-  "latestReportNid": "96525",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 40,
+  "latestReportNid": "96614",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96525",
-    "writeDate": "2026-10-08",
-    "brokerName": "신한투자증권",
-    "title": "회복의 이유가 더 많아졌다",
-    "goalPrice": 500000,
+    "nid": "96614",
+    "writeDate": "2026-10-12",
+    "brokerName": "하나증권",
+    "title": "북미 ESS 물량 증가 지속",
+    "goalPrice": 480000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 5,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 3
+        "자동차": 5,
+        "배터리": 3,
+        "수요": 3,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "96614",
+    "96596",
+    "96590",
+    "96585",
+    "96584",
     "96525",
     "96252",
     "96155",

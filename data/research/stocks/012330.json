@@ -2,33 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "012330",
   "itemName": "현대모비스",
-  "reportCount": 35,
-  "latestReportNid": "96559",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 37,
+  "latestReportNid": "96602",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96559",
-    "writeDate": "2026-10-08",
-    "brokerName": "하나증권",
-    "title": "3Q26 프리뷰: 실적은 AS가 지키고, 재편은 로봇이 이끈다",
-    "goalPrice": 580000,
+    "nid": "96602",
+    "writeDate": "2026-10-12",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Preview: 전동화 수익성 개선 지속",
+    "goalPrice": 630000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 12,
+        "negative": 8
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 7,
+      "earningsNegativeSignalCount": 6,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "로봇": 2,
+        "환율": 5,
+        "자동차": 3,
+        "가격": 1,
         "미국": 1,
-        "자동차": 1
+        "반도체": 1,
+        "수요": 1,
+        "원가": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "96602",
+    "96591",
     "96559",
     "96404",
     "94565",

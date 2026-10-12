@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "reportCount": 79,
-  "latestReportNid": "96513",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 84,
+  "latestReportNid": "96634",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96513",
-    "writeDate": "2026-10-07",
-    "brokerName": "한화투자증권",
-    "title": "주인공은 HBM으로 바뀐다",
-    "goalPrice": 580000,
+    "nid": "96634",
+    "writeDate": "2026-10-12",
+    "brokerName": "DS투자증권",
+    "title": "사상 최초 DRAM 분기 매출 100조원 상회",
+    "goalPrice": 530000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 1,
+        "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 4,
-        "가격": 1,
-        "수요": 1
+        "원가": 2,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96634",
+    "96616",
+    "96597",
+    "96588",
+    "96578",
     "96513",
     "96456",
     "96444",

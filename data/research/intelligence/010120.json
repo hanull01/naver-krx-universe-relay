@@ -3,51 +3,51 @@
   "rankingEligible": true,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 26,
-  "brokerCount": 10,
+  "reportCount": 27,
+  "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
-        "min": 270000,
+        "count": 4,
+        "min": 260000,
         "max": 300000,
-        "mean": 283333,
-        "median": 280000,
-        "stdev": 12472,
-        "range": 30000
+        "mean": 277500,
+        "median": 275000,
+        "stdev": 14790,
+        "range": 40000
       },
       "earningsDirection": {
-        "UP": 3
+        "UP": 4
       },
       "textSignal": {
-        "positive": 14,
-        "negative": 2,
-        "net": 12,
-        "netPerReport": 4.0
+        "positive": 17,
+        "negative": 3,
+        "net": 14,
+        "netPerReport": 3.5
       },
       "topics": {
         "환율": {
-          "count": 3,
+          "count": 4,
           "perReport": 1.0
         },
         "원가": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
+      "from": "2026-08-13",
+      "to": "2026-09-11",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -78,7 +78,7 @@
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 3,
+        "currentCount": 4,
         "currentPerReport": 1.0,
         "previousCount": 0,
         "previousPerReport": 0,
@@ -88,10 +88,10 @@
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.25,
         "ratio": null
       },
       {
@@ -106,9 +106,9 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 2,
-    "targetMeanChangePct": -8.6,
-    "targetMedianChangePct": -9.68,
+    "reportCountChange": 3,
+    "targetMeanChangePct": -10.48,
+    "targetMedianChangePct": -11.29,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
@@ -273,34 +273,34 @@
       }
     },
     "2026-10": {
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
-        "min": 270000,
+        "count": 4,
+        "min": 260000,
         "max": 300000,
-        "mean": 283333,
-        "median": 280000,
-        "stdev": 12472,
-        "range": 30000
+        "mean": 277500,
+        "median": 275000,
+        "stdev": 14790,
+        "range": 40000
       },
       "earningsDirection": {
-        "UP": 3
+        "UP": 4
       },
       "textSignal": {
-        "positive": 14,
-        "negative": 2,
-        "net": 12,
-        "netPerReport": 4.0
+        "positive": 17,
+        "negative": 3,
+        "net": 14,
+        "netPerReport": 3.5
       },
       "topics": {
         "환율": {
-          "count": 3,
+          "count": 4,
           "perReport": 1.0
         },
         "원가": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         }
       }
     }
@@ -533,6 +533,21 @@
           "date": "2026-10-07",
           "goalPrice": 270000,
           "title": "Hakuna Matata"
+        }
+      ]
+    },
+    "한화투자증권": {
+      "reportCount": 1,
+      "targetPricePointCount": 1,
+      "firstGoalPrice": 260000,
+      "latestGoalPrice": 260000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-10-12",
+          "goalPrice": 260000,
+          "title": "3Q26 Preview: 걸릴 것 하나 없다"
         }
       ]
     }

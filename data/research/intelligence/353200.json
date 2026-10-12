@@ -1,89 +1,70 @@
 {
-  "status": "LOW_SAMPLE",
-  "rankingEligible": false,
+  "status": "OK",
+  "rankingEligible": true,
   "itemCode": "353200",
   "itemName": "대덕전자",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-12",
   "dateRange": {
     "from": "2026-04-08",
-    "to": "2026-10-08"
+    "to": "2026-10-12"
   },
-  "reportCount": 21,
+  "reportCount": 22,
   "brokerCount": 8,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-09",
-      "to": "2026-10-09",
-      "reportCount": 2,
-      "brokerCount": 2,
+      "from": "2026-09-12",
+      "to": "2026-10-12",
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
+        "count": 3,
         "min": 190000,
-        "max": 200000,
-        "mean": 195000,
-        "median": 195000,
-        "stdev": 5000,
-        "range": 10000
+        "max": 240000,
+        "mean": 210000,
+        "median": 200000,
+        "stdev": 21602,
+        "range": 50000
       },
       "earningsDirection": {
         "DOWN": 1,
-        "UP": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 7,
+        "positive": 11,
         "negative": 2,
-        "net": 5,
-        "netPerReport": 2.5
+        "net": 9,
+        "netPerReport": 3.0
       },
       "topics": {
         "환율": {
-          "count": 2,
+          "count": 3,
           "perReport": 1.0
         },
         "수요": {
-          "count": 1,
-          "perReport": 0.5
+          "count": 2,
+          "perReport": 0.667
         }
       }
     },
     "previous": {
-      "from": "2026-08-10",
-      "to": "2026-09-08",
-      "reportCount": 1,
-      "brokerCount": 1,
-      "targetPrice": {
-        "count": 1,
-        "min": 180000,
-        "max": 180000,
-        "mean": 180000,
-        "median": 180000,
-        "stdev": 0,
-        "range": 0
-      },
-      "earningsDirection": {
-        "UP": 1
-      },
+      "from": "2026-08-13",
+      "to": "2026-09-11",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
       "textSignal": {
-        "positive": 5,
-        "negative": 1,
-        "net": 4,
-        "netPerReport": 4.0
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
       },
-      "topics": {
-        "수요": {
-          "count": 1,
-          "perReport": 1.0
-        },
-        "원가": {
-          "count": 1,
-          "perReport": 1.0
-        }
-      }
+      "topics": {}
     },
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 2,
+        "currentCount": 3,
         "currentPerReport": 1.0,
         "previousCount": 0,
         "previousPerReport": 0,
@@ -92,28 +73,19 @@
       },
       {
         "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -0.5,
-        "ratio": 0.5
-      },
-      {
-        "topic": "원가",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 1.0,
-        "perReportDelta": -1.0,
-        "ratio": 0.0
+        "currentCount": 2,
+        "currentPerReport": 0.667,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.667,
+        "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": 8.33,
-    "targetMedianChangePct": 8.33,
+    "reportCountChange": 3,
+    "targetMeanChangePct": null,
+    "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
@@ -298,33 +270,33 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 200000,
-        "max": 200000,
-        "mean": 200000,
-        "median": 200000,
-        "stdev": 0,
-        "range": 0
+        "max": 240000,
+        "mean": 220000,
+        "median": 220000,
+        "stdev": 20000,
+        "range": 40000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 5,
+        "positive": 9,
         "negative": 0,
-        "net": 5,
-        "netPerReport": 5.0
+        "net": 9,
+        "netPerReport": 4.5
       },
       "topics": {
         "수요": {
-          "count": 1,
+          "count": 2,
           "perReport": 1.0
         },
         "환율": {
-          "count": 1,
+          "count": 2,
           "perReport": 1.0
         }
       }
@@ -477,8 +449,8 @@
       ]
     },
     "키움증권": {
-      "reportCount": 1,
-      "targetPricePointCount": 1,
+      "reportCount": 2,
+      "targetPricePointCount": 2,
       "firstGoalPrice": 240000,
       "latestGoalPrice": 240000,
       "changeAmount": 0,
@@ -488,6 +460,11 @@
           "date": "2026-08-06",
           "goalPrice": 240000,
           "title": "전 사업부 실적 호황 반영 중, 중장기 로드맵도 주목"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 240000,
+          "title": "4Q와 27년 눈높이 추가 상향, 더 타이트한 업황"
         }
       ]
     },

@@ -2,36 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "015760",
   "itemName": "한국전력",
-  "reportCount": 18,
-  "latestReportNid": "96075",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 19,
+  "latestReportNid": "96626",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96075",
-    "writeDate": "2026-09-10",
-    "brokerName": "유안타증권",
-    "title": "낮아진 기대치, 시작된 구조 변화",
-    "goalPrice": 47000,
+    "nid": "96626",
+    "writeDate": "2026-10-12",
+    "brokerName": "하나증권",
+    "title": "좋아도 좋은 것이 아닌",
+    "goalPrice": 40000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
-        "negative": 2
+        "positive": 3,
+        "negative": 9
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원전": 9,
-        "수요": 3,
-        "원가": 3,
-        "AI": 2,
-        "반도체": 2,
-        "수주": 1
+        "원가": 2,
+        "가격": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96626",
     "96075",
     "95577",
     "95553",

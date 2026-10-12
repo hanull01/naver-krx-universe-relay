@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "024110",
   "itemName": "기업은행",
-  "reportCount": 12,
-  "latestReportNid": "96480",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 13,
+  "latestReportNid": "96615",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "96480",
-    "writeDate": "2026-10-07",
-    "brokerName": "SK증권",
-    "title": "중간배당까지는 해 볼게요",
-    "goalPrice": 26000,
+    "nid": "96615",
+    "writeDate": "2026-10-12",
+    "brokerName": "하나증권",
+    "title": "타행들과는 다른 NIM 상승 현상 긍정적",
+    "goalPrice": 28500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 0
+        "positive": 6,
+        "negative": 6
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 4,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "환율": 4,
+        "원가": 2,
+        "중국": 2,
+        "금리": 1
+      }
     }
   },
   "reportNids": [
+    "96615",
     "96480",
     "94920",
     "94685",

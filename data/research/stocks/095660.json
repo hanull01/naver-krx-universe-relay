@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "itemCode": "095660",
   "itemName": "네오위즈",
-  "reportCount": 9,
-  "latestReportNid": "95607",
-  "latestWriteDate": "2026-08-14",
+  "reportCount": 10,
+  "latestReportNid": "96607",
+  "latestWriteDate": "2026-10-12",
   "latest": {
-    "nid": "95607",
-    "writeDate": "2026-08-14",
+    "nid": "96607",
+    "writeDate": "2026-10-12",
     "brokerName": "유진투자증권",
-    "title": "신작 모멘텀 부재",
-    "goalPrice": 25000,
+    "title": "대형 퍼블리싱 신작 가시화가 필요",
+    "goalPrice": 23000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 7,
-        "negative": 8
+        "negative": 11
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 7,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
         "원가": 1
@@ -27,6 +27,7 @@
     }
   },
   "reportNids": [
+    "96607",
     "95607",
     "95528",
     "94325",
