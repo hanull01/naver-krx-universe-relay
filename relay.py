@@ -981,6 +981,10 @@ def load_daily_for_technical(code, verified_bar=None):
     if len(bars) != 1:
         return daily
     bar = bars[0]
+    if verified_bar is not None and (
+            bar.get('date') != verified_bar.get('date')
+            or bar.get('source') != VERIFIED_REGULAR_CLOSE_SOURCE):
+        return daily
     if (not bar.get('sourceTime') or bar.get('source') != VERIFIED_REGULAR_CLOSE_SOURCE):
         return daily
     merged = dict(daily)
