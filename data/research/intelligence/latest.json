@@ -1,7 +1,7 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-10-12",
+  "asOf": "2026-10-13",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
@@ -1134,22 +1134,16 @@
       "reportCount": 23,
       "brokerCount": 8,
       "recentReportCount": 1,
-      "previousReportCount": 7,
+      "previousReportCount": 1,
       "recentTargetMean": 67000,
-      "previousTargetMean": 62571,
+      "previousTargetMean": 61000,
       "recentTargetMedian": 67000,
       "recentTargetStdev": 0,
-      "targetMeanChangePct": 7.08,
-      "targetDispersionChangePct": -100.0,
+      "targetMeanChangePct": 9.84,
+      "targetDispersionChangePct": null,
       "revisionUp": 2,
       "revisionDown": 8,
-      "risingTopics": [
-        {
-          "topic": "환율",
-          "delta": 0.714,
-          "ratio": 3.5
-        }
-      ]
+      "risingTopics": []
     }
   ],
   "rankings": {

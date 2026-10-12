@@ -3,7 +3,7 @@
   "rankingEligible": false,
   "itemCode": "006800",
   "itemName": "미래에셋증권",
-  "asOf": "2026-10-12",
+  "asOf": "2026-10-13",
   "dateRange": {
     "from": "2026-04-06",
     "to": "2026-10-07"
@@ -12,8 +12,8 @@
   "brokerCount": 8,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-12",
-      "to": "2026-10-12",
+      "from": "2026-09-13",
+      "to": "2026-10-13",
       "reportCount": 1,
       "brokerCount": 1,
       "targetPrice": {
@@ -42,33 +42,32 @@
       }
     },
     "previous": {
-      "from": "2026-08-13",
-      "to": "2026-09-11",
-      "reportCount": 7,
-      "brokerCount": 6,
+      "from": "2026-08-14",
+      "to": "2026-09-12",
+      "reportCount": 1,
+      "brokerCount": 1,
       "targetPrice": {
-        "count": 7,
-        "min": 42000,
-        "max": 95000,
-        "mean": 62571,
+        "count": 1,
+        "min": 61000,
+        "max": 61000,
+        "mean": 61000,
         "median": 61000,
-        "stdev": 16706,
-        "range": 53000
+        "stdev": 0,
+        "range": 0
       },
       "earningsDirection": {
-        "UNKNOWN": 4,
-        "UP": 3
+        "UNKNOWN": 1
       },
       "textSignal": {
-        "positive": 30,
+        "positive": 0,
         "negative": 2,
-        "net": 28,
-        "netPerReport": 4.0
+        "net": -2,
+        "netPerReport": -2.0
       },
       "topics": {
         "환율": {
-          "count": 2,
-          "perReport": 0.286
+          "count": 1,
+          "perReport": 1.0
         }
       }
     },
@@ -77,18 +76,18 @@
         "topic": "환율",
         "currentCount": 1,
         "currentPerReport": 1.0,
-        "previousCount": 2,
-        "previousPerReport": 0.286,
-        "perReportDelta": 0.714,
-        "ratio": 3.5
+        "previousCount": 1,
+        "previousPerReport": 1.0,
+        "perReportDelta": 0.0,
+        "ratio": 1.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -6,
-    "targetMeanChangePct": 7.08,
+    "reportCountChange": 0,
+    "targetMeanChangePct": 9.84,
     "targetMedianChangePct": 9.84,
-    "targetDispersionChangePct": -100.0
+    "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
     "total": 10,
