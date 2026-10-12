@@ -5,6 +5,7 @@ list pagination contract remains under research until a live sample proves a
 complete, non-repeating termination condition.
 """
 from collections import defaultdict
+import json
 from pathlib import Path
 
 import naver_market as market
@@ -146,11 +147,13 @@ def build_work_theme_contract(periods):
 
 def validate_pc_theme_snapshot(payload):
     """Validate staged PC rankings before they may replace a prior good file."""
-    if payload.get('status') != 'OK':
-        raise market.MarketApiError('pc theme periods are not all complete')
     periods = payload.get('periods')
     if not isinstance(periods, dict) or set(periods) != set(PC_THEME_PERIODS):
         raise market.MarketApiError('pc theme periods are incomplete')
+    if payload.get('status') != 'OK':
+        raise market.MarketApiError(
+            'pc theme periods are not all complete: ' +
+            json.dumps(pc_theme_period_diagnostics(periods), ensure_ascii=False, sort_keys=True))
     for period, row in periods.items():
         if row.get('status') != 'OK':
             raise market.MarketApiError(f'pc theme {period} is not valid')
@@ -159,6 +162,33 @@ def validate_pc_theme_snapshot(payload):
         if row.get('count') != row.get('uniqueThemeCount'):
             raise market.MarketApiError(f'pc theme {period} has duplicate codes')
     return True
+
+
+def pc_theme_period_diagnostics(periods):
+    """Return compact per-period failure evidence safe for Actions logs.
+
+    This intentionally exposes only pagination counters and sanitized collector
+    errors.  It neither retries requests nor includes source payload rows.
+    """
+    diagnostics = {}
+    for period in PC_THEME_PERIODS:
+        row = periods.get(period, {})
+        pages = row.get('pageDiagnostics') or []
+        last = pages[-1] if pages else {}
+        error = row.get('error') or {}
+        message = str(error.get('message', ''))
+        diagnostics[period] = {
+            'status': row.get('status'),
+            'pagesFetched': row.get('pagination', {}).get('pagesFetched', len(pages)),
+            'uniqueThemeCount': row.get('uniqueThemeCount'),
+            'lastHasNext': last.get('hasNext'),
+            'lastCursorPresent': last.get('cursorPresent'),
+            'cursorRepeated': 'cursor repeated' in message,
+            'duplicateCodeCount': row.get('quality', {}).get('duplicateCodes'),
+            'errorType': error.get('type'),
+            'errorMessage': error.get('message'),
+        }
+    return diagnostics
 
 
 def write_pc_theme_snapshot(payload, output_dir):

@@ -152,10 +152,31 @@ class ThemeResearchTests(unittest.TestCase):
             self.assertEqual(result['status'], 'OK')
             before = (output / 'latest.json').read_text(encoding='utf-8')
             invalid = {'status': 'PARTIAL', 'periods': payload['periods']}
-            with self.assertRaises(theme.market.MarketApiError):
+            with self.assertRaisesRegex(theme.market.MarketApiError, '"daily"'):
                 theme.write_pc_theme_snapshot(invalid, output)
             self.assertEqual((output / 'latest.json').read_text(encoding='utf-8'), before)
             self.assertEqual(json.loads(before)['workContract']['source'], 'NAVER_PC_THEME_RANKING')
+
+    def test_failed_period_diagnostics_are_compact_and_specific(self):
+        periods = {
+            'daily': {'status': 'OK', 'uniqueThemeCount': 264,
+                      'pagination': {'pagesFetched': 14},
+                      'pageDiagnostics': [{'hasNext': False, 'cursorPresent': False}],
+                      'quality': {'duplicateCodes': 0}},
+            'weekly': {'status': 'PARTIAL', 'uniqueThemeCount': 40,
+                       'pagination': {'pagesFetched': 3},
+                       'pageDiagnostics': [{'hasNext': True, 'cursorPresent': True}],
+                       'quality': {'duplicateCodes': 0},
+                       'error': {'type': 'MarketApiError', 'message': 'pc theme cursor repeated'}},
+            'monthly': {'status': 'ERROR', 'uniqueThemeCount': 0,
+                        'pagination': {'pagesFetched': 0}, 'pageDiagnostics': [],
+                        'quality': {'duplicateCodes': 0},
+                        'error': {'type': 'URLError', 'message': 'connection failed'}},
+        }
+        result = theme.pc_theme_period_diagnostics(periods)
+        self.assertEqual(result['daily']['lastHasNext'], False)
+        self.assertTrue(result['weekly']['cursorRepeated'])
+        self.assertEqual(result['monthly']['errorType'], 'URLError')
 
 
 if __name__ == '__main__':

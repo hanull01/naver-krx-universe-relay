@@ -1,5 +1,6 @@
 """Stage validated NAVER PC theme rankings without enabling report use."""
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -17,7 +18,13 @@ def main(argv=None):
     if not 1 <= args.max_pages <= themes.PC_THEME_MAX_PAGES:
         parser.error(f'--max-pages must be 1..{themes.PC_THEME_MAX_PAGES}')
     payload = themes.collect_pc_theme_periods(max_pages=args.max_pages)
-    themes.write_pc_theme_snapshot(payload, args.output_dir)
+    try:
+        themes.write_pc_theme_snapshot(payload, args.output_dir)
+    except themes.market.MarketApiError:
+        print('PC_THEME_RESEARCH diagnostics=' + json.dumps(
+            themes.pc_theme_period_diagnostics(payload.get('periods', {})),
+            ensure_ascii=False, sort_keys=True))
+        raise
     print('PC_THEME_RESEARCH status=OK output=' + str(Path(args.output_dir) / 'latest.json'))
 
 
