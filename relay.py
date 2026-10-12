@@ -899,6 +899,37 @@ def build_verified_regular_daily_bar(daily, realtime, current, code):
     }
 
 
+def regular_close_diagnostic(daily, realtime, current, code, error):
+    """Return bounded validation facts without retaining source responses."""
+    daily_rows = [row for row in (daily or {}).get('datas', [])
+                  if isinstance(row, dict)]
+    target = current.astimezone(KST).date().isoformat()
+    target_rows = [row for row in daily_rows if row.get('date') == target]
+    realtime_rows = (realtime or {}).get('datas', [])
+    quote = next((row for row in realtime_rows
+                  if isinstance(row, dict) and row.get('itemCode') == code), None)
+    daily_ohlcv = bool(target_rows) and all(
+        key in target_rows[0] for key in ('open', 'high', 'low', 'close', 'volume'))
+    daily_close = target_rows[0].get('close') if target_rows else None
+    realtime_close = quote.get('closePrice') if quote else None
+    try:
+        close_match = number(daily_close, 'daily.close') == number(realtime_close, 'realtime.closePrice')
+    except (TypeError, ValueError):
+        close_match = False
+    traded_at = str(quote.get('localTradedAt') or '') if quote else ''
+    return {
+        'code': code, 'targetDate': target,
+        'collectedAtKst': current.astimezone(KST).isoformat(),
+        'dailyDates': sorted({str(row.get('date')) for row in daily_rows if row.get('date')}),
+        'dailyOhlcvPresent': daily_ohlcv,
+        'realtimeMarketStatus': quote.get('marketStatus') if quote else None,
+        'realtimeMarketStatusDetailType': quote.get('marketStatusDetailType') if quote else None,
+        'realtimeDate': traded_at[:10] if len(traded_at) >= 10 else None,
+        'dailyRealtimeCloseMatch': close_match,
+        'failureReason': str(error),
+    }
+
+
 def collect_regular_daily(code, current=None):
     """Persist a NAVER daily/realtime cross-verified regular-session candle."""
     current = current or now()
@@ -910,13 +941,16 @@ def collect_regular_daily(code, current=None):
                'status': 'unavailable', 'fresh': False, 'datas': [], 'errors': []}
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
-        bar = build_verified_regular_daily_bar(daily, fetch(url), current, code)
+        realtime = fetch(url)
+        bar = build_verified_regular_daily_bar(daily, realtime, current, code)
         payload.update(status='ok', regularDailyStatus='ok', fresh=True,
                        sourceTime=bar['sourceTime'], datas=[bar])
     except Exception as exc:
         # Raw daily history is deliberately independent from this optional
         # reconstruction.  Consumers fall back to completed history only.
         payload['errors'].append({'error': str(exc)})
+        payload['diagnostic'] = regular_close_diagnostic(
+            locals().get('daily'), locals().get('realtime'), current, code, exc)
     save(f'{REGULAR_DAILY_DIR}/{code}.json', payload)
     return {'itemCode': code, 'regularDailyStatus': payload['regularDailyStatus']}
 

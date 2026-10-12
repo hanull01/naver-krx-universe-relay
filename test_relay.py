@@ -810,6 +810,29 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(save.call_args.args[0], 'data/daily-regular/201490.json')
         self.assertEqual(save.call_args.args[1]['status'], 'unavailable')
 
+    def test_regular_daily_failure_records_bounded_validation_diagnostic(self):
+        current = datetime(2026, 10, 12, 16, 53, tzinfo=relay.KST)
+        daily = {'datas': [{'date': '2026-10-12', 'open': 100, 'high': 110,
+                            'low': 90, 'close': 105, 'volume': 10}]}
+        realtime = {'datas': [{'itemCode': '005930', 'closePrice': '105',
+                               'marketStatus': 'OPEN',
+                               'marketStatusDetailType': 'open',
+                               'localTradedAt': '2026-10-12T16:53:00+09:00'}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily/005930.json').write_text(json.dumps(daily), encoding='utf-8')
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'fetch', return_value=realtime), \
+                 patch.object(relay, 'save') as save:
+                result = relay.collect_regular_daily('005930', current)
+        self.assertEqual(result['regularDailyStatus'], 'unavailable')
+        payload = save.call_args.args[1]
+        self.assertEqual(payload['diagnostic']['code'], '005930')
+        self.assertEqual(payload['diagnostic']['targetDate'], '2026-10-12')
+        self.assertTrue(payload['diagnostic']['dailyOhlcvPresent'])
+        self.assertEqual(payload['diagnostic']['realtimeMarketStatus'], 'OPEN')
+        self.assertEqual(payload['diagnostic']['realtimeDate'], '2026-10-12')
+        self.assertTrue(payload['diagnostic']['dailyRealtimeCloseMatch'])
+
     def test_verified_regular_close_uses_daily_realtime_match_not_minute_or_overmarket(self):
         current = datetime(2026, 10, 8, 20, 1, tzinfo=relay.KST)
         daily = {'datas': [{'date': '2026-10-08', 'open': 269500, 'high': 270000,
