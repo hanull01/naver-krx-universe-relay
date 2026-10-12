@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "status": "AVAILABLE",
+  "monitoringDate": "2026-10-13",
+  "candidateSourceSha256": "fb7fe3c45b6fd4b35c3157a0619e45fa1992ad7e8d784d61cacb35de58be332e",
+  "marketSourceTime": "2026-10-12T20:00:00+09:00",
+  "generatedAt": "2026-10-12T22:48:41.181936+09:00",
+  "source": "NAVER_KRX",
+  "requestedCount": 3,
+  "quoteCount": 3,
+  "missingSymbols": [],
+  "errors": [],
+  "datas": [
+    {
+      "itemCode": "0197X0",
+      "stockName": "SOL SK하이닉스선물단일종목인버스2X",
+      "closePrice": 7140,
+      "fluctuationsRatio": 9.59,
+      "accumulatedTradingVolume": 13765614,
+      "accumulatedTradingValue": 96124000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-12T15:30:00+09:00",
+      "marketStatus": "CLOSE",
+      "session": "CLOSED",
+      "priceBasis": "AFTER_MARKET_FINAL",
+      "fresh": false,
+      "status": "stale"
+    },
+    {
+      "itemCode": "114800",
+      "stockName": "KODEX 인버스",
+      "closePrice": 1075,
+      "fluctuationsRatio": 3.86,
+      "accumulatedTradingVolume": 679370333,
+      "accumulatedTradingValue": 720795000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-12T15:30:00+09:00",
+      "marketStatus": "CLOSE",
+      "session": "CLOSED",
+      "priceBasis": "AFTER_MARKET_FINAL",
+      "fresh": false,
+      "status": "stale"
+    },
+    {
+      "itemCode": "252670",
+      "stockName": "KODEX 200선물인버스2X",
+      "closePrice": 83,
+      "fluctuationsRatio": 7.79,
+      "accumulatedTradingVolume": 7828302837,
+      "accumulatedTradingValue": 635381000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-12T15:30:00+09:00",
+      "marketStatus": "CLOSE",
+      "session": "CLOSED",
+      "priceBasis": "AFTER_MARKET_FINAL",
+      "fresh": false,
+      "status": "stale"
+    }
+  ]
+}
