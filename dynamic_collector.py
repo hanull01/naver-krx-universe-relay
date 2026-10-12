@@ -5,6 +5,10 @@ builds an input plan and merges validated optional rows in memory; callers may
 publish the optional result only after a separate operations approval.
 """
 
+import json
+import os
+from pathlib import Path
+
 
 DATASET_KEYS = ('quotes', 'technicals', 'states')
 
@@ -112,3 +116,37 @@ def preserve_baseline_on_failure(base_payload, optional_targets, reason):
     merged['optionalStatus'] = 'ERROR'
     merged['dynamicCollection'] = True
     return merged
+
+
+def build_optional_snapshot(merged_payload, stage_plan, market_source_time,
+                            enabled=False):
+    """Build a separately publishable snapshot; disabled is the default."""
+    optional_status = merged_payload.get('optionalStatus')
+    requested = merged_payload.get('optionalRequestedCount', 0)
+    accepted = merged_payload.get('optionalAcceptedCount', 0)
+    if not enabled:
+        return {'status': 'DISABLED', 'reason': 'OPERATIONS_APPROVAL_REQUIRED',
+                'networkCalls': 0}
+    if optional_status != 'OK' or requested != accepted:
+        return {'status': 'INVALID', 'reason': 'OPTIONAL_DATA_INCOMPLETE',
+                'networkCalls': 0}
+    return {
+        'schemaVersion': 'dynamic-optional-quotes-v1',
+        'status': 'AVAILABLE', 'marketSourceTime': market_source_time,
+        'collectionPlanVersion': stage_plan.get('version'),
+        'targets': stage_plan.get('optionalTargets', []),
+        'datas': merged_payload.get('datas', []), 'networkCalls': 0,
+    }
+
+
+def write_optional_snapshot(snapshot, path):
+    """Atomically write only a validated AVAILABLE optional snapshot."""
+    if not isinstance(snapshot, dict) or snapshot.get('status') != 'AVAILABLE':
+        raise ValueError('optional snapshot is not publishable')
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + '.tmp')
+    temporary.write_text(json.dumps(snapshot, ensure_ascii=False, sort_keys=True),
+                         encoding='utf-8')
+    os.replace(temporary, path)
+    return path

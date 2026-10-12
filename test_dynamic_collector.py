@@ -1,4 +1,6 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 import dynamic_collector
 
@@ -59,6 +61,29 @@ class DynamicCollectorTests(unittest.TestCase):
             {'datas': [{'itemCode': 'O1', 'status': 'stale'}]}, ['O1'])
         self.assertEqual(result['optionalAcceptedCount'], 0)
         self.assertEqual(result['optionalRejected'][0]['reason'], 'ROW_NOT_USABLE')
+
+    def test_optional_snapshot_is_disabled_by_default_and_atomic_when_enabled(self):
+        stage = dynamic_collector.prepare_optional_stage(self.plan(), ['B1'])
+        merged = dynamic_collector.merge_optional_dataset(
+            {'datas': [{'itemCode': 'B1'}]},
+            {'datas': [{'itemCode': 'O1', 'sourceTime': 't'},
+                       {'itemCode': 'O2', 'sourceTime': 't'}]},
+            stage['optionalTargets'], 't')
+        self.assertEqual(dynamic_collector.build_optional_snapshot(merged, stage, 't')['status'], 'DISABLED')
+        enabled = dynamic_collector.build_optional_snapshot(merged, stage, 't', enabled=True)
+        self.assertEqual(enabled['status'], 'AVAILABLE')
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertTrue(dynamic_collector.write_optional_snapshot(
+                enabled, Path(directory) / 'latest.json').exists())
+
+    def test_incomplete_optional_snapshot_is_not_publishable(self):
+        stage = dynamic_collector.prepare_optional_stage(self.plan(), ['B1'])
+        merged = dynamic_collector.preserve_baseline_on_failure(
+            {'datas': [{'itemCode': 'B1'}]}, stage['optionalTargets'], 'FETCH_FAILED')
+        result = dynamic_collector.build_optional_snapshot(merged, stage, 't', enabled=True)
+        self.assertEqual(result['status'], 'INVALID')
+        with self.assertRaises(ValueError):
+            dynamic_collector.write_optional_snapshot(result, '/tmp/should-not-publish.json')
 
 
 if __name__ == '__main__':
