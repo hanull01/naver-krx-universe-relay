@@ -365,7 +365,7 @@ def load_monitoring_daily_final(codes, business_day):
                 or payload.get('format') != 'COLUMN_ARRAY_V1'
                 or payload.get('publicationStatus') != 'FINAL'
                 or str(payload.get('asOfDate')) != target
-                or str(payload.get('market', '')).lower() != market):
+                or str(payload.get('market', '')).lower() != market.lower()):
             raise ValueError(f'invalid monitoring daily FINAL contract: {market}')
         for stock in payload.get('stocks', []):
             code = str(stock.get('code') or '')
