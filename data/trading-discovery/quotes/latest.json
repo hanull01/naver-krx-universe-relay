@@ -3,8 +3,8 @@
   "status": "AVAILABLE",
   "monitoringDate": "2026-10-13",
   "candidateSourceSha256": "fb7fe3c45b6fd4b35c3157a0619e45fa1992ad7e8d784d61cacb35de58be332e",
-  "marketSourceTime": "2026-10-12T20:00:00+09:00",
-  "generatedAt": "2026-10-12T22:48:41.181936+09:00",
+  "marketSourceTime": "2026-10-12T15:30:00+09:00",
+  "generatedAt": "2026-10-13T00:04:20.118571+09:00",
   "source": "NAVER_KRX",
   "requestedCount": 3,
   "quoteCount": 3,
@@ -21,10 +21,10 @@
       "source": "NAVER_KRX",
       "sourceTime": "2026-10-12T15:30:00+09:00",
       "marketStatus": "CLOSE",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "fresh": false,
-      "status": "stale"
+      "session": "PRE",
+      "priceBasis": "PREVIOUS_KRX_CLOSE",
+      "fresh": true,
+      "status": "ok"
     },
     {
       "itemCode": "114800",
@@ -36,10 +36,10 @@
       "source": "NAVER_KRX",
       "sourceTime": "2026-10-12T15:30:00+09:00",
       "marketStatus": "CLOSE",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "fresh": false,
-      "status": "stale"
+      "session": "PRE",
+      "priceBasis": "PREVIOUS_KRX_CLOSE",
+      "fresh": true,
+      "status": "ok"
     },
     {
       "itemCode": "252670",
@@ -51,10 +51,10 @@
       "source": "NAVER_KRX",
       "sourceTime": "2026-10-12T15:30:00+09:00",
       "marketStatus": "CLOSE",
-      "session": "CLOSED",
-      "priceBasis": "AFTER_MARKET_FINAL",
-      "fresh": false,
-      "status": "stale"
+      "session": "PRE",
+      "priceBasis": "PREVIOUS_KRX_CLOSE",
+      "fresh": true,
+      "status": "ok"
     }
   ]
 }
