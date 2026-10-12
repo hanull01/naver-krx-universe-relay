@@ -49,7 +49,7 @@ class DynamicCollectorTests(unittest.TestCase):
         def fetch(batch):
             calls.append(list(batch))
             return {'datas': [{'itemCode': code, 'sourceTime': 't'} for code in batch]}
-        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch)
+        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch, allow_network=True)
         self.assertEqual(calls, [['O00', 'O01'], ['O02']])
         self.assertEqual(result['status'], 'OK')
         self.assertEqual(result['networkCalls'], 2)
@@ -61,10 +61,26 @@ class DynamicCollectorTests(unittest.TestCase):
             if batch == ['O1']:
                 raise RuntimeError('fixture failure')
             return {'datas': [{'itemCode': 'O2', 'sourceTime': 't'}]}
-        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch)
+        result = dynamic_collector.collect_optional_with_existing_fetch(stage, fetch, allow_network=True)
         self.assertEqual(result['status'], 'PARTIAL')
         self.assertEqual(result['errors'][0]['codes'], ['O1'])
         self.assertEqual(result['networkCalls'], 3)
+
+    def test_optional_fetch_is_disabled_without_explicit_network_opt_in(self):
+        stage = dynamic_collector.prepare_optional_stage(self.plan(), ['B1'])
+        result = dynamic_collector.collect_optional_with_existing_fetch(
+            stage, lambda batch: {'datas': []})
+        self.assertEqual(result['status'], 'DISABLED')
+        self.assertEqual(result['networkCalls'], 0)
+
+    def test_pilot_requires_three_to_five_explicit_optional_codes(self):
+        stage = dynamic_collector.prepare_pilot_stage(
+            {'selectedCodes': ['O1', 'O2', 'O3', 'O4'],
+             'collectionCodes': ['O1', 'O2', 'O3', 'O4']}, [],
+            pilot_codes=['O1', 'O2', 'O3'])
+        self.assertTrue(stage['pilot'])
+        self.assertFalse(stage['networkEnabled'])
+        self.assertEqual(stage['optionalBatches'], [['O1', 'O2', 'O3']])
 
     def test_source_time_mismatch_isolated(self):
         result = dynamic_collector.merge_optional_dataset(

@@ -70,13 +70,36 @@ def prepare_optional_stage(plan, baseline_codes, max_batch_size=50,
     }
 
 
-def collect_optional_with_existing_fetch(stage_plan, fetch_batch):
+def prepare_pilot_stage(plan, baseline_codes, pilot_codes=None, max_symbols=5):
+    """Prepare an explicit 3-5 symbol pilot without enabling network access."""
+    if not 3 <= max_symbols <= 5:
+        raise ValueError('pilot size must be between 3 and 5')
+    stage = prepare_optional_stage(plan, baseline_codes, max_batch_size=max_symbols)
+    allowed = set(stage['optionalTargets'])
+    requested = [str(code) for code in (pilot_codes or []) if str(code) in allowed]
+    if len(requested) > max_symbols:
+        raise ValueError('pilot exceeds max_symbols')
+    if len(requested) < 3:
+        raise ValueError('pilot requires at least 3 optional targets')
+    stage['optionalTargets'] = sorted(set(requested))
+    stage['optionalBatches'] = [stage['optionalTargets']]
+    stage['collectionTargets'] = sorted(set(stage['baselineTargets']) | set(requested))
+    stage['pilot'] = True
+    stage['networkEnabled'] = False
+    stage['publishPolicy'] = 'PILOT_DISABLED_UNTIL_EXPLICIT_APPROVAL'
+    return stage
+
+
+def collect_optional_with_existing_fetch(stage_plan, fetch_batch, allow_network=False):
     """Call an injected existing relay fetch once per bounded optional batch.
 
     ``fetch_batch`` must be the existing relay fetch adapter.  No network
     client or endpoint is created here, and callers must not enable this stage
     without an operations approval.
     """
+    if not allow_network:
+        return {'status': 'DISABLED', 'reason': 'EXPLICIT_NETWORK_OPT_IN_REQUIRED',
+                'datas': [], 'errors': [], 'attempts': [], 'networkCalls': 0}
     if not callable(fetch_batch):
         raise TypeError('fetch_batch must be callable')
     rows, errors, attempts = [], [], []
