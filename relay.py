@@ -1145,9 +1145,15 @@ def calculate_technicals(code, stock_name, daily, quote):
     completed_current = daily_cache_is_current(
         daily, expected_completed_date=(quote or {}).get('previousBusinessDay'))
     provisional_price = quote.get('closePrice') if quote else None
+    today_date = quote_date(quote)
+    has_confirmed_today_bar = any(
+        ''.join(ch for ch in str(bar.get('date') or '') if ch.isdigit()) == today_date
+        and bar.get('complete') is True and not bar.get('noTrading')
+        for bar in (daily or {}).get('datas', [])
+    ) if today_date else False
     provisional_closes = closes + [provisional_price] if provisional_price is not None else closes
     provisional = None
-    if not completed_current and provisional_price is not None:
+    if not has_confirmed_today_bar and today_date and provisional_price is not None:
         provisional = {
             'status': 'provisional',
             'basis': 'VERIFIED_HISTORY_PLUS_NAVER_CURRENT_PRICE',

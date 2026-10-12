@@ -363,6 +363,16 @@ class RelayTests(unittest.TestCase):
             result = relay.calculate_technicals('000001', 'A', daily, {'accumulatedTradingVolume': 1000})
         self.assertEqual(result['status'], 'error')
 
+    def test_provisional_created_when_previous_history_is_current(self):
+        daily = self.daily_fixture(60)
+        daily.update({'status': 'ok', 'sourceTime': '2026-10-08T15:30:00+09:00'})
+        quote = {'closePrice': 150, 'sourceTime': '2026-10-12T20:00:00+09:00',
+                 'session': 'AFTER', 'previousBusinessDay': '2026-10-08'}
+        result = relay.calculate_technicals('000001', 'A', daily, quote)
+        self.assertEqual(result['confirmedStatus'], 'ok')
+        self.assertIsNotNone(result['provisional'])
+        self.assertFalse(result['provisional']['confirmed'])
+
     def test_daily_cache_uses_completed_source_time_before_provisional_latest_date(self):
         current = datetime(2026, 9, 28, 15, 32, tzinfo=relay.KST)
         daily = self.daily_fixture(60)
