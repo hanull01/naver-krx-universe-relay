@@ -1,48 +1,20 @@
 {
   "schemaVersion": 1,
   "itemCode": "329180",
-  "generatedAt": "2026-10-08T15:58:13.469402+09:00",
+  "generatedAt": "2026-10-12T16:53:40.041865+09:00",
   "source": "NAVER_KRX",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/329180/day?startDateTime=20250406&endDateTime=20261008",
-  "status": "ok",
-  "fresh": true,
-  "errors": [],
-  "count": 367,
-  "completedCount": 366,
+  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/329180/day?startDateTime=20250410&endDateTime=20261012",
+  "status": "stale",
+  "fresh": false,
+  "errors": [
+    {
+      "error": "stale",
+      "expectedCompletedDate": "2026-10-09"
+    }
+  ],
+  "count": 365,
+  "completedCount": 364,
   "datas": [
-    {
-      "date": "2025-04-07",
-      "open": 284000,
-      "high": 289000,
-      "low": 275500,
-      "close": 275500,
-      "volume": 333671,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
-    {
-      "date": "2025-04-08",
-      "open": 285500,
-      "high": 295500,
-      "low": 285500,
-      "close": 294500,
-      "volume": 288828,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
-    {
-      "date": "2025-04-09",
-      "open": 301500,
-      "high": 303000,
-      "low": 287500,
-      "close": 293500,
-      "volume": 405588,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
     {
       "date": "2025-04-10",
       "open": 310000,
@@ -4041,14 +4013,25 @@
       "open": 399000,
       "high": 399500,
       "low": 383000,
-      "close": 384000,
-      "volume": 325400,
+      "close": 384500,
+      "volume": 350061,
+      "noTrading": false,
+      "roundingMismatch": false,
+      "complete": true
+    },
+    {
+      "date": "2026-10-12",
+      "open": 383000,
+      "high": 384000,
+      "low": 361500,
+      "close": 362500,
+      "volume": 319159,
       "noTrading": false,
       "roundingMismatch": false,
       "complete": false
     }
   ],
-  "sourceTime": "2026-10-07",
-  "latestDate": "2026-10-08",
+  "sourceTime": "2026-10-08",
+  "latestDate": "2026-10-12",
   "freshnessPolicy": "today is always provisional; latest completed date must equal conservative previous weekday; consumer must verify actual KRX calendar"
 }

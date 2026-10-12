@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
   "itemCode": "373220",
-  "generatedAt": "2026-10-08T15:58:29.188186+09:00",
-  "source": "NAVER_MINUTE",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/373220/minute?startDateTime=202610080900&endDateTime=202610081530",
+  "generatedAt": "2026-10-12T16:53:49.636297+09:00",
+  "source": "NAVER_VERIFIED_REGULAR_CLOSE",
+  "sourceUrl": "https://polling.finance.naver.com/api/realtime/domestic/stock/373220",
+  "verification": "DAILY_REALTIME_MATCH",
   "regularDailyStatus": "unavailable",
   "status": "unavailable",
   "fresh": false,
   "datas": [],
   "errors": [
     {
-      "error": "15:30 minute close is unavailable"
+      "error": "realtime marketStatus is not CLOSE"
     }
   ]
 }

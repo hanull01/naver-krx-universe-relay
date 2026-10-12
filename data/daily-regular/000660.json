@@ -1,28 +1,17 @@
 {
   "schemaVersion": 1,
   "itemCode": "000660",
-  "generatedAt": "2026-10-08T15:58:22.846145+09:00",
-  "source": "NAVER_MINUTE",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/000660/minute?startDateTime=202610080900&endDateTime=202610081530",
-  "regularDailyStatus": "ok",
-  "status": "ok",
-  "fresh": true,
-  "datas": [
+  "generatedAt": "2026-10-12T16:53:46.254328+09:00",
+  "source": "NAVER_VERIFIED_REGULAR_CLOSE",
+  "sourceUrl": "https://polling.finance.naver.com/api/realtime/domestic/stock/000660",
+  "verification": "DAILY_REALTIME_MATCH",
+  "regularDailyStatus": "unavailable",
+  "status": "unavailable",
+  "fresh": false,
+  "datas": [],
+  "errors": [
     {
-      "date": "2026-10-08",
-      "open": 1722000,
-      "high": 1759000,
-      "low": 1681000,
-      "close": 1681000,
-      "volume": 3019790,
-      "complete": true,
-      "noTrading": false,
-      "session": "REGULAR",
-      "source": "NAVER_MINUTE",
-      "sourceTime": "20261008153000",
-      "barType": "REGULAR_SESSION"
+      "error": "realtime marketStatus is not CLOSE"
     }
-  ],
-  "errors": [],
-  "sourceTime": "20261008153000"
+  ]
 }
