@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
 QUOTES_LITE_PATH = ROOT / 'data/quotes-lite.json'
-SUBJECT_PREFIX = '[MARKET_DATA_READY]'
+SUBJECT_PREFIX = 'MARKET_DATA_READY'
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""

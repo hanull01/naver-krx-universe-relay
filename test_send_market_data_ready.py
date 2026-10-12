@@ -25,7 +25,7 @@ class ReadyMailTests(unittest.TestCase):
     def env(self):
         return {'MARKET_GMAIL_USERNAME':'sender@example.com','MARKET_GMAIL_APP_PASSWORD':'secret','MARKET_GMAIL_TO':'trigger@example.com','GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'hanull01/naver-krx-universe-relay','GITHUB_SERVER_URL':'https://github.com','MARKET_DATA_COMMIT_SHA':'abc123','MARKET_DATA_COLLECTION_STARTED_AT':'2026-09-29T10:32:00+09:00'}
     def test_valid_payload_builds_exact_prefix_and_required_lines(self):
-        metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('[MARKET_DATA_READY]'))
+        metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('MARKET_DATA_READY ')); self.assertNotIn('[MARKET_DATA_READY]', message['Subject'])
         for line in ('run_id=123','generatedAt=','sourceTime=','count=2','expectedCount=2','freshCount=2','missingCodes=[]','delayTime=0','status=ok'): self.assertIn(line,message.get_content())
     def test_invalid_coverage_status_delay_and_times_are_blocked(self):
         for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None}):

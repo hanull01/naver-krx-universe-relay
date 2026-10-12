@@ -113,7 +113,8 @@ class SafePublisherTests(unittest.TestCase):
             self.assertNotIn("trading_discovery.py", trigger_paths)
             self.assertNotIn("publish_trading_discovery.py", workflow)
         mail = (root / "send_market_data_ready.py").read_text(encoding="utf-8")
-        self.assertIn("[MARKET_DATA_READY]", mail)
+        self.assertIn("MARKET_DATA_READY", mail)
+        self.assertNotIn("[MARKET_DATA_READY]", mail)
         self.assertNotIn("trading-discovery", mail)
 
     def test_supplemental_collection_is_optional_and_does_not_change_mail_gate(self):
