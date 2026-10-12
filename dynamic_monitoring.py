@@ -48,6 +48,18 @@ def _kiwoom_codes(discovery):
             for item in discovery.get('symbols', []) if item}
 
 
+def _published_industries(payload):
+    """Accept the published industry contract without weakening validation."""
+    if not isinstance(payload, dict):
+        return [], None
+    if payload.get('status') == 'AVAILABLE':
+        return list(payload.get('industries') or []), 'STATUS_AVAILABLE'
+    quality = payload.get('quality') or {}
+    if quality.get('sourceStatus') == 'OK' and quality.get('industryEvidenceUsable') == 'FULL':
+        return list(payload.get('industries') or []), 'QUALITY_FULL'
+    return [], None
+
+
 def _theme_payload(snapshot):
     try:
         collection = snapshot['collection']
@@ -112,9 +124,7 @@ def build_context(theme_snapshot, full_market, universe, quotes, technicals, sta
         themes['strongRankLimit'] = strong_rank_limit
         themes['quality'] = {period: themes['periods'][period]['quality'] for period in THEME_PERIODS}
 
-    industries = []
-    if isinstance(full_market, dict) and full_market.get('status') == 'AVAILABLE':
-        industries = list(full_market.get('industries') or [])
+    industries, industry_validation = _published_industries(full_market)
     strong_industries = sorted(
         [row for row in industries if isinstance(row.get('changeRate'), (int, float)) and row['changeRate'] > 0],
         key=lambda row: row['changeRate'], reverse=True)
@@ -143,7 +153,8 @@ def build_context(theme_snapshot, full_market, universe, quotes, technicals, sta
         'reuse': {'quotes': len(quote_idx), 'technicals': len(tech_idx), 'states': len(state_idx),
                   'membershipThemes': len(memberships.get('themes', []))},
         'industries': {'status': 'AVAILABLE' if industries else 'UNAVAILABLE',
-                       'strong': strong_industries, 'source': 'FULL_MARKET_EVIDENCE'},
+                       'strong': strong_industries, 'source': 'FULL_MARKET_EVIDENCE',
+                       'validation': industry_validation},
         'themes': themes,
         'relatedStocks': related,
         'policy': {'membership': 'CACHED_OR_TOP_THEMES_ON_DEMAND_ONLY',

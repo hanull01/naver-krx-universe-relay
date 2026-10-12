@@ -46,6 +46,16 @@ class DynamicMonitoringTests(unittest.TestCase):
         self.assertEqual(result['industries']['status'], 'AVAILABLE')
         self.assertEqual(result['networkCalls'], 0)
 
+    def test_published_industry_quality_contract_is_consumable_without_theme_data(self):
+        result = monitor.build_context(
+            {}, {'quality': {'sourceStatus': 'OK', 'industryEvidenceUsable': 'FULL'},
+                 'industries': [{'name': '반도체', 'changeRate': 1.0}]},
+            {}, {'datas': []}, {'datas': []}, {'datas': []})
+        self.assertEqual(result['themes']['status'], 'UNAVAILABLE')
+        self.assertEqual(result['industries']['status'], 'AVAILABLE')
+        self.assertEqual(result['industries']['validation'], 'QUALITY_FULL')
+        self.assertEqual(result['networkCalls'], 0)
+
 
 if __name__ == '__main__':
     unittest.main()
