@@ -105,6 +105,35 @@ def collect_pc_theme_periods(fetcher=market.fetch_json, clock=market.generated_a
             'researchGate': 'DISABLED_PENDING_OPERATIONAL_APPROVAL', 'periods': periods}
 
 
+def attach_pc_theme_analysis(ranking, membership, quotes=None, technicals=None,
+                             universe_codes=None):
+    """Join PC rankings to explicitly supplied memberships, without new requests.
+
+    NAVER's top-three lists remain a separate source from system-selected leaders.
+    Themes without a verified supplied membership stay UNKNOWN rather than being
+    treated as empty or removed.
+    """
+    by_id = {str(row.get('id')): row for row in membership.get('themes', [])}
+    analyzed = analyze_dynamic_themes({'themes': list(by_id.values())}, quotes, technicals,
+                                      universe_codes)
+    systems = {str(row['id']): row for row in analyzed['groups']}
+    rows = []
+    for theme in ranking.get('themes', []):
+        system = systems.get(str(theme['id']))
+        rows.append({
+            'id': theme['id'], 'name': theme['name'], 'ranking': theme['ranking'],
+            'changeRate': theme['changeRate'], 'updatedAt': theme['updatedAt'],
+            'naverTopByChangeRate': theme['naverTopByChangeRate'],
+            'naverTopByTradingValue': theme['naverTopByTradingValue'],
+            'systemLeaders': system['leaders'] if system else [],
+            'membershipStatus': system['status'] if system else 'UNKNOWN',
+            'qualityStatus': 'OK' if ranking['status'] == 'OK' and system else 'PARTIAL',
+        })
+    return {'period': ranking['period'], 'rankingStatus': ranking['status'],
+            'count': len(rows), 'themes': rows,
+            'unlinkedThemeCount': sum(row['membershipStatus'] == 'UNKNOWN' for row in rows)}
+
+
 def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
                    max_pages=market.MAX_CATEGORY_PAGES):
     """Collect theme pages, failing closed on repeats or unconfirmed end."""

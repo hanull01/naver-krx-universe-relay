@@ -108,6 +108,23 @@ class ThemeResearchTests(unittest.TestCase):
         self.assertEqual(changed['status'], 'PARTIAL')
         self.assertFalse(changed['updatedAtConsistent'])
 
+    def test_pc_analysis_keeps_naver_and_system_leaders_separate(self):
+        ranking = {'period': 'daily', 'status': 'OK', 'themes': [{
+            'id': '1', 'name': 'AI', 'ranking': 1, 'changeRate': 2.0,
+            'updatedAt': 't', 'naverTopByChangeRate': [{'code': '000001'}],
+            'naverTopByTradingValue': [{'code': '000001'}]}]}
+        membership = {'themes': [{'id': '1', 'name': 'AI',
+                                  'members': [{'code': '000001', 'name': 'A'}]}]}
+        result = theme.attach_pc_theme_analysis(
+            ranking, membership,
+            quotes={'000001': {'code': '000001', 'name': 'A', 'changeRate': 1.0,
+                               'tradingValue': 100}},
+        )
+        row = result['themes'][0]
+        self.assertEqual(row['naverTopByChangeRate'], [{'code': '000001'}])
+        self.assertEqual(row['systemLeaders'][0]['code'], '000001')
+        self.assertEqual(row['membershipStatus'], 'OK')
+
 
 if __name__ == '__main__':
     unittest.main()
