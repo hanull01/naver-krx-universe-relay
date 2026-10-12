@@ -166,6 +166,15 @@ jobs:
           fi
           exit 0
 
+      - name: Preserve full-market failure diagnostic
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-market-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/full-market-current-error.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Commit refreshed production data
         id: publish
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0'
