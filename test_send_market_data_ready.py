@@ -23,10 +23,11 @@ class ReadyMailTests(unittest.TestCase):
         timestamp = '2026-09-29T10:39:00+09:00'
         return {'status':'ok','count':2,'expectedCount':2,'coverageCount':2,'freshCount':2,'missingCodes':[], 'generatedAt':timestamp,'sourceTime':timestamp,'collectionStartedAt':'2026-09-29T10:32:00+09:00','datas':[{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'},{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'}]}
     def env(self):
-        return {'MARKET_GMAIL_USERNAME':'sender@example.com','MARKET_GMAIL_APP_PASSWORD':'secret','MARKET_GMAIL_TO':'trigger@example.com','GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'hanull01/naver-krx-universe-relay','GITHUB_SERVER_URL':'https://github.com','MARKET_DATA_COMMIT_SHA':'abc123','MARKET_DATA_COLLECTION_STARTED_AT':'2026-09-29T10:32:00+09:00'}
+        return {'MARKET_GMAIL_USERNAME':'sender@example.com','MARKET_GMAIL_APP_PASSWORD':'secret','MARKET_GMAIL_TO':'trigger@example.com','GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'hanull01/naver-krx-universe-relay','GITHUB_SERVER_URL':'https://github.com','MARKET_DATA_COMMIT_SHA':'abc123','MARKET_DATA_COLLECTION_STARTED_AT':'2026-09-29T10:32:00+09:00','FULL_MARKET_STATUS':'UNAVAILABLE','FULL_MARKET_FAILURE_REASON':'CURRENT_SNAPSHOT_INCOMPLETE','FULL_MARKET_LAST_PUBLISHED_AT':'2026-10-12T08:00:00+09:00'}
     def test_valid_payload_builds_exact_prefix_and_required_lines(self):
         metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('MARKET_DATA_READY ')); self.assertNotIn('[MARKET_DATA_READY]', message['Subject'])
         for line in ('run_id=123','generatedAt=','sourceTime=','count=2','expectedCount=2','freshCount=2','missingCodes=[]','delayTime=0','status=ok'): self.assertIn(line,message.get_content())
+        for line in ('fullMarketStatus=UNAVAILABLE','fullMarketFailureReason=CURRENT_SNAPSHOT_INCOMPLETE','fullMarketLastPublishedAt=2026-10-12T08:00:00+09:00','fullMarketDataWarning=Do not use prior full-market data as today data'): self.assertIn(line,message.get_content())
     def test_invalid_coverage_status_delay_and_times_are_blocked(self):
         for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None}):
             payload=self.payload(); payload.update(changes)
@@ -89,6 +90,6 @@ class ReadyMailTests(unittest.TestCase):
     def test_smtp_timeout_is_safe(self):
         self.assert_smtp_failure(socket.timeout('secret'), 'Gmail SMTP timeout')
     def test_workflow_sends_only_after_successful_publish(self):
-        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+500])
+        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+700]); self.assertNotIn("steps.full_market.outputs.exit_code == '0' && steps.publish.outputs.published", workflow[mail:mail+700])
 
 if __name__ == '__main__': unittest.main()

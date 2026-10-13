@@ -20,6 +20,11 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 try:
+    from market_universe_reconcile import classify_delta
+except ImportError:
+    from tools.market_universe_reconcile import classify_delta
+
+try:
     import certifi
     SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 except Exception:
@@ -243,18 +248,17 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
         common = set(expected_market) & set(observed_market)
         market_changed = sorted(code for code in common
                                 if expected_market[code] != observed_market[code])
-        delta = {
-            "added": sorted(set(observed_market) - set(expected_market)),
-            "removed": sorted(set(expected_market) - set(observed_market)),
-            "marketChanged": market_changed,
-            "requiresExternalVerification": bool(
-                last_result["missingCodes"] or last_result["extraCodes"] or market_changed
-            ),
-        }
+        delta = classify_delta(
+            {"assets": [{"code": code, "market": market} for code, market in expected_market.items()]},
+            {"assets": [{"code": code, "market": market} for code, market in observed_market.items()]},
+        )
+        delta["requiresExternalVerification"] = bool(
+            last_result["missingCodes"] or last_result["extraCodes"] or market_changed
+        )
         return {
             "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
             "status": "FAILURE", "collectionStatus": "SUCCESS",
-            "reconciliationStatus": "CHANGES_DETECTED",
+            "reconciliationStatus": "UNIVERSE_RECONCILIATION_REQUIRED",
             "expectedCount": last_result["expectedCount"], "count": last_result["count"],
             "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
             "attemptCount": max_attempts, "missingCodes": last_result["missingCodes"],

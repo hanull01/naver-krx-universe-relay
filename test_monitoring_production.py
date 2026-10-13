@@ -262,8 +262,9 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertIn('--output "$RUNNER_TEMP/full-market-current.json"', workflow)
         self.assertNotIn("data/market/stocks-current.json", workflow)
         self.assertIn("data/monitoring/latest-quality.json", workflow)
-        self.assertIn("steps.full_market.outputs.exit_code == '0'", workflow)
-        self.assertIn("steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'", workflow)
+        self.assertIn("steps.full_market.outputs.exit_code != '0'", workflow)
+        self.assertIn("steps.collect.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'", workflow)
+        self.assertIn("FULL_MARKET_STATUS", workflow)
         self.assertFalse((ROOT / ".github/workflows/refresh-full-market-monitoring.yml").exists())
 
     def test_market_schedules_match_main_hourly_daily_and_snapshot_contract(self):

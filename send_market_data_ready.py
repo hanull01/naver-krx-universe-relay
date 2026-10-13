@@ -107,6 +107,12 @@ def ready_message(metadata, env):
             lines.append(f'{key}={metadata[key]}')
     if metadata.get('collectionStartedAt'): lines.append(f'collectionStartedAt={metadata["collectionStartedAt"]}')
     if env.get('MARKET_DATA_COLLECTION_FINISHED_AT'): lines.append(f'collectionFinishedAt={env["MARKET_DATA_COLLECTION_FINISHED_AT"]}')
+    lines.extend([
+        f'fullMarketStatus={env.get("FULL_MARKET_STATUS", "UNKNOWN")}',
+        f'fullMarketFailureReason={env.get("FULL_MARKET_FAILURE_REASON", "UNKNOWN")}',
+        f'fullMarketLastPublishedAt={env.get("FULL_MARKET_LAST_PUBLISHED_AT", "UNKNOWN")}',
+        'fullMarketDataWarning=Do not use prior full-market data as today data',
+    ])
     message.set_content('\n'.join(lines) + '\n'); return message
 
 def send_ready_email(message, env, smtp_factory=smtplib.SMTP_SSL):

@@ -126,7 +126,8 @@ class SafePublisherTests(unittest.TestCase):
         self.assertIn("exit 0", optional)
         mail = workflow[workflow.index("id: ready_email"):]
         self.assertIn("steps.collect.outputs.exit_code == '0'", mail[:600])
-        self.assertIn("steps.full_market.outputs.exit_code == '0'", mail[:600])
+        self.assertNotIn("steps.full_market.outputs.exit_code == '0'", mail[:600])
+        self.assertIn("FULL_MARKET_STATUS", mail)
         self.assertIn("steps.publish.outputs.published == 'true'", mail[:600])
         self.assertNotIn("steps.discovery_quotes", mail[:600])
 
