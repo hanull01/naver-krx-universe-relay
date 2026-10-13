@@ -56,7 +56,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
     quality = payloads["latest-quality.json"]
     expected_date = str(as_of or "").replace("-", "")
     baseline_date = str(quality.get("baselineAsOfDate") or "")
-    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS"):
+    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
         return {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"}
     if expected_date and baseline_date != expected_date:
         snapshot_time = quality.get("currentSnapshotGeneratedAt")
@@ -91,6 +91,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "generatedAt": next(iter(generated), None),
         "sourceTime": quality.get("currentSnapshotGeneratedAt"),
         "quality": quality,
+        "qualityStatus": quality.get("collectionQualityStatus", "UNKNOWN"),
         "breadth": {
             "advancers": total.get("advancers"),
             "decliners": total.get("decliners"),

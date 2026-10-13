@@ -283,8 +283,8 @@ def signal_subset(features):
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
                    previous_summary=None, today=None, previous_good_industries=None, baseline=None,
                    publication_context=None):
-    if current_snapshot.get("status") != "SUCCESS":
-        raise ValueError("current snapshot is not SUCCESS")
+    if current_snapshot.get("status") not in ("SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
+        raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
     if baseline is not None:
         if baseline.get("historyStatus") != "OK":
@@ -311,14 +311,17 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     membership = membership or {"status": "UNUSABLE", "industries": []}
     breadth_data = {market: breadth(features, market) for market in ("TOTAL", "KOSPI", "KOSDAQ")}
     publication_context = publication_context or {}
+    collection_quality = current_snapshot.get("status", "UNKNOWN")
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
-                   "markets": breadth_data}
+                   "markets": breadth_data, "qualityStatus": collection_quality,
+                   "universeDelta": current_snapshot.get("universeDelta")}
     summary = {"schemaVersion": 1, "generatedAt": current_snapshot["generatedAt"], "source": "NAVER_FULL_MARKET_EVIDENCE",
                # Keep breadth for current readers; fullMarket is the explicit
                # scope Work must use for market-wide interpretation.
                "breadth": breadth_data, "fullMarket": full_market,
                "themeEvidenceStatus": "DISABLED_PENDING_RESEARCH_GATE", "availableThemeCount": 0,
-               "themeEvidence": {"scope": "FULL_MARKET", "status": "DISABLED_PENDING_RESEARCH_GATE"}}
+               "themeEvidence": {"scope": "FULL_MARKET", "status": "DISABLED_PENDING_RESEARCH_GATE"},
+               "fullMarketQualityStatus": collection_quality}
     summary.update({key: publication_context[key] for key in (
         "session", "publicationStatus", "monitoredUniverse", "universeCrossCheck",
     ) if key in publication_context})
@@ -363,7 +366,9 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "closeValidCount": sum(item["close_valid"] for item in features),
                                 "featureValidCount": sum(item["traded_bar"] for item in features),
                                 "ohlcInvalidCount": sum(not item["ohlc_valid"] for item in features), "volumeInvalidCount": sum(not item["volume_valid"] for item in features),
-                                "currentSnapshotAttemptCount": current_snapshot["attemptCount"], "industryStatus": quality["sourceStatus"],
+                                "currentSnapshotAttemptCount": current_snapshot["attemptCount"], "collectionQualityStatus": collection_quality,
+                                "publicationStatus": collection_quality,
+                                "universeDelta": current_snapshot.get("universeDelta"), "industryStatus": quality["sourceStatus"],
                                 "industryCoverageVsPreviousPct": quality["coverageVsPreviousPct"], "industryFailedPage": quality["failedPage"],
                                 "industryMissingCount": quality["missingCount"], "themeStatus": "DISABLED_PENDING_RESEARCH_GATE"},
         "latest-summary.json": summary,

@@ -95,11 +95,13 @@ class FullMarketCurrentTests(unittest.TestCase):
                 universe, fetch, 2, 1, 0,
                 lambda: "2026-10-13T08:00:00+09:00"
             )
-        self.assertEqual(snapshot["status"], "FAILURE")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
         self.assertEqual(snapshot["collectionStatus"], "SUCCESS")
         self.assertEqual(snapshot["count"], 4)
         self.assertEqual(snapshot["missingCodes"], ["123456"])
         self.assertEqual(snapshot["extraCodes"], ["999999"])
+        self.assertEqual(snapshot["universeDelta"]["verificationStatus"], "PENDING_EXTERNAL_VERIFICATION")
+        self.assertFalse(snapshot["universeDelta"]["applied"])
 
     def test_duplicate_and_page_boundary_duplicate_fail(self):
         fetch = paged({
@@ -133,7 +135,7 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertEqual(snapshot["attemptCount"], 2)
         self.assertEqual(len(snapshot["attemptDiagnostics"]), 2)
 
-    def test_all_retries_fail_and_publish_preserves_existing_snapshot(self):
+    def test_complete_collection_with_universe_delta_publishes_pending_snapshot(self):
         def fetch(market, index, size):
             pages = {"KOSPI": [[raw("005930"), raw("0088M0")], []],
                      "KOSDAQ": [[raw("000660"), raw("999999")], []]}
@@ -150,8 +152,8 @@ class FullMarketCurrentTests(unittest.TestCase):
             output.write_text('{"status":"SUCCESS","sentinel":true}\n', encoding="utf-8")
             diagnostic = root / "stocks-current-error.json"
             current.publish(snapshot, output, diagnostic)
-            self.assertTrue(json.loads(output.read_text(encoding="utf-8"))["sentinel"])
-            self.assertEqual(json.loads(diagnostic.read_text(encoding="utf-8"))["status"], "FAILURE")
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["status"], "COMPLETE_RECONCILIATION_PENDING")
+            self.assertFalse(diagnostic.exists())
 
     def test_halted_and_zero_volume_are_preserved(self):
         row = raw("005930", tradeStopYn="Y", tradableStatus="HALTED", openPrice="0",

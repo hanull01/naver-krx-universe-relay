@@ -255,15 +255,21 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
         delta["requiresExternalVerification"] = bool(
             last_result["missingCodes"] or last_result["extraCodes"] or market_changed
         )
+        generated_at = clock()
         return {
             "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
-            "status": "FAILURE", "collectionStatus": "SUCCESS",
+            "status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
             "reconciliationStatus": "UNIVERSE_RECONCILIATION_REQUIRED",
             "expectedCount": last_result["expectedCount"], "count": last_result["count"],
             "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
             "attemptCount": max_attempts, "missingCodes": last_result["missingCodes"],
             "extraCodes": last_result["extraCodes"], "duplicateCodes": last_result["duplicateCodes"],
-            "universeDelta": delta,
+            "universeDelta": delta | {
+                "firstDetectedAt": generated_at,
+                "lastCheckedAt": generated_at,
+                "verificationStatus": "PENDING_EXTERNAL_VERIFICATION",
+                "applied": False,
+            },
             "stocks": last_result["stocks"], "attemptDiagnostics": diagnostics,
         }
     return {
@@ -285,7 +291,7 @@ def output_sizes(payload):
 
 
 def publish(snapshot, output=DEFAULT_OUTPUT, diagnostic=DEFAULT_DIAGNOSTIC, compact=True):
-    if snapshot["status"] == "SUCCESS":
+    if snapshot["status"] in ("SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
         atomic_json(output, snapshot, compact=compact)
         return {"published": str(output), "diagnostic": None}
     # Do not overwrite the last known-good production snapshot.
@@ -310,7 +316,7 @@ def main():
         report |= publish(snapshot, args.output, args.diagnostic)
     print(json.dumps({key: snapshot[key] for key in ("status", "expectedCount", "count", "coverageCount", "markets", "attemptCount")} | report,
                      ensure_ascii=False))
-    return 0 if snapshot["status"] == "SUCCESS" else 1
+    return 0 if snapshot["status"] in ("SUCCESS", "COMPLETE_RECONCILIATION_PENDING") else 1
 
 
 if __name__ == "__main__":

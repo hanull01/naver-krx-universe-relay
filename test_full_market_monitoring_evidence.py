@@ -161,6 +161,18 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(built["latest-summary.json"]["themeEvidenceStatus"], "DISABLED_PENDING_RESEARCH_GATE")
         self.assertEqual(built["latest-quality.json"]["historyCoveragePct"], 100.0)
 
+    def test_reconciliation_pending_snapshot_remains_analyzable_with_quality_status(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "universeDelta": {"added": ["005930"], "verificationStatus": "PENDING_EXTERNAL_VERIFICATION"},
+                    "stocks": [current()]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "005930.jsonl").write_text(json.dumps(history("20260930", 100)) + "\n", encoding="utf-8")
+            built, _ = evidence.build_evidence(snapshot, root, None, None, None, "20261001")
+        self.assertEqual(built["latest-quality.json"]["collectionQualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(built["latest-summary.json"]["fullMarket"]["qualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
+
 
 if __name__ == "__main__":
     unittest.main()
