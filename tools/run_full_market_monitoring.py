@@ -310,6 +310,21 @@ def collection_readiness(baseline, now=None, market_day_check=krx_market_day.mar
     return fresh, "READY" if fresh else reason, previous
 
 
+def snapshot_is_publishable(current):
+    """Accept complete collection with pending Universe reconciliation only."""
+    publishable_statuses = {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
+    return bool(
+        current
+        and current.get("status") in publishable_statuses
+        and current.get("collectionStatus", "SUCCESS") == "SUCCESS"
+        and not current.get("duplicateCodes")
+        and not current.get("repeatedPages")
+        and not current.get("errors")
+        and current.get("coverageCount", 0) > 0
+        and current.get("count") == current.get("coverageCount")
+    )
+
+
 def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,
@@ -320,7 +335,7 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     if not fresh:
         return {"status": "NOT_PUBLISHED", "reason": freshness_status}
     current = load_json(current_file) if current_file else collector()
-    if not current or current.get("status") != "SUCCESS" or current.get("coverageCount") != current.get("expectedCount"):
+    if not snapshot_is_publishable(current):
         return {"status": "NOT_PUBLISHED", "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
     universe_subset = extract_universe_snapshot(current, universe_file)
     cross_check = cross_check_universe_snapshot(universe_subset, relay_quotes_file)
@@ -335,7 +350,7 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         "relayQuoteGeneratedAt": cross_check.get("relayGeneratedAt"),
         "relayQuoteSourceTime": cross_check.get("relaySourceTime"),
         "relayQuoteSourceTimeLatest": cross_check.get("relaySourceTimeLatest"),
-        "session": session_at(now), "publicationStatus": "SUCCESS",
+        "session": session_at(now), "publicationStatus": current.get("status", "SUCCESS"),
         "universeSubsetCount": len(universe_subset),
         "universeSubsetSnapshotGeneratedAt": current.get("generatedAt"),
         "universeCrossCheck": cross_check,

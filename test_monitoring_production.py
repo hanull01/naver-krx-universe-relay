@@ -137,6 +137,16 @@ class MonitoringProductionTests(unittest.TestCase):
             self.assertEqual(result["reason"], "CURRENT_SNAPSHOT_INCOMPLETE")
             self.assertEqual(json.loads(preserved.read_text()), {"preserve": True})
 
+    def test_reconciliation_pending_complete_snapshot_is_publishable(self):
+        base = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
+                "count": 2763, "coverageCount": 2763, "expectedCount": 2764,
+                "universeDelta": {"removed": ["469900"]}}
+        self.assertTrue(runner.snapshot_is_publishable(base))
+        self.assertTrue(runner.snapshot_is_publishable(dict(base, status="SUCCESS", expectedCount=2763)))
+        self.assertFalse(runner.snapshot_is_publishable(dict(base, status="PARTIAL")))
+        self.assertFalse(runner.snapshot_is_publishable(dict(base, duplicateCodes=["000001"])))
+        self.assertFalse(runner.snapshot_is_publishable(dict(base, count=2762)))
+
     def test_extracts_enabled_universe_from_the_validated_full_snapshot(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
