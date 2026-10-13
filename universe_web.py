@@ -12,12 +12,18 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.parse import parse_qs
 
 import universe_manager as manager
+import dynamic_universe_manager as dynamic
 
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CONFIG = ROOT / "config" / "universe.json"
+DEFAULT_DYNAMIC_RESULT = ROOT / "data" / "dynamic-universe" / "latest.json"
+DEFAULT_DYNAMIC_HISTORY = ROOT / "data" / "dynamic-universe" / "history.json"
+DEFAULT_POLICY = ROOT / "config" / "dynamic_universe_policy.json"
+DEFAULT_ASSET_REGISTRY = ROOT / "data" / "market-universe" / "all-assets.json"
 
 
 def safe_config_path(value):
@@ -85,8 +91,14 @@ def operation_summary(operation):
 
 
 class UniverseWebApp:
-    def __init__(self, config_path=DEFAULT_CONFIG):
+    def __init__(self, config_path=DEFAULT_CONFIG, dynamic_result=DEFAULT_DYNAMIC_RESULT,
+                 dynamic_history=DEFAULT_DYNAMIC_HISTORY, policy_path=DEFAULT_POLICY,
+                 asset_registry=DEFAULT_ASSET_REGISTRY):
         self.config_path = Path(config_path)
+        self.dynamic_result = Path(dynamic_result)
+        self.dynamic_history = Path(dynamic_history)
+        self.policy_path = Path(policy_path)
+        self.asset_registry = Path(asset_registry)
 
     def current(self):
         return manager.load(self.config_path)
@@ -95,6 +107,7 @@ class UniverseWebApp:
         data = self.current()
         errors, warnings = manager.validation(data)
         stocks = data.get("stocks", []) if isinstance(data, dict) else []
+        auto = self.auto_management()
         return {
             "enabledCount": sum(stock.get("enabled") is True for stock in stocks if isinstance(stock, dict)),
             "disabledCount": sum(stock.get("enabled") is False for stock in stocks if isinstance(stock, dict)),
@@ -104,7 +117,54 @@ class UniverseWebApp:
             "validation": {"status": "ERROR" if errors else "WARNING" if warnings else "OK", "errors": errors, "warnings": warnings},
             "configPath": str(self.config_path),
             "modifiedAt": self.config_path.stat().st_mtime,
+            "autoSectorCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["sectors"]),
+            "autoThemeCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["themes"]),
+            "autoLeaderCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["leaders"]),
+            "themeStatus": "PENDING" if auto["pending"] else "AVAILABLE",
         }
+
+    def auto_management(self):
+        payload = dynamic.load_json(self.dynamic_result, {}) or {}
+        return {"version": payload.get("version", "dynamic-universe-management-v1"),
+                "generatedAt": payload.get("generatedAt"), "sectors": payload.get("sectors", []),
+                "themes": payload.get("themes", []), "leaders": payload.get("leaders", []),
+                "kiwoomDiscovery": payload.get("kiwoomDiscovery", []),
+                "pending": payload.get("pending", [{"type": "AUTO_THEME", "status": "PENDING", "reason": "DYNAMIC_RESULT_NOT_PUBLISHED"}])}
+
+    def watchlists(self):
+        data = self.current(); names = {row["itemCode"]: row["stockName"] for row in data.get("stocks", [])}
+        return {name: [{"code": code, "name": names.get(code)} for code in codes]
+                for name, codes in manager.user_watchlists(data).items()}
+
+    def history(self):
+        payload = dynamic.load_json(self.dynamic_history, {"events": []}) or {"events": []}
+        backups = sorted(self.config_path.parent.glob("history/universe-*.json"), reverse=True)
+        return {"automatic": payload.get("events", []),
+                "userBackups": [{"file": path.name, "modifiedAt": path.stat().st_mtime} for path in backups[:100]]}
+
+    def settings(self):
+        return dynamic.load_json(self.policy_path, {}) or {}
+
+    def search(self, query):
+        query = str(query or "").strip().lower()
+        if not query: return []
+        registry = dynamic.load_json(self.asset_registry, {}) or {}
+        rows = registry if isinstance(registry, list) else registry.get("stocks") or registry.get("assets") or registry.get("items") or []
+        results = []
+        for row in rows:
+            code = str(row.get("code") or row.get("itemCode") or "")
+            name = str(row.get("name") or row.get("stockName") or "")
+            if query in code.lower() or query in name.lower():
+                results.append({"code": code, "name": name, "market": row.get("market")})
+            if len(results) >= 20: break
+        return results
+
+    def _watchlist_mutation(self, data, operation):
+        mapping = {"watchlist_add": "add", "watchlist_remove": "remove",
+                   "watchlist_group_create": "group_create", "watchlist_group_delete": "group_delete"}
+        action = mapping.get(operation.get("op"))
+        if not action: raise ValueError("지원하지 않는 관심종목 작업")
+        manager.mutate_user_watchlist(data, action, operation.get("name", ""), operation.get("code"), operation.get("stockName"))
 
     def stocks(self):
         data = self.current()
@@ -132,7 +192,10 @@ class UniverseWebApp:
         messages = io.StringIO()
         try:
             with contextlib.redirect_stdout(messages):
-                manager.mutate(after, action_args(operation))
+                if str(operation.get("op", "")).startswith("watchlist_"):
+                    self._watchlist_mutation(after, operation)
+                else:
+                    manager.mutate(after, action_args(operation))
             errors, warnings = manager.validation(after)
         except (ValueError, KeyError, TypeError) as exc:
             return {"ok": False, "errors": [str(exc)], "warnings": [], "summary": operation_summary(operation)}
@@ -161,7 +224,10 @@ class UniverseWebApp:
         if not preview["changed"]:
             return {**preview, "applied": False}
         after = copy.deepcopy(before)
-        manager.mutate(after, action_args(operation))
+        if str(operation.get("op", "")).startswith("watchlist_"):
+            self._watchlist_mutation(after, operation)
+        else:
+            manager.mutate(after, action_args(operation))
         messages = io.StringIO()
         with contextlib.redirect_stdout(messages):
             manager.save(self.config_path, before, after, dry_run=False)
@@ -173,6 +239,12 @@ class UniverseWebApp:
             if method == "GET" and route == "/api/dashboard": return HTTPStatus.OK, self.dashboard()
             if method == "GET" and route == "/api/stocks": return HTTPStatus.OK, {"stocks": self.stocks()}
             if method == "GET" and route == "/api/groups": return HTTPStatus.OK, {"groups": self.groups()}
+            if method == "GET" and route == "/api/automatic": return HTTPStatus.OK, self.auto_management()
+            if method == "GET" and route == "/api/user-watchlists": return HTTPStatus.OK, {"groups": self.watchlists()}
+            if method == "GET" and route == "/api/history": return HTTPStatus.OK, self.history()
+            if method == "GET" and route == "/api/settings": return HTTPStatus.OK, self.settings()
+            if method == "GET" and route == "/api/search/stocks":
+                return HTTPStatus.OK, {"results": self.search((parse_qs(urlparse(path).query).get("q") or [""])[0])}
             if method == "GET" and route == "/api/validation":
                 errors, warnings = manager.validation(self.current())
                 return HTTPStatus.OK, {"errors": errors, "warnings": warnings}
@@ -247,9 +319,13 @@ def main(argv=None):
 
 
 HTML = r'''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Universe Manager</title><style>
-body{font:15px system-ui,sans-serif;max-width:1100px;margin:auto;padding:16px;color:#15202b}h1,h2{margin-top:28px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}.card,section{border:1px solid #d8dee4;border-radius:8px;padding:12px}.card b{font-size:24px;display:block}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid #e7eaed;padding:7px;vertical-align:top}button,input,select{padding:7px;margin:3px}pre{white-space:pre-wrap;background:#f6f8fa;padding:10px;overflow:auto}.warn{color:#9a6700}.error{color:#cf222e}.ok{color:#1a7f37}@media(max-width:650px){table{font-size:12px}th:nth-child(5),td:nth-child(5){display:none}}</style>
-<h1>Universe Manager</h1><p>로컬 전용 관리 화면입니다. Discovery 후보는 자동 추가되지 않으며, disable이 기본 제거 방식입니다.</p><section id="dashboard"></section><section><h2>Stocks</h2><div id="stocks"></div></section><section><h2>Groups</h2><div id="groups"></div></section><section><h2>변경 Preview</h2><p>모든 변경은 먼저 Preview로 검증하고, 오류가 없을 때만 Apply합니다.</p><select id="op"><option value="stock_add">종목 추가</option><option value="stock_disable">종목 비활성화</option><option value="stock_enable">종목 활성화</option><option value="stock_delete">종목 hard delete</option><option value="group_create">그룹 생성</option><option value="group_delete">그룹 삭제</option><option value="group_rename">그룹 이름 변경</option><option value="member_add">그룹 구성원 추가</option><option value="member_remove">그룹 구성원 제거</option><option value="leader_set">leader 지정</option><option value="leader_remove">leader 해제</option></select><input id="code" placeholder="종목코드"><input id="stockName" placeholder="종목명"><select id="kind"><option>sector</option><option>theme</option><option>watchlist</option></select><input id="name" placeholder="그룹명"><input id="newName" placeholder="새 그룹명"><button onclick="preview()">Preview</button><label><input type="checkbox" id="confirm">hard delete 확인</label><button id="apply" disabled onclick="applyChange()">Apply</button><pre id="result"></pre></section>
-<script>let pending=null;const $=id=>document.getElementById(id);async function api(url,body){let r=await fetch(url,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});return await r.json()}function esc(s){return String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}async function load(){let d=await api('/api/dashboard');$('dashboard').innerHTML='<h2>Dashboard</h2><div class="cards">'+[['Enabled',d.enabledCount],['Disabled',d.disabledCount],['Sectors',d.sectorCount],['Themes',d.themeCount],['Watchlists',d.watchlistCount],['Validation',d.validation.status]].map(x=>'<div class="card"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('')+'<p>파일: '+esc(d.configPath)+'<br>수정시각: '+new Date(d.modifiedAt*1000).toLocaleString()+'</p>';let s=await api('/api/stocks');$('stocks').innerHTML='<table><tr><th>Code</th><th>Name</th><th>Status</th><th>Sector</th><th>Theme</th><th>Watchlist</th><th>Leader</th></tr>'+s.stocks.map(x=>'<tr><td>'+x.itemCode+'</td><td>'+esc(x.stockName)+'</td><td>'+ (x.enabled?'enabled':'disabled')+'</td><td>'+esc(x.sector.join(', '))+'</td><td>'+esc(x.theme.join(', '))+'</td><td>'+esc(x.watchlist.join(', '))+'</td><td>'+esc((x.leaders||[]).join(', '))+'</td></tr>').join('')+'</table>';let g=await api('/api/groups');$('groups').innerHTML=Object.entries(g.groups).map(([k,v])=>'<h3>'+k+'</h3>'+v.map(x=>'<div class="card"><b>'+esc(x.name)+'</b>members: '+esc(x.members.map(m=>m.code+' '+m.name).join(', '))+'<br>leaders: '+esc(x.leaders.join(', '))+'</div>').join('')).join('')}function operation(){return{op:$('op').value,code:$('code').value,stockName:$('stockName').value,kind:$('kind').value,name:$('name').value,newName:$('newName').value}}async function preview(){pending=await api('/api/preview',{operation:operation()});$('result').textContent=(pending.errors||[]).join('\n')+(pending.warnings||[]).join('\n')+'\n'+(pending.summary||'')+'\n'+(pending.diff||'');$('apply').disabled=!pending.ok||!pending.changed}async function applyChange(){let r=await api('/api/apply',{operation:operation(),baselineHash:pending.baselineHash,confirmHardDelete:$('confirm').checked});$('result').textContent=JSON.stringify(r,null,2);if(r.ok)load()}load()</script>'''
+body{font:15px system-ui,sans-serif;max-width:1120px;margin:auto;padding:16px;color:#17202a;background:#f7f8fa}nav{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:0;background:#f7f8fa;padding:8px 0}.view{display:none}.view.active{display:block}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.card,section{background:white;border:1px solid #d8dee4;border-radius:10px;padding:13px;margin:9px 0}.metric b{font-size:26px;display:block}button,input,select{padding:9px;margin:3px;border:1px solid #afb8c1;border-radius:7px}button{cursor:pointer}.muted{color:#667085}.badge{display:inline-block;padding:2px 7px;border-radius:10px;background:#eaeef2;font-size:12px}.ACTIVE,.REENTERED{background:#dafbe1}.WATCH,.PENDING,.DISCOVERED{background:#fff8c5}.REMOVED{background:#ffebe9}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid #e7eaed;padding:7px}pre{white-space:pre-wrap;background:#f6f8fa;padding:10px;overflow:auto}@media(max-width:650px){table{font-size:12px}}</style>
+<h1>Universe Manager</h1><p class="muted">전체시장 분석과 관리목록은 분리됩니다. 자동 데이터는 읽기 전용이고 사용자 관심종목만 직접 편집됩니다.</p>
+<nav><button data-tab="auto">자동 관리</button><button data-tab="watch">사용자 관심종목</button><button data-tab="history">변경 이력</button><button data-tab="settings">관리 설정</button></nav>
+<main><section id="auto" class="view active"><div id="dashboard"></div><h2>동적 섹터</h2><div id="sectors"></div><h2>동적 테마</h2><div id="themes"></div><h2>주도주</h2><div id="leaders"></div><h2>키움 발굴종목</h2><div id="kiwoom"></div></section>
+<section id="watch" class="view"><h2>사용자 관심종목</h2><input id="query" placeholder="종목명 또는 코드"><button onclick="searchStocks()">검색</button><div id="search"></div><div id="watchlists"></div><h3>변경 미리보기</h3><select id="op"><option value="watchlist_add">추가</option><option value="watchlist_remove">삭제</option><option value="watchlist_group_create">그룹 생성</option><option value="watchlist_group_delete">그룹 삭제</option></select><input id="code" placeholder="종목코드"><input id="stockName" placeholder="종목명"><input id="name" placeholder="관심 그룹"><button onclick="preview()">미리보기</button><button id="apply" disabled onclick="applyChange()">저장</button><pre id="result"></pre></section>
+<section id="history" class="view"><h2>변경 이력</h2><div id="events"></div></section><section id="settings" class="view"><h2>관리 설정</h2><pre id="policy"></pre></section></main>
+<script>let pending=null;const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));async function api(url,body){let r=await fetch(url,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{}),x=await r.json();if(!r.ok)throw x;return x}const status=s=>'<span class="badge '+esc(s)+'">'+esc(s)+'</span>';function rows(items,extra=''){return(items||[]).map(x=>'<div class="card"><b>'+esc(x.name||x.code||x.id)+'</b> '+status(x.status||'')+' <span class="muted">점수 '+esc(x.score??'-')+'</span>'+extra.replaceAll('{code}',esc(x.code||'')).replaceAll('{name}',esc(x.name||''))+'</div>').join('')||'<p class="muted">현재 항목 없음</p>'}async function load(){let[d,a,w,h,p]=await Promise.all(['/api/dashboard','/api/automatic','/api/user-watchlists','/api/history','/api/settings'].map(api));$('dashboard').innerHTML='<div class="cards">'+[['자동 섹터',d.autoSectorCount],['자동 테마',d.autoThemeCount],['주도주',d.autoLeaderCount],['테마 상태',d.themeStatus],['설정 검증',d.validation.status]].map(x=>'<div class="card metric"><span class="muted">'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')+'</div>';$('sectors').innerHTML=rows(a.sectors);$('themes').innerHTML=rows(a.themes)+rows(a.pending);$('leaders').innerHTML=rows(a.leaders);$('kiwoom').innerHTML=rows(a.kiwoomDiscovery);$('watchlists').innerHTML=Object.entries(w.groups).map(([n,v])=>'<div class="card"><b>'+esc(n)+'</b><p>'+v.map(x=>'<span class="badge">'+esc(x.code)+' '+esc(x.name)+'</span>').join(' ')+'</p></div>').join('');$('events').innerHTML=rows(h.automatic)+ '<h3>사용자 변경 백업</h3>'+rows(h.userBackups);$('policy').textContent=JSON.stringify(p,null,2)}document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.tab).classList.add('active')});function operation(){return{op:$('op').value,code:$('code').value,stockName:$('stockName').value,name:$('name').value}}async function preview(){try{pending=await api('/api/preview',{operation:operation()});$('result').textContent=(pending.summary||'')+'\n'+(pending.diff||'');$('apply').disabled=!pending.ok||!pending.changed}catch(e){$('result').textContent=(e.errors||['미리보기 실패']).join('\n')}}async function applyChange(){let r=await api('/api/apply',{operation:operation(),baselineHash:pending.baselineHash});$('result').textContent=JSON.stringify(r,null,2);if(r.ok)load()}async function searchStocks(){let x=await api('/api/search/stocks?q='+encodeURIComponent($('query').value));$('search').innerHTML=rows(x.results,'<button onclick="choose(\'{code}\',\'{name}\')">선택</button>')}function choose(c,n){$('code').value=c;$('stockName').value=n}load()</script>'''
 
 
 if __name__ == "__main__":

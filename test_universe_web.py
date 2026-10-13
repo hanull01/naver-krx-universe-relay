@@ -87,6 +87,25 @@ class UniverseWebTests(unittest.TestCase):
         self.assertEqual(status, 422)
         self.assertIn("잘못된 JSON 구조", payload["errors"][0])
 
+    def test_dynamic_tabs_fail_closed_when_result_missing(self):
+        status, payload = self.request("GET", "/api/automatic")
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["pending"][0]["status"], "PENDING")
+
+    def test_user_watchlist_endpoint_excludes_legacy(self):
+        self.app.current()["watchlists"]
+        status, payload = self.request("GET", "/api/user-watchlists")
+        self.assertEqual(status, 200)
+        self.assertNotIn("legacy33", payload["groups"])
+
+    def test_user_watchlist_preview_and_apply(self):
+        operation = {"op": "watchlist_add", "name": "직접관심", "code": "000002"}
+        preview = self.app.preview(operation)
+        self.assertTrue(preview["ok"])
+        result = self.app.apply(operation, preview["baselineHash"])
+        self.assertTrue(result["ok"])
+        self.assertIn("000002", self.app.current()["watchlists"]["직접관심"])
+
 
 if __name__ == "__main__":
     unittest.main()

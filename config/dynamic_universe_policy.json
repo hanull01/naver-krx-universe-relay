@@ -1,0 +1,25 @@
+{
+  "version": "dynamic-universe-policy-v1",
+  "refreshIntervalMinutes": 60,
+  "collectionLimit": 120,
+  "activationConfirmations": 2,
+  "removalConfirmations": 2,
+  "watchConfirmations": 1,
+  "leaderLimitPerGroup": 3,
+  "sector": {
+    "minimumScore": 60,
+    "minimumRelativeStrength": 0,
+    "minimumAdvancerPct": 50,
+    "minimumTurnoverConcentrationPct": 0,
+    "minimumPctAboveMA20": 50,
+    "minimumLeaderCount": 1
+  },
+  "theme": {
+    "minimumScore": 60,
+    "requireVerifiedMembership": true
+  },
+  "leader": {
+    "minimumScore": 60,
+    "minimumPersistence": 1
+  }
+}

@@ -1,6 +1,6 @@
 # Universe Management
 
-`config/universe.json` is the operating source of truth. Use `universe_manager.py`
+`config/universe.json` remains the operating compatibility source of truth. Use `universe_manager.py`
 for normal local management; it does not collect data, change scoring, or add Discovery
 candidates automatically.
 
@@ -92,3 +92,11 @@ The UI never changes the configuration on dashboard/list requests or Preview. Ap
 blocked on validation errors, rejects configuration changes made after Preview, and asks
 for explicit confirmation before hard delete. Warnings remain visible but can be applied.
 Discovery candidates remain manual review items; they are not shown or promoted by v1.
+
+## Dynamic management view
+
+The web UI separates read-only automatic management, editable user watchlists,
+change history, and management settings. Automatic selection is published
+beside the compatibility Universe; see [Dynamic Universe Manager](dynamic-universe-manager.md).
+Only non-`legacy33` watchlist groups are treated as user-owned. Automatic runs
+cannot add, remove, rename, or clear those groups.

@@ -158,6 +158,10 @@ jobs:
             code=$?
           fi
           if [ "$code" -eq 0 ]; then
+            python tools/build_dynamic_universe.py
+            code=$?
+          fi
+          if [ "$code" -eq 0 ]; then
             echo "market_status=AVAILABLE" >> "$GITHUB_OUTPUT"
             echo "failure_reason=NONE" >> "$GITHUB_OUTPUT"
           else
@@ -235,7 +239,9 @@ jobs:
               data/monitoring/latest-leaders.json \
               data/monitoring/latest-changes.json \
               data/monitoring/latest-quality.json \
-              data/monitoring/latest-summary.json
+              data/monitoring/latest-summary.json \
+              data/dynamic-universe/latest.json \
+              data/dynamic-universe/history.json
           else
             echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
           fi

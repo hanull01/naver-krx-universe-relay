@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DEFAULT_PATH = ROOT / "config" / "universe.json"
 GROUP_KEYS = {"sector": "sectors", "theme": "themes", "watchlist": "watchlists"}
+LEGACY_WATCHLISTS = {"legacy33"}
 
 
 def code(value):
@@ -136,6 +137,44 @@ def references(data, item_code):
             if item_code in members:
                 found.append(f"leader/{kind}/{name}")
     return found
+
+
+def user_watchlists(data):
+    """Return only explicitly user-managed groups.
+
+    ``legacy33`` is a compatibility baseline, not proof of user intent.  It is
+    therefore excluded from editable USER_WATCHLIST data during migration.
+    """
+    return {name: list(members) for name, members in data.get("watchlists", {}).items()
+            if name not in LEGACY_WATCHLISTS}
+
+
+def mutate_user_watchlist(data, action, group_name, item_code=None, stock_name=None):
+    """Apply a user-authorized watchlist mutation and nothing else."""
+    if not isinstance(group_name, str) or not group_name.strip():
+        raise ValueError("관심 그룹명이 필요합니다")
+    group_name = group_name.strip()
+    if group_name in LEGACY_WATCHLISTS:
+        raise ValueError("legacy 호환 목록은 사용자 관심종목으로 편집할 수 없습니다")
+    watchlists = data.setdefault("watchlists", {})
+    if action == "group_create":
+        if group_name in watchlists: raise ValueError("이미 존재하는 관심 그룹입니다")
+        watchlists[group_name] = []
+    elif action == "group_delete":
+        if group_name not in watchlists: raise ValueError("존재하지 않는 관심 그룹입니다")
+        del watchlists[group_name]
+    elif action == "add":
+        if item_code not in stock_map(data):
+            if not stock_name or not str(stock_name).strip(): raise ValueError("신규 종목명 필요")
+            data["stocks"].append({"itemCode": item_code, "stockName": str(stock_name).strip(), "enabled": True})
+        watchlists.setdefault(group_name, [])
+        if item_code not in watchlists[group_name]: watchlists[group_name].append(item_code)
+    elif action == "remove":
+        if group_name not in watchlists: raise ValueError("존재하지 않는 관심 그룹입니다")
+        if item_code in watchlists[group_name]: watchlists[group_name].remove(item_code)
+    else:
+        raise ValueError("지원하지 않는 관심종목 작업")
+    return data
 
 
 def render(data):
