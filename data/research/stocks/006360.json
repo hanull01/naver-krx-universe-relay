@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "006360",
   "itemName": "GS건설",
-  "reportCount": 37,
-  "latestReportNid": "96558",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 38,
+  "latestReportNid": "96649",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96558",
-    "writeDate": "2026-10-08",
-    "brokerName": "하나증권",
-    "title": "주택과 데이터센터가 만들어줄 턴어라운드",
-    "goalPrice": 46000,
+    "nid": "96649",
+    "writeDate": "2026-10-13",
+    "brokerName": "신한투자증권",
+    "title": "4Q 수주 규모가 중요",
+    "goalPrice": 47000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 3,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3
+        "수주": 3,
+        "AI": 2,
+        "금리": 1
       }
     }
   },
   "reportNids": [
+    "96649",
     "96558",
     "96544",
     "96522",

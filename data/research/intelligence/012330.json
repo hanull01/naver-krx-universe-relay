@@ -6,52 +6,60 @@
   "asOf": "2026-10-13",
   "dateRange": {
     "from": "2026-04-09",
-    "to": "2026-10-12"
+    "to": "2026-10-13"
   },
-  "reportCount": 37,
+  "reportCount": 39,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-13",
       "to": "2026-10-13",
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 4,
+        "count": 6,
         "min": 580000,
-        "max": 710000,
-        "mean": 625000,
-        "median": 605000,
-        "stdev": 53151,
-        "range": 130000
+        "max": 800000,
+        "mean": 656667,
+        "median": 635000,
+        "stdev": 77603,
+        "range": 220000
       },
       "earningsDirection": {
         "UNKNOWN": 1,
         "DOWN": 1,
-        "UP": 2
+        "UP": 4
       },
       "textSignal": {
-        "positive": 20,
-        "negative": 12,
-        "net": 8,
-        "netPerReport": 2.0
+        "positive": 33,
+        "negative": 17,
+        "net": 16,
+        "netPerReport": 2.667
       },
       "topics": {
         "수요": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 3,
+          "perReport": 0.5
         },
         "환율": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 3,
+          "perReport": 0.5
         },
         "중국": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.167
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.167
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.167
         }
       }
     },
@@ -73,52 +81,70 @@
     "topicAcceleration": [
       {
         "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentCount": 3,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.5,
+        "ratio": null
+      },
+      {
+        "topic": "환율",
+        "currentCount": 3,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
+        "ratio": null
+      },
+      {
+        "topic": "AI",
+        "currentCount": 1,
+        "currentPerReport": 0.167,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.167,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.167,
+        "ratio": null
+      },
+      {
+        "topic": "재고",
+        "currentCount": 1,
+        "currentPerReport": 0.167,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.167,
         "ratio": null
       },
       {
         "topic": "중국",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
-        "ratio": null
-      },
-      {
-        "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.25,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.167,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 4,
+    "reportCountChange": 6,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 17,
+    "total": 19,
     "up": 10,
-    "down": 7,
+    "down": 9,
     "flat": 0
   },
   "monthly": {
@@ -273,44 +299,52 @@
       }
     },
     "2026-10": {
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 6,
+      "brokerCount": 6,
       "targetPrice": {
-        "count": 4,
+        "count": 6,
         "min": 580000,
-        "max": 710000,
-        "mean": 625000,
-        "median": 605000,
-        "stdev": 53151,
-        "range": 130000
+        "max": 800000,
+        "mean": 656667,
+        "median": 635000,
+        "stdev": 77603,
+        "range": 220000
       },
       "earningsDirection": {
         "UNKNOWN": 1,
         "DOWN": 1,
-        "UP": 2
+        "UP": 4
       },
       "textSignal": {
-        "positive": 20,
-        "negative": 12,
-        "net": 8,
-        "netPerReport": 2.0
+        "positive": 33,
+        "negative": 17,
+        "net": 16,
+        "netPerReport": 2.667
       },
       "topics": {
         "수요": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 3,
+          "perReport": 0.5
         },
         "환율": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 3,
+          "perReport": 0.5
         },
         "중국": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.167
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.167
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.167
         }
       }
     }
@@ -537,12 +571,12 @@
       ]
     },
     "키움증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 550000,
-      "latestGoalPrice": 750000,
-      "changeAmount": 200000,
-      "changePct": 36.36,
+      "latestGoalPrice": 640000,
+      "changeAmount": 90000,
+      "changePct": 16.36,
       "trajectory": [
         {
           "date": "2026-04-09",
@@ -558,6 +592,11 @@
           "date": "2026-07-27",
           "goalPrice": 750000,
           "title": "2010년 이후 첫 A/S 영업이익률 27%대 회복"
+        },
+        {
+          "date": "2026-10-13",
+          "goalPrice": 640000,
+          "title": "증명해야 할 요소가 쌓여가고 있다"
         }
       ]
     },
@@ -592,12 +631,12 @@
       ]
     },
     "한화투자증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 590000,
-      "latestGoalPrice": 810000,
-      "changeAmount": 220000,
-      "changePct": 37.29,
+      "latestGoalPrice": 800000,
+      "changeAmount": 210000,
+      "changePct": 35.59,
       "trajectory": [
         {
           "date": "2026-04-13",
@@ -618,6 +657,11 @@
           "date": "2026-07-27",
           "goalPrice": 810000,
           "title": "불리한 매크로 환경에도 구조적 수익성 개선 중"
+        },
+        {
+          "date": "2026-10-13",
+          "goalPrice": 800000,
+          "title": "불리한 매크로 영향 지속, 구조적 수익성 개선도 지속"
         }
       ]
     }

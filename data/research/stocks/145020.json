@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "145020",
   "itemName": "휴젤",
-  "reportCount": 18,
-  "latestReportNid": "96324",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 19,
+  "latestReportNid": "96673",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96324",
-    "writeDate": "2026-09-28",
-    "brokerName": "신한투자증권",
-    "title": "미국 침투 가속화를 위한 전략적 전환",
-    "goalPrice": 300000,
+    "nid": "96673",
+    "writeDate": "2026-10-13",
+    "brokerName": "교보증권",
+    "title": "3Q26 Preview: 쉬어가는 한 분기",
+    "goalPrice": 310000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 7,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 3
+        "미국": 5,
+        "원가": 1,
+        "재고": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "96673",
     "96324",
     "96294",
     "96256",

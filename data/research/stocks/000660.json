@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "000660",
   "itemName": "SK하이닉스",
-  "reportCount": 69,
-  "latestReportNid": "96606",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 70,
+  "latestReportNid": "96671",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96606",
-    "writeDate": "2026-10-12",
-    "brokerName": "SK증권",
-    "title": "환율을 이기는 호실적 예상",
-    "goalPrice": 4000000,
+    "nid": "96671",
+    "writeDate": "2026-10-13",
+    "brokerName": "하나증권",
+    "title": "컨센서스에 부합",
+    "goalPrice": 3600000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 1,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "가격": 8,
         "반도체": 6,
-        "가격": 2,
+        "수요": 4,
         "환율": 2,
-        "수요": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96671",
     "96606",
     "96537",
     "96468",

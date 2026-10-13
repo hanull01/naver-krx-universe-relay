@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "047050",
   "itemName": "포스코인터내셔널",
-  "reportCount": 21,
-  "latestReportNid": "96582",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 22,
+  "latestReportNid": "96662",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96582",
-    "writeDate": "2026-10-12",
-    "brokerName": "키움증권",
-    "title": "자산 인수 성과 확인",
-    "goalPrice": 80000,
+    "nid": "96662",
+    "writeDate": "2026-10-13",
+    "brokerName": "유안타증권",
+    "title": "이익 기반이 넓어진다",
+    "goalPrice": 112000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 10,
-        "negative": 1
+        "positive": 4,
+        "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "자동차": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "96662",
     "96582",
     "96408",
     "96305",

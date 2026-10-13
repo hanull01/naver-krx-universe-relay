@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "375500",
   "itemName": "DL이앤씨",
-  "reportCount": 44,
-  "latestReportNid": "96568",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 45,
+  "latestReportNid": "96645",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96568",
-    "writeDate": "2026-10-08",
-    "brokerName": "한화투자증권",
-    "title": "아직까지 남은 숙제",
-    "goalPrice": 110000,
+    "nid": "96645",
+    "writeDate": "2026-10-13",
+    "brokerName": "신한투자증권",
+    "title": "아쉬운 실적",
+    "goalPrice": 90000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 8,
         "negative": 3
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "자동차": 1
+        "수주": 4,
+        "금리": 1
       }
     }
   },
   "reportNids": [
+    "96645",
     "96568",
     "96540",
     "96523",

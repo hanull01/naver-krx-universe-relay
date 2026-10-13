@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "259960",
   "itemName": "크래프톤",
-  "reportCount": 25,
-  "latestReportNid": "96620",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 26,
+  "latestReportNid": "96664",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96620",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "웰메이드/UGC 모드 성과, 신작 일정 구체화 필요",
-    "goalPrice": 340000,
+    "nid": "96664",
+    "writeDate": "2026-10-13",
+    "brokerName": "유안타증권",
+    "title": "신작이 관건",
+    "goalPrice": 330000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 4,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "중국": 1
+        "원가": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96664",
     "96620",
     "96605",
     "96455",

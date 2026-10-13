@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "195940",
   "itemName": "HK이노엔",
-  "reportCount": 14,
-  "latestReportNid": "96086",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 16,
+  "latestReportNid": "96661",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96086",
-    "writeDate": "2026-09-10",
-    "brokerName": "미래에셋증권",
-    "title": "여전히 주가의 원동력은 케이캡",
-    "goalPrice": 56000,
+    "nid": "96661",
+    "writeDate": "2026-10-13",
+    "brokerName": "유안타증권",
+    "title": "몇달 남지 않은 27년",
+    "goalPrice": 68000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 2,
+        "negative": 3
       },
-      "earningsTextDirection": "MIXED",
+      "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 1
+        "중국": 3,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96661",
+    "96650",
     "96086",
     "94862",
     "94744",

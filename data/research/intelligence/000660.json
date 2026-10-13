@@ -6,52 +6,52 @@
   "asOf": "2026-10-13",
   "dateRange": {
     "from": "2026-04-01",
-    "to": "2026-10-12"
+    "to": "2026-10-13"
   },
-  "reportCount": 69,
+  "reportCount": 70,
   "brokerCount": 15,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-13",
       "to": "2026-10-13",
-      "reportCount": 6,
-      "brokerCount": 6,
+      "reportCount": 7,
+      "brokerCount": 7,
       "targetPrice": {
-        "count": 6,
+        "count": 7,
         "min": 2700000,
         "max": 4000000,
-        "mean": 3450000,
-        "median": 3450000,
-        "stdev": 485627,
+        "mean": 3471429,
+        "median": 3600000,
+        "stdev": 452657,
         "range": 1300000
       },
       "earningsDirection": {
         "UP": 2,
         "UNKNOWN": 3,
-        "DOWN": 1
+        "DOWN": 2
       },
       "textSignal": {
-        "positive": 26,
-        "negative": 17,
-        "net": 9,
-        "netPerReport": 1.5
+        "positive": 27,
+        "negative": 22,
+        "net": 5,
+        "netPerReport": 0.714
       },
       "topics": {
         "수요": {
-          "count": 5,
-          "perReport": 0.833
+          "count": 6,
+          "perReport": 0.857
         },
         "환율": {
-          "count": 4,
-          "perReport": 0.667
+          "count": 5,
+          "perReport": 0.714
         },
         "AI": {
           "count": 2,
-          "perReport": 0.333
+          "perReport": 0.286
         },
         "원가": {
           "count": 2,
-          "perReport": 0.333
+          "perReport": 0.286
         }
       }
     },
@@ -110,39 +110,39 @@
     "topicAcceleration": [
       {
         "topic": "수요",
-        "currentCount": 5,
-        "currentPerReport": 0.833,
+        "currentCount": 6,
+        "currentPerReport": 0.857,
         "previousCount": 1,
         "previousPerReport": 0.2,
-        "perReportDelta": 0.633,
-        "ratio": 4.16
+        "perReportDelta": 0.657,
+        "ratio": 4.28
       },
       {
         "topic": "환율",
-        "currentCount": 4,
-        "currentPerReport": 0.667,
+        "currentCount": 5,
+        "currentPerReport": 0.714,
         "previousCount": 1,
         "previousPerReport": 0.2,
-        "perReportDelta": 0.467,
-        "ratio": 3.33
+        "perReportDelta": 0.514,
+        "ratio": 3.57
       },
       {
         "topic": "원가",
         "currentCount": 2,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.286,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.286,
         "ratio": null
       },
       {
         "topic": "AI",
         "currentCount": 2,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.286,
         "previousCount": 1,
         "previousPerReport": 0.2,
-        "perReportDelta": 0.133,
-        "ratio": 1.67
+        "perReportDelta": 0.086,
+        "ratio": 1.43
       },
       {
         "topic": "HBM",
@@ -174,10 +174,10 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 1,
-    "targetMeanChangePct": 11.65,
-    "targetMedianChangePct": 11.29,
-    "targetDispersionChangePct": 65.21
+    "reportCountChange": 2,
+    "targetMeanChangePct": 12.34,
+    "targetMedianChangePct": 16.13,
+    "targetDispersionChangePct": 54.0
   },
   "goalPriceRevisions": {
     "total": 25,
@@ -462,44 +462,44 @@
       }
     },
     "2026-10": {
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 3100000,
         "max": 4000000,
-        "mean": 3700000,
-        "median": 3850000,
-        "stdev": 367423,
+        "mean": 3680000,
+        "median": 3700000,
+        "stdev": 331059,
         "range": 900000
       },
       "earningsDirection": {
         "UP": 1,
         "UNKNOWN": 2,
-        "DOWN": 1
+        "DOWN": 2
       },
       "textSignal": {
-        "positive": 19,
-        "negative": 15,
-        "net": 4,
-        "netPerReport": 1.0
+        "positive": 20,
+        "negative": 20,
+        "net": 0,
+        "netPerReport": 0.0
       },
       "topics": {
         "환율": {
-          "count": 4,
+          "count": 5,
           "perReport": 1.0
         },
         "수요": {
-          "count": 3,
-          "perReport": 0.75
+          "count": 4,
+          "perReport": 0.8
         },
         "원가": {
           "count": 2,
-          "perReport": 0.5
+          "perReport": 0.4
         },
         "AI": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         }
       }
     }
@@ -901,8 +901,8 @@
       ]
     },
     "하나증권": {
-      "reportCount": 5,
-      "targetPricePointCount": 5,
+      "reportCount": 6,
+      "targetPricePointCount": 6,
       "firstGoalPrice": 1600000,
       "latestGoalPrice": 3600000,
       "changeAmount": 2000000,
@@ -932,6 +932,11 @@
           "date": "2026-08-20",
           "goalPrice": 3600000,
           "title": "40조원 규모의 자기주식 취득 및 소각 공시"
+        },
+        {
+          "date": "2026-10-13",
+          "goalPrice": 3600000,
+          "title": "컨센서스에 부합"
         }
       ]
     },

@@ -6,47 +6,47 @@
   "asOf": "2026-10-13",
   "dateRange": {
     "from": "2026-04-17",
-    "to": "2026-10-07"
+    "to": "2026-10-13"
   },
-  "reportCount": 25,
+  "reportCount": 26,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-13",
       "to": "2026-10-13",
-      "reportCount": 4,
-      "brokerCount": 3,
+      "reportCount": 5,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 33000,
-        "max": 40000,
-        "mean": 36750,
+        "max": 42000,
+        "mean": 37800,
         "median": 37000,
-        "stdev": 2487,
-        "range": 7000
+        "stdev": 3059,
+        "range": 9000
       },
       "earningsDirection": {
         "UNKNOWN": 2,
-        "UP": 2
+        "UP": 3
       },
       "textSignal": {
-        "positive": 11,
-        "negative": 0,
-        "net": 11,
-        "netPerReport": 2.75
+        "positive": 16,
+        "negative": 2,
+        "net": 14,
+        "netPerReport": 2.8
       },
       "topics": {
         "AI": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         },
         "환율": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         }
       }
     },
@@ -69,34 +69,34 @@
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.2,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.2,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.2,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.2,
         "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.2,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.2,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 4,
+    "reportCountChange": 5,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
@@ -285,42 +285,42 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
+        "count": 2,
         "min": 37000,
-        "max": 37000,
-        "mean": 37000,
-        "median": 37000,
-        "stdev": 0,
-        "range": 0
+        "max": 42000,
+        "mean": 39500,
+        "median": 39500,
+        "stdev": 2500,
+        "range": 5000
       },
       "earningsDirection": {
-        "UP": 1
+        "UP": 2
       },
       "textSignal": {
-        "positive": 5,
-        "negative": 0,
-        "net": 5,
-        "netPerReport": 5.0
+        "positive": 10,
+        "negative": 2,
+        "net": 8,
+        "netPerReport": 4.0
       },
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
         },
         "원가": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
         }
       }
     }
   },
   "brokerTrajectory": {
     "DS투자증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 42000,
       "latestGoalPrice": 42000,
       "changeAmount": 0,
@@ -345,6 +345,11 @@
           "date": "2026-07-27",
           "goalPrice": 42000,
           "title": "성장하는 실적. 눈 앞으로 다가온 FDC"
+        },
+        {
+          "date": "2026-10-13",
+          "goalPrice": 42000,
+          "title": "3Q26 Preview: 증익의 시작점"
         }
       ]
     },

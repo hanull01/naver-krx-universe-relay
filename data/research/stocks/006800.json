@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "006800",
   "itemName": "미래에셋증권",
-  "reportCount": 23,
-  "latestReportNid": "96502",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 24,
+  "latestReportNid": "96651",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96502",
-    "writeDate": "2026-10-07",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre - SpaceX 평가손실로 인한 적자는 불가피",
-    "goalPrice": 67000,
+    "nid": "96651",
+    "writeDate": "2026-10-13",
+    "brokerName": "iM증권",
+    "title": "업황 둔화 스페이스X주가 하락 환율 영향",
+    "goalPrice": 33000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 5
+        "positive": 2,
+        "negative": 16
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsNegativeSignalCount": 8,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 3
+        "환율": 2,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96651",
     "96502",
     "96079",
     "95576",

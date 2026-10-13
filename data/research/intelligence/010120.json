@@ -6,42 +6,42 @@
   "asOf": "2026-10-13",
   "dateRange": {
     "from": "2026-04-02",
-    "to": "2026-10-12"
+    "to": "2026-10-13"
   },
-  "reportCount": 27,
+  "reportCount": 28,
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-13",
       "to": "2026-10-13",
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 260000,
         "max": 300000,
-        "mean": 277500,
-        "median": 275000,
-        "stdev": 14790,
+        "mean": 282000,
+        "median": 280000,
+        "stdev": 16000,
         "range": 40000
       },
       "earningsDirection": {
-        "UP": 4
+        "UP": 5
       },
       "textSignal": {
-        "positive": 17,
-        "negative": 3,
-        "net": 14,
-        "netPerReport": 3.5
+        "positive": 29,
+        "negative": 5,
+        "net": 24,
+        "netPerReport": 4.8
       },
       "topics": {
         "환율": {
           "count": 4,
-          "perReport": 1.0
+          "perReport": 0.8
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         }
       }
     },
@@ -79,19 +79,19 @@
       {
         "topic": "환율",
         "currentCount": 4,
-        "currentPerReport": 1.0,
+        "currentPerReport": 0.8,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 1.0,
+        "perReportDelta": 0.8,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentPerReport": 0.2,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.2,
         "ratio": null
       },
       {
@@ -106,15 +106,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 3,
-    "targetMeanChangePct": -10.48,
-    "targetMedianChangePct": -11.29,
+    "reportCountChange": 4,
+    "targetMeanChangePct": -9.03,
+    "targetMedianChangePct": -9.68,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 9,
+    "total": 10,
     "up": 8,
-    "down": 1,
+    "down": 2,
     "flat": 0
   },
   "monthly": {
@@ -273,34 +273,34 @@
       }
     },
     "2026-10": {
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 260000,
         "max": 300000,
-        "mean": 277500,
-        "median": 275000,
-        "stdev": 14790,
+        "mean": 282000,
+        "median": 280000,
+        "stdev": 16000,
         "range": 40000
       },
       "earningsDirection": {
-        "UP": 4
+        "UP": 5
       },
       "textSignal": {
-        "positive": 17,
-        "negative": 3,
-        "net": 14,
-        "netPerReport": 3.5
+        "positive": 29,
+        "negative": 5,
+        "net": 24,
+        "netPerReport": 4.8
       },
       "topics": {
         "환율": {
           "count": 4,
-          "perReport": 1.0
+          "perReport": 0.8
         },
         "원가": {
           "count": 1,
-          "perReport": 0.25
+          "perReport": 0.2
         }
       }
     }
@@ -387,12 +387,12 @@
       ]
     },
     "대신증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 1000000,
-      "latestGoalPrice": 330000,
-      "changeAmount": -670000,
-      "changePct": -67.0,
+      "latestGoalPrice": 300000,
+      "changeAmount": -700000,
+      "changePct": -70.0,
       "trajectory": [
         {
           "date": "2026-04-02",
@@ -408,6 +408,11 @@
           "date": "2026-07-24",
           "goalPrice": 330000,
           "title": "구조적 실적 개선. 이제 시작일 뿐!"
+        },
+        {
+          "date": "2026-10-13",
+          "goalPrice": 300000,
+          "title": "글로벌 종합 전력 솔루션 업체로의 진화는 계속된다"
         }
       ]
     },

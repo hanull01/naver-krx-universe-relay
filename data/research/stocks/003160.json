@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "003160",
   "itemName": "디아이",
-  "reportCount": 4,
-  "latestReportNid": "96018",
-  "latestWriteDate": "2026-09-07",
+  "reportCount": 5,
+  "latestReportNid": "96657",
+  "latestWriteDate": "2026-10-13",
   "latest": {
-    "nid": "96018",
-    "writeDate": "2026-09-07",
-    "brokerName": "iM증권",
-    "title": "전방산업 투자 확대 ⇒ 올해 사상 최대 실적",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96657",
+    "writeDate": "2026-10-13",
+    "brokerName": "대신증권",
+    "title": "이제 시작",
+    "goalPrice": 60000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
+        "positive": 5,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "반도체": 2
+        "반도체": 1
       }
     }
   },
   "reportNids": [
+    "96657",
     "96018",
     "95316",
     "93159",
