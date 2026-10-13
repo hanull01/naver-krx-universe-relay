@@ -80,6 +80,27 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertEqual(result["missingCodes"], ["123456"])
         self.assertEqual(result["extraCodes"], ["999999"])
 
+    def test_complete_collection_preserves_change_counts_for_reconciliation(self):
+        fetch = paged({
+            "KOSPI": [[raw("005930"), raw("0088M0")], []],
+            "KOSDAQ": [[raw("000660"), raw("999999")], []],
+        })
+        with tempfile.TemporaryDirectory() as directory:
+            universe = Path(directory) / "universe.json"
+            universe.write_text(json.dumps({"assets": [
+                {"code": code, "assetType": "STOCK", "market": market}
+                for market, codes in self.expected.items() for code in codes
+            ]}), encoding="utf-8")
+            snapshot = current.collect_snapshot(
+                universe, fetch, 2, 1, 0,
+                lambda: "2026-10-13T08:00:00+09:00"
+            )
+        self.assertEqual(snapshot["status"], "FAILURE")
+        self.assertEqual(snapshot["collectionStatus"], "SUCCESS")
+        self.assertEqual(snapshot["count"], 4)
+        self.assertEqual(snapshot["missingCodes"], ["123456"])
+        self.assertEqual(snapshot["extraCodes"], ["999999"])
+
     def test_duplicate_and_page_boundary_duplicate_fail(self):
         fetch = paged({
             "KOSPI": [[raw("005930"), raw("0088M0")], []],

@@ -202,10 +202,14 @@ def collect_attempt(expected, fetcher=fetch_page, page_size=200, sleep_seconds=0
     expected_codes = set().union(*expected.values())
     missing, extra = sorted(expected_codes - codes), sorted(codes - expected_codes)
     malformed_limit = max(10, math.ceil(len(expected_codes) * 0.01))
-    valid = not (errors or duplicates or missing or extra or repeated_pages or not rows
-                 or malformed > malformed_limit or not all(terminal.get(market) for market in MARKETS))
+    structurally_valid = not (errors or duplicates or repeated_pages or not rows
+                              or malformed > malformed_limit
+                              or not all(terminal.get(market) for market in MARKETS))
+    valid = structurally_valid and not (missing or extra)
     return {
-        "valid": valid, "count": len(rows), "markets": market_counts,
+        "valid": valid, "structurallyValid": structurally_valid,
+        "collectionStatus": "SUCCESS" if structurally_valid else "FAILURE",
+        "count": len(rows), "markets": market_counts,
         "expectedCount": len(expected_codes), "expectedMarkets": {key: len(value) for key, value in expected.items()},
         "coverageCount": len(codes & expected_codes), "missingCodes": missing,
         "extraCodes": extra, "duplicateCodes": sorted(set(duplicates)),
@@ -220,8 +224,10 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                      max_attempts=3, sleep_seconds=0.15, clock=now_iso):
     expected = load_authoritative_universe(universe_file)
     diagnostics = []
+    last_result = None
     for attempt in range(1, max_attempts + 1):
         result = collect_attempt(expected, fetcher, page_size, sleep_seconds, clock())
+        last_result = result
         diagnostics.append({key: value for key, value in result.items() if key != "stocks"} | {"attempt": attempt})
         if result["valid"]:
             return {
@@ -231,8 +237,34 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                 "attemptCount": attempt, "missingCodes": [], "extraCodes": [], "duplicateCodes": [],
                 "stocks": result["stocks"], "attemptDiagnostics": diagnostics,
             }
+    if last_result and last_result["structurallyValid"]:
+        expected_market = {code: market for market, codes in expected.items() for code in codes}
+        observed_market = {str(row["code"]): row["market"] for row in last_result["stocks"]}
+        common = set(expected_market) & set(observed_market)
+        market_changed = sorted(code for code in common
+                                if expected_market[code] != observed_market[code])
+        delta = {
+            "added": sorted(set(observed_market) - set(expected_market)),
+            "removed": sorted(set(expected_market) - set(observed_market)),
+            "marketChanged": market_changed,
+            "requiresExternalVerification": bool(
+                last_result["missingCodes"] or last_result["extraCodes"] or market_changed
+            ),
+        }
+        return {
+            "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
+            "status": "FAILURE", "collectionStatus": "SUCCESS",
+            "reconciliationStatus": "CHANGES_DETECTED",
+            "expectedCount": last_result["expectedCount"], "count": last_result["count"],
+            "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
+            "attemptCount": max_attempts, "missingCodes": last_result["missingCodes"],
+            "extraCodes": last_result["extraCodes"], "duplicateCodes": last_result["duplicateCodes"],
+            "universeDelta": delta,
+            "stocks": last_result["stocks"], "attemptDiagnostics": diagnostics,
+        }
     return {
         "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE, "status": "FAILURE",
+        "collectionStatus": "FAILURE", "reconciliationStatus": "NOT_AVAILABLE",
         "expectedCount": sum(len(codes) for codes in expected.values()), "count": 0, "coverageCount": 0,
         "markets": {market: 0 for market in MARKETS}, "attemptCount": max_attempts,
         "missingCodes": [], "extraCodes": [], "duplicateCodes": [], "stocks": [],
