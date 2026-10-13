@@ -149,6 +149,7 @@ def feature_row(current, history, today, overlay=False):
     result = {
         "code": current["code"], "name": current["name"], "market": current["market"],
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
+        "currentHigh": current_high,
         "close_valid": validity["close_valid"], "ohlc_valid": validity["ohlc_valid"],
         "volume_valid": validity["volume_valid"], "traded_bar": validity["traded_bar"],
         **{f"ma{window}": ma[window] for window in ma},
@@ -231,6 +232,8 @@ def aggregate_industries(features, industries, membership, previous_good=None):
     quality = industry_quality(industries, previous_good)
     source = {str(row.get("id")): row for row in industries.get("industries", [])}
     result = []
+    market_returns = [item["ret_1d"] for item in features if item["close_valid"] and item["ret_1d"] is not None]
+    market_average = mean(market_returns)
     for group in membership.get("industries", []):
         if group.get("status") != "OK":
             continue
@@ -246,6 +249,10 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "advancers": sum((item["changeRate"] or 0) > 0 for item in valid),
             "decliners": sum((item["changeRate"] or 0) < 0 for item in valid), "avgReturn1D": mean(returns),
             "medianReturn1D": median(returns), "avgReturn5D": mean([item["ret_5d"] for item in valid if item["ret_5d"] is not None]),
+            "advancePct": pct(sum((item.get("changeRate") or 0) > 0 for item in valid), len(valid)),
+            "breadthConcentration": ("BROAD" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) / len(valid) >= 0.6
+                                      else "NARROW" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) > 0 else "WEAK"),
+            "relativeStrengthVsMarket": round(mean(returns) - market_average, 6) if returns and market_average is not None else None,
             "pctAboveMA20": pct(sum(item["above_ma20"] is True for item in valid), sum(item["above_ma20"] is not None for item in valid)),
             "pctAboveMA60": pct(sum(item["above_ma60"] is True for item in valid), sum(item["above_ma60"] is not None for item in valid)),
             "pctBreakout20": pct(sum(item["breakout_20_intraday"] is True for item in valid), sum(item["breakout_20_intraday"] is not None for item in valid)),
@@ -255,6 +262,52 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "industrySourcePresent": str(group.get("id")) in source,
         })
     return quality, sorted(result, key=lambda item: (item["avgReturn1D"] is not None, item["avgReturn1D"] or -9999), reverse=True)
+
+
+def technical_checks(row):
+    """Expose evidence-backed checks without inventing strategy thresholds."""
+    checks = {}
+    for label, actual, threshold, passed, reason in (
+        ("above_ma20", row.get("currentPrice"), row.get("ma20"), row.get("above_ma20"), "current price vs MA20"),
+        ("above_ma60", row.get("currentPrice"), row.get("ma60"), row.get("above_ma60"), "current price vs MA60"),
+        ("breakout_20", row.get("currentHigh"), row.get("rolling_high_20"), row.get("breakout_20_intraday"), "intraday high vs 20-day high"),
+        ("volume_confirmation", row.get("current_volume_ratio_20"), 1.0,
+         row.get("current_volume_ratio_20") > 1 if isinstance(row.get("current_volume_ratio_20"), (int, float)) else None,
+         "current volume / 20-day average"),
+    ):
+        checks[label] = {"actual": actual, "threshold": threshold,
+                         "decision": "PASS" if passed is True else "FAIL" if passed is False else "UNAVAILABLE",
+                         "reason": reason}
+    return checks
+
+
+def leader_evidence(row, previous_codes=None):
+    reasons = []
+    if isinstance(row.get("changeRate"), (int, float)) and row["changeRate"] > 0:
+        reasons.append("POSITIVE_RETURN")
+    if isinstance(row.get("current_volume_ratio_20"), (int, float)) and row["current_volume_ratio_20"] > 1:
+        reasons.append("VOLUME_ABOVE_20D_AVERAGE")
+    if row.get("above_ma20") is True:
+        reasons.append("ABOVE_MA20")
+    if row.get("above_ma60") is True:
+        reasons.append("ABOVE_MA60")
+    if row.get("breakout_20_intraday") is True:
+        reasons.append("BREAKOUT_20_INTRADAY")
+    if previous_codes is not None:
+        reasons.append("RETAINED_FROM_PREVIOUS" if row["code"] in previous_codes else "NEW_IN_CURRENT_LEADERS")
+    return {"selectionReasons": reasons, "technicalChecks": technical_checks(row),
+            "decision": "PASS" if len(reasons) >= 2 else "WAIT" if reasons else "UNAVAILABLE"}
+
+
+def compare_leaders(previous_summary, leaders):
+    previous = ((previous_summary or {}).get("previousLeaders")
+                or (previous_summary or {}).get("leaders")
+                or (previous_summary or {}).get("fullMarketLeaders") or [])
+    old = {str(row.get("code")) for row in previous if isinstance(row, dict) and row.get("code")}
+    current = {str(row.get("code")) for row in leaders if row.get("code")}
+    if not old:
+        return {"status": "COMPARISON_UNAVAILABLE", "new": [], "retained": [], "dropped": []}
+    return {"status": "AVAILABLE", "new": sorted(current - old), "retained": sorted(current & old), "dropped": sorted(old - current)}
 
 
 def compare_breadth(previous, current):
@@ -328,6 +381,16 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     quality, industry_rows = aggregate_industries(features, industries, membership, previous_good_industries)
     leaders = sorted(features, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
                                                   item["current_volume_ratio_20"] or -1), reverse=True)[:30]
+    previous_leaders = (previous_summary or {}).get("previousLeaders") or (previous_summary or {}).get("leaders", [])
+    previous_leader_codes = {
+        str(row.get("code")) for row in previous_leaders
+        if isinstance(row, dict) and row.get("code")
+    } or None
+    leader_rows = []
+    for item in leaders:
+        row = {key: item.get(key) for key in ("code", "name", "market", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "above_ma60", "breakout_20_intraday")}
+        row.update(leader_evidence(item, previous_leader_codes))
+        leader_rows.append(row)
     baseline_count = baseline.get("count") if baseline else None
     baseline_authoritative = baseline.get("authoritativeCount") if baseline else None
     baseline_coverage = baseline.get("coveragePct") if baseline else None
@@ -344,10 +407,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                      "sourceIndustryCount": len(industries.get("industries", [])),
                                      "aggregationUsableIndustryCount": len(industry_rows), "industries": industry_rows},
         "latest-leaders.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
-                                "fullMarketLeaders": [{key: item.get(key) for key in ("code", "name", "market", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "breakout_20_intraday")} for item in leaders],
+                                "leaderChanges": compare_leaders(previous_summary, leader_rows),
+                                "fullMarketLeaders": leader_rows,
                                 "monitoredUniverseLeaders": publication_context.get("monitoredUniverseLeaders", []),
                                 # Compatibility alias; this is never a 42-stock list.
-                                "candidates": [{key: item.get(key) for key in ("code", "name", "market", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "breakout_20_intraday")} for item in leaders]},
+                                "candidates": leader_rows},
         "latest-changes.json": compare_breadth(previous_summary, summary),
         "latest-quality.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                                 "currentCount": len(current_codes), "currentCoveragePct": pct(len(current_codes), current_snapshot["expectedCount"]),
@@ -398,7 +462,8 @@ def main():
     industries = load_json(MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
     membership = load_json(MARKET_DIR / "industry-membership.json", {"status": "UNUSABLE", "industries": []})
     previous_good_industries = load_json(MARKET_DIR / "industries-latest-ok.json")
-    previous = load_json(Path(args.output_dir) / "latest-summary.json")
+    previous = load_json(Path(args.output_dir) / "latest-summary.json") or {}
+    previous["previousLeaders"] = (load_json(Path(args.output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
     baseline = load_json(args.baseline_file) if args.history_mode == "baseline" else None
     evidence, _ = build_evidence(
         current, HISTORY_DIR, industries, membership, previous,

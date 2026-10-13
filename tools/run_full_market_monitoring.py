@@ -360,7 +360,8 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     industries = evidence.load_json(evidence.MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
     membership = evidence.load_json(evidence.MARKET_DIR / "industry-membership.json", {"status": "UNUSABLE", "industries": []})
     previous_good = evidence.load_json(evidence.MARKET_DIR / "industries-latest-ok.json")
-    previous = evidence.load_json(Path(output_dir) / "latest-summary.json")
+    previous = evidence.load_json(Path(output_dir) / "latest-summary.json") or {}
+    previous["previousLeaders"] = (evidence.load_json(Path(output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
     payloads, _ = evidence.build_evidence(
         current, industries=industries, membership=membership, previous_summary=previous,
         today=now.strftime("%Y%m%d"), previous_good_industries=previous_good,

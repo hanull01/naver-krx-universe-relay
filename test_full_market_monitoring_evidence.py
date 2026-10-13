@@ -173,6 +173,42 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(built["latest-quality.json"]["collectionQualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
         self.assertEqual(built["latest-summary.json"]["fullMarket"]["qualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
 
+    def test_leaders_include_evidence_backed_reasons_and_technical_checks(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-01T10:00:00+09:00", "expectedCount": 2,
+                    "coverageCount": 2, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("A", price=130, volume=200), current("B", price=90, volume=200)]}
+        snapshot["stocks"][0]["changeRate"] = 5
+        snapshot["stocks"][1]["changeRate"] = -2
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for code in ("A", "B"):
+                (root / f"{code}.jsonl").write_text("\n".join(json.dumps(history(f"202609{d:02d}", 100 + d)) for d in range(1, 22)), encoding="utf-8")
+            previous = {"previousLeaders": [{"code": "B"}]}
+            built, _ = evidence.build_evidence(snapshot, root, previous_summary=previous, today="20261001")
+        leaders = built["latest-leaders.json"]["fullMarketLeaders"]
+        self.assertEqual(leaders[0]["code"], "A")
+        self.assertIn("POSITIVE_RETURN", leaders[0]["selectionReasons"])
+        self.assertIn("above_ma20", leaders[0]["technicalChecks"])
+        self.assertEqual(built["latest-leaders.json"]["leaderChanges"]["status"], "AVAILABLE")
+        self.assertIn("A", built["latest-leaders.json"]["leaderChanges"]["new"])
+
+    def test_industry_reports_breadth_concentration_and_relative_strength(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 2,
+                    "coverageCount": 2, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("A"), current("B")]}
+        snapshot["stocks"][0]["changeRate"] = 4
+        snapshot["stocks"][1]["changeRate"] = -1
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "업종"}], "diagnostics": {}}
+        membership = {"status": "OK", "industries": [{"id": "1", "name": "업종", "status": "OK", "members": [{"code": "A"}, {"code": "B"}]}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for code in ("A", "B"):
+                (root / f"{code}.jsonl").write_text("\n".join(json.dumps(history(f"202609{d:02d}", 100 + d)) for d in range(1, 22)), encoding="utf-8")
+            built, _ = evidence.build_evidence(snapshot, root, industries, membership, today="20261001")
+        row = built["latest-industries.json"]["industries"][0]
+        self.assertIn(row["breadthConcentration"], ("BROAD", "NARROW", "WEAK"))
+        self.assertIn("relativeStrengthVsMarket", row)
+
 
 if __name__ == "__main__":
     unittest.main()
