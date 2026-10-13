@@ -1,6 +1,6 @@
 import unittest
 
-from tools.market_universe_reconcile import classify_delta, reconcile_verified
+from tools.market_universe_reconcile import classify_delta, pending_observation, reconcile_verified
 
 
 def universe(rows):
@@ -8,6 +8,14 @@ def universe(rows):
 
 
 class UniverseReconcileTests(unittest.TestCase):
+    def test_pending_observation_does_not_approve_change(self):
+        previous = universe([{"code": "469900", "name": "폐지종목", "market": "KOSDAQ"}])
+        observed = universe([])
+        record = pending_observation(previous, observed, observed_at="2026-10-13T15:45:00+09:00")
+        self.assertEqual(record["verificationStatus"], "PENDING_EXTERNAL_VERIFICATION")
+        self.assertFalse(record["applied"])
+        self.assertEqual(record["delta"]["removed"], ["469900"])
+
     def test_469900_verified_delisting_updates_current_set(self):
         previous = universe([
             {"code": "469900", "name": "폐지종목", "market": "KOSDAQ"},

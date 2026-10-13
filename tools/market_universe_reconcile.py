@@ -34,6 +34,19 @@ def classify_delta(previous, observed):
     }
 
 
+def pending_observation(previous, observed, *, observed_at, source="NAVER_STOCKLIST_CURRENT"):
+    """Record an observation without approving or changing the Universe."""
+    delta = classify_delta(previous, observed)
+    return {
+        "firstDetectedAt": observed_at,
+        "lastCheckedAt": observed_at,
+        "source": source,
+        "verificationStatus": "PENDING_EXTERNAL_VERIFICATION" if any(delta.values()) else "NO_CHANGE",
+        "applied": False,
+        "delta": delta,
+    }
+
+
 def _event_key(event):
     kind = event.get("type")
     if kind not in CHANGE_TYPES or not event.get("sourceVerified"):

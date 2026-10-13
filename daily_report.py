@@ -1064,9 +1064,12 @@ def write_markdown(report, path):
     if full_market.get("status") != "AVAILABLE":
         lines.append(f"- 상태: UNAVAILABLE ({full_market.get('reason', 'UNKNOWN')})")
     else:
+        lines.append(f"- 수집 품질: {full_market.get('qualityStatus', 'UNKNOWN')}")
         fb = full_market["breadth"]
         lines.extend([
             f"- 기준일: {full_market['asOfDate']}",
+            f"- 분석 대상/기준 Universe: {full_market.get('quality', {}).get('currentCount', 'UNKNOWN')}/"
+            f"{full_market.get('quality', {}).get('authoritativeCount', 'UNKNOWN')}종목",
             f"- 상승/하락/보합: {fb['advancers']}/{fb['decliners']}/{fb['unchanged']}",
             f"- MA20 위: {fb['aboveMA20']['count']} ({fb['aboveMA20']['pct']}%)",
             f"- MA60 위: {fb['aboveMA60']['count']} ({fb['aboveMA60']['pct']}%)",
@@ -1076,6 +1079,13 @@ def write_markdown(report, path):
             f"- 거래량 확산: {fb['volumeAbove20DayAverage']['count']} ({fb['volumeAbove20DayAverage']['pct']}%)",
             f"- Full-market leaders: {len(full_market['leaders'])}종목",
         ])
+        delta = full_market.get("quality", {}).get("universeDelta")
+        if delta:
+            lines.append(
+                f"- Universe 변동 확인: {delta.get('verificationStatus', 'UNKNOWN')} "
+                f"(추가 {len(delta.get('added', []))}, 제외 {len(delta.get('removed', []))}, "
+                f"시장변경 {len(delta.get('marketChanged', []))}, 명칭변경 {len(delta.get('nameChanged', []))})"
+            )
 
     lines.extend(
         [
