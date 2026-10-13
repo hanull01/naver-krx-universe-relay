@@ -34,10 +34,34 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
         return payload
 
     def build(self, discovery_path, previous_path):
-        with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery_path,
-                            PREVIOUS_REPORT_PATH=previous_path,
-                            TRADING_DISCOVERY_QUOTES_PATH=Path(str(discovery_path) + ".quotes")):
-            return daily_report.build_report("2026-10-08")
+        # Keep these date-based integration tests independent from the mutable
+        # production snapshots in data/.  The fixture preserves the published
+        # rows but pins the quote contract to the report's fixed trading date.
+        with tempfile.TemporaryDirectory() as fixture_dir:
+            fixture = Path(fixture_dir)
+            quote_fixture = fixture / "quotes.json"
+            quote_payload = json.loads(Path(daily_report.QUOTES_PATH).read_text(encoding="utf-8"))
+            quote_payload.update({
+                "status": "ok",
+                "fresh": True,
+                "generatedAt": "2026-10-08T10:00:00+09:00",
+                "sourceTime": "2026-10-08T10:00:00+09:00",
+            })
+            quote_fixture.write_text(json.dumps(quote_payload), encoding="utf-8")
+            technical_fixture = fixture / "technicals.json"
+            technical_fixture.write_text(Path(daily_report.TECHNICALS_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+            state_fixture = fixture / "states.json"
+            state_fixture.write_text(Path(daily_report.STATES_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+            with patch.multiple(
+                daily_report,
+                QUOTES_PATH=quote_fixture,
+                TECHNICALS_PATH=technical_fixture,
+                STATES_PATH=state_fixture,
+                TRADING_DISCOVERY_PATH=discovery_path,
+                PREVIOUS_REPORT_PATH=previous_path,
+                TRADING_DISCOVERY_QUOTES_PATH=Path(str(discovery_path) + ".quotes"),
+            ):
+                return daily_report.build_report("2026-10-08")
 
     def core_quotes(self, path, source_time):
         path.write_text(json.dumps({"sourceTime": source_time, "datas": []}), encoding="utf-8")
