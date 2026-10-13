@@ -1,0 +1,167 @@
+{
+  "version": "dynamic-universe-management-v1",
+  "generatedAt": "2026-10-13T07:20:34.493113+00:00",
+  "networkCalls": 0,
+  "sectors": [],
+  "themes": [],
+  "leaders": [],
+  "kiwoomDiscovery": [
+    {
+      "code": "0197X0",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "114800",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "252670",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    }
+  ],
+  "userWatchlists": {
+    "관심종목": [
+      "272210",
+      "201490",
+      "039200",
+      "344820"
+    ],
+    "관심2": [
+      "006800"
+    ]
+  },
+  "memberships": [
+    {
+      "code": "006800",
+      "sources": [
+        "USER_WATCHLIST"
+      ],
+      "reasons": [
+        "관심2"
+      ]
+    },
+    {
+      "code": "0197X0",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "039200",
+      "sources": [
+        "USER_WATCHLIST"
+      ],
+      "reasons": [
+        "관심종목"
+      ]
+    },
+    {
+      "code": "114800",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "201490",
+      "sources": [
+        "USER_WATCHLIST"
+      ],
+      "reasons": [
+        "관심종목"
+      ]
+    },
+    {
+      "code": "252670",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "272210",
+      "sources": [
+        "USER_WATCHLIST"
+      ],
+      "reasons": [
+        "관심종목"
+      ]
+    },
+    {
+      "code": "344820",
+      "sources": [
+        "USER_WATCHLIST"
+      ],
+      "reasons": [
+        "관심종목"
+      ]
+    }
+  ],
+  "collectionCodes": [
+    "006800",
+    "0197X0",
+    "039200",
+    "114800",
+    "201490",
+    "252670",
+    "272210",
+    "344820"
+  ],
+  "pending": [
+    {
+      "type": "AUTO_THEME",
+      "status": "PENDING",
+      "reason": "VERIFIED_THEME_MEMBERSHIP_NOT_PUBLISHED"
+    }
+  ],
+  "changes": [],
+  "policy": {
+    "version": "dynamic-universe-policy-v1",
+    "refreshIntervalMinutes": 60,
+    "collectionLimit": 120,
+    "activationConfirmations": 2,
+    "removalConfirmations": 2,
+    "watchConfirmations": 1,
+    "leaderLimitPerGroup": 3,
+    "sector": {
+      "minimumScore": 60,
+      "minimumRelativeStrength": 0,
+      "minimumAdvancerPct": 50,
+      "minimumTurnoverConcentrationPct": 0,
+      "minimumPctAboveMA20": 50,
+      "minimumLeaderCount": 1
+    },
+    "theme": {
+      "minimumScore": 60,
+      "requireVerifiedMembership": true
+    },
+    "leader": {
+      "minimumScore": 60,
+      "minimumPersistence": 1
+    }
+  },
+  "load": {
+    "limit": 120,
+    "count": 8,
+    "limitExceededByProtectedSources": 0
+  },
+  "safety": {
+    "productionUniverseMutated": false,
+    "userWatchlistsMutated": false,
+    "legacyBaselinePreserved": true,
+    "deduplicateCollectionBy": "itemCode"
+  }
+}
