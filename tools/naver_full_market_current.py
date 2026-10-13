@@ -230,6 +230,7 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
     expected = load_authoritative_universe(universe_file)
     diagnostics = []
     last_result = None
+    previous_structural_delta = None
     for attempt in range(1, max_attempts + 1):
         result = collect_attempt(expected, fetcher, page_size, sleep_seconds, clock())
         last_result = result
@@ -242,6 +243,19 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                 "attemptCount": attempt, "missingCodes": [], "extraCodes": [], "duplicateCodes": [],
                 "stocks": result["stocks"], "attemptDiagnostics": diagnostics,
             }
+        # A repeated, structurally complete delta is safe to analyze. Avoid
+        # the third full-market request when the same authoritative-set
+        # mismatch is observed again; the first mismatch still gets one
+        # confirmation request to distinguish a moving page from a lifecycle
+        # change.
+        if result["structurallyValid"]:
+            structural_delta = (
+                tuple(result["missingCodes"]), tuple(result["extraCodes"]),
+                tuple(result.get("duplicateCodes", [])),
+            )
+            if structural_delta == previous_structural_delta:
+                break
+            previous_structural_delta = structural_delta
     if last_result and last_result["structurallyValid"]:
         expected_market = {code: market for market, codes in expected.items() for code in codes}
         observed_market = {str(row["code"]): row["market"] for row in last_result["stocks"]}
@@ -262,7 +276,7 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
             "reconciliationStatus": "UNIVERSE_RECONCILIATION_REQUIRED",
             "expectedCount": last_result["expectedCount"], "count": last_result["count"],
             "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
-            "attemptCount": max_attempts, "missingCodes": last_result["missingCodes"],
+            "attemptCount": len(diagnostics), "missingCodes": last_result["missingCodes"],
             "extraCodes": last_result["extraCodes"], "duplicateCodes": last_result["duplicateCodes"],
             "universeDelta": delta | {
                 "firstDetectedAt": generated_at,

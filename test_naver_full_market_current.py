@@ -92,7 +92,7 @@ class FullMarketCurrentTests(unittest.TestCase):
                 for market, codes in self.expected.items() for code in codes
             ]}), encoding="utf-8")
             snapshot = current.collect_snapshot(
-                universe, fetch, 2, 1, 0,
+                universe, fetch, 2, 3, 0,
                 lambda: "2026-10-13T08:00:00+09:00"
             )
         self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
@@ -100,6 +100,8 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertEqual(snapshot["count"], 4)
         self.assertEqual(snapshot["missingCodes"], ["123456"])
         self.assertEqual(snapshot["extraCodes"], ["999999"])
+        self.assertEqual(snapshot["attemptCount"], 2)
+        self.assertEqual(len(snapshot["attemptDiagnostics"]), 2)
         self.assertEqual(snapshot["universeDelta"]["verificationStatus"], "PENDING_EXTERNAL_VERIFICATION")
         self.assertFalse(snapshot["universeDelta"]["applied"])
 
