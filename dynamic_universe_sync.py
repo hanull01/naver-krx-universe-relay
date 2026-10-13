@@ -11,6 +11,7 @@ import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from dynamic_universe_symbols import normalize_symbol
 
 
 class SyncError(ValueError):
@@ -49,10 +50,11 @@ def validate(latest, history, commit, now=None, max_age_seconds=172800):
     codes = latest.get("collectionCodes")
     if not isinstance(codes, list) or len(codes) != len(set(codes)):
         raise SyncError("COLLECTION_CODES_INVALID")
-    if any(not isinstance(code, str) or len(code) != 6 or not code.isdigit() for code in codes):
+    normalized = [normalize_symbol(code) for code in codes]
+    if any(code is None for code in normalized) or normalized != codes:
         raise SyncError("COLLECTION_CODE_INVALID")
     for row in latest.get("memberships", []):
-        if not isinstance(row, dict) or row.get("code") not in codes:
+        if not isinstance(row, dict) or normalize_symbol(row.get("code")) not in codes:
             raise SyncError("MEMBERSHIP_INVALID")
     return {"generatedAt": generated.isoformat(), "ageSeconds": round(age, 3),
             "commit": commit, "collectionCount": len(codes)}

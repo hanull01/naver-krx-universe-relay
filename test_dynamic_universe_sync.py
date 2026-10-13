@@ -48,5 +48,13 @@ class DynamicUniverseSyncTests(unittest.TestCase):
                     with self.assertRaisesRegex(sync.SyncError, error):
                         sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", root / "state.json", now="2026-10-13T06:00:00+00:00")
 
+    def test_alphanumeric_krx_code_is_accepted(self):
+        latest = payload()
+        latest["collectionCodes"] = ["005930", "0197X0"]
+        latest["memberships"] = [{"code": code} for code in latest["collectionCodes"]]
+        history = {"version": "dynamic-universe-history-v1", "events": []}
+        result = sync.validate(latest, history, "a" * 40, now="2026-10-13T06:00:00+00:00")
+        self.assertEqual(result["collectionCount"], 2)
+
 
 if __name__ == "__main__": unittest.main()

@@ -11,6 +11,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
+from dynamic_universe_symbols import normalize_symbol
 
 
 ROOT = Path(__file__).resolve().parent
@@ -45,7 +46,7 @@ def _number(value, default=None):
 
 def _code(row):
     value = (row.get("code") or row.get("itemCode") or row.get("symbol")) if isinstance(row, dict) else row
-    return str(value) if value else None
+    return normalize_symbol(str(value)) if value else None
 
 
 def _sector_decision(row, policy):
