@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "asOf": "2026-10-13",
+  "asOf": "2026-10-14",
   "dateRange": {
     "from": "2026-03-30",
     "to": "2026-10-12"
@@ -12,8 +12,8 @@
   "brokerCount": 14,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-13",
-      "to": "2026-10-13",
+      "from": "2026-09-14",
+      "to": "2026-10-14",
       "reportCount": 16,
       "brokerCount": 12,
       "targetPrice": {
@@ -84,49 +84,48 @@
       }
     },
     "previous": {
-      "from": "2026-08-14",
-      "to": "2026-09-12",
-      "reportCount": 3,
+      "from": "2026-08-15",
+      "to": "2026-09-13",
+      "reportCount": 2,
       "brokerCount": 1,
       "targetPrice": {
-        "count": 3,
+        "count": 2,
         "min": 370000,
         "max": 400000,
-        "mean": 380000,
-        "median": 370000,
-        "stdev": 14142,
+        "mean": 385000,
+        "median": 385000,
+        "stdev": 15000,
         "range": 30000
       },
       "earningsDirection": {
-        "UP": 1,
         "UNKNOWN": 2
       },
       "textSignal": {
-        "positive": 9,
+        "positive": 7,
         "negative": 4,
-        "net": 5,
-        "netPerReport": 1.667
+        "net": 3,
+        "netPerReport": 1.5
       },
       "topics": {
         "AI": {
-          "count": 2,
-          "perReport": 0.667
+          "count": 1,
+          "perReport": 0.5
         },
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.5
         },
         "중국": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.5
         },
         "HBM": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.5
         },
         "환율": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.5
         }
       }
     },
@@ -141,24 +140,6 @@
         "ratio": null
       },
       {
-        "topic": "수요",
-        "currentCount": 10,
-        "currentPerReport": 0.625,
-        "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": 0.292,
-        "ratio": 1.88
-      },
-      {
-        "topic": "환율",
-        "currentCount": 10,
-        "currentPerReport": 0.625,
-        "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": 0.292,
-        "ratio": 1.88
-      },
-      {
         "topic": "메모리",
         "currentCount": 3,
         "currentPerReport": 0.188,
@@ -166,6 +147,24 @@
         "previousPerReport": 0,
         "perReportDelta": 0.188,
         "ratio": null
+      },
+      {
+        "topic": "수요",
+        "currentCount": 10,
+        "currentPerReport": 0.625,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": 0.125,
+        "ratio": 1.25
+      },
+      {
+        "topic": "환율",
+        "currentCount": 10,
+        "currentPerReport": 0.625,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": 0.125,
+        "ratio": 1.25
       },
       {
         "topic": "DRAM",
@@ -217,35 +216,35 @@
         "currentCount": 5,
         "currentPerReport": 0.312,
         "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.021,
-        "ratio": 0.94
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.188,
+        "ratio": 0.62
+      },
+      {
+        "topic": "AI",
+        "currentCount": 3,
+        "currentPerReport": 0.188,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.312,
+        "ratio": 0.38
       },
       {
         "topic": "중국",
         "currentCount": 0,
         "currentPerReport": 0,
         "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.333,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
         "ratio": 0.0
-      },
-      {
-        "topic": "AI",
-        "currentCount": 3,
-        "currentPerReport": 0.188,
-        "previousCount": 2,
-        "previousPerReport": 0.667,
-        "perReportDelta": -0.479,
-        "ratio": 0.28
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 13,
-    "targetMeanChangePct": 33.51,
-    "targetMedianChangePct": 35.14,
-    "targetDispersionChangePct": 433.21
+    "reportCountChange": 14,
+    "targetMeanChangePct": 31.77,
+    "targetMedianChangePct": 29.87,
+    "targetDispersionChangePct": 402.71
   },
   "goalPriceRevisions": {
     "total": 27,

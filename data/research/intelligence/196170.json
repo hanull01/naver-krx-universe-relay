@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "196170",
   "itemName": "알테오젠",
-  "asOf": "2026-10-13",
+  "asOf": "2026-10-14",
   "dateRange": {
     "from": "2026-03-26",
     "to": "2026-10-12"
@@ -12,8 +12,8 @@
   "brokerCount": 4,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-13",
-      "to": "2026-10-13",
+      "from": "2026-09-14",
+      "to": "2026-10-14",
       "reportCount": 3,
       "brokerCount": 3,
       "targetPrice": {
@@ -42,34 +42,29 @@
       }
     },
     "previous": {
-      "from": "2026-08-14",
-      "to": "2026-09-12",
-      "reportCount": 6,
+      "from": "2026-08-15",
+      "to": "2026-09-13",
+      "reportCount": 5,
       "brokerCount": 3,
       "targetPrice": {
-        "count": 6,
-        "min": 410000,
+        "count": 5,
+        "min": 450000,
         "max": 540000,
-        "mean": 475000,
-        "median": 465000,
-        "stdev": 44253,
-        "range": 130000
+        "mean": 488000,
+        "median": 480000,
+        "stdev": 36551,
+        "range": 90000
       },
       "earningsDirection": {
-        "UNKNOWN": 6
+        "UNKNOWN": 5
       },
       "textSignal": {
-        "positive": 8,
+        "positive": 5,
         "negative": 2,
-        "net": 6,
-        "netPerReport": 1.0
+        "net": 3,
+        "netPerReport": 0.6
       },
-      "topics": {
-        "환율": {
-          "count": 1,
-          "perReport": 0.167
-        }
-      }
+      "topics": {}
     },
     "topicAcceleration": [
       {
@@ -80,23 +75,14 @@
         "previousPerReport": 0,
         "perReportDelta": 0.333,
         "ratio": null
-      },
-      {
-        "topic": "환율",
-        "currentCount": 0,
-        "currentPerReport": 0,
-        "previousCount": 1,
-        "previousPerReport": 0.167,
-        "perReportDelta": -0.167,
-        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": -3,
-    "targetMeanChangePct": -8.77,
-    "targetMedianChangePct": -3.23,
-    "targetDispersionChangePct": -46.74
+    "reportCountChange": -2,
+    "targetMeanChangePct": -11.2,
+    "targetMedianChangePct": -6.25,
+    "targetDispersionChangePct": -35.51
   },
   "goalPriceRevisions": {
     "total": 7,
