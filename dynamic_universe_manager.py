@@ -131,7 +131,8 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         status, qs, ws = _transition(old, qualified, policy)
         entry = {"id": identity, "name": row.get("name") or identity, "status": status, "score": score,
                  "qualifyStreak": qs, "weakenStreak": ws, "checks": checks,
-                 "source": "FULL_MARKET_EVIDENCE", "sourceTime": row.get("sourceTime") or context.get("generatedAt")}
+                 "source": "FULL_MARKET_EVIDENCE", "sourceTime": row.get("sourceTime") or context.get("generatedAt"),
+                 "evidenceQuality": industry_block.get("qualityStatus") or "UNKNOWN"}
         sectors.append(entry)
         if not old or old.get("status") != status: changes.append({"type": "AUTO_SECTOR", "id": identity, "from": (old or {}).get("status"), "to": status})
         if _managed(status):
@@ -207,6 +208,10 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     for row in normalized_leaders:
         row["collectionAdmitted"] = row.get("code") in admitted_auto_codes
     return {"version": "dynamic-universe-management-v1", "generatedAt": generated_at, "networkCalls": 0,
+            "industryEvidence": {"status": industry_block.get("qualityStatus") or "UNKNOWN",
+                                  "sourceStatus": (industry_block.get("quality") or {}).get("sourceStatus"),
+                                  "industryEvidenceUsable": (industry_block.get("quality") or {}).get("industryEvidenceUsable"),
+                                  "analyzedIndustryCount": len(industry_rows)},
             "sectors": sectors, "themes": themes, "leaders": normalized_leaders, "kiwoomDiscovery": discovery_rows,
             "userWatchlists": user_watchlists, "memberships": [memberships[code] for code in sorted(memberships)],
             "collectionCodes": sorted(memberships), "pending": pending, "changes": changes,
