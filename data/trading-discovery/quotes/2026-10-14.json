@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "AVAILABLE",
+  "monitoringDate": "2026-10-14",
+  "candidateSourceSha256": "b360ca58abd25d4aa6244e6024d9d6752a3f07023b976c223b2bdbe266c1a0ae",
+  "marketSourceTime": "2026-10-14T09:26:13.141181+09:00",
+  "generatedAt": "2026-10-14T09:26:49.964648+09:00",
+  "source": "NAVER_KRX",
+  "requestedCount": 2,
+  "quoteCount": 2,
+  "missingSymbols": [],
+  "errors": [],
+  "datas": [
+    {
+      "itemCode": "114800",
+      "stockName": "KODEX 인버스",
+      "closePrice": 1121,
+      "fluctuationsRatio": -1.92,
+      "accumulatedTradingVolume": 143882818,
+      "accumulatedTradingValue": 161859000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-14T09:26:49.862651+09:00",
+      "marketStatus": "OPEN",
+      "session": "REGULAR",
+      "priceBasis": "KRX_REGULAR",
+      "fresh": true,
+      "status": "ok"
+    },
+    {
+      "itemCode": "252670",
+      "stockName": "KODEX 200선물인버스2X",
+      "closePrice": 90,
+      "fluctuationsRatio": -4.26,
+      "accumulatedTradingVolume": 2069819347,
+      "accumulatedTradingValue": 187488000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-14T09:26:49.862667+09:00",
+      "marketStatus": "OPEN",
+      "session": "REGULAR",
+      "priceBasis": "KRX_REGULAR",
+      "fresh": true,
+      "status": "ok"
+    }
+  ]
+}
