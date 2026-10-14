@@ -119,7 +119,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     sector_previous = _previous_index(previous, "sectors")
     theme_previous = _previous_index(previous, "themes")
     leader_previous = _previous_index(previous, "leaders")
-    sectors, themes, leaders, pending, changes = [], [], [], [], []
+    sectors, themes, leaders, initial_candidates, pending, changes = [], [], [], [], [], []
 
     industry_block = (context or {}).get("industries") or {}
     industry_rows = industry_block.get("industries") or industry_block.get("strong") or []
@@ -135,6 +135,29 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                  "evidenceQuality": industry_block.get("qualityStatus") or "UNKNOWN"}
         sectors.append(entry)
         if not old or old.get("status") != status: changes.append({"type": "AUTO_SECTOR", "id": identity, "from": (old or {}).get("status"), "to": status})
+        evidence_usable = ((industry_block.get("qualityStatus") or "").upper() in {"FULL", "OK"}
+                           or (industry_block.get("quality") or {}).get("industryEvidenceUsable") in {"FULL", "OK"})
+        if status == "DISCOVERED" and evidence_usable:
+            accepted_initial = []
+            for candidate in row.get("leaders") or []:
+                ok, candidate_score, candidate_checks = _leader_decision(candidate, policy["leader"])
+                if ok:
+                    accepted_initial.append((candidate_score, candidate, candidate_checks))
+            for candidate_score, candidate, candidate_checks in sorted(
+                    accepted_initial, key=lambda item: (-item[0], _code(item[1]) or ""))[:3]:
+                code = _code(candidate)
+                if code:
+                    initial_candidates.append({"id": f"initial:{identity}:{code}", "code": code,
+                        "name": candidate.get("name"), "groupType": "sector", "groupId": identity,
+                        "score": candidate_score, "checks": candidate_checks,
+                        "status": "INITIAL_OBSERVATION", "source": "INITIAL_OBSERVATION",
+                        "sourceTime": candidate.get("sourceTime") or row.get("sourceTime") or context.get("generatedAt")})
+            if not accepted_initial:
+                pending.append({"type": "INITIAL_OBSERVATION", "groupId": identity,
+                                "status": "PENDING", "reason": "NO_VALID_GROUP_CANDIDATE"})
+        elif status == "DISCOVERED":
+            pending.append({"type": "INITIAL_OBSERVATION", "groupId": identity,
+                            "status": "PENDING", "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"})
         if _managed(status):
             accepted = []
             for candidate in row.get("leaders") or []:
@@ -212,7 +235,8 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                                   "sourceStatus": (industry_block.get("quality") or {}).get("sourceStatus"),
                                   "industryEvidenceUsable": (industry_block.get("quality") or {}).get("industryEvidenceUsable"),
                                   "analyzedIndustryCount": len(industry_rows)},
-            "sectors": sectors, "themes": themes, "leaders": normalized_leaders, "kiwoomDiscovery": discovery_rows,
+            "sectors": sectors, "themes": themes, "leaders": normalized_leaders,
+            "initialObservationCandidates": initial_candidates, "kiwoomDiscovery": discovery_rows,
             "userWatchlists": user_watchlists, "memberships": [memberships[code] for code in sorted(memberships)],
             "collectionCodes": sorted(memberships), "pending": pending, "changes": changes,
             "policy": policy, "load": {"limit": limit, "count": len(memberships),

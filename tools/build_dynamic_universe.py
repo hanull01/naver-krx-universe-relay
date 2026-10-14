@@ -46,6 +46,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--industries", default=str(ROOT / "data/monitoring/latest-industries.json"))
     parser.add_argument("--universe", default=str(ROOT / "config/universe.json"))
+    parser.add_argument("--signals", default=str(ROOT / "data/monitoring/latest-stock-signals.json"))
     parser.add_argument("--discovery", default=str(ROOT / "data/trading-discovery/latest.json"))
     parser.add_argument("--policy", default=str(manager.DEFAULT_POLICY))
     parser.add_argument("--output", default=str(ROOT / "data/dynamic-universe/latest.json"))
@@ -61,9 +62,19 @@ def main(argv=None):
                               "quality": quality},
                "themes": {"status": "UNAVAILABLE", "reason": "VERIFIED_THEME_MEMBERSHIP_NOT_PUBLISHED"}}
     previous = manager.load_json(args.output, {}) or {}
+    discovery = manager.load_json(args.discovery, {}) or {}
     result = manager.build_management_result(context, manager.load_json(args.universe, {}) or {},
-                                              manager.load_json(args.discovery, {}) or {}, previous,
+                                              discovery, previous,
                                               manager.load_json(args.policy, {}) or {})
+    signals = manager.load_json(args.signals, {}) or {}
+    quotes = {str(row.get("code")): row for row in signals.get("stocks", []) if row.get("code")}
+    for key in ("leaders", "initialObservationCandidates"):
+        for row in result.get(key, []):
+            quote = quotes.get(str(row.get("code")))
+            if quote:
+                for field in ("currentPrice", "changeRate", "sourceTime"):
+                    if quote.get(field) is not None:
+                        row[field] = quote[field]
     if not args.no_write:
         manager.publish_result(result, args.output, args.output, args.history)
     print(json.dumps({"status": "SUCCESS", "networkCalls": 0, "industryQuality": industry_quality_state,
