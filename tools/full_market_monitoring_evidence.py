@@ -150,6 +150,7 @@ def feature_row(current, history, today, overlay=False):
     result = {
         "code": current["code"], "name": current["name"], "market": current["market"],
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
+        "accumulatedTradingValue": number(current.get("accumulatedTradingValue")),
         "currentHigh": current_high,
         "close_valid": validity["close_valid"], "ohlc_valid": validity["ohlc_valid"],
         "volume_valid": validity["volume_valid"], "traded_bar": validity["traded_bar"],
@@ -235,6 +236,7 @@ def aggregate_industries(features, industries, membership, previous_good=None):
     result = []
     market_returns = [item["ret_1d"] for item in features if item["close_valid"] and item["ret_1d"] is not None]
     market_average = mean(market_returns)
+    market_median = median(market_returns)
     for group in membership.get("industries", []):
         if group.get("status") != "OK":
             continue
@@ -242,6 +244,10 @@ def aggregate_industries(features, industries, membership, previous_good=None):
         valid = [item for item in members if item["close_valid"]]
         feature_valid = [item for item in members if item["traded_bar"]]
         returns = [item["ret_1d"] for item in valid if item["ret_1d"] is not None]
+        turnover = [item.get("accumulatedTradingValue") for item in valid
+                    if isinstance(item.get("accumulatedTradingValue"), (int, float))]
+        top_turnover = sorted(turnover, reverse=True)[:3]
+        ma5_valid = [item for item in valid if item.get("ma5") is not None and item.get("currentPrice") is not None]
         leaders = sorted(valid, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
                                                    item["current_volume_ratio_20"] or -1), reverse=True)[:3]
         result.append({
@@ -254,11 +260,25 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "breadthConcentration": ("BROAD" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) / len(valid) >= 0.6
                                       else "NARROW" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) > 0 else "WEAK"),
             "relativeStrengthVsMarket": round(mean(returns) - market_average, 6) if returns and market_average is not None else None,
+            "relativeStrengthVsMarketMedian": round(median(returns) - market_median, 6) if returns and market_median is not None else None,
+            "marketAverageReturn1D": market_average,
+            "marketMedianReturn1D": market_median,
+            "avgReturnSkew": round(mean(returns) - median(returns), 6) if returns else None,
+            "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE" if returns and abs(mean(returns) - median(returns)) >= 2 else "ALIGNED" if returns else "UNAVAILABLE",
+            "pctAboveMA5": pct(sum(item.get("currentPrice") > item.get("ma5") for item in ma5_valid), len(ma5_valid)),
             "pctAboveMA20": pct(sum(item["above_ma20"] is True for item in valid), sum(item["above_ma20"] is not None for item in valid)),
             "pctAboveMA60": pct(sum(item["above_ma60"] is True for item in valid), sum(item["above_ma60"] is not None for item in valid)),
             "pctBreakout20": pct(sum(item["breakout_20_intraday"] is True for item in valid), sum(item["breakout_20_intraday"] is not None for item in valid)),
             "pctNear52WeekHigh": pct(sum(item["near_52week_high"] is True for item in valid), sum(item["near_52week_high"] is not None for item in valid)),
             "pctVolumeAbove20DayAverage": pct(sum((item["current_volume_ratio_20"] or 0) > 1 for item in valid), sum(item["current_volume_ratio_20"] is not None for item in valid)),
+            "tradingValue": {
+                "total": sum(turnover) if turnover else None,
+                "availableCount": len(turnover),
+                "coveragePct": pct(len(turnover), len(valid)),
+                "top3ConcentrationPct": (sum(top_turnover) * 100 / sum(turnover)) if turnover and sum(turnover) else None,
+                "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
+            },
+            "persistence": {"status": "UNAVAILABLE_NO_GROUP_HISTORY", "availableTradingDays": 1},
             "leaders": [{key: item.get(key) for key in ("code", "name", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "breakout_20_intraday")} for item in leaders],
             "industrySourcePresent": str(group.get("id")) in source,
         })
@@ -458,7 +478,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "publicationStatus": collection_quality,
                                 "universeDelta": current_snapshot.get("universeDelta"), "industryStatus": quality["sourceStatus"],
                                 "industryCoverageVsPreviousPct": quality["coverageVsPreviousPct"], "industryFailedPage": quality["failedPage"],
-                                "industryMissingCount": quality["missingCount"], "themeStatus": "DISABLED_PENDING_RESEARCH_GATE"},
+                                "industryMissingCount": quality["missingCount"], "themeStatus": theme_status},
         "latest-summary.json": summary,
     }
     evidence["latest-quality.json"].update(publication_context)
@@ -480,10 +500,37 @@ def build_theme_signals(generated_at, features, theme_membership):
         codes = [str(row.get("code")) for row in members if isinstance(row, dict) and row.get("code")]
         unique_codes = list(dict.fromkeys(codes))
         stocks = [rows_by_code[code] for code in unique_codes if code in rows_by_code]
+        valid = [row for row in stocks if row.get("close_valid")]
+        returns = [row.get("ret_1d") for row in valid if isinstance(row.get("ret_1d"), (int, float))]
+        values = [row.get("accumulatedTradingValue") for row in valid
+                  if isinstance(row.get("accumulatedTradingValue"), (int, float))]
+        top_values = sorted(values, reverse=True)[:3]
+        ma5 = [row for row in valid if row.get("ma5") is not None and row.get("currentPrice") is not None]
+        theme_metrics = {
+            "validQuoteCount": len(valid),
+            "advancers": sum((row.get("changeRate") or 0) > 0 for row in valid),
+            "decliners": sum((row.get("changeRate") or 0) < 0 for row in valid),
+            "unchanged": sum((row.get("changeRate") or 0) == 0 for row in valid),
+            "advancerPct": pct(sum((row.get("changeRate") or 0) > 0 for row in valid), len(valid)),
+            "averageReturn1D": mean(returns),
+            "medianReturn1D": median(returns),
+            "pctAboveMA5": pct(sum(row.get("currentPrice") > row.get("ma5") for row in ma5), len(ma5)),
+            "pctAboveMA20": pct(sum(row.get("above_ma20") is True for row in valid), sum(row.get("above_ma20") is not None for row in valid)),
+            "volumeIncreasePct": pct(sum((row.get("current_volume_ratio_20") or 0) > 1 for row in valid), sum(row.get("current_volume_ratio_20") is not None for row in valid)),
+            "tradingValue": {
+                "total": sum(values) if values else None,
+                "availableCount": len(values),
+                "coveragePct": pct(len(values), len(valid)),
+                "top3ConcentrationPct": (sum(top_values) * 100 / sum(values)) if values and sum(values) else None,
+                "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
+            },
+            "persistence": {"status": "UNAVAILABLE_NO_GROUP_HISTORY", "availableTradingDays": 1},
+        }
         output.append({"id": str(theme.get("id")), "name": theme.get("name"),
                        "membershipStatus": theme.get("status"), "memberCount": len(unique_codes),
                        "featureCount": len(stocks), "coveragePct": round(len(stocks) * 100 / len(unique_codes), 4) if unique_codes else None,
                        "missingCodes": [code for code in unique_codes if code not in rows_by_code],
+                       "metrics": theme_metrics,
                        "stocks": stocks})
     return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "OK",
             "sourceStatus": theme_membership.get("status"), "themeCount": len(output), "themes": output}
