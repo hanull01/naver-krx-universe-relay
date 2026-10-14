@@ -13,7 +13,13 @@ class UniverseWebTests(unittest.TestCase):
         self.path = Path(self.temp.name) / "config" / "universe.json"
         self.path.parent.mkdir(parents=True)
         self.path.write_text(json.dumps(fixture(), ensure_ascii=False), encoding="utf-8")
-        self.app = universe_web.UniverseWebApp(self.path)
+        self.dynamic_path = Path(self.temp.name) / "dynamic-universe.json"
+        self.dynamic_path.write_text(json.dumps({
+            "pending": [{"status": "PENDING", "reason": "FIXTURE"}],
+            "sectors": [], "themes": [], "leaders": [],
+            "initialObservationCandidates": [], "kiwoomDiscovery": [],
+        }, ensure_ascii=False), encoding="utf-8")
+        self.app = universe_web.UniverseWebApp(self.path, dynamic_result=self.dynamic_path)
 
     def tearDown(self):
         self.temp.cleanup()
