@@ -150,7 +150,7 @@ def feature_row(current, history, today, overlay=False):
     result = {
         "code": current["code"], "name": current["name"], "market": current["market"],
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
-        "accumulatedTradingValue": number(current.get("accumulatedTradingValue")),
+        "accumulatedTradingValue": number(current.get("accumulatedTradingValue", current.get("tradeAmount"))),
         "currentHigh": current_high,
         "close_valid": validity["close_valid"], "ohlc_valid": validity["ohlc_valid"],
         "volume_valid": validity["volume_valid"], "traded_bar": validity["traded_bar"],
