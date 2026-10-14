@@ -1,21 +1,39 @@
 {
   "version": "dynamic-universe-management-v1",
-  "generatedAt": "2026-10-14T02:22:43.606806+00:00",
+  "generatedAt": "2026-10-14T03:24:05.813650+00:00",
   "networkCalls": 0,
   "industryEvidence": {
-    "status": "PARTIAL_WITH_COVERAGE",
-    "sourceStatus": "PARTIAL",
-    "industryEvidenceUsable": "UNUSABLE",
+    "status": "FULL",
+    "sourceStatus": "OK",
+    "industryEvidenceUsable": "FULL",
     "analyzedIndustryCount": 78
   },
   "sectors": [
+    {
+      "id": "329",
+      "name": "도로와철도운송",
+      "status": "ACTIVE",
+      "score": 100.0,
+      "qualifyStreak": 4,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
     {
       "id": "274",
       "name": "섬유,의류,신발,호화품",
       "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": true,
         "advancerPct": true,
@@ -24,444 +42,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "329",
-      "name": "도로와철도운송",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 3,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "261",
-      "name": "제약",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "323",
       "name": "해운사",
-      "status": "DISCOVERED",
-      "score": 100.0,
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "304",
-      "name": "철강",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "306",
-      "name": "전기장비",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "320",
-      "name": "건축제품",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "283",
-      "name": "전기제품",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 3,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "291",
-      "name": "조선",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "333",
-      "name": "무선통신서비스",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 3,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "334",
-      "name": "무역회사와판매업체",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "305",
-      "name": "항공사",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "298",
-      "name": "가정용기기와용품",
-      "status": "DISCOVERED",
-      "score": 100.0,
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "293",
-      "name": "컴퓨터와주변기기",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "331",
-      "name": "복합유틸리티",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 3,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "297",
-      "name": "가정용품",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "300",
-      "name": "양방향미디어와서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "313",
-      "name": "석유와가스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "325",
-      "name": "전기유틸리티",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "299",
-      "name": "기계",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "336",
-      "name": "다각화된통신서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "290",
-      "name": "교육서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "273",
-      "name": "자동차",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "289",
-      "name": "건축자재",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "326",
-      "name": "항공화물운송과물류",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 3,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "275",
-      "name": "담배",
       "status": "ACTIVE",
       "score": 100.0,
       "qualifyStreak": 2,
@@ -474,8 +60,314 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "261",
+      "name": "제약",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "304",
+      "name": "철강",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "306",
+      "name": "전기장비",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "291",
+      "name": "조선",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "283",
+      "name": "전기제품",
+      "status": "ACTIVE",
+      "score": 100.0,
+      "qualifyStreak": 4,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "313",
+      "name": "석유와가스",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "333",
+      "name": "무선통신서비스",
+      "status": "ACTIVE",
+      "score": 100.0,
+      "qualifyStreak": 4,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "331",
+      "name": "복합유틸리티",
+      "status": "ACTIVE",
+      "score": 100.0,
+      "qualifyStreak": 4,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "325",
+      "name": "전기유틸리티",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "305",
+      "name": "항공사",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "334",
+      "name": "무역회사와판매업체",
+      "status": "DISCOVERED",
+      "score": 100.0,
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "320",
+      "name": "건축제품",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "300",
+      "name": "양방향미디어와서비스",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "298",
+      "name": "가정용기기와용품",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "293",
+      "name": "컴퓨터와주변기기",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "299",
+      "name": "기계",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "273",
+      "name": "자동차",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "271",
@@ -483,7 +375,7 @@
       "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": true,
         "advancerPct": true,
@@ -492,16 +384,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "270",
-      "name": "자동차부품",
+      "id": "289",
+      "name": "건축자재",
       "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": true,
         "advancerPct": true,
@@ -510,16 +402,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "322",
-      "name": "비철금속",
+      "id": "290",
+      "name": "교육서비스",
       "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": true,
         "advancerPct": true,
@@ -528,98 +420,26 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "332",
-      "name": "문구류",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "id": "297",
+      "name": "가정용품",
+      "status": "DISCOVERED",
+      "score": 100.0,
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
       "checks": {
         "relativeStrength": true,
         "advancerPct": true,
         "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
+        "pctAboveMA20": true,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "282",
-      "name": "전자장비와기기",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "338",
-      "name": "사무용전자제품",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "272",
-      "name": "화학",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "294",
-      "name": "통신장비",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "279",
@@ -627,6 +447,96 @@
       "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "286",
+      "name": "생물공학",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "326",
+      "name": "항공화물운송과물류",
+      "status": "ACTIVE",
+      "score": 100.0,
+      "qualifyStreak": 4,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "270",
+      "name": "자동차부품",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "295",
+      "name": "에너지장비및서비스",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "282",
+      "name": "전자장비와기기",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
       "weakenStreak": 3,
       "checks": {
         "relativeStrength": true,
@@ -636,16 +546,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "287",
-      "name": "소프트웨어",
+      "id": "322",
+      "name": "비철금속",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -654,16 +564,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "321",
-      "name": "증권",
+      "id": "336",
+      "name": "다각화된통신서비스",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -672,8 +582,26 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "338",
+      "name": "사무용전자제품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "327",
@@ -681,7 +609,7 @@
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -690,224 +618,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "295",
-      "name": "에너지장비및서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "339",
-      "name": "다각화된소비자서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "262",
-      "name": "생명과학도구및서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "286",
-      "name": "생물공학",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "312",
-      "name": "가스유틸리티",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "276",
-      "name": "복합기업",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "310",
-      "name": "광고",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "302",
-      "name": "식품과기본식료품소매",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "317",
-      "name": "호텔,레스토랑,레저",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "268",
-      "name": "식품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "296",
-      "name": "운송인프라",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "280",
-      "name": "부동산",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "316",
@@ -915,7 +627,7 @@
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -924,8 +636,188 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "294",
+      "name": "통신장비",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "262",
+      "name": "생명과학도구및서비스",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "317",
+      "name": "호텔,레스토랑,레저",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "287",
+      "name": "소프트웨어",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "275",
+      "name": "담배",
+      "status": "WATCH",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "272",
+      "name": "화학",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "332",
+      "name": "문구류",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "321",
+      "name": "증권",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "312",
+      "name": "가스유틸리티",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "310",
+      "name": "광고",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "309",
@@ -933,7 +825,7 @@
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -942,16 +834,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "285",
-      "name": "방송과엔터테인먼트",
+      "id": "296",
+      "name": "운송인프라",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -960,170 +852,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "318",
-      "name": "종이와목재",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "269",
-      "name": "디스플레이장비및부품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "324",
-      "name": "상업서비스와공급품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "267",
-      "name": "IT서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "311",
-      "name": "포장재",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "266",
-      "name": "화장품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "277",
-      "name": "창업투자",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "307",
-      "name": "전자제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "319",
-      "name": "기타금융",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "308",
@@ -1131,7 +861,7 @@
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1140,16 +870,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "263",
-      "name": "게임엔터테인먼트",
+      "id": "276",
+      "name": "복합기업",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1158,34 +888,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "265",
-      "name": "판매업체",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "284",
-      "name": "우주항공과국방",
+      "id": "302",
+      "name": "식품과기본식료품소매",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1194,34 +906,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "281",
-      "name": "건강관리장비와용품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "292",
-      "name": "핸드셋",
+      "id": "268",
+      "name": "식품",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1230,16 +924,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "314",
-      "name": "출판",
+      "id": "269",
+      "name": "디스플레이장비및부품",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1248,16 +942,16 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "288",
-      "name": "건강관리기술",
+      "id": "266",
+      "name": "화장품",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": true,
@@ -1266,106 +960,124 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
-      "id": "264",
-      "name": "백화점과일반상점",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "328",
-      "name": "전문소매",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "337",
-      "name": "카드",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "303",
-      "name": "가구",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "301",
-      "name": "은행",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 3,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "278",
-      "name": "반도체와반도체장비",
+      "id": "318",
+      "name": "종이와목재",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "285",
+      "name": "방송과엔터테인먼트",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "267",
+      "name": "IT서비스",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "311",
+      "name": "포장재",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "280",
+      "name": "부동산",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "324",
+      "name": "상업서비스와공급품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "277",
+      "name": "창업투자",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": false,
@@ -1374,8 +1086,296 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "307",
+      "name": "전자제품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "288",
+      "name": "건강관리기술",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "281",
+      "name": "건강관리장비와용품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "284",
+      "name": "우주항공과국방",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "264",
+      "name": "백화점과일반상점",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "263",
+      "name": "게임엔터테인먼트",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "265",
+      "name": "판매업체",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "292",
+      "name": "핸드셋",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "339",
+      "name": "다각화된소비자서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "319",
+      "name": "기타금융",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "303",
+      "name": "가구",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "328",
+      "name": "전문소매",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "337",
+      "name": "카드",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "314",
+      "name": "출판",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "278",
+      "name": "반도체와반도체장비",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "301",
+      "name": "은행",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 4,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "330",
@@ -1383,7 +1383,7 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": false,
@@ -1392,8 +1392,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     },
     {
       "id": "315",
@@ -1401,7 +1401,7 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 3,
+      "weakenStreak": 4,
       "checks": {
         "relativeStrength": false,
         "advancerPct": false,
@@ -1410,8 +1410,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-14T02:22:41.912020+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+      "sourceTime": "2026-10-14T03:24:03.338183+00:00",
+      "evidenceQuality": "FULL"
     }
   ],
   "themes": [],
@@ -1423,6 +1423,193 @@
       "groupType": "sector",
       "groupId": "329",
       "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:329:084670",
+      "code": "084670",
+      "name": "동양고속",
+      "groupType": "sector",
+      "groupId": "329",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:329:095570",
+      "code": "095570",
+      "name": "AJ네트웍스",
+      "groupType": "sector",
+      "groupId": "329",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "DISCOVERED",
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
+      "collectionAdmitted": false
+    },
+    {
+      "id": "sector:323:011200",
+      "code": "011200",
+      "name": "HMM",
+      "groupType": "sector",
+      "groupId": "323",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "DISCOVERED",
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
+      "collectionAdmitted": false
+    },
+    {
+      "id": "sector:323:028670",
+      "code": "028670",
+      "name": "팬오션",
+      "groupType": "sector",
+      "groupId": "323",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "DISCOVERED",
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
+      "collectionAdmitted": false
+    },
+    {
+      "id": "sector:283:012340",
+      "code": "012340",
+      "name": "뉴인텍",
+      "groupType": "sector",
+      "groupId": "283",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:283:417200",
+      "code": "417200",
+      "name": "LS머트리얼즈",
+      "groupType": "sector",
+      "groupId": "283",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:283:240600",
+      "code": "240600",
+      "name": "유진테크놀로지",
+      "groupType": "sector",
+      "groupId": "283",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:333:065530",
+      "code": "065530",
+      "name": "와이어블",
+      "groupType": "sector",
+      "groupId": "333",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:331:071320",
+      "code": "071320",
+      "name": "지역난방공사",
+      "groupType": "sector",
+      "groupId": "331",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:326:009070",
+      "code": "009070",
+      "name": "KCTC",
+      "groupType": "sector",
+      "groupId": "326",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "source": "AUTO_LEADER",
+      "status": "ACTIVE",
+      "qualifyStreak": 3,
+      "weakenStreak": 0,
+      "collectionAdmitted": true
+    },
+    {
+      "id": "sector:275:033780",
+      "code": "033780",
+      "name": "KT&G",
+      "groupType": "sector",
+      "groupId": "275",
+      "score": 100.0,
       "checks": {
         "minimumScore": true,
         "minimumPersistence": true
@@ -1445,112 +1632,10 @@
         "minimumPersistence": true
       },
       "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
       "collectionAdmitted": false
-    },
-    {
-      "id": "sector:329:084670",
-      "code": "084670",
-      "name": "동양고속",
-      "groupType": "sector",
-      "groupId": "329",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:283:012340",
-      "code": "012340",
-      "name": "뉴인텍",
-      "groupType": "sector",
-      "groupId": "283",
-      "score": 100.0,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:283:417200",
-      "code": "417200",
-      "name": "LS머트리얼즈",
-      "groupType": "sector",
-      "groupId": "283",
-      "score": 100.0,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:283:240600",
-      "code": "240600",
-      "name": "유진테크놀로지",
-      "groupType": "sector",
-      "groupId": "283",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:333:065530",
-      "code": "065530",
-      "name": "와이어블",
-      "groupType": "sector",
-      "groupId": "333",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:331:071320",
-      "code": "071320",
-      "name": "지역난방공사",
-      "groupType": "sector",
-      "groupId": "331",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
     },
     {
       "id": "sector:326:000700",
@@ -1558,57 +1643,6 @@
       "name": "유수홀딩스",
       "groupType": "sector",
       "groupId": "326",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "collectionAdmitted": false
-    },
-    {
-      "id": "sector:326:009070",
-      "code": "009070",
-      "name": "KCTC",
-      "groupType": "sector",
-      "groupId": "326",
-      "score": 66.67,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "collectionAdmitted": true
-    },
-    {
-      "id": "sector:275:033780",
-      "code": "033780",
-      "name": "KT&G",
-      "groupType": "sector",
-      "groupId": "275",
-      "score": 100.0,
-      "checks": {
-        "minimumScore": true,
-        "minimumPersistence": true
-      },
-      "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "collectionAdmitted": false
-    },
-    {
-      "id": "sector:329:095570",
-      "code": "095570",
-      "name": "AJ네트웍스",
-      "groupType": "sector",
-      "groupId": "329",
       "score": 66.67,
       "checks": {
         "minimumScore": true,
@@ -1699,6 +1733,15 @@
       ],
       "reasons": [
         "sector:283"
+      ]
+    },
+    {
+      "code": "033780",
+      "sources": [
+        "AUTO_LEADER"
+      ],
+      "reasons": [
+        "sector:275"
       ]
     },
     {
@@ -1833,6 +1876,7 @@
     "006800",
     "009070",
     "012340",
+    "033780",
     "036930",
     "039200",
     "065530",
@@ -1859,90 +1903,66 @@
     {
       "type": "AUTO_SECTOR",
       "id": "323",
+      "from": "DISCOVERED",
+      "to": "ACTIVE"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "334",
       "from": "REMOVED",
       "to": "DISCOVERED"
     },
     {
       "type": "AUTO_SECTOR",
       "id": "298",
+      "from": "DISCOVERED",
+      "to": "REMOVED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "297",
       "from": "REMOVED",
       "to": "DISCOVERED"
     },
     {
       "type": "AUTO_SECTOR",
       "id": "275",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
+      "from": "ACTIVE",
+      "to": "WATCH"
     },
     {
       "type": "AUTO_LEADER",
-      "id": "sector:329:000650",
+      "id": "sector:329:095570",
+      "from": "REMOVED",
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:323:011200",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:323:028670",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:275:033780",
       "from": "DISCOVERED",
       "to": "ACTIVE"
     },
     {
       "type": "AUTO_LEADER",
       "id": "sector:329:038390",
-      "from": null,
-      "to": "DISCOVERED"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:329:084670",
       "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:283:012340",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:283:417200",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:283:240600",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:333:065530",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:331:071320",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
+      "to": "REMOVED"
     },
     {
       "type": "AUTO_LEADER",
       "id": "sector:326:000700",
-      "from": null,
-      "to": "DISCOVERED"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:326:009070",
-      "from": "DISCOVERED",
-      "to": "ACTIVE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:275:033780",
-      "from": null,
-      "to": "DISCOVERED"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:329:095570",
       "from": "DISCOVERED",
       "to": "REMOVED"
     }
@@ -1974,7 +1994,7 @@
   },
   "load": {
     "limit": 120,
-    "count": 18,
+    "count": 19,
     "limitExceededByProtectedSources": 0
   },
   "safety": {
