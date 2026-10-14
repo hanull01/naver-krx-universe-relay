@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "itemCode": "034020",
-  "generatedAt": "2026-10-13T16:53:28.606579+09:00",
+  "generatedAt": "2026-10-14T17:15:13.103607+09:00",
   "source": "NAVER_VERIFIED_REGULAR_CLOSE",
   "sourceUrl": "https://polling.finance.naver.com/api/realtime/domestic/stock/034020",
   "verification": "DAILY_REALTIME_MATCH",
@@ -16,10 +16,9 @@
   ],
   "diagnostic": {
     "code": "034020",
-    "targetDate": "2026-10-13",
-    "collectedAtKst": "2026-10-13T16:53:28.606579+09:00",
+    "targetDate": "2026-10-14",
+    "collectedAtKst": "2026-10-14T17:15:13.103607+09:00",
     "dailyDates": [
-      "2025-04-11",
       "2025-04-14",
       "2025-04-15",
       "2025-04-16",
@@ -383,13 +382,14 @@
       "2026-10-07",
       "2026-10-08",
       "2026-10-12",
-      "2026-10-13"
+      "2026-10-13",
+      "2026-10-14"
     ],
     "dailyOhlcvPresent": true,
     "realtimeMarketStatus": "OPEN",
     "realtimeMarketStatusDetailType": "open",
-    "realtimeDate": "2026-10-13",
-    "dailyRealtimeCloseMatch": true,
+    "realtimeDate": "2026-10-14",
+    "dailyRealtimeCloseMatch": false,
     "failureReason": "realtime marketStatus is not CLOSE"
   }
 }

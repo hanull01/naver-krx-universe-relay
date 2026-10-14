@@ -1,26 +1,15 @@
 {
   "schemaVersion": 1,
   "itemCode": "267260",
-  "generatedAt": "2026-10-13T16:53:15.119577+09:00",
+  "generatedAt": "2026-10-14T17:14:59.402691+09:00",
   "source": "NAVER_KRX",
-  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/267260/day?startDateTime=20250411&endDateTime=20261013",
+  "sourceUrl": "https://api.stock.naver.com/chart/domestic/item/267260/day?startDateTime=20250412&endDateTime=20261014",
   "status": "ok",
   "fresh": true,
   "errors": [],
   "count": 365,
   "completedCount": 364,
   "datas": [
-    {
-      "date": "2025-04-11",
-      "open": 304000,
-      "high": 310500,
-      "low": 299500,
-      "close": 310500,
-      "volume": 272623,
-      "noTrading": false,
-      "roundingMismatch": false,
-      "complete": true
-    },
     {
       "date": "2025-04-14",
       "open": 316000,
@@ -4019,14 +4008,25 @@
       "open": 567000,
       "high": 567000,
       "low": 531000,
-      "close": 558000,
-      "volume": 164181,
+      "close": 559000,
+      "volume": 166970,
+      "noTrading": false,
+      "roundingMismatch": false,
+      "complete": true
+    },
+    {
+      "date": "2026-10-14",
+      "open": 559000,
+      "high": 564000,
+      "low": 531000,
+      "close": 539000,
+      "volume": 187187,
       "noTrading": false,
       "roundingMismatch": false,
       "complete": false
     }
   ],
-  "sourceTime": "2026-10-12",
-  "latestDate": "2026-10-13",
+  "sourceTime": "2026-10-13",
+  "latestDate": "2026-10-14",
   "freshnessPolicy": "today is always provisional; latest completed date must equal conservative previous weekday; consumer must verify actual KRX calendar"
 }
