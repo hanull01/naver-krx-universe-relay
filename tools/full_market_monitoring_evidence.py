@@ -433,6 +433,21 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     for item in leaders:
         row = {key: item.get(key) for key in ("code", "name", "market", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "above_ma60", "breakout_20_intraday")}
         row.update(leader_evidence(item, previous_leader_codes))
+        required = ("ma5", "ma20", "ma60", "currentPrice")
+        missing = [key for key in required if item.get(key) is None]
+        basis_date = item.get("temporaryCurrentBarDate")
+        confirmed = bool(item.get("close_valid") and item.get("ohlc_valid") and basis_date)
+        row["technicalEvidence"] = {
+            "status": "AVAILABLE" if confirmed and not missing else "UNAVAILABLE",
+            "reason": ("CONFIRMED_DAILY_BASELINE" if confirmed and not missing
+                       else "MISSING_CONFIRMED_DAILY_FEATURE"),
+            "lastConfirmedDailyDate": basis_date,
+            "maBasisDate": basis_date,
+            "closeConfirmed": bool(item.get("close_valid")),
+            "signalStatus": "AVAILABLE" if confirmed and not missing else "BLOCKED",
+            "missingFields": missing,
+            "ma5": item.get("ma5"), "ma20": item.get("ma20"), "ma60": item.get("ma60"),
+        }
         leader_rows.append(row)
     baseline_count = baseline.get("count") if baseline else None
     baseline_authoritative = baseline.get("authoritativeCount") if baseline else None

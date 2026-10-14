@@ -32,6 +32,7 @@ FULL_MARKET_FILES = (
     "latest-stock-signals.json",
     "latest-industries.json",
     "latest-leaders.json",
+    "latest-theme-signals.json",
     "latest-changes.json",
     "latest-quality.json",
     "latest-summary.json",
@@ -838,6 +839,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     except (OSError, ValueError, json.JSONDecodeError):
         full_market_signals = {}
     try:
+        theme_signals = load_json(MONITORING_PATH / "latest-theme-signals.json")
+    except (OSError, ValueError, json.JSONDecodeError):
+        theme_signals = {"status": "UNAVAILABLE", "themes": []}
+    try:
         monitoring_baseline = load_json(MONITORING_BASELINE_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
         monitoring_baseline = {}
@@ -882,6 +887,27 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         report_date, discovery, discovery_quotes, technicals, states,
         full_market_signals, previous_discovery, monitoring_baseline,
     )
+    leader_by_code = {
+        str(row.get("code")): row for row in full_market.get("leaders", [])
+        if isinstance(row, dict) and row.get("code")
+    }
+    dynamic_leader_evidence = []
+    for leader in dynamic_universe.get("leaders", []):
+        code = str(leader.get("code") or leader.get("itemCode") or "")
+        evidence = leader_by_code.get(code, {}).get("technicalEvidence")
+        if evidence is not None:
+            dynamic_leader_evidence.append({"code": code, "name": leader.get("name"), "technicalEvidence": evidence})
+    theme_analysis = []
+    for theme in theme_signals.get("themes", []) if isinstance(theme_signals, dict) else []:
+        if not isinstance(theme, dict):
+            continue
+        theme_analysis.append({
+            "id": theme.get("id"), "name": theme.get("name"),
+            "membershipStatus": theme.get("membershipStatus"),
+            "memberCount": theme.get("memberCount"), "featureCount": theme.get("featureCount"),
+            "coveragePct": theme.get("coveragePct"), "missingCodes": theme.get("missingCodes", []),
+            "metrics": theme.get("metrics", {}),
+        })
     kiwoom_section["additionalQuoteLookup"] = {
         "enabled": bool(fetch_discovery_missing),
         "networkCalls": lookup["networkCalls"],
@@ -971,6 +997,13 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "industryEvidence": dynamic_universe.get("industryEvidence"),
                 "source": "GITHUB_DYNAMIC_UNIVERSE",
             },
+            "themeSignals": {
+                "path": "data/monitoring/latest-theme-signals.json",
+                "generatedAt": theme_signals.get("generatedAt"),
+                "status": theme_signals.get("status"),
+                "sourceStatus": theme_signals.get("sourceStatus"),
+                "themeCount": theme_signals.get("themeCount", len(theme_analysis)),
+            },
         },
         "coverage": {
             "enabledStockCount": len(enabled),
@@ -1019,6 +1052,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "themes": dynamic_universe.get("themes", []),
             "leaders": dynamic_universe.get("leaders", []),
             "initialObservationCandidates": dynamic_universe.get("initialObservationCandidates", []),
+            "leaderEvidence": dynamic_leader_evidence,
+            "themeAnalysis": theme_analysis,
             "source": "GITHUB_DYNAMIC_UNIVERSE",
         },
         "groupSummary": groups,
