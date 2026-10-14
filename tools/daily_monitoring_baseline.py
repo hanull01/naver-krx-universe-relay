@@ -291,6 +291,7 @@ def feature_row_from_baseline(current, stock, today, overlay=False):
     return {
         "code": current["code"], "name": current["name"], "market": current["market"],
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
+        "accumulatedTradingValue": number(current.get("accumulatedTradingValue", current.get("tradeAmount"))),
         **validity, **{f"ma{window}": ma[window] for window in WINDOWS},
         **{f"dist_ma{window}": dist(ma[window]) for window in WINDOWS},
         **{f"ret_{window}d": ret(window) for window in RETURN_WINDOWS},
