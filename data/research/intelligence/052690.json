@@ -1,9 +1,9 @@
 {
-  "status": "LOW_SAMPLE",
+  "status": "NO_RECENT_RESEARCH",
   "rankingEligible": false,
   "itemCode": "052690",
   "itemName": "한전기술",
-  "asOf": "2026-10-14",
+  "asOf": "2026-10-15",
   "dateRange": {
     "from": "2026-05-11",
     "to": "2026-09-14"
@@ -12,8 +12,23 @@
   "brokerCount": 7,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-09-14",
-      "to": "2026-10-14",
+      "from": "2026-09-15",
+      "to": "2026-10-15",
+      "reportCount": 0,
+      "brokerCount": 0,
+      "targetPrice": {},
+      "earningsDirection": {},
+      "textSignal": {
+        "positive": 0,
+        "negative": 0,
+        "net": 0,
+        "netPerReport": 0
+      },
+      "topics": {}
+    },
+    "previous": {
+      "from": "2026-08-16",
+      "to": "2026-09-14",
       "reportCount": 2,
       "brokerCount": 2,
       "targetPrice": {
@@ -42,35 +57,20 @@
         }
       }
     },
-    "previous": {
-      "from": "2026-08-15",
-      "to": "2026-09-13",
-      "reportCount": 0,
-      "brokerCount": 0,
-      "targetPrice": {},
-      "earningsDirection": {},
-      "textSignal": {
-        "positive": 0,
-        "negative": 0,
-        "net": 0,
-        "netPerReport": 0
-      },
-      "topics": {}
-    },
     "topicAcceleration": [
       {
         "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.5,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.5,
-        "ratio": null
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.5,
+        "perReportDelta": -0.5,
+        "ratio": 0.0
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 2,
+    "reportCountChange": -2,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null

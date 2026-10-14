@@ -1,16 +1,16 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-10-14",
+  "asOf": "2026-10-15",
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
-    "OK": 24,
+    "OK": 22,
     "NO_RESEARCH": 4,
-    "LOW_SAMPLE": 8,
-    "NO_RECENT_RESEARCH": 6
+    "LOW_SAMPLE": 9,
+    "NO_RECENT_RESEARCH": 7
   },
-  "rankingEligibleCount": 24,
+  "rankingEligibleCount": 22,
   "stocks": [
     {
       "itemCode": "005930",
@@ -671,32 +671,21 @@
     {
       "itemCode": "105560",
       "itemName": "KB금융",
-      "status": "OK",
-      "rankingEligible": true,
+      "status": "LOW_SAMPLE",
+      "rankingEligible": false,
       "reportCount": 25,
       "brokerCount": 10,
-      "recentReportCount": 3,
-      "previousReportCount": 0,
-      "recentTargetMean": 217667,
-      "previousTargetMean": null,
-      "recentTargetMedian": 213000,
-      "recentTargetStdev": 12684,
-      "targetMeanChangePct": null,
+      "recentReportCount": 2,
+      "previousReportCount": 1,
+      "recentTargetMean": 209000,
+      "previousTargetMean": 235000,
+      "recentTargetMedian": 209000,
+      "recentTargetStdev": 4000,
+      "targetMeanChangePct": -11.06,
       "targetDispersionChangePct": null,
       "revisionUp": 10,
       "revisionDown": 0,
-      "risingTopics": [
-        {
-          "topic": "원가",
-          "delta": 0.333,
-          "ratio": null
-        },
-        {
-          "topic": "환율",
-          "delta": 0.333,
-          "ratio": null
-        }
-      ]
+      "risingTopics": []
     },
     {
       "itemCode": "086790",
@@ -805,24 +794,24 @@
     {
       "itemCode": "196170",
       "itemName": "알테오젠",
-      "status": "OK",
-      "rankingEligible": true,
+      "status": "LOW_SAMPLE",
+      "rankingEligible": false,
       "reportCount": 20,
       "brokerCount": 4,
-      "recentReportCount": 3,
-      "previousReportCount": 5,
-      "recentTargetMean": 433333,
-      "previousTargetMean": 488000,
-      "recentTargetMedian": 450000,
-      "recentTargetStdev": 23570,
-      "targetMeanChangePct": -11.2,
-      "targetDispersionChangePct": -35.51,
+      "recentReportCount": 2,
+      "previousReportCount": 6,
+      "recentTargetMean": 425000,
+      "previousTargetMean": 481667,
+      "recentTargetMedian": 425000,
+      "recentTargetStdev": 25000,
+      "targetMeanChangePct": -11.76,
+      "targetDispersionChangePct": -31.03,
       "revisionUp": 3,
       "revisionDown": 4,
       "risingTopics": [
         {
           "topic": "수요",
-          "delta": 0.333,
+          "delta": 0.5,
           "ratio": null
         }
       ]
@@ -953,27 +942,21 @@
     {
       "itemCode": "052690",
       "itemName": "한전기술",
-      "status": "LOW_SAMPLE",
+      "status": "NO_RECENT_RESEARCH",
       "rankingEligible": false,
       "reportCount": 11,
       "brokerCount": 7,
-      "recentReportCount": 2,
-      "previousReportCount": 0,
-      "recentTargetMean": 160000,
-      "previousTargetMean": null,
-      "recentTargetMedian": 160000,
-      "recentTargetStdev": 0,
+      "recentReportCount": 0,
+      "previousReportCount": 2,
+      "recentTargetMean": null,
+      "previousTargetMean": 160000,
+      "recentTargetMedian": null,
+      "recentTargetStdev": null,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 0,
       "revisionDown": 1,
-      "risingTopics": [
-        {
-          "topic": "환율",
-          "delta": 0.5,
-          "ratio": null
-        }
-      ]
+      "risingTopics": []
     },
     {
       "itemCode": "051600",
@@ -2063,31 +2046,6 @@
           {
             "topic": "원가",
             "delta": 0.1,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "196170",
-        "itemName": "알테오젠",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 20,
-        "brokerCount": 4,
-        "recentReportCount": 3,
-        "previousReportCount": 5,
-        "recentTargetMean": 433333,
-        "previousTargetMean": 488000,
-        "recentTargetMedian": 450000,
-        "recentTargetStdev": 23570,
-        "targetMeanChangePct": -11.2,
-        "targetDispersionChangePct": -35.51,
-        "revisionUp": 3,
-        "revisionDown": 4,
-        "risingTopics": [
-          {
-            "topic": "수요",
-            "delta": 0.333,
             "ratio": null
           }
         ]
