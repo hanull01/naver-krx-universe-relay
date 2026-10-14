@@ -3,23 +3,23 @@
   "coverageStatus": "OK",
   "version": "daily-market-research-report-v2",
   "asOf": "2026-10-14",
-  "generatedAt": "2026-10-14T22:53:43.761784+09:00",
+  "generatedAt": "2026-10-14T22:59:22.936573+09:00",
   "sources": {
     "quotes": {
       "path": "data/quotes.json",
-      "generatedAt": "2026-10-14T22:51:08.905567+09:00",
+      "generatedAt": "2026-10-14T22:57:07.084965+09:00",
       "sourceTime": "2026-10-14T20:00:00+09:00",
       "status": "ok",
       "fresh": true
     },
     "technicals": {
       "path": "data/technicals.json",
-      "generatedAt": "2026-10-14T22:51:10.497929+09:00",
+      "generatedAt": "2026-10-14T22:57:08.719072+09:00",
       "status": "ok"
     },
     "states": {
       "path": "data/states.json",
-      "generatedAt": "2026-10-14T22:51:10.537125+09:00",
+      "generatedAt": "2026-10-14T22:57:08.736849+09:00",
       "status": "ok"
     },
     "researchIntelligence": {
@@ -29,13 +29,13 @@
     },
     "indices": {
       "path": "data/market/indices.json",
-      "generatedAt": "2026-10-14T13:51:44.502518+00:00",
+      "generatedAt": "2026-10-14T13:57:40.665889+00:00",
       "status": "OK",
       "source": "NAVER_MOBILE_INDEX_BASIC"
     },
     "dynamicUniverse": {
       "path": "data/dynamic-universe/latest.json",
-      "generatedAt": "2026-10-14T13:51:42.523285+00:00",
+      "generatedAt": "2026-10-14T13:57:38.926711+00:00",
       "status": "AVAILABLE",
       "industryEvidence": {
         "status": "FULL",
@@ -87,7 +87,7 @@
     },
     "indices": {
       "schemaVersion": 1,
-      "generatedAt": "2026-10-14T13:51:44.502518+00:00",
+      "generatedAt": "2026-10-14T13:57:40.665889+00:00",
       "status": "OK",
       "source": "NAVER_MOBILE_INDEX_BASIC",
       "indices": [
@@ -123,13 +123,13 @@
         "value": 20526581000000,
         "availableCount": 943,
         "observedCount": 943,
-        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
+        "sourceTime": "2026-10-14T13:57:36.601166+00:00"
       },
       "KOSDAQ": {
         "value": 6161503560000,
         "availableCount": 1820,
         "observedCount": 1820,
-        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
+        "sourceTime": "2026-10-14T13:57:36.601166+00:00"
       }
     },
     "dynamicThemes": [
@@ -138,7 +138,7 @@
         "name": "리비안(RIVIAN)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -151,7 +151,7 @@
         "name": "2차전지(생산)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -164,7 +164,7 @@
         "name": "2차전지(나트륨이온)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -177,7 +177,7 @@
         "name": "LPG(액화석유가스)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -190,7 +190,7 @@
         "name": "정유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -203,7 +203,7 @@
         "name": "윤활유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -216,7 +216,7 @@
         "name": "석유화학",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -229,7 +229,7 @@
         "name": "2차전지(LFP/리튬인산철)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -242,7 +242,7 @@
         "name": "2차전지",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -255,7 +255,7 @@
         "name": "2차전지(전고체)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -268,7 +268,7 @@
         "name": "리튬",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -281,7 +281,7 @@
         "name": "주유소",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -294,7 +294,7 @@
         "name": "니켈",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -307,7 +307,7 @@
         "name": "전력저장장치(ESS)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -320,7 +320,7 @@
         "name": "전기차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -333,7 +333,7 @@
         "name": "폐배터리",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -346,7 +346,7 @@
         "name": "음성인식",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -359,7 +359,7 @@
         "name": "자동차부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -373,7 +373,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -385,7 +385,7 @@
         "name": "스마트폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -398,7 +398,7 @@
         "name": "조선",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -411,7 +411,7 @@
         "name": "MLCC(적층세라믹콘덴서)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -424,7 +424,7 @@
         "name": "폴더블폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -437,7 +437,7 @@
         "name": "고령화 사회(노인복지)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -450,7 +450,7 @@
         "name": "스마트홈(홈네트워크)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -463,7 +463,7 @@
         "name": "뉴로모픽 반도체",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -476,7 +476,7 @@
         "name": "NFT(대체불가토큰)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -489,7 +489,7 @@
         "name": "삼성페이",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -502,7 +502,7 @@
         "name": "공기청정기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -515,7 +515,7 @@
         "name": "갤럭시 부품주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -528,7 +528,7 @@
         "name": "의료기기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -541,7 +541,7 @@
         "name": "제습기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -554,7 +554,7 @@
         "name": "가상현실(VR)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -567,7 +567,7 @@
         "name": "마이크로 LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -580,7 +580,7 @@
         "name": "LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -593,7 +593,7 @@
         "name": "무선충전기술",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -607,7 +607,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -619,7 +619,7 @@
         "name": "플렉서블 디스플레이",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -632,7 +632,7 @@
         "name": "치매",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -645,7 +645,7 @@
         "name": "LNG(액화천연가스)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -658,7 +658,7 @@
         "name": "피지컬 AI/휴머노이드 로봇",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -672,7 +672,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -685,7 +685,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -697,7 +697,7 @@
         "name": "유리 기판",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -711,7 +711,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -724,7 +724,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -736,7 +736,7 @@
         "name": "카메라모듈/부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -749,7 +749,7 @@
         "name": "드론(Drone)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -762,7 +762,7 @@
         "name": "UAM(도심항공모빌리티)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -775,7 +775,7 @@
         "name": "SI(시스템통합)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -788,7 +788,7 @@
         "name": "자동차 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -801,7 +801,7 @@
         "name": "냉각시스템(액침냉각 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -815,7 +815,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -827,7 +827,7 @@
         "name": "스마트카(SMART CAR)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -840,7 +840,7 @@
         "name": "지능형로봇/인공지능(AI)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -854,7 +854,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -866,7 +866,7 @@
         "name": "방위산업/전쟁 및 테러",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -880,7 +880,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 5,
+        "weakenStreak": 6,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -892,7 +892,7 @@
         "name": "아이폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -906,7 +906,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -918,7 +918,7 @@
         "name": "IT 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -931,7 +931,7 @@
         "name": "치아 치료(임플란트 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -944,7 +944,7 @@
         "name": "자율주행차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -958,7 +958,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -970,7 +970,7 @@
         "name": "자원개발",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -983,7 +983,7 @@
         "name": "반도체 대표주(생산)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -997,7 +997,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1009,7 +1009,7 @@
         "name": "CXL(컴퓨트익스프레스링크)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1022,7 +1022,7 @@
         "name": "전력반도체",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1036,7 +1036,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1049,7 +1049,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1061,7 +1061,7 @@
         "name": "S7(삼성전자/SK하이닉스 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1075,7 +1075,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1088,7 +1088,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1101,7 +1101,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1113,7 +1113,7 @@
         "name": "우주항공산업(누리호/인공위성 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1127,7 +1127,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1140,7 +1140,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1152,7 +1152,7 @@
         "name": "바이오시밀러(복제 바이오의약품)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1166,7 +1166,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1179,7 +1179,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1192,7 +1192,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1204,7 +1204,7 @@
         "name": "반도체 기판(FC-BGA/PCB/MLB 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1217,7 +1217,7 @@
         "name": "항공기부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1231,7 +1231,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1244,7 +1244,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1256,7 +1256,7 @@
         "name": "면역항암제",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1269,7 +1269,7 @@
         "name": "전기차(충전소/충전기)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1283,7 +1283,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1296,7 +1296,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1309,7 +1309,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1322,7 +1322,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1335,7 +1335,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1348,7 +1348,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1360,7 +1360,7 @@
         "name": "밸류업(25년 기업가치 제고계획 발표)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1374,7 +1374,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1387,7 +1387,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1400,7 +1400,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1413,7 +1413,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1426,7 +1426,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1439,7 +1439,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1452,7 +1452,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1465,7 +1465,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1478,7 +1478,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1491,7 +1491,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1504,7 +1504,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1517,7 +1517,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1529,7 +1529,7 @@
         "name": "전자파",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1543,7 +1543,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 6,
+        "weakenStreak": 7,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1556,7 +1556,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1762,10 +1762,10 @@
   "fullMarket": {
     "status": "AVAILABLE",
     "asOfDate": "20261014",
-    "generatedAt": "2026-10-14T13:51:39.818141+00:00",
-    "sourceTime": "2026-10-14T13:51:39.818141+00:00",
+    "generatedAt": "2026-10-14T13:57:36.601166+00:00",
+    "sourceTime": "2026-10-14T13:57:36.601166+00:00",
     "quality": {
-      "generatedAt": "2026-10-14T13:51:39.818141+00:00",
+      "generatedAt": "2026-10-14T13:57:36.601166+00:00",
       "scope": "AUTHORITATIVE_FULL_MARKET",
       "authoritativeCount": 2763,
       "currentCount": 2763,
@@ -7326,16 +7326,16 @@
       "baselineGeneratedAt": "2026-10-14T17:00:21.418691+09:00",
       "baselineCoverage": 100.0,
       "baselineFreshnessStatus": "VALID_CURRENT_DAY_FINAL",
-      "currentSnapshotGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
+      "currentSnapshotGeneratedAt": "2026-10-14T13:57:36.601166+00:00",
       "currentCoverage": 2763,
       "currentAttempt": 1,
-      "evidenceGeneratedAt": "2026-10-14T22:51:40.041480+09:00",
-      "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
+      "evidenceGeneratedAt": "2026-10-14T22:57:36.726837+09:00",
+      "relayQuoteGeneratedAt": "2026-10-14T22:57:07.084965+09:00",
       "relayQuoteSourceTime": "2026-10-14T20:00:00+09:00",
       "relayQuoteSourceTimeLatest": "2026-10-14T20:00:00+09:00",
       "session": "CLOSED",
       "universeSubsetCount": 42,
-      "universeSubsetSnapshotGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
+      "universeSubsetSnapshotGeneratedAt": "2026-10-14T13:57:36.601166+00:00",
       "universeCrossCheck": {
         "status": "AVAILABLE",
         "expectedCount": 42,
@@ -7378,7 +7378,7 @@
             "differentCount": 0
           }
         },
-        "relayGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
+        "relayGeneratedAt": "2026-10-14T22:57:07.084965+09:00",
         "relaySourceTime": "2026-10-14T20:00:00+09:00",
         "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
         "relaySessions": [
@@ -7391,7 +7391,7 @@
       "monitoredUniverse": {
         "scope": "MONITORED_UNIVERSE",
         "configuredCount": 42,
-        "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
+        "relayQuoteGeneratedAt": "2026-10-14T22:57:07.084965+09:00",
         "relaySourceTime": "2026-10-14T20:00:00+09:00",
         "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
         "current": {
@@ -9273,10 +9273,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 87.5,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 92261122000.0,
+          "availableCount": 8,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 97.44082670054674,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9340,10 +9340,10 @@
         "pctNear52WeekHigh": 1.2658,
         "pctVolumeAbove20DayAverage": 43.4211,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 73719828000.0,
+          "availableCount": 79,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 45.97310509188925,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9407,10 +9407,10 @@
         "pctNear52WeekHigh": 9.0909,
         "pctVolumeAbove20DayAverage": 63.6364,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 239357048000.0,
+          "availableCount": 11,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 93.86145170039029,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9474,10 +9474,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 44.4444,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 92751000000.0,
+          "availableCount": 9,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 92.98012959429009,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9541,10 +9541,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 31.25,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 602718691000.0,
+          "availableCount": 169,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 51.1197022094674,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9608,10 +9608,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 42.8571,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 39260000000.0,
+          "availableCount": 8,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 92.53183902190524,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9675,10 +9675,10 @@
         "pctNear52WeekHigh": 10.5263,
         "pctVolumeAbove20DayAverage": 38.8889,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 447936074000.0,
+          "availableCount": 19,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 78.78200048697127,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9742,10 +9742,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.6667,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 159487013000.0,
+          "availableCount": 15,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 96.38527746456697,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9809,10 +9809,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 73375898000.0,
+          "availableCount": 4,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 99.92504350679293,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9876,10 +9876,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 44.2308,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 303843309000.0,
+          "availableCount": 54,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 50.010344970275455,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -9943,10 +9943,10 @@
         "pctNear52WeekHigh": 9.5238,
         "pctVolumeAbove20DayAverage": 10.5263,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 13860842000.0,
+          "availableCount": 21,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 94.50603361613963,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10010,10 +10010,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.7937,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1415953030000.0,
+          "availableCount": 66,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 68.91449231193778,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10077,10 +10077,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 33630029000.0,
+          "availableCount": 20,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 85.23044389881436,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10144,10 +10144,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 41.9355,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 649678199000.0,
+          "availableCount": 32,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 45.04861028898401,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10211,10 +10211,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 54.5455,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 3321424000.0,
+          "availableCount": 11,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 85.51672415205044,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10278,10 +10278,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 57.1429,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 7347679000.0,
+          "availableCount": 9,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 97.73521679431015,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10345,10 +10345,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 55564000000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10394,10 +10394,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 438871235000.0,
+          "availableCount": 30,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 56.84446372977714,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10461,10 +10461,10 @@
         "pctNear52WeekHigh": 1.8868,
         "pctVolumeAbove20DayAverage": 26.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 79828589000.0,
+          "availableCount": 54,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 73.6322371926178,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10528,10 +10528,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1075000000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10577,10 +10577,10 @@
         "pctNear52WeekHigh": 0.6711,
         "pctVolumeAbove20DayAverage": 39.3103,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 347112399000.0,
+          "availableCount": 150,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 54.813368968706875,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10644,10 +10644,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 45.4545,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1708222000.0,
+          "availableCount": 11,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 72.03390425834581,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10711,10 +10711,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 16.6667,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 14251391000.0,
+          "availableCount": 12,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 88.81940015539536,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10778,10 +10778,10 @@
         "pctNear52WeekHigh": 0.8475,
         "pctVolumeAbove20DayAverage": 40.678,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 598194615000.0,
+          "availableCount": 119,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 44.516097992624026,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10845,10 +10845,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 15629428000.0,
+          "availableCount": 28,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 57.15147093035011,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10912,10 +10912,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.7143,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1372772000.0,
+          "availableCount": 14,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 61.52237953571314,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -10979,10 +10979,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.7143,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1670302490000.0,
+          "availableCount": 102,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 62.14354101813019,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11046,10 +11046,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.5567,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 585598713000.0,
+          "availableCount": 103,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 51.918385790578064,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11113,10 +11113,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 18400040000.0,
+          "availableCount": 6,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 99.93590774802664,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11180,10 +11180,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 75.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 10008122000.0,
+          "availableCount": 8,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 90.25669351352832,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11247,10 +11247,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 58.3333,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 39633381000.0,
+          "availableCount": 12,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 95.35901062793508,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11314,10 +11314,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 53662221000.0,
+          "availableCount": 5,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 97.85655349598743,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11381,10 +11381,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.1818,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 4247745000.0,
+          "availableCount": 23,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 63.776827469633886,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11448,10 +11448,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 11.1111,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 8617950000.0,
+          "availableCount": 19,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 86.2614078754228,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11515,10 +11515,10 @@
         "pctNear52WeekHigh": 3.2258,
         "pctVolumeAbove20DayAverage": 35.7143,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 10252774000.0,
+          "availableCount": 31,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 47.30096459748357,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11582,10 +11582,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 26.087,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 285371150000.0,
+          "availableCount": 76,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 54.85628102210052,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11649,10 +11649,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 12944157000.0,
+          "availableCount": 2,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11707,10 +11707,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 169000000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11756,10 +11756,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 31.25,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 218697108000.0,
+          "availableCount": 48,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 86.98041265365063,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11823,10 +11823,10 @@
         "pctNear52WeekHigh": 2.5641,
         "pctVolumeAbove20DayAverage": 28.9474,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 63376449000.0,
+          "availableCount": 39,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 74.10639242346949,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11890,10 +11890,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 127000000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -11939,10 +11939,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 21.0526,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 24908956000.0,
+          "availableCount": 19,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 62.65361342322014,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12006,10 +12006,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 66.6667,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 4935209000.0,
+          "availableCount": 15,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 88.26373918510848,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12073,10 +12073,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 21.875,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 212253640000.0,
+          "availableCount": 72,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 72.19877595503192,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12140,10 +12140,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 41.6667,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 265698974000.0,
+          "availableCount": 12,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 95.4471130174556,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12207,10 +12207,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 8466000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12256,10 +12256,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 77145385000.0,
+          "availableCount": 38,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 66.19822948579491,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12323,10 +12323,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.7407,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 12979545000.0,
+          "availableCount": 27,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 84.15212551749696,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12390,10 +12390,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 374850991000.0,
+          "availableCount": 61,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 70.75291418930783,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12457,10 +12457,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 32.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 20437358000.0,
+          "availableCount": 29,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 80.87685306486289,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12524,10 +12524,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 27.2727,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 4231771000.0,
+          "availableCount": 12,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 94.16591776823462,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12591,10 +12591,10 @@
         "pctNear52WeekHigh": 50.0,
         "pctVolumeAbove20DayAverage": 0.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 1000000.0,
+          "availableCount": 2,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12649,10 +12649,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 10.3448,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 192677024000.0,
+          "availableCount": 31,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 65.88849950267033,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12716,10 +12716,10 @@
         "pctNear52WeekHigh": 9.1954,
         "pctVolumeAbove20DayAverage": 20.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 19376378000.0,
+          "availableCount": 87,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 73.37194288839741,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12783,10 +12783,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.1538,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 169545705000.0,
+          "availableCount": 39,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 57.7336948759628,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12850,10 +12850,10 @@
         "pctNear52WeekHigh": 1.5152,
         "pctVolumeAbove20DayAverage": 39.6825,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 124486826000.0,
+          "availableCount": 66,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 62.750127471319736,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12917,10 +12917,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 30.2326,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 117270153000.0,
+          "availableCount": 89,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 60.661641671090855,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -12984,10 +12984,10 @@
         "pctNear52WeekHigh": 1.8868,
         "pctVolumeAbove20DayAverage": 29.4118,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 179712275000.0,
+          "availableCount": 54,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 62.70007488358822,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13051,10 +13051,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 28989582000.0,
+          "availableCount": 6,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 98.58148351362914,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13118,10 +13118,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 16.5138,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 190924595000.0,
+          "availableCount": 112,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 51.91802711431704,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13185,10 +13185,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 257752000.0,
+          "availableCount": 5,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 97.15850895434372,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13252,10 +13252,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 303854488000.0,
+          "availableCount": 24,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 79.50976850471928,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13319,10 +13319,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 33.3333,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 511898000.0,
+          "availableCount": 6,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 85.11383127107354,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13386,10 +13386,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 23.0769,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 40848359000.0,
+          "availableCount": 13,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 86.93765641846224,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13453,10 +13453,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 29.0323,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 67401253000.0,
+          "availableCount": 33,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 57.091465347090804,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13520,10 +13520,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 5111421000.0,
+          "availableCount": 5,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 98.75451464475339,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13587,10 +13587,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 73997787000.0,
+          "availableCount": 14,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 60.03693056388295,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13654,10 +13654,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 19.6429,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 81642609000.0,
+          "availableCount": 57,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 48.55230067427169,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13721,10 +13721,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 26.6667,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 140232570000.0,
+          "availableCount": 16,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 99.43980916844069,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13788,10 +13788,10 @@
         "pctNear52WeekHigh": 2.0408,
         "pctVolumeAbove20DayAverage": 17.3913,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 203480041000.0,
+          "availableCount": 51,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 68.3417962354352,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13855,10 +13855,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 32.0988,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 191681081000.0,
+          "availableCount": 90,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 55.06442965020632,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13922,10 +13922,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 4193000000.0,
+          "availableCount": 1,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -13971,10 +13971,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 30.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 2024794000.0,
+          "availableCount": 11,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 88.35466719083522,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14038,10 +14038,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 71.4286,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 680554000.0,
+          "availableCount": 7,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 60.425329951774586,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14105,10 +14105,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.75,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 505171138000.0,
+          "availableCount": 33,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 62.87196082845097,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14172,10 +14172,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 63.6364,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 628485000000.0,
+          "availableCount": 11,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 75.50697311789462,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14239,10 +14239,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 75.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 186814919000.0,
+          "availableCount": 12,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 76.71175341194244,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14306,10 +14306,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.1078,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 13350000926000.0,
+          "availableCount": 168,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 75.42621199665376,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14373,10 +14373,10 @@
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
         "tradingValue": {
-          "total": null,
-          "availableCount": 0,
-          "coveragePct": 0.0,
-          "top3ConcentrationPct": null,
+          "total": 97744000000.0,
+          "availableCount": 3,
+          "coveragePct": 100.0,
+          "top3ConcentrationPct": 100.0,
           "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
         },
         "persistence": {
@@ -14417,8 +14417,8 @@
     ],
     "changes": {
       "comparisonAvailable": true,
-      "previousGeneratedAt": "2026-10-14T13:48:37.076975+00:00",
-      "currentGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
+      "previousGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
+      "currentGeneratedAt": "2026-10-14T13:57:36.601166+00:00",
       "deltaAdvancerPct": 0.0,
       "deltaPctAboveMA20": 0.0,
       "deltaPctAboveMA60": 0.0,
@@ -14430,7 +14430,7 @@
     "monitoredUniverse": {
       "scope": "MONITORED_UNIVERSE",
       "configuredCount": 42,
-      "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
+      "relayQuoteGeneratedAt": "2026-10-14T22:57:07.084965+09:00",
       "relaySourceTime": "2026-10-14T20:00:00+09:00",
       "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
       "current": {
@@ -14689,19 +14689,19 @@
         "value": 20526581000000,
         "availableCount": 943,
         "observedCount": 943,
-        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
+        "sourceTime": "2026-10-14T13:57:36.601166+00:00"
       },
       "KOSDAQ": {
         "value": 6161503560000,
         "availableCount": 1820,
         "observedCount": 1820,
-        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
+        "sourceTime": "2026-10-14T13:57:36.601166+00:00"
       }
     }
   },
   "dynamicUniverse": {
     "status": "AVAILABLE",
-    "generatedAt": "2026-10-14T13:51:42.523285+00:00",
+    "generatedAt": "2026-10-14T13:57:38.926711+00:00",
     "industryEvidence": {
       "status": "FULL",
       "sourceStatus": "OK",
@@ -14714,7 +14714,7 @@
         "name": "리비안(RIVIAN)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14727,7 +14727,7 @@
         "name": "2차전지(생산)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14740,7 +14740,7 @@
         "name": "2차전지(나트륨이온)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14753,7 +14753,7 @@
         "name": "LPG(액화석유가스)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14766,7 +14766,7 @@
         "name": "정유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14779,7 +14779,7 @@
         "name": "윤활유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14792,7 +14792,7 @@
         "name": "석유화학",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14805,7 +14805,7 @@
         "name": "2차전지(LFP/리튬인산철)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14818,7 +14818,7 @@
         "name": "2차전지",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14831,7 +14831,7 @@
         "name": "2차전지(전고체)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14844,7 +14844,7 @@
         "name": "리튬",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14857,7 +14857,7 @@
         "name": "주유소",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14870,7 +14870,7 @@
         "name": "니켈",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14883,7 +14883,7 @@
         "name": "전력저장장치(ESS)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14896,7 +14896,7 @@
         "name": "전기차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14909,7 +14909,7 @@
         "name": "폐배터리",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14922,7 +14922,7 @@
         "name": "음성인식",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14935,7 +14935,7 @@
         "name": "자동차부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14949,7 +14949,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14961,7 +14961,7 @@
         "name": "스마트폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14974,7 +14974,7 @@
         "name": "조선",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14987,7 +14987,7 @@
         "name": "MLCC(적층세라믹콘덴서)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15000,7 +15000,7 @@
         "name": "폴더블폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15013,7 +15013,7 @@
         "name": "고령화 사회(노인복지)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15026,7 +15026,7 @@
         "name": "스마트홈(홈네트워크)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15039,7 +15039,7 @@
         "name": "뉴로모픽 반도체",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15052,7 +15052,7 @@
         "name": "NFT(대체불가토큰)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15065,7 +15065,7 @@
         "name": "삼성페이",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15078,7 +15078,7 @@
         "name": "공기청정기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15091,7 +15091,7 @@
         "name": "갤럭시 부품주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15104,7 +15104,7 @@
         "name": "의료기기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15117,7 +15117,7 @@
         "name": "제습기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15130,7 +15130,7 @@
         "name": "가상현실(VR)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15143,7 +15143,7 @@
         "name": "마이크로 LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15156,7 +15156,7 @@
         "name": "LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15169,7 +15169,7 @@
         "name": "무선충전기술",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15183,7 +15183,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15195,7 +15195,7 @@
         "name": "플렉서블 디스플레이",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15208,7 +15208,7 @@
         "name": "치매",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15221,7 +15221,7 @@
         "name": "LNG(액화천연가스)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15234,7 +15234,7 @@
         "name": "피지컬 AI/휴머노이드 로봇",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15248,7 +15248,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15261,7 +15261,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15273,7 +15273,7 @@
         "name": "유리 기판",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15287,7 +15287,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15300,7 +15300,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15312,7 +15312,7 @@
         "name": "카메라모듈/부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15325,7 +15325,7 @@
         "name": "드론(Drone)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15338,7 +15338,7 @@
         "name": "UAM(도심항공모빌리티)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15351,7 +15351,7 @@
         "name": "SI(시스템통합)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15364,7 +15364,7 @@
         "name": "자동차 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15377,7 +15377,7 @@
         "name": "냉각시스템(액침냉각 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15391,7 +15391,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15403,7 +15403,7 @@
         "name": "스마트카(SMART CAR)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15416,7 +15416,7 @@
         "name": "지능형로봇/인공지능(AI)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15430,7 +15430,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15442,7 +15442,7 @@
         "name": "방위산업/전쟁 및 테러",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15456,7 +15456,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 5,
+        "weakenStreak": 6,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15468,7 +15468,7 @@
         "name": "아이폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15482,7 +15482,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15494,7 +15494,7 @@
         "name": "IT 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15507,7 +15507,7 @@
         "name": "치아 치료(임플란트 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15520,7 +15520,7 @@
         "name": "자율주행차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15534,7 +15534,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15546,7 +15546,7 @@
         "name": "자원개발",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15559,7 +15559,7 @@
         "name": "반도체 대표주(생산)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15573,7 +15573,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15585,7 +15585,7 @@
         "name": "CXL(컴퓨트익스프레스링크)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15598,7 +15598,7 @@
         "name": "전력반도체",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15612,7 +15612,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15625,7 +15625,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15637,7 +15637,7 @@
         "name": "S7(삼성전자/SK하이닉스 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15651,7 +15651,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15664,7 +15664,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15677,7 +15677,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15689,7 +15689,7 @@
         "name": "우주항공산업(누리호/인공위성 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15703,7 +15703,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15716,7 +15716,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15728,7 +15728,7 @@
         "name": "바이오시밀러(복제 바이오의약품)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15742,7 +15742,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15755,7 +15755,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15768,7 +15768,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15780,7 +15780,7 @@
         "name": "반도체 기판(FC-BGA/PCB/MLB 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15793,7 +15793,7 @@
         "name": "항공기부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15807,7 +15807,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15820,7 +15820,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15832,7 +15832,7 @@
         "name": "면역항암제",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15845,7 +15845,7 @@
         "name": "전기차(충전소/충전기)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15859,7 +15859,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15872,7 +15872,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15885,7 +15885,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15898,7 +15898,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15911,7 +15911,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15924,7 +15924,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15936,7 +15936,7 @@
         "name": "밸류업(25년 기업가치 제고계획 발표)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 8,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -15950,7 +15950,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15963,7 +15963,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15976,7 +15976,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -15989,7 +15989,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16002,7 +16002,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16015,7 +16015,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16028,7 +16028,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16041,7 +16041,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16054,7 +16054,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16067,7 +16067,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16080,7 +16080,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16093,7 +16093,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16105,7 +16105,7 @@
         "name": "전자파",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 9,
+        "qualifyStreak": 10,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -16119,7 +16119,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 6,
+        "weakenStreak": 7,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16132,7 +16132,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 10,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -16154,7 +16154,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 16,
+        "qualifyStreak": 17,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 224000.0,
@@ -16173,7 +16173,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 16,
+        "qualifyStreak": 17,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 41950.0,
@@ -16192,7 +16192,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 6,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -16209,7 +16209,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 6,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -16226,7 +16226,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 16,
+        "qualifyStreak": 17,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -16243,7 +16243,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 16,
+        "qualifyStreak": 17,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 600.0,
@@ -16262,7 +16262,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 12,
+        "qualifyStreak": 13,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 8310.0,
@@ -16281,7 +16281,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 11,
+        "qualifyStreak": 12,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 11530.0,
@@ -16300,7 +16300,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 15,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 182500.0,
@@ -16319,7 +16319,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 16,
+        "qualifyStreak": 17,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -16337,7 +16337,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 5,
+        "weakenStreak": 6,
         "collectionAdmitted": false,
         "currentPrice": 23300.0,
         "changeRate": 5.67
@@ -16356,7 +16356,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 5,
+        "weakenStreak": 6,
         "collectionAdmitted": false,
         "currentPrice": 7230.0,
         "changeRate": 10.38
@@ -16375,7 +16375,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 6,
+        "weakenStreak": 7,
         "collectionAdmitted": false
       },
       {
@@ -16392,7 +16392,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 6,
+        "weakenStreak": 7,
         "collectionAdmitted": false
       },
       {
@@ -16409,7 +16409,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 8,
         "collectionAdmitted": false,
         "currentPrice": 1610.0,
         "changeRate": 2.09
@@ -16428,7 +16428,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 11,
+        "weakenStreak": 12,
         "collectionAdmitted": false
       },
       {
@@ -16445,7 +16445,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 11,
+        "weakenStreak": 12,
         "collectionAdmitted": false,
         "currentPrice": 1125.0,
         "changeRate": 6.64
@@ -16464,7 +16464,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 12,
+        "weakenStreak": 13,
         "collectionAdmitted": false
       },
       {
@@ -16481,7 +16481,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 12,
+        "weakenStreak": 13,
         "collectionAdmitted": false,
         "currentPrice": 16320.0,
         "changeRate": 7.02
@@ -16500,7 +16500,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 14,
+        "weakenStreak": 15,
         "collectionAdmitted": false
       },
       {
@@ -16517,7 +16517,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 14,
+        "weakenStreak": 15,
         "collectionAdmitted": false
       }
     ],
