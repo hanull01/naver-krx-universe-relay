@@ -24,6 +24,8 @@ TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
+MARKET_INDICES_PATH = DATA / "market" / "indices.json"
+DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
     "latest-breadth.json",
@@ -113,6 +115,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "industries": payloads["latest-industries.json"].get("industries", []),
         "changes": payloads["latest-changes.json"],
         "monitoredUniverse": summary.get("monitoredUniverse", {}),
+        "marketTradingValue": payloads["latest-breadth.json"].get("fullMarket", {}).get("marketTradingValue", {}),
     }
 
 
@@ -712,6 +715,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     technicals = load_json(TECHNICALS_PATH)
     states = load_json(STATES_PATH)
     research = load_json(RESEARCH_PATH)
+    try:
+        indices = load_json(MARKET_INDICES_PATH)
+    except (OSError, ValueError, json.JSONDecodeError):
+        indices = {"status": "UNAVAILABLE", "indices": [], "errors": [{"reason": "MISSING_INDEX_SNAPSHOT"}]}
+    try:
+        dynamic_universe = load_json(DYNAMIC_UNIVERSE_PATH)
+    except (OSError, ValueError, json.JSONDecodeError):
+        dynamic_universe = {"status": "UNAVAILABLE", "reason": "MISSING_DYNAMIC_UNIVERSE_SNAPSHOT", "themes": [], "leaders": []}
 
     group_states = {}
     if GROUP_STATES_PATH.exists():
@@ -947,6 +958,19 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "asOf": research.get("asOf"),
                 "status": research.get("status"),
             },
+            "indices": {
+                "path": "data/market/indices.json",
+                "generatedAt": indices.get("generatedAt"),
+                "status": indices.get("status"),
+                "source": indices.get("source"),
+            },
+            "dynamicUniverse": {
+                "path": "data/dynamic-universe/latest.json",
+                "generatedAt": dynamic_universe.get("generatedAt"),
+                "status": dynamic_universe.get("status", "AVAILABLE"),
+                "industryEvidence": dynamic_universe.get("industryEvidence"),
+                "source": "GITHUB_DYNAMIC_UNIVERSE",
+            },
         },
         "coverage": {
             "enabledStockCount": len(enabled),
@@ -959,6 +983,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         },
         "marketSummary": {
             "breadth": breadth,
+            "indices": indices,
+            "marketTradingValue": full_market.get("marketTradingValue", {}),
+            "dynamicThemes": dynamic_universe.get("themes", []),
             "topGainers": [
                 {
                     "itemCode": row["itemCode"],
@@ -980,11 +1007,20 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         },
         "monitoredUniverse": {
             "breadth": breadth,
-            "scope": "MONITORED_UNIVERSE",
+            "scope": "MONITORED_UNIVERSE_STATIC_42",
             "current": monitored_current,
             "regularSession": monitored_regular,
         },
         "fullMarket": full_market,
+        "dynamicUniverse": {
+            "status": dynamic_universe.get("status", "AVAILABLE"),
+            "generatedAt": dynamic_universe.get("generatedAt"),
+            "industryEvidence": dynamic_universe.get("industryEvidence"),
+            "themes": dynamic_universe.get("themes", []),
+            "leaders": dynamic_universe.get("leaders", []),
+            "initialObservationCandidates": dynamic_universe.get("initialObservationCandidates", []),
+            "source": "GITHUB_DYNAMIC_UNIVERSE",
+        },
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
         "technicalEventsCurrent": technical_events(rows, "currentState"),
@@ -1036,9 +1072,44 @@ def write_markdown(report, path):
         f"- 20일 돌파 확인/시도/실패: {breadth['breakout20ConfirmedCount']}/{breadth['breakout20AttemptCount']}/{breadth['breakout20FailedCount']}",
         f"- 거래량 급증/증가: {breadth['volumeSurgeCount']}/{breadth['volumeElevatedCount']}",
         "",
-        "### 등락 상위",
+        "### 코스피·코스닥 지수",
         "",
     ])
+
+    index_snapshot = report["marketSummary"].get("indices") or {}
+    if index_snapshot.get("status") == "OK":
+        for index in index_snapshot.get("indices", []):
+            lines.append(
+                f"- {index['name']}: {index['close']:,.2f} "
+                f"({index['changePoints']:+,.2f}p, {index['changeRate']:+.2f}%), "
+                f"시장상태 {index.get('marketStatus') or '확인 불가'}, "
+                f"원천시각 {index.get('sourceTime') or '확인 불가'}"
+            )
+        trading_values = report["marketSummary"].get("marketTradingValue") or {}
+        for market in ("KOSPI", "KOSDAQ"):
+            row = trading_values.get(market) or {}
+            value = row.get("value")
+            if value is None:
+                lines.append(f"- {market} 시장 거래대금: 확인 불가 (확보 {row.get('availableCount', 0)}/{row.get('observedCount', 0)}종목)")
+            else:
+                lines.append(f"- {market} 시장 거래대금: {value:,.0f} (시세 기준시각 {row.get('sourceTime') or '확인 불가'})")
+    else:
+        lines.append(f"- 지수 자료 확인 불가: {index_snapshot.get('errors') or 'UNKNOWN'}")
+
+    dynamic = report.get("dynamicUniverse", {})
+    lines.extend(["", "### 동적 테마·관찰 결과", ""])
+    lines.append(f"- 원천: GitHub 동적 Universe (생성시각 {dynamic.get('generatedAt') or '확인 불가'})")
+    evidence = dynamic.get("industryEvidence") or {}
+    lines.append(f"- 업종 근거: {evidence.get('status') or evidence.get('industryEvidenceUsable') or '확인 불가'}")
+    themes = dynamic.get("themes") or []
+    if themes:
+        lines.append(f"- 검증된 동적 테마: {len(themes)}개")
+        for theme in themes[:10]:
+            lines.append(f"- {theme.get('name') or theme.get('id')}: 상태 {theme.get('status', '확인 불가')}")
+    else:
+        lines.append("- 검증된 동적 테마: 현재 선정 없음")
+
+    lines.extend(["", "### 등락 상위", ""])
 
     for row in report["marketSummary"]["topGainers"][:5]:
         lines.append(

@@ -365,11 +365,23 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     industries = industries or {"status": "UNUSABLE", "industries": []}
     membership = membership or {"status": "UNUSABLE", "industries": []}
     breadth_data = {market: breadth(features, market) for market in ("TOTAL", "KOSPI", "KOSDAQ")}
+    market_trading_value = {}
+    for market in ("KOSPI", "KOSDAQ"):
+        rows = [row for row in current_snapshot["stocks"] if row.get("market") == market]
+        values = [row.get("accumulatedTradingValue") for row in rows
+                  if row.get("accumulatedTradingValue") is not None]
+        market_trading_value[market] = {
+            "value": sum(values) if values else None,
+            "availableCount": len(values),
+            "observedCount": len(rows),
+            "sourceTime": current_snapshot.get("generatedAt"),
+        }
     publication_context = publication_context or {}
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                    "markets": breadth_data, "qualityStatus": collection_quality,
-                   "universeDelta": current_snapshot.get("universeDelta")}
+                   "universeDelta": current_snapshot.get("universeDelta"),
+                   "marketTradingValue": market_trading_value}
     summary = {"schemaVersion": 1, "generatedAt": current_snapshot["generatedAt"], "source": "NAVER_FULL_MARKET_EVIDENCE",
                # Keep breadth for current readers; fullMarket is the explicit
                # scope Work must use for market-wide interpretation.
