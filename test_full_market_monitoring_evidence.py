@@ -159,6 +159,18 @@ class EvidenceTests(unittest.TestCase):
             (root / "005930.jsonl").write_text(json.dumps(history("20260930", 100)) + "\n", encoding="utf-8")
             built, _ = evidence.build_evidence(snapshot, root, None, None, None, "20261001")
         self.assertEqual(built["latest-summary.json"]["themeEvidenceStatus"], "DISABLED_PENDING_RESEARCH_GATE")
+
+    def test_verified_theme_membership_is_reflected_in_summary(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1, "coverageCount": 1,
+                    "attemptCount": 1, "duplicateCodes": [], "missingCodes": [], "stocks": [current()]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "005930.jsonl").write_text(json.dumps(history("20260930", 100)) + "\n", encoding="utf-8")
+            membership = {"status": "OK", "generatedAt": "2026-10-14T17:00:00+09:00", "themes": [{"id": "520", "members": [{"code": "005930"}]}]}
+            built, _ = evidence.build_evidence(snapshot, root, None, None, None, "20261001", theme_membership=membership)
+        summary = built["latest-summary.json"]
+        self.assertEqual(summary["themeEvidenceStatus"], "AVAILABLE_RESEARCH_MEMBERSHIP")
+        self.assertEqual(summary["availableThemeCount"], 1)
         self.assertEqual(built["latest-quality.json"]["historyCoveragePct"], 100.0)
 
     def test_reconciliation_pending_snapshot_remains_analyzable_with_quality_status(self):

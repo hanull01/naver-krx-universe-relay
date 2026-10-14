@@ -378,6 +378,15 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         }
     publication_context = publication_context or {}
     collection_quality = current_snapshot.get("status", "UNKNOWN")
+    theme_status = str(theme_membership.get("status") or "UNUSABLE")
+    theme_rows = theme_membership.get("themes") or []
+    theme_evidence_status = "AVAILABLE_RESEARCH_MEMBERSHIP" if theme_status == "OK" and theme_rows else "DISABLED_PENDING_RESEARCH_GATE"
+    theme_evidence = {
+        "scope": "VERIFIED_RESEARCH_THEME_MEMBERSHIP",
+        "status": theme_evidence_status,
+        "themeCount": len(theme_rows),
+        "sourceGeneratedAt": theme_membership.get("generatedAt"),
+    }
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                    "markets": breadth_data, "qualityStatus": collection_quality,
                    "universeDelta": current_snapshot.get("universeDelta"),
@@ -386,8 +395,8 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                # Keep breadth for current readers; fullMarket is the explicit
                # scope Work must use for market-wide interpretation.
                "breadth": breadth_data, "fullMarket": full_market,
-               "themeEvidenceStatus": "DISABLED_PENDING_RESEARCH_GATE", "availableThemeCount": 0,
-               "themeEvidence": {"scope": "FULL_MARKET", "status": "DISABLED_PENDING_RESEARCH_GATE"},
+               "themeEvidenceStatus": theme_evidence_status, "availableThemeCount": len(theme_rows),
+               "themeEvidence": theme_evidence,
                "fullMarketQualityStatus": collection_quality}
     summary.update({key: publication_context[key] for key in (
         "session", "publicationStatus", "monitoredUniverse", "universeCrossCheck",
