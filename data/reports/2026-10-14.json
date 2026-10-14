@@ -3,23 +3,23 @@
   "coverageStatus": "OK",
   "version": "daily-market-research-report-v2",
   "asOf": "2026-10-14",
-  "generatedAt": "2026-10-14T22:15:04.566746+09:00",
+  "generatedAt": "2026-10-14T22:53:43.761784+09:00",
   "sources": {
     "quotes": {
       "path": "data/quotes.json",
-      "generatedAt": "2026-10-14T21:51:32.283888+09:00",
+      "generatedAt": "2026-10-14T22:51:08.905567+09:00",
       "sourceTime": "2026-10-14T20:00:00+09:00",
       "status": "ok",
       "fresh": true
     },
     "technicals": {
       "path": "data/technicals.json",
-      "generatedAt": "2026-10-14T21:51:33.348982+09:00",
+      "generatedAt": "2026-10-14T22:51:10.497929+09:00",
       "status": "ok"
     },
     "states": {
       "path": "data/states.json",
-      "generatedAt": "2026-10-14T21:51:33.383035+09:00",
+      "generatedAt": "2026-10-14T22:51:10.537125+09:00",
       "status": "ok"
     },
     "researchIntelligence": {
@@ -29,13 +29,13 @@
     },
     "indices": {
       "path": "data/market/indices.json",
-      "generatedAt": "2026-10-14T12:52:05.498997+00:00",
+      "generatedAt": "2026-10-14T13:51:44.502518+00:00",
       "status": "OK",
       "source": "NAVER_MOBILE_INDEX_BASIC"
     },
     "dynamicUniverse": {
       "path": "data/dynamic-universe/latest.json",
-      "generatedAt": "2026-10-14T12:52:03.651639+00:00",
+      "generatedAt": "2026-10-14T13:51:42.523285+00:00",
       "status": "AVAILABLE",
       "industryEvidence": {
         "status": "FULL",
@@ -87,7 +87,7 @@
     },
     "indices": {
       "schemaVersion": 1,
-      "generatedAt": "2026-10-14T12:52:05.498997+00:00",
+      "generatedAt": "2026-10-14T13:51:44.502518+00:00",
       "status": "OK",
       "source": "NAVER_MOBILE_INDEX_BASIC",
       "indices": [
@@ -123,13 +123,13 @@
         "value": 20526581000000,
         "availableCount": 943,
         "observedCount": 943,
-        "sourceTime": "2026-10-14T12:52:00.845042+00:00"
+        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
       },
       "KOSDAQ": {
         "value": 6161503560000,
         "availableCount": 1820,
         "observedCount": 1820,
-        "sourceTime": "2026-10-14T12:52:00.845042+00:00"
+        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
       }
     },
     "dynamicThemes": [
@@ -138,7 +138,7 @@
         "name": "리비안(RIVIAN)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -151,7 +151,7 @@
         "name": "2차전지(생산)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -164,7 +164,7 @@
         "name": "2차전지(나트륨이온)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -177,7 +177,7 @@
         "name": "LPG(액화석유가스)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -190,7 +190,7 @@
         "name": "정유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -203,7 +203,7 @@
         "name": "윤활유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -216,7 +216,7 @@
         "name": "석유화학",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -229,7 +229,7 @@
         "name": "2차전지(LFP/리튬인산철)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -242,7 +242,7 @@
         "name": "2차전지",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -255,7 +255,7 @@
         "name": "2차전지(전고체)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -268,7 +268,7 @@
         "name": "리튬",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -281,7 +281,7 @@
         "name": "주유소",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -294,7 +294,7 @@
         "name": "니켈",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -307,7 +307,7 @@
         "name": "전력저장장치(ESS)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -320,7 +320,7 @@
         "name": "전기차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -333,7 +333,7 @@
         "name": "폐배터리",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -346,7 +346,7 @@
         "name": "음성인식",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -359,7 +359,7 @@
         "name": "자동차부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -373,7 +373,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -385,7 +385,7 @@
         "name": "스마트폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -398,7 +398,7 @@
         "name": "조선",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -411,7 +411,7 @@
         "name": "MLCC(적층세라믹콘덴서)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -424,7 +424,7 @@
         "name": "폴더블폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -437,7 +437,7 @@
         "name": "고령화 사회(노인복지)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -450,7 +450,7 @@
         "name": "스마트홈(홈네트워크)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -463,7 +463,7 @@
         "name": "뉴로모픽 반도체",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -476,7 +476,7 @@
         "name": "NFT(대체불가토큰)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -489,7 +489,7 @@
         "name": "삼성페이",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -502,7 +502,7 @@
         "name": "공기청정기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -515,7 +515,7 @@
         "name": "갤럭시 부품주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -528,7 +528,7 @@
         "name": "의료기기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -541,7 +541,7 @@
         "name": "제습기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -554,7 +554,7 @@
         "name": "가상현실(VR)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -567,7 +567,7 @@
         "name": "마이크로 LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -580,7 +580,7 @@
         "name": "LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -593,7 +593,7 @@
         "name": "무선충전기술",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -607,7 +607,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -619,7 +619,7 @@
         "name": "플렉서블 디스플레이",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -632,7 +632,7 @@
         "name": "치매",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -645,7 +645,7 @@
         "name": "LNG(액화천연가스)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -658,7 +658,7 @@
         "name": "피지컬 AI/휴머노이드 로봇",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -672,7 +672,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -685,7 +685,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -697,7 +697,7 @@
         "name": "유리 기판",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -711,7 +711,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -724,7 +724,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -736,7 +736,7 @@
         "name": "카메라모듈/부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -749,7 +749,7 @@
         "name": "드론(Drone)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -762,7 +762,7 @@
         "name": "UAM(도심항공모빌리티)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -775,7 +775,7 @@
         "name": "SI(시스템통합)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -788,7 +788,7 @@
         "name": "자동차 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -801,7 +801,7 @@
         "name": "냉각시스템(액침냉각 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -815,7 +815,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -827,7 +827,7 @@
         "name": "스마트카(SMART CAR)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -840,7 +840,7 @@
         "name": "지능형로봇/인공지능(AI)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -854,7 +854,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -866,7 +866,7 @@
         "name": "방위산업/전쟁 및 테러",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -880,7 +880,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 3,
+        "weakenStreak": 5,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -892,7 +892,7 @@
         "name": "아이폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -906,7 +906,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -918,7 +918,7 @@
         "name": "IT 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -931,7 +931,7 @@
         "name": "치아 치료(임플란트 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -944,7 +944,7 @@
         "name": "자율주행차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -958,7 +958,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -970,7 +970,7 @@
         "name": "자원개발",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -983,7 +983,7 @@
         "name": "반도체 대표주(생산)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -997,7 +997,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1009,7 +1009,7 @@
         "name": "CXL(컴퓨트익스프레스링크)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1022,7 +1022,7 @@
         "name": "전력반도체",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1036,7 +1036,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1049,7 +1049,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1061,7 +1061,7 @@
         "name": "S7(삼성전자/SK하이닉스 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1075,7 +1075,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1088,7 +1088,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1101,7 +1101,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1113,7 +1113,7 @@
         "name": "우주항공산업(누리호/인공위성 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1127,7 +1127,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1140,7 +1140,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1152,7 +1152,7 @@
         "name": "바이오시밀러(복제 바이오의약품)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1166,7 +1166,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1179,7 +1179,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1192,7 +1192,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1204,7 +1204,7 @@
         "name": "반도체 기판(FC-BGA/PCB/MLB 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1217,7 +1217,7 @@
         "name": "항공기부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1231,7 +1231,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1244,7 +1244,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1256,7 +1256,7 @@
         "name": "면역항암제",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1269,7 +1269,7 @@
         "name": "전기차(충전소/충전기)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1283,7 +1283,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1296,7 +1296,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1309,7 +1309,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1322,7 +1322,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1335,7 +1335,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1348,7 +1348,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1360,7 +1360,7 @@
         "name": "밸류업(25년 기업가치 제고계획 발표)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1374,7 +1374,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1387,7 +1387,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1400,7 +1400,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1413,7 +1413,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1426,7 +1426,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1439,7 +1439,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1452,7 +1452,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1465,7 +1465,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1478,7 +1478,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1491,7 +1491,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1504,7 +1504,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1517,7 +1517,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1529,7 +1529,7 @@
         "name": "전자파",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -1543,7 +1543,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 4,
+        "weakenStreak": 6,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1556,7 +1556,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -1762,10 +1762,10 @@
   "fullMarket": {
     "status": "AVAILABLE",
     "asOfDate": "20261014",
-    "generatedAt": "2026-10-14T12:52:00.845042+00:00",
-    "sourceTime": "2026-10-14T12:52:00.845042+00:00",
+    "generatedAt": "2026-10-14T13:51:39.818141+00:00",
+    "sourceTime": "2026-10-14T13:51:39.818141+00:00",
     "quality": {
-      "generatedAt": "2026-10-14T12:52:00.845042+00:00",
+      "generatedAt": "2026-10-14T13:51:39.818141+00:00",
       "scope": "AUTHORITATIVE_FULL_MARKET",
       "authoritativeCount": 2763,
       "currentCount": 2763,
@@ -7321,21 +7321,21 @@
       "industryCoverageVsPreviousPct": null,
       "industryFailedPage": null,
       "industryMissingCount": 0,
-      "themeStatus": "DISABLED_PENDING_RESEARCH_GATE",
+      "themeStatus": "OK",
       "baselineAsOfDate": "20261014",
       "baselineGeneratedAt": "2026-10-14T17:00:21.418691+09:00",
       "baselineCoverage": 100.0,
       "baselineFreshnessStatus": "VALID_CURRENT_DAY_FINAL",
-      "currentSnapshotGeneratedAt": "2026-10-14T12:52:00.845042+00:00",
+      "currentSnapshotGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
       "currentCoverage": 2763,
       "currentAttempt": 1,
-      "evidenceGeneratedAt": "2026-10-14T21:52:01.064506+09:00",
-      "relayQuoteGeneratedAt": "2026-10-14T21:51:32.283888+09:00",
+      "evidenceGeneratedAt": "2026-10-14T22:51:40.041480+09:00",
+      "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
       "relayQuoteSourceTime": "2026-10-14T20:00:00+09:00",
       "relayQuoteSourceTimeLatest": "2026-10-14T20:00:00+09:00",
       "session": "CLOSED",
       "universeSubsetCount": 42,
-      "universeSubsetSnapshotGeneratedAt": "2026-10-14T12:52:00.845042+00:00",
+      "universeSubsetSnapshotGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
       "universeCrossCheck": {
         "status": "AVAILABLE",
         "expectedCount": 42,
@@ -7378,7 +7378,7 @@
             "differentCount": 0
           }
         },
-        "relayGeneratedAt": "2026-10-14T21:51:32.283888+09:00",
+        "relayGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
         "relaySourceTime": "2026-10-14T20:00:00+09:00",
         "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
         "relaySessions": [
@@ -7391,7 +7391,7 @@
       "monitoredUniverse": {
         "scope": "MONITORED_UNIVERSE",
         "configuredCount": 42,
-        "relayQuoteGeneratedAt": "2026-10-14T21:51:32.283888+09:00",
+        "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
         "relaySourceTime": "2026-10-14T20:00:00+09:00",
         "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
         "current": {
@@ -9261,11 +9261,28 @@
         "advancePct": 75.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 6.834738,
+        "relativeStrengthVsMarketMedian": 1.278339,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 5.833082,
+        "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE",
+        "pctAboveMA5": 37.5,
         "pctAboveMA20": 62.5,
         "pctAboveMA60": 62.5,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 87.5,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "000650",
@@ -9311,11 +9328,28 @@
         "advancePct": 55.6962,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 5.516736,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 5.793419,
+        "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE",
+        "pctAboveMA5": 39.2405,
         "pctAboveMA20": 44.3038,
         "pctAboveMA60": 47.4359,
         "pctBreakout20": 9.2105,
         "pctNear52WeekHigh": 1.2658,
         "pctVolumeAbove20DayAverage": 43.4211,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "033340",
@@ -9361,11 +9395,28 @@
         "advancePct": 81.8182,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 2.595015,
+        "relativeStrengthVsMarketMedian": 1.146914,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 1.724784,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 63.6364,
         "pctAboveMA20": 45.4545,
         "pctAboveMA60": 54.5455,
         "pctBreakout20": 18.1818,
         "pctNear52WeekHigh": 9.0909,
         "pctVolumeAbove20DayAverage": 63.6364,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "028670",
@@ -9411,11 +9462,28 @@
         "advancePct": 66.6667,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 2.285029,
+        "relativeStrengthVsMarketMedian": 0.247525,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 2.314187,
+        "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE",
+        "pctAboveMA5": 33.3333,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 55.5556,
         "pctBreakout20": 33.3333,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 44.4444,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "089590",
@@ -9461,11 +9529,28 @@
         "advancePct": 44.9704,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 2.115783,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 2.392466,
+        "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE",
+        "pctAboveMA5": 18.9349,
         "pctAboveMA20": 27.2189,
         "pctAboveMA60": 33.3333,
         "pctBreakout20": 3.75,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 31.25,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "900120",
@@ -9511,11 +9596,28 @@
         "advancePct": 62.5,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.991717,
+        "relativeStrengthVsMarketMedian": 1.233431,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 1.034969,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 50.0,
         "pctAboveMA20": 50.0,
         "pctAboveMA60": 50.0,
         "pctBreakout20": 14.2857,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 42.8571,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "38380K",
@@ -9561,11 +9663,28 @@
         "advancePct": 63.1579,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.898034,
+        "relativeStrengthVsMarketMedian": 1.125,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 1.049717,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 36.8421,
         "pctAboveMA20": 42.1053,
         "pctAboveMA60": 57.8947,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 10.5263,
         "pctVolumeAbove20DayAverage": 38.8889,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "128820",
@@ -9611,11 +9730,28 @@
         "advancePct": 86.6667,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.88796,
+        "relativeStrengthVsMarketMedian": 1.465614,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.699029,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 40.0,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 33.3333,
         "pctBreakout20": 13.3333,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.6667,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "134580",
@@ -9661,11 +9797,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 1.84472,
+        "relativeStrengthVsMarketMedian": 1.958033,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.16337,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 25.0,
         "pctAboveMA20": 50.0,
         "pctAboveMA60": 25.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "065530",
@@ -9711,11 +9864,28 @@
         "advancePct": 68.5185,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.815776,
+        "relativeStrengthVsMarketMedian": 0.839695,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 1.252764,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 33.3333,
         "pctAboveMA20": 27.7778,
         "pctAboveMA60": 46.2963,
         "pctBreakout20": 3.8462,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 44.2308,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "009190",
@@ -9761,11 +9931,28 @@
         "advancePct": 61.9048,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.798151,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 2.074834,
+        "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE",
+        "pctAboveMA5": 23.8095,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 42.8571,
         "pctBreakout20": 5.2632,
         "pctNear52WeekHigh": 9.5238,
         "pctVolumeAbove20DayAverage": 10.5263,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "065650",
@@ -9811,11 +9998,28 @@
         "advancePct": 72.7273,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.356911,
+        "relativeStrengthVsMarketMedian": 1.788959,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.155365,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 28.7879,
         "pctAboveMA20": 53.0303,
         "pctAboveMA60": 62.1212,
         "pctBreakout20": 12.6984,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.7937,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "012340",
@@ -9861,11 +10065,28 @@
         "advancePct": 60.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.222518,
+        "relativeStrengthVsMarketMedian": 0.593385,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.905816,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 30.0,
         "pctAboveMA20": 45.0,
         "pctAboveMA60": 70.0,
         "pctBreakout20": 5.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "042600",
@@ -9911,11 +10132,28 @@
         "advancePct": 62.5,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.193332,
+        "relativeStrengthVsMarketMedian": 0.343944,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 1.126071,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 12.5,
         "pctAboveMA20": 21.875,
         "pctAboveMA60": 40.625,
         "pctBreakout20": 6.4516,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 41.9355,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "126340",
@@ -9961,11 +10199,28 @@
         "advancePct": 72.7273,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.175365,
+        "relativeStrengthVsMarketMedian": 0.659341,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.792707,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 63.6364,
         "pctAboveMA20": 27.2727,
         "pctAboveMA60": 45.4545,
         "pctBreakout20": 9.0909,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 54.5455,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "035200",
@@ -10011,11 +10266,28 @@
         "advancePct": 77.7778,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 1.040815,
+        "relativeStrengthVsMarketMedian": 0.881057,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.436441,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 55.5556,
         "pctAboveMA20": 25.0,
         "pctAboveMA60": 25.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 57.1429,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "317240",
@@ -10061,11 +10333,28 @@
         "advancePct": 100.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.999677,
+        "relativeStrengthVsMarketMedian": 1.27636,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 100.0,
         "pctAboveMA20": 100.0,
         "pctAboveMA60": 100.0,
         "pctBreakout20": 100.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "033780",
@@ -10093,11 +10382,28 @@
         "advancePct": 70.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.971356,
+        "relativeStrengthVsMarketMedian": 1.333333,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.085294,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 13.3333,
         "pctAboveMA20": 3.3333,
         "pctAboveMA60": 10.0,
         "pctBreakout20": 3.5714,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "082740",
@@ -10143,11 +10449,28 @@
         "advancePct": 72.2222,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.938238,
+        "relativeStrengthVsMarketMedian": 0.90307,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.311851,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 40.7407,
         "pctAboveMA20": 38.8889,
         "pctAboveMA60": 40.7407,
         "pctBreakout20": 4.0,
         "pctNear52WeekHigh": 1.8868,
         "pctVolumeAbove20DayAverage": 26.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "131100",
@@ -10193,11 +10516,28 @@
         "advancePct": 100.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.630053,
+        "relativeStrengthVsMarketMedian": 0.906736,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 100.0,
         "pctAboveMA20": 100.0,
         "pctAboveMA60": 100.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "071320",
@@ -10225,11 +10565,28 @@
         "advancePct": 61.3333,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.484797,
+        "relativeStrengthVsMarketMedian": 0.337249,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.424231,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 27.3333,
         "pctAboveMA20": 28.6667,
         "pctAboveMA60": 32.6667,
         "pctBreakout20": 4.8276,
         "pctNear52WeekHigh": 0.6711,
         "pctVolumeAbove20DayAverage": 39.3103,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "011330",
@@ -10275,11 +10632,28 @@
         "advancePct": 63.6364,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.468083,
+        "relativeStrengthVsMarketMedian": 0.691643,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.053123,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 45.4545,
         "pctAboveMA20": 27.2727,
         "pctAboveMA60": 27.2727,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 45.4545,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "121440",
@@ -10325,11 +10699,28 @@
         "advancePct": 83.3333,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.453437,
+        "relativeStrengthVsMarketMedian": 0.462016,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.268104,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 25.0,
         "pctAboveMA20": 16.6667,
         "pctAboveMA60": 50.0,
         "pctBreakout20": 8.3333,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 16.6667,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "017940",
@@ -10375,11 +10766,28 @@
         "advancePct": 66.3866,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.446354,
+        "relativeStrengthVsMarketMedian": 0.570125,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.152912,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 32.7731,
         "pctAboveMA20": 36.1345,
         "pctAboveMA60": 51.2605,
         "pctBreakout20": 5.9322,
         "pctNear52WeekHigh": 0.8475,
         "pctVolumeAbove20DayAverage": 40.678,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "457190",
@@ -10425,11 +10833,28 @@
         "advancePct": 53.5714,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.394798,
+        "relativeStrengthVsMarketMedian": -0.325857,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.997338,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 17.8571,
         "pctAboveMA20": 14.2857,
         "pctAboveMA60": 17.8571,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "377220",
@@ -10475,11 +10900,28 @@
         "advancePct": 64.2857,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.354409,
+        "relativeStrengthVsMarketMedian": 0.981337,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.350245,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 28.5714,
         "pctAboveMA20": 14.2857,
         "pctAboveMA60": 7.1429,
         "pctBreakout20": 7.1429,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.7143,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "000180",
@@ -10525,11 +10967,28 @@
         "advancePct": 53.9216,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.276882,
+        "relativeStrengthVsMarketMedian": 0.094103,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.459462,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 21.5686,
         "pctAboveMA20": 49.0196,
         "pctAboveMA60": 60.7843,
         "pctBreakout20": 6.1224,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.7143,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "015260",
@@ -10575,11 +11034,28 @@
         "advancePct": 58.2524,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.238043,
+        "relativeStrengthVsMarketMedian": 0.191205,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.323521,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 10.6796,
         "pctAboveMA20": 17.6471,
         "pctAboveMA60": 30.3922,
         "pctBreakout20": 3.0928,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.5567,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "452280",
@@ -10625,11 +11101,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.22855,
+        "relativeStrengthVsMarketMedian": 0.464191,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.041042,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 16.6667,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 16.6667,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "191410",
@@ -10675,11 +11168,28 @@
         "advancePct": 75.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.222026,
+        "relativeStrengthVsMarketMedian": 0.514593,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.015884,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 37.5,
         "pctAboveMA20": 25.0,
         "pctAboveMA60": 50.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 75.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "121890",
@@ -10725,11 +11235,28 @@
         "advancePct": 66.6667,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.205488,
+        "relativeStrengthVsMarketMedian": 0.513187,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.031016,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 33.3333,
         "pctAboveMA20": 41.6667,
         "pctAboveMA60": 58.3333,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 58.3333,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "086280",
@@ -10775,11 +11302,28 @@
         "advancePct": 40.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.204729,
+        "relativeStrengthVsMarketMedian": 0.4662,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.015212,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "453450",
@@ -10825,11 +11369,28 @@
         "advancePct": 69.5652,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.200654,
+        "relativeStrengthVsMarketMedian": 0.389972,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.087365,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 34.7826,
         "pctAboveMA20": 30.4348,
         "pctAboveMA60": 34.7826,
         "pctBreakout20": 4.5455,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.1818,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "095720",
@@ -10875,11 +11436,28 @@
         "advancePct": 57.8947,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.192819,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.469502,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 42.1053,
         "pctAboveMA20": 26.3158,
         "pctAboveMA60": 47.3684,
         "pctBreakout20": 16.6667,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 11.1111,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "363260",
@@ -10925,11 +11503,28 @@
         "advancePct": 54.8387,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.144751,
+        "relativeStrengthVsMarketMedian": 0.375235,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.046199,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 38.7097,
         "pctAboveMA20": 32.2581,
         "pctAboveMA60": 38.7097,
         "pctBreakout20": 7.1429,
         "pctNear52WeekHigh": 3.2258,
         "pctVolumeAbove20DayAverage": 35.7143,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "0030R0",
@@ -10975,11 +11570,28 @@
         "advancePct": 55.2632,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.111906,
+        "relativeStrengthVsMarketMedian": 0.407266,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.018677,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 15.7895,
         "pctAboveMA20": 9.2105,
         "pctAboveMA60": 13.1579,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 26.087,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "37550L",
@@ -11025,11 +11637,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": 0.076139,
+        "relativeStrengthVsMarketMedian": 0.352822,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "030200",
@@ -11066,11 +11695,28 @@
         "advancePct": 100.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.016572,
+        "relativeStrengthVsMarketMedian": 0.293255,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "005360",
@@ -11098,11 +11744,28 @@
         "advancePct": 60.4167,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": 0.005301,
+        "relativeStrengthVsMarketMedian": 0.831898,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.549914,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 35.4167,
         "pctAboveMA20": 29.1667,
         "pctAboveMA60": 39.5833,
         "pctBreakout20": 6.25,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 31.25,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "001525",
@@ -11148,11 +11811,28 @@
         "advancePct": 53.8462,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.006447,
+        "relativeStrengthVsMarketMedian": -0.125313,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.395549,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 12.8205,
         "pctAboveMA20": 23.0769,
         "pctAboveMA60": 38.4615,
         "pctBreakout20": 5.2632,
         "pctNear52WeekHigh": 2.5641,
         "pctVolumeAbove20DayAverage": 28.9474,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "009730",
@@ -11198,11 +11878,28 @@
         "advancePct": 100.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": -0.007866,
+        "relativeStrengthVsMarketMedian": 0.268817,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "029530",
@@ -11230,11 +11927,28 @@
         "advancePct": 52.6316,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.049464,
+        "relativeStrengthVsMarketMedian": -0.347222,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.574441,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 31.5789,
         "pctAboveMA20": 21.0526,
         "pctAboveMA60": 21.0526,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 21.0526,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "475560",
@@ -11280,11 +11994,28 @@
         "advancePct": 66.6667,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": -0.097176,
+        "relativeStrengthVsMarketMedian": 0.244698,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.065191,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 46.6667,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 20.0,
         "pctBreakout20": 6.6667,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 66.6667,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "023150",
@@ -11330,11 +12061,28 @@
         "advancePct": 58.3333,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.115657,
+        "relativeStrengthVsMarketMedian": 0.191603,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.030577,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 18.0556,
         "pctAboveMA20": 26.7606,
         "pctAboveMA60": 50.7042,
         "pctBreakout20": 4.6875,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 21.875,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "288980",
@@ -11380,11 +12128,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.119209,
+        "relativeStrengthVsMarketMedian": 0.061463,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.096011,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 8.3333,
         "pctAboveMA60": 8.3333,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 41.6667,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "000040",
@@ -11430,11 +12195,28 @@
         "advancePct": 100.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": -0.137794,
+        "relativeStrengthVsMarketMedian": 0.138889,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "080010",
@@ -11462,11 +12244,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.158491,
+        "relativeStrengthVsMarketMedian": -0.081169,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.199361,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 15.7895,
         "pctAboveMA20": 31.5789,
         "pctAboveMA60": 36.8421,
         "pctBreakout20": 11.4286,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "199730",
@@ -11512,11 +12311,28 @@
         "advancePct": 48.1481,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.190716,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.085967,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 37.037,
         "pctAboveMA20": 29.6296,
         "pctAboveMA60": 48.1481,
         "pctBreakout20": 3.7037,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.7407,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "340440",
@@ -11562,11 +12378,28 @@
         "advancePct": 50.8197,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.248555,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.028128,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 11.4754,
         "pctAboveMA20": 19.6721,
         "pctAboveMA60": 32.7869,
         "pctBreakout20": 3.3333,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 35.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "352480",
@@ -11612,11 +12445,28 @@
         "advancePct": 31.0345,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.335195,
+        "relativeStrengthVsMarketMedian": -0.096899,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.038387,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 20.6897,
         "pctAboveMA20": 20.6897,
         "pctAboveMA60": 48.2759,
         "pctBreakout20": 12.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 32.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "012750",
@@ -11662,11 +12512,28 @@
         "advancePct": 58.3333,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.353612,
+        "relativeStrengthVsMarketMedian": 0.465201,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.54213,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 8.3333,
         "pctAboveMA20": 25.0,
         "pctAboveMA60": 25.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 27.2727,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "051160",
@@ -11712,11 +12579,28 @@
         "advancePct": 0.0,
         "breadthConcentration": "WEAK",
         "relativeStrengthVsMarket": -0.419703,
+        "relativeStrengthVsMarketMedian": -0.14302,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 50.0,
         "pctAboveMA20": 50.0,
         "pctAboveMA60": 50.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 50.0,
         "pctVolumeAbove20DayAverage": 0.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "0106J0",
@@ -11753,11 +12637,28 @@
         "advancePct": 38.7097,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.428847,
+        "relativeStrengthVsMarketMedian": -0.58548,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.433316,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 12.9032,
         "pctAboveMA20": 29.0323,
         "pctAboveMA60": 35.4839,
         "pctBreakout20": 3.4483,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 10.3448,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "060900",
@@ -11803,11 +12704,28 @@
         "advancePct": 39.0805,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.459923,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.18324,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 35.6322,
         "pctAboveMA20": 57.6471,
         "pctAboveMA60": 65.4762,
         "pctBreakout20": 5.0,
         "pctNear52WeekHigh": 9.1954,
         "pctVolumeAbove20DayAverage": 20.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "487720",
@@ -11853,11 +12771,28 @@
         "advancePct": 30.7692,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.47543,
+        "relativeStrengthVsMarketMedian": -0.3003,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.101553,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 5.1282,
         "pctAboveMA20": 2.5641,
         "pctAboveMA60": 10.2564,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.1538,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "239340",
@@ -11903,11 +12838,28 @@
         "advancePct": 37.8788,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.486782,
+        "relativeStrengthVsMarketMedian": -0.472233,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.262134,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 27.2727,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 47.6923,
         "pctBreakout20": 6.3492,
         "pctNear52WeekHigh": 1.5152,
         "pctVolumeAbove20DayAverage": 39.6825,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "484120",
@@ -11953,11 +12905,28 @@
         "advancePct": 49.4382,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.488897,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.212214,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 23.5955,
         "pctAboveMA20": 17.9775,
         "pctAboveMA60": 30.3371,
         "pctBreakout20": 3.4884,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 30.2326,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "003310",
@@ -12003,11 +12972,28 @@
         "advancePct": 42.5926,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.530756,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.254073,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 11.1111,
         "pctAboveMA20": 22.2222,
         "pctAboveMA60": 24.5283,
         "pctBreakout20": 1.9608,
         "pctNear52WeekHigh": 1.8868,
         "pctVolumeAbove20DayAverage": 29.4118,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "087010",
@@ -12053,11 +13039,28 @@
         "advancePct": 33.3333,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.621595,
+        "relativeStrengthVsMarketMedian": -0.557847,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.212935,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 33.3333,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 50.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "053280",
@@ -12103,11 +13106,28 @@
         "advancePct": 50.8929,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.827611,
+        "relativeStrengthVsMarketMedian": -0.303526,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.247402,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 16.9643,
         "pctAboveMA20": 17.1171,
         "pctAboveMA60": 43.6364,
         "pctBreakout20": 3.6697,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 16.5138,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "039290",
@@ -12153,11 +13173,28 @@
         "advancePct": 40.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.87498,
+        "relativeStrengthVsMarketMedian": -0.117786,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.480511,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 40.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 40.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "071840",
@@ -12203,11 +13240,28 @@
         "advancePct": 33.3333,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.892661,
+        "relativeStrengthVsMarketMedian": -0.664963,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.048985,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 8.3333,
         "pctAboveMA20": 4.1667,
         "pctAboveMA60": 13.6364,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 25.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "122450",
@@ -12253,11 +13307,28 @@
         "advancePct": 50.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.937719,
+        "relativeStrengthVsMarketMedian": -0.376297,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.284739,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 33.3333,
         "pctAboveMA20": 16.6667,
         "pctAboveMA60": 16.6667,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 33.3333,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "006880",
@@ -12303,11 +13374,28 @@
         "advancePct": 61.5385,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": -0.945479,
+        "relativeStrengthVsMarketMedian": 0.208333,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.877129,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 7.6923,
         "pctAboveMA20": 23.0769,
         "pctAboveMA60": 25.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 23.0769,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "328130",
@@ -12353,11 +13441,28 @@
         "advancePct": 57.5758,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -0.955868,
+        "relativeStrengthVsMarketMedian": 0.0,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.679185,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 21.2121,
         "pctAboveMA20": 18.1818,
         "pctAboveMA60": 36.3636,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 29.0323,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "101730",
@@ -12403,11 +13508,28 @@
         "advancePct": 80.0,
         "breadthConcentration": "BROAD",
         "relativeStrengthVsMarket": -0.955934,
+        "relativeStrengthVsMarketMedian": -0.7,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.020749,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 20.0,
         "pctAboveMA20": 20.0,
         "pctAboveMA60": 20.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 40.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "021880",
@@ -12453,11 +13575,28 @@
         "advancePct": 42.8571,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.149269,
+        "relativeStrengthVsMarketMedian": -1.136602,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.264016,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 28.5714,
         "pctAboveMA20": 7.1429,
         "pctAboveMA60": 7.1429,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 50.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "452260",
@@ -12503,11 +13642,28 @@
         "advancePct": 54.386,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.215343,
+        "relativeStrengthVsMarketMedian": -0.198216,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.740444,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 22.807,
         "pctAboveMA20": 33.3333,
         "pctAboveMA60": 52.6316,
         "pctBreakout20": 1.7857,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 19.6429,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "088280",
@@ -12553,11 +13709,28 @@
         "advancePct": 43.75,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.264539,
+        "relativeStrengthVsMarketMedian": -0.408351,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.579505,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 12.5,
         "pctAboveMA20": 18.75,
         "pctAboveMA60": 37.5,
         "pctBreakout20": 6.6667,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 26.6667,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "154040",
@@ -12603,11 +13776,28 @@
         "advancePct": 25.4902,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.363427,
+        "relativeStrengthVsMarketMedian": -0.707214,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.37953,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 9.8039,
         "pctAboveMA20": 17.6471,
         "pctAboveMA60": 56.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 2.0408,
         "pctVolumeAbove20DayAverage": 17.3913,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "388790",
@@ -12653,11 +13843,28 @@
         "advancePct": 35.5556,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.379048,
+        "relativeStrengthVsMarketMedian": -0.498665,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.6037,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 17.7778,
         "pctAboveMA20": 34.4444,
         "pctAboveMA60": 44.4444,
         "pctBreakout20": 6.1728,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 32.0988,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "219750",
@@ -12703,11 +13910,28 @@
         "advancePct": 0.0,
         "breadthConcentration": "WEAK",
         "relativeStrengthVsMarket": -1.566249,
+        "relativeStrengthVsMarketMedian": -1.289566,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.0,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 100.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "029780",
@@ -12735,11 +13959,28 @@
         "advancePct": 45.4545,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.735351,
+        "relativeStrengthVsMarketMedian": -0.108873,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -1.349795,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 18.1818,
         "pctAboveMA20": 18.1818,
         "pctAboveMA60": 36.3636,
         "pctBreakout20": 10.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 30.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "079430",
@@ -12785,11 +14026,28 @@
         "advancePct": 42.8571,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -1.803869,
+        "relativeStrengthVsMarketMedian": -1.456311,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.070875,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 14.2857,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 71.4286,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "432430",
@@ -12835,11 +14093,28 @@
         "advancePct": 39.3939,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -2.043453,
+        "relativeStrengthVsMarketMedian": -1.262916,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.503854,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 9.0909,
         "pctAboveMA20": 15.625,
         "pctAboveMA60": 41.9355,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 18.75,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "272210",
@@ -12885,11 +14160,28 @@
         "advancePct": 0.0,
         "breadthConcentration": "WEAK",
         "relativeStrengthVsMarket": -2.436195,
+        "relativeStrengthVsMarketMedian": -1.848875,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.310637,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 9.0909,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 63.6364,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "024110",
@@ -12935,11 +14227,28 @@
         "advancePct": 25.0,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -3.56115,
+        "relativeStrengthVsMarketMedian": -3.221121,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": -0.063346,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 16.6667,
         "pctAboveMA20": 16.6667,
         "pctAboveMA60": 25.0,
         "pctBreakout20": 16.6667,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 75.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "000400",
@@ -12985,11 +14294,28 @@
         "advancePct": 16.6667,
         "breadthConcentration": "NARROW",
         "relativeStrengthVsMarket": -4.290766,
+        "relativeStrengthVsMarketMedian": -4.376966,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.362883,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 8.9286,
         "pctAboveMA20": 47.3054,
         "pctAboveMA60": 75.3012,
         "pctBreakout20": 4.1916,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 46.1078,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "486510",
@@ -13035,11 +14361,28 @@
         "advancePct": 0.0,
         "breadthConcentration": "WEAK",
         "relativeStrengthVsMarket": -4.499777,
+        "relativeStrengthVsMarketMedian": -4.430038,
+        "marketAverageReturn1D": 0.276683,
+        "marketMedianReturn1D": 0.0,
+        "avgReturnSkew": 0.206944,
+        "avgReturnSkewInterpretation": "ALIGNED",
+        "pctAboveMA5": 0.0,
         "pctAboveMA20": 0.0,
         "pctAboveMA60": 0.0,
         "pctBreakout20": 0.0,
         "pctNear52WeekHigh": 0.0,
         "pctVolumeAbove20DayAverage": 100.0,
+        "tradingValue": {
+          "total": null,
+          "availableCount": 0,
+          "coveragePct": 0.0,
+          "top3ConcentrationPct": null,
+          "comparisonStatus": "UNAVAILABLE_NO_HISTORY"
+        },
+        "persistence": {
+          "status": "UNAVAILABLE_NO_GROUP_HISTORY",
+          "availableTradingDays": 1
+        },
         "leaders": [
           {
             "code": "032830",
@@ -13074,8 +14417,8 @@
     ],
     "changes": {
       "comparisonAvailable": true,
-      "previousGeneratedAt": "2026-10-14T12:46:01.581801+00:00",
-      "currentGeneratedAt": "2026-10-14T12:52:00.845042+00:00",
+      "previousGeneratedAt": "2026-10-14T13:48:37.076975+00:00",
+      "currentGeneratedAt": "2026-10-14T13:51:39.818141+00:00",
       "deltaAdvancerPct": 0.0,
       "deltaPctAboveMA20": 0.0,
       "deltaPctAboveMA60": 0.0,
@@ -13087,7 +14430,7 @@
     "monitoredUniverse": {
       "scope": "MONITORED_UNIVERSE",
       "configuredCount": 42,
-      "relayQuoteGeneratedAt": "2026-10-14T21:51:32.283888+09:00",
+      "relayQuoteGeneratedAt": "2026-10-14T22:51:08.905567+09:00",
       "relaySourceTime": "2026-10-14T20:00:00+09:00",
       "relaySourceTimeLatest": "2026-10-14T20:00:00+09:00",
       "current": {
@@ -13346,19 +14689,19 @@
         "value": 20526581000000,
         "availableCount": 943,
         "observedCount": 943,
-        "sourceTime": "2026-10-14T12:52:00.845042+00:00"
+        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
       },
       "KOSDAQ": {
         "value": 6161503560000,
         "availableCount": 1820,
         "observedCount": 1820,
-        "sourceTime": "2026-10-14T12:52:00.845042+00:00"
+        "sourceTime": "2026-10-14T13:51:39.818141+00:00"
       }
     }
   },
   "dynamicUniverse": {
     "status": "AVAILABLE",
-    "generatedAt": "2026-10-14T12:52:03.651639+00:00",
+    "generatedAt": "2026-10-14T13:51:42.523285+00:00",
     "industryEvidence": {
       "status": "FULL",
       "sourceStatus": "OK",
@@ -13371,7 +14714,7 @@
         "name": "리비안(RIVIAN)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13384,7 +14727,7 @@
         "name": "2차전지(생산)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13397,7 +14740,7 @@
         "name": "2차전지(나트륨이온)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13410,7 +14753,7 @@
         "name": "LPG(액화석유가스)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13423,7 +14766,7 @@
         "name": "정유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13436,7 +14779,7 @@
         "name": "윤활유",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13449,7 +14792,7 @@
         "name": "석유화학",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13462,7 +14805,7 @@
         "name": "2차전지(LFP/리튬인산철)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13475,7 +14818,7 @@
         "name": "2차전지",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13488,7 +14831,7 @@
         "name": "2차전지(전고체)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13501,7 +14844,7 @@
         "name": "리튬",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13514,7 +14857,7 @@
         "name": "주유소",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13527,7 +14870,7 @@
         "name": "니켈",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13540,7 +14883,7 @@
         "name": "전력저장장치(ESS)",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13553,7 +14896,7 @@
         "name": "전기차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13566,7 +14909,7 @@
         "name": "폐배터리",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13579,7 +14922,7 @@
         "name": "음성인식",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13592,7 +14935,7 @@
         "name": "자동차부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13606,7 +14949,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13618,7 +14961,7 @@
         "name": "스마트폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13631,7 +14974,7 @@
         "name": "조선",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13644,7 +14987,7 @@
         "name": "MLCC(적층세라믹콘덴서)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13657,7 +15000,7 @@
         "name": "폴더블폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13670,7 +15013,7 @@
         "name": "고령화 사회(노인복지)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13683,7 +15026,7 @@
         "name": "스마트홈(홈네트워크)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13696,7 +15039,7 @@
         "name": "뉴로모픽 반도체",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13709,7 +15052,7 @@
         "name": "NFT(대체불가토큰)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13722,7 +15065,7 @@
         "name": "삼성페이",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13735,7 +15078,7 @@
         "name": "공기청정기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13748,7 +15091,7 @@
         "name": "갤럭시 부품주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13761,7 +15104,7 @@
         "name": "의료기기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13774,7 +15117,7 @@
         "name": "제습기",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13787,7 +15130,7 @@
         "name": "가상현실(VR)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13800,7 +15143,7 @@
         "name": "마이크로 LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13813,7 +15156,7 @@
         "name": "LED",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13826,7 +15169,7 @@
         "name": "무선충전기술",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13840,7 +15183,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13852,7 +15195,7 @@
         "name": "플렉서블 디스플레이",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13865,7 +15208,7 @@
         "name": "치매",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13878,7 +15221,7 @@
         "name": "LNG(액화천연가스)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13891,7 +15234,7 @@
         "name": "피지컬 AI/휴머노이드 로봇",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13905,7 +15248,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13918,7 +15261,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13930,7 +15273,7 @@
         "name": "유리 기판",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13944,7 +15287,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13957,7 +15300,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -13969,7 +15312,7 @@
         "name": "카메라모듈/부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13982,7 +15325,7 @@
         "name": "드론(Drone)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -13995,7 +15338,7 @@
         "name": "UAM(도심항공모빌리티)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14008,7 +15351,7 @@
         "name": "SI(시스템통합)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14021,7 +15364,7 @@
         "name": "자동차 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14034,7 +15377,7 @@
         "name": "냉각시스템(액침냉각 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14048,7 +15391,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14060,7 +15403,7 @@
         "name": "스마트카(SMART CAR)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14073,7 +15416,7 @@
         "name": "지능형로봇/인공지능(AI)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14087,7 +15430,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14099,7 +15442,7 @@
         "name": "방위산업/전쟁 및 테러",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14113,7 +15456,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 3,
+        "weakenStreak": 5,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14125,7 +15468,7 @@
         "name": "아이폰",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14139,7 +15482,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14151,7 +15494,7 @@
         "name": "IT 대표주",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14164,7 +15507,7 @@
         "name": "치아 치료(임플란트 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14177,7 +15520,7 @@
         "name": "자율주행차",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14191,7 +15534,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14203,7 +15546,7 @@
         "name": "자원개발",
         "status": "ACTIVE",
         "score": 100.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14216,7 +15559,7 @@
         "name": "반도체 대표주(생산)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14230,7 +15573,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14242,7 +15585,7 @@
         "name": "CXL(컴퓨트익스프레스링크)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14255,7 +15598,7 @@
         "name": "전력반도체",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14269,7 +15612,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14282,7 +15625,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14294,7 +15637,7 @@
         "name": "S7(삼성전자/SK하이닉스 등)",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14308,7 +15651,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14321,7 +15664,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14334,7 +15677,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14346,7 +15689,7 @@
         "name": "우주항공산업(누리호/인공위성 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14360,7 +15703,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14373,7 +15716,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14385,7 +15728,7 @@
         "name": "바이오시밀러(복제 바이오의약품)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14399,7 +15742,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14412,7 +15755,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14425,7 +15768,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14437,7 +15780,7 @@
         "name": "반도체 기판(FC-BGA/PCB/MLB 등)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14450,7 +15793,7 @@
         "name": "항공기부품",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14464,7 +15807,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14477,7 +15820,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14489,7 +15832,7 @@
         "name": "면역항암제",
         "status": "ACTIVE",
         "score": 80.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14502,7 +15845,7 @@
         "name": "전기차(충전소/충전기)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14516,7 +15859,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14529,7 +15872,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14542,7 +15885,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14555,7 +15898,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14568,7 +15911,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14581,7 +15924,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14593,7 +15936,7 @@
         "name": "밸류업(25년 기업가치 제고계획 발표)",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 5,
+        "qualifyStreak": 7,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14607,7 +15950,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14620,7 +15963,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14633,7 +15976,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14646,7 +15989,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14659,7 +16002,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14672,7 +16015,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14685,7 +16028,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14698,7 +16041,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14711,7 +16054,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14724,7 +16067,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14737,7 +16080,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14750,7 +16093,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14762,7 +16105,7 @@
         "name": "전자파",
         "status": "ACTIVE",
         "score": 60.0,
-        "qualifyStreak": 7,
+        "qualifyStreak": 9,
         "weakenStreak": 0,
         "checks": {
           "verifiedMembership": true,
@@ -14776,7 +16119,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 4,
+        "weakenStreak": 6,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14789,7 +16132,7 @@
         "status": "REMOVED",
         "score": 40.0,
         "qualifyStreak": 0,
-        "weakenStreak": 7,
+        "weakenStreak": 9,
         "checks": {
           "verifiedMembership": true,
           "minimumScore": false
@@ -14811,7 +16154,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 14,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 224000.0,
@@ -14830,7 +16173,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 14,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 41950.0,
@@ -14849,7 +16192,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 4,
+        "qualifyStreak": 6,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -14866,7 +16209,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 4,
+        "qualifyStreak": 6,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -14883,7 +16226,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 14,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -14900,7 +16243,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 14,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 600.0,
@@ -14919,7 +16262,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 10,
+        "qualifyStreak": 12,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 8310.0,
@@ -14938,7 +16281,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 9,
+        "qualifyStreak": 11,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 11530.0,
@@ -14957,7 +16300,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 13,
+        "qualifyStreak": 15,
         "weakenStreak": 0,
         "collectionAdmitted": true,
         "currentPrice": 182500.0,
@@ -14976,7 +16319,7 @@
         },
         "source": "AUTO_LEADER",
         "status": "ACTIVE",
-        "qualifyStreak": 14,
+        "qualifyStreak": 16,
         "weakenStreak": 0,
         "collectionAdmitted": true
       },
@@ -14994,7 +16337,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 3,
+        "weakenStreak": 5,
         "collectionAdmitted": false,
         "currentPrice": 23300.0,
         "changeRate": 5.67
@@ -15013,7 +16356,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 3,
+        "weakenStreak": 5,
         "collectionAdmitted": false,
         "currentPrice": 7230.0,
         "changeRate": 10.38
@@ -15032,7 +16375,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 4,
+        "weakenStreak": 6,
         "collectionAdmitted": false
       },
       {
@@ -15049,7 +16392,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 4,
+        "weakenStreak": 6,
         "collectionAdmitted": false
       },
       {
@@ -15066,7 +16409,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 5,
+        "weakenStreak": 7,
         "collectionAdmitted": false,
         "currentPrice": 1610.0,
         "changeRate": 2.09
@@ -15085,7 +16428,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 11,
         "collectionAdmitted": false
       },
       {
@@ -15102,7 +16445,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 9,
+        "weakenStreak": 11,
         "collectionAdmitted": false,
         "currentPrice": 1125.0,
         "changeRate": 6.64
@@ -15121,7 +16464,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 10,
+        "weakenStreak": 12,
         "collectionAdmitted": false
       },
       {
@@ -15138,7 +16481,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 10,
+        "weakenStreak": 12,
         "collectionAdmitted": false,
         "currentPrice": 16320.0,
         "changeRate": 7.02
@@ -15157,7 +16500,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 12,
+        "weakenStreak": 14,
         "collectionAdmitted": false
       },
       {
@@ -15174,7 +16517,7 @@
         "source": "AUTO_LEADER",
         "status": "REMOVED",
         "qualifyStreak": 0,
-        "weakenStreak": 12,
+        "weakenStreak": 14,
         "collectionAdmitted": false
       }
     ],
@@ -18483,7 +19826,7 @@
         "price": 234500,
         "changeRate": 1.08,
         "volume": 17382089,
-        "tradingValue": 4097032000000,
+        "tradingValue": 4097031000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -18730,7 +20073,7 @@
         "price": 217500,
         "changeRate": -5.02,
         "volume": 654465,
-        "tradingValue": 145272000000,
+        "tradingValue": 145271000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -19146,7 +20489,7 @@
         "price": 1377000,
         "changeRate": 1.03,
         "volume": 549864,
-        "tradingValue": 761532000000,
+        "tradingValue": 761531000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -19257,7 +20600,7 @@
         "price": 110400,
         "changeRate": -5.8,
         "volume": 661268,
-        "tradingValue": 74208000000,
+        "tradingValue": 74207000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -19812,7 +21155,7 @@
         "price": 371000,
         "changeRate": 1.23,
         "volume": 240422,
-        "tradingValue": 89160000000,
+        "tradingValue": 89159000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -20034,7 +21377,7 @@
         "price": 19090,
         "changeRate": 3.98,
         "volume": 5378424,
-        "tradingValue": 102420000000,
+        "tradingValue": 102419000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -20150,7 +21493,7 @@
         "price": 842000,
         "changeRate": 0.36,
         "volume": 202543,
-        "tradingValue": 169454000000,
+        "tradingValue": 169453000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -20361,7 +21704,7 @@
         "price": 577000,
         "changeRate": 2.12,
         "volume": 92157,
-        "tradingValue": 53141000000,
+        "tradingValue": 53140000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -20714,7 +22057,7 @@
         "price": 357500,
         "changeRate": 2.58,
         "volume": 313872,
-        "tradingValue": 113202000000,
+        "tradingValue": 113201000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -20951,7 +22294,7 @@
         "price": 122100,
         "changeRate": -1.85,
         "volume": 1054724,
-        "tradingValue": 128632000000,
+        "tradingValue": 128631000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -21273,7 +22616,7 @@
         "price": 180700,
         "changeRate": 0.56,
         "volume": 464868,
-        "tradingValue": 84511000000,
+        "tradingValue": 84510000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -21485,7 +22828,7 @@
         "price": 420000,
         "changeRate": 2.44,
         "volume": 671525,
-        "tradingValue": 283135000000,
+        "tradingValue": 283134000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -21606,7 +22949,7 @@
         "price": 596000,
         "changeRate": 6.43,
         "volume": 886314,
-        "tradingValue": 522449000000,
+        "tradingValue": 522448000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
@@ -21832,7 +23175,7 @@
         "price": 68900,
         "changeRate": -1.85,
         "volume": 2306707,
-        "tradingValue": 160177000000,
+        "tradingValue": 160176000000,
         "sourceTime": "2026-10-14T20:00:00+09:00",
         "fresh": true,
         "referencePrice": null,
