@@ -2,34 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "034220",
   "itemName": "LG디스플레이",
-  "reportCount": 21,
-  "latestReportNid": "96533",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 22,
+  "latestReportNid": "96688",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96533",
-    "writeDate": "2026-10-08",
-    "brokerName": "SK증권",
-    "title": "3Q 실적 미스 예상. 그러나 27년 CAPEX 재개",
-    "goalPrice": 12500,
+    "nid": "96688",
+    "writeDate": "2026-10-14",
+    "brokerName": "IBK투자증권",
+    "title": "칩플레이션에 이어 환율까지",
+    "goalPrice": 13000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 3
+        "positive": 3,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "환율": 2,
-        "가격": 1,
-        "수요": 1
+        "환율": 4,
+        "가격": 2
       }
     }
   },
   "reportNids": [
+    "96688",
     "96533",
     "96433",
     "96240",

@@ -2,33 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "011200",
   "itemName": "HMM",
-  "reportCount": 13,
-  "latestReportNid": "95882",
-  "latestWriteDate": "2026-08-26",
+  "reportCount": 14,
+  "latestReportNid": "96700",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "95882",
-    "writeDate": "2026-08-26",
-    "brokerName": "대신증권",
-    "title": "지정학적 수혜는 지속된다",
-    "goalPrice": 29000,
+    "nid": "96700",
+    "writeDate": "2026-10-14",
+    "brokerName": "신한투자증권",
+    "title": "우려도 있지만 너무 잠잠한 주가",
+    "goalPrice": 26000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
+        "positive": 2,
         "negative": 1
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UP",
-      "topics": {
-        "미국": 1,
-        "수요": 1,
-        "원가": 1
-      }
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "96700",
     "95882",
     "95645",
     "95617",

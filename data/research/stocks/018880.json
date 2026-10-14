@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "018880",
   "itemName": "한온시스템",
-  "reportCount": 19,
-  "latestReportNid": "95923",
-  "latestWriteDate": "2026-08-28",
+  "reportCount": 20,
+  "latestReportNid": "96682",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "95923",
-    "writeDate": "2026-08-28",
-    "brokerName": "신한투자증권",
-    "title": "조금씩 달라지고 있는 이익의 퀄리티",
-    "goalPrice": null,
-    "normalizedOpinion": "HOLD",
+    "nid": "96682",
+    "writeDate": "2026-10-14",
+    "brokerName": "키움증권",
+    "title": "하반기 실적 모멘텀 가장 돋보일 부품사",
+    "goalPrice": 6500,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 3
+        "positive": 3,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3,
-        "수주": 2
+        "원가": 5,
+        "미국": 2,
+        "자동차": 1,
+        "파업": 1
       }
     }
   },
   "reportNids": [
+    "96682",
     "95923",
     "95509",
     "95122",

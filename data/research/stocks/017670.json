@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "017670",
   "itemName": "SK텔레콤",
-  "reportCount": 51,
-  "latestReportNid": "96666",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 52,
+  "latestReportNid": "96710",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96666",
-    "writeDate": "2026-10-13",
-    "brokerName": "하나증권",
-    "title": "3Q 프리뷰 - DPS 증가 기대감 커지는 계기될 것",
-    "goalPrice": 140000,
+    "nid": "96710",
+    "writeDate": "2026-10-14",
+    "brokerName": "유안타증권",
+    "title": "이익 회복 위에 쌓이는 AIDC 가치",
+    "goalPrice": 118000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 2,
-        "negative": 0
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "금리": 2
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96710",
     "96666",
     "96656",
     "96476",

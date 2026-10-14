@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "083650",
   "itemName": "비에이치아이",
-  "reportCount": 7,
-  "latestReportNid": "95759",
-  "latestWriteDate": "2026-08-19",
+  "reportCount": 8,
+  "latestReportNid": "96708",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "95759",
-    "writeDate": "2026-08-19",
-    "brokerName": "신한투자증권",
-    "title": "성장 가시성에 수익성까지",
-    "goalPrice": 110000,
+    "nid": "96708",
+    "writeDate": "2026-10-14",
+    "brokerName": "유안타증권",
+    "title": "수주는 숨 고르기, 실적은 역대급",
+    "goalPrice": 120000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 1,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 3,
-        "원전": 2
+        "환율": 2,
+        "수주": 1,
+        "원전": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96708",
     "95759",
     "95659",
     "95327",

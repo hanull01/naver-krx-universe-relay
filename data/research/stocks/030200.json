@@ -2,33 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "030200",
   "itemName": "KT",
-  "reportCount": 36,
-  "latestReportNid": "96668",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 37,
+  "latestReportNid": "96709",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96668",
-    "writeDate": "2026-10-13",
-    "brokerName": "하나증권",
-    "title": "3Q 프리뷰 - 2027년도 내다본 매수 추천",
-    "goalPrice": 76000,
+    "nid": "96709",
+    "writeDate": "2026-10-14",
+    "brokerName": "유안타증권",
+    "title": "바닥 통과, 성장 엔진 점화",
+    "goalPrice": 73000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 5
+        "positive": 4,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 2,
-        "금리": 1,
-        "미국": 1
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96709",
     "96668",
     "96389",
     "95962",

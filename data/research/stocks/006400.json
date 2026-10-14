@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "006400",
   "itemName": "삼성SDI",
-  "reportCount": 30,
-  "latestReportNid": "96564",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 31,
+  "latestReportNid": "96693",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96564",
-    "writeDate": "2026-10-08",
-    "brokerName": "DS투자증권",
-    "title": "본업 흑자를 확인할 3분기",
-    "goalPrice": 940000,
+    "nid": "96693",
+    "writeDate": "2026-10-14",
+    "brokerName": "신한투자증권",
+    "title": "일회성 너머의 ESS 성장",
+    "goalPrice": 740000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 6,
+        "negative": 1
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 2,
+        "미국": 3,
         "자동차": 2,
-        "환율": 2
+        "수요": 1,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "96693",
     "96564",
     "96241",
     "96154",

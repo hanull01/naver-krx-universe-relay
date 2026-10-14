@@ -5,12 +5,12 @@
   "universeSource": "config/universe.json",
   "enabledStockCount": 42,
   "statusCounts": {
-    "OK": 22,
+    "OK": 24,
     "NO_RESEARCH": 4,
-    "LOW_SAMPLE": 10,
+    "LOW_SAMPLE": 8,
     "NO_RECENT_RESEARCH": 6
   },
-  "rankingEligibleCount": 22,
+  "rankingEligibleCount": 24,
   "stocks": [
     {
       "itemCode": "005930",
@@ -344,27 +344,27 @@
       "itemName": "효성중공업",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 32,
+      "reportCount": 33,
       "brokerCount": 10,
-      "recentReportCount": 4,
+      "recentReportCount": 5,
       "previousReportCount": 1,
-      "recentTargetMean": 4450000,
+      "recentTargetMean": 4440000,
       "previousTargetMean": 4000000,
       "recentTargetMedian": 4400000,
-      "recentTargetStdev": 364005,
-      "targetMeanChangePct": 11.25,
+      "recentTargetStdev": 326190,
+      "targetMeanChangePct": 11.0,
       "targetDispersionChangePct": null,
       "revisionUp": 5,
-      "revisionDown": 6,
+      "revisionDown": 7,
       "risingTopics": [
         {
           "topic": "수요",
-          "delta": 0.25,
+          "delta": 0.4,
           "ratio": null
         },
         {
           "topic": "환율",
-          "delta": 0.25,
+          "delta": 0.4,
           "ratio": null
         }
       ]
@@ -374,32 +374,32 @@
       "itemName": "HD현대중공업",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 25,
+      "reportCount": 26,
       "brokerCount": 13,
-      "recentReportCount": 5,
+      "recentReportCount": 6,
       "previousReportCount": 2,
-      "recentTargetMean": 851200,
+      "recentTargetMean": 846000,
       "previousTargetMean": 755000,
-      "recentTargetMedian": 840000,
-      "recentTargetStdev": 61691,
-      "targetMeanChangePct": 12.74,
-      "targetDispersionChangePct": -41.25,
+      "recentTargetMedian": 830000,
+      "recentTargetStdev": 57504,
+      "targetMeanChangePct": 12.05,
+      "targetDispersionChangePct": -45.23,
       "revisionUp": 2,
-      "revisionDown": 1,
+      "revisionDown": 2,
       "risingTopics": [
         {
-          "topic": "AI",
-          "delta": 0.2,
-          "ratio": null
-        },
-        {
           "topic": "원가",
-          "delta": 0.2,
+          "delta": 0.333,
           "ratio": null
         },
         {
           "topic": "환율",
-          "delta": 0.2,
+          "delta": 0.333,
+          "ratio": null
+        },
+        {
+          "topic": "AI",
+          "delta": 0.167,
           "ratio": null
         }
       ]
@@ -407,53 +407,59 @@
     {
       "itemCode": "042660",
       "itemName": "한화오션",
-      "status": "LOW_SAMPLE",
-      "rankingEligible": false,
-      "reportCount": 29,
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 30,
       "brokerCount": 12,
-      "recentReportCount": 2,
+      "recentReportCount": 3,
       "previousReportCount": 0,
-      "recentTargetMean": 124000,
+      "recentTargetMean": 119333,
       "previousTargetMean": null,
-      "recentTargetMedian": 124000,
-      "recentTargetStdev": 4000,
+      "recentTargetMedian": 120000,
+      "recentTargetStdev": 7364,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 0,
-      "revisionDown": 6,
-      "risingTopics": []
+      "revisionDown": 7,
+      "risingTopics": [
+        {
+          "topic": "환율",
+          "delta": 0.333,
+          "ratio": null
+        }
+      ]
     },
     {
       "itemCode": "010140",
       "itemName": "삼성중공업",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 26,
+      "reportCount": 27,
       "brokerCount": 12,
-      "recentReportCount": 5,
+      "recentReportCount": 6,
       "previousReportCount": 0,
-      "recentTargetMean": 37800,
+      "recentTargetMean": 37333,
       "previousTargetMean": null,
       "recentTargetMedian": 37000,
-      "recentTargetStdev": 3059,
+      "recentTargetStdev": 2981,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 2,
-      "revisionDown": 1,
+      "revisionDown": 2,
       "risingTopics": [
         {
           "topic": "AI",
-          "delta": 0.2,
+          "delta": 0.167,
           "ratio": null
         },
         {
           "topic": "원가",
-          "delta": 0.2,
+          "delta": 0.167,
           "ratio": null
         },
         {
           "topic": "환율",
-          "delta": 0.2,
+          "delta": 0.167,
           "ratio": null
         }
       ]
@@ -714,29 +720,29 @@
     {
       "itemCode": "055550",
       "itemName": "신한지주",
-      "status": "LOW_SAMPLE",
-      "rankingEligible": false,
-      "reportCount": 21,
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 24,
       "brokerCount": 9,
-      "recentReportCount": 2,
+      "recentReportCount": 5,
       "previousReportCount": 0,
-      "recentTargetMean": 134500,
+      "recentTargetMean": 133250,
       "previousTargetMean": null,
-      "recentTargetMedian": 134500,
-      "recentTargetStdev": 500,
+      "recentTargetMedian": 133000,
+      "recentTargetStdev": 1299,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
       "revisionUp": 7,
-      "revisionDown": 0,
+      "revisionDown": 1,
       "risingTopics": [
         {
           "topic": "원가",
-          "delta": 0.5,
+          "delta": 0.4,
           "ratio": null
         },
         {
           "topic": "주주환원",
-          "delta": 0.5,
+          "delta": 0.2,
           "ratio": null
         }
       ]
@@ -866,42 +872,42 @@
       "itemName": "삼성SDI",
       "status": "OK",
       "rankingEligible": true,
-      "reportCount": 30,
+      "reportCount": 31,
       "brokerCount": 11,
-      "recentReportCount": 3,
+      "recentReportCount": 4,
       "previousReportCount": 0,
-      "recentTargetMean": 913333,
+      "recentTargetMean": 870000,
       "previousTargetMean": null,
-      "recentTargetMedian": 940000,
-      "recentTargetStdev": 83799,
+      "recentTargetMedian": 870000,
+      "recentTargetStdev": 104403,
       "targetMeanChangePct": null,
       "targetDispersionChangePct": null,
-      "revisionUp": 5,
+      "revisionUp": 6,
       "revisionDown": 6,
       "risingTopics": [
         {
+          "topic": "수요",
+          "delta": 0.5,
+          "ratio": null
+        },
+        {
           "topic": "환율",
-          "delta": 0.667,
+          "delta": 0.5,
           "ratio": null
         },
         {
           "topic": "AI",
-          "delta": 0.333,
-          "ratio": null
-        },
-        {
-          "topic": "수요",
-          "delta": 0.333,
+          "delta": 0.25,
           "ratio": null
         },
         {
           "topic": "재고",
-          "delta": 0.333,
+          "delta": 0.25,
           "ratio": null
         },
         {
           "topic": "중국",
-          "delta": 0.333,
+          "delta": 0.25,
           "ratio": null
         }
       ]
@@ -1295,6 +1301,41 @@
         ]
       },
       {
+        "itemCode": "010140",
+        "itemName": "삼성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 27,
+        "brokerCount": 12,
+        "recentReportCount": 6,
+        "previousReportCount": 0,
+        "recentTargetMean": 37333,
+        "previousTargetMean": null,
+        "recentTargetMedian": 37000,
+        "recentTargetStdev": 2981,
+        "targetMeanChangePct": null,
+        "targetDispersionChangePct": null,
+        "revisionUp": 2,
+        "revisionDown": 2,
+        "risingTopics": [
+          {
+            "topic": "AI",
+            "delta": 0.167,
+            "ratio": null
+          },
+          {
+            "topic": "원가",
+            "delta": 0.167,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.167,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "012330",
         "itemName": "현대모비스",
         "status": "OK",
@@ -1340,41 +1381,6 @@
         ]
       },
       {
-        "itemCode": "010140",
-        "itemName": "삼성중공업",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 26,
-        "brokerCount": 12,
-        "recentReportCount": 5,
-        "previousReportCount": 0,
-        "recentTargetMean": 37800,
-        "previousTargetMean": null,
-        "recentTargetMedian": 37000,
-        "recentTargetStdev": 3059,
-        "targetMeanChangePct": null,
-        "targetDispersionChangePct": null,
-        "revisionUp": 2,
-        "revisionDown": 1,
-        "risingTopics": [
-          {
-            "topic": "AI",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
-            "topic": "원가",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
-            "topic": "환율",
-            "delta": 0.2,
-            "ratio": null
-          }
-        ]
-      },
-      {
         "itemCode": "000270",
         "itemName": "기아",
         "status": "OK",
@@ -1414,6 +1420,36 @@
           },
           {
             "topic": "사이클",
+            "delta": 0.2,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "055550",
+        "itemName": "신한지주",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 24,
+        "brokerCount": 9,
+        "recentReportCount": 5,
+        "previousReportCount": 0,
+        "recentTargetMean": 133250,
+        "previousTargetMean": null,
+        "recentTargetMedian": 133000,
+        "recentTargetStdev": 1299,
+        "targetMeanChangePct": null,
+        "targetDispersionChangePct": null,
+        "revisionUp": 7,
+        "revisionDown": 1,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.4,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
             "delta": 0.2,
             "ratio": null
           }
@@ -1480,76 +1516,31 @@
         ]
       },
       {
-        "itemCode": "000660",
-        "itemName": "SK하이닉스",
+        "itemCode": "298040",
+        "itemName": "효성중공업",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 70,
-        "brokerCount": 15,
-        "recentReportCount": 7,
-        "previousReportCount": 4,
-        "recentTargetMean": 3471429,
-        "previousTargetMean": 3162500,
-        "recentTargetMedian": 3600000,
-        "recentTargetStdev": 452657,
-        "targetMeanChangePct": 9.77,
-        "targetDispersionChangePct": 58.35,
-        "revisionUp": 21,
-        "revisionDown": 4,
-        "risingTopics": [
-          {
-            "topic": "수요",
-            "delta": 0.607,
-            "ratio": 3.43
-          },
-          {
-            "topic": "환율",
-            "delta": 0.464,
-            "ratio": 2.86
-          },
-          {
-            "topic": "AI",
-            "delta": 0.286,
-            "ratio": null
-          },
-          {
-            "topic": "원가",
-            "delta": 0.286,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "058470",
-        "itemName": "리노공업",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 7,
-        "brokerCount": 7,
-        "recentReportCount": 3,
-        "previousReportCount": 0,
-        "recentTargetMean": 107500,
-        "previousTargetMean": null,
-        "recentTargetMedian": 107500,
-        "recentTargetStdev": 7500,
-        "targetMeanChangePct": null,
+        "reportCount": 33,
+        "brokerCount": 10,
+        "recentReportCount": 5,
+        "previousReportCount": 1,
+        "recentTargetMean": 4440000,
+        "previousTargetMean": 4000000,
+        "recentTargetMedian": 4400000,
+        "recentTargetStdev": 326190,
+        "targetMeanChangePct": 11.0,
         "targetDispersionChangePct": null,
-        "revisionUp": 0,
-        "revisionDown": 0,
+        "revisionUp": 5,
+        "revisionDown": 7,
         "risingTopics": [
           {
             "topic": "수요",
-            "delta": 0.667,
-            "ratio": null
-          },
-          {
-            "topic": "AI",
-            "delta": 0.333,
+            "delta": 0.4,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.333,
+            "delta": 0.4,
             "ratio": null
           }
         ]
@@ -1685,32 +1676,32 @@
         "itemName": "HD현대중공업",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 25,
+        "reportCount": 26,
         "brokerCount": 13,
-        "recentReportCount": 5,
+        "recentReportCount": 6,
         "previousReportCount": 2,
-        "recentTargetMean": 851200,
+        "recentTargetMean": 846000,
         "previousTargetMean": 755000,
-        "recentTargetMedian": 840000,
-        "recentTargetStdev": 61691,
-        "targetMeanChangePct": 12.74,
-        "targetDispersionChangePct": -41.25,
+        "recentTargetMedian": 830000,
+        "recentTargetStdev": 57504,
+        "targetMeanChangePct": 12.05,
+        "targetDispersionChangePct": -45.23,
         "revisionUp": 2,
-        "revisionDown": 1,
+        "revisionDown": 2,
         "risingTopics": [
           {
-            "topic": "AI",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
             "topic": "원가",
-            "delta": 0.2,
+            "delta": 0.333,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.2,
+            "delta": 0.333,
+            "ratio": null
+          },
+          {
+            "topic": "AI",
+            "delta": 0.167,
             "ratio": null
           }
         ]
@@ -1720,27 +1711,27 @@
         "itemName": "효성중공업",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 32,
+        "reportCount": 33,
         "brokerCount": 10,
-        "recentReportCount": 4,
+        "recentReportCount": 5,
         "previousReportCount": 1,
-        "recentTargetMean": 4450000,
+        "recentTargetMean": 4440000,
         "previousTargetMean": 4000000,
         "recentTargetMedian": 4400000,
-        "recentTargetStdev": 364005,
-        "targetMeanChangePct": 11.25,
+        "recentTargetStdev": 326190,
+        "targetMeanChangePct": 11.0,
         "targetDispersionChangePct": null,
         "revisionUp": 5,
-        "revisionDown": 6,
+        "revisionDown": 7,
         "risingTopics": [
           {
             "topic": "수요",
-            "delta": 0.25,
+            "delta": 0.4,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.25,
+            "delta": 0.4,
             "ratio": null
           }
         ]
@@ -2106,32 +2097,32 @@
         "itemName": "HD현대중공업",
         "status": "OK",
         "rankingEligible": true,
-        "reportCount": 25,
+        "reportCount": 26,
         "brokerCount": 13,
-        "recentReportCount": 5,
+        "recentReportCount": 6,
         "previousReportCount": 2,
-        "recentTargetMean": 851200,
+        "recentTargetMean": 846000,
         "previousTargetMean": 755000,
-        "recentTargetMedian": 840000,
-        "recentTargetStdev": 61691,
-        "targetMeanChangePct": 12.74,
-        "targetDispersionChangePct": -41.25,
+        "recentTargetMedian": 830000,
+        "recentTargetStdev": 57504,
+        "targetMeanChangePct": 12.05,
+        "targetDispersionChangePct": -45.23,
         "revisionUp": 2,
-        "revisionDown": 1,
+        "revisionDown": 2,
         "risingTopics": [
           {
-            "topic": "AI",
-            "delta": 0.2,
-            "ratio": null
-          },
-          {
             "topic": "원가",
-            "delta": 0.2,
+            "delta": 0.333,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.2,
+            "delta": 0.333,
+            "ratio": null
+          },
+          {
+            "topic": "AI",
+            "delta": 0.167,
             "ratio": null
           }
         ]

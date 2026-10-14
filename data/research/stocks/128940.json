@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "128940",
   "itemName": "한미약품",
-  "reportCount": 32,
-  "latestReportNid": "96530",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 35,
+  "latestReportNid": "96716",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96530",
-    "writeDate": "2026-10-08",
-    "brokerName": "iM증권",
-    "title": "펩타이드의 이야기, AI로 다시 쓰다",
-    "goalPrice": 650000,
+    "nid": "96716",
+    "writeDate": "2026-10-14",
+    "brokerName": "하나증권",
+    "title": "더 안정적인 성장을 위한 정비 작업(3Q26 Pre)",
+    "goalPrice": 660000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 2,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 1
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "96716",
+    "96706",
+    "96685",
     "96530",
     "96306",
     "95890",

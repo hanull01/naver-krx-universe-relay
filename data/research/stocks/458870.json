@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "458870",
   "itemName": "씨어스",
-  "reportCount": 10,
-  "latestReportNid": "96275",
-  "latestWriteDate": "2026-09-22",
+  "reportCount": 11,
+  "latestReportNid": "96679",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96275",
-    "writeDate": "2026-09-22",
-    "brokerName": "IBK투자증권",
-    "title": "내수와 수출 동반성장 시기가 다가온다",
-    "goalPrice": 30000,
-    "normalizedOpinion": "BUY",
+    "nid": "96679",
+    "writeDate": "2026-10-14",
+    "brokerName": "미래에셋증권",
+    "title": "국내를 평정한 이상, 이제 다음은 세계무대다.",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 2
+        "positive": 0,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "가격": 2,
+        "금리": 2
+      }
     }
   },
   "reportNids": [
+    "96679",
     "96275",
     "95782",
     "95696",

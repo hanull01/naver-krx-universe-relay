@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "001740",
   "itemName": "SK네트웍스",
-  "reportCount": 6,
-  "latestReportNid": "96302",
-  "latestWriteDate": "2026-09-23",
+  "reportCount": 7,
+  "latestReportNid": "96713",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96302",
-    "writeDate": "2026-09-23",
-    "brokerName": "삼성증권",
-    "title": "업스테이지 지분가치 부각 중",
-    "goalPrice": 7650,
+    "nid": "96713",
+    "writeDate": "2026-10-14",
+    "brokerName": "하나증권",
+    "title": "일회성 비용으로 단기 실적 부진 전망",
+    "goalPrice": 10000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 2
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "MIXED",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "수요": 2
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96713",
     "96302",
     "95710",
     "95688",

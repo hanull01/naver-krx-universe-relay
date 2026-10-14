@@ -2,27 +2,28 @@
   "schemaVersion": 1,
   "itemCode": "145020",
   "itemName": "휴젤",
-  "reportCount": 19,
-  "latestReportNid": "96673",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 20,
+  "latestReportNid": "96705",
+  "latestWriteDate": "2026-10-14",
   "latest": {
-    "nid": "96673",
-    "writeDate": "2026-10-13",
-    "brokerName": "교보증권",
-    "title": "3Q26 Preview: 쉬어가는 한 분기",
-    "goalPrice": 310000,
+    "nid": "96705",
+    "writeDate": "2026-10-14",
+    "brokerName": "미래에셋증권",
+    "title": "3Q26 Preview: 단기 실적 눈높이 조정",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 0
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 5,
+        "미국": 6,
+        "가격": 1,
         "원가": 1,
         "재고": 1,
         "중국": 1
@@ -30,6 +31,7 @@
     }
   },
   "reportNids": [
+    "96705",
     "96673",
     "96324",
     "96294",

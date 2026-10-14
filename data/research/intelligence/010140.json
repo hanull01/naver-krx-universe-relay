@@ -6,47 +6,48 @@
   "asOf": "2026-10-14",
   "dateRange": {
     "from": "2026-04-17",
-    "to": "2026-10-13"
+    "to": "2026-10-14"
   },
-  "reportCount": 26,
+  "reportCount": 27,
   "brokerCount": 12,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-14",
       "to": "2026-10-14",
-      "reportCount": 5,
+      "reportCount": 6,
       "brokerCount": 4,
       "targetPrice": {
-        "count": 5,
+        "count": 6,
         "min": 33000,
         "max": 42000,
-        "mean": 37800,
+        "mean": 37333,
         "median": 37000,
-        "stdev": 3059,
+        "stdev": 2981,
         "range": 9000
       },
       "earningsDirection": {
         "UNKNOWN": 2,
-        "UP": 3
+        "UP": 3,
+        "DOWN": 1
       },
       "textSignal": {
         "positive": 16,
-        "negative": 2,
-        "net": 14,
-        "netPerReport": 2.8
+        "negative": 3,
+        "net": 13,
+        "netPerReport": 2.167
       },
       "topics": {
         "AI": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.167
         },
         "환율": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.167
         },
         "원가": {
           "count": 1,
-          "perReport": 0.2
+          "perReport": 0.167
         }
       }
     },
@@ -69,42 +70,42 @@
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.2,
+        "currentPerReport": 0.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.2,
+        "perReportDelta": 0.167,
         "ratio": null
       },
       {
         "topic": "원가",
         "currentCount": 1,
-        "currentPerReport": 0.2,
+        "currentPerReport": 0.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.2,
+        "perReportDelta": 0.167,
         "ratio": null
       },
       {
         "topic": "환율",
         "currentCount": 1,
-        "currentPerReport": 0.2,
+        "currentPerReport": 0.167,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.2,
+        "perReportDelta": 0.167,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 5,
+    "reportCountChange": 6,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 3,
+    "total": 4,
     "up": 2,
-    "down": 1,
+    "down": 2,
     "flat": 0
   },
   "monthly": {
@@ -285,34 +286,35 @@
       }
     },
     "2026-10": {
-      "reportCount": 2,
-      "brokerCount": 2,
+      "reportCount": 3,
+      "brokerCount": 3,
       "targetPrice": {
-        "count": 2,
-        "min": 37000,
+        "count": 3,
+        "min": 35000,
         "max": 42000,
-        "mean": 39500,
-        "median": 39500,
-        "stdev": 2500,
-        "range": 5000
+        "mean": 38000,
+        "median": 37000,
+        "stdev": 2944,
+        "range": 7000
       },
       "earningsDirection": {
-        "UP": 2
+        "UP": 2,
+        "DOWN": 1
       },
       "textSignal": {
         "positive": 10,
-        "negative": 2,
-        "net": 8,
-        "netPerReport": 4.0
+        "negative": 3,
+        "net": 7,
+        "netPerReport": 2.333
       },
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         },
         "원가": {
           "count": 1,
-          "perReport": 0.5
+          "perReport": 0.333
         }
       }
     }
@@ -374,12 +376,12 @@
       ]
     },
     "SK증권": {
-      "reportCount": 3,
-      "targetPricePointCount": 3,
+      "reportCount": 4,
+      "targetPricePointCount": 4,
       "firstGoalPrice": 40000,
-      "latestGoalPrice": 40000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 35000,
+      "changeAmount": -5000,
+      "changePct": -12.5,
       "trajectory": [
         {
           "date": "2026-05-04",
@@ -395,6 +397,11 @@
           "date": "2026-09-17",
           "goalPrice": 40000,
           "title": "부유식은 내가 잘해"
+        },
+        {
+          "date": "2026-10-14",
+          "goalPrice": 35000,
+          "title": "선방할 실적, FDC 본계약 기대"
         }
       ]
     },

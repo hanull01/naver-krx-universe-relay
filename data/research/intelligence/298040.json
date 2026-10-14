@@ -6,44 +6,45 @@
   "asOf": "2026-10-14",
   "dateRange": {
     "from": "2026-04-07",
-    "to": "2026-10-12"
+    "to": "2026-10-14"
   },
-  "reportCount": 32,
+  "reportCount": 33,
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-14",
       "to": "2026-10-14",
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 4000000,
         "max": 5000000,
-        "mean": 4450000,
+        "mean": 4440000,
         "median": 4400000,
-        "stdev": 364005,
+        "stdev": 326190,
         "range": 1000000
       },
       "earningsDirection": {
         "UP": 2,
         "MIXED": 1,
-        "DOWN": 1
+        "DOWN": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 6,
-        "negative": 4,
-        "net": 2,
-        "netPerReport": 0.5
+        "negative": 5,
+        "net": 1,
+        "netPerReport": 0.2
       },
       "topics": {
         "수요": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 2,
+          "perReport": 0.4
         },
         "환율": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 2,
+          "perReport": 0.4
         }
       }
     },
@@ -80,20 +81,20 @@
     "topicAcceleration": [
       {
         "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentCount": 2,
+        "currentPerReport": 0.4,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.4,
         "ratio": null
       },
       {
         "topic": "환율",
-        "currentCount": 1,
-        "currentPerReport": 0.25,
+        "currentCount": 2,
+        "currentPerReport": 0.4,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.25,
+        "perReportDelta": 0.4,
         "ratio": null
       },
       {
@@ -108,15 +109,15 @@
     ]
   },
   "comparison": {
-    "reportCountChange": 3,
-    "targetMeanChangePct": 11.25,
+    "reportCountChange": 4,
+    "targetMeanChangePct": 11.0,
     "targetMedianChangePct": 10.0,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 11,
+    "total": 12,
     "up": 5,
-    "down": 6,
+    "down": 7,
     "flat": 0
   },
   "monthly": {
@@ -272,36 +273,37 @@
       }
     },
     "2026-10": {
-      "reportCount": 4,
-      "brokerCount": 4,
+      "reportCount": 5,
+      "brokerCount": 5,
       "targetPrice": {
-        "count": 4,
+        "count": 5,
         "min": 4000000,
         "max": 5000000,
-        "mean": 4450000,
+        "mean": 4440000,
         "median": 4400000,
-        "stdev": 364005,
+        "stdev": 326190,
         "range": 1000000
       },
       "earningsDirection": {
         "UP": 2,
         "MIXED": 1,
-        "DOWN": 1
+        "DOWN": 1,
+        "UNKNOWN": 1
       },
       "textSignal": {
         "positive": 6,
-        "negative": 4,
-        "net": 2,
-        "netPerReport": 0.5
+        "negative": 5,
+        "net": 1,
+        "netPerReport": 0.2
       },
       "topics": {
         "수요": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 2,
+          "perReport": 0.4
         },
         "환율": {
-          "count": 1,
-          "perReport": 0.25
+          "count": 2,
+          "perReport": 0.4
         }
       }
     }
@@ -428,12 +430,12 @@
       ]
     },
     "미래에셋증권": {
-      "reportCount": 2,
-      "targetPricePointCount": 2,
+      "reportCount": 3,
+      "targetPricePointCount": 3,
       "firstGoalPrice": 5000000,
-      "latestGoalPrice": 5000000,
-      "changeAmount": 0,
-      "changePct": 0.0,
+      "latestGoalPrice": 4400000,
+      "changeAmount": -600000,
+      "changePct": -12.0,
       "trajectory": [
         {
           "date": "2026-07-16",
@@ -444,6 +446,11 @@
           "date": "2026-08-03",
           "goalPrice": 5000000,
           "title": "단기 실적보다는 본질적인 사업 경쟁력에 주목"
+        },
+        {
+          "date": "2026-10-14",
+          "goalPrice": 4400000,
+          "title": "중장기 카탈리스트는 여전히 유효"
         }
       ]
     },

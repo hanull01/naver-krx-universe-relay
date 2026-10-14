@@ -6,56 +6,56 @@
   "asOf": "2026-10-14",
   "dateRange": {
     "from": "2026-03-30",
-    "to": "2026-10-08"
+    "to": "2026-10-14"
   },
-  "reportCount": 30,
+  "reportCount": 31,
   "brokerCount": 11,
   "recentVsPrevious": {
     "recent": {
       "from": "2026-09-14",
       "to": "2026-10-14",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
-        "min": 800000,
+        "count": 4,
+        "min": 740000,
         "max": 1000000,
-        "mean": 913333,
-        "median": 940000,
-        "stdev": 83799,
-        "range": 200000
+        "mean": 870000,
+        "median": 870000,
+        "stdev": 104403,
+        "range": 260000
       },
       "earningsDirection": {
         "UNKNOWN": 1,
-        "UP": 1,
+        "UP": 2,
         "MIXED": 1
       },
       "textSignal": {
-        "positive": 17,
-        "negative": 5,
-        "net": 12,
-        "netPerReport": 4.0
+        "positive": 23,
+        "negative": 6,
+        "net": 17,
+        "netPerReport": 4.25
       },
       "topics": {
+        "수요": {
+          "count": 2,
+          "perReport": 0.5
+        },
         "환율": {
           "count": 2,
-          "perReport": 0.667
+          "perReport": 0.5
         },
         "중국": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         },
         "AI": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         },
         "재고": {
           "count": 1,
-          "perReport": 0.333
-        },
-        "수요": {
-          "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
         }
       }
     },
@@ -76,61 +76,61 @@
     },
     "topicAcceleration": [
       {
-        "topic": "환율",
+        "topic": "수요",
         "currentCount": 2,
-        "currentPerReport": 0.667,
+        "currentPerReport": 0.5,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.667,
+        "perReportDelta": 0.5,
+        "ratio": null
+      },
+      {
+        "topic": "환율",
+        "currentCount": 2,
+        "currentPerReport": 0.5,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.5,
         "ratio": null
       },
       {
         "topic": "AI",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
-        "ratio": null
-      },
-      {
-        "topic": "수요",
-        "currentCount": 1,
-        "currentPerReport": 0.333,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.25,
         "ratio": null
       },
       {
         "topic": "재고",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.25,
         "ratio": null
       },
       {
         "topic": "중국",
         "currentCount": 1,
-        "currentPerReport": 0.333,
+        "currentPerReport": 0.25,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.333,
+        "perReportDelta": 0.25,
         "ratio": null
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 3,
+    "reportCountChange": 4,
     "targetMeanChangePct": null,
     "targetMedianChangePct": null,
     "targetDispersionChangePct": null
   },
   "goalPriceRevisions": {
-    "total": 11,
-    "up": 5,
+    "total": 12,
+    "up": 6,
     "down": 6,
     "flat": 0
   },
@@ -390,30 +390,35 @@
       }
     },
     "2026-10": {
-      "reportCount": 1,
-      "brokerCount": 1,
+      "reportCount": 2,
+      "brokerCount": 2,
       "targetPrice": {
-        "count": 1,
-        "min": 940000,
+        "count": 2,
+        "min": 740000,
         "max": 940000,
-        "mean": 940000,
-        "median": 940000,
-        "stdev": 0,
-        "range": 0
+        "mean": 840000,
+        "median": 840000,
+        "stdev": 100000,
+        "range": 200000
       },
       "earningsDirection": {
-        "MIXED": 1
+        "MIXED": 1,
+        "UP": 1
       },
       "textSignal": {
-        "positive": 1,
-        "negative": 2,
-        "net": -1,
-        "netPerReport": -1.0
+        "positive": 7,
+        "negative": 3,
+        "net": 4,
+        "netPerReport": 2.0
       },
       "topics": {
         "환율": {
           "count": 1,
-          "perReport": 1.0
+          "perReport": 0.5
+        },
+        "수요": {
+          "count": 1,
+          "perReport": 0.5
         }
       }
     }
@@ -590,12 +595,12 @@
       ]
     },
     "신한투자증권": {
-      "reportCount": 4,
-      "targetPricePointCount": 4,
+      "reportCount": 5,
+      "targetPricePointCount": 5,
       "firstGoalPrice": 580000,
-      "latestGoalPrice": 620000,
-      "changeAmount": 40000,
-      "changePct": 6.9,
+      "latestGoalPrice": 740000,
+      "changeAmount": 160000,
+      "changePct": 27.59,
       "trajectory": [
         {
           "date": "2026-04-20",
@@ -616,6 +621,11 @@
           "date": "2026-07-31",
           "goalPrice": 620000,
           "title": "흑자전환, 다음은 본업"
+        },
+        {
+          "date": "2026-10-14",
+          "goalPrice": 740000,
+          "title": "일회성 너머의 ESS 성장"
         }
       ]
     },
