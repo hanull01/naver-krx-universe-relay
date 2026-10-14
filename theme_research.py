@@ -362,6 +362,34 @@ def collect_theme_membership(fetcher=market.fetch_json, clock=market.generated_a
     }
 
 
+def collect_theme_membership_for_list(themes, fetcher=market.fetch_json,
+                                      clock=market.generated_at):
+    """Collect members for a previously validated, stable theme list.
+
+    The legacy list endpoint is live-sorted and can overlap while it changes.
+    A validated cursor ranking snapshot supplies stable IDs; this function only
+    fetches each membership page and fails closed on incomplete membership.
+    """
+    rows, by_code = [], defaultdict(list)
+    for theme in themes:
+        members = collect_theme_members(theme['id'], fetcher, clock)
+        row = {'id': str(theme['id']), 'name': theme['name'],
+               'status': members['status'], 'memberCount': members['count'],
+               'pagination': members['pagination'],
+               'members': [{'code': x['code'], 'name': x['name']} for x in members['members']]}
+        if members.get('error'):
+            row['error'] = members['error']
+        rows.append(row)
+        for member in members['members']:
+            by_code[member['code']].append({'id': str(theme['id']), 'name': theme['name']})
+    status = market.status_from(rows)
+    return {'generatedAt': clock(), 'source': 'NAVER', 'status': status,
+            'researchGate': 'PENDING_LIVE_MEMBERSHIP_CONFIRMATION',
+            'themeCount': len(rows),
+            'membershipCount': sum(row['memberCount'] for row in rows),
+            'themes': rows, 'byCode': dict(by_code)}
+
+
 def analyze_dynamic_themes(membership, quotes=None, technicals=None,
                            universe_codes=None, previous=None):
     """Aggregate verified member data; unknown inputs remain unknown."""

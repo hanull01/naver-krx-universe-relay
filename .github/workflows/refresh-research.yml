@@ -124,6 +124,17 @@ jobs:
           echo "PC theme staging outcome: ${{ steps.pc_theme_rankings.outcome }}"
           # This optional dataset never controls research/intelligence validity.
 
+      - name: Stage verified theme membership
+        id: theme_membership
+        continue-on-error: true
+        run: |
+          python3 tools/collect_theme_membership.py \
+            --output data/research/theme-membership/latest.json
+
+      - name: Report theme membership result
+        if: always()
+        run: 'echo "Theme membership outcome: ${{ steps.theme_membership.outcome }}"'
+
       - name: Run tests
         run: python3 -m unittest discover -s . -p 'test_*.py'
 

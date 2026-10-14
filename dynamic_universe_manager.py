@@ -172,9 +172,11 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         pending.append({"type": "AUTO_THEME", "status": "PENDING", "reason": theme_block.get("reason") or "VERIFIED_THEME_DATA_UNAVAILABLE"})
     else:
         theme_rows = ((theme_block.get("periods") or {}).get("daily") or {}).get("themes") or []
+        current_theme_ids = set()
         for row in theme_rows:
             identity = str(row.get("id") or row.get("name") or "")
             if not identity: continue
+            current_theme_ids.add(identity)
             qualified, score, checks = _theme_decision(row, policy["theme"])
             old = theme_previous.get(identity)
             status, qs, ws = _transition(old, qualified, policy)
@@ -190,6 +192,10 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                 for leader_score, candidate, leader_checks in sorted(accepted, key=lambda item: (-item[0], _code(item[1]) or ""))[:policy["leaderLimitPerGroup"]]:
                     code = _code(candidate)
                     if code: leaders.append({"id": f"theme:{identity}:{code}", "code": code, "name": candidate.get("name"), "groupType": "theme", "groupId": identity, "score": leader_score, "checks": leader_checks, "source": "AUTO_LEADER"})
+        for identity, old in theme_previous.items():
+            if identity not in current_theme_ids:
+                themes.append({**old, "dataQuality": "LIST_NOT_FOUND", "selectionDeferred": True,
+                               "lastVerifiedAt": old.get("sourceTime") or previous.get("generatedAt")})
 
     normalized_leaders = []
     for row in leaders:

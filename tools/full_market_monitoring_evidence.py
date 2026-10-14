@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HISTORY_DIR = ROOT / "data/naver-history/canonical/daily"
 MARKET_DIR = ROOT / "data/market"
 MONITORING_DIR = ROOT / "data/monitoring"
+THEME_MEMBERSHIP_FILE = ROOT / "data/research/theme-membership/latest.json"
 UNIVERSE_FILE = ROOT / "data/market-universe/all-assets.json"
 KST_DATE = lambda: datetime.now().astimezone().strftime("%Y%m%d")
 
@@ -335,7 +336,7 @@ def signal_subset(features):
 
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
                    previous_summary=None, today=None, previous_good_industries=None, baseline=None,
-                   publication_context=None):
+                   publication_context=None, theme_membership=None):
     if current_snapshot.get("status") not in ("SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
         raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
@@ -360,6 +361,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                     for row in current_snapshot["stocks"]]
     history_codes = {path.stem for path in Path(history_dir).glob("*.jsonl")}
     current_codes = {row["code"] for row in current_snapshot["stocks"]}
+    theme_membership = theme_membership or {"status": "UNUSABLE", "themes": []}
     industries = industries or {"status": "UNUSABLE", "industries": []}
     membership = membership or {"status": "UNUSABLE", "industries": []}
     breadth_data = {market: breadth(features, market) for market in ("TOTAL", "KOSPI", "KOSDAQ")}
@@ -402,6 +404,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                   "monitoredUniverse": publication_context.get("monitoredUniverse")},
         "latest-stock-signals.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
                                       "count": len(signal_subset(features)), "stocks": signal_subset(features)},
+        "latest-theme-signals.json": build_theme_signals(summary["generatedAt"], features, theme_membership),
         "latest-industries.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "quality": quality,
                                      "membershipSourceStatus": membership.get("status"),
                                      "sourceIndustryCount": len(industries.get("industries", [])),
@@ -441,6 +444,30 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     return evidence, features
 
 
+def build_theme_signals(generated_at, features, theme_membership):
+    """Publish only full-market features needed by verified theme members."""
+    rows_by_code = {str(row.get("code")): row for row in features if row.get("code")}
+    themes = theme_membership.get("themes") if isinstance(theme_membership, dict) else None
+    if theme_membership.get("status") not in {"OK", "PARTIAL"} or not isinstance(themes, list):
+        return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "UNAVAILABLE",
+                "sourceStatus": theme_membership.get("status", "UNUSABLE"), "themes": []}
+    output = []
+    for theme in themes:
+        members = theme.get("members") if isinstance(theme, dict) else None
+        if not isinstance(members, list):
+            continue
+        codes = [str(row.get("code")) for row in members if isinstance(row, dict) and row.get("code")]
+        unique_codes = list(dict.fromkeys(codes))
+        stocks = [rows_by_code[code] for code in unique_codes if code in rows_by_code]
+        output.append({"id": str(theme.get("id")), "name": theme.get("name"),
+                       "membershipStatus": theme.get("status"), "memberCount": len(unique_codes),
+                       "featureCount": len(stocks), "coveragePct": round(len(stocks) * 100 / len(unique_codes), 4) if unique_codes else None,
+                       "missingCodes": [code for code in unique_codes if code not in rows_by_code],
+                       "stocks": stocks})
+    return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "OK",
+            "sourceStatus": theme_membership.get("status"), "themeCount": len(output), "themes": output}
+
+
 def write_evidence(evidence, output_dir=MONITORING_DIR):
     sizes = {}
     for name, payload in evidence.items():
@@ -461,6 +488,7 @@ def main():
     current = load_json(args.current_file) if args.current_file else current_collector.collect_snapshot(UNIVERSE_FILE)
     industries = load_json(MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
     membership = load_json(MARKET_DIR / "industry-membership.json", {"status": "UNUSABLE", "industries": []})
+    theme_membership = load_json(THEME_MEMBERSHIP_FILE, {"status": "UNUSABLE", "themes": []})
     previous_good_industries = load_json(MARKET_DIR / "industries-latest-ok.json")
     previous = load_json(Path(args.output_dir) / "latest-summary.json") or {}
     previous["previousLeaders"] = (load_json(Path(args.output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
@@ -468,6 +496,7 @@ def main():
     evidence, _ = build_evidence(
         current, HISTORY_DIR, industries, membership, previous,
         previous_good_industries=previous_good_industries, baseline=baseline,
+        theme_membership=theme_membership,
     )
     sizes = write_evidence(evidence, args.output_dir) if not args.no_write else {name: len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) for name, payload in evidence.items()}
     print(json.dumps({"currentCoverage": current["coverageCount"], "files": sizes, "totalBytes": sum(sizes.values())}, ensure_ascii=False))
