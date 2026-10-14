@@ -137,8 +137,20 @@ jobs:
             echo "published=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ "$actual" != "$expected" ]; then
+          unexpected=""
+          while IFS= read -r path; do
+            case "$path" in
+              data/market-universe/all-assets.json|\
+              data/monitoring-baseline/latest.json|\
+              data/monitoring-daily/kospi.json|\
+              data/monitoring-daily/kosdaq.json|\
+              data/monitoring-daily/universe-lifecycle.json) ;;
+              *) unexpected+="$path\n" ;;
+            esac
+          done <<< "$actual"
+          if [ -n "$unexpected" ]; then
             echo "::error::Unexpected staged paths; refusing commit."
+            printf '%b' "$unexpected"
             exit 1
           fi
           git commit -m "Refresh full-market rolling daily state"
