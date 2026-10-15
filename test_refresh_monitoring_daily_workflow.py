@@ -9,8 +9,10 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
     def setUp(self):
         self.text = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_uses_1545_kst_queue_and_manual_dry_run(self):
-        self.assertIn('cron: "45 6 * * 1-5"', self.text)
+    def test_follows_daily_candles_and_manual_dry_run(self):
+        self.assertIn('workflow_run:', self.text)
+        self.assertIn('workflows: ["Refresh daily candles"]', self.text)
+        self.assertNotIn('cron: "45 6 * * 1-5"', self.text)
         self.assertIn('group: generated-data-write', self.text)
         self.assertIn('workflow_dispatch:', self.text)
         self.assertIn('dry_run:', self.text)

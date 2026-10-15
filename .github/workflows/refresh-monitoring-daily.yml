@@ -8,11 +8,9 @@ on:
         required: false
         default: false
         type: boolean
-  schedule:
-    # 15:45 KST (06:45 UTC) follows the existing 15:40 42-stock daily job.
-    # Time starts collection only; NAVER's complete 2,768-row daily response
-    # and KRX calendar validation decide whether a FINAL state may publish.
-    - cron: "45 6 * * 1-5"
+  workflow_run:
+    workflows: ["Refresh daily candles"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -36,6 +34,7 @@ jobs:
 
       - name: Check KRX trading day
         id: market_day
+        if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
         shell: bash
         run: |
           set +e
