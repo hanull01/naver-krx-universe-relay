@@ -342,12 +342,13 @@ def compare_breadth(previous, current):
     return result
 
 
-def signal_subset(features):
+def signal_subset(features, required_codes=None):
     ordered = lambda rows, key, reverse=True: sorted([row for row in rows if row.get(key) is not None], key=lambda row: row[key], reverse=reverse)[:60]
     selected = {row["code"]: row for row in ordered(features, "changeRate")}
     selected.update({row["code"]: row for row in ordered(features, "changeRate", False)})
     selected.update({row["code"]: row for row in ordered(features, "current_volume_ratio_20")})
     selected.update({row["code"]: row for row in features if row.get("breakout_20_intraday") or row.get("near_52week_high")})
+    selected.update({row["code"]: row for row in features if str(row.get("code")) in {str(code) for code in (required_codes or [])}})
     keys = ("code", "name", "market", "currentPrice", "change", "changeRate", "historyStatus", "ret_1d", "ret_5d", "ret_20d",
             "dist_ma20", "dist_ma60", "dist_high_20", "above_ma20", "above_ma60", "breakout_20_intraday",
             "near_52week_high", "current_volume_ratio_20", "close_valid", "ohlc_valid", "volume_valid")
@@ -474,12 +475,20 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     baseline_coverage = baseline.get("coveragePct") if baseline else None
     baseline_history_status = baseline.get("historyStatus") if baseline else None
     canonical_coverage = pct(len(current_codes & history_codes), current_snapshot["expectedCount"])
+    tracked_codes = []
+    discovery = load_json(ROOT / "data/trading-discovery/latest.json", {}) or {}
+    if discovery.get("monitoringDate") == str(summary["generatedAt"])[:10]:
+        tracked_codes = discovery.get("symbols") or []
+    tracked_signals = signal_subset(features, tracked_codes)
     evidence = {
         "latest-breadth.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
                                   "fullMarket": full_market, "breadth": breadth_data,
                                   "monitoredUniverse": publication_context.get("monitoredUniverse")},
         "latest-stock-signals.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
-                                      "count": len(signal_subset(features)), "stocks": signal_subset(features)},
+                                      "count": len(tracked_signals), "stocks": tracked_signals,
+                                      "trackedDiscoveryCodes": sorted({str(code) for code in tracked_codes}),
+                                      "trackedDiscoveryCoverage": sum(str(code) in {str(row.get("code")) for row in tracked_signals}
+                                                                       for code in tracked_codes)},
         "latest-theme-signals.json": build_theme_signals(summary["generatedAt"], features, theme_membership),
         "latest-industries.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "quality": quality,
                                      "membershipSourceStatus": membership.get("status"),

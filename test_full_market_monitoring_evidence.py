@@ -26,6 +26,12 @@ def current(code="005930", market="KOSPI", price=130, volume=200):
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_required_discovery_codes_are_retained_in_signal_subset(self):
+        rows = [evidence.feature_row(current("005930"), [history("20260930", 100)] * 20, "20261015"),
+                evidence.feature_row(current("006400"), [history("20260930", 100)] * 20, "20261015")]
+        selected = evidence.signal_subset(rows, ["006400"])
+        self.assertIn("006400", [row["code"] for row in selected])
+
     def test_verified_new_listing_without_baseline_is_history_insufficient(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 2,
                     "coverageCount": 2, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
