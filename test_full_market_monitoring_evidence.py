@@ -26,6 +26,44 @@ def current(code="005930", market="KOSPI", price=130, volume=200):
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_verified_new_listing_without_baseline_is_history_insufficient(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 2,
+                    "coverageCount": 2, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("005930"), current("179880", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261014", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            original = evidence.UNIVERSE_FILE
+            evidence.UNIVERSE_FILE = Path(directory) / "universe.json"
+            evidence.UNIVERSE_FILE.write_text(json.dumps({"metadata": {"lifecycle": {"events": [
+                {"type": "NEW_LISTING", "code": "179880", "effectiveDate": "20261015",
+                 "sourceVerified": True}]}}}), encoding="utf-8")
+            try:
+                context = {"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"}
+                built, _ = evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                                    publication_context=context, today="20261015")
+                self.assertEqual(context["baselineDiagnostics"]["newListingHistoryInsufficient"], ["179880"])
+                row = next(item for item in built["latest-stock-signals.json"]["stocks"]
+                           if item["code"] == "179880")
+                self.assertEqual(row["historyStatus"], "HISTORY_INSUFFICIENT")
+            finally:
+                evidence.UNIVERSE_FILE = original
+
+    def test_existing_baseline_gap_remains_fatal(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("005930")]}
+        baseline = {"asOfDate": "20261014", "count": 0, "authoritativeCount": 0,
+                    "coveragePct": 0.0, "historyStatus": "OK", "stocks": []}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "baseline missing 1 current codes"):
+                evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                        publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                                        today="20261015")
+
     def test_current_history_merge_no_duplicate_and_no_mutation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); path = root / "005930.jsonl"

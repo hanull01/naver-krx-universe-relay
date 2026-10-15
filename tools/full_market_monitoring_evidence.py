@@ -348,7 +348,7 @@ def signal_subset(features):
     selected.update({row["code"]: row for row in ordered(features, "changeRate", False)})
     selected.update({row["code"]: row for row in ordered(features, "current_volume_ratio_20")})
     selected.update({row["code"]: row for row in features if row.get("breakout_20_intraday") or row.get("near_52week_high")})
-    keys = ("code", "name", "market", "currentPrice", "change", "changeRate", "ret_1d", "ret_5d", "ret_20d",
+    keys = ("code", "name", "market", "currentPrice", "change", "changeRate", "historyStatus", "ret_1d", "ret_5d", "ret_20d",
             "dist_ma20", "dist_ma60", "dist_high_20", "above_ma20", "above_ma60", "breakout_20_intraday",
             "near_52week_high", "current_volume_ratio_20", "close_valid", "ohlc_valid", "volume_valid")
     return [{key: row.get(key) for key in keys} for row in sorted(selected.values(), key=lambda row: row["code"])]
@@ -372,9 +372,29 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             raise ValueError("same-day baseline requires validated final-session overlay")
         by_code = {row["code"]: row for row in baseline.get("stocks", [])}
         missing = [row["code"] for row in current_snapshot["stocks"] if row["code"] not in by_code]
-        if missing:
-            raise ValueError(f"baseline missing {len(missing)} current codes")
-        features = [baseline_builder.feature_row_from_baseline(row, by_code[row["code"]], today, overlay=overlay)
+        # A newly listed stock can legitimately have no confirmed daily history
+        # yet.  Allow only codes recorded by the verified universe lifecycle for
+        # today's effective date; every other baseline gap remains fatal.
+        universe = load_json(UNIVERSE_FILE, {}) or {}
+        lifecycle = (universe.get("metadata", {}) or {}).get("lifecycle", {}) or {}
+        lifecycle_new = {
+            str(event.get("code")): event for event in lifecycle.get("events", [])
+            if event.get("type") == "NEW_LISTING"
+            and str(event.get("effectiveDate", "")).replace("-", "") == str(today).replace("-", "")
+            and event.get("sourceVerified") is True
+        }
+        allowed_missing = [code for code in missing if code in lifecycle_new]
+        unexpected_missing = [code for code in missing if code not in lifecycle_new]
+        if unexpected_missing:
+            raise ValueError(f"baseline missing {len(unexpected_missing)} current codes: {unexpected_missing}")
+        if allowed_missing:
+            publication_context.setdefault("baselineDiagnostics", {})["newListingHistoryInsufficient"] = sorted(allowed_missing)
+        features = [baseline_builder.feature_row_from_baseline(
+            row, by_code.get(row["code"], {"code": row["code"], "name": row.get("name"),
+                                                "market": row.get("market"), "returnBases": {},
+                                                "rollingHighs": {}, "rollingHighCounts": {},
+                                                "volumeState20": {}, "previousMa20": None,
+                                                "previousMa60": None}), today, overlay=overlay)
                     for row in current_snapshot["stocks"]]
     else:
         features = [feature_row(row, read_history(row["code"], history_dir, today), today)

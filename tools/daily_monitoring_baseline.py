@@ -290,6 +290,7 @@ def feature_row_from_baseline(current, stock, today, overlay=False):
                           if price and (base := number(stock.get(return_key, {}).get(str(window)))) else None)
     return {
         "code": current["code"], "name": current["name"], "market": current["market"],
+        "historyStatus": "HISTORY_INSUFFICIENT" if not stock.get("lastTradingDate") else "AVAILABLE",
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
         "accumulatedTradingValue": number(current.get("accumulatedTradingValue", current.get("tradeAmount"))),
         **validity, **{f"ma{window}": ma[window] for window in WINDOWS},
