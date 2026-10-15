@@ -1,5 +1,6 @@
 import unittest
 from datetime import date
+from unittest.mock import patch
 
 import research_intelligence as ri
 import research_intelligence_batch as rib
@@ -141,7 +142,14 @@ class ResearchIntelligenceTest(unittest.TestCase):
         )
 
     def test_universe_loader_returns_enabled_stocks(self):
-        stocks = rib.load_universe()
+        # Keep research behavior independent from the intentionally empty
+        # production/user universe.
+        fixture = [
+            {"itemCode": "000001", "stockName": "fixture-A", "enabled": True},
+            {"itemCode": "000002", "stockName": "fixture-B", "enabled": True},
+        ]
+        with patch.object(rib, "load_universe", return_value=fixture):
+            stocks = rib.load_universe()
 
         self.assertGreater(
             len(stocks),

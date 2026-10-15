@@ -548,11 +548,21 @@ class RelayTests(unittest.TestCase):
             self.assertFalse(relay.run_quote_pipeline())
 
     def test_universe_legacy_and_validation(self):
-        universe = relay.load_universe()
-        self.assertEqual(len(universe['watchlists']['legacy33']), 33)
-        self.assertGreaterEqual(len(relay.universe_codes(universe)), 33)
-        self.assertEqual(universe['watchlists']['legacy33'][-1], '051600')
-        broken = json.loads(json.dumps(universe))
+        # Use an explicit legacy fixture; the production universe is intentionally
+        # user-reset and must not be required by this regression test.
+        codes = [f"{index:06d}" for index in range(1, 34)]
+        universe = {
+            'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True} for code in codes],
+            'sectors': {}, 'themes': {},
+            'watchlists': {'legacy33': codes},
+            'leaders': {'sector': {}, 'theme': {}, 'watchlist': {}},
+        }
+        with patch.object(relay, 'load_universe', return_value=universe):
+            loaded = relay.load_universe()
+        self.assertEqual(len(loaded['watchlists']['legacy33']), 33)
+        self.assertGreaterEqual(len(relay.universe_codes(loaded)), 33)
+        self.assertEqual(loaded['watchlists']['legacy33'][-1], '000033')
+        broken = json.loads(json.dumps(loaded))
         broken['leaders']['sector']['원전·발전설비'] = ['999999']
         with self.assertRaises(ValueError):
             relay.validate_universe(broken)
@@ -1182,7 +1192,16 @@ class RelayTests(unittest.TestCase):
         def normalize(row, current):
             return dict(itemCode=row['itemCode'], fresh=True, sourceTime=current.isoformat())
         current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        codes = [f"{index:06d}" for index in range(1, 34)]
+        fixture = {
+            'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True} for code in codes],
+            'sectors': {'원전·발전설비': codes}, 'themes': {},
+            'watchlists': {'legacy33': codes},
+            'leaders': {'sector': {'원전·발전설비': codes[:2]}, 'theme': {}, 'watchlist': {}},
+        }
+        sector = {code: '원전·발전설비' for code in codes}
         with patch.object(relay, 'now', return_value=current), \
+             patch.object(relay, 'universe_state', return_value=(fixture, codes, codes, sector)), \
              patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), \
              patch.object(relay, 'save') as save:
             result = relay.collect_quotes()
@@ -1191,7 +1210,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(len(calls[0]), result['expectedCount'])
         written = {call.args[0]: call.args[1] for call in save.call_args_list}
         self.assertEqual(written['data/core33-lite.json']['count'], 33)
-        self.assertEqual(written['data/core33-lite.json']['datas'][-1]['itemCode'], '051600')
+        self.assertEqual(written['data/core33-lite.json']['datas'][-1]['itemCode'], '000033')
         self.assertEqual(set(written['data/core33-lite.json']['datas'][0]), set(relay.LITE_FIELDS))
         self.assertIn('data/quotes.json', written)
         self.assertIn('data/quotes-lite.json', written)
