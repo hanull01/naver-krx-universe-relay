@@ -40,7 +40,9 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication is not from today')
     if collection_started_at and generated < parse_timestamp(collection_started_at, 'collectionStartedAt'):
         raise ReadyValidationError('full-market publication predates this collection run')
-    return {'generatedAt': generated.isoformat(), 'count': count}
+    return {'mode': 'FULL_MARKET', 'status': 'SUCCESS', 'scope': 'AUTHORITATIVE_FULL_MARKET',
+            'generatedAt': generated.isoformat(), 'count': count,
+            'tradingDate': generated.date().isoformat(), 'marketSession': 'REGULAR_MARKET'}
 
 def parse_timestamp(value, field):
     if not isinstance(value, str) or not value:
@@ -122,12 +124,26 @@ def ready_message(metadata, env):
     message = EmailMessage(); message['Subject'] = f'{SUBJECT_PREFIX} {generated:%Y-%m-%d %H:%M}'
     message['From'] = env.get('MARKET_GMAIL_USERNAME', ''); message['To'] = env.get('MARKET_GMAIL_TO', '')
     lines = [f'repository={repository}', 'workflow=Refresh market data', f'run_id={run_id}',
-             f'run_url={server}/{repository}/actions/runs/{run_id}', f'commit_sha={commit_sha}',
-             f'generatedAt={metadata["generatedAt"]}', f'sourceTime={metadata["sourceTime"]}',
-             f'count={metadata["count"]}', f'expectedCount={metadata["expectedCount"]}',
-             f'freshCount={metadata["freshCount"]}', f'coverageCount={metadata["coverageCount"]}',
-             'missingCodes=[]', 'delayTime=0', 'status=ok',
-             f'session={metadata["session"]}', f'priceBasis={metadata["priceBasis"]}']
+             f'run_url={server}/{repository}/actions/runs/{run_id}', f'commit_sha={commit_sha}']
+    if metadata.get('mode') == 'FULL_MARKET':
+        lines.extend([
+            'fullMarket.status=SUCCESS', 'fullMarket.scope=AUTHORITATIVE_FULL_MARKET',
+            f'fullMarket.generatedAt={metadata["generatedAt"]}',
+            f'fullMarket.tradingDate={metadata["tradingDate"]}',
+            f'fullMarket.marketSession={metadata["marketSession"]}',
+            f'fullMarket.count={metadata["count"]}',
+            f'fullMarket.coverageCount={metadata["count"]}',
+            f'fullMarket.publicationCommitSha={commit_sha}',
+            'legacyQuotes.mode=SUPPLEMENTAL_ONLY',
+            'legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY',
+        ])
+    else:
+        lines.extend([
+            f'generatedAt={metadata["generatedAt"]}', f'sourceTime={metadata["sourceTime"]}',
+            f'count={metadata["count"]}', f'expectedCount={metadata["expectedCount"]}',
+            f'freshCount={metadata["freshCount"]}', f'coverageCount={metadata["coverageCount"]}',
+            'missingCodes=[]', 'delayTime=0', 'status=ok',
+            f'session={metadata["session"]}', f'priceBasis={metadata["priceBasis"]}'])
     for key in ('liveCount', 'noAfterTradeCount'):
         if metadata.get(key) is not None:
             lines.append(f'{key}={metadata[key]}')
@@ -175,9 +191,10 @@ def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, 
         if env.get('FULL_MARKET_REQUIRED') == 'true':
             full_market = validate_full_market_publication(
                 summary_path, quality_path, env.get('MARKET_DATA_COLLECTION_STARTED_AT'), current=current)
-        payload = json.loads(Path(quotes_path).read_text(encoding='utf-8'))
-        metadata = validate_quotes(payload, current=current, collection_started_at=env.get('MARKET_DATA_COLLECTION_STARTED_AT'))
-        metadata['fullMarket'] = full_market
+            metadata = full_market
+        else:
+            payload = json.loads(Path(quotes_path).read_text(encoding='utf-8'))
+            metadata = validate_quotes(payload, current=current, collection_started_at=env.get('MARKET_DATA_COLLECTION_STARTED_AT'))
         send_ready_email(ready_message(metadata, env), env, smtp_factory=smtp_factory)
     except (OSError, json.JSONDecodeError, ReadyValidationError, RuntimeError) as exc:
         print(f'MARKET_DATA_READY not sent: {exc}'); return 1

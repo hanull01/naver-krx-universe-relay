@@ -112,4 +112,30 @@ class ReadyMailTests(unittest.TestCase):
             with patch('sys.stdout', output): self.assertEqual(ready.main(env, path, FakeSMTP, current=self.current), 1)
             self.assertIn('already signaled', output.getvalue())
 
+    def test_full_market_primary_ignores_missing_legacy_quotes(self):
+        FakeSMTP.messages=[]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'markets': {'TOTAL': {'stockCount': 2764, 'validCount': 2764}}}}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            env = dict(self.env(), FULL_MARKET_REQUIRED='true')
+            missing_quotes = root / 'missing-quotes.json'
+            self.assertEqual(ready.main(env, missing_quotes, FakeSMTP, current=self.current,
+                                        summary_path=summary, quality_path=quality), 0)
+            content = FakeSMTP.messages[-1].get_content()
+            self.assertIn('fullMarket.count=2764', content)
+            self.assertIn('legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY', content)
+
+    def test_full_market_primary_rejects_stale_publication(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-28T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'markets': {'TOTAL': {'stockCount': 2764, 'validCount': 2764}}}}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            env = dict(self.env(), FULL_MARKET_REQUIRED='true')
+            with self.assertRaisesRegex(ready.ReadyValidationError, 'not from today'):
+                ready.validate_full_market_publication(summary, quality, current=self.current)
+
 if __name__ == '__main__': unittest.main()
