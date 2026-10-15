@@ -336,7 +336,8 @@ jobs:
                 git rebase --abort || true
                 exit 1
               fi
-              if git push origin HEAD:main; then
+              target_ref="${GITHUB_REF_NAME:-main}"
+              if git push origin "HEAD:${target_ref}"; then
                 echo "Market data push succeeded."
                 echo "published=true" >> "$GITHUB_OUTPUT"
                 echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -388,7 +389,8 @@ jobs:
             git rebase --abort || true
             exit 1
           fi
-          git push origin HEAD:main
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git push origin "HEAD:${target_ref}"
 
       - name: Fail after preserving production snapshot
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0'
