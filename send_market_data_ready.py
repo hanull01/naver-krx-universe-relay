@@ -11,10 +11,36 @@ from zoneinfo import ZoneInfo
 KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
 QUOTES_LITE_PATH = ROOT / 'data/quotes-lite.json'
+FULL_MARKET_SUMMARY_PATH = ROOT / 'data/monitoring/latest-summary.json'
+FULL_MARKET_QUALITY_PATH = ROOT / 'data/monitoring/latest-quality.json'
 SUBJECT_PREFIX = 'MARKET_DATA_READY'
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""
+
+def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
+                                     quality_path=FULL_MARKET_QUALITY_PATH,
+                                     collection_started_at=None, current=None):
+    """Require the current full-market publication before signaling Work."""
+    try:
+        summary = json.loads(Path(summary_path).read_text(encoding='utf-8'))
+        quality = json.loads(Path(quality_path).read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ReadyValidationError('full-market publication metadata is unavailable') from exc
+    if summary.get('publicationStatus') != 'SUCCESS' or quality.get('publicationStatus') != 'SUCCESS':
+        raise ReadyValidationError('full-market publication is not successful')
+    if summary.get('fullMarket', {}).get('scope') != 'AUTHORITATIVE_FULL_MARKET':
+        raise ReadyValidationError('full-market scope is not authoritative')
+    total = summary.get('fullMarket', {}).get('markets', {}).get('TOTAL', {})
+    count = total.get('stockCount')
+    if not isinstance(count, int) or count <= 0 or total.get('validCount') != count:
+        raise ReadyValidationError('full-market coverage is incomplete')
+    generated = parse_timestamp(summary.get('generatedAt'), 'fullMarketGeneratedAt')
+    if current and generated.date() != current.astimezone(KST).date():
+        raise ReadyValidationError('full-market publication is not from today')
+    if collection_started_at and generated < parse_timestamp(collection_started_at, 'collectionStartedAt'):
+        raise ReadyValidationError('full-market publication predates this collection run')
+    return {'generatedAt': generated.isoformat(), 'count': count}
 
 def parse_timestamp(value, field):
     if not isinstance(value, str) or not value:
@@ -139,11 +165,19 @@ def send_ready_email(message, env, smtp_factory=smtplib.SMTP_SSL):
     except Exception as exc:
         raise RuntimeError(f'Gmail SMTP unexpected error: {type(exc).__name__}') from exc
 
-def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, current=None):
+def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, current=None,
+         summary_path=FULL_MARKET_SUMMARY_PATH, quality_path=FULL_MARKET_QUALITY_PATH):
     env = os.environ if env is None else env
     try:
+        if env.get('MARKET_DATA_READY_ALREADY_SENT') == env.get('MARKET_DATA_COMMIT_SHA'):
+            raise ReadyValidationError('same publication commit was already signaled')
+        full_market = None
+        if env.get('FULL_MARKET_REQUIRED') == 'true':
+            full_market = validate_full_market_publication(
+                summary_path, quality_path, env.get('MARKET_DATA_COLLECTION_STARTED_AT'), current=current)
         payload = json.loads(Path(quotes_path).read_text(encoding='utf-8'))
         metadata = validate_quotes(payload, current=current, collection_started_at=env.get('MARKET_DATA_COLLECTION_STARTED_AT'))
+        metadata['fullMarket'] = full_market
         send_ready_email(ready_message(metadata, env), env, smtp_factory=smtp_factory)
     except (OSError, json.JSONDecodeError, ReadyValidationError, RuntimeError) as exc:
         print(f'MARKET_DATA_READY not sent: {exc}'); return 1

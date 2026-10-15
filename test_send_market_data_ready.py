@@ -90,6 +90,26 @@ class ReadyMailTests(unittest.TestCase):
     def test_smtp_timeout_is_safe(self):
         self.assert_smtp_failure(socket.timeout('secret'), 'Gmail SMTP timeout')
     def test_workflow_sends_only_after_successful_publish(self):
-        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+700]); self.assertNotIn("steps.full_market.outputs.exit_code == '0' && steps.publish.outputs.published", workflow[mail:mail+700])
+        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+900]); self.assertIn("steps.full_market.outputs.exit_code == '0'", workflow[mail:mail+900]); self.assertIn("FULL_MARKET_REQUIRED: 'true'", workflow[mail:mail+1400])
+
+    def test_full_market_publication_requires_success_and_authoritative_coverage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
+            payload = {'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                       'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'markets': {'TOTAL': {'stockCount': 2, 'validCount': 2}}}}
+            summary.write_text(json.dumps(payload), encoding='utf-8'); quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+            self.assertEqual(result['count'], 2)
+            payload['publicationStatus'] = 'COMPLETE_RECONCILIATION_PENDING'; summary.write_text(json.dumps(payload), encoding='utf-8')
+            with self.assertRaisesRegex(ready.ReadyValidationError, 'not successful'):
+                ready.validate_full_market_publication(summary, quality, current=self.current)
+
+    def test_same_commit_is_not_signaled_twice(self):
+        FakeSMTP.messages=[]
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'quotes-lite.json'; path.write_text(json.dumps(self.payload()),encoding='utf-8')
+            env = dict(self.env(), MARKET_DATA_READY_ALREADY_SENT='abc123'); output=StringIO()
+            with patch('sys.stdout', output): self.assertEqual(ready.main(env, path, FakeSMTP, current=self.current), 1)
+            self.assertIn('already signaled', output.getvalue())
 
 if __name__ == '__main__': unittest.main()

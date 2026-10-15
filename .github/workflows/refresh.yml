@@ -314,7 +314,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
@@ -326,6 +326,7 @@ jobs:
           FULL_MARKET_STATUS: ${{ steps.full_market.outputs.market_status }}
           FULL_MARKET_FAILURE_REASON: ${{ steps.full_market.outputs.failure_reason }}
           FULL_MARKET_LAST_PUBLISHED_AT: ${{ steps.full_market.outputs.last_published_at }}
+          FULL_MARKET_REQUIRED: 'true'
         run: python send_market_data_ready.py
 
       - name: Warn when MARKET_DATA_READY signal fails

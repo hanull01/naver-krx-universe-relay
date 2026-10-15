@@ -273,7 +273,10 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertNotIn("data/market/stocks-current.json", workflow)
         self.assertIn("data/monitoring/latest-quality.json", workflow)
         self.assertIn("steps.full_market.outputs.exit_code != '0'", workflow)
-        self.assertIn("steps.collect.outputs.exit_code == '0' && steps.publish.outputs.published == 'true'", workflow)
+        self.assertIn("steps.collect.outputs.exit_code == '0'", workflow)
+        self.assertIn("steps.full_market.outputs.exit_code == '0'", workflow)
+        self.assertIn("steps.full_market.outputs.ready == 'true'", workflow)
+        self.assertIn("steps.publish.outputs.published == 'true'", workflow)
         self.assertIn("FULL_MARKET_STATUS", workflow)
         self.assertFalse((ROOT / ".github/workflows/refresh-full-market-monitoring.yml").exists())
 
