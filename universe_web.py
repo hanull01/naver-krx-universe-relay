@@ -391,3 +391,4 @@ let initialized=false,serial=0;async function initialize(note){if(initialized)re
 window.loadUser=initialize;select('dash');initialize();
 })();
 </script>'''
+if __name__=="__main__":main()
