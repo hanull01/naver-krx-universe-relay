@@ -76,7 +76,9 @@ jobs:
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
-        run: git pull --ff-only origin main
+        run: |
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git pull --ff-only origin "$target_ref"
 
       - name: Collect NAVER data
         id: collect
@@ -330,8 +332,9 @@ jobs:
             echo "Market data collection succeeded; synchronizing its data commit."
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
-              git fetch origin main
-              if ! git rebase origin/main; then
+              target_ref="${GITHUB_REF_NAME:-main}"
+              git fetch origin "$target_ref"
+              if ! git rebase "origin/${target_ref}"; then
                 echo "::error::Data commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
                 git rebase --abort || true
                 exit 1
@@ -351,7 +354,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
+        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
@@ -383,8 +386,9 @@ jobs:
             exit 0
           fi
           git commit -m "Record NAVER quote collection failure"
-          git fetch origin main
-          if ! git rebase origin/main; then
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git fetch origin "$target_ref"
+          if ! git rebase "origin/${target_ref}"; then
             echo "::error::Diagnostic commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
             git rebase --abort || true
             exit 1
