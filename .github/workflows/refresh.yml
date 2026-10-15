@@ -215,6 +215,25 @@ jobs:
           python market_indices.py
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
+      - name: Run V2 shadow observation
+        id: v2_shadow
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # V2 reads the already-generated monitoring snapshot.  Its runner
+          # catches its own errors and never gates V1 or MARKET_DATA_READY.
+          python tools/run_dynamic_universe_v2_shadow.py
+          echo "status=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('status','FAILED'))
+          except Exception:
+              print('FAILED')
+          PY
+          )" >> "$GITHUB_OUTPUT"
+
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true'
@@ -284,6 +303,23 @@ jobs:
             git add -- data/trading-discovery/quotes
           else
             echo "Kiwoom supplemental quotes are not eligible for this market commit; preserving prior files."
+          fi
+
+          if [ -f data/dynamic-universe/v2-shadow-run-status.json ]; then
+            git add -- data/dynamic-universe/v2-shadow-run-status.json
+            if [ "$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('status'))
+          except Exception:
+              print('FAILED')
+          PY
+          )" = "OK" ]; then
+              git add -- data/dynamic-universe/v2-shadow-latest.json data/dynamic-universe/v2-shadow-history.json
+            else
+              echo "V2 shadow failed; publishing only its run status and preserving prior V2 result/history."
+            fi
           fi
 
           if git diff --cached --quiet; then
