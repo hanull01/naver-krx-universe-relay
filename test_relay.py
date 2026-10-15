@@ -210,6 +210,28 @@ class RelayTests(unittest.TestCase):
         self.assertIn('data/groups/관심.json', written)
         self.assertEqual([row['itemCode'] for row in written['data/groups/테마A.json']['datas']], ['000001', '000002'])
 
+    def test_realtime_large_universe_is_split_into_provider_safe_batches(self):
+        universe = self.expanded_universe()
+        codes = [f'{i:06d}' for i in range(1, 1002)]
+        universe['stocks'] = [{'itemCode': code, 'stockName': code, 'enabled': True} for code in codes]
+        calls = []
+        def fetch(url):
+            requested = url.rsplit('/', 1)[-1].split(',')
+            calls.append(requested)
+            return {'datas': [{'itemCode': code} for code in requested]}
+        def normalize(row, current):
+            return {'itemCode': row['itemCode'], 'stockName': row['itemCode'], 'fresh': True,
+                    'sourceTime': current.isoformat(), 'closePrice': 1, 'fluctuationsRatio': 0,
+                    'accumulatedTradingVolume': 1, 'marketStatus': 'OPEN', 'delayTime': 0,
+                    'status': 'ok'}
+        current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, [], {})), \
+             patch.object(relay, 'now', return_value=current), patch.object(relay, 'fetch', fetch), \
+             patch.object(relay, 'normalize_quote', normalize), patch.object(relay, 'save'):
+            result = relay.collect_quotes()
+        self.assertEqual(result['status'], 'ok')
+        self.assertEqual([len(batch) for batch in calls], [500, 500, 1])
+
     def test_expanded_universe_daily_is_deduplicated(self):
         universe = self.expanded_universe()
         codes = relay.universe_codes(universe)

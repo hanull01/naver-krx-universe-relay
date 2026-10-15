@@ -18,6 +18,9 @@ KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
 UNIVERSE_PATH = ROOT / 'config/universe.json'
 QUOTE_URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock/'
+# NAVER's realtime endpoint rejects oversized comma-separated paths. Keep the
+# request bounded so one provider response cannot invalidate the whole snapshot.
+QUOTE_BATCH_SIZE = 500
 DAILY_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/day'
 MINUTE_URL = 'https://api.stock.naver.com/chart/domestic/item/{code}/minute'
 REGULAR_DAILY_DIR = 'data/daily-regular'
@@ -677,7 +680,8 @@ def collect_quotes():
         except Exception as exc:
             errors.append({'stage': stage, 'codes': codes, 'error': str(exc)})
 
-    batch(codes, 'all_batch')
+    for offset in range(0, len(codes), QUOTE_BATCH_SIZE):
+        batch(codes[offset:offset + QUOTE_BATCH_SIZE], 'all_batch')
     seen_groups = set()
     for group in universe['sectors'].values():
         missing = [c for c in group if c in codes and c not in rows and c not in seen_groups]
