@@ -95,7 +95,51 @@ def preview_summary(before, after, operation):
 class UniverseWebApp:
     def __init__(self,config_path=DEFAULT_CONFIG): self.config_path=Path(config_path)
     def current(self): return manager.load(self.config_path)
-    def dynamic_payload(self): return dynamic.load_json(DEFAULT_DYNAMIC_RESULT, {}) or {}
+    def dynamic_payload(self):
+        payload = dynamic.load_json(DEFAULT_DYNAMIC_RESULT, {}) or {}
+        industries = dynamic.load_json(ROOT / "data" / "monitoring" / "latest-industries.json", {}) or {}
+        themes = dynamic.load_json(ROOT / "data" / "monitoring" / "latest-theme-signals.json", {}) or {}
+        industry_by_id = {str(v.get("id")): v for v in industries.get("industries", []) if isinstance(v, dict)}
+        industry_by_name = {str(v.get("name")): v for v in industries.get("industries", []) if isinstance(v, dict)}
+        theme_by_id = {str(v.get("id")): v for v in themes.get("themes", []) if isinstance(v, dict)}
+        sectors = []
+        for item in payload.get("sectors", []):
+            if not isinstance(item, dict):
+                continue
+            evidence = industry_by_id.get(str(item.get("id"))) or industry_by_name.get(str(item.get("name")))
+            merged = dict(item)
+            if evidence:
+                merged["metrics"] = evidence
+                merged["leaders"] = evidence.get("leaders", [])
+                merged["evidenceGeneratedAt"] = industries.get("generatedAt")
+            sectors.append(merged)
+        selected_themes = []
+        for item in payload.get("themes", []):
+            if not isinstance(item, dict):
+                continue
+            evidence = theme_by_id.get(str(item.get("id")))
+            merged = dict(item)
+            if evidence:
+                merged["metrics"] = evidence.get("metrics", {})
+                merged["stocks"] = evidence.get("stocks", [])
+                merged["evidenceGeneratedAt"] = themes.get("generatedAt")
+            selected_themes.append(merged)
+        name_by_code = {}
+        try:
+            assets = dynamic.load_json(ROOT / "data" / "market-universe" / "all-assets.json", {}).get("assets", [])
+            name_by_code.update({str(v.get("code")): v.get("name") for v in assets if v.get("code") and v.get("name")})
+        except (AttributeError, TypeError):
+            pass
+        kiwoom = []
+        for item in payload.get("kiwoomDiscovery", []):
+            if isinstance(item, dict) and item.get("code"):
+                item = dict(item)
+                item["name"] = item.get("name") or name_by_code.get(str(item["code"]))
+                item["nameSource"] = "NAVER_MARKET_UNIVERSE" if item.get("name") else None
+            kiwoom.append(item)
+        return {**payload, "sectors": sectors, "themes": selected_themes,
+                "kiwoomDiscovery": kiwoom,
+                "analysisGeneratedAt": {"industries": industries.get("generatedAt"), "themes": themes.get("generatedAt")}}
     def dynamic_history(self): return dynamic.load_json(DEFAULT_DYNAMIC_HISTORY, {"events": []}) or {"events": []}
     def dashboard(self):
         data=self.current(); errors,warnings=manager.validation(data); stocks=data.get("stocks",[])
@@ -394,13 +438,15 @@ body{overflow-x:hidden}.app{padding-bottom:120px}.bottom{padding-bottom:calc(14p
   const kst=v=>{if(!v)return '기준시각 확인 불가';try{return new Date(v).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'medium',timeStyle:'short'})}catch(_){return '기준시각 확인 불가'}};
   const reason=v=>v?.reason||v?.criteria||'선정 근거 자료 없음';
   function item(v){let rate=v?.changeRate??v?.changePercent;return '<div class="detail"><b>'+esc(v?.name||v?.code||'종목명 확인 불가')+'</b>'+(v?.code?' <span class="badge">'+esc(v.code)+'</span>':'')+' <span class="badge">'+esc(state(v?.status))+'</span>'+(rate!=null?'<br>등락률 '+esc(rate)+'%':'')+'<br><span class="reason">'+esc(reason(v))+'</span>'+(v?.sourceTime?'<br><span class="muted">데이터 기준시각: '+esc(kst(v.sourceTime))+'</span>':'')+'</div>'}
-  function group(v){let ms=v?.metrics||{},tv=ms.tradingValue||{};return '<article class="card market-card"><h3>'+esc(v?.name||'이름 확인 불가')+'</h3><span class="badge">'+esc(state(v?.status||v?.membershipStatus))+'</span><p class="muted">'+(ms.advancers!=null?('상승 '+ms.advancers+' · 하락 '+(ms.decliners||0)+' · 상승 비율 '+ms.advancerPct+'%'):'시장 강약 확인 대기')+'</p><p class="muted">평균 '+(ms.averageReturn1D??'확인 불가')+'% · 중앙값 '+(ms.medianReturn1D??'확인 불가')+'% · 20일선 상회 '+(ms.pctAboveMA20??'확인 불가')+'%</p><p class="muted">거래대금 '+(tv.total!=null?String(tv.total):'확인 불가')+' · 상위 3종목 집중도 '+(tv.top3ConcentrationPct!=null?tv.top3ConcentrationPct+'%':'확인 불가')+'</p>'+((v?.leaders||v?.stocks||[]).slice(0,3).map(item).join('')||'<p class="reason">주목 종목 자료 없음</p>')+'</article>'}
+  function metric(v,suffix=''){return v==null||v===''?'확인 불가':esc(String(v)+suffix)}
+  function group(v){let ms=v?.metrics||{},tv=ms.tradingValue||{},rows=v?.stocks||v?.leaders||[];let details='<div class="detail" hidden><p>상승 '+metric(ms.advancers)+' · 하락 '+metric(ms.decliners)+' · 보합 '+metric(ms.unchanged)+'</p><p>평균 '+metric(ms.averageReturn1D??ms.avgReturn1D,'%')+' · 중앙값 '+metric(ms.medianReturn1D,'%')+' · 20일선 상회 '+metric(ms.pctAboveMA20,'%')+'</p><p>거래대금 '+metric(tv.total)+' · 상위 3종목 집중도 '+metric(tv.top3ConcentrationPct,'%')+'</p>'+((rows.slice(0,3).map(item).join(''))||'<p class="reason">주목 종목 자료 없음</p>')+'</div>';return '<article class="card market-card"><button class="market-toggle" type="button" aria-expanded="false"><h3>'+esc(v?.name||'이름 확인 불가')+'</h3><span class="badge">'+esc(state(v?.status||v?.membershipStatus))+'</span><p class="muted">'+(ms.advancers!=null?('상승 '+ms.advancers+' · 하락 '+(ms.decliners||0)+' · 상승 비율 '+metric(ms.advancerPct,'%')):'시장 강약 확인 대기')+'</p></button>'+details+'</article>'}
   function section(title,items){let rows=(items||[]).filter(v=>v?.status!=='REMOVED');return '<h2>'+title+'</h2>'+((rows.map(group).join(''))||'<p class="muted">현재 선정된 대상 없음</p>')}
   function renderMarket(x){let sectors=x?.sectors||[],themes=x?.themes||[],leaders=x?.leaders||[],kiwoom=x?.kiwoomDiscovery||[];let active=sectors.filter(v=>['ACTIVE','WATCH','DISCOVERED','REENTERED'].includes(v?.status)).length;let observed=new Set([...leaders,...kiwoom].map(v=>v?.code).filter(Boolean));$('dash').innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">선정 자료: '+esc(kst(x?.generatedAt))+' · 동기화: '+esc(state(x?.sync?.status))+'</p><div class="market-summary"><article class="card"><span class="muted">주목 업종</span><b>'+active+'</b></article><article class="card"><span class="muted">주목 테마</span><b>'+themes.filter(v=>v?.status!=='REMOVED').length+'</b></article><article class="card"><span class="muted">관찰 종목</span><b>'+observed.size+'</b></article><article class="card"><span class="muted">키움 후보</span><b>'+kiwoom.length+'</b></article></div>'+section('오늘 새로 주목할 대상',sectors.filter(v=>v?.status==='DISCOVERED'))+section('주목 업종',sectors)+section('주목 테마',themes)+'<h2>주도주·대표 관찰 종목</h2>'+((leaders.slice(0,10).map(item).join(''))||'<p class="muted">현재 선정된 주도주 없음</p>')+'<h2>키움 발굴 후보</h2>'+((kiwoom.slice(0,10).map(item).join(''))||'<p class="muted">현재 선정된 후보 없음</p>')+'</article>'}
   function renderUser(){let v=dash.validation;$('valid').innerHTML='<article class="card"><h2>시스템 관리</h2><p>설정 검증: '+esc(state(v.status))+'</p>'+[...(v.errors||[]),...(v.warnings||[])].map(esc).join('<br>')+(v.errors?.length||v.warnings?.length?'':'현재 설정은 정상입니다.')+'</article>';if(typeof renderStocks==='function')renderStocks();if($('stockListMine')&&$('stockList'))$('stockListMine').innerHTML=$('stockList').innerHTML;$('groups').querySelectorAll('.legacy-summary').forEach(x=>x.remove())}
   function select(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tabs [data-v]').forEach(b=>b.classList.toggle('tab-selected',b.dataset.v===id));let b=document.querySelector('.tabs [data-v="'+id+'"]');if(b)b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});if(id==='dash')syncMarket()}
   document.querySelector('.tabs').innerHTML='<button data-v="dash">시장 현황</button><button data-v="groups" class="secondary">내 관심종목</button><button data-v="valid" class="secondary">시스템 관리</button><button class="secondary" onclick="logout()">로그아웃</button>';document.querySelectorAll('.tabs [data-v]').forEach(b=>b.onclick=()=>select(b.dataset.v));select('dash');
   async function syncMarket(){try{let x=await api('/api/automatic');renderMarket(x)}catch(_){$('dash').innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">동적 시장 자료를 확인할 수 없습니다. 마지막 정상 자료를 유지합니다.</p></article>'}}
+  document.addEventListener('click',e=>{let b=e.target.closest('.market-toggle');if(!b)return;let d=b.parentElement.querySelector('.detail');let open=d.hidden;d.hidden=!open;b.setAttribute('aria-expanded',String(open));b.parentElement.classList.toggle('selected',open)});
   let loadUser=async function(note){try{[dash,stocks,groups]=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups)]);renderUser();await syncMarket();if(note)toast('설정 검증: '+state(dash.validation.status))}catch(e){toast((e.errors||['불러오기 실패']).join(' '))}};
   window.load=loadUser;window.render=renderUser;loadUser();
 })();
