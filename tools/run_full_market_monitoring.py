@@ -68,12 +68,16 @@ def cross_check_universe_snapshot(universe_subset, relay_quotes_file=RELAY_QUOTE
     """
     relay = load_json(relay_quotes_file)
     if not isinstance(relay, dict) or not isinstance(relay.get("datas"), list):
-        raise ValueError("relay quote snapshot unavailable for cross-check")
+        return {"status": "UNAVAILABLE", "reason": "RELAY_QUOTE_SNAPSHOT_MISSING",
+                "expectedCount": len(universe_subset), "relayCount": 0,
+                "missingRelayCodes": [str(row.get("code")) for row in universe_subset]}
     relay_by_code = {str(row.get("itemCode")): row for row in relay["datas"] if row.get("itemCode")}
     expected = [str(row.get("code")) for row in universe_subset]
     missing = [code for code in expected if code not in relay_by_code]
     if missing:
-        raise ValueError(f"relay quote snapshot missing {len(missing)} enabled Universe codes")
+        return {"status": "PARTIAL", "reason": "RELAY_QUOTE_COVERAGE_INCOMPLETE",
+                "expectedCount": len(expected), "relayCount": len(relay_by_code),
+                "missingRelayCodes": missing}
     fields = {
         "currentPrice": "closePrice", "change": "compareToPreviousClosePrice",
         "changeRate": "fluctuationsRatio", "openPrice": "openPrice",
@@ -338,6 +342,9 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     if not snapshot_is_publishable(current):
         return {"status": "NOT_PUBLISHED", "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
     universe_subset = extract_universe_snapshot(current, universe_file)
+    # The relay/legacy view is an advisory comparison only.  Full-market
+    # evidence must remain publishable when the registered Universe is empty,
+    # stale, or intentionally independent from the authoritative snapshot.
     cross_check = cross_check_universe_snapshot(universe_subset, relay_quotes_file)
     monitored = monitored_universe_summary(universe_subset, relay_quotes_file, relay_states_file)
     context = {

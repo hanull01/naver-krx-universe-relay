@@ -84,6 +84,23 @@ jobs:
         shell: bash
         run: |
           set +e
+          if python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              payload=json.loads(Path('config/universe.json').read_text(encoding='utf-8'))
+              codes=[row for row in payload.get('stocks', []) if row.get('enabled', True) and row.get('itemCode')]
+          except Exception:
+              codes=[1]
+          raise SystemExit(0 if not codes else 1)
+          PY
+          then
+            echo "Registered Universe is empty; full-market collection remains independent."
+            echo "collection_started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)" >> "$GITHUB_OUTPUT"
+            echo "collection_finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)" >> "$GITHUB_OUTPUT"
+            echo "exit_code=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           # This is the fast intraday path: use cached daily candles and
           # refresh quotes, technicals, states, and group states without daily
           # NAVER API requests.
@@ -100,7 +117,7 @@ jobs:
 
       - name: Collect full-market monitoring evidence
         id: full_market
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        if: steps.market_day.outputs.run == 'true'
         shell: bash
         run: |
           set +e
@@ -190,7 +207,7 @@ jobs:
 
       - name: Collect market indices
         id: indices
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        if: steps.market_day.outputs.run == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -200,7 +217,7 @@ jobs:
 
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        if: steps.market_day.outputs.run == 'true'
         continue-on-error: true
         timeout-minutes: 2
         shell: bash
@@ -316,7 +333,7 @@ jobs:
         run: echo "::warning::MARKET_DATA_READY email was not sent; market data publication remains successful."
 
       - name: Commit collector diagnostic only
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != ''
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != ''
         shell: bash
         run: |
           echo "Collector failed; preserving last successful production snapshot."
@@ -337,7 +354,7 @@ jobs:
           git push origin HEAD:main
 
       - name: Fail after preserving production snapshot
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0'
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0'
         run: |
           echo "Collector failed; preserving last successful production snapshot."
           exit 1
