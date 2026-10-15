@@ -1,333 +1,408 @@
 #!/usr/bin/env python3
-"""Local-only browser UI layered on top of universe_manager.py."""
-
-import argparse
-import contextlib
-import copy
-import difflib
-import hashlib
-import io
-import json
+"""Local UI; every Universe mutation delegates to universe_manager."""
+import argparse, contextlib, copy, difflib, hashlib, io, json, os, secrets, time, threading
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
+import stock_search
+import config_sync
 import universe_manager as manager
+from universe_auth import AuthError, WebAuthnService
 import dynamic_universe_manager as dynamic
-
+import dynamic_universe_background_sync as background_sync
+import dynamic_universe_sync as sync_contract
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CONFIG = ROOT / "config" / "universe.json"
 DEFAULT_DYNAMIC_RESULT = ROOT / "data" / "dynamic-universe" / "latest.json"
 DEFAULT_DYNAMIC_HISTORY = ROOT / "data" / "dynamic-universe" / "history.json"
-DEFAULT_POLICY = ROOT / "config" / "dynamic_universe_policy.json"
-DEFAULT_ASSET_REGISTRY = ROOT / "data" / "market-universe" / "all-assets.json"
+_sync_lock = threading.Lock()
+def _saved_sync_state():
+    try:
+        value = json.loads((ROOT / "data" / "dynamic-universe" / ".sync-state.json").read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {}
 
+
+_last_sync = _saved_sync_state()
+_sync_state = {"status": "NOT_STARTED", "result": None,
+               "lastAppliedCommit": _last_sync.get("commit"),
+               "lastAppliedGeneratedAt": _last_sync.get("generatedAt"),
+               "lastAppliedSha256": _last_sync.get("latestSha256")}
+
+def tailscale_ipv4(runner=None):
+    """Legacy helper retained for diagnostics; Serve is the recommended path."""
+    import subprocess
+    try:
+        result = (runner or subprocess.run)(["tailscale", "ip", "-4"], text=True, capture_output=True, check=True)
+        return result.stdout.strip().splitlines()[0]
+    except (OSError, subprocess.SubprocessError, IndexError): return None
 
 def safe_config_path(value):
-    """CLI configuration is deliberately constrained to this repository config dir."""
     path = Path(value).resolve()
-    config_dir = (ROOT / "config").resolve()
-    if path.parent != config_dir or path.name != "universe.json":
+    if path.parent != (ROOT / "config").resolve() or path.name != "universe.json":
         raise argparse.ArgumentTypeError("config path must be config/universe.json inside this repository")
     return path
 
-
-def payload_hash(data):
-    return hashlib.sha256(manager.serialized(data).encode("utf-8")).hexdigest()
-
+def payload_hash(data): return hashlib.sha256(manager.serialized(data).encode()).hexdigest()
 
 def memberships(data):
-    result = {stock["itemCode"]: {kind: [] for kind in manager.GROUP_KEYS} for stock in data["stocks"]}
-    leaders = data.get("leaders", {})
-    for kind, key in manager.GROUP_KEYS.items():
-        for name, codes in data.get(key, {}).items():
+    result={s["itemCode"]:{k:[] for k in manager.GROUP_KEYS} for s in data["stocks"]}
+    for kind,key in manager.GROUP_KEYS.items():
+        for name,codes in data.get(key,{}).items():
+            if kind == "watchlist" and name == "legacy33":
+                continue
             for code in codes:
-                if code in result:
-                    result[code][kind].append(name)
-        for name, codes in leaders.get(kind, {}).items():
-            for code in codes:
-                if code in result:
-                    result[code].setdefault("leaders", []).append(f"{kind}:{name}")
+                if code in result: result[code][kind].append(name)
     return result
 
-
-def action_args(operation):
-    """Translate a UI operation into the canonical manager mutation arguments."""
-    op = operation.get("op")
-    code = operation.get("code")
-    kind = operation.get("kind")
-    name = operation.get("name")
-    if op == "stock_add":
-        return argparse.Namespace(command="stock", action="add", code=code, name=operation.get("stockName", ""))
-    if op in ("stock_enable", "stock_disable"):
-        return argparse.Namespace(command="stock", action=op.removeprefix("stock_"), code=code)
-    if op == "stock_delete":
-        return argparse.Namespace(command="stock", action="delete", code=code, hard=True)
-    if op in ("group_create", "group_delete"):
-        return argparse.Namespace(command="group", action=op.removeprefix("group_"), kind=kind, name=name)
-    if op == "group_rename":
-        return argparse.Namespace(command="group", action="rename", kind=kind, name=name, new_name=operation.get("newName", ""))
-    if op in ("member_add", "member_remove"):
-        return argparse.Namespace(command="group", action="member", kind=kind, name=name, member_action=op.removeprefix("member_"), code=code)
-    if op in ("leader_set", "leader_remove"):
-        return argparse.Namespace(command="leader", action=op.removeprefix("leader_"), kind=kind, name=name, code=code)
+def action_args(op):
+    name,code,kind=op.get("name"),op.get("code"),op.get("kind")
+    if op["op"] == "stock_add": return argparse.Namespace(command="stock",action="add",code=code,name=op.get("stockName", ""))
+    if op["op"] in ("stock_enable","stock_disable"): return argparse.Namespace(command="stock",action=op["op"][6:],code=code)
+    if op["op"] == "stock_delete": return argparse.Namespace(command="stock",action="delete",code=code,hard=True)
+    if op["op"] in ("group_create","group_delete"): return argparse.Namespace(command="group",action=op["op"][6:],kind=kind,name=name)
+    if op["op"] == "group_rename": return argparse.Namespace(command="group",action="rename",kind=kind,name=name,new_name=op.get("newName", ""))
+    if op["op"] in ("member_add","member_remove"): return argparse.Namespace(command="group",action="member",kind=kind,name=name,member_action=op["op"][7:],code=code)
+    if op["op"] in ("leader_set","leader_remove"): return argparse.Namespace(command="leader",action=op["op"][7:],kind=kind,name=name,code=code)
     raise ValueError("unknown operation")
 
+def mutate_operation(data,op):
+    if op.get("op")=="stock_add_with_groups":
+        manager.mutate(data,action_args({"op":"stock_add","code":op.get("code"),"stockName":op.get("stockName","")}))
+        for kind,names in op.get("groups",{}).items():
+            for name in names: manager.mutate(data,action_args({"op":"member_add","kind":kind,"name":name,"code":op.get("code")}))
+    else: manager.mutate(data,action_args(op))
 
-def operation_summary(operation):
-    op = operation.get("op", "unknown")
-    code = operation.get("code", "")
-    name = operation.get("name", "")
-    if op == "stock_add": return f"+ stock {code} {operation.get('stockName', '')}"
-    if op == "stock_disable": return f"disable {code}"
-    if op == "stock_enable": return f"enable {code}"
-    if op == "stock_delete": return f"hard delete {code}"
-    if op.startswith("member_"): return f"{op.removeprefix('member_')} member {code} -> {operation.get('kind')}:{name}"
-    if op.startswith("leader_"): return f"{op.removeprefix('leader_')} leader {code} -> {operation.get('kind')}:{name}"
-    return f"{op} {operation.get('kind', '')}:{name}"
+def operation_summary(op): return {"stock_add":"신규 종목 추가","stock_add_with_groups":"신규 종목 추가","stock_enable":"종목 활성화","stock_disable":"종목 비활성화","stock_delete":"종목 완전 삭제","group_create":"그룹 생성","group_delete":"그룹 삭제","group_rename":"그룹 이름 변경","member_add":"구성종목 추가","member_remove":"구성종목 제거","leader_set":"주도주 지정","leader_remove":"주도주 해제"}.get(op.get("op"),"변경")
 
+def preview_summary(before, after, operation):
+    """Describe the same snapshots used for the raw diff, keyed only by itemCode."""
+    before_codes = {stock.get("itemCode") for stock in before.get("stocks", [])}
+    added = [stock for stock in after.get("stocks", []) if stock.get("itemCode") not in before_codes]
+    if added:
+        group_lines = []
+        labels = {"sector": "섹터", "theme": "테마", "watchlist": "관심종목"}
+        for kind, label in labels.items():
+            names = operation.get("groups", {}).get(kind, [])
+            group_lines.append(f"{label}: {', '.join(names) if names else '지정 안 함'}")
+        return "\n".join([*(f"신규 종목: {stock.get('stockName', '')} {stock['itemCode']}" for stock in added), *group_lines])
+    return operation_summary(operation)
 
 class UniverseWebApp:
-    def __init__(self, config_path=DEFAULT_CONFIG, dynamic_result=DEFAULT_DYNAMIC_RESULT,
-                 dynamic_history=DEFAULT_DYNAMIC_HISTORY, policy_path=DEFAULT_POLICY,
-                 asset_registry=DEFAULT_ASSET_REGISTRY):
-        self.config_path = Path(config_path)
-        self.dynamic_result = Path(dynamic_result)
-        self.dynamic_history = Path(dynamic_history)
-        self.policy_path = Path(policy_path)
-        self.asset_registry = Path(asset_registry)
-
-    def current(self):
-        return manager.load(self.config_path)
-
+    def __init__(self,config_path=DEFAULT_CONFIG): self.config_path=Path(config_path)
+    def current(self): return manager.load(self.config_path)
+    def dynamic_payload(self): return dynamic.load_json(DEFAULT_DYNAMIC_RESULT, {}) or {}
+    def dynamic_history(self): return dynamic.load_json(DEFAULT_DYNAMIC_HISTORY, {"events": []}) or {"events": []}
     def dashboard(self):
-        data = self.current()
-        errors, warnings = manager.validation(data)
-        stocks = data.get("stocks", []) if isinstance(data, dict) else []
-        auto = self.auto_management()
-        return {
-            "enabledCount": sum(stock.get("enabled") is True for stock in stocks if isinstance(stock, dict)),
-            "disabledCount": sum(stock.get("enabled") is False for stock in stocks if isinstance(stock, dict)),
-            "sectorCount": len(data.get("sectors", {})),
-            "themeCount": len(data.get("themes", {})),
-            "watchlistCount": len(data.get("watchlists", {})),
-            "validation": {"status": "ERROR" if errors else "WARNING" if warnings else "OK", "errors": errors, "warnings": warnings},
-            "configPath": str(self.config_path),
-            "modifiedAt": self.config_path.stat().st_mtime,
-            "autoSectorCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["sectors"]),
-            "autoThemeCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["themes"]),
-            "autoLeaderCount": sum(row.get("status") in {"ACTIVE", "WATCH", "REENTERED"} for row in auto["leaders"]),
-            "themeStatus": "PENDING" if auto["pending"] else "AVAILABLE",
-        }
-
-    def auto_management(self):
-        payload = dynamic.load_json(self.dynamic_result, {}) or {}
-        return {"version": payload.get("version", "dynamic-universe-management-v1"),
-                "generatedAt": payload.get("generatedAt"), "sectors": payload.get("sectors", []),
-                "themes": payload.get("themes", []), "leaders": payload.get("leaders", []),
-                "initialObservationCandidates": payload.get("initialObservationCandidates", []),
-                "kiwoomDiscovery": payload.get("kiwoomDiscovery", []),
-                "pending": payload.get("pending", [{"type": "AUTO_THEME", "status": "PENDING", "reason": "DYNAMIC_RESULT_NOT_PUBLISHED"}])}
-
-    def watchlists(self):
-        data = self.current(); names = {row["itemCode"]: row["stockName"] for row in data.get("stocks", [])}
-        return {name: [{"code": code, "name": names.get(code)} for code in codes]
-                for name, codes in manager.user_watchlists(data).items()}
-
-    def history(self):
-        payload = dynamic.load_json(self.dynamic_history, {"events": []}) or {"events": []}
-        backups = sorted(self.config_path.parent.glob("history/universe-*.json"), reverse=True)
-        return {"automatic": payload.get("events", []),
-                "userBackups": [{"file": path.name, "modifiedAt": path.stat().st_mtime} for path in backups[:100]]}
-
-    def settings(self):
-        return dynamic.load_json(self.policy_path, {}) or {}
-
-    def search(self, query):
-        query = str(query or "").strip().lower()
-        if not query: return []
-        registry = dynamic.load_json(self.asset_registry, {}) or {}
-        rows = registry if isinstance(registry, list) else registry.get("stocks") or registry.get("assets") or registry.get("items") or []
-        results = []
-        for row in rows:
-            code = str(row.get("code") or row.get("itemCode") or "")
-            name = str(row.get("name") or row.get("stockName") or "")
-            if query in code.lower() or query in name.lower():
-                results.append({"code": code, "name": name, "market": row.get("market")})
-            if len(results) >= 20: break
-        return results
-
-    def _watchlist_mutation(self, data, operation):
-        mapping = {"watchlist_add": "add", "watchlist_remove": "remove",
-                   "watchlist_group_create": "group_create", "watchlist_group_delete": "group_delete"}
-        action = mapping.get(operation.get("op"))
-        if not action: raise ValueError("지원하지 않는 관심종목 작업")
-        manager.mutate_user_watchlist(data, action, operation.get("name", ""), operation.get("code"), operation.get("stockName"))
-
+        data=self.current(); errors,warnings=manager.validation(data); stocks=data.get("stocks",[])
+        return {"enabledCount":sum(x.get("enabled") is True for x in stocks),"disabledCount":sum(x.get("enabled") is False for x in stocks),"sectorCount":len(data.get("sectors",{})),"themeCount":len(data.get("themes",{})),"watchlistCount":len(data.get("watchlists",{})),"validation":{"status":"ERROR" if errors else "WARNING" if warnings else "OK","errors":errors,"warnings":warnings},"configPath":str(self.config_path),"modifiedAt":self.config_path.stat().st_mtime}
     def stocks(self):
-        data = self.current()
-        member_map = memberships(data)
-        return [
-            {**stock, **member_map.get(stock["itemCode"], {"leaders": []})}
-            for stock in data.get("stocks", [])
-        ]
-
+        data=self.current(); ms=memberships(data); markets={r["code"]:r.get("market") for r in stock_search.local_stocks(self.config_path)}
+        return [{**s,"market":markets.get(s["itemCode"]),**ms.get(s["itemCode"],{"leaders":[]})} for s in data.get("stocks",[])]
     def groups(self):
-        data = self.current()
-        names = {stock["itemCode"]: stock["stockName"] for stock in data.get("stocks", [])}
-        result = {}
-        for kind, key in manager.GROUP_KEYS.items():
-            leader_map = data.get("leaders", {}).get(kind, {})
-            result[kind] = [
-                {"name": name, "members": [{"code": code, "name": names.get(code)} for code in codes], "leaders": leader_map.get(name, [])}
-                for name, codes in data.get(key, {}).items()
-            ]
-        return result
-
-    def preview(self, operation):
-        before = self.current()
-        after = copy.deepcopy(before)
-        messages = io.StringIO()
+        data=self.current(); names={s["itemCode"]:s["stockName"] for s in data.get("stocks",[])}; out={}
+        for kind,key in manager.GROUP_KEYS.items(): out[kind]=[{"name":n,"members":[{"code":c,"name":names.get(c)} for c in codes],"leaders":[]} for n,codes in data.get(key,{}).items() if not (kind == "watchlist" and n == "legacy33")]
+        return out
+    def search(self,q): return stock_search.search_stocks(q,universe_path=self.config_path)
+    def preview(self,op):
+        before=self.current(); after=copy.deepcopy(before); output=io.StringIO()
         try:
-            with contextlib.redirect_stdout(messages):
-                if str(operation.get("op", "")).startswith("watchlist_"):
-                    self._watchlist_mutation(after, operation)
-                else:
-                    manager.mutate(after, action_args(operation))
-            errors, warnings = manager.validation(after)
-        except (ValueError, KeyError, TypeError) as exc:
-            return {"ok": False, "errors": [str(exc)], "warnings": [], "summary": operation_summary(operation)}
-        before_text, after_text = manager.serialized(before), manager.serialized(after)
-        diff = "".join(difflib.unified_diff(before_text.splitlines(True), after_text.splitlines(True), fromfile="before/universe.json", tofile="after/universe.json"))
-        return {
-            "ok": not errors,
-            "errors": errors,
-            "warnings": warnings,
-            "summary": operation_summary(operation),
-            "messages": messages.getvalue().strip(),
-            "diff": diff,
-            "baselineHash": payload_hash(before),
-            "changed": before_text != after_text,
-        }
-
-    def apply(self, operation, baseline_hash, confirm_hard_delete=False):
-        if operation.get("op") == "stock_delete" and not confirm_hard_delete:
-            return {"ok": False, "errors": ["hard delete requires explicit confirmation"]}
-        before = self.current()
-        if baseline_hash != payload_hash(before):
-            return {"ok": False, "errors": ["configuration changed after preview; preview again"]}
-        preview = self.preview(operation)
-        if not preview["ok"]:
-            return preview
-        if not preview["changed"]:
-            return {**preview, "applied": False}
-        after = copy.deepcopy(before)
-        if str(operation.get("op", "")).startswith("watchlist_"):
-            self._watchlist_mutation(after, operation)
-        else:
-            manager.mutate(after, action_args(operation))
-        messages = io.StringIO()
-        with contextlib.redirect_stdout(messages):
-            manager.save(self.config_path, before, after, dry_run=False)
-        return {"ok": True, "applied": True, "summary": preview["summary"], "messages": messages.getvalue().strip()}
-
-    def handle(self, method, path, body=None):
+            with contextlib.redirect_stdout(output): mutate_operation(after,op)
+            errors,warnings=manager.validation(after)
+        except (ValueError,KeyError,TypeError) as exc: return {"ok":False,"errors":[str(exc)],"warnings":[],"summary":operation_summary(op)}
+        a,b=manager.serialized(before),manager.serialized(after)
+        return {"ok":not errors,"errors":errors,"warnings":warnings,"summary":preview_summary(before,after,op),"messages":output.getvalue().strip(),"diff":"".join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile="before/universe.json",tofile="after/universe.json")),"baselineHash":payload_hash(before),"changed":a!=b}
+    def apply(self,op,baseline,confirm_hard_delete=False):
+        if op.get("op")=="stock_delete" and not confirm_hard_delete: return {"ok":False,"errors":["hard delete requires explicit confirmation"]}
+        before=self.current()
+        if baseline != payload_hash(before): return {"ok":False,"errors":["configuration changed after preview; preview again"]}
+        preview=self.preview(op)
+        if not preview["ok"] or not preview["changed"]: return {**preview,"applied":False}
+        after=copy.deepcopy(before); mutate_operation(after,op); manager.save(self.config_path,before,after,dry_run=False)
+        return {"ok":True,"applied":True,"summary":preview["summary"]}
+    def handle(self,method,path,body=None):
         try:
-            route = urlparse(path).path
-            if method == "GET" and route == "/api/dashboard": return HTTPStatus.OK, self.dashboard()
-            if method == "GET" and route == "/api/stocks": return HTTPStatus.OK, {"stocks": self.stocks()}
-            if method == "GET" and route == "/api/groups": return HTTPStatus.OK, {"groups": self.groups()}
-            if method == "GET" and route == "/api/automatic": return HTTPStatus.OK, self.auto_management()
-            if method == "GET" and route == "/api/user-watchlists": return HTTPStatus.OK, {"groups": self.watchlists()}
-            if method == "GET" and route == "/api/history": return HTTPStatus.OK, self.history()
-            if method == "GET" and route == "/api/settings": return HTTPStatus.OK, self.settings()
-            if method == "GET" and route == "/api/search/stocks":
-                return HTTPStatus.OK, {"results": self.search((parse_qs(urlparse(path).query).get("q") or [""])[0])}
-            if method == "GET" and route == "/api/validation":
-                errors, warnings = manager.validation(self.current())
-                return HTTPStatus.OK, {"errors": errors, "warnings": warnings}
-            if method == "POST" and route in ("/api/preview", "/api/apply"):
-                request = body if isinstance(body, dict) else {}
-                if route.endswith("preview"):
-                    result = self.preview(request.get("operation", {}))
-                    return (HTTPStatus.OK if result["ok"] else HTTPStatus.UNPROCESSABLE_ENTITY), result
-                result = self.apply(request.get("operation", {}), request.get("baselineHash"), request.get("confirmHardDelete", False))
-                return (HTTPStatus.OK if result["ok"] else HTTPStatus.UNPROCESSABLE_ENTITY), result
-            return HTTPStatus.NOT_FOUND, {"errors": ["not found"]}
-        except (ValueError, OSError, json.JSONDecodeError) as exc:
-            return HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": [str(exc)]}
+            route=urlparse(path).path
+            if method=="GET" and route=="/healthz": return HTTPStatus.OK,{"status":"ok"}
+            if method=="GET" and route=="/api/dashboard": return HTTPStatus.OK,self.dashboard()
+            if method=="GET" and route=="/api/automatic":
+                p=self.dynamic_payload(); sync=dict(_sync_state); return HTTPStatus.OK,{"generatedAt":p.get("generatedAt"),"commit":sync.get("lastAppliedCommit") or p.get("commit"),"sectors":p.get("sectors",[]),"themes":p.get("themes",[]),"leaders":p.get("leaders",[]),"initialObservationCandidates":p.get("initialObservationCandidates",[]),"kiwoomDiscovery":p.get("kiwoomDiscovery",[]),"pending":p.get("pending",[]),"industryEvidence":p.get("industryEvidence"),"sync":sync}
+            if method=="GET" and route=="/api/history": return HTTPStatus.OK,self.dynamic_history()
+            if method=="GET" and route=="/api/settings": return HTTPStatus.OK,dynamic.load_json(ROOT/"config"/"dynamic_universe_policy.json",{}) or {}
+            if method=="GET" and route=="/api/dynamic-sync/status": return HTTPStatus.OK,dict(_sync_state)
+            if method=="GET" and route=="/api/config-sync/status": return HTTPStatus.OK,config_sync.status(ROOT)
+            if method=="GET" and route=="/api/config-sync/preview": return HTTPStatus.OK,config_sync.preview(ROOT)
+            if method=="GET" and route=="/api/stocks": return HTTPStatus.OK,{"stocks":self.stocks()}
+            if method=="GET" and route=="/api/groups": return HTTPStatus.OK,{"groups":self.groups()}
+            if method=="GET" and route=="/api/search/stocks": return HTTPStatus.OK,self.search(parse_qs(urlparse(path).query).get("q",[""])[0])
+            if method=="GET" and route in ("/api/validate","/api/validation"):
+                e,w=manager.validation(self.current()); return HTTPStatus.OK,{"errors":e,"warnings":w}
+            if method=="POST" and route in ("/api/preview","/api/apply"):
+                request=body or {}; result=self.preview(request.get("operation",{})) if route.endswith("preview") else self.apply(request.get("operation",{}),request.get("baselineHash"),request.get("confirmHardDelete",False)); return (HTTPStatus.OK if result["ok"] else HTTPStatus.UNPROCESSABLE_ENTITY),result
+            return HTTPStatus.NOT_FOUND,{"errors":["not found"]}
+        except (ValueError,OSError,json.JSONDecodeError) as exc: return HTTPStatus.UNPROCESSABLE_ENTITY,{"errors":[str(exc)]}
 
+class SessionAuth:
+    SESSION_SECONDS=28800
+    def __init__(self,pin=None,required=False,now=time.time): self.pin=pin; self.required=required; self.now=now; self.sessions={}
+    def issue(self):
+        t=secrets.token_urlsafe(32); self.sessions[t]={"csrf":secrets.token_urlsafe(24),"expires":self.now()+self.SESSION_SECONDS}; return t
+    def login(self,pin): return self.issue() if self.required and self.pin and secrets.compare_digest(str(pin or ""),self.pin) else None
+    def record(self,t):
+        x=self.sessions.get(t or "")
+        if x and x["expires"]>self.now(): return x
+        self.logout(t); return None
+    def allowed(self,t): return not self.required or bool(self.record(t))
+    def csrf(self,t):
+        x=self.record(t); return x["csrf"] if x else None
+    def csrf_valid(self,t,v): return bool(self.csrf(t) and v and secrets.compare_digest(self.csrf(t),str(v)))
+    def logout(self,t): self.sessions.pop(t or "",None)
+
+def sync_after_login():
+    """Start one non-blocking pull per process at the successful login boundary."""
+    global _sync_state
+    with _sync_lock:
+        if _sync_state.get("status") == "RUNNING": return
+        _sync_state = {"status": "RUNNING", "result": None,
+                       "lastAppliedCommit": _sync_state.get("lastAppliedCommit"),
+                       "lastAppliedGeneratedAt": _sync_state.get("lastAppliedGeneratedAt"),
+                       "lastAppliedSha256": _sync_state.get("lastAppliedSha256")}
+    def worker():
+        global _sync_state
+        try:
+            result = background_sync.run_result(["--root", str(ROOT), "--ref", "main"])
+            saved = _saved_sync_state()
+            _sync_state = {"status": result.get("status", "COMPLETED"), "result": result,
+                           "lastAppliedCommit": result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
+                           "lastAppliedGeneratedAt": result.get("generatedAt") or saved.get("generatedAt") or _last_sync.get("generatedAt"),
+                           "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256")}
+        except Exception as exc:
+            safe_error = str(exc) if isinstance(exc, sync_contract.SyncError) else type(exc).__name__
+            _sync_state = {"status": "FAILED", "result": {"error": safe_error, "errorType": type(exc).__name__},
+                           "lastAppliedCommit": _last_sync.get("commit"),
+                           "lastAppliedGeneratedAt": _last_sync.get("generatedAt"),
+                           "lastAppliedSha256": _last_sync.get("latestSha256")}
+    threading.Thread(target=worker, name="dynamic-universe-login-sync", daemon=True).start()
+
+def login_page(has_credential, recovery=False):
+    if recovery:
+        return LOGIN_HTML
+    start = LOGIN_HTML.index('<details>')
+    end = LOGIN_HTML.index('</details>', start) + len('</details>')
+    page = LOGIN_HTML[:start] + LOGIN_HTML[end:]
+    page = page.replace('<button onclick="login()">Face ID로 로그인</button>', '<div id="authActions"></div>')
+    page = page.replace('<p id=e>등록된 Passkey가 없거나 이 주소가 HTTPS가 아니면 Face ID 로그인을 사용할 수 없습니다.</p>', '<p id=e></p>')
+    script = r'''<script>(async()=>{
+const hasCredential=__HAS_CREDENTIAL__,key='universePasskeyFailureCount',actions=document.querySelector('#authActions'),error=document.querySelector('#e');
+let failures=Number(sessionStorage.getItem(key)||0),attempted=false;
+function render(){actions.replaceChildren();if(!hasCredential){let recovery=document.createElement('a');recovery.href='/?recovery=1';recovery.textContent='로그인 복구';actions.append(recovery);return}let retry=document.createElement('button');retry.textContent='다시 로그인';retry.onclick=attempt;actions.append(retry);if(failures>=3){let recovery=document.createElement('a');recovery.href='/?recovery=1';recovery.textContent='로그인 복구';recovery.style.marginLeft='12px';actions.append(recovery)}}
+async function attempt(){if(attempted)return;attempted=true;error.textContent='로그인 중…';try{let x=await post('/api/auth/passkey/options',{}),c=await navigator.credentials.get({publicKey:prep(x.publicKey)});await post('/api/auth/passkey/verify',{ceremonyId:x.ceremonyId,credential:cred(c)});sessionStorage.removeItem(key);location='/'}catch(x){failures+=1;sessionStorage.setItem(key,String(failures));attempted=false;error.textContent='로그인에 실패했습니다.';render()}}
+if(!hasCredential){render()}else if(failures===0){attempt()}else{render()}
+})()</script>'''.replace('__HAS_CREDENTIAL__', json.dumps(bool(has_credential)))
+    return page + script
 
 class Handler(BaseHTTPRequestHandler):
-    app = None
-
-    def send_json(self, status, payload):
-        raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
-
+    app=None; auth=SessionAuth(); webauthn=WebAuthnService(); secure_cookies=False; bootstrap={}
+    def session(self):
+        for x in self.headers.get("Cookie","").split(";"):
+            k,_,v=x.strip().partition("=")
+            if k=="universe_session": return v
+        return None
+    def send_json(self,status,payload,cookies=()):
+        raw=json.dumps(payload,ensure_ascii=False).encode(); self.send_response(status); self.send_header("Content-Type","application/json; charset=utf-8"); self.send_header("Content-Length",str(len(raw))); self.send_header("Cache-Control","no-store, max-age=0"); self.send_header("Pragma","no-cache")
+        for c in cookies:self.send_header("Set-Cookie",c)
+        self.end_headers(); self.wfile.write(raw)
+    def send_html(self,text):
+        raw=text.encode(); self.send_response(200);self.send_header("Content-Type","text/html; charset=utf-8");self.send_header("Content-Length",str(len(raw)));self.send_header("Cache-Control","no-store, max-age=0");self.send_header("Pragma","no-cache");self.end_headers();self.wfile.write(raw)
+    def cookie_policy(self, http_only=False):
+        secure="; Secure" if self.secure_cookies else ""
+        return f"; Path=/; SameSite=Strict{secure}" + ("; HttpOnly" if http_only else "")
+    def cookies(self,t):
+        c=self.auth.csrf(t)
+        return [f"universe_session={t}; Max-Age=28800"+self.cookie_policy(http_only=True),f"universe_csrf={c}; Max-Age=28800"+self.cookie_policy()]
+    def expired_cookies(self):
+        expired="; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        return ["universe_session="+expired+self.cookie_policy(http_only=True),"universe_csrf="+expired+self.cookie_policy()]
     def do_GET(self):
-        if urlparse(self.path).path == "/":
-            raw = HTML.encode("utf-8")
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(raw)))
-            self.end_headers()
-            self.wfile.write(raw)
+        route=urlparse(self.path).path
+        if route=="/healthz":self.send_json(200,{"status":"ok"});return
+        if route=="/help":self.send_html(HELP_HTML);return
+        if route=="/api/auth/status":
+            x=self.webauthn.status();x.update({"authenticated":self.auth.allowed(self.session()),"csrfToken":self.auth.csrf(self.session())});self.send_json(200,x);return
+        if route in ("/api/config-sync/status","/api/config-sync/preview") and not self.auth.record(self.session()):
+            self.send_json(401,{"errors":["설정 GitHub 상태 확인에는 로그인이 필요합니다"]});return
+        if route=="/":
+            if self.auth.allowed(self.session()):
+                self.send_html(HTML + ADD_UI_JS)
+            else:
+                recovery = parse_qs(urlparse(self.path).query).get("recovery", [""])[0] == "1"
+                self.send_html(login_page(self.webauthn.status().get("hasCredential", False), recovery))
             return
-        status, payload = self.app.handle("GET", self.path)
-        self.send_json(status, payload)
-
+        if not self.auth.allowed(self.session()):self.send_json(401,{"errors":["로그인이 필요합니다"]});return
+        s,p=self.app.handle("GET",self.path);self.send_json(s,p)
     def do_POST(self):
-        try:
-            length = int(self.headers.get("Content-Length", "0"))
-            body = json.loads(self.rfile.read(length).decode("utf-8"))
-        except (ValueError, json.JSONDecodeError):
-            self.send_json(HTTPStatus.BAD_REQUEST, {"errors": ["invalid JSON request"]})
+        try:body=json.loads(self.rfile.read(int(self.headers.get("Content-Length","0"))).decode())
+        except (ValueError,json.JSONDecodeError):self.send_json(400,{"errors":["잘못된 요청입니다"]});return
+        route=urlparse(self.path).path
+        if route=="/api/login":
+            t=self.auth.login(body.get("pin"))
+            if not t:self.send_json(401,{"errors":["PIN 코드가 올바르지 않습니다"]});return
+            self.send_json(200,{"ok":True},self.cookies(t));sync_after_login();return
+        if route=="/api/logout":
+            token=self.session()
+            if self.auth.record(token):
+                if not self.auth.csrf_valid(token,self.headers.get("X-CSRF-Token")):
+                    self.send_json(403,{"errors":["보안 확인이 만료되었습니다. 다시 로그인하세요."]});return
+                self.auth.logout(token)
+                self.send_json(200,{"ok":True},self.expired_cookies());return
+            # A repeated logout has no server-side session to alter, but still
+            # expires any stale browser cookies so logout remains idempotent.
+            self.send_json(200,{"ok":True,"alreadyLoggedOut":True},self.expired_cookies());return
+        if route=="/api/auth/register/options":
+            if not self.auth.pin or not secrets.compare_digest(str(body.get("pin") or ""),self.auth.pin):self.send_json(401,{"errors":["최초 등록 또는 복구에는 관리자 PIN 승인이 필요합니다."]});return
+            try:x=self.webauthn.registration_options();b=secrets.token_urlsafe(24);self.bootstrap[b]=time.time()+300;x["bootstrapId"]=b;self.send_json(200,x)
+            except AuthError as e:self.send_json(422,{"errors":[str(e)]})
             return
-        status, payload = self.app.handle("POST", self.path, body)
-        self.send_json(status, payload)
+        if route=="/api/auth/register/verify":
+            if self.bootstrap.pop(body.get("bootstrapId"),0)<time.time():self.send_json(401,{"errors":["관리자 등록 승인이 만료되었습니다."]});return
+            try:self.send_json(200,self.webauthn.finish_registration(body.get("ceremonyId"),body.get("credential")))
+            except AuthError as e:self.send_json(422,{"errors":[str(e)]})
+            return
+        if route=="/api/auth/passkey/options":
+            try:self.send_json(200,self.webauthn.authentication_options())
+            except AuthError as e:self.send_json(422,{"errors":[str(e)]})
+            return
+        if route=="/api/auth/passkey/verify":
+            try:self.webauthn.finish_authentication(body.get("ceremonyId"),body.get("credential"));t=self.auth.issue();self.send_json(200,{"ok":True},self.cookies(t));sync_after_login()
+            except AuthError as e:self.send_json(401,{"errors":[str(e)]})
+            return
+        if not self.auth.allowed(self.session()):self.send_json(401,{"errors":["로그인이 필요합니다"]});return
+        if route=="/api/config-sync/push":
+            if not self.auth.record(self.session()):self.send_json(401,{"errors":["설정 GitHub 저장에는 로그인이 필요합니다"]});return
+            if not self.auth.csrf_valid(self.session(),self.headers.get("X-CSRF-Token")):self.send_json(403,{"errors":["보안 확인이 만료되었습니다. 다시 로그인하세요."]});return
+            try:self.send_json(200,config_sync.push(ROOT))
+            except ValueError as e:self.send_json(422,{"errors":[str(e)]})
+            return
+        if route in ("/api/preview","/api/apply") and self.auth.required and not self.auth.csrf_valid(self.session(),self.headers.get("X-CSRF-Token")):self.send_json(403,{"errors":["보안 확인이 만료되었습니다. 다시 로그인하세요."]});return
+        s,p=self.app.handle("POST",self.path,body);self.send_json(s,p)
+    def log_message(self,*_):pass
 
-    def log_message(self, *_):
-        pass
-
-
-def create_server(host, port, config_path=DEFAULT_CONFIG):
-    Handler.app = UniverseWebApp(config_path)
-    return ThreadingHTTPServer((host, port), Handler)
-
+def create_server(host,port,config_path=DEFAULT_CONFIG,pin=None,require_auth=False,webauthn=None):
+    Handler.app=UniverseWebApp(config_path);Handler.webauthn=webauthn or WebAuthnService();Handler.auth=SessionAuth(pin,require_auth or host!="127.0.0.1" or Handler.webauthn.configured);Handler.secure_cookies=Handler.webauthn.configured;Handler.bootstrap={};return ThreadingHTTPServer((host,port),Handler)
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Local-only Universe Manager Web UI")
-    parser.add_argument("--host", default="127.0.0.1", choices=("127.0.0.1",), help="local bind address")
-    parser.add_argument("--port", type=int, default=8765)
-    parser.add_argument("--config", type=safe_config_path, default=DEFAULT_CONFIG, help=argparse.SUPPRESS)
-    args = parser.parse_args(argv)
-    server = create_server(args.host, args.port, args.config)
-    print(f"Universe Web UI: http://{args.host}:{args.port}")
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
+    p=argparse.ArgumentParser();p.add_argument("--host",default="127.0.0.1");p.add_argument("--port",type=int,default=8765);p.add_argument("--require-auth",action="store_true");p.add_argument("--show-tailscale-help",action="store_true");p.add_argument("--tailscale",action="store_true",help="호환용: Tailscale Serve 안내");p.add_argument("--config",type=safe_config_path,default=DEFAULT_CONFIG,help=argparse.SUPPRESS);a=p.parse_args(argv)
+    if a.show_tailscale_help or a.tailscale:print("Tailscale Serve HTTPS: .venv-web/bin/python universe_web.py ; tailscale serve --https=443 http://127.0.0.1:8765 ; tailscale serve status로 HTTPS 주소 확인 후 RP ID/Origin 환경변수 설정");return
+    service=WebAuthnService();required=a.require_auth or a.host!="127.0.0.1" or service.configured;pin=os.environ.get("UNIVERSE_WEB_PIN")
+    if required and not pin:raise SystemExit("오류: 인증 운영에는 UNIVERSE_WEB_PIN이 bootstrap/복구용으로 필요합니다.")
+    s=create_server(a.host,a.port,a.config,pin,required,service);print(f"로컬 접속: http://127.0.0.1:{a.port}");print("Passkey 운영: --show-tailscale-help")
+    try:s.serve_forever()
+    except KeyboardInterrupt:pass
+    finally:s.server_close()
 
+HTML = r'''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Universe Manager</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--card:#fff;--ink:#152033;--mute:#64748b;--line:#e4e8f0;--brand:#5267ee;--good:#087d5a;--warn:#9a6500;--bad:#bc3030}@media(prefers-color-scheme:dark){:root{--bg:#101624;--card:#192235;--ink:#edf2ff;--mute:#a8b2c6;--line:#303c52;--brand:#8b99ff}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;padding-bottom:90px}.app{max-width:820px;margin:auto;padding:max(16px,env(safe-area-inset-top)) 16px 16px}.head{display:flex;justify-content:space-between;align-items:center}.tabs,.actions{display:flex;gap:8px;overflow:auto}.tabs{position:sticky;top:0;background:var(--bg);padding:14px 0;z-index:2}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.metric b{display:block;font-size:26px;margin-top:5px}.muted{color:var(--mute);font-size:13px}.chip,.badge{display:inline-block;background:#e8edff;color:#4052bd;border-radius:999px;padding:4px 8px;margin:3px;font-size:12px}.ok{background:#dff6ed;color:var(--good)}.warn{background:#fff0d4;color:var(--warn)}.bad{background:#ffe1e1;color:var(--bad)}button,input{font:inherit;border-radius:12px;padding:11px 13px;min-height:44px;border:1px solid var(--line)}button{background:var(--brand);color:#fff;border:0;font-weight:700}.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line)}.danger{background:var(--bad)}input{width:100%;background:var(--card);color:var(--ink)}.view{display:none}.view.active{display:block}.bottom{position:fixed;bottom:0;left:0;right:0;padding:10px max(16px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card) 93%,transparent);display:flex;justify-content:center;gap:8px;border-top:1px solid var(--line)}.sheet{display:none;position:fixed;inset:0;background:#0008;align-items:end;z-index:10}.sheet.on{display:flex}.panel{background:var(--card);width:min(820px,100%);margin:auto;padding:20px;border-radius:22px 22px 0 0;max-height:88vh;overflow:auto}pre{white-space:pre-wrap;overflow:auto;background:#101624;color:#e8efff;border-radius:12px;padding:12px}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#152033;color:#fff;padding:11px 15px;border-radius:12px;display:none;z-index:20}@media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}.stocks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stocks .card{margin:0}.sheet{align-items:center}.panel{border-radius:22px}}</style><body><main class="app"><header class="head"><div><h1>Universe Manager</h1><span class="muted">안전한 Universe 관리</span></div><a href="/help">사용방법</a></header><nav class="tabs"><button data-v="dash">대시보드</button><button class="secondary" data-v="stocks">종목 관리</button><button class="secondary" data-v="groups">그룹 관리</button><button class="secondary" data-v="valid">설정 검증</button><button class="secondary" onclick="logout()">로그아웃</button></nav><section id="dash" class="view active"></section><section id="stocks" class="view"><input id="filter" placeholder="종목명 · 종목코드 · 그룹 검색"><div id="stockList" class="stocks"></div></section><section id="groups" class="view"></section><section id="valid" class="view"></section></main><div class="bottom"><button onclick="addStock()">＋ 종목 추가</button><button class="secondary" onclick="load(true)">설정 검증</button></div><div id="sheet" class="sheet"><div class="panel"><button class="secondary" onclick="closeSheet()">닫기</button><div id="sheetBody"></div></div></div><div id="toast" class="toast"></div><script>
+let dash,stocks,groups,pending;const $=x=>document.getElementById(x),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function csrf(){return document.cookie.split('; ').find(x=>x.startsWith('universe_csrf='))?.split('=')[1]}async function api(url,body){let h={'Content-Type':'application/json'};if(body&&csrf())h['X-CSRF-Token']=csrf();let r=await fetch(url,body?{method:'POST',headers:h,body:JSON.stringify(body)}:{}),x=await r.json();if(!r.ok)throw x;return x}function toast(x){$('toast').textContent=x;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)}function badge(x){let c=x==='OK'?'ok':x==='ERROR'?'bad':'warn';return '<span class="badge '+c+'">'+esc(x==='OK'?'정상':x==='ERROR'?'오류':x==='WARNING'?'경고':x)+'</span>'}function tab(){document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$((b.dataset.v)).classList.add('active')})}function render(){let v=dash.validation;$('dash').innerHTML='<div class="grid">'+[['활성 종목',dash.enabledCount],['비활성 종목',dash.disabledCount],['섹터',dash.sectorCount],['테마',dash.themeCount],['관심종목',dash.watchlistCount],['설정 검증',v.status]].map(x=>'<article class="card metric"><span class="muted">'+x[0]+'</span><b>'+x[1]+'</b></article>').join('')+'</div><article class="card">현재 설정: '+esc(dash.configPath)+'<br><span class="muted">최근 변경: '+new Date(dash.modifiedAt*1000).toLocaleString()+'</span></article>';$('valid').innerHTML='<article class="card"><h2>설정 검증 '+badge(v.status)+'</h2>'+[...v.errors.map(x=>'오류: '+esc(x)),...v.warnings.map(x=>'경고: '+esc(x))].join('<br>')+(v.errors.length||v.warnings.length?'':'현재 설정은 정상입니다.')+'</article>';renderStocks();$('groups').innerHTML=Object.entries(groups).map(([kind,gs])=>'<article class="card"><h2>'+({sector:'섹터',theme:'테마',watchlist:'관심종목'}[kind])+'</h2>'+gs.map(g=>'<p><b>'+esc(g.name)+'</b> <span class="badge">'+g.members.length+' 종목</span><br>'+g.members.map(m=>'<span class="chip">'+esc(m.name||m.code)+'</span>').join('')+'<br><span class="muted">주도주: '+(g.leaders.join(', ')||'없음')+'</span></p>').join('')+'</article>').join('')}function renderStocks(){let q=$('filter').value?.toLowerCase()||'';$('stockList').innerHTML=stocks.filter(s=>[s.itemCode,s.stockName,...s.sector,...s.theme,...s.watchlist].join(' ').toLowerCase().includes(q)).map(s=>'<article class="card"><b>'+esc(s.stockName)+'</b> <span class="badge">'+s.itemCode+'</span><p>'+badge(s.enabled?'활성':'비활성')+' '+[...s.sector.map(x=>'섹터 '+x),...s.theme.map(x=>'테마 '+x),...s.watchlist.map(x=>'관심 '+x)].map(esc).join(' · ')+'</p><button class="secondary" onclick="preview({op:\'stock_'+(s.enabled?'disable':'enable')+'\',code:\''+s.itemCode+'\'})">'+(s.enabled?'비활성화':'활성화')+'</button> <button class="danger" onclick="hard(\''+s.itemCode+'\')">완전 삭제</button></article>').join('')||'<article class="card">검색 결과가 없습니다.</article>'}async function load(note){try{[dash,stocks,groups]=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups)]);render();if(note)toast('설정 검증: '+dash.validation.status)}catch(e){toast((e.errors||['불러오기 실패']).join(' '))}}function sheet(x){$('sheetBody').innerHTML=x;$('sheet').classList.add('on')}function closeSheet(){$('sheet').classList.remove('on')}async function addStock(){let q=prompt('추가할 종목명을 입력하세요');if(!q)return;try{let x=await api('/api/search/stocks?q='+encodeURIComponent(q));let r=x.results?.[0];if(!r)throw {errors:[x.message||'검색 결과가 없습니다.']};preview({op:'stock_add',code:r.code,stockName:r.name})}catch(e){toast((e.errors||['종목 검색 서비스를 사용할 수 없습니다.']).join(' '))}}async function preview(op){try{let x=await api('/api/preview',{operation:op});pending={op,x};sheet('<h2>변경 미리보기</h2><p>'+x.summary+'</p><pre>'+esc(x.diff||'변경 없음')+'</pre><button onclick="apply()" '+(!x.ok||!x.changed?'disabled':'')+'>변경 적용</button>')}catch(e){toast((e.errors||['미리보기 실패']).join(' '))}}async function apply(){try{let x=await api('/api/apply',{operation:pending.op,baselineHash:pending.x.baselineHash,confirmHardDelete:pending.op.op==='stock_delete'});toast(x.applied?'변경을 안전하게 적용했습니다.':'변경 없음');closeSheet();load()}catch(e){toast((e.errors||['적용이 차단되었습니다']).join(' '))}}function hard(c){if(confirm('과거 데이터 연결에 영향을 줄 수 있습니다. 완전 삭제할까요?'))preview({op:'stock_delete',code:c})}async function logout(){await api('/api/logout',{});location='/'}$('filter').oninput=renderStocks;tab();load();</script></body></html>'''
+HELP_HTML='''<!doctype html><meta charset="utf-8"><title>Universe Manager 사용방법</title><h1>Universe Manager 사용방법</h1><p>조회만으로 설정은 바뀌지 않습니다. 변경은 미리보기·검증·적용 순서로 처리되며 기존 설정은 백업 후 안전하게 교체됩니다.</p><p>Discovery 후보는 자동으로 Universe에 들어오지 않습니다. 제거는 기본적으로 비활성화를 사용하세요.</p><h2>iPhone Face ID 로그인</h2><p>Mac과 iPhone에서 Tailscale을 켠 뒤 UI는 localhost로 실행하고 <code>tailscale serve --https=443 http://127.0.0.1:8765</code>를 사용합니다. HTTPS 주소를 RP ID/Origin으로 설정하고, 최초에는 관리자 PIN 승인으로 Passkey를 등록합니다.</p>'''
+LOGIN_HTML='''<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>로그인</title><h1>Universe Manager</h1><button onclick="login()">Face ID로 로그인</button><p id=e>등록된 Passkey가 없거나 이 주소가 HTTPS가 아니면 Face ID 로그인을 사용할 수 없습니다.</p><details><summary>최초 등록·복구용 PIN</summary><input id=pin type=password placeholder="관리자 PIN"><button onclick="register()">이 PIN으로 Face ID 등록</button></details><script>const e=document.querySelector('#e'),b=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),x=>x.charCodeAt(0)),q=a=>btoa(String.fromCharCode(...new Uint8Array(a))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');function prep(o){o.challenge=b(o.challenge);if(o.user)o.user.id=b(o.user.id);for(let k of ['allowCredentials','excludeCredentials'])if(o[k])o[k]=o[k].map(x=>({...x,id:b(x.id)}));return o}function cred(c){let r=c.response;return{id:c.id,rawId:q(c.rawId),type:c.type,response:{clientDataJSON:q(r.clientDataJSON),attestationObject:r.attestationObject&&q(r.attestationObject),authenticatorData:r.authenticatorData&&q(r.authenticatorData),signature:r.signature&&q(r.signature),userHandle:r.userHandle&&q(r.userHandle)}}}async function post(u,x){let r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)}),v=await r.json();if(!r.ok)throw v;return v}async function login(){try{let x=await post('/api/auth/passkey/options',{}),c=await navigator.credentials.get({publicKey:prep(x.publicKey)});await post('/api/auth/passkey/verify',{ceremonyId:x.ceremonyId,credential:cred(c)});location='/'}catch(x){e.textContent=(x.errors||['인증이 취소되었습니다.']).join(' ')}}async function register(){try{let x=await post('/api/auth/register/options',{pin:pin.value}),c=await navigator.credentials.create({publicKey:prep(x.publicKey)});await post('/api/auth/register/verify',{bootstrapId:x.bootstrapId,ceremonyId:x.ceremonyId,credential:cred(c)});e.textContent='Face ID 등록이 완료되었습니다.'}catch(x){e.textContent=(x.errors||['등록에 실패했습니다.']).join(' ')}}</script>'''
 
-HTML = r'''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Universe Manager</title><style>
-body{font:15px system-ui,sans-serif;max-width:1120px;margin:auto;padding:16px;color:#17202a;background:#f7f8fa}nav{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:0;background:#f7f8fa;padding:8px 0}.view{display:none}.view.active{display:block}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.card,section{background:white;border:1px solid #d8dee4;border-radius:10px;padding:13px;margin:9px 0}.metric b{font-size:26px;display:block}button,input,select{padding:9px;margin:3px;border:1px solid #afb8c1;border-radius:7px}button{cursor:pointer}.muted{color:#667085}.badge{display:inline-block;padding:2px 7px;border-radius:10px;background:#eaeef2;font-size:12px}.ACTIVE,.REENTERED{background:#dafbe1}.WATCH,.PENDING,.DISCOVERED{background:#fff8c5}.REMOVED{background:#ffebe9}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid #e7eaed;padding:7px}pre{white-space:pre-wrap;background:#f6f8fa;padding:10px;overflow:auto}@media(max-width:650px){table{font-size:12px}}</style>
-<h1>Universe Manager</h1><p class="muted">전체시장 분석과 관리목록은 분리됩니다. 자동 데이터는 읽기 전용이고 사용자 관심종목만 직접 편집됩니다.</p>
-<nav><button data-tab="auto">자동 관리</button><button data-tab="watch">사용자 관심종목</button><button data-tab="history">변경 이력</button><button data-tab="settings">관리 설정</button></nav>
-<main><section id="auto" class="view active"><div id="dashboard"></div><h2>동적 섹터</h2><div id="sectors"></div><h2>동적 테마</h2><div id="themes"></div><h2>정식 주도주</h2><div id="leaders"></div><h2>초기 관찰 후보</h2><div id="initialObservationCandidates"></div><h2>키움 발굴종목</h2><div id="kiwoom"></div></section>
-<section id="watch" class="view"><h2>사용자 관심종목</h2><input id="query" placeholder="종목명 또는 코드"><button onclick="searchStocks()">검색</button><div id="search"></div><div id="watchlists"></div><h3>변경 미리보기</h3><select id="op"><option value="watchlist_add">추가</option><option value="watchlist_remove">삭제</option><option value="watchlist_group_create">그룹 생성</option><option value="watchlist_group_delete">그룹 삭제</option></select><input id="code" placeholder="종목코드"><input id="stockName" placeholder="종목명"><input id="name" placeholder="관심 그룹"><button onclick="preview()">미리보기</button><button id="apply" disabled onclick="applyChange()">저장</button><pre id="result"></pre></section>
-<section id="history" class="view"><h2>변경 이력</h2><div id="events"></div></section><section id="settings" class="view"><h2>관리 설정</h2><pre id="policy"></pre></section></main>
-<script>let pending=null;const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));async function api(url,body){let r=await fetch(url,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{}),x=await r.json();if(!r.ok)throw x;return x}const status=s=>'<span class="badge '+esc(s)+'">'+esc(s)+'</span>';function rows(items,extra=''){return(items||[]).map(x=>'<div class="card"><b>'+esc(x.name||x.code||x.id)+'</b> '+status(x.status||'')+' <span class="muted">점수 '+esc(x.score??'-')+'</span>'+(x.currentPrice!=null?'<span class="muted"> · 현재가 '+esc(x.currentPrice)+' · 등락률 '+esc(x.changeRate??'-')+'% · 시세 기준 '+esc(x.sourceTime||'확인 불가')+'</span>':'')+extra.replaceAll('{code}',esc(x.code||'')).replaceAll('{name}',esc(x.name||''))+'</div>').join('')||'<p class="muted">현재 항목 없음</p>'}async function load(){let[d,a,w,h,p]=await Promise.all(['/api/dashboard','/api/automatic','/api/user-watchlists','/api/history','/api/settings'].map(api));$('dashboard').innerHTML='<div class="cards">'+[['자동 섹터',d.autoSectorCount],['자동 테마',d.autoThemeCount],['주도주',d.autoLeaderCount],['테마 상태',d.themeStatus],['설정 검증',d.validation.status]].map(x=>'<div class="card metric"><span class="muted">'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')+'</div>';$('sectors').innerHTML=rows(a.sectors);$('themes').innerHTML=rows(a.themes)+rows(a.pending);$('leaders').innerHTML=rows(a.leaders);$('initialObservationCandidates').innerHTML=rows(a.initialObservationCandidates);$('kiwoom').innerHTML=rows(a.kiwoomDiscovery);$('watchlists').innerHTML=Object.entries(w.groups).map(([n,v])=>'<div class="card"><b>'+esc(n)+'</b><p>'+v.map(x=>'<span class="badge">'+esc(x.code)+' '+esc(x.name)+'</span>').join(' ')+'</p></div>').join('');$('events').innerHTML=rows(h.automatic)+ '<h3>사용자 변경 백업</h3>'+rows(h.userBackups);$('policy').textContent=JSON.stringify(p,null,2)}document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.tab).classList.add('active')});function operation(){return{op:$(\'op\').value,code:$(\'code\').value,stockName:$(\'stockName\').value,name:$(\'name\').value}}async function preview(){try{pending=await api('/api/preview',{operation:operation()});$(\'result\').textContent=(pending.summary||'')+'\\n'+(pending.diff||'');$(\'apply\').disabled=!pending.ok||!pending.changed}catch(e){$(\'result\').textContent=(e.errors||['미리보기 실패']).join('\\n')}}async function applyChange(){let r=await api('/api/apply',{operation:operation(),baselineHash:pending.baselineHash});$(\'result\').textContent=JSON.stringify(r,null,2);if(r.ok)load()}async function searchStocks(){let x=await api('/api/search/stocks?q='+encodeURIComponent($(\'query\').value));$(\'search\').innerHTML=rows(x.results,'<button onclick="choose(\'{code}\',\'{name}\')">선택</button>')}function choose(c,n){$(\'code\').value=c;$(\'stockName\').value=n}load()</script>'''
-
-
-if __name__ == "__main__":
-    main()
+ADD_UI_JS = r'''<style>.choices{display:flex;flex-wrap:wrap;gap:8px}.choices .chip{display:flex;align-items:center;gap:7px;margin:0;min-height:42px;padding:8px 12px;cursor:pointer}.choices input{appearance:none!important;width:20px!important;height:20px!important;min-height:0!important;padding:0!important;margin:0!important;border:2px solid #7180a8!important;border-radius:50%!important;background:transparent!important}.choices input[type=checkbox]{border-radius:6px!important}.choices input:checked{border-color:var(--brand)!important;background:var(--brand)!important;box-shadow:inset 0 0 0 4px var(--card)}</style><script>
+let baseRender=render;render=function(){baseRender();let g=$('groups');g.insertAdjacentHTML('afterbegin','<button onclick="newGroup()">＋ 그룹 추가</button>');let v=dash.validation;if(v.warnings?.length||v.errors?.length){$('dash').insertAdjacentHTML('beforeend','<article class="card '+(v.errors?.length?'bad':'warn')+'"><b>'+(v.errors?.length?'설정 오류':'설정 경고')+'</b><br>'+[...(v.errors||[]),...(v.warnings||[])].map(esc).join('<br>')+'</article>')}};
+function newGroup(){sheet('<h2>그룹 추가</h2><h3>그룹 종류</h3><div class="choices"><label class="chip"><input type="radio" name="groupKind" value="sector" checked> 섹터</label><label class="chip"><input type="radio" name="groupKind" value="theme"> 테마</label><label class="chip"><input type="radio" name="groupKind" value="watchlist"> 관심종목</label></div><h3>그룹 이름</h3><input id="groupName" placeholder="예: AI 소프트웨어"><p class="muted">구성종목은 그룹 생성 후 종목 편집에서 추가할 수 있습니다.</p><button onclick="previewNewGroup()">변경 미리보기</button>')}
+function previewNewGroup(){let kind=document.querySelector('#sheetBody input[name=groupKind]:checked').value,name=$('groupName').value.trim();if(!name){toast('그룹 이름을 입력하세요.');return}preview({op:'group_create',kind,name})}
+function groupEditor(stock){let html='<h2>'+ (stock?'종목 편집':'종목 추가')+'</h2><div class="card"><b>'+stock.name+'</b><br>'+stock.code+' · '+(stock.market||'시장 정보 없음')+'</div>';for(let [kind,label,multi] of [['sector','섹터',false],['theme','테마',true],['watchlist','관심종목',true]]){let list=groups[kind]||[];html+='<h3>'+label+'</h3><div class="choices" data-kind="'+kind+'">'+(kind==='sector'?'<label class="chip"><input type="radio" name="sector" value=""> 지정 안 함</label>':'')+list.map(g=>'<label class="chip"><input type="'+(multi?'checkbox':'radio')+'" name="'+kind+'" value="'+esc(g.name)+'"> '+esc(g.name)+'</label>').join('')+'</div>'}html+='<button onclick="previewGroups('+JSON.stringify(stock).replace(/"/g,'&quot;')+')">변경 미리보기</button>';sheet(html)}
+addStock=async function(){let q=prompt('종목명을 입력하세요');if(!q)return;try{let x=await api('/api/search/stocks?q='+encodeURIComponent(q)),r=x.results?.[0];if(!r)throw {errors:[x.message||'검색 결과가 없습니다.']};groupEditor(r)}catch(e){toast((e.errors||['종목 검색 실패']).join(' '))}}
+function previewGroups(stock){let groupsOut={sector:[],theme:[],watchlist:[]};document.querySelectorAll('#sheetBody .choices input:checked').forEach(x=>{if(x.value)groupsOut[x.closest('.choices').dataset.kind].push(x.value)});preview({op:'stock_add_with_groups',code:stock.code,stockName:stock.name,groups:groupsOut})}
+let oldPreview=preview;preview=async function(op){try{let x=await api('/api/preview',{operation:op});pending={op,x};let lines=(x.summary||'').split('\n').map(esc).join('<br>');sheet('<h2>변경 미리보기</h2><div class="card">'+lines+'</div><button class="secondary" onclick="groupEditor({code:\''+(op.code||'')+'\',name:\''+(op.stockName||'')+'\'})">수정하기</button> <button onclick="apply()" '+(!x.ok||!x.changed?'disabled':'')+'>변경 적용</button><details><summary>상세 변경 내용 보기</summary><pre>'+esc(x.diff||'변경 없음')+'</pre></details>')}catch(e){toast((e.errors||['미리보기 실패']).join(' '))}}
+function configSummary(diff){let rows=[];if(diff.includes('"itemCode": "006800"'))rows.push('신규 종목<br><b>미래에셋증권</b><br><span class="badge">006800</span>');if(diff.includes('"관심2"'))rows.push('관심종목<br><b>관심2</b><br>＋ 미래에셋증권');return rows.join('<hr>')||'저장할 Universe 설정 변경을 확인하세요.'}
+async function refreshConfigBackup(){let card=$('configBackup');if(!card)return;try{let x=await api('/api/config-sync/status');let changed=x.state==='LOCAL_CONFIG_CHANGES';card.querySelector('[data-sync-status]').innerHTML=changed?'🟠 저장하지 않은 설정 변경 있음':'✅ GitHub에 저장된 설정과 동일';card.querySelector('[data-sync-actions]').style.display='flex'}catch(e){card.querySelector('[data-sync-status]').textContent='로그인 필요 — 설정 백업 상태는 로그인 후 확인할 수 있습니다.';card.querySelector('[data-sync-actions]').style.display='none'}}
+async function previewConfigBackup(){try{let x=await api('/api/config-sync/preview');sheet('<h2>GitHub에 저장할 설정 변경</h2><div class="card">'+configSummary(x.diff||'')+'</div><button onclick="pushConfigBackup()">GitHub에 설정 저장</button><details><summary>상세 변경 내용 보기</summary><pre>'+esc(x.diff||'변경 없음')+'</pre></details>')}catch(e){toast((e.errors||['로그인이 필요합니다.']).join(' '))}}
+async function pushConfigBackup(){try{let x=await api('/api/config-sync/push',{});toast(x.message||'설정을 GitHub에 저장했습니다.');closeSheet();refreshConfigBackup()}catch(e){toast((e.errors||['설정 저장이 차단되었습니다.']).join(' '))}}
+let renderWithConfigBackup=render;render=function(){renderWithConfigBackup();let v=$('valid');if(!$('configBackup'))v.insertAdjacentHTML('beforeend','<article id="configBackup" class="card"><h2>Universe 설정 백업</h2><p class="muted">종목·섹터·테마·관심종목 설정만 GitHub에 저장합니다.<br>프로그램 소스코드는 포함되지 않습니다.</p><p data-sync-status>상태 확인 중…</p><div class="actions" data-sync-actions style="display:none"><button class="secondary" onclick="refreshConfigBackup()">상태 새로고침</button><button class="secondary" onclick="previewConfigBackup()">변경 미리보기</button><button onclick="previewConfigBackup()">GitHub에 설정 저장</button></div></article>');refreshConfigBackup()}
+</script>'''
+ADD_UI_JS += r'''<script>
+async function loadDynamicUniverseCard(){try{let x=await api('/api/automatic'),old=document.querySelector('#dynamicUniverseCard');if(old)old.remove();let card=document.createElement('article');card.id='dynamicUniverseCard';card.className='card';let rows=(items,label)=>'<h3>'+label+'</h3>'+((items||[]).map(x=>'<p><b>'+esc(x.name||x.code||'항목')+'</b> <span class="badge">'+esc(x.status||'UNAVAILABLE')+'</span><br><span class="muted">근거: '+esc(JSON.stringify(x.reason||x.criteria||''))+'</span></p>').join('')||'<p class="muted">현재 선정 없음</p>');card.innerHTML='<h2>동적 Universe</h2><p class="muted">동기화: '+esc(x.sync?.status||'UNKNOWN')+' · 기준시각: '+esc(x.generatedAt||'없음')+' · 게시 커밋: '+esc(x.commit||'없음')+'</p>'+rows(x.sectors,'자동 섹터')+rows(x.themes,'자동 테마')+rows(x.leaders,'자동 주도주')+rows(x.kiwoomDiscovery,'키움 발굴종목');document.querySelector('#dash')?.prepend(card)}catch(_){}}
+/* legacy dynamic-card loader disabled; the stable host loader below owns rendering */
+</script>'''
+ADD_UI_JS += r'''<script>
+if(window._dynamicObserver)window._dynamicObserver.disconnect();
+loadDynamicUniverseCard=async function(){try{let x=await api('/api/automatic'),host=document.querySelector('#dynamicUniverseHost');if(!host){host=document.createElement('section');host.id='dynamicUniverseHost';host.className='view active';let dash=document.querySelector('#dash');dash.parentNode.insertBefore(host,dash)}let card=document.querySelector('#dynamicUniverseCard');if(!card){card=document.createElement('article');card.id='dynamicUniverseCard';card.className='card';host.append(card)}let rows=(items,label)=>'<h3>'+label+'</h3>'+((items||[]).map(x=>'<p><b>'+esc(x.name||x.code||'항목')+'</b> <span class="badge">'+esc(x.status||'UNAVAILABLE')+'</span><br><span class="muted">근거: '+esc(x.reason||x.criteria||'근거 자료 없음')+'</span></p>').join('')||'<p class="muted">현재 선정 없음</p>');card.innerHTML='<h2>동적 Universe</h2><p class="muted">동기화: '+esc(x.sync?.status||'UNKNOWN')+' · 기준시각: '+esc(x.generatedAt||'없음')+' · 게시 커밋: '+esc(x.commit||'마지막 정상 게시본 없음')+'</p>'+rows(x.sectors,'자동 선정 섹터')+rows(x.themes,'자동 테마')+rows(x.leaders,'자동 주도주')+rows(x.kiwoomDiscovery,'KIWOOM_DISCOVERY')}catch(_){}};
+loadDynamicUniverseCard();
+</script>'''
+ADD_UI_JS += r'''<script>
+(()=>{const h=document.querySelector('#dynamicUniverseHost');if(h){h.classList.remove('view','active');h.classList.add('dynamic-host')}})();
+</script>'''
+ADD_UI_JS += r'''<script>
+/* final static dynamic-Universe tab is installed below */
+</script>'''
+for _legacy_marker in ("<script>\nasync function loadDynamicUniverseCard", "<script>\nif(window._dynamicObserver", "<script>\n(()=>{const h", "<script>\nconst _stableDynamicLoad"):
+    _legacy_start = ADD_UI_JS.find(_legacy_marker)
+    if _legacy_start >= 0:
+        _legacy_end = ADD_UI_JS.find("</script>", _legacy_start)
+        if _legacy_end >= 0:
+            ADD_UI_JS = ADD_UI_JS[:_legacy_start] + ADD_UI_JS[_legacy_end + len("</script>"):]
+HTML = HTML.replace('<button class="secondary" data-v="valid">설정 검증</button>', '<button class="secondary" data-v="valid">설정 검증</button><button class="secondary" data-v="dynamic">동적 Universe</button>')
+HTML = HTML.replace('<button data-v="dash">대시보드</button><button class="secondary" data-v="stocks">종목 관리</button><button class="secondary" data-v="groups">그룹 관리</button><button class="secondary" data-v="valid">설정 검증</button><button class="secondary" data-v="dynamic">동적 Universe</button><button class="secondary" onclick="logout()">로그아웃</button>', '<button data-v="dash">시장 현황</button><button class="secondary" data-v="groups">내 관심종목</button><button class="secondary" data-v="valid">시스템 관리</button><button class="secondary" onclick="logout()">로그아웃</button>')
+HTML = HTML.replace('<section id="dash" class="view active"></section>', '<section id="dash" class="view active"><div id="dynamicUniverseContent"></div></section>')
+HTML = HTML.replace('<section id="groups" class="view"></section>', '<section id="groups" class="view"><h2>내 관심종목</h2><div id="myStocks"><h3>종목 관리</h3><h4>등록 종목</h4><input id="filterMine" placeholder="종목명 · 종목코드 검색"><div id="stockListMine"></div></div></section>')
+ADD_UI_JS += r'''<script>
+async function loadDynamicUniverseTab(){try{let x=await api('/api/automatic'),root=$('dynamicUniverseContent');if(!root)return;let rows=(items,label)=>'<h3>'+label+'</h3>'+((items||[]).map(v=>'<p><b>'+esc(v.name||v.code||'항목')+'</b> <span class="badge">'+esc(v.status||'UNAVAILABLE')+'</span><br><span class="muted">근거: '+esc(v.reason||v.criteria||'근거 자료 없음')+'</span></p>').join('')||'<p class="muted">현재 선정 없음</p>');root.innerHTML='<article class="card"><h2>동적 Universe</h2><p class="muted">동기화: '+esc(x.sync?.status||'UNKNOWN')+' · 기준시각: '+esc(x.generatedAt||'없음')+' · 게시 커밋: '+esc(x.commit||'마지막 정상 게시본 없음')+'</p>'+rows(x.sectors,'자동 선정 섹터')+rows(x.themes,'자동 테마')+rows(x.leaders,'자동 주도주')+rows(x.kiwoomDiscovery,'KIWOOM_DISCOVERY')+'</article>'}catch(_){} }
+let _baseLoadForDynamic=load;load=async function(note){await _baseLoadForDynamic(note);await loadDynamicUniverseTab()};loadDynamicUniverseTab();
+</script>'''
+ADD_UI_JS += r'''<style>
+body{overflow-x:hidden}.tabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabs button{flex:0 0 auto;min-width:88px;white-space:nowrap;word-break:keep-all;background:var(--card);color:var(--ink);border:1px solid var(--line)}.tabs button.tab-selected{background:var(--brand);color:#fff;border-color:var(--brand)}.dynamic-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.dynamic-summary .card{margin:0;min-width:0;overflow-wrap:anywhere}.dynamic-summary b{font-size:22px;line-height:1.15;white-space:normal}.dynamic-status{overflow-wrap:anywhere;word-break:break-word}.dynamic-detail{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}.bottom{padding-bottom:calc(14px + env(safe-area-inset-bottom));}.app{padding-bottom:110px}@media(min-width:650px){.dynamic-summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style><script>
+function _dynamicKst(v){if(!v)return '없음';try{return new Date(v).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})+' KST'}catch(_){return String(v)}}
+   function _dynamicChecks(v){let c=v&&v.checks||{},labels={relativeStrength:'상대강도',advancerPct:'상승종목 비율',turnoverConcentrationPct:'거래대금 집중도',pctAboveMA20:'20일선 상회 비율',leaderCount:'주도주 수',minimumScore:'최소 선정점수',minimumPersistence:'선정 지속성'};return Object.keys(c).map(k=>'<span class="badge '+(c[k]===true?'ok':c[k]===false?'bad':'warn')+'">'+esc(labels[k]||k)+': '+(c[k]===true?'PASS':c[k]===false?'FAIL':'UNAVAILABLE')+'</span>').join(' ')}
+function _dynamicRows(items,label,removed){let active=items.filter(v=>['ACTIVE','DISCOVERED','WATCH','REENTERED','INITIAL_OBSERVATION'].includes(String(v?.status||''))),gone=items.filter(v=>String(v?.status||'')==='REMOVED'),detail=v=>{let price=v.currentPrice??v.price??v.nowPrice,rate=v.changeRate??v.changePercent;return '<p class="dynamic-detail"><b>'+esc(v.name||v.code||'항목')+'</b> <span class="badge">'+esc(v.status||'UNAVAILABLE')+'</span>'+(v.code?' <span class="badge">'+esc(v.code)+'</span>':'')+'<br>'+_dynamicChecks(v)+(v.score!=null?' <span class="muted">점수 '+esc(v.score)+'</span>':'')+(price!=null?' <br><span class="muted">현재가 '+esc(price)+(rate!=null?' · 등락률 '+esc(rate)+'%':'')+'</span>':'')+'<br><span class="muted">연속 선정 '+esc(v.qualifyStreak??'자료 없음')+' · 약화 '+esc(v.weakenStreak??'자료 없음')+' · 기준시각 '+esc(_dynamicKst(v.sourceTime)||'자료 없음')+'</span><br><span class="muted">근거: '+esc(v.reason||v.criteria||'근거 자료 없음')+'</span></p>'},html='<h3>'+label+'</h3>'+((active.map(detail).join(''))||'<p class="muted">현재 선정 없음</p>');if(removed&&gone.length)html+='<details><summary>REMOVED 업종 '+gone.length+'개</summary>'+gone.map(detail).join('')+'</details>';return html}
+async function loadDynamicUniverseTab(){try{let x=await api('/api/automatic'),root=$('dynamicUniverseContent');if(!root)return;let sectors=Array.isArray(x.sectors)?x.sectors:[],themes=Array.isArray(x.themes)?x.themes:[],leaders=Array.isArray(x.leaders)?x.leaders:[],kiwoom=Array.isArray(x.kiwoomDiscovery)?x.kiwoomDiscovery:[],active=sectors.filter(v=>v.status==='ACTIVE').length,disc=sectors.filter(v=>v.status==='DISCOVERED').length,watch=sectors.filter(v=>v.status==='WATCH').length,removed=sectors.filter(v=>v.status==='REMOVED').length;root.innerHTML='<article class="card"><h2>동적 Universe</h2><p class="muted">동기화 상태: '+esc(x.sync?.status||'UNKNOWN')+' · 생성시각: '+esc(_dynamicKst(x.generatedAt))+' · 게시 커밋: '+esc(x.commit||'마지막 정상 게시본 없음')+'</p><div class="dynamic-summary"><article class="card metric"><span class="muted">선정 섹터</span><b>'+active+' ACTIVE / '+disc+' DISCOVERED</b></article><article class="card metric"><span class="muted">관찰 섹터</span><b>'+watch+'</b></article><article class="card metric"><span class="muted">자동 주도주</span><b>'+leaders.length+'</b></article><article class="card metric"><span class="muted">REMOVED</span><b>'+removed+'</b></article></div>'+_dynamicRows(sectors,'선정 섹터',true)+_dynamicRows(leaders,'자동 주도주',false)+_dynamicRows(themes,'검증된 테마',false)+'<h3>KIWOOM_DISCOVERY</h3>'+((kiwoom.map(v=>'<p><b>'+esc(v.name||'종목명 자료 없음')+'</b> <span class="badge">'+esc(v.code||'코드 없음')+'</span> '+esc(v.status||'UNAVAILABLE')+'<br><span class="muted">근거: '+esc(v.reason||v.criteria||'근거 자료 없음')+'</span></p>').join(''))||'<p class="muted">현재 선정 없음</p>')+'</article>'}catch(_){} }
+function tab(){let buttons=[...document.querySelectorAll('.tabs [data-v]')];let select=id=>{document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));buttons.forEach(b=>b.classList.toggle('tab-selected',b.dataset.v===id));let b=buttons.find(x=>x.dataset.v===id);if(b)b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})};buttons.forEach(b=>b.onclick=()=>select(b.dataset.v));let current=document.querySelector('.view.active');select(current?.id||'dash')}
+tab();loadDynamicUniverseTab();
+(async()=>{for(let i=0;i<120;i++){await new Promise(r=>setTimeout(r,500));try{let s=await api('/api/dynamic-sync/status');if(s.status!=='RUNNING'){await loadDynamicUniverseTab();break}}catch(_){break}}})();
+loadDynamicUniverseTab=async function(){try{let x=await api('/api/automatic'),root=$('dynamicUniverseContent');if(!root)return;let sectors=Array.isArray(x.sectors)?x.sectors:[],themes=Array.isArray(x.themes)?x.themes:[],leaders=Array.isArray(x.leaders)?x.leaders:[],kiwoom=Array.isArray(x.kiwoomDiscovery)?x.kiwoomDiscovery:[],active=sectors.filter(v=>v.status==='ACTIVE').length,disc=sectors.filter(v=>v.status==='DISCOVERED').length,watch=sectors.filter(v=>v.status==='WATCH').length,removed=sectors.filter(v=>v.status==='REMOVED').length;let kNames={'036930':'주성엔지니어링','114800':'KODEX 인버스','131970':'두산테스나','252670':'KODEX 200선물인버스2X','373220':'LG에너지솔루션'};root.innerHTML='<article class="card"><h2>동적 Universe</h2><p class="muted dynamic-status">동기화 상태: '+esc(x.sync?.status||'UNKNOWN')+' · 생성시각: '+esc(_dynamicKst(x.generatedAt))+' · 게시 커밋: '+esc(x.commit||'마지막 정상 게시본 없음')+'</p><div class="dynamic-summary"><article class="card metric"><span class="muted">활성 섹터</span><b>'+active+'</b></article><article class="card metric"><span class="muted">발견 섹터</span><b>'+disc+'</b></article><article class="card metric"><span class="muted">자동 주도주</span><b>'+leaders.length+'</b></article><article class="card metric"><span class="muted">제외 업종</span><b>'+removed+'</b></article></div>'+_dynamicRows(sectors,'선정 섹터',true)+_dynamicRows(leaders,'자동 주도주',false)+_dynamicRows(themes,'검증된 테마',false)+'<h3>KIWOOM_DISCOVERY</h3>'+((kiwoom.map(v=>'<p class="dynamic-detail"><b>'+esc(kNames[v.code]||v.name||'종목명 자료 없음')+'</b> <span class="badge">'+esc(v.code||'코드 없음')+'</span> <span class="badge">'+esc(v.status||'UNAVAILABLE')+'</span><br><span class="muted">출처: 장종료후 단타후보군 탐색 · 근거: '+esc(v.reason||v.criteria||'근거 자료 없음')+'</span></p>').join(''))||'<p class="muted">현재 선정 없음</p>')+'</article>'}catch(_){} };
+loadDynamicUniverseTab();
+</script>'''
+ADD_UI_JS += r'''<script>
+let _render124=render;
+render=function(){_render124();if(!$('dynamicUniverseContent'))$('dash').insertAdjacentHTML('beforeend','<div id="dynamicUniverseContent"></div>');if(!$('myStocks'))$('groups').insertAdjacentHTML('beforeend','<div id="myStocks"><h3>종목 관리</h3><input id="filterMine" placeholder="종목명 · 종목코드 검색"><div id="stockListMine"></div></div>');if($('filterMine'))$('filterMine').oninput=()=>{if($('filter'))$('filter').value=$('filterMine').value;renderStocks()};if($('stockListMine')&&$('stockList'))$('stockListMine').innerHTML=$('stockList').innerHTML};
+let _renderStocks124=renderStocks;
+renderStocks=function(){_renderStocks124();if($('stockListMine')&&$('stockList'))$('stockListMine').innerHTML=$('stockList').innerHTML};
+if(typeof loadDynamicUniverseTab==='function'){loadDynamicUniverseTab()}
+</script>'''
+ADD_UI_JS += r'''<script>
+function _dynamicKst(v){if(!v)return '기준시각 확인 불가';try{let d=new Date(v),now=new Date(),fmt={timeZone:'Asia/Seoul',hour:'numeric',minute:'2-digit',hour12:true};let ds=d.toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}),ns=now.toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'});let yd=new Date(now.getTime()-86400000).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}),label=ds===ns?'오늘':ds===yd?'어제':ds;return label+' '+d.toLocaleTimeString('ko-KR',fmt)}catch(_){return '기준시각 확인 불가'}}
+loadDynamicUniverseTab=async function(){try{let x=await api('/api/automatic'),root=$('dynamicUniverseContent');if(!root)return;let sectors=Array.isArray(x.sectors)?x.sectors:[],themes=Array.isArray(x.themes)?x.themes:[],leaders=Array.isArray(x.leaders)?x.leaders:[],initial=Array.isArray(x.initialObservationCandidates)?x.initialObservationCandidates:[],kiwoom=Array.isArray(x.kiwoomDiscovery)?x.kiwoomDiscovery:[],live=sectors.filter(v=>v.status!=='REMOVED'),observed=new Set();[...live,...themes.filter(v=>v.status!=='REMOVED'),...leaders.filter(v=>v.status!=='REMOVED'),...initial].forEach(v=>(v.members||v.codes||v.constituents||[]).forEach(c=>observed.add(c.code||c)));leaders.forEach(v=>v.status!=='REMOVED'&&v.code&&observed.add(v.code));initial.forEach(v=>v.code&&observed.add(v.code));let focus=live.filter(v=>['ACTIVE','DISCOVERED','WATCH','REENTERED'].includes(v.status)).length;let kNames={'036930':'주성엔지니어링','114800':'KODEX 인버스','131970':'두산테스나','252670':'KODEX 200선물인버스2X','373220':'LG에너지솔루션'};root.innerHTML='<article class="card"><h2>시장 현황</h2><p class="muted">선정 자료: '+esc(_dynamicKst(x.generatedAt))+' · 마지막 업데이트: '+esc(x.sync?.lastAppliedAt?_dynamicKst(x.sync.lastAppliedAt):'확인 불가')+'</p><div class="dynamic-summary"><article class="card metric"><span class="muted">주목 섹터</span><b>'+focus+'</b></article><article class="card metric"><span class="muted">주목 테마</span><b>'+themes.filter(v=>v.status!=='REMOVED').length+'</b></article><article class="card metric"><span class="muted">관찰 종목</span><b>'+observed.size+'</b></article><article class="card metric"><span class="muted">키움 후보</span><b>'+kiwoom.length+'</b></article></div>'+_dynamicRows(sectors,'주목 섹터',true)+_dynamicRows(themes,'주목 테마',false)+_dynamicRows(leaders,'정식 관찰 종목',false)+_dynamicRows(initial,'초기 관찰 후보',false)+'<h3>키움 발굴 후보</h3>'+((kiwoom.map(v=>'<p class="dynamic-detail"><b>'+esc(kNames[v.code]||v.name||'종목명 자료 없음')+'</b> <span class="badge">'+esc(v.code||'코드 없음')+'</span><br><span class="muted">출처: 장종료후 단타후보군 탐색 · 기준일: '+esc(_dynamicKst(v.sourceTime||x.generatedAt))+'</span></p>').join(''))||'<p class="muted">현재 선정 없음</p>')+'</article>'}catch(_){} };
+loadDynamicUniverseTab();
+</script>'''
+# Final UX reconciliation: one renderer owns each screen. Legacy edit helpers
+# remain available, but they no longer own dashboard DOM.
+ADD_UI_JS += r'''<style>
+.tabs button.tab-selected{background:var(--brand);color:#fff;border-color:var(--brand)}
+.tabs button{flex:0 0 auto;min-width:88px;white-space:nowrap;word-break:keep-all}
+body{overflow-x:hidden}.app{padding-bottom:120px}.bottom{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.market-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.market-summary .card{margin:0;min-width:0}.market-summary b{font-size:24px}
+.market-card{border-top:3px solid var(--brand)}.detail{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}.status{font-weight:700}.reason{color:var(--mute);font-size:13px}
+@media(min-width:650px){.market-summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style><script>
+(function(){
+  const labels={ACTIVE:'주목 중',WATCH:'관찰 중',DISCOVERED:'선정 검토 중',REENTERED:'재주목',REMOVED:'관찰 종료',PASS:'조건 충족',FAIL:'조건 미충족',WAIT:'확인 대기'};
+  const state=v=>labels[String(v||'')]||'확인 대기';
+  const kst=v=>{if(!v)return '기준시각 확인 불가';try{return new Date(v).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'medium',timeStyle:'short'})}catch(_){return '기준시각 확인 불가'}};
+  const reason=v=>v?.reason||v?.criteria||'선정 근거 자료 없음';
+  function item(v){let rate=v?.changeRate??v?.changePercent;return '<div class="detail"><b>'+esc(v?.name||v?.code||'종목명 확인 불가')+'</b>'+(v?.code?' <span class="badge">'+esc(v.code)+'</span>':'')+' <span class="badge">'+esc(state(v?.status))+'</span>'+(rate!=null?'<br>등락률 '+esc(rate)+'%':'')+'<br><span class="reason">'+esc(reason(v))+'</span>'+(v?.sourceTime?'<br><span class="muted">데이터 기준시각: '+esc(kst(v.sourceTime))+'</span>':'')+'</div>'}
+  function group(v){let ms=v?.metrics||{},tv=ms.tradingValue||{};return '<article class="card market-card"><h3>'+esc(v?.name||'이름 확인 불가')+'</h3><span class="badge">'+esc(state(v?.status||v?.membershipStatus))+'</span><p class="muted">'+(ms.advancers!=null?('상승 '+ms.advancers+' · 하락 '+(ms.decliners||0)+' · 상승 비율 '+ms.advancerPct+'%'):'시장 강약 확인 대기')+'</p><p class="muted">평균 '+(ms.averageReturn1D??'확인 불가')+'% · 중앙값 '+(ms.medianReturn1D??'확인 불가')+'% · 20일선 상회 '+(ms.pctAboveMA20??'확인 불가')+'%</p><p class="muted">거래대금 '+(tv.total!=null?String(tv.total):'확인 불가')+' · 상위 3종목 집중도 '+(tv.top3ConcentrationPct!=null?tv.top3ConcentrationPct+'%':'확인 불가')+'</p>'+((v?.leaders||v?.stocks||[]).slice(0,3).map(item).join('')||'<p class="reason">주목 종목 자료 없음</p>')+'</article>'}
+  function section(title,items){let rows=(items||[]).filter(v=>v?.status!=='REMOVED');return '<h2>'+title+'</h2>'+((rows.map(group).join(''))||'<p class="muted">현재 선정된 대상 없음</p>')}
+  function renderMarket(x){let sectors=x?.sectors||[],themes=x?.themes||[],leaders=x?.leaders||[],kiwoom=x?.kiwoomDiscovery||[];let active=sectors.filter(v=>['ACTIVE','WATCH','DISCOVERED','REENTERED'].includes(v?.status)).length;let observed=new Set([...leaders,...kiwoom].map(v=>v?.code).filter(Boolean));$('dash').innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">선정 자료: '+esc(kst(x?.generatedAt))+' · 동기화: '+esc(state(x?.sync?.status))+'</p><div class="market-summary"><article class="card"><span class="muted">주목 업종</span><b>'+active+'</b></article><article class="card"><span class="muted">주목 테마</span><b>'+themes.filter(v=>v?.status!=='REMOVED').length+'</b></article><article class="card"><span class="muted">관찰 종목</span><b>'+observed.size+'</b></article><article class="card"><span class="muted">키움 후보</span><b>'+kiwoom.length+'</b></article></div>'+section('오늘 새로 주목할 대상',sectors.filter(v=>v?.status==='DISCOVERED'))+section('주목 업종',sectors)+section('주목 테마',themes)+'<h2>주도주·대표 관찰 종목</h2>'+((leaders.slice(0,10).map(item).join(''))||'<p class="muted">현재 선정된 주도주 없음</p>')+'<h2>키움 발굴 후보</h2>'+((kiwoom.slice(0,10).map(item).join(''))||'<p class="muted">현재 선정된 후보 없음</p>')+'</article>'}
+  function renderUser(){let v=dash.validation;$('valid').innerHTML='<article class="card"><h2>시스템 관리</h2><p>설정 검증: '+esc(state(v.status))+'</p>'+[...(v.errors||[]),...(v.warnings||[])].map(esc).join('<br>')+(v.errors?.length||v.warnings?.length?'':'현재 설정은 정상입니다.')+'</article>';if(typeof renderStocks==='function')renderStocks();if($('stockListMine')&&$('stockList'))$('stockListMine').innerHTML=$('stockList').innerHTML;$('groups').querySelectorAll('.legacy-summary').forEach(x=>x.remove())}
+  function select(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tabs [data-v]').forEach(b=>b.classList.toggle('tab-selected',b.dataset.v===id));let b=document.querySelector('.tabs [data-v="'+id+'"]');if(b)b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});if(id==='dash')syncMarket()}
+  document.querySelector('.tabs').innerHTML='<button data-v="dash">시장 현황</button><button data-v="groups" class="secondary">내 관심종목</button><button data-v="valid" class="secondary">시스템 관리</button><button class="secondary" onclick="logout()">로그아웃</button>';document.querySelectorAll('.tabs [data-v]').forEach(b=>b.onclick=()=>select(b.dataset.v));select('dash');
+  async function syncMarket(){try{let x=await api('/api/automatic');renderMarket(x)}catch(_){$('dash').innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">동적 시장 자료를 확인할 수 없습니다. 마지막 정상 자료를 유지합니다.</p></article>'}}
+  let loadUser=async function(note){try{[dash,stocks,groups]=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups)]);renderUser();await syncMarket();if(note)toast('설정 검증: '+state(dash.validation.status))}catch(e){toast((e.errors||['불러오기 실패']).join(' '))}};
+  window.load=loadUser;window.render=renderUser;loadUser();
+})();
+</script>'''
+if __name__=="__main__":main()
