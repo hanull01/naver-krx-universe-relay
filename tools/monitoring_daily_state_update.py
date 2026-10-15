@@ -202,8 +202,6 @@ def refresh_stock_universe(previous_universe, stock_payload, target_date):
                    "reason": "ADDED_TO_AUTHORITATIVE_SOURCE"} for code in added_codes],
         "marketChanged": market_changed,
     }
-    if market_changed:
-        raise UniverseHistoryRequired(diagnostics)
     if not removed_codes and not added_codes:
         # A same-set refresh is a lifecycle NOOP.  Preserve the committed
         # universe bytes so a same-day rerun does not create metadata-only
@@ -239,8 +237,9 @@ def reconcile_authoritative_universe(existing, previous_universe, current_univer
     return output
 
 
-def load_state(state_dir, universe_file):
-    expected = authoritative_groups(universe_file); loaded = {}
+def load_state(state_dir, universe_file=None):
+    """Load structurally valid state, optionally enforcing an expected set."""
+    expected = authoritative_groups(universe_file) if universe_file is not None else None; loaded = {}
     for market in MARKETS:
         path = Path(state_dir) / f"{market.lower()}.json"
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -249,12 +248,28 @@ def load_state(state_dir, universe_file):
         stocks = payload.get("stocks")
         if not isinstance(stocks, list): raise ValueError(f"invalid stocks: {path.name}")
         codes = [str(item.get("code")) for item in stocks]
-        if len(codes) != len(set(codes)) or set(codes) != set(expected[market]):
+        if len(codes) != len(set(codes)) or (expected is not None and set(codes) != set(expected[market])):
             raise ValueError(f"authoritative code mismatch: {path.name}")
         for stock in stocks:
             if len(decode_stock(stock)) > KEEP: raise ValueError(f"retention overflow: {stock['code']}")
         loaded[market] = payload
     return loaded
+
+
+def universe_from_state(state, reference_universe):
+    """Use state-file membership as yesterday's universe for reconciliation."""
+    reference = _universe_payload(reference_universe)
+    reference_assets = {str(row.get("code")): row for row in reference.get("assets", [])}
+    assets = []
+    for market in MARKETS:
+        for stock in state[market]["stocks"]:
+            code = str(stock["code"])
+            row = dict(reference_assets.get(code) or {})
+            row.update({"code": code, "market": market, "assetType": "STOCK"})
+            assets.append(row)
+    assets.extend(row for row in reference.get("assets", [])
+                  if row.get("assetType", "STOCK") != "STOCK")
+    return {**reference, "assets": assets}
 
 
 def normalize_daily_rows(payload, target_date):
@@ -434,11 +449,12 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
                                  **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
-    existing = load_state(state_dir, previous_universe)
+    existing = load_state(state_dir)
+    state_universe = universe_from_state(existing, previous_universe)
     current_universe, diagnostics = refresh_stock_universe(
-        previous_universe, stock_payload, target_date)
+        state_universe, stock_payload, target_date)
     reconciled = reconcile_authoritative_universe(
-        existing, previous_universe, current_universe, diagnostics)
+        existing, state_universe, current_universe, diagnostics)
     target = compact_date(target_date)
     lifecycle_changed = bool(diagnostics["removed"] or diagnostics["added"])
     if not lifecycle_changed and all(

@@ -393,6 +393,39 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertFalse(outcome["changed"])
         self.assertEqual({}, dict(calls))
 
+    def test_refresh_reconciles_state_membership_drift_before_today_collection(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "drift-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "drift-state"; state_dir.mkdir()
+        state = self._state_for_payload(previous)
+        # Simulate the production shape: the authoritative universe already
+        # moved on, while rolling state still contains the prior membership.
+        state["KOSPI"]["stocks"] = [s for s in state["KOSPI"]["stocks"] if s["code"] != "000003"]
+        state["KOSDAQ"]["stocks"].append(update.encode_stock("000004", []))
+        for market, payload in state.items():
+            payload["asOfDate"] = "20261007"
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "drift-baseline.json"; baseline_path.write_text("{}", encoding="utf-8")
+        lifecycle_path = self.root / "drift-lifecycle.json"
+        stocks = [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ"),
+                  stock("000004", "D", "KOSDAQ")]
+        source = {"stocks": stocks, "metadata": {"failedCount": 0,
+                  "markets": {"KOSPI": 1, "KOSDAQ": 2}}}
+        def fake_baseline(state_value, target, current, _output):
+            groups = update.authoritative_groups(current)
+            rows = [{"code": code, "market": market} for market in update.MARKETS for code in sorted(groups[market])]
+            return {"asOfDate": update.compact_date(target), "authoritativeCount": 3, "count": 3,
+                    "coveragePct": 100.0, "historyStatus": "OK", "stocks": rows,
+                    "refreshDiagnostics": {}}
+        with patch.object(update, "baseline_from_state", side_effect=fake_baseline):
+            result = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08",
+                source, fetcher=lambda *_args: self._daily_response("20261008"), retry_sleep=0)
+        self.assertEqual(3, result["coverage"])
+        self.assertEqual({"000001", "000002", "000004"},
+                         {s["code"] for market in update.MARKETS for s in
+                          json.loads((state_dir / f"{market.lower()}.json").read_text())["stocks"]})
+
     def test_lifecycle_validation_failure_leaves_every_artifact_unchanged(self):
         previous, stock = self._lifecycle_fixture()
         universe = self.root / "atomic-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
