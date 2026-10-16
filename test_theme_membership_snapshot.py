@@ -10,18 +10,18 @@ class ThemeMembershipSnapshotTests(unittest.TestCase):
         calls = []
 
         def fetch(path, params, expected):
-            calls.append((path, params['marketType'], params['startIdx']))
+            calls.append((path, params['marketType'], params.get('cursor')))
             if params['marketType'] == 'KOSPI':
                 return {'hasNext': False, 'items': [], 'cursor': None}
             return ({'hasNext': True, 'items': [
                 {'itemCode': '000001', 'itemName': 'A'}
-            ], 'cursor': None} if params['startIdx'] == 0 else
-                    {'hasNext': False, 'items': [], 'cursor': None})
+            ], 'cursor': 'next'} if params.get('cursor') is None else
+                    {'hasNext': False, 'items': [{'itemCode': '000002', 'itemName': 'B'}], 'cursor': None})
 
         result = theme.collect_theme_membership_for_list([{'id': '520', 'name': '테스트'}], fetch)
         self.assertEqual(result['status'], 'OK')
         self.assertEqual(result['themeCount'], 1)
-        self.assertEqual(result['membershipCount'], 1)
+        self.assertEqual(result['membershipCount'], 2)
         self.assertEqual(result['byCode']['000001'][0]['id'], '520')
         self.assertEqual(len(calls), 3)
 
@@ -29,7 +29,7 @@ class ThemeMembershipSnapshotTests(unittest.TestCase):
         def fetch(path, params, expected):
             return {'hasNext': True, 'items': [
                 {'itemCode': '000001', 'itemName': 'A'}
-            ], 'cursor': None}
+            ], 'cursor': 'next'}
 
         result = theme.collect_theme_membership_for_list([{'id': '520', 'name': '테스트'}], fetch)
         self.assertIn(result['status'], {'PARTIAL', 'ERROR'})
