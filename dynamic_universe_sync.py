@@ -85,8 +85,15 @@ def sync(fetch, latest_path, history_path, state_path, now=None, max_age_seconds
         state = json.loads(Path(state_path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         pass
+    latest_sha = hashlib.sha256(latest_raw).hexdigest()
     if state.get("commit") == latest_commit:
         return {"status": "NOOP", **info}
+    if state.get("generatedAt") == latest["generatedAt"]:
+        if state.get("latestSha256") == latest_sha:
+            return {"status": "NOOP", **info,
+                    "appliedCommit": state.get("commit"),
+                    "sourceCommit": latest_commit}
+        raise SyncError("PUBLISHED_RESULT_HASH_MISMATCH")
     if state.get("generatedAt") and _instant(latest["generatedAt"]) <= _instant(state["generatedAt"]):
         raise SyncError("PUBLISHED_RESULT_NOT_NEWER")
     previous = {}
@@ -97,7 +104,7 @@ def sync(fetch, latest_path, history_path, state_path, now=None, max_age_seconds
         _atomic_write(latest_path, latest)
         _atomic_write(history_path, history)
         _atomic_write(state_path, {"commit": latest_commit, "generatedAt": latest["generatedAt"],
-                                   "latestSha256": hashlib.sha256(latest_raw).hexdigest()})
+                                   "latestSha256": latest_sha})
     except Exception:
         for path, raw in previous.items():
             if raw is None: continue
