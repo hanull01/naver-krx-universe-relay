@@ -265,6 +265,24 @@ class EvidenceTests(unittest.TestCase):
         self.assertIn(row["breadthConcentration"], ("BROAD", "NARROW", "WEAK"))
         self.assertIn("relativeStrengthVsMarket", row)
 
+    def test_empty_industry_aggregation_is_not_full(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [],
+                    "missingCodes": [], "stocks": [current("A")]}
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "업종"}],
+                      "diagnostics": {}}
+        membership = {"status": "PARTIAL", "industries": [{"id": "1", "name": "업종",
+                       "status": "ERROR", "members": []}]}
+        with tempfile.TemporaryDirectory() as directory:
+            built, _ = evidence.build_evidence(snapshot, Path(directory), industries,
+                                                membership, today="20261001")
+        quality = built["latest-industries.json"]["quality"]
+        self.assertEqual(quality["sourceIndustryCount"], 1)
+        self.assertEqual(quality["membershipIndustryCount"], 1)
+        self.assertEqual(quality["aggregationUsableIndustryCount"], 0)
+        self.assertEqual(quality["industryEvidenceUsable"], "UNUSABLE")
+        self.assertEqual(quality["partialReason"], "INDUSTRY_MEMBERSHIP_UNUSABLE")
+
 
 if __name__ == "__main__":
     unittest.main()
