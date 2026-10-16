@@ -179,6 +179,13 @@ def normalize_stock(row, investor=False):
     return result
 
 
+def normalize_industry_member(row, market_type):
+    """Normalize the current browser/API stocklist contract."""
+    require_fields(row, ('itemCode', 'itemName'), 'industry member')
+    return {'code': str(row['itemCode']), 'name': row['itemName'],
+            'marketType': row.get('marketType') or market_type, 'source': dict(row)}
+
+
 def normalize_category(row):
     validate_category_row(row)
     return {
@@ -274,11 +281,47 @@ def fetch_industry_info(category_no, fetcher=fetch_json):
 
 
 def collect_industry_members(category_no, fetcher=fetch_json, clock=generated_at,
-                             max_pages=MAX_MEMBER_PAGES):
+                             max_pages=MAX_MEMBER_PAGES, market_types=None):
     members, seen_codes = [], set()
     error = None
     finished = False
-    for page_index in range(max_pages):
+    if market_types is not None:
+        cursors = {market: None for market in market_types}
+        for market_type in market_types:
+            for page_index in range(max_pages):
+                try:
+                    params = {'marketType': market_type, 'sortType': 'tradingVolume',
+                              'sortDirection': 'desc', 'size': min(PAGE_SIZE, 100)}
+                    if cursors[market_type]:
+                        params['cursor'] = cursors[market_type]
+                    response = fetcher(f'/api/domestic/market/upjong/{category_no}/stocklist', params, dict)
+                    rows = response.get('items')
+                    if not isinstance(rows, list):
+                        raise MarketApiError('industry member response missing items array')
+                    normalized = [normalize_industry_member(row, market_type) for row in rows]
+                    codes = [row['code'] for row in normalized]
+                    duplicate = seen_codes.intersection(codes)
+                    if duplicate or len(codes) != len(set(codes)):
+                        raise MarketApiError(f'industry member duplicate itemcode: {sorted(duplicate or set(codes))[:3]}')
+                    seen_codes.update(codes); members.extend(normalized)
+                    has_next = response.get('hasNext') is True
+                    next_cursor = response.get('cursor')
+                    if not has_next:
+                        break
+                    if not next_cursor or next_cursor == cursors[market_type]:
+                        raise MarketApiError('industry member pagination missing or repeated cursor')
+                    cursors[market_type] = next_cursor
+                except Exception as exc:
+                    error = error_payload(exc); break
+            else:
+                error = error_payload(MarketApiError(f'industry member max pages reached: {max_pages}'))
+            if error:
+                break
+        finished = error is None
+        pagination = {'type': 'CURSOR', 'parameter': 'cursor', 'endCondition': 'HAS_NEXT_FALSE' if finished else 'UNCONFIRMED',
+                      'markets': list(market_types), 'pagesFetched': len(members)}
+    else:
+      for page_index in range(max_pages):
         try:
             rows = fetcher(f'/api/domestic/market/upjong/{category_no}/stocklist', {
                 'marketType': 'ALL', 'orderType': 'quantTop', 'startIdx': page_index,
@@ -297,14 +340,15 @@ def collect_industry_members(category_no, fetcher=fetch_json, clock=generated_at
         except Exception as exc:
             error = error_payload(exc)
             break
-    if not finished and error is None:
-        error = error_payload(MarketApiError(f'industry member max pages reached: {max_pages}'))
+      if not finished and error is None:
+          error = error_payload(MarketApiError(f'industry member max pages reached: {max_pages}'))
+      pagination = {'type': 'PAGE_INDEX', 'parameter': 'startIdx',
+                    'endCondition': 'EMPTY_ARRAY' if finished else 'UNCONFIRMED',
+                    'pagesFetched': (len(members) + PAGE_SIZE - 1) // PAGE_SIZE + 1 if finished else max_pages}
     payload = {'generatedAt': clock(), 'source': 'NAVER',
                'status': 'OK' if finished else ('PARTIAL' if members else 'ERROR'),
                'categoryId': str(category_no), 'count': len(members),
-               'pagination': {'type': 'PAGE_INDEX', 'parameter': 'startIdx',
-                              'endCondition': 'EMPTY_ARRAY' if finished else 'UNCONFIRMED',
-                              'pagesFetched': (len(members) + PAGE_SIZE - 1) // PAGE_SIZE + 1 if finished else max_pages},
+               'pagination': pagination,
                'members': members}
     if error:
         payload['error'] = error
@@ -408,7 +452,8 @@ def collect_industry_membership(fetcher=fetch_json, clock=generated_at):
     industries = collect_industries(fetcher, clock)
     rows, by_code = [], {}
     for industry in industries['industries']:
-        members = collect_industry_members(industry['id'], fetcher, clock)
+        members = collect_industry_members(industry['id'], fetcher, clock,
+                                           market_types=('KOSPI', 'KOSDAQ'))
         rows.append({'id': industry['id'], 'name': industry['name'], 'status': members['status'],
                      'memberCount': members['count'], 'pagination': members['pagination'],
                      'members': [{'code': row['code'], 'name': row['name']} for row in members['members']]})

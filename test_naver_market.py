@@ -151,12 +151,32 @@ class MarketTests(unittest.TestCase):
                 return [category(1), category(2)] if params['startIdx'] == 0 else []
             category_id = path.split('/')[-2]
             if category_id == '1':
-                return [stock('000001')] if params['startIdx'] == 0 else []
+                if params['marketType'] == 'KOSPI':
+                    return {'hasNext': False, 'items': [{'itemCode': '000001', 'itemName': 'A', 'marketType': 'KOSPI'}]}
+                return {'hasNext': False, 'items': []}
             raise market.MarketApiError('temporary failure')
         payload = market.collect_industry_membership(fetch, self.CLOCK)
         self.assertEqual(payload['status'], 'PARTIAL')
         self.assertEqual(payload['byCode']['000001'], [{'id': '1', 'name': '업종1'}])
         self.assertEqual(payload['industries'][1]['status'], 'ERROR')
+
+    def test_cursor_industry_membership_merges_markets_and_pages(self):
+        calls = []
+        def fetch(path, params, expected):
+            calls.append((path, params))
+            market_type = params.get('marketType')
+            cursor = params.get('cursor')
+            if market_type == 'KOSPI':
+                return {'hasNext': True, 'cursor': 'k1',
+                        'items': [{'itemCode': '000001', 'itemName': 'A', 'marketType': 'KOSPI'}]} if not cursor else {
+                            'hasNext': False, 'items': [{'itemCode': '000002', 'itemName': 'B', 'marketType': 'KOSPI'}]}
+            return {'hasNext': False, 'items': [{'itemCode': '000003', 'itemName': 'C', 'marketType': 'KOSDAQ'}]}
+        payload = market.collect_industry_members('1', fetch, self.CLOCK,
+                                                  market_types=('KOSPI', 'KOSDAQ'))
+        self.assertEqual(payload['status'], 'OK')
+        self.assertEqual([row['code'] for row in payload['members']], ['000001', '000002', '000003'])
+        self.assertEqual(payload['pagination']['type'], 'CURSOR')
+        self.assertEqual(calls[1][1]['cursor'], 'k1')
 
     def test_manifest_and_atomic_current_error_write(self):
         rankings = {'generatedAt': 'x', 'source': 'NAVER', 'status': 'ERROR', 'rankings': []}
