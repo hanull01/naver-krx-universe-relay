@@ -13,7 +13,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from pathlib import Path
 from urllib.parse import quote
 
@@ -430,9 +430,16 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         raise DiscoveryError("DISCOVERY_NOT_AVAILABLE")
     monitoring_date = discovery.get("monitoringDate")
     market_source_time = quotes.get("sourceTime") if isinstance(quotes, dict) else None
+    now = (clock or (lambda: datetime.now(KST)))()
+    try:
+        source_date = datetime.fromisoformat(str(market_source_time).replace("Z", "+00:00")).astimezone(KST).date().isoformat()
+    except (TypeError, ValueError):
+        source_date = None
     if (not market_source_time or quotes.get("status") != "ok"
             or quotes.get("fresh") is not True):
         raise DiscoveryError("MARKET_QUOTES_NOT_READY")
+    if source_date != monitoring_date and now.astimezone(KST).time() >= time(9, 0):
+        raise DiscoveryError("MARKET_QUOTES_DATE_MISMATCH")
     existing = set(_index(quotes)) | current_signal_codes(full_market_signals, monitoring_date)
     result = fetch_naver_missing_quotes(
         discovery.get("symbols", []), existing, limit=limit, fetcher=fetcher,
@@ -451,7 +458,7 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         status = "PARTIAL"
     else:
         status = "AVAILABLE"
-    now_value = (clock or (lambda: datetime.now(KST)))()
+    now_value = now
     generated_at = now_value.isoformat() if hasattr(now_value, "isoformat") else str(now_value)
     return {
         "schemaVersion": 1, "status": status, "monitoringDate": monitoring_date,
@@ -478,6 +485,17 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
     if not isinstance(rows, list) or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_QUOTE_KEYS for row in rows):
         raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
     codes = [row.get("itemCode") for row in rows]
+    try:
+        monitoring_day = datetime.fromisoformat(str(payload.get("monitoringDate"))).date()
+    except (TypeError, ValueError) as exc:
+        raise DiscoveryError("SUPPLEMENTAL_DATE_INVALID") from exc
+    for row in rows:
+        try:
+            row_day = datetime.fromisoformat(str(row.get("sourceTime")).replace("Z", "+00:00")).astimezone(KST).date()
+        except (TypeError, ValueError) as exc:
+            raise DiscoveryError("SUPPLEMENTAL_QUOTE_DATE_INVALID") from exc
+        if row_day != monitoring_day:
+            raise DiscoveryError("SUPPLEMENTAL_QUOTE_DATE_MISMATCH")
     missing = payload.get("missingSymbols")
     if (len(codes) != len(set(codes)) or any(code not in discovery.get("symbols", []) for code in codes)
             or payload.get("quoteCount") != len(rows)
@@ -497,7 +515,7 @@ def supplemental_quotes_status(discovery, market_source_time, path=None):
         return {"status": "UNAVAILABLE", "reason": "SUPPLEMENTAL_MISSING", "datas": []}
     except DiscoveryError as exc:
         reason = str(exc)
-        status = "STALE" if reason == "SUPPLEMENTAL_MARKET_TIME_MISMATCH" else "INVALID"
+        status = "STALE" if reason in {"SUPPLEMENTAL_MARKET_TIME_MISMATCH", "SUPPLEMENTAL_QUOTE_DATE_MISMATCH"} else "INVALID"
         return {"status": status, "reason": reason, "datas": []}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"status": "INVALID", "reason": "SUPPLEMENTAL_UNREADABLE", "datas": []}

@@ -118,6 +118,27 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
         self.assertEqual(calls, [["043260"]])
         self.assertEqual(result["status"], "AVAILABLE")
 
+    def test_previous_day_market_quotes_are_rejected_after_open(self):
+        candidate = discovery(["251340"]); candidate["monitoringDate"] = "2026-10-16"
+        with self.assertRaisesRegex(td.DiscoveryError, "MARKET_QUOTES_DATE_MISMATCH"):
+            td.build_supplemental_quotes(candidate,
+                quotes_payload([quote("251340")], "2026-10-15T15:30:00+09:00"), {},
+                fetcher=lambda _: self.fail("stale source must not be reused"),
+                normalizer=lambda row, _now: row,
+                clock=lambda: datetime(2026, 10, 16, 9, 25, tzinfo=KST))
+
+    def test_supplemental_quote_date_mismatch_is_stale(self):
+        candidate = discovery(["251340"]); candidate["monitoringDate"] = "2026-10-16"
+        payload = {"schemaVersion": 1, "status": "AVAILABLE", "monitoringDate": "2026-10-16",
+            "candidateSourceSha256": candidate["sourceSha256"],
+            "marketSourceTime": "2026-10-16T09:25:00+09:00", "generatedAt": "2026-10-16T09:25:01+09:00",
+            "source": "NAVER_KRX", "requestedCount": 1, "quoteCount": 1,
+            "missingSymbols": [], "errors": [],
+            "datas": [{**quote("251340"), "sourceTime": "2026-10-15T15:30:00+09:00"}]}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "latest.json"; path.write_text(json.dumps(payload), encoding="utf-8")
+            self.assertEqual("STALE", td.supplemental_quotes_status(candidate, payload["marketSourceTime"], path=path)["status"])
+
     def test_fresh_premarket_previous_close_is_preserved_as_market_source_time(self):
         result = td.build_supplemental_quotes(
             discovery(["0197X0"]),
