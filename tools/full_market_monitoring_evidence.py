@@ -287,9 +287,21 @@ def aggregate_industries(features, industries, membership, previous_good=None):
     membership_count = len(membership.get("industries") or [])
     quality["aggregationUsableIndustryCount"] = len(result)
     quality["membershipIndustryCount"] = membership_count
+    quality["membershipSourceStatus"] = membership.get("status", "UNUSABLE")
+    quality["membershipUsableIndustryCount"] = sum(
+        1 for group in (membership.get("industries") or [])
+        if isinstance(group, dict) and group.get("status") == "OK"
+    )
     quality["sourceCoveragePct"] = (round(source_count * 100 / membership_count, 4)
                                      if membership_count else None)
-    if quality["sourceStatus"] == "PARTIAL":
+    if not result and source_count and membership_count:
+        quality["industryEvidenceUsable"] = "UNUSABLE"
+        quality["partialReason"] = (
+            "INDUSTRY_MEMBERSHIP_UNUSABLE"
+            if quality["membershipUsableIndustryCount"] == 0
+            else "INDUSTRY_AGGREGATION_EMPTY"
+        )
+    elif quality["sourceStatus"] == "PARTIAL":
         quality["industryEvidenceUsable"] = "PARTIAL_WITH_COVERAGE" if result else "UNUSABLE"
         quality["partialReason"] = "INDUSTRY_SOURCE_INCOMPLETE"
     return quality, sorted(result, key=lambda item: (item["avgReturn1D"] is not None, item["avgReturn1D"] or -9999), reverse=True)
