@@ -1,14 +1,13 @@
 {
   "status": "OK",
-  "observedAt": "2026-10-15T06:35:54.284744+00:00",
+  "observedAt": "2026-10-16T02:23:17.579240+00:00",
   "tradingDate": "2026-10-15",
   "summary": {
     "industries": {
       "count": 79,
       "v2StatusDistribution": {
-        "WATCH": 1,
-        "WEAK": 29,
-        "DEFENSIVE": 49
+        "WEAK": 73,
+        "WATCH": 6
       },
       "v1V2StatusDifferences": 79,
       "unavailable": 0
@@ -16,11 +15,13 @@
     "themes": {
       "count": 264,
       "v2StatusDistribution": {
-        "WEAK": 264
+        "ACTIVE": 10,
+        "WEAK": 251,
+        "WATCH": 3
       },
-      "v1V2StatusDifferences": 264,
+      "v1V2StatusDifferences": 254,
       "unavailable": 0
     }
   },
-  "observationCount": 1
+  "observationCount": 2
 }
