@@ -1,5 +1,7 @@
 import unittest
 from datetime import date
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 import research_intelligence as ri
@@ -170,6 +172,17 @@ class ResearchIntelligenceTest(unittest.TestCase):
                 for stock in stocks
             )
         )
+
+    def test_stale_stock_outputs_are_pruned_after_empty_universe_batch(self):
+        with TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+            (output_dir / "005930.json").write_text("{}", encoding="utf-8")
+            (output_dir / "latest.json").write_text("{}", encoding="utf-8")
+
+            rib.prune_stale_stock_outputs(output_dir, [])
+
+            self.assertFalse((output_dir / "005930.json").exists())
+            self.assertTrue((output_dir / "latest.json").exists())
 
 
 if __name__ == "__main__":
