@@ -76,7 +76,9 @@ jobs:
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
-        run: git pull --ff-only origin main
+        run: |
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git pull --ff-only origin "$target_ref"
 
       - name: Collect NAVER data
         id: collect
@@ -215,6 +217,25 @@ jobs:
           python market_indices.py
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
+      - name: Run V2 shadow observation
+        id: v2_shadow
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # V2 reads the already-generated monitoring snapshot.  Its runner
+          # catches its own errors and never gates V1 or MARKET_DATA_READY.
+          python tools/run_dynamic_universe_v2_shadow.py
+          echo "status=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('status','FAILED'))
+          except Exception:
+              print('FAILED')
+          PY
+          )" >> "$GITHUB_OUTPUT"
+
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true'
@@ -286,6 +307,23 @@ jobs:
             echo "Kiwoom supplemental quotes are not eligible for this market commit; preserving prior files."
           fi
 
+          if [ -f data/dynamic-universe/v2-shadow-run-status.json ]; then
+            git add -- data/dynamic-universe/v2-shadow-run-status.json
+            if [ "$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('status'))
+          except Exception:
+              print('FAILED')
+          PY
+          )" = "OK" ]; then
+              git add -- data/dynamic-universe/v2-shadow-latest.json data/dynamic-universe/v2-shadow-history.json
+            else
+              echo "V2 shadow failed; publishing only its run status and preserving prior V2 result/history."
+            fi
+          fi
+
           if git diff --cached --quiet; then
             echo "No data changes to commit"
             echo "published=false" >> "$GITHUB_OUTPUT"
@@ -294,13 +332,15 @@ jobs:
             echo "Market data collection succeeded; synchronizing its data commit."
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
-              git fetch origin main
-              if ! git rebase origin/main; then
+              target_ref="${GITHUB_REF_NAME:-main}"
+              git fetch origin "$target_ref"
+              if ! git rebase "origin/${target_ref}"; then
                 echo "::error::Data commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
                 git rebase --abort || true
                 exit 1
               fi
-              if git push origin HEAD:main; then
+              target_ref="${GITHUB_REF_NAME:-main}"
+              if git push origin "HEAD:${target_ref}"; then
                 echo "Market data push succeeded."
                 echo "published=true" >> "$GITHUB_OUTPUT"
                 echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -314,7 +354,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
+        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
@@ -346,13 +386,15 @@ jobs:
             exit 0
           fi
           git commit -m "Record NAVER quote collection failure"
-          git fetch origin main
-          if ! git rebase origin/main; then
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git fetch origin "$target_ref"
+          if ! git rebase "origin/${target_ref}"; then
             echo "::error::Diagnostic commit conflicts with newer main. No automatic conflict resolution or force push was attempted."
             git rebase --abort || true
             exit 1
           fi
-          git push origin HEAD:main
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git push origin "HEAD:${target_ref}"
 
       - name: Fail after preserving production snapshot
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0'
