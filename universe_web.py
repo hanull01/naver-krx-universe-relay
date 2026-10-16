@@ -387,7 +387,29 @@ function renderMarket(x){let sectors=x?.sectors||[],themes=x?.themes||[],leaders
 function renderMine(){let host=$('myStocks');if(!host){$('groups').insertAdjacentHTML('beforeend','<div id="myStocks"><h3>등록 종목</h3><input id="filterMine" placeholder="종목명 · 종목코드 검색"><div id="stockListMine"></div></div>');host=$('myStocks')}if($('filterMine'))$('filterMine').oninput=function(){let q=this.value.toLowerCase();$('stockListMine').innerHTML=stocks.filter(s=>(s.itemCode+' '+s.stockName).toLowerCase().includes(q)).map(s=>'<p><b>'+esc(s.stockName)+'</b> <span class="badge">'+esc(s.itemCode)+'</span> '+badge(s.enabled?'활성':'비활성')+'</p>').join('')||'<p class="muted">등록 종목이 없습니다.</p>'};$('filterMine').oninput()}
 function select(id){let bs=[...document.querySelectorAll('.tabs [data-v]')];document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));bs.forEach(b=>b.classList.toggle('tab-selected',b.dataset.v===id));let b=bs.find(x=>x.dataset.v===id);if(b)b.scrollIntoView({block:'nearest',inline:'center'})}
 document.querySelectorAll('.tabs [data-v]').forEach(b=>b.onclick=()=>select(b.dataset.v));document.addEventListener('click',e=>{let b=e.target.closest('.market-toggle');if(!b)return;let d=b.nextElementSibling,open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));d.classList.toggle('open',!open)});select('dash');
-let initialized=false,serial=0;async function initialize(note){if(initialized)return;initialized=true;let n=++serial;try{let r=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups),api('/api/automatic')]);if(n!==serial)return;[dash,stocks,groups]=r;render();renderMine();renderMarket(r[3]);if(note)toast('설정 검증: '+dash.validation.status)}catch(e){initialized=false;toast('시장 자료를 불러오지 못했습니다. 마지막 정상 화면을 유지합니다.')}}
+let initialized=false,serial=0,syncPollTimer=null,syncPollStopped=false,syncPollCount=0,lastSyncView=null;
+function stopSyncPolling(){syncPollStopped=true;if(syncPollTimer){clearTimeout(syncPollTimer);syncPollTimer=null}}
+function terminalSyncStatus(status){return ['APPLIED','NOOP','FAILED','SUCCESS','COMPLETED'].includes(status)}
+async function refreshAutomaticView(){let next=await api('/api/automatic');let before=lastSyncView||{};let changed=next.commit!==before.commit||next.generatedAt!==before.generatedAt;if(changed){lastSyncView=next;renderMarket(next)}return next}
+async function pollSyncStatus(){
+  if(syncPollStopped||syncPollCount>=15)return stopSyncPolling();
+  syncPollCount+=1;
+  try{
+    let status=await api('/api/dynamic-sync/status');
+    if(status.status==='RUNNING'){
+      syncPollTimer=setTimeout(pollSyncStatus,1000);return;
+    }
+    if(status.status==='APPLIED')await refreshAutomaticView();
+    else if(terminalSyncStatus(status.status)){lastSyncView={...(lastSyncView||{}),sync:{...(lastSyncView?.sync||{}),status:status.status}};renderMarket(lastSyncView)}
+    stopSyncPolling();
+  }catch(e){stopSyncPolling()}
+}
+function startSyncPolling(view){
+  stopSyncPolling();syncPollStopped=false;syncPollCount=0;lastSyncView=view;
+  if(view?.sync?.status==='RUNNING')syncPollTimer=setTimeout(pollSyncStatus,250);
+}
+window.addEventListener('pagehide',stopSyncPolling,{once:true});
+async function initialize(note){if(initialized)return;initialized=true;let n=++serial;try{let r=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups),api('/api/automatic')]);if(n!==serial)return;[dash,stocks,groups]=r;render();renderMine();renderMarket(r[3]);startSyncPolling(r[3]);if(note)toast('설정 검증: '+dash.validation.status)}catch(e){initialized=false;stopSyncPolling();toast('시장 자료를 불러오지 못했습니다. 마지막 정상 화면을 유지합니다.')}}
 window.loadUser=initialize;select('dash');initialize();
 })();
 </script>'''
