@@ -1,0 +1,31 @@
+name: Validate Python Regression
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check certifi webauthn
+      - name: Compile Python files
+        run: python -m compileall -q .
+      - name: Run full unittest regression
+        run: python -m unittest discover -s . -p 'test_*.py'
+      - name: Run theme regression summary
+        run: python -m unittest -v test_theme_research test_theme_membership_snapshot
+      - name: Verify changed-file policy
+        run: |
+          git diff --check
+          echo "Regression validation completed without data collection or publishing steps."
