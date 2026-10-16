@@ -25,6 +25,27 @@ class ThemeMembershipSnapshotTests(unittest.TestCase):
         self.assertEqual(result['byCode']['000001'][0]['id'], '520')
         self.assertEqual(len(calls), 3)
 
+    def test_collection_metrics_match_market_and_theme_requests(self):
+        def fetch(path, params, expected):
+            if params['marketType'] == 'KOSPI':
+                return {'hasNext': False, 'items': [], 'cursor': None}
+            return {'hasNext': False, 'items': [
+                {'itemCode': '000001', 'itemName': 'A'}
+            ], 'cursor': None}
+
+        result = theme.collect_theme_membership_for_list(
+            [{'id': '520', 'name': '테스트'}], fetch)
+        metrics = result['collectionMetrics']
+        self.assertEqual(metrics['requests'], 2)
+        self.assertEqual(sum(metrics['marketRequests'].values()), 2)
+        self.assertEqual(metrics['marketRequests']['KOSPI'], 1)
+        self.assertEqual(metrics['marketRequests']['KOSDAQ'], 1)
+        self.assertEqual(metrics['themeRequests']['520']['requests'], 2)
+        self.assertEqual(metrics['themeRequests']['520']['pages'], 2)
+        self.assertEqual(metrics['themeRequests']['520']['status'], 'OK')
+        self.assertEqual(len(metrics['latencies']), 2)
+        self.assertTrue(all(value >= 0 for value in metrics['latencies']))
+
     def test_incomplete_membership_is_not_publishable(self):
         def fetch(path, params, expected):
             return {'hasNext': True, 'items': [
