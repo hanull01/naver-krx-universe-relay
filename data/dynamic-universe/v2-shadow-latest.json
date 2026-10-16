@@ -1,9 +1,9 @@
 {
   "schemaVersion": "dynamic-universe-v2-shadow-2",
-  "generatedAt": "2026-10-16T11:24:22.082883+00:00",
+  "generatedAt": "2026-10-16T12:00:34.279003+00:00",
   "source": {
-    "industries": "2026-10-16T11:24:22.082883+00:00",
-    "themes": "2026-10-16T11:24:22.082883+00:00"
+    "industries": "2026-10-16T12:00:34.279003+00:00",
+    "themes": "2026-10-16T12:00:34.279003+00:00"
   },
   "weights": {
     "priceRelativeStrength": 30,
@@ -155,7 +155,7 @@
       "id": "308",
       "name": "인터넷과카탈로그소매",
       "kind": "industry",
-      "v1Status": "DISCOVERED",
+      "v1Status": "ACTIVE",
       "v2Status": "ACTIVE",
       "score": 81.34,
       "rawScore": 81.34,
@@ -1030,7 +1030,7 @@
       "id": "285",
       "name": "방송과엔터테인먼트",
       "kind": "industry",
-      "v1Status": "WATCH",
+      "v1Status": "REMOVED",
       "v2Status": "WEAK",
       "score": 71.21,
       "rawScore": 71.21,
@@ -4167,7 +4167,7 @@
       "id": "527",
       "name": "윤활유",
       "kind": "theme",
-      "v1Status": "WATCH",
+      "v1Status": "REMOVED",
       "v2Status": "WEAK",
       "score": 63.38,
       "rawScore": 63.38,
@@ -15826,7 +15826,7 @@
         "ACTIVE": 3,
         "WATCH": 4
       },
-      "v1V2StatusDifferences": 79,
+      "v1V2StatusDifferences": 78,
       "unavailable": 0
     },
     "themes": {
