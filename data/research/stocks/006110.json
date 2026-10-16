@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "006110",
   "itemName": "삼아알미늄",
-  "reportCount": 2,
-  "latestReportNid": "94436",
-  "latestWriteDate": "2026-07-24",
+  "reportCount": 3,
+  "latestReportNid": "96724",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "94436",
-    "writeDate": "2026-07-24",
-    "brokerName": "SK증권",
-    "title": "Corp Day: \"하반기 캐파 부족\" 알박 쇼티지",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96724",
+    "writeDate": "2026-10-15",
+    "brokerName": "신한투자증권",
+    "title": "ESS 빅사이클의 가장 좁은 병목",
+    "goalPrice": 102000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 2,
-        "negative": 2
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "배터리": 1,
-        "원가": 1
+        "AI": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96724",
     "94436",
     "91410"
   ]

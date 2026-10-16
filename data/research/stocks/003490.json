@@ -2,33 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "003490",
   "itemName": "대한항공",
-  "reportCount": 20,
-  "latestReportNid": "96422",
-  "latestWriteDate": "2026-10-02",
+  "reportCount": 25,
+  "latestReportNid": "96803",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96422",
-    "writeDate": "2026-10-02",
-    "brokerName": "신한투자증권",
-    "title": "난기류를 헤치고 27년으로",
-    "goalPrice": 38000,
+    "nid": "96803",
+    "writeDate": "2026-10-16",
+    "brokerName": "한화투자증권",
+    "title": "[3Q26 Review] 2Q 성과급 미반영분 반영",
+    "goalPrice": 43000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
+        "수요": 3,
+        "AI": 1,
         "원가": 1,
-        "환율": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96803",
+    "96800",
+    "96790",
+    "96789",
+    "96780",
     "96422",
     "96344",
     "96298",

@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "462870",
   "itemName": "시프트업",
-  "reportCount": 14,
-  "latestReportNid": "95847",
-  "latestWriteDate": "2026-08-25",
+  "reportCount": 15,
+  "latestReportNid": "96763",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "95847",
-    "writeDate": "2026-08-25",
-    "brokerName": "키움증권",
-    "title": "캡콤 지향점을 위한 길",
-    "goalPrice": 65000,
+    "nid": "96763",
+    "writeDate": "2026-10-15",
+    "brokerName": "교보증권",
+    "title": "27년 공백은 기반영, 연내 Spirits 공개 따른 반응 관찰 필요",
+    "goalPrice": 42000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 0,
-        "negative": 0
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "중국": 2,
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96763",
     "95847",
     "95662",
     "95476",

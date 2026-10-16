@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "443060",
   "itemName": "HD현대마린솔루션",
-  "reportCount": 17,
-  "latestReportNid": "96624",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 18,
+  "latestReportNid": "96752",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96624",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "기술서비스 플랫폼 업체 Goltens 인수",
-    "goalPrice": 330000,
+    "nid": "96752",
+    "writeDate": "2026-10-15",
+    "brokerName": "삼성증권",
+    "title": "Goltens 인수, 서비스 인프라 확보를 위한 합리적 결정",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 3,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "조선": 1,
-        "환율": 1
+        "조선": 5,
+        "수주": 2,
+        "원가": 2,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "96752",
     "96624",
     "96612",
     "96363",

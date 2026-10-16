@@ -2,31 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "196170",
   "itemName": "알테오젠",
-  "reportCount": 20,
-  "latestReportNid": "96617",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 21,
+  "latestReportNid": "96777",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96617",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "네덜란드 법원의 가처분 결정은 충분히 뒤집힐 수 있다",
-    "goalPrice": 450000,
-    "normalizedOpinion": "BUY",
+    "nid": "96777",
+    "writeDate": "2026-10-16",
+    "brokerName": "한국IR협의회",
+    "title": "주사는 짧게, 성장은 길게",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 5,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "수주": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "96777",
     "96617",
     "96239",
     "96125",

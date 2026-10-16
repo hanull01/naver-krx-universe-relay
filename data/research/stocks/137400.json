@@ -2,33 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "137400",
   "itemName": "피엔티",
-  "reportCount": 1,
-  "latestReportNid": "95947",
-  "latestWriteDate": "2026-09-01",
+  "reportCount": 2,
+  "latestReportNid": "96775",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "95947",
-    "writeDate": "2026-09-01",
-    "brokerName": "미래에셋증권",
-    "title": "고객사 다변화. 소재 사업 방향성이 중요",
-    "goalPrice": 40000,
-    "normalizedOpinion": "BUY",
+    "nid": "96775",
+    "writeDate": "2026-10-16",
+    "brokerName": "한국IR협의회",
+    "title": "이차전지 전극공정 장비 기업",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 1,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 2,
-        "중국": 2,
-        "미국": 1
+        "배터리": 4
       }
     }
   },
   "reportNids": [
+    "96775",
     "95947"
   ]
 }

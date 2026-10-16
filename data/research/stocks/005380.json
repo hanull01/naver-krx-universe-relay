@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "005380",
   "itemName": "현대차",
-  "reportCount": 48,
-  "latestReportNid": "96611",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 49,
+  "latestReportNid": "96735",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96611",
-    "writeDate": "2026-10-12",
-    "brokerName": "유안타증권",
-    "title": "3Q26 Pre: 실적보다 환율이 향후의 리스크",
-    "goalPrice": 410000,
+    "nid": "96735",
+    "writeDate": "2026-10-15",
+    "brokerName": "iM증권",
+    "title": "낮은 눈높이, 26.4Q에 거는 기대",
+    "goalPrice": 600000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 3
+        "positive": 2,
+        "negative": 6
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "환율": 2,
-        "수요": 1,
-        "원가": 1
+        "환율": 5,
+        "자동차": 3,
+        "원가": 2,
+        "중국": 2,
+        "가격": 1,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "96735",
     "96611",
     "96603",
     "96587",

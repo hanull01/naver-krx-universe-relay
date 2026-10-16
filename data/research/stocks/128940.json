@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "128940",
   "itemName": "한미약품",
-  "reportCount": 35,
-  "latestReportNid": "96716",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 36,
+  "latestReportNid": "96801",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96716",
-    "writeDate": "2026-10-14",
-    "brokerName": "하나증권",
-    "title": "더 안정적인 성장을 위한 정비 작업(3Q26 Pre)",
-    "goalPrice": 660000,
+    "nid": "96801",
+    "writeDate": "2026-10-16",
+    "brokerName": "교보증권",
+    "title": "3Q26 Preveiw: 계약금 이연으로 실적 일시적 휴식",
+    "goalPrice": 700000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 2
+        "positive": 4,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 1
+        "미국": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96801",
     "96716",
     "96706",
     "96685",

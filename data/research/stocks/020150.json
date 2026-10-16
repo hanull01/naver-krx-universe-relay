@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "020150",
   "itemName": "롯데에너지머티리얼즈",
-  "reportCount": 15,
-  "latestReportNid": "96563",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 16,
+  "latestReportNid": "96798",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96563",
-    "writeDate": "2026-10-08",
-    "brokerName": "DS투자증권",
-    "title": "회로박 공급자 우위 지속",
-    "goalPrice": 74000,
+    "nid": "96798",
+    "writeDate": "2026-10-16",
+    "brokerName": "하나증권",
+    "title": "3Q26 Preview: 전지박 출하 QoQ +40% 전망",
+    "goalPrice": 69000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 3
+        "positive": 6,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "수요": 3,
-        "환율": 3,
-        "원가": 2
+        "AI": 1,
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96798",
     "96563",
     "95875",
     "95280",

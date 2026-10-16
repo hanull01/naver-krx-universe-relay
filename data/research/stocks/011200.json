@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "011200",
   "itemName": "HMM",
-  "reportCount": 14,
-  "latestReportNid": "96700",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 15,
+  "latestReportNid": "96750",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96700",
-    "writeDate": "2026-10-14",
-    "brokerName": "신한투자증권",
-    "title": "우려도 있지만 너무 잠잠한 주가",
-    "goalPrice": 26000,
-    "normalizedOpinion": "BUY",
+    "nid": "96750",
+    "writeDate": "2026-10-15",
+    "brokerName": "하나증권",
+    "title": "3Q26 Pre: 호시절 보내는 중",
+    "goalPrice": 24000,
+    "normalizedOpinion": "HOLD",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 6,
         "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsPositiveSignalCount": 5,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3,
+        "환율": 2,
+        "조선": 1
+      }
     }
   },
   "reportNids": [
+    "96750",
     "96700",
     "95882",
     "95645",

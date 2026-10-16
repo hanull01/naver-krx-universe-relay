@@ -2,34 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "080160",
   "itemName": "모두투어",
-  "reportCount": 1,
-  "latestReportNid": "91236",
-  "latestWriteDate": "2026-04-06",
+  "reportCount": 2,
+  "latestReportNid": "96732",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "91236",
-    "writeDate": "2026-04-06",
-    "brokerName": "한국IR협의회",
-    "title": "본격적인 수익성 개선세 돌입",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96732",
+    "writeDate": "2026-10-15",
+    "brokerName": "신한투자증권",
+    "title": "돌파구가 필요한 때",
+    "goalPrice": 10000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 2
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 6,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "가격": 1,
         "수요": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "96732",
     "91236"
   ]
 }

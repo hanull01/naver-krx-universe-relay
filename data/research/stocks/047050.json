@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "047050",
   "itemName": "포스코인터내셔널",
-  "reportCount": 23,
-  "latestReportNid": "96692",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 24,
+  "latestReportNid": "96756",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96692",
-    "writeDate": "2026-10-14",
-    "brokerName": "신한투자증권",
-    "title": "넓어지는 사업 영토, 높아지는 이익 체력",
-    "goalPrice": 82000,
+    "nid": "96756",
+    "writeDate": "2026-10-15",
+    "brokerName": "삼성증권",
+    "title": "Inorganic growth가 지속된다!",
+    "goalPrice": 80000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 11,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "가격": 4,
+        "미국": 1,
+        "수요": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96756",
     "96692",
     "96662",
     "96582",

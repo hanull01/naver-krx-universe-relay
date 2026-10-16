@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "030200",
   "itemName": "KT",
-  "reportCount": 37,
-  "latestReportNid": "96709",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 39,
+  "latestReportNid": "96731",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96709",
-    "writeDate": "2026-10-14",
-    "brokerName": "유안타증권",
-    "title": "바닥 통과, 성장 엔진 점화",
+    "nid": "96731",
+    "writeDate": "2026-10-15",
+    "brokerName": "유진투자증권",
+    "title": "밑그림은 그려졌고, 이제 실행을 볼 차례",
     "goalPrice": 73000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 11,
+        "negative": 9
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 6,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "원가": 1,
+        "AI": 1,
+        "금리": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96731",
+    "96729",
     "96709",
     "96668",
     "96389",

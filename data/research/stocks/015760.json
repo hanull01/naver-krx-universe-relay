@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "015760",
   "itemName": "한국전력",
-  "reportCount": 19,
-  "latestReportNid": "96626",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 21,
+  "latestReportNid": "96778",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96626",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "좋아도 좋은 것이 아닌",
-    "goalPrice": 40000,
+    "nid": "96778",
+    "writeDate": "2026-10-16",
+    "brokerName": "키움증권",
+    "title": "혼돈 속 피난처",
+    "goalPrice": 41000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 9
+        "positive": 8,
+        "negative": 4
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "가격": 1,
-        "환율": 1
+        "원전": 3,
+        "환율": 3
       }
     }
   },
   "reportNids": [
+    "96778",
+    "96727",
     "96626",
     "96075",
     "95577",

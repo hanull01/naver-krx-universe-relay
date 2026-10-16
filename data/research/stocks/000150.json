@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "000150",
   "itemName": "두산",
-  "reportCount": 27,
-  "latestReportNid": "96334",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 28,
+  "latestReportNid": "96762",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96334",
-    "writeDate": "2026-09-28",
-    "brokerName": "하나증권",
-    "title": "전방 수요 지속 상향조정 중",
-    "goalPrice": 2420000,
+    "nid": "96762",
+    "writeDate": "2026-10-15",
+    "brokerName": "교보증권",
+    "title": "뚜렷한 저평가 구간",
+    "goalPrice": 2200000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 0
+        "positive": 3,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 4,
-        "AI": 2,
+        "수요": 2,
+        "가격": 1,
+        "반도체": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96762",
     "96334",
     "96253",
     "96229",

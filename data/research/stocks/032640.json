@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "032640",
   "itemName": "LG유플러스",
-  "reportCount": 39,
-  "latestReportNid": "96667",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 40,
+  "latestReportNid": "96783",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96667",
-    "writeDate": "2026-10-13",
-    "brokerName": "하나증권",
-    "title": "3Q 프리뷰 - 특별한 대안 없다면 길게 보세요",
-    "goalPrice": 20000,
+    "nid": "96783",
+    "writeDate": "2026-10-16",
+    "brokerName": "유진투자증권",
+    "title": "조용함, 그것이 좋은 것",
+    "goalPrice": 19000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 18,
+        "negative": 7
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 12,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "금리": 2
+        "수요": 2,
+        "AI": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96783",
     "96667",
     "96390",
     "95960",

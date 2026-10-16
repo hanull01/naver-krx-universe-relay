@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "009450",
   "itemName": "경동나비엔",
-  "reportCount": 4,
-  "latestReportNid": "95467",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 5,
+  "latestReportNid": "96733",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "95467",
-    "writeDate": "2026-08-12",
+    "nid": "96733",
+    "writeDate": "2026-10-15",
     "brokerName": "신한투자증권",
-    "title": "다시 투자할 시점",
+    "title": "환율 보다 HVAC 주목",
     "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 0,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96733",
     "95467",
     "93331",
     "93187",

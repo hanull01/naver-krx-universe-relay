@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "060250",
   "itemName": "NHN KCP",
-  "reportCount": 3,
-  "latestReportNid": "95800",
-  "latestWriteDate": "2026-08-21",
+  "reportCount": 4,
+  "latestReportNid": "96765",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "95800",
-    "writeDate": "2026-08-21",
-    "brokerName": "신한투자증권",
-    "title": "NDR 후기: PG를 넘어 AI 결제 인프라로",
-    "goalPrice": 22000,
+    "nid": "96765",
+    "writeDate": "2026-10-15",
+    "brokerName": "교보증권",
+    "title": "시장 확장으로 이룬 점유율 상승의 함의",
+    "goalPrice": 20000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 5,
+        "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96765",
     "95800",
     "95303",
     "93435"

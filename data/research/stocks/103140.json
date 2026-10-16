@@ -2,34 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "103140",
   "itemName": "풍산",
-  "reportCount": 15,
-  "latestReportNid": "96625",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 17,
+  "latestReportNid": "96779",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96625",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "여전한 저평가 구간",
+    "nid": "96779",
+    "writeDate": "2026-10-16",
+    "brokerName": "신한투자증권",
+    "title": "메탈게인 이후의 숙제",
     "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 1,
+        "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "방산": 3,
-        "가격": 1,
-        "수요": 1,
-        "환율": 1
+        "방산": 1
       }
     }
   },
   "reportNids": [
+    "96779",
+    "96757",
     "96625",
     "95444",
     "95088",

@@ -2,36 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "097950",
   "itemName": "CJ제일제당",
-  "reportCount": 19,
-  "latestReportNid": "96458",
-  "latestWriteDate": "2026-10-06",
+  "reportCount": 21,
+  "latestReportNid": "96766",
+  "latestWriteDate": "2026-10-15",
   "latest": {
-    "nid": "96458",
-    "writeDate": "2026-10-06",
-    "brokerName": "교보증권",
-    "title": "점진적으로 나아지는 과정",
-    "goalPrice": 270000,
+    "nid": "96766",
+    "writeDate": "2026-10-15",
+    "brokerName": "DS투자증권",
+    "title": "바닥을 다지며",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 18,
-        "negative": 10
+        "positive": 8,
+        "negative": 8
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 5,
-        "가격": 2,
-        "미국": 2,
         "환율": 2,
-        "자동차": 1,
-        "중국": 1
+        "가격": 1,
+        "미국": 1,
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96766",
+    "96726",
     "96458",
     "96423",
     "95497",

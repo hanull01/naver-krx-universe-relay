@@ -2,34 +2,31 @@
   "schemaVersion": 1,
   "itemCode": "018670",
   "itemName": "SK가스",
-  "reportCount": 7,
-  "latestReportNid": "96077",
-  "latestWriteDate": "2026-09-10",
+  "reportCount": 9,
+  "latestReportNid": "96796",
+  "latestWriteDate": "2026-10-16",
   "latest": {
-    "nid": "96077",
-    "writeDate": "2026-09-10",
-    "brokerName": "유안타증권",
-    "title": "연료 선택권이 만든 이익 체력",
-    "goalPrice": 340000,
+    "nid": "96796",
+    "writeDate": "2026-10-16",
+    "brokerName": "하나증권",
+    "title": "배당성장주의 정석",
+    "goalPrice": 365000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 3,
+        "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "AI": 2,
-        "가격": 2,
-        "수요": 2,
-        "원가": 1
-      }
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {}
     }
   },
   "reportNids": [
+    "96796",
+    "96747",
     "96077",
     "95163",
     "95125",
