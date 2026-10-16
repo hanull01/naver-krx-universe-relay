@@ -31,7 +31,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install required test dependency
-        run: python -m pip install --disable-pip-version-check webauthn
+        run: python -m pip install --disable-pip-version-check certifi webauthn
 
       - name: Sync latest main before collection
         run: git pull --ff-only origin main

@@ -297,37 +297,67 @@ def collect_theme_members(theme_id, fetcher=market.fetch_json,
     members, seen_codes = [], set()
     error = None
     finished = False
-    for page_index in range(max_pages):
-        try:
-            rows = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), {
-                'marketType': 'ALL', 'orderType': 'quantTop',
-                'startIdx': page_index, 'pageSize': market.PAGE_SIZE,
-            }, list)
-            if not rows:
-                finished = True
-                break
-            normalized = [market.normalize_stock(row) for row in rows]
-            codes = [row['code'] for row in normalized]
-            duplicate = seen_codes.intersection(codes)
-            if duplicate or len(codes) != len(set(codes)):
-                raise market.MarketApiError(
-                    f'theme member duplicate itemcode: {sorted(duplicate or set(codes))[:3]}')
-            seen_codes.update(codes)
-            members.extend(normalized)
-        except Exception as exc:
-            error = market.error_payload(exc)
+    markets = ('KOSPI', 'KOSDAQ')
+    pages_fetched = 0
+    end_condition = 'UNCONFIRMED'
+    for market_type in markets:
+        if error:
             break
-    if not finished and error is None:
-        error = market.error_payload(
-            market.MarketApiError(f'theme member max pages reached: {max_pages}'))
+        market_finished = False
+        for page_index in range(max_pages):
+            try:
+                payload = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), {
+                    'marketType': market_type, 'orderType': 'quantTop',
+                    'startIdx': page_index, 'pageSize': market.PAGE_SIZE,
+                }, dict)
+                pages_fetched += 1
+                if isinstance(payload, list):
+                    # Compatibility for existing isolated fixtures; live NAVER
+                    # responses use the validated {hasNext, items} contract.
+                    rows, has_next = payload, bool(payload)
+                    if not rows:
+                        end_condition = 'EMPTY_ARRAY'
+                else:
+                    if not isinstance(payload.get('items'), list) or not isinstance(payload.get('hasNext'), bool):
+                        raise market.MarketApiError('theme member response missing items/hasNext contract')
+                    rows, has_next = payload['items'], payload['hasNext']
+                    if not has_next:
+                        end_condition = 'HAS_NEXT_FALSE'
+                if not rows and has_next:
+                    raise market.MarketApiError('theme member empty page with hasNext')
+                normalized = []
+                for row in rows:
+                    item = dict(row)
+                    item['itemcode'] = item.get('itemcode') or item.get('itemCode')
+                    item['itemname'] = item.get('itemname') or item.get('itemName')
+                    normalized.append(market.normalize_stock(item))
+                codes = [row['code'] for row in normalized]
+                duplicate = seen_codes.intersection(codes)
+                if duplicate or len(codes) != len(set(codes)):
+                    raise market.MarketApiError(
+                        f'theme member duplicate itemcode: {sorted(duplicate or set(codes))[:3]}')
+                seen_codes.update(codes)
+                members.extend(normalized)
+                if not has_next:
+                    market_finished = True
+                    break
+            except Exception as exc:
+                error = market.error_payload(exc)
+                break
+        if not market_finished and error is None:
+            error = market.error_payload(
+                market.MarketApiError(f'theme member max pages reached: {max_pages}'))
+            break
+    if error is None:
+        finished = True
     payload = {
         'generatedAt': clock(), 'source': 'NAVER',
         'status': 'OK' if finished else ('PARTIAL' if members else 'ERROR'),
         'themeId': str(theme_id), 'count': len(members),
         'pagination': {
             'type': 'PAGE_INDEX', 'parameter': 'startIdx',
-            'endCondition': 'EMPTY_ARRAY' if finished else 'UNCONFIRMED',
-            'pagesFetched': page_index + 1,
+            'endCondition': end_condition if finished else 'UNCONFIRMED',
+            'pagesFetched': pages_fetched,
         },
         'members': members,
     }
