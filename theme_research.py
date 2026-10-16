@@ -304,12 +304,14 @@ def collect_theme_members(theme_id, fetcher=market.fetch_json,
         if error:
             break
         market_finished = False
+        cursor = None
         for page_index in range(max_pages):
             try:
-                payload = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), {
-                    'marketType': market_type, 'orderType': 'quantTop',
-                    'startIdx': page_index, 'pageSize': market.PAGE_SIZE,
-                }, dict)
+                params = {'marketType': market_type, 'sortType': 'marketCap',
+                          'size': market.PAGE_SIZE}
+                if cursor:
+                    params['cursor'] = cursor
+                payload = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), params, dict)
                 pages_fetched += 1
                 if isinstance(payload, list):
                     # Compatibility for existing isolated fixtures; live NAVER
@@ -323,6 +325,10 @@ def collect_theme_members(theme_id, fetcher=market.fetch_json,
                     rows, has_next = payload['items'], payload['hasNext']
                     if not has_next:
                         end_condition = 'HAS_NEXT_FALSE'
+                    else:
+                        cursor = payload.get('cursor')
+                        if not isinstance(cursor, str) or not cursor:
+                            raise market.MarketApiError('theme member hasNext without cursor')
                 if not rows and has_next:
                     raise market.MarketApiError('theme member empty page with hasNext')
                 normalized = []
@@ -355,7 +361,7 @@ def collect_theme_members(theme_id, fetcher=market.fetch_json,
         'status': 'OK' if finished else ('PARTIAL' if members else 'ERROR'),
         'themeId': str(theme_id), 'count': len(members),
         'pagination': {
-            'type': 'PAGE_INDEX', 'parameter': 'startIdx',
+            'type': 'CURSOR', 'parameter': 'cursor',
             'endCondition': end_condition if finished else 'UNCONFIRMED',
             'pagesFetched': pages_fetched,
         },

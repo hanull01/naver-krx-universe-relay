@@ -42,7 +42,8 @@ class ThemeResearchTests(unittest.TestCase):
 
     def test_member_duplicates_and_missing_fields_fail_closed(self):
         def duplicate(path, params, expected):
-            return [stock('000001'), stock('000001')] if params['startIdx'] == 0 else []
+            return {'hasNext': False, 'cursor': None,
+                    'items': [stock('000001'), stock('000001')]}
         result = theme.collect_theme_members('1', duplicate, self.CLOCK)
         self.assertEqual(result['status'], 'ERROR')
         self.assertIn('duplicate', result['error']['message'])
@@ -51,9 +52,8 @@ class ThemeResearchTests(unittest.TestCase):
         def fetch(path, params, expected):
             if path == theme.THEME_LIST_PATH:
                 return [category(1, 'AI')] if params['startIdx'] == 0 else []
-            if params['startIdx'] == 0:
-                return [stock('000001'), stock('000002')]
-            return []
+            return {'hasNext': False, 'cursor': None,
+                    'items': [stock('000001'), stock('000002')]}
         membership = theme.collect_theme_membership(fetch, self.CLOCK)
         result = theme.analyze_dynamic_themes(
             membership,
