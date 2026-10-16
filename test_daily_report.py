@@ -423,7 +423,7 @@ class DailyReportTests(unittest.TestCase):
                     "regularSession": {"status": "CONFIRMED", "price": 99,
                                        "priceVsMA20": "below", "breakout20": "failed"},
                 }]},
-                "research.json": {"stocks": []},
+                "research.json": {"stocks": [{"itemCode": "000999", "status": "OK", "rankingEligible": True}]},
             }
             for name, payload in files.items():
                 (root / name).write_text(json.dumps(payload), encoding="utf-8")
@@ -445,6 +445,7 @@ class DailyReportTests(unittest.TestCase):
                 "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY",
             )
             self.assertEqual(report["nextSessionCandidates"]["asOf"], "2026-10-06")
+            self.assertEqual(report["coverage"]["researchStockCount"], 0)
 
     def test_research_summary_requires_ranking_eligible_for_active_stocks(self):
         rows = [
