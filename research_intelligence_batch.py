@@ -53,6 +53,20 @@ def load_universe():
     return stocks
 
 
+def prune_stale_stock_outputs(output_dir, stocks):
+    """Remove per-stock outputs no longer present in the enabled universe."""
+    expected_codes = {
+        str(stock.get("itemCode"))
+        for stock in stocks
+        if stock.get("itemCode")
+    }
+    for path in output_dir.glob("*.json"):
+        if path.name == "latest.json":
+            continue
+        if path.stem not in expected_codes:
+            path.unlink()
+
+
 def revision_summary(reports):
     revisions = []
 
@@ -393,6 +407,8 @@ def main():
                 ensure_ascii=False,
                 indent=2,
             )
+
+    prune_stale_stock_outputs(output_dir, stocks)
 
     status_counts = {}
 
