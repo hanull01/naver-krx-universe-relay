@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "status": "AVAILABLE",
+  "monitoringDate": "2026-10-16",
+  "candidateSourceSha256": "42f7d9303b9d1810e889593e89e5378a9ac54dcd20796da40dfdd69bcc157d15",
+  "marketSourceTime": "2026-10-15T10:27:21.119354+09:00",
+  "generatedAt": "2026-10-15T23:37:24.737305+09:00",
+  "source": "NAVER_KRX",
+  "requestedCount": 1,
+  "quoteCount": 1,
+  "missingSymbols": [],
+  "errors": [],
+  "datas": [
+    {
+      "itemCode": "251340",
+      "stockName": "KODEX 코스닥150선물인버스",
+      "closePrice": 2610,
+      "fluctuationsRatio": 8.52,
+      "accumulatedTradingVolume": 46371473,
+      "accumulatedTradingValue": 120503000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-10-15T15:30:00+09:00",
+      "marketStatus": "CLOSE",
+      "session": "CLOSED",
+      "priceBasis": "AFTER_MARKET_FINAL",
+      "fresh": false,
+      "status": "stale"
+    }
+  ]
+}
