@@ -38,6 +38,28 @@ class DynamicUniverseSyncTests(unittest.TestCase):
             with self.assertRaisesRegex(sync.SyncError, "PUBLISHED_RESULT_NOT_NEWER"):
                 sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", state, now="2026-10-13T07:00:00+00:00")
 
+    def test_commit_changed_but_payload_same_is_noop(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d); f = self.files(commit="a" * 40)
+            sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", root / "state.json", now="2026-10-13T06:00:00+00:00")
+            f["data/dynamic-universe/latest.json"] = (f["data/dynamic-universe/latest.json"][0], "b" * 40)
+            f["data/dynamic-universe/history.json"] = (f["data/dynamic-universe/history.json"][0], "b" * 40)
+            result = sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", root / "state.json", now="2026-10-13T06:00:00+00:00")
+            self.assertEqual(result["status"], "NOOP")
+            self.assertEqual(result["appliedCommit"], "a" * 40)
+            self.assertEqual(json.loads((root / "state.json").read_text())["commit"], "a" * 40)
+
+    def test_same_generated_at_with_different_payload_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d); f = self.files(commit="a" * 40)
+            sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", root / "state.json", now="2026-10-13T06:00:00+00:00")
+            changed = payload(); changed["collectionCodes"] = ["000660"]
+            changed["memberships"] = [{"code": "000660"}]
+            f["data/dynamic-universe/latest.json"] = (json.dumps(changed).encode(), "b" * 40)
+            f["data/dynamic-universe/history.json"] = (f["data/dynamic-universe/history.json"][0], "b" * 40)
+            with self.assertRaisesRegex(sync.SyncError, "PUBLISHED_RESULT_HASH_MISMATCH"):
+                sync.sync(lambda p: f[p], root / "latest.json", root / "history.json", root / "state.json", now="2026-10-13T06:00:00+00:00")
+
     def test_stale_corrupt_and_invalid_codes_are_rejected(self):
         for mutate, error in ((lambda x: x.update(generatedAt="2026-10-01T00:00:00+00:00"), "PUBLISHED_RESULT_STALE"),
                               (lambda x: x.update(collectionCodes=["bad"]), "COLLECTION_CODE_INVALID")):

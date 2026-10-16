@@ -221,7 +221,7 @@ def sync_after_login():
             result = background_sync.run_result(["--root", str(ROOT), "--ref", "main"])
             saved = _saved_sync_state()
             _sync_state = {"status": result.get("status", "COMPLETED"), "result": result,
-                           "lastAppliedCommit": result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
+                           "lastAppliedCommit": result.get("appliedCommit") or result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
                            "lastAppliedGeneratedAt": result.get("generatedAt") or saved.get("generatedAt") or _last_sync.get("generatedAt"),
                            "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256")}
         except Exception as exc:
