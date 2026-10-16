@@ -3,6 +3,7 @@ import argparse
 import json
 import sys
 import time
+import statistics
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -65,9 +66,25 @@ def main(argv=None):
                 'quality': {'sourceStatus': 'OK', 'paginationValidated': True,
                             'duplicateMemberships': 0, 'requestCount': calls,
                             'elapsedSeconds': round(time.monotonic() - started, 3)}}
+    latencies = snapshot.get('collectionMetrics', {}).get('latencies', [])
+    if latencies:
+        ordered = sorted(latencies)
+        def percentile(p):
+            return ordered[min(len(ordered) - 1, round((len(ordered) - 1) * p))]
+        snapshot['quality']['requestLatencySeconds'] = {
+            'average': round(statistics.fmean(latencies), 4),
+            'p50': round(percentile(0.50), 4),
+            'p95': round(percentile(0.95), 4),
+            'max': round(max(latencies), 4),
+        }
+    snapshot['quality']['marketRequestCounts'] = (
+        snapshot.get('collectionMetrics', {}).get('marketRequests', {}))
+    snapshot['quality']['themeRequestCounts'] = (
+        snapshot.get('collectionMetrics', {}).get('themeRequests', {}))
     naver_market.atomic_write(output, snapshot)
     print(json.dumps({'status': 'OK', 'themeCount': snapshot['themeCount'],
-                      'membershipCount': snapshot['membershipCount']}, ensure_ascii=False))
+                      'membershipCount': snapshot['membershipCount'],
+                      'quality': snapshot['quality']}, ensure_ascii=False))
     return 0
 
 

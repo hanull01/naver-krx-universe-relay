@@ -6,6 +6,7 @@ complete, non-repeating termination condition.
 """
 from collections import defaultdict
 import json
+import time
 from pathlib import Path
 
 import naver_market as market
@@ -292,7 +293,8 @@ def collect_themes(fetcher=market.fetch_json, clock=market.generated_at,
 
 def collect_theme_members(theme_id, fetcher=market.fetch_json,
                           clock=market.generated_at,
-                          max_pages=market.MAX_MEMBER_PAGES):
+                          max_pages=market.MAX_MEMBER_PAGES,
+                          metrics=None):
     """Collect one theme's members with duplicate and incomplete detection."""
     members, seen_codes = [], set()
     error = None
@@ -311,7 +313,20 @@ def collect_theme_members(theme_id, fetcher=market.fetch_json,
                           'size': market.PAGE_SIZE}
                 if cursor:
                     params['cursor'] = cursor
-                payload = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), params, dict)
+                request_started = time.monotonic()
+                try:
+                    payload = fetcher(THEME_MEMBER_PATH.format(theme_id=theme_id), params, dict)
+                except Exception:
+                    if metrics is not None:
+                        metrics['errors'] = metrics.get('errors', 0) + 1
+                    raise
+                finally:
+                    if metrics is not None:
+                        elapsed = time.monotonic() - request_started
+                        metrics.setdefault('latencies', []).append(elapsed)
+                        metrics['requests'] = metrics.get('requests', 0) + 1
+                        metrics.setdefault('marketRequests', {}).setdefault(market_type, 0)
+                        metrics['marketRequests'][market_type] += 1
                 pages_fetched += 1
                 if isinstance(payload, list):
                     # Compatibility for existing isolated fixtures; live NAVER
@@ -407,8 +422,25 @@ def collect_theme_membership_for_list(themes, fetcher=market.fetch_json,
     fetches each membership page and fails closed on incomplete membership.
     """
     rows, by_code = [], defaultdict(list)
+    metrics = {'requests': 0, 'errors': 0, 'latencies': [],
+               'marketRequests': {'KOSPI': 0, 'KOSDAQ': 0},
+               'themeRequests': {}}
     for theme in themes:
-        members = collect_theme_members(theme['id'], fetcher, clock)
+        theme_metrics = {'requests': 0, 'errors': 0, 'latencies': [],
+                         'marketRequests': {'KOSPI': 0, 'KOSDAQ': 0}}
+        members = collect_theme_members(theme['id'], fetcher, clock,
+                                        metrics=theme_metrics)
+        metrics['themeRequests'][str(theme['id'])] = {
+            'requests': theme_metrics['requests'],
+            'errors': theme_metrics['errors'],
+            'pages': members['pagination']['pagesFetched'],
+            'status': members['status'],
+        }
+        metrics['requests'] += theme_metrics['requests']
+        metrics['errors'] += theme_metrics['errors']
+        metrics['latencies'].extend(theme_metrics['latencies'])
+        for market_type in metrics['marketRequests']:
+            metrics['marketRequests'][market_type] += theme_metrics['marketRequests'][market_type]
         row = {'id': str(theme['id']), 'name': theme['name'],
                'status': members['status'], 'memberCount': members['count'],
                'pagination': members['pagination'],
@@ -423,7 +455,8 @@ def collect_theme_membership_for_list(themes, fetcher=market.fetch_json,
             'researchGate': 'PENDING_LIVE_MEMBERSHIP_CONFIRMATION',
             'themeCount': len(rows),
             'membershipCount': sum(row['memberCount'] for row in rows),
-            'themes': rows, 'byCode': dict(by_code)}
+            'themes': rows, 'byCode': dict(by_code),
+            'collectionMetrics': metrics}
 
 
 def analyze_dynamic_themes(membership, quotes=None, technicals=None,
