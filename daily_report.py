@@ -732,9 +732,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     quote_idx = index_rows(quotes)
     tech_idx = index_rows(technicals)
     state_idx = index_rows(states)
-    research_idx = research_index(research)
-
     enabled = enabled_universe(universe)
+    # Research intelligence is a snapshot keyed by item code.  It can outlive
+    # a user's enabled universe, so only active configured items count toward
+    # this report's current research coverage.  Stale per-stock research is
+    # not promoted back into the active universe by the report builder.
+    enabled_codes = {str(item["itemCode"]) for item in enabled}
+    research_idx = {
+        code: row for code, row in research_index(research).items()
+        if code in enabled_codes
+    }
     member_idx = memberships(universe)
 
     rows = []
