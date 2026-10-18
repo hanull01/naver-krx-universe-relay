@@ -33,6 +33,10 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)
         self.assertIn('nowKst=', self.text)
 
+    def test_workflow_run_publishes_provisional_state_only(self):
+        self.assertIn("github.event_name }}\" = \"workflow_run\"", self.text)
+        self.assertIn('extra+=(--provisional)', self.text)
+
     def test_publish_stages_only_atomic_lifecycle_artifacts_without_force_push(self):
         for path in ('data/market-universe/all-assets.json', 'data/monitoring-daily/kospi.json',
                      'data/monitoring-daily/kosdaq.json', 'data/monitoring-daily/universe-lifecycle.json',

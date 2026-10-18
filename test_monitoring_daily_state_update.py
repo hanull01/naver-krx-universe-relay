@@ -77,6 +77,18 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         result, changed = update.update_state(state, update.normalize_daily_rows(self._rows(target, 999, 1000, 1), target), target, self.universe)
         self.assertTrue(changed); self.assertEqual("FINAL", result["KOSPI"]["publicationStatus"])
 
+    def test_provisional_write_keeps_baseline_unchanged(self):
+        baseline_path = self.root / "baseline.json"
+        baseline_path.write_text('{"asOfDate":"20260101","historyStatus":"OK"}\n', encoding="utf-8")
+        state = update.load_state(self.state_dir, self.universe)
+        incoming = update.normalize_daily_rows(self._rows("20260102"), "20260102")
+        with patch.object(update, "baseline_from_state", return_value={"asOfDate": "20260102"}):
+            result = update.update_from_rows(state, incoming, self.state_dir, "20260102",
+                                             self.universe, baseline_path, provisional=True)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual("PROVISIONAL", json.loads((self.state_dir / "kospi.json").read_text())["publicationStatus"])
+        self.assertEqual('{"asOfDate":"20260101","historyStatus":"OK"}\n', baseline_path.read_text())
+
     def test_missing_and_duplicate_are_blocked(self):
         state = update.load_state(self.state_dir, self.universe)
         with self.assertRaisesRegex(ValueError, "duplicate daily code"):
