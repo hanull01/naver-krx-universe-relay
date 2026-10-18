@@ -78,6 +78,7 @@ def fetch_factory(repository=DEFAULT_REPOSITORY, ref="main", run_id=None, starte
             _log(run_id, event, started, stage, "FAILED", _error_code(exc, stage), type(exc).__name__)
             raise
 
+    fetch.commit = commit
     return fetch
 
 
@@ -95,8 +96,24 @@ def run_result(argv=None):
     target = root / "data" / "dynamic-universe"
     target.mkdir(parents=True, exist_ok=True)
     try:
-        result = syncer.sync(fetch_factory(args.repository, args.ref, run_id, started), target / "latest.json",
-                             target / "history.json", target / ".sync-state.json", now=args.now)
+        fetch = fetch_factory(args.repository, args.ref, run_id, started)
+        state_path = target / ".sync-state.json"
+        try:
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            state = {}
+        if (state.get("commit") == getattr(fetch, "commit", None)
+                and (target / "latest.json").is_file()
+                and (target / "history.json").is_file()):
+            result = {"status": "NOOP", "commit": state.get("commit"),
+                      "generatedAt": state.get("generatedAt"),
+                      "appliedCommit": state.get("commit"),
+                      "sourceCommit": getattr(fetch, "commit", None)}
+            _log(run_id, "validation_result", started, "commit_check", "NOOP",
+                 details={"source_commit": result.get("commit"), "artifact_fetch_skipped": True})
+            _log(run_id, "sync_finished", started, "finished", "NOOP")
+            return {**result, "run_id": run_id}
+        result = syncer.sync(fetch, target / "latest.json", target / "history.json", state_path, now=args.now)
         _log(run_id, "validation_result", started, "validation", "OK", details={"source_commit": result.get("commit"), "collectionCount": result.get("collectionCount")})
         _log(run_id, "persistence_result", started, "persistence", result.get("status", "UNKNOWN"))
         _log(run_id, "sync_finished", started, "finished", result.get("status", "UNKNOWN"))
