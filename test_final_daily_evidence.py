@@ -12,13 +12,15 @@ def row(code="000001", **extra):
 
 
 class FinalDailyEvidenceTests(unittest.TestCase):
-    def test_after_20_without_terminal_marker_stays_unknown(self):
+    def test_after_20_without_terminal_marker_is_official_candidate(self):
         result = validate_snapshot({"tradingDate": "20261019",
                                     "generatedAt": "2026-10-19T20:30:00+09:00",
                                     "stocks": [row()]},
                                    {"asOfDate": "20261019", "historyStatus": "OK"})
         self.assertEqual(result["status"], "PASS_WITH_UNKNOWN_FINALITY")
-        self.assertFalse(result["finalEligible"])
+        self.assertTrue(result["finalEligible"])
+        self.assertEqual(result["sessionStatus"], "NAVER_OFFICIAL_POST_20")
+        self.assertEqual(result["finalityPolicy"], "NAVER_OFFICIAL_POST_20_CANDIDATE")
         self.assertEqual(result["networkCalls"], 0)
 
     def test_terminal_marker_can_be_reported_but_not_inferred(self):
@@ -47,6 +49,15 @@ class FinalDailyEvidenceTests(unittest.TestCase):
                                     "stocks": [row(highPrice=None, marketStatus="CLOSED")]})
         self.assertFalse(result["finalEligible"])
         self.assertIn("OHLCV_PRICE_INVALID:000001", result["errors"])
+
+    def test_etf_and_etn_use_regular_session_policy_without_after_market_marker(self):
+        result = validate_snapshot({"tradingDate": "20261019",
+                                    "generatedAt": "2026-10-19T20:30:00+09:00",
+                                    "stocks": [row("ETF1", assetType="ETF"),
+                                               row("ETN1", assetType="ETN")]},
+                                   {"asOfDate": "20261019", "historyStatus": "OK"})
+        self.assertTrue(result["finalEligible"])
+        self.assertEqual(result["finalityPolicy"], "NAVER_OFFICIAL_POST_20_CANDIDATE")
 
 
 if __name__ == "__main__":
