@@ -26,6 +26,9 @@ FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 MARKET_INDICES_PATH = DATA / "market" / "indices.json"
 DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
+V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
+V2_SHADOW_HISTORY_PATH = DATA / "dynamic-universe" / "v2-shadow-history.json"
+V2_SHADOW_STATUS_PATH = DATA / "dynamic-universe" / "v2-shadow-run-status.json"
 PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
     "latest-breadth.json",
@@ -117,6 +120,74 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "changes": payloads["latest-changes.json"],
         "monitoredUniverse": summary.get("monitoredUniverse", {}),
         "marketTradingValue": payloads["latest-breadth.json"].get("fullMarket", {}).get("marketTradingValue", {}),
+    }
+
+
+def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shadow_status):
+    """Build a report-only comparison; never changes V1 or watchlist data."""
+    v1_sectors = dynamic_universe.get("sectors") or []
+    v1_themes = dynamic_universe.get("themes") or []
+    v2_industries = shadow_latest.get("industries") or []
+    v2_themes = shadow_latest.get("themes") or []
+
+    def distribution(rows, field):
+        result = {}
+        for row in rows:
+            value = row.get(field) or "UNKNOWN"
+            result[value] = result.get(value, 0) + 1
+        return result
+
+    def evidence(row):
+        components = row.get("components") or {}
+        statuses = row.get("componentStatus") or {}
+        return {
+            "relativeStrength": {"value": components.get("priceRelativeStrength"), "status": statuses.get("priceRelativeStrength", "WAIT")},
+            "breadth": {"value": components.get("breadth"), "status": statuses.get("breadth", "WAIT")},
+            "ma20AboveRatio": {"value": row.get("ma20AboveRatio"), "status": row.get("ma20Status", "WAIT")},
+            "turnoverParticipation": {"value": components.get("turnoverParticipation"), "status": statuses.get("turnoverParticipation", "WAIT")},
+            "persistence": {"value": components.get("persistence"), "status": statuses.get("persistence", "WAIT"), "observedDays": row.get("persistenceDays", 0)},
+        }
+
+    def rows(items):
+        return [{
+            "id": row.get("id"), "name": row.get("name"),
+            "v1Status": row.get("v1Status"), "v2Status": row.get("v2Status"),
+            "score": row.get("score"), "criteria": evidence(row),
+            "reason": row.get("watchReasons") or row.get("missingComponents") or [],
+            "dataQuality": row.get("dataQuality", "UNAVAILABLE"),
+            "sourceTradingDate": row.get("sourceTradingDate") or shadow_status.get("tradingDate"),
+            "sourceGeneratedAt": shadow_latest.get("generatedAt"),
+            "watchEligible": row.get("watchEligible"), "watchRank": row.get("watchRank"),
+        } for row in items]
+
+    observations = shadow_history.get("observations") or []
+    unique_dates = sorted({str(row.get("tradingDate")) for row in observations if row.get("tradingDate")})
+    leader_codes = {str(row.get("code")) for row in dynamic_universe.get("leaders", []) if row.get("code")}
+    watchlists = dynamic_universe.get("userWatchlists")
+    watchlist_rows = watchlists.get("stocks", []) if isinstance(watchlists, dict) else []
+    user_codes = {str(row.get("code")) for row in watchlist_rows if isinstance(row, dict) and row.get("code")}
+    return {
+        "asOf": shadow_status.get("tradingDate") or shadow_latest.get("tradingDate"),
+        "sourceGeneratedAt": shadow_latest.get("generatedAt"),
+        "source": "data/dynamic-universe/v2-shadow-latest.json",
+        "v1": {
+            "sectors": {"total": len(v1_sectors), "statusCounts": distribution(v1_sectors, "status")},
+            "themes": {"total": len(v1_themes), "statusCounts": distribution(v1_themes, "status")},
+            "leaders": {"count": len(dynamic_universe.get("leaders", [])), "codes": sorted(leader_codes)},
+        },
+        "v2Shadow": {
+            "experimental": True,
+            "industries": {"total": len(v2_industries), "statusCounts": distribution(v2_industries, "v2Status"), "rows": rows(v2_industries)},
+            "themes": {"total": len(v2_themes), "statusCounts": distribution(v2_themes, "v2Status"), "rows": rows(v2_themes)},
+            "history": {"recordCount": len(observations), "uniqueTradingDates": unique_dates, "status": shadow_status.get("status", "UNAVAILABLE")},
+            "note": "V2 Shadow는 실험적 분석이며 V1 선정·관심종목·매매 판단을 변경하지 않습니다.",
+        },
+        "observationSources": {
+            "postedLeaders": len(leader_codes),
+            "userWatchlistCodes": sorted(user_codes),
+            "uiObservationCount": None,
+            "unresolvedDifference": "UI 관찰종목 28개 원천은 이 리포트 입력에 포함되지 않아 코드 기준 추가 1개를 확정할 수 없음",
+        },
     }
 
 
@@ -724,6 +795,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         dynamic_universe = load_json(DYNAMIC_UNIVERSE_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
         dynamic_universe = {"status": "UNAVAILABLE", "reason": "MISSING_DYNAMIC_UNIVERSE_SNAPSHOT", "themes": [], "leaders": []}
+    def optional_json(path, default):
+        try:
+            return load_json(path)
+        except (OSError, ValueError, json.JSONDecodeError):
+            return default
+    shadow_latest = optional_json(V2_SHADOW_LATEST_PATH, {})
+    shadow_history = optional_json(V2_SHADOW_HISTORY_PATH, {})
+    shadow_status = optional_json(V2_SHADOW_STATUS_PATH, {})
 
     group_states = {}
     if GROUP_STATES_PATH.exists():
@@ -1063,6 +1142,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "themeAnalysis": theme_analysis,
             "source": "GITHUB_DYNAMIC_UNIVERSE",
         },
+        "v1V2Analysis": shadow_v1_v2_analysis(
+            dynamic_universe, shadow_latest, shadow_history, shadow_status
+        ),
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
         "technicalEventsCurrent": technical_events(rows, "currentState"),
@@ -1150,6 +1232,26 @@ def write_markdown(report, path):
             lines.append(f"- {theme.get('name') or theme.get('id')}: 상태 {theme.get('status', '확인 불가')}")
     else:
         lines.append("- 검증된 동적 테마: 현재 선정 없음")
+
+    comparison = report.get("v1V2Analysis") or {}
+    v1 = comparison.get("v1") or {}
+    v2 = comparison.get("v2Shadow") or {}
+    lines.extend(["", "<details>", "<summary>V1 운영 선정과 V2 Shadow 판정 근거</summary>", ""])
+    lines.append("- V1: 운영 선정 결과입니다. V2 결과와 섞지 않습니다.")
+    lines.append("- V2: 실험적 주도성 분석이며 관심종목·매매 판단을 변경하지 않습니다.")
+    lines.append(f"- V1 업종: {v1.get('sectors', {}).get('total', 0)}개, 상태 {v1.get('sectors', {}).get('statusCounts', {})}")
+    lines.append(f"- V1 테마: {v1.get('themes', {}).get('total', 0)}개, 상태 {v1.get('themes', {}).get('statusCounts', {})}")
+    lines.append(f"- V2 업종: {v2.get('industries', {}).get('total', 0)}개, 상태 {v2.get('industries', {}).get('statusCounts', {})}")
+    lines.append(f"- V2 테마: {v2.get('themes', {}).get('total', 0)}개, 상태 {v2.get('themes', {}).get('statusCounts', {})}")
+    lines.append(f"- V2 관측 거래일: {', '.join(v2.get('history', {}).get('uniqueTradingDates', [])) or '확인 불가'}; 지속성은 자료 부족 시 WAIT/PARTIAL")
+    lines.append("- V2 판정 근거: 상대강도·상승 확산·MA20·거래대금·지속성의 실제값과 각 항목 상태를 원본 그대로 표시합니다.")
+    lines.append("- V2 세부 근거는 생성된 JSON의 `v1V2Analysis.v2Shadow.*.rows`에서 확인할 수 있습니다.")
+    lines.append("</details>")
+
+    sources = comparison.get("observationSources") or {}
+    lines.extend(["", "### 관찰 종목 출처", "", f"- 게시 주도주: {sources.get('postedLeaders', 0)}개"])
+    if sources.get("uiObservationCount") is None:
+        lines.append(f"- UI 관찰 종목 차이: {sources.get('unresolvedDifference')}")
 
     lines.extend(["", "### 등락 상위", ""])
 

@@ -8,6 +8,30 @@ import daily_report
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_shadow_comparison_keeps_v1_and_v2_separate(self):
+        dynamic = {
+            "sectors": [{"id": "s1", "status": "ACTIVE"}],
+            "themes": [{"id": "t1", "status": "ACTIVE"}, {"id": "t2", "status": "REMOVED"}],
+            "leaders": [{"code": "005930"}],
+        }
+        shadow = {"generatedAt": "2026-10-16T12:00:00+09:00", "industries": [], "themes": [{
+            "id": "t1", "name": "테마", "v1Status": "ACTIVE", "v2Status": "WATCH",
+            "score": 61.5, "components": {"breadth": 80},
+            "componentStatus": {"breadth": "VALID", "persistence": "PARTIAL"},
+            "persistenceDays": 1, "dataQuality": "PARTIAL",
+        }]}
+        got = daily_report.shadow_v1_v2_analysis(dynamic, shadow, {"observations": []}, {"tradingDate": "2026-10-16"})
+        self.assertEqual(got["v1"]["themes"]["statusCounts"], {"ACTIVE": 1, "REMOVED": 1})
+        self.assertEqual(got["v2Shadow"]["themes"]["statusCounts"], {"WATCH": 1})
+        self.assertEqual(got["v2Shadow"]["themes"]["rows"][0]["criteria"]["persistence"]["status"], "PARTIAL")
+
+    def test_shadow_history_without_source_dates_stays_partial(self):
+        got = daily_report.shadow_v1_v2_analysis({}, {"industries": [], "themes": []}, {
+            "observations": [{"tradingDate": "2026-10-16"}]
+        }, {"status": "OK", "tradingDate": "2026-10-16"})
+        self.assertEqual(got["v2Shadow"]["history"]["uniqueTradingDates"], ["2026-10-16"])
+        self.assertEqual(got["observationSources"]["uiObservationCount"], None)
+
     def test_full_market_evidence_requires_final_same_day_complete_set(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
