@@ -95,6 +95,7 @@ jobs:
           target_date='${{ steps.closing_window.outputs.target_date }}'
           extra=()
           if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then extra+=(--provisional); fi
           now_kst=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat())')
           echo "Full-market daily collection: targetDate=${target_date}, nowKst=${now_kst}"
           python tools/build_monitoring_daily_state.py update-latest \
