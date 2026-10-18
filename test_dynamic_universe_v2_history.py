@@ -35,6 +35,16 @@ class DynamicUniverseV2HistoryTests(unittest.TestCase):
         history = append_observation(history, make_observation(result("b"), "2026-10-16", "2026-10-16T01:00:00Z"))
         self.assertEqual(evaluate_horizons(history)[0]["status"], "NO_ELIGIBLE_BASE_ITEMS")
 
+    def test_source_date_mismatch_is_excluded_from_horizons(self):
+        history = {}
+        bad = make_observation(result("2026-10-16T12:00:00+00:00"), "2026-10-15")
+        good = make_observation(result("2026-10-17T12:00:00+00:00"), "2026-10-17")
+        history = append_observation(history, bad)
+        history = append_observation(history, good)
+        self.assertEqual(bad["dateQuality"], "MISMATCH")
+        self.assertEqual(unique_trading_dates(history), ["2026-10-17"])
+        self.assertEqual(evaluate_horizons(history), [])
+
 
 if __name__ == "__main__":
     unittest.main()
