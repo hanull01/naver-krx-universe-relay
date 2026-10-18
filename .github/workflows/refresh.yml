@@ -245,7 +245,9 @@ jobs:
           python tools/build_monitoring_daily_state.py update-latest \
             --daily-input "$RUNNER_TEMP/final-daily-monitoring-input.json" \
             --date "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tradingDate"])' "$RUNNER_TEMP/full-market-current.json")" \
-            --no-write
+            > "$RUNNER_TEMP/final-daily-monitoring-result.json"
+          cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
+          echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Collect market indices
         id: indices
@@ -339,6 +341,15 @@ jobs:
               data/dynamic-universe/history.json
           else
             echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
+          fi
+
+          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
+            git add \
+              data/monitoring-daily/kospi.json \
+              data/monitoring-daily/kosdaq.json \
+              data/monitoring-baseline/latest.json
+          else
+            echo "Final daily history not eligible for publish; preserving prior monitoring-daily files."
           fi
 
           if [ "${{ steps.discovery_quotes.outputs.exit_code }}" = "0" ]; then
