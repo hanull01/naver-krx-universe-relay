@@ -19,6 +19,7 @@ DEFAULT_CONFIG = ROOT / "config" / "universe.json"
 DEFAULT_DYNAMIC_RESULT = ROOT / "data" / "dynamic-universe" / "latest.json"
 DEFAULT_DYNAMIC_HISTORY = ROOT / "data" / "dynamic-universe" / "history.json"
 _sync_lock = threading.Lock()
+_AUTO_SYNC_INTERVAL_SECONDS = max(60, int(os.environ.get("UNIVERSE_AUTO_SYNC_INTERVAL_SECONDS", str(20 * 60))))
 def _saved_sync_state():
     try:
         value = json.loads((ROOT / "data" / "dynamic-universe" / ".sync-state.json").read_text(encoding="utf-8"))
@@ -31,7 +32,8 @@ _last_sync = _saved_sync_state()
 _sync_state = {"status": "NOT_STARTED", "result": None,
                "lastAppliedCommit": _last_sync.get("commit"),
                "lastAppliedGeneratedAt": _last_sync.get("generatedAt"),
-               "lastAppliedSha256": _last_sync.get("latestSha256")}
+               "lastAppliedSha256": _last_sync.get("latestSha256"),
+               "lastCheckedAt": None, "lastSuccessAt": None}
 
 def tailscale_ipv4(runner=None):
     """Legacy helper retained for diagnostics; Serve is the recommended path."""
@@ -206,31 +208,48 @@ class SessionAuth:
     def csrf_valid(self,t,v): return bool(self.csrf(t) and v and secrets.compare_digest(self.csrf(t),str(v)))
     def logout(self,t): self.sessions.pop(t or "",None)
 
-def sync_after_login():
-    """Start one non-blocking pull per process at the successful login boundary."""
+def _start_sync(source):
+    """Start one non-blocking pull, shared by login and periodic checks."""
     global _sync_state
     with _sync_lock:
         if _sync_state.get("status") == "RUNNING": return
+        previous_state = dict(_sync_state)
         _sync_state = {"status": "RUNNING", "result": None,
                        "lastAppliedCommit": _sync_state.get("lastAppliedCommit"),
                        "lastAppliedGeneratedAt": _sync_state.get("lastAppliedGeneratedAt"),
-                       "lastAppliedSha256": _sync_state.get("lastAppliedSha256")}
+                       "lastAppliedSha256": _sync_state.get("lastAppliedSha256"),
+                       "lastCheckedAt": _sync_state.get("lastCheckedAt"),
+                       "lastSuccessAt": _sync_state.get("lastSuccessAt"),
+                       "source": source}
     def worker():
         global _sync_state
+        checked_at = time.strftime("%Y-%m-%dT%H:%M:%S+00:00", time.gmtime())
         try:
             result = background_sync.run_result(["--root", str(ROOT), "--ref", "main"])
             saved = _saved_sync_state()
             _sync_state = {"status": result.get("status", "COMPLETED"), "result": result,
                            "lastAppliedCommit": result.get("appliedCommit") or result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
                            "lastAppliedGeneratedAt": result.get("generatedAt") or saved.get("generatedAt") or _last_sync.get("generatedAt"),
-                           "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256")}
+                           "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256"),
+                           "lastCheckedAt": checked_at, "lastSuccessAt": checked_at, "source": source}
         except Exception as exc:
             safe_error = str(exc) if isinstance(exc, sync_contract.SyncError) else type(exc).__name__
             _sync_state = {"status": "FAILED", "result": {"error": safe_error, "errorType": type(exc).__name__},
-                           "lastAppliedCommit": _last_sync.get("commit"),
-                           "lastAppliedGeneratedAt": _last_sync.get("generatedAt"),
-                           "lastAppliedSha256": _last_sync.get("latestSha256")}
+                           "lastAppliedCommit": previous_state.get("lastAppliedCommit"),
+                           "lastAppliedGeneratedAt": previous_state.get("lastAppliedGeneratedAt"),
+                           "lastAppliedSha256": previous_state.get("lastAppliedSha256"),
+                           "lastCheckedAt": checked_at, "lastSuccessAt": previous_state.get("lastSuccessAt"), "source": source}
     threading.Thread(target=worker, name="dynamic-universe-login-sync", daemon=True).start()
+
+def sync_after_login():
+    """Start one non-blocking pull at the successful login boundary."""
+    _start_sync("login")
+
+def periodic_sync_loop():
+    """Check published data without requiring a logged-in browser session."""
+    while True:
+        _start_sync("periodic")
+        time.sleep(_AUTO_SYNC_INTERVAL_SECONDS)
 
 def login_page(has_credential, recovery=False):
     if recovery:
@@ -344,6 +363,7 @@ def main(argv=None):
     service=WebAuthnService();required=a.require_auth or a.host!="127.0.0.1" or service.configured;pin=os.environ.get("UNIVERSE_WEB_PIN")
     if required and not pin:raise SystemExit("오류: 인증 운영에는 UNIVERSE_WEB_PIN이 bootstrap/복구용으로 필요합니다.")
     s=create_server(a.host,a.port,a.config,pin,required,service);print(f"로컬 접속: http://127.0.0.1:{a.port}");print("Passkey 운영: --show-tailscale-help")
+    threading.Thread(target=periodic_sync_loop, name="dynamic-universe-periodic-sync", daemon=True).start()
     try:s.serve_forever()
     except KeyboardInterrupt:pass
     finally:s.server_close()

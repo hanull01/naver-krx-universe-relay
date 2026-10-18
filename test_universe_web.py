@@ -1,6 +1,8 @@
 import io
 import json
 import tempfile
+import time
+import threading
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -112,6 +114,34 @@ class UniverseWebTests(unittest.TestCase):
         self.assertIn("Universe Manager 사용방법", universe_web.HELP_HTML)
         self.assertIn("종목 관리", universe_web.HTML)
         self.assertIn("변경 미리보기", universe_web.HTML)
+
+    def test_periodic_and_login_sync_share_single_inflight_run(self):
+        previous = dict(universe_web._sync_state)
+        calls = []
+        started = threading.Event()
+        release = threading.Event()
+        try:
+            universe_web._sync_state = {"status": "NOT_STARTED", "result": None,
+                                       "lastAppliedCommit": "old", "lastAppliedGeneratedAt": "old",
+                                       "lastAppliedSha256": "sha", "lastCheckedAt": None,
+                                       "lastSuccessAt": None}
+            def fake_sync(args):
+                calls.append(args); started.set(); release.wait(2)
+                return {"status": "NOOP", "commit": "new", "generatedAt": "now"}
+            with patch.object(universe_web.background_sync, "run_result", side_effect=fake_sync):
+                universe_web._start_sync("periodic")
+                self.assertTrue(started.wait(1))
+                universe_web.sync_after_login()
+                self.assertEqual(len(calls), 1)
+                release.set()
+                deadline = time.time() + 2
+                while universe_web._sync_state.get("status") == "RUNNING" and time.time() < deadline:
+                    time.sleep(0.01)
+                self.assertEqual(universe_web._sync_state["status"], "NOOP")
+                self.assertEqual(universe_web._sync_state["source"], "periodic")
+                self.assertIsNotNone(universe_web._sync_state["lastCheckedAt"])
+        finally:
+            universe_web._sync_state = previous
 
     def test_stock_search_exact_prefix_partial_and_code(self):
         for query in ("삼성전자", "삼성", "전자", "005930"):
