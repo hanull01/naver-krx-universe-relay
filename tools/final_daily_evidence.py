@@ -2,8 +2,9 @@
 
 This module never fetches data or writes operating daily/baseline files.  It
 only evaluates a supplied snapshot and existing baseline for a possible same-
-day daily-bar observation.  Session finality is deliberately UNKNOWN unless
-the source explicitly provides a recognized terminal marker.
+day daily-bar observation.  NAVER's official post-20:00 definition allows a
+candidate final trade without a terminal marker; this module still never
+writes history or promotes the operating FINAL store.
 """
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ from zoneinfo import ZoneInfo
 
 KST = ZoneInfo("Asia/Seoul")
 TERMINAL_MARKERS = {"CLOSED", "AFTER_MARKET_CLOSED", "FINAL"}
+OFFICIAL_POLICY = "NAVER_OFFICIAL_POST_20_CANDIDATE"
 
 
 def _date(value):
@@ -82,14 +84,20 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     markers |= {str(row.get("tradingSessionType") or "").upper() for row in rows}
     markers.discard("")
     terminal = bool(markers & TERMINAL_MARKERS)
-    session_status = "EXPLICIT_TERMINAL" if terminal else "UNKNOWN"
-    if not terminal:
+    official_candidate = not errors
+    if terminal:
+        session_status = "EXPLICIT_TERMINAL"
+    elif official_candidate:
+        session_status = "NAVER_OFFICIAL_POST_20"
+    else:
+        session_status = "UNKNOWN"
         warnings.append("SESSION_FINALITY_UNKNOWN")
 
     status = "PASS_WITH_UNKNOWN_FINALITY" if not errors else "UNUSABLE"
     return {
         "status": status,
-        "finalEligible": bool(not errors and terminal),
+        "finalEligible": bool(official_candidate),
+        "finalityPolicy": OFFICIAL_POLICY,
         "sessionStatus": session_status,
         "tradingDate": target,
         "generatedAt": generated,
@@ -115,7 +123,7 @@ def main(argv=None):
     result = validate_snapshot(snapshot, baseline, baseline.get("asOfDate"))
     print(json.dumps({key: result[key] for key in (
         "status", "tradingDate", "generatedAt", "rowCount", "expectedCount",
-        "sessionStatus", "finalEligible", "errors", "warnings", "networkCalls"
+        "sessionStatus", "finalEligible", "finalityPolicy", "errors", "warnings", "networkCalls"
     )}, ensure_ascii=False, sort_keys=True))
     return 0
 
