@@ -90,6 +90,9 @@ def sync(fetch, latest_path, history_path, state_path, now=None, max_age_seconds
         return {"status": "NOOP", **info}
     if state.get("generatedAt") == latest["generatedAt"]:
         if state.get("latestSha256") == latest_sha:
+            state = {**state, "lastVerifiedSourceCommit": latest_commit,
+                     "lastVerifiedAt": datetime.now(timezone.utc).isoformat()}
+            _atomic_write(state_path, state)
             return {"status": "NOOP", **info,
                     "appliedCommit": state.get("commit"),
                     "sourceCommit": latest_commit}
