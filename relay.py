@@ -730,7 +730,8 @@ def collect_daily(code):
     start = (current - timedelta(days=550)).strftime('%Y%m%d')
     url = DAILY_URL.format(code=code) + f'?startDateTime={start}&endDateTime={current:%Y%m%d}'
     payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
-               'source': 'NAVER_KRX', 'sourceUrl': url, 'status': 'error',
+               'source': 'NAVER_KRX', 'sourceUrl': url,
+               'publicationStatus': 'PROVISIONAL', 'status': 'error',
                'fresh': False, 'errors': [], 'count': 0, 'completedCount': 0, 'datas': []}
     try:
         response = fetch(url)
@@ -941,6 +942,7 @@ def collect_regular_daily(code, current=None):
     payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
                'source': VERIFIED_REGULAR_CLOSE_SOURCE, 'sourceUrl': url,
                'verification': VERIFIED_REGULAR_CLOSE_METHOD,
+               'publicationStatus': 'PROVISIONAL',
                'regularDailyStatus': 'unavailable',
                'status': 'unavailable', 'fresh': False, 'datas': [], 'errors': []}
     try:
@@ -1019,6 +1021,13 @@ def load_daily_for_technical(code, verified_bar=None):
     except (OSError, json.JSONDecodeError):
         return daily
     if regular.get('regularDailyStatus') != 'ok' or not isinstance(regular.get('datas'), list):
+        return daily
+    # The 16:35 collector is an observation only.  A regular-session bar
+    # becomes a usable FINAL override only after the 20:30 final path has
+    # published the authoritative monitoring-daily result.  Keep accepting
+    # legacy fixtures without this field, but never consume a newly written
+    # provisional payload as FINAL.
+    if regular.get('publicationStatus') == 'PROVISIONAL':
         return daily
     bars = [bar for bar in regular['datas'] if isinstance(bar, dict)
             and bar.get('complete') is True and bar.get('barType') == 'REGULAR_SESSION']
