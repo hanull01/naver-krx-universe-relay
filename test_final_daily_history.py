@@ -1,6 +1,7 @@
 import unittest
 
-from tools.final_daily_history import moving_averages, monitoring_daily_rows, reconcile_rows, snapshot_rows
+from tools.final_daily_history import (moving_averages, monitoring_daily_payload,
+                                       monitoring_daily_rows, reconcile_rows, snapshot_rows)
 
 
 def row(code="000001", assetType="STOCK", **extra):
@@ -17,6 +18,15 @@ def snapshot(rows, date="20261019"):
 
 
 class FinalDailyHistoryTests(unittest.TestCase):
+    def test_monitoring_payload_is_dry_run_and_requires_exact_stock_coverage(self):
+        rows = [row("S"), row("E", "ETF")]
+        result = monitoring_daily_payload(snapshot(rows), {"asOfDate": "20261019", "historyStatus": "OK"}, ["S", "E"])
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual([item["code"] for item in result["rows"]], ["S"])
+        self.assertEqual(result["excluded"][0]["assetType"], "ETF")
+        self.assertEqual(result["diagnostic"]["networkCalls"], 0)
+        self.assertNotIn("write", result)
+
     def test_monitoring_adapter_reuses_stock_schema_and_excludes_etf_etn(self):
         proposed = snapshot_rows(snapshot([row("S"), row("E", "ETF"), row("N", "ETN")]),
                                  {"asOfDate": "20261019", "historyStatus": "OK"})["rows"]

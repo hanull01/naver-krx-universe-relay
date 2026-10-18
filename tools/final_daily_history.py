@@ -109,3 +109,15 @@ def monitoring_daily_rows(proposed_rows):
                      "closeValid": True, "ohlcValid": True, "volumeValid": True})
     return {"rows": sorted(rows, key=lambda row: row["code"]), "excluded": excluded,
             "status": "READY" if rows else "WAIT"}
+
+
+def monitoring_daily_payload(snapshot, baseline=None, expected_codes=None):
+    """Build the existing update-latest input without writing or fetching."""
+    candidate = snapshot_rows(snapshot, baseline=baseline, expected_codes=expected_codes)
+    if candidate["status"] != "READY":
+        return {"status": "WAIT", "reason": candidate["reason"],
+                "diagnostic": candidate["diagnostic"], "rows": []}
+    adapted = monitoring_daily_rows(candidate["rows"])
+    return {"status": adapted["status"], "reason": [],
+            "diagnostic": candidate["diagnostic"], "excluded": adapted["excluded"],
+            "rows": adapted["rows"]}
