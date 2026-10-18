@@ -209,6 +209,17 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Diagnose final daily-bar evidence
+        id: final_daily_evidence
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && github.event_name == 'schedule' && github.event.schedule == '30 11 * * 1-5'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # Reuse the validated runner-temporary snapshot; never refetch quotes.
+          python tools/final_daily_evidence.py \
+            --snapshot "$RUNNER_TEMP/full-market-current.json" \
+            --baseline data/monitoring-baseline/latest.json
+
       - name: Collect market indices
         id: indices
         if: steps.market_day.outputs.run == 'true'

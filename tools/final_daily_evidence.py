@@ -1,0 +1,124 @@
+"""Read-only validation for a post-20:00 NAVER current snapshot.
+
+This module never fetches data or writes operating daily/baseline files.  It
+only evaluates a supplied snapshot and existing baseline for a possible same-
+day daily-bar observation.  Session finality is deliberately UNKNOWN unless
+the source explicitly provides a recognized terminal marker.
+"""
+from __future__ import annotations
+
+from datetime import datetime
+import argparse
+import json
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+KST = ZoneInfo("Asia/Seoul")
+TERMINAL_MARKERS = {"CLOSED", "AFTER_MARKET_CLOSED", "FINAL"}
+
+
+def _date(value):
+    text = str(value or "").replace("-", "")
+    return text if len(text) == 8 and text.isdigit() else None
+
+
+def _number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=None):
+    """Return deterministic diagnostics; no network or filesystem access."""
+    snapshot = snapshot if isinstance(snapshot, dict) else {}
+    rows = snapshot.get("stocks") or []
+    target = _date(target_date or snapshot.get("tradingDate") or snapshot.get("asOfDate"))
+    generated = snapshot.get("generatedAt")
+    errors, warnings = [], []
+    if not target:
+        errors.append("TRADING_DATE_MISSING")
+    if not generated:
+        errors.append("SNAPSHOT_TIME_MISSING")
+    else:
+        try:
+            instant = datetime.fromisoformat(str(generated).replace("Z", "+00:00")).astimezone(KST)
+            if instant.hour < 20:
+                errors.append("SNAPSHOT_BEFORE_20_KST")
+        except ValueError:
+            errors.append("SNAPSHOT_TIME_INVALID")
+
+    codes = [str(row.get("code") or "") for row in rows]
+    duplicates = sorted({code for code in codes if code and codes.count(code) > 1})
+    if duplicates:
+        errors.append("DUPLICATE_CODES")
+    if expected_codes is not None:
+        missing = sorted(set(map(str, expected_codes)) - set(codes))
+        extra = sorted(set(codes) - set(map(str, expected_codes)))
+        if missing:
+            errors.append("MISSING_CODES")
+        if extra:
+            errors.append("EXTRA_CODES")
+    else:
+        missing, extra = [], []
+    expected_count = snapshot.get("expectedCount")
+    if isinstance(expected_count, int) and len(rows) != expected_count:
+        errors.append("COVERAGE_MISMATCH")
+
+    for row in rows:
+        code = str(row.get("code") or "")
+        prices = [row.get(key) for key in ("openPrice", "highPrice", "lowPrice", "currentPrice")]
+        if not all(_number(value) and value >= 0 for value in prices):
+            errors.append(f"OHLCV_PRICE_INVALID:{code}")
+        if _number(row.get("accumulatedTradingVolume")) and row["accumulatedTradingVolume"] < 0:
+            errors.append(f"VOLUME_INVALID:{code}")
+        if _number(row.get("accumulatedTradingValue")) and row["accumulatedTradingValue"] < 0:
+            errors.append(f"VALUE_INVALID:{code}")
+
+    baseline_date = _date((baseline or {}).get("asOfDate"))
+    if baseline_date and target and baseline_date != target:
+        errors.append("BASELINE_DATE_MISMATCH")
+    if (baseline or {}).get("historyStatus") not in (None, "OK"):
+        errors.append("BASELINE_NOT_READY")
+
+    markers = {str(row.get("marketStatus") or "").upper() for row in rows}
+    markers |= {str(row.get("tradingSessionType") or "").upper() for row in rows}
+    markers.discard("")
+    terminal = bool(markers & TERMINAL_MARKERS)
+    session_status = "EXPLICIT_TERMINAL" if terminal else "UNKNOWN"
+    if not terminal:
+        warnings.append("SESSION_FINALITY_UNKNOWN")
+
+    status = "PASS_WITH_UNKNOWN_FINALITY" if not errors else "UNUSABLE"
+    return {
+        "status": status,
+        "finalEligible": bool(not errors and terminal),
+        "sessionStatus": session_status,
+        "tradingDate": target,
+        "generatedAt": generated,
+        "rowCount": len(rows),
+        "expectedCount": expected_count,
+        "duplicateCodes": duplicates,
+        "missingCodes": missing,
+        "extraCodes": extra,
+        "errors": sorted(set(errors)),
+        "warnings": sorted(set(warnings)),
+        "baselineDate": baseline_date,
+        "networkCalls": 0,
+    }
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--snapshot", required=True)
+    parser.add_argument("--baseline", required=True)
+    args = parser.parse_args(argv)
+    snapshot = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
+    baseline = json.loads(Path(args.baseline).read_text(encoding="utf-8"))
+    result = validate_snapshot(snapshot, baseline, baseline.get("asOfDate"))
+    print(json.dumps({key: result[key] for key in (
+        "status", "tradingDate", "generatedAt", "rowCount", "expectedCount",
+        "sessionStatus", "finalEligible", "errors", "warnings", "networkCalls"
+    )}, ensure_ascii=False, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
