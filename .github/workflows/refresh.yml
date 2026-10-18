@@ -220,6 +220,33 @@ jobs:
             --snapshot "$RUNNER_TEMP/full-market-current.json" \
             --baseline data/monitoring-baseline/latest.json
 
+      - name: Prepare final daily monitoring update (disabled by default)
+        id: final_daily_history
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && github.event_name == 'schedule' && github.event.schedule == '30 11 * * 1-5' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-monitoring-input.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          from tools.final_daily_history import monitoring_daily_payload
+          snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
+          universe = json.loads(Path("data/market-universe/all-assets.json").read_text(encoding="utf-8"))
+          expected = [str(row["code"]) for row in universe.get("assets", []) if row.get("assetType") == "STOCK"]
+          result = monitoring_daily_payload(snapshot, baseline, expected)
+          if result["status"] != "READY":
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + json.dumps(result["reason"], ensure_ascii=False))
+          Path(sys.argv[2]).write_text(json.dumps({"rows": result["rows"]}, ensure_ascii=False), encoding="utf-8")
+          print(json.dumps({"status": result["status"], "rows": len(result["rows"]),
+                            "excluded": len(result["excluded"]), "networkCalls": 0}, ensure_ascii=False))
+          PY
+          python tools/build_monitoring_daily_state.py update-latest \
+            --daily-input "$RUNNER_TEMP/final-daily-monitoring-input.json" \
+            --date "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tradingDate"])' "$RUNNER_TEMP/full-market-current.json")" \
+            --no-write
+
       - name: Collect market indices
         id: indices
         if: steps.market_day.outputs.run == 'true'
