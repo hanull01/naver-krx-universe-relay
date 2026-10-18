@@ -27,7 +27,7 @@ def _observation_id(result: Dict[str, Any], trading_date: str, observed_at: str)
 
 def make_observation(result: Dict[str, Any], trading_date: str, observed_at: Optional[str] = None) -> Dict[str, Any]:
     observed_at = observed_at or datetime.now(timezone.utc).isoformat()
-    return {
+    observation = {
         "observationId": _observation_id(result, trading_date, observed_at),
         "tradingDate": trading_date,
         "observedAt": observed_at,
@@ -38,6 +38,11 @@ def make_observation(result: Dict[str, Any], trading_date: str, observed_at: Opt
         "industries": result.get("industries", []),
         "themes": result.get("themes", []),
     }
+    generated = result.get("generatedAt")
+    if isinstance(generated, str) and len(generated) >= 10 and generated[4] == "-" and generated[7] == "-":
+        observation["sourceTradingDate"] = generated[:10]
+        observation["dateQuality"] = "VERIFIED" if trading_date == generated[:10] else "MISMATCH"
+    return observation
 
 
 def append_observation(history: Dict[str, Any], observation: Dict[str, Any]) -> Dict[str, Any]:
@@ -54,7 +59,8 @@ def append_observation(history: Dict[str, Any], observation: Dict[str, Any]) -> 
 
 
 def unique_trading_dates(history: Dict[str, Any]) -> List[str]:
-    return sorted({item.get("tradingDate") for item in history.get("observations", []) if item.get("tradingDate")})
+    return sorted({item.get("tradingDate") for item in history.get("observations", [])
+                   if item.get("tradingDate") and item.get("dateQuality") != "MISMATCH"})
 
 
 def evaluate_horizons(history: Dict[str, Any]) -> List[Dict[str, Any]]:

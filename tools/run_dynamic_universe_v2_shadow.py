@@ -22,12 +22,25 @@ except ModuleNotFoundError:  # direct `python tools/...py` invocation
     from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
 
 
-def run_once(root: Path, trading_date: str, observed_at: str | None = None) -> Dict[str, Any]:
+def _infer_trading_date(industry_payload: Dict[str, Any], theme_payload: Dict[str, Any]) -> str:
+    for row in theme_payload.get("themes", []):
+        for stock in row.get("stocks", []) if isinstance(row, dict) else []:
+            value = stock.get("temporaryCurrentBarDate") if isinstance(stock, dict) else None
+            if isinstance(value, str) and len(value) == 8 and value.isdigit():
+                return f"{value[:4]}-{value[4:6]}-{value[6:]}"
+    generated = industry_payload.get("generatedAt") or theme_payload.get("generatedAt")
+    if isinstance(generated, str) and len(generated) >= 10:
+        return generated[:10]
+    raise ValueError("TRADING_DATE_UNAVAILABLE")
+
+
+def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
     status_path = root / "data/dynamic-universe/v2-shadow-run-status.json"
     try:
         ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
         v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
+        trading_date = trading_date or _infer_trading_date(ind, theme)
         result = evaluate_snapshot(ind, theme, v1)
         result["summary"] = summarize(result)
         (root / "data/dynamic-universe/v2-shadow-latest.json").write_text(
@@ -47,4 +60,4 @@ def run_once(root: Path, trading_date: str, observed_at: str | None = None) -> D
 
 if __name__ == "__main__":
     root = Path(__file__).resolve().parents[1]
-    print(json.dumps(run_once(root, "2026-10-15"), ensure_ascii=False))
+    print(json.dumps(run_once(root, None), ensure_ascii=False))
