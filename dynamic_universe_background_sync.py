@@ -102,7 +102,8 @@ def run_result(argv=None):
             state = json.loads(state_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             state = {}
-        if (state.get("commit") == getattr(fetch, "commit", None)
+        verified_source_commit = state.get("lastVerifiedSourceCommit") or state.get("commit")
+        if (verified_source_commit == getattr(fetch, "commit", None)
                 and (target / "latest.json").is_file()
                 and (target / "history.json").is_file()):
             result = {"status": "NOOP", "commit": state.get("commit"),
@@ -110,7 +111,8 @@ def run_result(argv=None):
                       "appliedCommit": state.get("commit"),
                       "sourceCommit": getattr(fetch, "commit", None)}
             _log(run_id, "validation_result", started, "commit_check", "NOOP",
-                 details={"source_commit": result.get("commit"), "artifact_fetch_skipped": True})
+                 details={"source_commit": result.get("commit"), "verified_source_commit": verified_source_commit,
+                          "artifact_fetch_skipped": True})
             _log(run_id, "sync_finished", started, "finished", "NOOP")
             return {**result, "run_id": run_id}
         result = syncer.sync(fetch, target / "latest.json", target / "history.json", state_path, now=args.now)
