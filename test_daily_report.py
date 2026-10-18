@@ -8,6 +8,36 @@ import daily_report
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_resolve_report_trading_date_requires_matching_published_material(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "baselineAsOfDate": "20261016", "publicationStatus": "SUCCESS",
+                "generatedAt": "q",
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({
+                "asOfDate": "20261016", "historyStatus": "OK", "generatedAt": "b",
+            }), encoding="utf-8")
+            got = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(got["status"], "READY")
+            self.assertEqual(got["tradingDate"], "2026-10-16")
+            self.assertEqual(daily_report.resolve_report_trading_date(
+                monitoring, baseline, "2026-10-17")["reason"], "REQUESTED_DATE_MISMATCH")
+
+    def test_resolve_report_trading_date_rejects_mismatch_or_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "baselineAsOfDate": "20261016", "publicationStatus": "SUCCESS",
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({"asOfDate": "20261015", "historyStatus": "OK"}), encoding="utf-8")
+            self.assertEqual(daily_report.resolve_report_trading_date(monitoring, baseline)["reason"], "TRADING_DATE_MISMATCH")
     def test_shadow_comparison_keeps_v1_and_v2_separate(self):
         dynamic = {
             "sectors": [{"id": "s1", "status": "ACTIVE"}],

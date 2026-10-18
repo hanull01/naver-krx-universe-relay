@@ -288,7 +288,7 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertIn('cron: "10,30,50 23 * * 0-4"', snapshots)
         self.assertIn('cron: "10,30,50 0-10 * * 1-5"', snapshots)
         self.assertIn('cron: "35 7 * * 1-5"', daily)
-        self.assertIn("cron: '40 11 * * 1-5'", report)
+        self.assertIn("cron: '0 14 * * 1-5'", report)
 
 
 if __name__ == "__main__":

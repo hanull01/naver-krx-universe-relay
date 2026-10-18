@@ -2,9 +2,14 @@ name: Build daily market report
 
 on:
   workflow_dispatch:
+    inputs:
+      as_of:
+        description: 'Optional already-published trading date (YYYY-MM-DD) for manual validation'
+        required: false
+        type: string
   schedule:
-    # 20:40 KST Mon-Fri = 11:40 UTC Mon-Fri
-    - cron: '40 11 * * 1-5'
+    # 23:00 KST Mon-Fri = 14:00 UTC Mon-Fri
+    - cron: '0 14 * * 1-5'
 
 permissions:
   contents: write
@@ -67,9 +72,22 @@ jobs:
       - name: Build daily report
         if: steps.market_day.outputs.run == 'true'
         run: |
-          python3 daily_report.py \
-            --as-of "$(TZ=Asia/Seoul date +%F)" \
-            --output-dir data/reports
+          report_date=$(python3 - <<'PY'
+          import json, os, sys
+          from daily_report import resolve_report_trading_date
+          requested = os.environ.get("REPORT_AS_OF") or None
+          result = resolve_report_trading_date(requested_date=requested)
+          print(json.dumps(result, ensure_ascii=False))
+          if result.get("status") != "READY":
+              raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
+          print(result["tradingDate"])
+          PY
+          )
+          as_of=$(printf '%s\n' "$report_date" | tail -n 1)
+          echo "Resolved report trading date: ${as_of}"
+          python3 daily_report.py --as-of "$as_of" --output-dir data/reports
+        env:
+          REPORT_AS_OF: ${{ inputs.as_of || '' }}
 
       - name: Validate daily report
         if: steps.market_day.outputs.run == 'true'
