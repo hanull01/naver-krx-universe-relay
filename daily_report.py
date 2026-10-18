@@ -123,6 +123,47 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
     }
 
 
+def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
+                                baseline_path=MONITORING_BASELINE_PATH,
+                                requested_date=None):
+    """Resolve an already-published trading date without using wall-clock date.
+
+    The report must not infer yesterday/weekends.  Both the published quality
+    artifact and the rolling baseline must identify the same date.
+    """
+    try:
+        quality = load_json(Path(monitoring_root) / "latest-quality.json")
+        baseline = load_json(baseline_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {"status": "WAIT", "reason": "TRADING_DATE_MATERIAL_UNAVAILABLE"}
+
+    def compact(value):
+        text = str(value or "").replace("-", "")
+        return text if len(text) == 8 and text.isdigit() else None
+
+    quality_date = compact(quality.get("baselineAsOfDate"))
+    baseline_date = compact(baseline.get("asOfDate"))
+    requested = compact(requested_date) if requested_date else None
+    if not quality_date or not baseline_date:
+        return {"status": "WAIT", "reason": "TRADING_DATE_MISSING"}
+    if quality_date != baseline_date:
+        return {"status": "WAIT", "reason": "TRADING_DATE_MISMATCH",
+                "qualityDate": quality_date, "baselineDate": baseline_date}
+    if requested and requested != quality_date:
+        return {"status": "WAIT", "reason": "REQUESTED_DATE_MISMATCH",
+                "requestedDate": requested, "availableDate": quality_date}
+    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS"):
+        return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
+                "publicationStatus": quality.get("publicationStatus")}
+    if baseline.get("historyStatus") not in (None, "OK"):
+        return {"status": "WAIT", "reason": "BASELINE_NOT_READY",
+                "historyStatus": baseline.get("historyStatus")}
+    return {"status": "READY", "tradingDate": f"{quality_date[:4]}-{quality_date[4:6]}-{quality_date[6:]}",
+            "source": "monitoring-quality-and-baseline",
+            "qualityGeneratedAt": quality.get("generatedAt"),
+            "baselineGeneratedAt": baseline.get("generatedAt")}
+
+
 def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shadow_status):
     """Build a report-only comparison; never changes V1 or watchlist data."""
     v1_sectors = dynamic_universe.get("sectors") or []
