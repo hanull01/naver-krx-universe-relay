@@ -1,33 +1,7 @@
 {
-  "status": "OK",
-  "observedAt": "2026-10-18T04:45:00+00:00",
-  "tradingDate": "2026-10-16",
-  "summary": {
-    "industries": {
-      "count": 79,
-      "v2StatusDistribution": {
-        "WEAK": 72,
-        "ACTIVE": 3,
-        "WATCH": 4
-      },
-      "v1V2StatusDifferences": 78,
-      "unavailable": 0
-    },
-    "themes": {
-      "count": 264,
-      "v2StatusDistribution": {
-        "WEAK": 255,
-        "ACTIVE": 7,
-        "WATCH": 2
-      },
-      "v1V2StatusDifferences": 257,
-      "unavailable": 0
-    }
-  },
-  "observationCount": 13,
-  "uniqueTradingDates": [
-    "2026-10-15",
-    "2026-10-16"
-  ],
-  "historyCorrectionApplied": true
+  "status": "FAILED",
+  "observedAt": "2026-10-18T23:11:26.609024+00:00",
+  "tradingDate": "2026-10-19",
+  "errorType": "ZeroDivisionError",
+  "error": "float division by zero"
 }
