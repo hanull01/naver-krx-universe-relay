@@ -86,3 +86,26 @@ def moving_averages(rows):
     closes = [row["close"] for row in ordered if _number(row.get("close"))]
     return {f"ma{window}": (sum(closes[-window:]) / window if len(closes) >= window else None)
             for window in (5, 20, 60)}
+
+
+def monitoring_daily_rows(proposed_rows):
+    """Adapt validated candidates to the existing STOCK monitoring schema.
+
+    The existing COLUMN_ARRAY_V1 writer is intentionally STOCK-only and keeps
+    close/high/volume plus validity flags.  This adapter performs no write and
+    leaves ETF/ETN rows out of that path rather than coercing them into the
+    stock universe.
+    """
+    rows = []
+    excluded = []
+    for row in proposed_rows or []:
+        asset_type = str(row.get("assetType") or "").upper()
+        if asset_type != "STOCK":
+            excluded.append({"code": str(row.get("code") or ""), "assetType": asset_type,
+                             "reason": "ASSET_TYPE_NOT_SUPPORTED_BY_MONITORING_DAILY"})
+            continue
+        rows.append({"code": str(row["code"]), "date": row["date"],
+                     "close": row["close"], "high": row["high"], "volume": row["volume"],
+                     "closeValid": True, "ohlcValid": True, "volumeValid": True})
+    return {"rows": sorted(rows, key=lambda row: row["code"]), "excluded": excluded,
+            "status": "READY" if rows else "WAIT"}
