@@ -340,6 +340,11 @@ def quote_error_diagnostic(payload, current):
 def load_previous_business_day_close(code, business_day):
     """Load only the requested completed daily close; no stale-date fallback."""
     path = ROOT / f'data/daily/{code}.json'
+    try:
+        final = load_monitoring_daily_final([code], business_day)[code]
+        return final['close']
+    except (OSError, ValueError, json.JSONDecodeError):
+        pass
     daily = load_daily_for_technical(code)
     rows = (daily or {}).get('datas', [])
     matches = [bar for bar in rows if bar.get('date') == business_day.isoformat()]
