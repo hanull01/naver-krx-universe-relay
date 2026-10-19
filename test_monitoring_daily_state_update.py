@@ -502,5 +502,19 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual(2767, sum(calls.values()))
         self.assertTrue(all(count == 1 for count in calls.values()))
 
+    def test_optional_ohlcv_columns_are_additive_and_v1_remains_readable(self):
+        legacy = update.encode_stock("000001", [{"date": "20261017", "close": 10,
+            "high": 11, "volume": 100, "closeValid": True, "ohlcValid": True,
+            "volumeValid": True}])
+        self.assertNotIn("open", legacy)
+        self.assertEqual(update.decode_stock(legacy)[0]["close"], 10)
+        extended = update.encode_stock("000001", [{"date": "20261018", "open": 9,
+            "low": 8, "close": 10, "high": 11, "volume": 100, "value": 1000,
+            "closeValid": True, "ohlcValid": True, "volumeValid": True}])
+        self.assertEqual(extended["open"], [9])
+        self.assertEqual(extended["low"], [8])
+        self.assertEqual(extended["value"], [1000])
+        self.assertEqual(update.decode_stock(extended)[0]["value"], 1000)
+
 
 if __name__ == "__main__": unittest.main()
