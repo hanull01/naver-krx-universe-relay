@@ -337,7 +337,7 @@ def collection_readiness(baseline, now=None, market_day_check=krx_market_day.mar
 
 def snapshot_is_publishable(current):
     """Accept complete collection with pending Universe reconciliation only."""
-    publishable_statuses = {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
+    publishable_statuses = {"SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"}
     return bool(
         current
         and current.get("status") in publishable_statuses
@@ -346,7 +346,11 @@ def snapshot_is_publishable(current):
         and not current.get("repeatedPages")
         and not current.get("errors")
         and current.get("coverageCount", 0) > 0
-        and current.get("count") == current.get("coverageCount")
+        and (
+            current.get("count") == current.get("coverageCount")
+            or (current.get("qualityStatus") == "WARNING"
+                and current.get("coverageCount", 0) * 100 >= current.get("expectedCount", 1) * 99)
+        )
     )
 
 

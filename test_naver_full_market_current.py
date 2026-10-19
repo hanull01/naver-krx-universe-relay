@@ -157,6 +157,40 @@ class FullMarketCurrentTests(unittest.TestCase):
             self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["status"], "COMPLETE_RECONCILIATION_PENDING")
             self.assertFalse(diagnostic.exists())
 
+    def test_small_composition_delta_is_usable_with_warning_metadata(self):
+        fetch = paged({
+            "KOSPI": [[raw("005930"), raw("0088M0")], []],
+            "KOSDAQ": [[raw("000660"), raw("999999")], []],
+        })
+        with tempfile.TemporaryDirectory() as directory:
+            universe = Path(directory) / "universe.json"
+            universe.write_text(json.dumps({"assets": [
+                {"code": code, "assetType": "STOCK", "market": market}
+                for market, codes in self.expected.items() for code in codes
+            ]}), encoding="utf-8")
+            snapshot = current.collect_snapshot(universe, fetch, 2, 3, 0,
+                                                lambda: "2026-10-01T10:00:00+09:00")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(snapshot["qualityStatus"], "WARNING")
+        self.assertEqual(snapshot["qualityWarnings"], ["UNIVERSE_COMPOSITION_CHANGED"])
+        self.assertEqual(snapshot["missingCodes"], ["123456"])
+        self.assertEqual(snapshot["extraCodes"], ["999999"])
+
+    def test_large_composition_delta_is_not_marked_usable(self):
+        expected = {"KOSPI": {f"{i:06d}" for i in range(100)}, "KOSDAQ": {f"{i:06d}" for i in range(100, 200)}}
+        observed = {"KOSPI": [[raw(f"{i:06d}") for i in range(100)], []],
+                    "KOSDAQ": [[raw(f"{i:06d}") for i in range(100, 180)], []]}
+        with tempfile.TemporaryDirectory() as directory:
+            universe = Path(directory) / "universe.json"
+            universe.write_text(json.dumps({"assets": [
+                {"code": code, "assetType": "STOCK", "market": market}
+                for market, codes in expected.items() for code in codes
+            ]}), encoding="utf-8")
+            snapshot = current.collect_snapshot(universe, paged(observed), 200, 3, 0,
+                                                lambda: "2026-10-01T10:00:00+09:00")
+        self.assertEqual(snapshot["qualityStatus"], "FAILURE")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
+
     def test_halted_and_zero_volume_are_preserved(self):
         row = raw("005930", tradeStopYn="Y", tradableStatus="HALTED", openPrice="0",
                   highPrice="0", lowPrice="0", tradeVolume="0")

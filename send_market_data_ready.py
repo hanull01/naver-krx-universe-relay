@@ -31,9 +31,18 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication is not successful')
     if summary.get('fullMarket', {}).get('scope') != 'AUTHORITATIVE_FULL_MARKET':
         raise ReadyValidationError('full-market scope is not authoritative')
-    total = summary.get('fullMarket', {}).get('markets', {}).get('TOTAL', {})
+    full_market = summary.get('fullMarket', {})
+    total = full_market.get('markets', {}).get('TOTAL', {})
     count = total.get('stockCount')
-    if not isinstance(count, int) or count <= 0 or total.get('validCount') != count:
+    expected = full_market.get('expectedCount', full_market.get('authoritativeCount', count))
+    coverage = full_market.get('coverageCount', count)
+    quality_status = full_market.get('qualityStatus', 'SUCCESS')
+    warning = quality_status in ('WARNING', 'SUCCESS_WITH_WARNING')
+    if (not isinstance(count, int) or count <= 0 or total.get('validCount') != count
+            or not isinstance(expected, int) or expected <= 0
+            or not isinstance(coverage, int) or coverage <= 0
+            or coverage * 100 < expected * 99
+            or (not warning and coverage != expected)):
         raise ReadyValidationError('full-market coverage is incomplete')
     generated = parse_timestamp(summary.get('generatedAt'), 'fullMarketGeneratedAt')
     if current and generated.date() != current.astimezone(KST).date():
@@ -42,6 +51,12 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication predates this collection run')
     return {'mode': 'FULL_MARKET', 'status': 'SUCCESS', 'scope': 'AUTHORITATIVE_FULL_MARKET',
             'generatedAt': generated.isoformat(), 'count': count,
+            'expectedCount': expected, 'coverageCount': coverage,
+            'qualityStatus': quality_status,
+            'missingCodes': full_market.get('missingCodes', []),
+            'unconfirmedMissingCodes': full_market.get('unconfirmedMissingCodes', full_market.get('missingCodes', [])),
+            'newCodes': full_market.get('newCodes', []),
+            'qualityWarnings': full_market.get('qualityWarnings', []),
             'tradingDate': generated.date().isoformat(), 'marketSession': 'REGULAR_MARKET'}
 
 def parse_timestamp(value, field):
@@ -132,7 +147,13 @@ def ready_message(metadata, env):
             f'fullMarket.tradingDate={metadata["tradingDate"]}',
             f'fullMarket.marketSession={metadata["marketSession"]}',
             f'fullMarket.count={metadata["count"]}',
-            f'fullMarket.coverageCount={metadata["count"]}',
+            f'fullMarket.expectedCount={metadata["expectedCount"]}',
+            f'fullMarket.coverageCount={metadata["coverageCount"]}',
+            f'fullMarket.qualityStatus={metadata["qualityStatus"]}',
+            f'fullMarket.missingCodes={",".join(metadata["missingCodes"]) or "none"}',
+            f'fullMarket.unconfirmedMissingCodes={",".join(metadata["unconfirmedMissingCodes"]) or "none"}',
+            f'fullMarket.newCodes={",".join(metadata["newCodes"]) or "none"}',
+            f'fullMarket.qualityWarnings={",".join(metadata["qualityWarnings"]) or "none"}',
             f'fullMarket.publicationCommitSha={commit_sha}',
             'legacyQuotes.mode=SUPPLEMENTAL_ONLY',
             'legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY',

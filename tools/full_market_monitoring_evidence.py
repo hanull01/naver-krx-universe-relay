@@ -380,7 +380,7 @@ def signal_subset(features, required_codes=None):
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
                    previous_summary=None, today=None, previous_good_industries=None, baseline=None,
                    publication_context=None, theme_membership=None):
-    if current_snapshot.get("status") not in ("SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
+    if current_snapshot.get("status") not in ("SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"):
         raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
     if baseline is not None:
@@ -451,7 +451,13 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         "sourceGeneratedAt": theme_membership.get("generatedAt"),
     }
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
-                   "markets": breadth_data, "qualityStatus": collection_quality,
+                   "markets": breadth_data, "qualityStatus": current_snapshot.get("qualityStatus", collection_quality),
+                   "expectedCount": current_snapshot.get("expectedCount"),
+                   "coverageCount": current_snapshot.get("coverageCount"),
+                   "missingCodes": current_snapshot.get("missingCodes", []),
+                   "unconfirmedMissingCodes": current_snapshot.get("unconfirmedMissingCodes", current_snapshot.get("missingCodes", [])),
+                   "newCodes": current_snapshot.get("extraCodes", []),
+                   "qualityWarnings": current_snapshot.get("qualityWarnings", []),
                    "universeDelta": current_snapshot.get("universeDelta"),
                    "marketTradingValue": market_trading_value}
     summary = {"schemaVersion": 1, "generatedAt": current_snapshot["generatedAt"], "source": "NAVER_FULL_MARKET_EVIDENCE",

@@ -138,4 +138,35 @@ class ReadyMailTests(unittest.TestCase):
             with self.assertRaisesRegex(ready.ReadyValidationError, 'not from today'):
                 ready.validate_full_market_publication(summary, quality, current=self.current)
 
+    def test_small_composition_warning_is_signaled_with_codes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'qualityStatus': 'WARNING',
+                    'expectedCount': 100, 'coverageCount': 99, 'missingCodes': ['028080'], 'newCodes': [],
+                    'qualityWarnings': ['UNIVERSE_COMPOSITION_CHANGED'],
+                    'markets': {'TOTAL': {'stockCount': 99, 'validCount': 99}}}}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            metadata = ready.validate_full_market_publication(summary, quality, current=self.current)
+            self.assertEqual(metadata['qualityStatus'], 'WARNING')
+            message = ready.ready_message(metadata, dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
+            content = message.get_content()
+            self.assertIn('fullMarket.missingCodes=028080', content)
+            self.assertIn('fullMarket.qualityStatus=WARNING', content)
+
+    def test_october_19_scale_warning_keeps_ready_eligible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'qualityStatus': 'WARNING',
+                    'expectedCount': 2764, 'coverageCount': 2763, 'missingCodes': ['028080'],
+                    'unconfirmedMissingCodes': ['028080'], 'newCodes': [],
+                    'qualityWarnings': ['UNIVERSE_COMPOSITION_CHANGED'],
+                    'markets': {'TOTAL': {'stockCount': 2763, 'validCount': 2763}}}}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            metadata = ready.validate_full_market_publication(summary, quality, current=self.current)
+            self.assertEqual(metadata['coverageCount'], 2763)
+            self.assertEqual(metadata['unconfirmedMissingCodes'], ['028080'])
+            self.assertEqual(metadata['qualityStatus'], 'WARNING')
+
 if __name__ == '__main__': unittest.main()
