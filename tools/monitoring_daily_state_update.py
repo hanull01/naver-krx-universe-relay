@@ -299,10 +299,14 @@ def normalize_daily_rows(payload, target_date):
             value = raw.get(name)
             return isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
         close_valid = bool(raw.get("closeValid", positive("close")))
-        ohlc_valid = bool(raw.get("ohlcValid", close_valid and positive("high") and raw["high"] >= raw["close"]))
+        low_ok = raw.get("low") is None or (isinstance(raw.get("low"), (int, float)) and raw["low"] <= raw["close"])
+        ohlc_valid = bool(raw.get("ohlcValid", close_valid and positive("high") and raw["high"] >= raw["close"] and low_ok))
         volume_valid = bool(raw.get("volumeValid", positive("volume")))
         rows[code] = {"date": target, "close": raw.get("close"), "high": raw.get("high"), "volume": raw.get("volume"),
                       "closeValid": close_valid, "ohlcValid": ohlc_valid, "volumeValid": volume_valid}
+        for key in OPTIONAL_COLUMNS:
+            if key in raw:
+                rows[code][key] = raw[key]
     return rows
 
 
