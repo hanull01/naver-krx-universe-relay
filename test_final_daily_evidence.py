@@ -39,9 +39,16 @@ class FinalDailyEvidenceTests(unittest.TestCase):
                                    expected_codes=["000001", "000002"])
         self.assertEqual(result["status"], "UNUSABLE")
         self.assertIn("SNAPSHOT_BEFORE_20_KST", result["errors"])
-        self.assertIn("BASELINE_DATE_MISMATCH", result["errors"])
+        self.assertNotIn("BASELINE_DATE_MISMATCH", result["errors"])
         self.assertIn("DUPLICATE_CODES", result["errors"])
         self.assertIn("MISSING_CODES", result["errors"])
+
+    def test_future_baseline_date_is_rejected(self):
+        result = validate_snapshot({"tradingDate": "20261019",
+                                    "generatedAt": "2026-10-19T20:30:00+09:00",
+                                    "stocks": [row()]},
+                                   {"asOfDate": "20261020", "historyStatus": "OK"})
+        self.assertIn("BASELINE_DATE_MISMATCH", result["errors"])
 
     def test_invalid_ohlcv_is_not_final(self):
         result = validate_snapshot({"tradingDate": "20261019",

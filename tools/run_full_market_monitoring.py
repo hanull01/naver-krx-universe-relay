@@ -270,7 +270,10 @@ def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day
     if baseline.get("count") != baseline.get("authoritativeCount") or baseline.get("coveragePct") != 100.0:
         return False, "BASELINE_COVERAGE_INVALID", previous
     session = session_at(now)
-    if as_of == previous and session not in {"AFTER", "CLOSED"}:
+    # The prior valid baseline is the input for intraday analysis and for the
+    # 20:30 snapshot. The current-day baseline is generated only after that
+    # snapshot has been validated and appended.
+    if as_of == previous:
         return True, "VALID_PREVIOUS_TRADING_DAY", previous
     if as_of == today.strftime("%Y%m%d") and session in {"AFTER", "CLOSED"}:
         return True, "VALID_CURRENT_DAY_FINAL", previous
