@@ -296,6 +296,47 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
     }
 
 
+def recover_missing_codes(snapshot, expected, fetch_missing):
+    """Recover only missing codes through an injected, bounded fetcher.
+
+    Normal collection remains unchanged and performs no extra requests. A
+    recovered row must match the authoritative code/market and contain valid
+    OHLCV plus trading value; failures leave the snapshot unusable.
+    """
+    missing = set(snapshot.get("missingCodes") or [])
+    if not missing or fetch_missing is None:
+        return snapshot
+    expected_market = {str(code): market for market, codes in expected.items() for code in codes}
+    rows = list(snapshot.get("stocks") or [])
+    existing = {str(row.get("code")) for row in rows}
+    recovered, rejected = [], []
+    for code in sorted(missing):
+        try:
+            raw = fetch_missing(code)
+            if not isinstance(raw, dict) or str(raw.get("itemcode") or "") != code:
+                raise ValueError("code mismatch")
+            market = expected_market.get(code)
+            if not market or str(raw.get("market") or market) != market:
+                raise ValueError("market mismatch")
+            row, bad = normalize(raw, market, snapshot.get("generatedAt"))
+            required = ("currentPrice", "openPrice", "highPrice", "lowPrice",
+                        "accumulatedTradingVolume", "accumulatedTradingValue")
+            if bad or any(not isinstance(row.get(key), (int, float)) or isinstance(row.get(key), bool)
+                          or row[key] < 0 for key in required):
+                raise ValueError("invalid OHLCV/value")
+            recovered.append(row)
+        except Exception as exc:
+            rejected.append({"code": code, "reason": str(exc)})
+    if rejected:
+        return snapshot | {"recoveryStatus": "FAILED", "recoveryRejected": rejected,
+                           "recoveryCalls": len(missing)}
+    merged = sorted(rows + [row for row in recovered if row["code"] not in existing],
+                    key=lambda row: (row["market"], row["code"]))
+    return snapshot | {"stocks": merged, "missingCodes": [], "count": len(merged),
+                       "coverageCount": len(merged), "recoveryStatus": "RECOVERED",
+                       "recoveryCalls": len(missing), "status": "SUCCESS"}
+
+
 def output_sizes(payload):
     pretty = len(json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
     compact = len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))

@@ -35,6 +35,24 @@ def paged(pages):
 class FullMarketCurrentTests(unittest.TestCase):
     expected = {"KOSPI": {"005930", "0088M0"}, "KOSDAQ": {"000660", "123456"}}
 
+    def test_missing_code_recovery_is_bounded_and_validated(self):
+        base = {"status": "COMPLETE_RECONCILIATION_PENDING", "missingCodes": ["123456"],
+                "stocks": [current.normalize(raw("000660"), "KOSDAQ", "2026-10-19T20:30:00+09:00")[0]],
+                "generatedAt": "2026-10-19T20:30:00+09:00"}
+        result = current.recover_missing_codes(
+            base, self.expected,
+            lambda code: raw(code, market="KOSDAQ"))
+        self.assertEqual(result["recoveryStatus"], "RECOVERED")
+        self.assertEqual(result["recoveryCalls"], 1)
+        self.assertEqual(result["missingCodes"], [])
+
+    def test_missing_code_recovery_failure_keeps_snapshot_unusable(self):
+        base = {"status": "COMPLETE_RECONCILIATION_PENDING", "missingCodes": ["123456"],
+                "stocks": [], "generatedAt": "2026-10-19T20:30:00+09:00"}
+        result = current.recover_missing_codes(base, self.expected, lambda code: raw("999999"))
+        self.assertEqual(result["recoveryStatus"], "FAILED")
+        self.assertEqual(result["missingCodes"], ["123456"])
+
     def test_normal_two_market_pagination_and_schema(self):
         fetch = paged({
             "KOSPI": [[raw("005930"), raw("0088M0")], []],
