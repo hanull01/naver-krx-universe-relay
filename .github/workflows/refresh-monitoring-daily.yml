@@ -8,9 +8,6 @@ on:
         required: false
         default: false
         type: boolean
-  workflow_run:
-    workflows: ["Refresh daily candles"]
-    types: [completed]
 
 permissions:
   contents: write
@@ -34,7 +31,7 @@ jobs:
 
       - name: Check KRX trading day
         id: market_day
-        if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
           set +e
@@ -95,7 +92,6 @@ jobs:
           target_date='${{ steps.closing_window.outputs.target_date }}'
           extra=()
           if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then extra+=(--provisional); fi
           now_kst=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat())')
           echo "Full-market daily collection: targetDate=${target_date}, nowKst=${now_kst}"
           python tools/build_monitoring_daily_state.py update-latest \

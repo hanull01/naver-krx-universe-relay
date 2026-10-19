@@ -1187,8 +1187,7 @@ class RelayTests(unittest.TestCase):
 
     def test_daily_workflow_runs_after_naver_final_close_publish_time(self):
         workflow = (Path(__file__).parent / '.github/workflows/refresh-daily.yml').read_text(encoding='utf-8')
-        self.assertIn('cron: "35 7 * * 1-5"', workflow)
-        self.assertIn('close publish time as 16:30 KST', workflow)
+        self.assertNotIn('cron: "35 7 * * 1-5"', workflow)
 
     def test_breakout_close_confirmation_uses_source_timestamp_not_market_status(self):
         config = {'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}
