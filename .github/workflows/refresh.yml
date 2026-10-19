@@ -383,6 +383,9 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit"
             echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "publication_usable=true" >> "$GITHUB_OUTPUT"
+            echo "publication_changed=false" >> "$GITHUB_OUTPUT"
+            echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Refresh NAVER market data"
             echo "Market data collection succeeded; synchronizing its data commit."
@@ -399,6 +402,8 @@ jobs:
               if git push origin "HEAD:${target_ref}"; then
                 echo "Market data push succeeded."
                 echo "published=true" >> "$GITHUB_OUTPUT"
+                echo "publication_usable=true" >> "$GITHUB_OUTPUT"
+                echo "publication_changed=true" >> "$GITHUB_OUTPUT"
                 echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
@@ -410,13 +415,14 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.published == 'true'
+        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
           MARKET_GMAIL_APP_PASSWORD: ${{ secrets.MARKET_GMAIL_APP_PASSWORD }}
           MARKET_GMAIL_TO: ${{ secrets.MARKET_GMAIL_TO }}
           MARKET_DATA_COMMIT_SHA: ${{ steps.publish.outputs.production_commit_sha }}
+          MARKET_DATA_PUBLICATION_CHANGED: ${{ steps.publish.outputs.publication_changed }}
           MARKET_DATA_COLLECTION_STARTED_AT: ${{ steps.collect.outputs.collection_started_at }}
           MARKET_DATA_COLLECTION_FINISHED_AT: ${{ steps.collect.outputs.collection_finished_at }}
           FULL_MARKET_STATUS: ${{ steps.full_market.outputs.market_status }}

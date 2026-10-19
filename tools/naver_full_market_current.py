@@ -270,9 +270,17 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
             last_result["missingCodes"] or last_result["extraCodes"] or market_changed
         )
         generated_at = clock()
+        expected_count = last_result["expectedCount"]
+        delta_count = len(last_result["missingCodes"]) + len(last_result["extraCodes"])
+        warning_limit = max(10, math.ceil(expected_count * 0.01))
+        warning_usable = delta_count <= warning_limit and last_result["coverageCount"] > 0
         return {
             "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
             "status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
+            "qualityStatus": "WARNING" if warning_usable else "FAILURE",
+            "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"] if warning_usable else ["UNIVERSE_RECONCILIATION_REQUIRED"],
+            "unconfirmedMissingCodes": list(last_result["missingCodes"]),
+            "newCodes": list(last_result["extraCodes"]),
             "reconciliationStatus": "UNIVERSE_RECONCILIATION_REQUIRED",
             "expectedCount": last_result["expectedCount"], "count": last_result["count"],
             "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
