@@ -12,6 +12,10 @@ import math
 
 MARKETS = ("KOSPI", "KOSDAQ")
 CHANGE_TYPES = {"NEW_LISTING", "DELISTING", "MARKET_TRANSFER", "NAME_CHANGE", "CODE_CHANGE"}
+STATUS_TYPES = {
+    "VERIFIED_LISTED", "VERIFIED_DELISTED", "VERIFIED_TRANSFERRED",
+    "VERIFIED_SUSPENDED", "UNVERIFIED", "COLLECTION_MISSING",
+}
 
 
 def _stocks(payload):
@@ -45,6 +49,68 @@ def pending_observation(previous, observed, *, observed_at, source="NAVER_STOCKL
         "applied": False,
         "delta": delta,
     }
+
+
+def classify_status_candidate(*, code, delta_type, evidence=None,
+                              collection_missing=False):
+    """Classify one observed change without inferring lifecycle facts.
+
+    ``evidence`` must be an explicit, dated official-source fixture.  A
+    planned notice is deliberately not sufficient for a verified state.
+    This function is pure and performs no network access.
+    """
+    code = str(code or "")
+    if not code:
+        raise ValueError("status candidate requires code")
+    if collection_missing and not evidence:
+        return {"code": code, "status": "COLLECTION_MISSING",
+                "deltaType": delta_type, "evidence": None}
+    evidence = dict(evidence or {})
+    if not evidence.get("sourceVerified"):
+        return {"code": code, "status": "UNVERIFIED",
+                "deltaType": delta_type, "evidence": evidence or None}
+    effective = str(evidence.get("effectiveDate") or "")
+    try:
+        date.fromisoformat(effective)
+    except ValueError as exc:
+        raise ValueError("verified status requires effectiveDate") from exc
+    if evidence.get("planned"):
+        return {"code": code, "status": "UNVERIFIED",
+                "deltaType": delta_type, "evidence": evidence}
+    mapping = {
+        "NEW_LISTING": "VERIFIED_LISTED",
+        "DELISTING": "VERIFIED_DELISTED",
+        "MARKET_TRANSFER": "VERIFIED_TRANSFERRED",
+        "SUSPENSION": "VERIFIED_SUSPENDED",
+    }
+    status = mapping.get(delta_type)
+    if status is None:
+        raise ValueError(f"unsupported status delta: {delta_type}")
+    return {"code": code, "status": status, "deltaType": delta_type,
+            "effectiveDate": effective, "evidence": evidence}
+
+
+def verified_lifecycle_events(candidates):
+    """Convert only verified status candidates to reconciler events."""
+    events = []
+    for candidate in candidates or []:
+        status = candidate.get("status")
+        if status not in {"VERIFIED_LISTED", "VERIFIED_DELISTED",
+                          "VERIFIED_TRANSFERRED"}:
+            continue
+        evidence = candidate.get("evidence") or {}
+        event_type = {
+            "VERIFIED_LISTED": "NEW_LISTING",
+            "VERIFIED_DELISTED": "DELISTING",
+            "VERIFIED_TRANSFERRED": "MARKET_TRANSFER",
+        }[status]
+        events.append({"type": event_type, "code": candidate["code"],
+                       "effectiveDate": candidate["effectiveDate"],
+                       "sourceVerified": True,
+                       "sourceUrl": evidence.get("sourceUrl"),
+                       "publishedAt": evidence.get("publishedAt"),
+                       "changeReason": evidence.get("changeReason")})
+    return events
 
 
 def _event_key(event):
