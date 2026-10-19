@@ -287,7 +287,7 @@ class MonitoringProductionTests(unittest.TestCase):
         report = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
         self.assertIn('cron: "10,30,50 23 * * 0-4"', snapshots)
         self.assertIn('cron: "10,30,50 0-10 * * 1-5"', snapshots)
-        self.assertIn('cron: "35 7 * * 1-5"', daily)
+        self.assertNotIn('cron: "35 7 * * 1-5"', daily)
         self.assertIn("cron: '0 14 * * 1-5'", report)
 
 
