@@ -1088,7 +1088,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(technicals['status'], 'ok')
         self.assertTrue(all(row['asOf'] == '2026-10-08' for row in technicals['datas']))
         self.assertEqual(states['status'], 'ok')
-        self.assertTrue(all(row['regularSession']['status'] == 'CONFIRMED'
+        self.assertTrue(all(row['regularSession']['status'] == 'UNAVAILABLE'
                             for row in states['datas']))
         self.assertNotIn(9999, [row['closePrice'] for row in result['datas']])
         self.assertIn('data/quotes.json', [call.args[0] for call in save.call_args_list])
@@ -1159,6 +1159,31 @@ class RelayTests(unittest.TestCase):
         self.assertEqual([bar['close'] for bar in daily['datas']], [100, 105])
         self.assertEqual(technical['asOf'], '2026-09-29')
         self.assertEqual(technical['status'], 'insufficient_history')
+
+    def test_provisional_regular_daily_is_not_used_as_final_override(self):
+        current = datetime(2026, 9, 29, 16, 0, tzinfo=relay.KST)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'data/daily').mkdir(parents=True)
+            (root / 'data/daily-regular').mkdir(parents=True)
+            raw = {'status': 'ok', 'sourceTime': '2026-09-28', 'datas': [
+                {'date': '2026-09-28', 'close': 100, 'high': 100, 'volume': 10,
+                 'complete': True, 'noTrading': False},
+                {'date': '2026-09-29', 'close': 999, 'high': 999, 'low': 999,
+                 'volume': 999, 'complete': False, 'noTrading': False},
+            ]}
+            regular = {'regularDailyStatus': 'ok', 'publicationStatus': 'PROVISIONAL',
+                       'datas': [{
+                           'date': '2026-09-29', 'open': 101, 'high': 110,
+                           'low': 100, 'close': 105, 'volume': 20,
+                           'complete': True, 'noTrading': False,
+                           'session': 'REGULAR', 'barType': 'REGULAR_SESSION',
+                           **verified_regular_fields('2026-09-29')}]}
+            (root / 'data/daily/201490.json').write_text(json.dumps(raw), encoding='utf-8')
+            (root / 'data/daily-regular/201490.json').write_text(json.dumps(regular), encoding='utf-8')
+            with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current):
+                daily = relay.load_daily_for_technical('201490')
+        self.assertEqual([bar['close'] for bar in daily['datas']], [100, 999])
 
     def test_daily_workflow_runs_after_naver_final_close_publish_time(self):
         workflow = (Path(__file__).parent / '.github/workflows/refresh-daily.yml').read_text(encoding='utf-8')

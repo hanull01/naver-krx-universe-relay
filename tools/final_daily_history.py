@@ -105,7 +105,9 @@ def monitoring_daily_rows(proposed_rows):
                              "reason": "ASSET_TYPE_NOT_SUPPORTED_BY_MONITORING_DAILY"})
             continue
         rows.append({"code": str(row["code"]), "date": row["date"],
+                     "open": row.get("open"), "low": row.get("low"),
                      "close": row["close"], "high": row["high"], "volume": row["volume"],
+                     "value": row.get("value"),
                      "closeValid": True, "ohlcValid": True, "volumeValid": True})
     return {"rows": sorted(rows, key=lambda row: row["code"]), "excluded": excluded,
             "status": "READY" if rows else "WAIT"}

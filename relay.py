@@ -340,6 +340,11 @@ def quote_error_diagnostic(payload, current):
 def load_previous_business_day_close(code, business_day):
     """Load only the requested completed daily close; no stale-date fallback."""
     path = ROOT / f'data/daily/{code}.json'
+    try:
+        final = load_monitoring_daily_final([code], business_day)[code]
+        return final['close']
+    except (OSError, ValueError, json.JSONDecodeError):
+        pass
     daily = load_daily_for_technical(code)
     rows = (daily or {}).get('datas', [])
     matches = [bar for bar in rows if bar.get('date') == business_day.isoformat()]
@@ -404,9 +409,9 @@ def load_monitoring_daily_final(codes, business_day):
             rows[code] = {
                 'date': business_day.isoformat(), 'close': close, 'high': high,
                 'volume': volume, 'complete': True, 'noTrading': volume == 0,
-                'session': 'REGULAR', 'barType': 'REGULAR_SESSION',
+                'session': 'FINAL_DAILY', 'barType': 'FINAL_DAILY',
                 'source': MONITORING_DAILY_SOURCE, 'sourceDate': business_day.isoformat(),
-                'sourceTime': datetime.combine(business_day, dtime(15, 30), tzinfo=KST).isoformat(),
+                'sourceTime': payload.get('generatedAt'),
                 'publicationStatus': 'FINAL', 'format': 'COLUMN_ARRAY_V1',
             }
     missing = sorted(requested - set(rows))
@@ -414,6 +419,71 @@ def load_monitoring_daily_final(codes, business_day):
         raise ValueError(f'monitoring daily FINAL coverage missing: {len(missing)}')
     print(f'MONITORING_DAILY_COVERAGE date={business_day.isoformat()} required={len(requested)} verified={len(rows)} status=FINAL')
     return rows
+
+
+def load_monitoring_daily_history(code, limit=301):
+    """Read one stock's bounded FINAL monitoring-daily history.
+
+    This is a read-only compatibility adapter for technical consumers.  It
+    deliberately does not replace the exact-date FINAL/REGULAR_CLOSE path.
+    """
+    requested = str(code)
+    found = None
+    for market in ('kospi', 'kosdaq'):
+        path = ROOT / f'{MONITORING_DAILY_DIR}/{market}.json'
+        payload = json.loads(path.read_text(encoding='utf-8'))
+        if (payload.get('schemaVersion') != 1
+                or payload.get('format') != 'COLUMN_ARRAY_V1'
+                or payload.get('publicationStatus') != 'FINAL'
+                or str(payload.get('market', '')).lower() != market):
+            raise ValueError(f'invalid monitoring daily FINAL contract: {market}')
+        for stock in payload.get('stocks', []):
+            if str(stock.get('code') or '') != requested:
+                continue
+            if found is not None:
+                raise ValueError(f'duplicate monitoring daily code: {requested}')
+            required = ('dates', 'close', 'high', 'volume', 'validity')
+            if any(not isinstance(stock.get(key), list) for key in required):
+                raise ValueError(f'malformed monitoring daily columns: {requested}')
+            lengths = {len(stock[key]) for key in required}
+            if len(lengths) != 1:
+                raise ValueError(f'monitoring daily column length mismatch: {requested}')
+            dates = stock['dates']
+            if dates != sorted(dates) or len(set(dates)) != len(dates):
+                raise ValueError(f'monitoring daily dates are not unique and ordered: {requested}')
+            start = max(0, len(dates) - limit)
+            numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool)
+            rows = []
+            for index in range(start, len(dates)):
+                day = str(dates[index])
+                if not re.fullmatch(r'\d{8}', day):
+                    raise ValueError(f'invalid monitoring daily date: {requested}')
+                close, high, volume = (stock[key][index] for key in ('close', 'high', 'volume'))
+                if (not numeric(close) or not numeric(high) or not numeric(volume)
+                        or close <= 0 or high < close or volume < 0):
+                    raise ValueError(f'invalid monitoring daily values: {requested}')
+                row = {
+                    'date': f'{day[:4]}-{day[4:6]}-{day[6:]}',
+                    'close': close, 'high': high, 'volume': volume,
+                    'complete': stock['validity'][index] == 0,
+                    'noTrading': volume == 0,
+                    'session': 'FINAL_DAILY', 'barType': 'FINAL_DAILY',
+                    'source': MONITORING_DAILY_SOURCE,
+                    'publicationStatus': 'FINAL',
+                    'sourceTime': payload.get('generatedAt'),
+                }
+                for key in ('open', 'low', 'value'):
+                    values = stock.get(key)
+                    if isinstance(values, list):
+                        if len(values) != len(dates):
+                            raise ValueError(f'monitoring daily optional column mismatch: {requested}')
+                        row[key] = values[index]
+                rows.append(row)
+            found = {'status': 'ok', 'datas': rows,
+                     'publicationStatus': 'FINAL', 'session': 'FINAL_DAILY'}
+    if found is None:
+        raise ValueError(f'monitoring daily FINAL history missing: {requested}')
+    return found
 
 
 def merge_verified_completed_bar(daily, bar):
@@ -426,7 +496,7 @@ def merge_verified_completed_bar(daily, bar):
         key=lambda row: row['date'])
     merged['regularSessionDate'] = bar['date']
     merged['regularDailyStatus'] = 'ok'
-    merged['sourceTime'] = bar['date']
+    merged['sourceTime'] = bar.get('sourceTime')
     return merged
 
 
@@ -616,6 +686,7 @@ def confirmed_regular_bar(daily, quote):
     for bar in reversed(daily.get('datas', [])):
         bar_date = ''.join(ch for ch in str(bar.get('date') or '') if ch.isdigit())
         if (bar_date == target and bar.get('complete') is True
+                and bar.get('session') != 'FINAL_DAILY'
                 and not bar.get('noTrading')):
             return bar
     return None
@@ -730,7 +801,8 @@ def collect_daily(code):
     start = (current - timedelta(days=550)).strftime('%Y%m%d')
     url = DAILY_URL.format(code=code) + f'?startDateTime={start}&endDateTime={current:%Y%m%d}'
     payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
-               'source': 'NAVER_KRX', 'sourceUrl': url, 'status': 'error',
+               'source': 'NAVER_KRX', 'sourceUrl': url,
+               'publicationStatus': 'PROVISIONAL', 'status': 'error',
                'fresh': False, 'errors': [], 'count': 0, 'completedCount': 0, 'datas': []}
     try:
         response = fetch(url)
@@ -941,6 +1013,7 @@ def collect_regular_daily(code, current=None):
     payload = {'schemaVersion': 1, 'itemCode': code, 'generatedAt': current.isoformat(),
                'source': VERIFIED_REGULAR_CLOSE_SOURCE, 'sourceUrl': url,
                'verification': VERIFIED_REGULAR_CLOSE_METHOD,
+               'publicationStatus': 'PROVISIONAL',
                'regularDailyStatus': 'unavailable',
                'status': 'unavailable', 'fresh': False, 'datas': [], 'errors': []}
     try:
@@ -1009,7 +1082,10 @@ def load_daily_for_technical(code, verified_bar=None):
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
-        return None
+        try:
+            return load_monitoring_daily_history(code)
+        except (OSError, ValueError, json.JSONDecodeError):
+            return None
     current = now()
     daily = normalize_raw_daily_for_technical(daily, current)
     if verified_bar is not None:
@@ -1019,6 +1095,13 @@ def load_daily_for_technical(code, verified_bar=None):
     except (OSError, json.JSONDecodeError):
         return daily
     if regular.get('regularDailyStatus') != 'ok' or not isinstance(regular.get('datas'), list):
+        return daily
+    # The 16:35 collector is an observation only.  A regular-session bar
+    # becomes a usable FINAL override only after the 20:30 final path has
+    # published the authoritative monitoring-daily result.  Keep accepting
+    # legacy fixtures without this field, but never consume a newly written
+    # provisional payload as FINAL.
+    if regular.get('publicationStatus') == 'PROVISIONAL':
         return daily
     bars = [bar for bar in regular['datas'] if isinstance(bar, dict)
             and bar.get('complete') is True and bar.get('barType') == 'REGULAR_SESSION']
@@ -1036,7 +1119,7 @@ def load_daily_for_technical(code, verified_bar=None):
                             key=lambda row: row['date'])
     merged['regularSessionDate'] = bar['date']
     merged['regularDailyStatus'] = 'ok'
-    merged['sourceTime'] = bar['sourceTime']
+    merged['sourceTime'] = bar.get('sourceTime')
     return merged
 
 
@@ -1063,7 +1146,7 @@ def _valid_regular_override_for_date(daily, target_date):
     monitoring_final = (
         bar.get('source') == MONITORING_DAILY_SOURCE
         and bar.get('sourceDate') == target_text
-        and bar.get('sourceTime') == datetime.combine(target, dtime(15, 30), tzinfo=KST).isoformat()
+        and bar.get('session') != 'FINAL_DAILY'
         and bar.get('publicationStatus') == 'FINAL'
         and bar.get('format') == 'COLUMN_ARRAY_V1')
     verified_realtime = (

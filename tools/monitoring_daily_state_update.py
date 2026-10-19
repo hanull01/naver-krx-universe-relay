@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
 KEEP = 301
 FORMAT = "COLUMN_ARRAY_V1"
+OPTIONAL_COLUMNS = ("open", "low", "value")
 MARKETS = ("KOSPI", "KOSDAQ")
 KST = ZoneInfo("Asia/Seoul")
 REGULAR_CLOSE_KST = time(15, 30)
@@ -130,18 +131,31 @@ def decode_stock(stock):
         raise ValueError("malformed COLUMN_ARRAY_V1 stock")
     if len({len(stock[key]) for key in keys}) != 1:
         raise ValueError(f"column length mismatch: {stock['code']}")
+    has_optional = any(key in stock for key in OPTIONAL_COLUMNS)
+    if has_optional and any(not isinstance(stock.get(key), list) or len(stock[key]) != len(stock["dates"])
+                           for key in OPTIONAL_COLUMNS):
+        raise ValueError(f"optional column length mismatch: {stock['code']}")
     dates = [compact_date(value) for value in stock["dates"]]
     if dates != sorted(dates) or len(dates) != len(set(dates)):
         raise ValueError(f"invalid date sequence: {stock['code']}")
-    return [{"date": day, "close": stock["close"][index], "high": stock["high"][index],
-             "volume": stock["volume"][index], **flags(stock["validity"][index])}
-            for index, day in enumerate(dates)]
+    rows = []
+    for index, day in enumerate(dates):
+        row = {"date": day, "close": stock["close"][index], "high": stock["high"][index],
+               "volume": stock["volume"][index], **flags(stock["validity"][index])}
+        if has_optional:
+            row.update({key: stock[key][index] for key in OPTIONAL_COLUMNS})
+        rows.append(row)
+    return rows
 
 
 def encode_stock(code, rows):
-    return {"code": str(code), "dates": [row["date"] for row in rows], "close": [row["close"] for row in rows],
+    payload = {"code": str(code), "dates": [row["date"] for row in rows], "close": [row["close"] for row in rows],
             "high": [row["high"] for row in rows], "volume": [row["volume"] for row in rows],
             "validity": [mask(row) for row in rows]}
+    if any(any(key in row for key in OPTIONAL_COLUMNS) for row in rows):
+        for key in OPTIONAL_COLUMNS:
+            payload[key] = [row.get(key) for row in rows]
+    return payload
 
 
 def _universe_payload(universe):
@@ -285,10 +299,14 @@ def normalize_daily_rows(payload, target_date):
             value = raw.get(name)
             return isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
         close_valid = bool(raw.get("closeValid", positive("close")))
-        ohlc_valid = bool(raw.get("ohlcValid", close_valid and positive("high") and raw["high"] >= raw["close"]))
+        low_ok = raw.get("low") is None or (isinstance(raw.get("low"), (int, float)) and raw["low"] <= raw["close"])
+        ohlc_valid = bool(raw.get("ohlcValid", close_valid and positive("high") and raw["high"] >= raw["close"] and low_ok))
         volume_valid = bool(raw.get("volumeValid", positive("volume")))
         rows[code] = {"date": target, "close": raw.get("close"), "high": raw.get("high"), "volume": raw.get("volume"),
                       "closeValid": close_valid, "ohlcValid": ohlc_valid, "volumeValid": volume_valid}
+        for key in OPTIONAL_COLUMNS:
+            if key in raw:
+                rows[code][key] = raw[key]
     return rows
 
 
@@ -378,7 +396,9 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
     return normalize_daily_rows({"rows": output}, target)
 
 
-def update_state(existing, daily_rows, target_date, universe_file):
+def update_state(existing, daily_rows, target_date, universe_file, publication_status="FINAL"):
+    if publication_status not in {"PROVISIONAL", "FINAL"}:
+        raise ValueError("invalid publication status")
     target = compact_date(target_date); groups = authoritative_groups(universe_file)
     expected = set().union(*(set(group) for group in groups.values()))
     if set(daily_rows) != expected:
@@ -400,7 +420,7 @@ def update_state(existing, daily_rows, target_date, universe_file):
             rows.sort(key=lambda row: row["date"])
             stocks.append(encode_stock(code, rows[-KEEP:]))
         output[market] = {"schemaVersion": 1, "format": FORMAT, "market": market, "retainedObservations": KEEP,
-                          "publicationStatus": "FINAL", "asOfDate": target, "stocks": sorted(stocks, key=lambda row: row["code"])}
+                          "publicationStatus": publication_status, "asOfDate": target, "stocks": sorted(stocks, key=lambda row: row["code"])}
     return output, changed
 
 
@@ -428,24 +448,27 @@ def baseline_from_state(state, target_date, universe_file, output, generated_at=
     return baseline
 
 
-def update_from_file(state_dir, daily_input, target_date, universe_file, baseline_output, no_write=False):
+def update_from_file(state_dir, daily_input, target_date, universe_file, baseline_output, no_write=False, provisional=False):
     existing = load_state(state_dir, universe_file)
     incoming = normalize_daily_rows(json.loads(Path(daily_input).read_text(encoding="utf-8")), target_date)
-    return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write)
+    return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write, provisional)
 
 
-def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False):
-    updated, changed = update_state(existing, incoming, target_date, universe_file)
+def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False, provisional=False):
+    publication_status = "PROVISIONAL" if provisional else "FINAL"
+    updated, changed = update_state(existing, incoming, target_date, universe_file, publication_status)
     baseline = baseline_from_state(updated, target_date, universe_file, baseline_output)
     if changed and not no_write:
-        transactional_publish({Path(state_dir) / "kospi.json": updated["KOSPI"], Path(state_dir) / "kosdaq.json": updated["KOSDAQ"],
-                               Path(baseline_output): baseline})
+        payloads = {Path(state_dir) / "kospi.json": updated["KOSPI"], Path(state_dir) / "kosdaq.json": updated["KOSDAQ"]}
+        if not provisional:
+            payloads[Path(baseline_output)] = baseline
+        transactional_publish(payloads)
     return {"status": "SUCCESS", "changed": changed, "asOfDate": compact_date(target_date),
             "coverage": sum(len(value["stocks"]) for value in updated.values()), "baseline": baseline}
 
 
 def update_with_universe_refresh(state_dir, universe_file, baseline_output, lifecycle_output,
-                                 target_date, stock_payload, fetcher=None, no_write=False,
+                                 target_date, stock_payload, fetcher=None, no_write=False, provisional=False,
                                  **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
@@ -471,7 +494,8 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
                 "coverage": len(expected), "lifecycle": diagnostics, "baseline": baseline}
     incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
                                   **collection_options)
-    updated, changed = update_state(reconciled, incoming, target_date, current_universe)
+    publication_status = "PROVISIONAL" if provisional else "FINAL"
+    updated, changed = update_state(reconciled, incoming, target_date, current_universe, publication_status)
     baseline = baseline_from_state(updated, target_date, current_universe, baseline_output)
     groups = authoritative_groups(current_universe)
     expected = set().union(*(set(group) for group in groups.values()))
@@ -482,13 +506,15 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
     baseline.setdefault("refreshDiagnostics", {})["universeLifecycle"] = diagnostics
     publication_changed = changed or lifecycle_changed
     if publication_changed and not no_write:
-        transactional_publish({
+        payloads = {
             Path(universe_file): current_universe,
             Path(state_dir) / "kospi.json": updated["KOSPI"],
             Path(state_dir) / "kosdaq.json": updated["KOSDAQ"],
-            Path(baseline_output): baseline,
             Path(lifecycle_output): diagnostics,
-        })
+        }
+        if not provisional:
+            payloads[Path(baseline_output)] = baseline
+        transactional_publish(payloads)
     return {"status": "SUCCESS", "changed": publication_changed,
             "asOfDate": compact_date(target_date), "coverage": len(expected),
             "lifecycle": diagnostics, "baseline": baseline}

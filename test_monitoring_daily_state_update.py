@@ -77,6 +77,18 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         result, changed = update.update_state(state, update.normalize_daily_rows(self._rows(target, 999, 1000, 1), target), target, self.universe)
         self.assertTrue(changed); self.assertEqual("FINAL", result["KOSPI"]["publicationStatus"])
 
+    def test_provisional_write_keeps_baseline_unchanged(self):
+        baseline_path = self.root / "baseline.json"
+        baseline_path.write_text('{"asOfDate":"20260101","historyStatus":"OK"}\n', encoding="utf-8")
+        state = update.load_state(self.state_dir, self.universe)
+        incoming = update.normalize_daily_rows(self._rows("20260102"), "20260102")
+        with patch.object(update, "baseline_from_state", return_value={"asOfDate": "20260102"}):
+            result = update.update_from_rows(state, incoming, self.state_dir, "20260102",
+                                             self.universe, baseline_path, provisional=True)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual("PROVISIONAL", json.loads((self.state_dir / "kospi.json").read_text())["publicationStatus"])
+        self.assertEqual('{"asOfDate":"20260101","historyStatus":"OK"}\n', baseline_path.read_text())
+
     def test_missing_and_duplicate_are_blocked(self):
         state = update.load_state(self.state_dir, self.universe)
         with self.assertRaisesRegex(ValueError, "duplicate daily code"):
@@ -489,6 +501,20 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual(2767, len(rows))
         self.assertEqual(2767, sum(calls.values()))
         self.assertTrue(all(count == 1 for count in calls.values()))
+
+    def test_optional_ohlcv_columns_are_additive_and_v1_remains_readable(self):
+        legacy = update.encode_stock("000001", [{"date": "20261017", "close": 10,
+            "high": 11, "volume": 100, "closeValid": True, "ohlcValid": True,
+            "volumeValid": True}])
+        self.assertNotIn("open", legacy)
+        self.assertEqual(update.decode_stock(legacy)[0]["close"], 10)
+        extended = update.encode_stock("000001", [{"date": "20261018", "open": 9,
+            "low": 8, "close": 10, "high": 11, "volume": 100, "value": 1000,
+            "closeValid": True, "ohlcValid": True, "volumeValid": True}])
+        self.assertEqual(extended["open"], [9])
+        self.assertEqual(extended["low"], [8])
+        self.assertEqual(extended["value"], [1000])
+        self.assertEqual(update.decode_stock(extended)[0]["value"], 1000)
 
 
 if __name__ == "__main__": unittest.main()

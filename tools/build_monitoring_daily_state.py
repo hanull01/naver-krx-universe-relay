@@ -76,7 +76,9 @@ def main():
     p.add_argument('--baseline-output', default=str(ROOT/'data/monitoring-baseline/latest.json'))
     p.add_argument('--lifecycle-output', default=str(ROOT/'data/monitoring-daily/universe-lifecycle.json'))
     p.add_argument('--closing-window', action='store_true', help='print KST final-daily eligibility without collecting data')
-    p.add_argument('--no-write',action='store_true'); a=p.parse_args()
+    p.add_argument('--no-write',action='store_true')
+    p.add_argument('--provisional', action='store_true', help='publish rolling state without changing the baseline')
+    a=p.parse_args()
     if a.closing_window:
         from monitoring_daily_state_update import closing_window
         print(json.dumps(closing_window(), ensure_ascii=False))
@@ -95,16 +97,16 @@ def main():
                     ensure_complete(stock_payload)
                     outcome = update_with_universe_refresh(
                         a.output_dir, a.universe_file, a.baseline_output,
-                        a.lifecycle_output, a.date, stock_payload, no_write=a.no_write)
+                        a.lifecycle_output, a.date, stock_payload, no_write=a.no_write, provisional=a.provisional)
                 else:
                     outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
                                                collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
-                                               a.universe_file, a.baseline_output, no_write=a.no_write)
+                                               a.universe_file, a.baseline_output, no_write=a.no_write, provisional=a.provisional)
             else:
                 if a.refresh_universe:
                     p.error('--refresh-universe requires --fetch-today')
                 outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
-                                           a.baseline_output, no_write=a.no_write)
+                                           a.baseline_output, no_write=a.no_write, provisional=a.provisional)
         except TodayRowsNotReady as exc:
             print(json.dumps(exc.diagnostics, ensure_ascii=False))
             return 2
