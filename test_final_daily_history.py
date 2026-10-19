@@ -34,8 +34,9 @@ class FinalDailyHistoryTests(unittest.TestCase):
         self.assertEqual(result["status"], "READY")
         self.assertEqual([item["code"] for item in result["rows"]], ["S"])
         self.assertEqual({item["assetType"] for item in result["excluded"]}, {"ETF", "ETN"})
-        self.assertEqual(set(result["rows"][0]),
-                         {"code", "date", "close", "high", "volume", "closeValid", "ohlcValid", "volumeValid"})
+        self.assertEqual(result["rows"][0]["open"], 10)
+        self.assertEqual(result["rows"][0]["low"], 9)
+        self.assertEqual(result["rows"][0]["value"], 1000)
 
     def test_stock_etf_etn_are_preserved_and_no_network_is_used(self):
         result = snapshot_rows(snapshot([row("S"), row("E", "ETF"), row("N", "ETN")]),
