@@ -2,10 +2,6 @@ name: Refresh daily candles
 
 on:
   workflow_dispatch:
-  schedule:
-    # NAVER declares the regular close publish time as 16:30 KST. Run five
-    # minutes later so daily/realtime cross-validation uses the final close.
-    - cron: "35 7 * * 1-5"
 
 permissions:
   contents: write

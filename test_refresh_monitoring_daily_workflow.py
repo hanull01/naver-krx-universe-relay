@@ -9,9 +9,9 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
     def setUp(self):
         self.text = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_follows_daily_candles_and_manual_dry_run(self):
-        self.assertIn('workflow_run:', self.text)
-        self.assertIn('workflows: ["Refresh daily candles"]', self.text)
+    def test_is_manual_only_after_final_path_owns_daily_state(self):
+        self.assertNotIn('workflow_run:', self.text)
+        self.assertNotIn('workflows: ["Refresh daily candles"]', self.text)
         self.assertNotIn('cron: "45 6 * * 1-5"', self.text)
         self.assertIn('group: generated-data-write', self.text)
         self.assertIn('workflow_dispatch:', self.text)
@@ -33,9 +33,9 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)
         self.assertIn('nowKst=', self.text)
 
-    def test_workflow_run_publishes_provisional_state_only(self):
-        self.assertIn("github.event_name }}\" = \"workflow_run\"", self.text)
-        self.assertIn('extra+=(--provisional)', self.text)
+    def test_no_workflow_run_provisional_path_remains(self):
+        self.assertNotIn('workflow_run', self.text)
+        self.assertNotIn('extra+=(--provisional)', self.text)
 
     def test_publish_stages_only_atomic_lifecycle_artifacts_without_force_push(self):
         for path in ('data/market-universe/all-assets.json', 'data/monitoring-daily/kospi.json',
