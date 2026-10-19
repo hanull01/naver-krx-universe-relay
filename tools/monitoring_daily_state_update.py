@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
 KEEP = 301
 FORMAT = "COLUMN_ARRAY_V1"
+OPTIONAL_COLUMNS = ("open", "low", "value")
 MARKETS = ("KOSPI", "KOSDAQ")
 KST = ZoneInfo("Asia/Seoul")
 REGULAR_CLOSE_KST = time(15, 30)
@@ -130,18 +131,31 @@ def decode_stock(stock):
         raise ValueError("malformed COLUMN_ARRAY_V1 stock")
     if len({len(stock[key]) for key in keys}) != 1:
         raise ValueError(f"column length mismatch: {stock['code']}")
+    has_optional = any(key in stock for key in OPTIONAL_COLUMNS)
+    if has_optional and any(not isinstance(stock.get(key), list) or len(stock[key]) != len(stock["dates"])
+                           for key in OPTIONAL_COLUMNS):
+        raise ValueError(f"optional column length mismatch: {stock['code']}")
     dates = [compact_date(value) for value in stock["dates"]]
     if dates != sorted(dates) or len(dates) != len(set(dates)):
         raise ValueError(f"invalid date sequence: {stock['code']}")
-    return [{"date": day, "close": stock["close"][index], "high": stock["high"][index],
-             "volume": stock["volume"][index], **flags(stock["validity"][index])}
-            for index, day in enumerate(dates)]
+    rows = []
+    for index, day in enumerate(dates):
+        row = {"date": day, "close": stock["close"][index], "high": stock["high"][index],
+               "volume": stock["volume"][index], **flags(stock["validity"][index])}
+        if has_optional:
+            row.update({key: stock[key][index] for key in OPTIONAL_COLUMNS})
+        rows.append(row)
+    return rows
 
 
 def encode_stock(code, rows):
-    return {"code": str(code), "dates": [row["date"] for row in rows], "close": [row["close"] for row in rows],
+    payload = {"code": str(code), "dates": [row["date"] for row in rows], "close": [row["close"] for row in rows],
             "high": [row["high"] for row in rows], "volume": [row["volume"] for row in rows],
             "validity": [mask(row) for row in rows]}
+    if any(any(key in row for key in OPTIONAL_COLUMNS) for row in rows):
+        for key in OPTIONAL_COLUMNS:
+            payload[key] = [row.get(key) for row in rows]
+    return payload
 
 
 def _universe_payload(universe):
