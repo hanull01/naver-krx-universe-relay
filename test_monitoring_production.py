@@ -115,7 +115,7 @@ class MonitoringProductionTests(unittest.TestCase):
             stale, datetime(2026, 10, 12, 10, 0, tzinfo=KST), market_day)[1],
             "BASELINE_STALE")
 
-    def test_collection_readiness_requires_current_final_after_close(self):
+    def test_collection_readiness_uses_prior_baseline_before_final_generation(self):
         sessions = {date(2026, 10, 8), date(2026, 10, 12)}
         market_day = lambda value: (value in sessions, "OPEN" if value in sessions else "HOLIDAY")
         prior = {"asOfDate": "20261008", "historyStatus": "OK",
@@ -123,7 +123,7 @@ class MonitoringProductionTests(unittest.TestCase):
                  "coveragePct": 100.0}
         current = dict(prior, asOfDate="20261012")
         after = datetime(2026, 10, 12, 16, 0, tzinfo=KST)
-        self.assertEqual(runner.collection_readiness(prior, after, market_day)[1], "BASELINE_STALE")
+        self.assertEqual(runner.collection_readiness(prior, after, market_day)[1], "READY")
         self.assertEqual(runner.collection_readiness(current, after, market_day)[1], "READY")
 
     def test_incomplete_current_never_publishes(self):

@@ -75,8 +75,15 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
             errors.append(f"VALUE_INVALID:{code}")
 
     baseline_date = _date((baseline or {}).get("asOfDate"))
-    if baseline_date and target and baseline_date != target:
-        errors.append("BASELINE_DATE_MISMATCH")
+    if baseline_date and target:
+        # Before final collection the baseline is normally the previous KRX
+        # trading day. The same-day baseline is generated downstream from
+        # this validated snapshot, not required as its prerequisite.
+        try:
+            if int(baseline_date) > int(target):
+                errors.append("BASELINE_DATE_MISMATCH")
+        except ValueError:
+            errors.append("BASELINE_DATE_MISMATCH")
     if (baseline or {}).get("historyStatus") not in (None, "OK"):
         errors.append("BASELINE_NOT_READY")
 
