@@ -404,9 +404,9 @@ def load_monitoring_daily_final(codes, business_day):
             rows[code] = {
                 'date': business_day.isoformat(), 'close': close, 'high': high,
                 'volume': volume, 'complete': True, 'noTrading': volume == 0,
-                'session': 'REGULAR', 'barType': 'REGULAR_SESSION',
+                'session': 'FINAL_DAILY', 'barType': 'FINAL_DAILY',
                 'source': MONITORING_DAILY_SOURCE, 'sourceDate': business_day.isoformat(),
-                'sourceTime': datetime.combine(business_day, dtime(15, 30), tzinfo=KST).isoformat(),
+                'sourceTime': payload.get('generatedAt'),
                 'publicationStatus': 'FINAL', 'format': 'COLUMN_ARRAY_V1',
             }
     missing = sorted(requested - set(rows))
@@ -426,7 +426,7 @@ def merge_verified_completed_bar(daily, bar):
         key=lambda row: row['date'])
     merged['regularSessionDate'] = bar['date']
     merged['regularDailyStatus'] = 'ok'
-    merged['sourceTime'] = bar['date']
+    merged['sourceTime'] = bar.get('sourceTime')
     return merged
 
 
@@ -616,6 +616,7 @@ def confirmed_regular_bar(daily, quote):
     for bar in reversed(daily.get('datas', [])):
         bar_date = ''.join(ch for ch in str(bar.get('date') or '') if ch.isdigit())
         if (bar_date == target and bar.get('complete') is True
+                and bar.get('session') != 'FINAL_DAILY'
                 and not bar.get('noTrading')):
             return bar
     return None
@@ -1045,7 +1046,7 @@ def load_daily_for_technical(code, verified_bar=None):
                             key=lambda row: row['date'])
     merged['regularSessionDate'] = bar['date']
     merged['regularDailyStatus'] = 'ok'
-    merged['sourceTime'] = bar['sourceTime']
+    merged['sourceTime'] = bar.get('sourceTime')
     return merged
 
 
@@ -1072,7 +1073,7 @@ def _valid_regular_override_for_date(daily, target_date):
     monitoring_final = (
         bar.get('source') == MONITORING_DAILY_SOURCE
         and bar.get('sourceDate') == target_text
-        and bar.get('sourceTime') == datetime.combine(target, dtime(15, 30), tzinfo=KST).isoformat()
+        and bar.get('session') != 'FINAL_DAILY'
         and bar.get('publicationStatus') == 'FINAL'
         and bar.get('format') == 'COLUMN_ARRAY_V1')
     verified_realtime = (

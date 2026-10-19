@@ -1088,7 +1088,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(technicals['status'], 'ok')
         self.assertTrue(all(row['asOf'] == '2026-10-08' for row in technicals['datas']))
         self.assertEqual(states['status'], 'ok')
-        self.assertTrue(all(row['regularSession']['status'] == 'CONFIRMED'
+        self.assertTrue(all(row['regularSession']['status'] == 'UNAVAILABLE'
                             for row in states['datas']))
         self.assertNotIn(9999, [row['closePrice'] for row in result['datas']])
         self.assertIn('data/quotes.json', [call.args[0] for call in save.call_args_list])
