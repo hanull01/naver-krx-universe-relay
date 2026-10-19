@@ -149,14 +149,32 @@ def monitored_universe_summary(universe_subset, relay_quotes_file=RELAY_QUOTES_F
             continue
         if target.time() < time(15, 30):
             continue
-        daily = load_json(regular_daily_dir / f"{code}.json")
-        if not isinstance(daily, dict) or not isinstance(daily.get("datas"), list):
-            continue
-        daily = dict(daily, regularSessionDate=target.date().isoformat())
-        if not relay._valid_same_day_regular_override(daily, target):
-            continue
-        bar = daily["datas"][0] if len(daily["datas"]) == 1 else next(
-            row for row in daily["datas"] if row.get("date") == target.date().isoformat())
+        # Prefer the already verified 15:30 reference embedded in quotes.json.
+        # This avoids reopening the per-symbol daily-regular cache and makes
+        # no additional network request.  Keep the cache as a compatibility
+        # fallback for older quote artifacts.
+        reference_time = str(quote.get("referenceSourceTime") or "")
+        reference_price = quote.get("referencePrice")
+        reference_ok = (quote.get("referenceStatus") == "ok"
+                        and quote.get("referencePriceBasis") == "TODAY_REGULAR_CLOSE"
+                        and reference_time.startswith(target.strftime("%Y%m%d"))
+                        and isinstance(reference_price, (int, float))
+                        and not isinstance(reference_price, bool))
+        if reference_ok:
+            bar = {"date": target.date().isoformat(), "close": reference_price,
+                   "high": reference_price, "complete": True,
+                   "session": "REGULAR", "barType": "REGULAR_SESSION",
+                   "source": "NAVER_VERIFIED_REGULAR_CLOSE",
+                   "sourceTime": reference_time}
+        else:
+            daily = load_json(regular_daily_dir / f"{code}.json")
+            if not isinstance(daily, dict) or not isinstance(daily.get("datas"), list):
+                continue
+            daily = dict(daily, regularSessionDate=target.date().isoformat())
+            if not relay._valid_same_day_regular_override(daily, target):
+                continue
+            bar = daily["datas"][0] if len(daily["datas"]) == 1 else next(
+                row for row in daily["datas"] if row.get("date") == target.date().isoformat())
         if any(not isinstance(bar.get(key), (int, float)) for key in ("close", "high")):
             continue
         # Relay's published thresholds are the source for this view.  Reuse
