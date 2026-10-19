@@ -50,6 +50,16 @@ class FinalDailyHistoryTests(unittest.TestCase):
         self.assertEqual(snapshot_rows(snapshot([missing_type]))["status"], "REJECTED")
         self.assertEqual(snapshot_rows(snapshot([row(accumulatedTradingValue=None)]))["status"], "REJECTED")
 
+    def test_collector_snapshot_can_use_verified_run_date_but_missing_code_still_blocks(self):
+        payload = {"generatedAt": "2026-10-19T20:30:00+09:00", "expectedCount": 2,
+                   "stocks": [row("000001")]}
+        result = monitoring_daily_payload(payload, {"asOfDate": "20261018", "historyStatus": "OK"},
+                                          ["000001", "028080"], target_date="20261019")
+        self.assertEqual(result["status"], "WAIT")
+        self.assertIn("MISSING_CODES", result["reason"])
+        self.assertIn("COVERAGE_MISMATCH", result["reason"])
+        self.assertNotIn("TRADING_DATE_MISSING", result["reason"])
+
     def test_ohlc_relationship_is_rejected(self):
         result = snapshot_rows(snapshot([row(highPrice=8)]))
         self.assertEqual(result["status"], "REJECTED")

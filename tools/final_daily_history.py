@@ -27,9 +27,10 @@ def _same(left, right):
         "source", "collectedAt", "session", "validationStatus"))
 
 
-def snapshot_rows(snapshot, baseline=None, expected_codes=None):
+def snapshot_rows(snapshot, baseline=None, expected_codes=None, target_date=None):
     """Convert a validated snapshot to proposed daily rows without writing."""
-    diagnostic = validate_snapshot(snapshot, baseline, expected_codes=expected_codes)
+    diagnostic = validate_snapshot(snapshot, baseline, target_date=target_date,
+                                   expected_codes=expected_codes)
     if diagnostic["errors"]:
         return {"status": "REJECTED", "reason": diagnostic["errors"], "diagnostic": diagnostic,
                 "rows": []}
@@ -113,9 +114,10 @@ def monitoring_daily_rows(proposed_rows):
             "status": "READY" if rows else "WAIT"}
 
 
-def monitoring_daily_payload(snapshot, baseline=None, expected_codes=None):
+def monitoring_daily_payload(snapshot, baseline=None, expected_codes=None, target_date=None):
     """Build the existing update-latest input without writing or fetching."""
-    candidate = snapshot_rows(snapshot, baseline=baseline, expected_codes=expected_codes)
+    candidate = snapshot_rows(snapshot, baseline=baseline, expected_codes=expected_codes,
+                              target_date=target_date)
     if candidate["status"] != "READY":
         return {"status": "WAIT", "reason": candidate["reason"],
                 "diagnostic": candidate["diagnostic"], "rows": []}

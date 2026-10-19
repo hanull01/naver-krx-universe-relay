@@ -235,7 +235,12 @@ jobs:
           baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
           universe = json.loads(Path("data/market-universe/all-assets.json").read_text(encoding="utf-8"))
           expected = [str(row["code"]) for row in universe.get("assets", []) if row.get("assetType") == "STOCK"]
-          result = monitoring_daily_payload(snapshot, baseline, expected)
+          target_date = snapshot.get("tradingDate") or snapshot.get("asOfDate")
+          if not target_date:
+              from datetime import datetime
+              from zoneinfo import ZoneInfo
+              target_date = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
+          result = monitoring_daily_payload(snapshot, baseline, expected, target_date=target_date)
           if result["status"] != "READY":
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + json.dumps(result["reason"], ensure_ascii=False))
           Path(sys.argv[2]).write_text(json.dumps({"rows": result["rows"]}, ensure_ascii=False), encoding="utf-8")
