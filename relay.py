@@ -416,6 +416,71 @@ def load_monitoring_daily_final(codes, business_day):
     return rows
 
 
+def load_monitoring_daily_history(code, limit=301):
+    """Read one stock's bounded FINAL monitoring-daily history.
+
+    This is a read-only compatibility adapter for technical consumers.  It
+    deliberately does not replace the exact-date FINAL/REGULAR_CLOSE path.
+    """
+    requested = str(code)
+    found = None
+    for market in ('kospi', 'kosdaq'):
+        path = ROOT / f'{MONITORING_DAILY_DIR}/{market}.json'
+        payload = json.loads(path.read_text(encoding='utf-8'))
+        if (payload.get('schemaVersion') != 1
+                or payload.get('format') != 'COLUMN_ARRAY_V1'
+                or payload.get('publicationStatus') != 'FINAL'
+                or str(payload.get('market', '')).lower() != market):
+            raise ValueError(f'invalid monitoring daily FINAL contract: {market}')
+        for stock in payload.get('stocks', []):
+            if str(stock.get('code') or '') != requested:
+                continue
+            if found is not None:
+                raise ValueError(f'duplicate monitoring daily code: {requested}')
+            required = ('dates', 'close', 'high', 'volume', 'validity')
+            if any(not isinstance(stock.get(key), list) for key in required):
+                raise ValueError(f'malformed monitoring daily columns: {requested}')
+            lengths = {len(stock[key]) for key in required}
+            if len(lengths) != 1:
+                raise ValueError(f'monitoring daily column length mismatch: {requested}')
+            dates = stock['dates']
+            if dates != sorted(dates) or len(set(dates)) != len(dates):
+                raise ValueError(f'monitoring daily dates are not unique and ordered: {requested}')
+            start = max(0, len(dates) - limit)
+            numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool)
+            rows = []
+            for index in range(start, len(dates)):
+                day = str(dates[index])
+                if not re.fullmatch(r'\d{8}', day):
+                    raise ValueError(f'invalid monitoring daily date: {requested}')
+                close, high, volume = (stock[key][index] for key in ('close', 'high', 'volume'))
+                if (not numeric(close) or not numeric(high) or not numeric(volume)
+                        or close <= 0 or high < close or volume < 0):
+                    raise ValueError(f'invalid monitoring daily values: {requested}')
+                row = {
+                    'date': f'{day[:4]}-{day[4:6]}-{day[6:]}',
+                    'close': close, 'high': high, 'volume': volume,
+                    'complete': stock['validity'][index] == 0,
+                    'noTrading': volume == 0,
+                    'session': 'FINAL_DAILY', 'barType': 'FINAL_DAILY',
+                    'source': MONITORING_DAILY_SOURCE,
+                    'publicationStatus': 'FINAL',
+                    'sourceTime': payload.get('generatedAt'),
+                }
+                for key in ('open', 'low', 'value'):
+                    values = stock.get(key)
+                    if isinstance(values, list):
+                        if len(values) != len(dates):
+                            raise ValueError(f'monitoring daily optional column mismatch: {requested}')
+                        row[key] = values[index]
+                rows.append(row)
+            found = {'status': 'ok', 'datas': rows,
+                     'publicationStatus': 'FINAL', 'session': 'FINAL_DAILY'}
+    if found is None:
+        raise ValueError(f'monitoring daily FINAL history missing: {requested}')
+    return found
+
+
 def merge_verified_completed_bar(daily, bar):
     """Merge an already-validated exact-date bar into an in-memory view only."""
     if not isinstance(daily, dict) or not isinstance(bar, dict):
@@ -1012,7 +1077,10 @@ def load_daily_for_technical(code, verified_bar=None):
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
-        return None
+        try:
+            return load_monitoring_daily_history(code)
+        except (OSError, ValueError, json.JSONDecodeError):
+            return None
     current = now()
     daily = normalize_raw_daily_for_technical(daily, current)
     if verified_bar is not None:
