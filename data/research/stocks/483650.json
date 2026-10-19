@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "483650",
   "itemName": "달바글로벌",
-  "reportCount": 19,
-  "latestReportNid": "96736",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 20,
+  "latestReportNid": "96835",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96736",
-    "writeDate": "2026-10-15",
-    "brokerName": "신한투자증권",
-    "title": "Analyst Day 후기: 안정적 고성장 증명!",
+    "nid": "96835",
+    "writeDate": "2026-10-19",
+    "brokerName": "교보증권",
+    "title": "비우호적 환율에도 수익성 기대치 상회 중",
     "goalPrice": 310000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 10,
+        "negative": 2
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3,
+        "환율": 3,
+        "미국": 1,
+        "자동차": 1,
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "96835",
     "96736",
     "95652",
     "95648",

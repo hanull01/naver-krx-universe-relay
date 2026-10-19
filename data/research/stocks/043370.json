@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "043370",
   "itemName": "피에이치에이",
-  "reportCount": 2,
-  "latestReportNid": "96099",
-  "latestWriteDate": "2026-09-11",
+  "reportCount": 3,
+  "latestReportNid": "96829",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96099",
-    "writeDate": "2026-09-11",
-    "brokerName": "한국IR협의회",
-    "title": "Georgia On My Mind (feat. HMGMA)",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96829",
+    "writeDate": "2026-10-19",
+    "brokerName": "하나증권",
+    "title": "자기주식 최대 10% 소각, 주주환원의 본격화",
+    "goalPrice": 16000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 6,
+        "negative": 6
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "미국": 3,
-        "환율": 2
+        "미국": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96829",
     "96099",
     "95714"
   ]

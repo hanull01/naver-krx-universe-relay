@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "103140",
   "itemName": "풍산",
-  "reportCount": 17,
-  "latestReportNid": "96779",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 18,
+  "latestReportNid": "96838",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96779",
-    "writeDate": "2026-10-16",
-    "brokerName": "신한투자증권",
-    "title": "메탈게인 이후의 숙제",
-    "goalPrice": 110000,
+    "nid": "96838",
+    "writeDate": "2026-10-19",
+    "brokerName": "한화투자증권",
+    "title": "Q26 Preview: 메탈은 줄고 방산은 이연된 3분기",
+    "goalPrice": 98000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 3,
+        "negative": 6
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "방산": 1
+        "환율": 4,
+        "방산": 3,
+        "가격": 2,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "96838",
     "96779",
     "96757",
     "96625",

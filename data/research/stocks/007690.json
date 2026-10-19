@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "007690",
   "itemName": "국도화학",
-  "reportCount": 2,
-  "latestReportNid": "94551",
-  "latestWriteDate": "2026-07-27",
+  "reportCount": 3,
+  "latestReportNid": "96828",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "94551",
-    "writeDate": "2026-07-27",
+    "nid": "96828",
+    "writeDate": "2026-10-19",
     "brokerName": "하나증권",
-    "title": "에폭시 글로벌 No.1의 성장이 시작된다",
-    "goalPrice": 62000,
+    "title": "외부요인 변화에 따른 대폭 감익",
+    "goalPrice": 43000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 0
+        "positive": 0,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "수요": 1,
-        "중국": 1
+        "가격": 3,
+        "원가": 3,
+        "환율": 3,
+        "수요": 2,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "96828",
     "94551",
     "93537"
   ]

@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "034220",
   "itemName": "LG디스플레이",
-  "reportCount": 22,
-  "latestReportNid": "96688",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 23,
+  "latestReportNid": "96825",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96688",
-    "writeDate": "2026-10-14",
-    "brokerName": "IBK투자증권",
-    "title": "칩플레이션에 이어 환율까지",
-    "goalPrice": 13000,
+    "nid": "96825",
+    "writeDate": "2026-10-19",
+    "brokerName": "대신증권",
+    "title": "3Q 실적의 추가 하향 고통과 인내의 시간..",
+    "goalPrice": 10500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 4,
+        "negative": 12
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 7,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "환율": 4,
-        "가격": 2
+        "가격": 3,
+        "환율": 2,
+        "반도체": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96825",
     "96688",
     "96533",
     "96433",

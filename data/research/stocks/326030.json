@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "326030",
   "itemName": "SK바이오팜",
-  "reportCount": 19,
-  "latestReportNid": "96148",
-  "latestWriteDate": "2026-09-15",
+  "reportCount": 20,
+  "latestReportNid": "96831",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96148",
-    "writeDate": "2026-09-15",
-    "brokerName": "iM증권",
-    "title": "임상 보류에 대한 과도한 우려",
-    "goalPrice": 130000,
+    "nid": "96831",
+    "writeDate": "2026-10-19",
+    "brokerName": "하나증권",
+    "title": "실적은 양호할 것, 오파칼림 업데이트 중요(3Q26 Pre)",
+    "goalPrice": 160000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 3,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3,
+        "환율": 2
+      }
     }
   },
   "reportNids": [
+    "96831",
     "96148",
     "96137",
     "96114",

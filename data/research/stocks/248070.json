@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "248070",
   "itemName": "솔루엠",
-  "reportCount": 3,
-  "latestReportNid": "93353",
-  "latestWriteDate": "2026-05-29",
+  "reportCount": 4,
+  "latestReportNid": "96820",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "93353",
-    "writeDate": "2026-05-29",
-    "brokerName": "유안타증권",
-    "title": "솔루엠 시즌2 돌입 준비",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96820",
+    "writeDate": "2026-10-19",
+    "brokerName": "미래에셋증권",
+    "title": "전력 기업으로 급부상",
+    "goalPrice": 28000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 5,
-        "negative": 0
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "AI": 1,
         "가격": 1,
-        "미국": 1,
-        "자동차": 1
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96820",
     "93353",
     "93334",
     "93236"

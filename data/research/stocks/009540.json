@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "009540",
   "itemName": "HD한국조선해양",
-  "reportCount": 8,
-  "latestReportNid": "96358",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 9,
+  "latestReportNid": "96805",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96358",
-    "writeDate": "2026-09-29",
-    "brokerName": "미래에셋증권",
-    "title": "배당률 어디까지 올라가는 거에요",
-    "goalPrice": 470000,
+    "nid": "96805",
+    "writeDate": "2026-10-19",
+    "brokerName": "키움증권",
+    "title": "글로벌 조선 건조 역량 확대에 주목",
+    "goalPrice": 530000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 5,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "조선": 2,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96805",
     "96358",
     "95860",
     "94735",

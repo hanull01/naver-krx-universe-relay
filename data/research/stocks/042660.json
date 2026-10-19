@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "042660",
   "itemName": "한화오션",
-  "reportCount": 31,
-  "latestReportNid": "96719",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 32,
+  "latestReportNid": "96809",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96719",
-    "writeDate": "2026-10-15",
-    "brokerName": "IBK투자증권",
-    "title": "3Q26 Preview: 진검승부",
-    "goalPrice": 120000,
+    "nid": "96809",
+    "writeDate": "2026-10-19",
+    "brokerName": "키움증권",
+    "title": "새로운 성장 동력이 필요",
+    "goalPrice": 119000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 2
+        "positive": 4,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 2
+        "수주": 1,
+        "조선": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96809",
     "96719",
     "96695",
     "96360",

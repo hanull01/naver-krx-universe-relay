@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "028260",
   "itemName": "삼성물산",
-  "reportCount": 25,
-  "latestReportNid": "96290",
-  "latestWriteDate": "2026-09-23",
+  "reportCount": 26,
+  "latestReportNid": "96827",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96290",
-    "writeDate": "2026-09-23",
-    "brokerName": "SK증권",
-    "title": "10월, 가시화될 할인율 축소",
-    "goalPrice": 550000,
+    "nid": "96827",
+    "writeDate": "2026-10-19",
+    "brokerName": "유안타증권",
+    "title": "하이테크 가즈아!",
+    "goalPrice": 510000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 0
+        "positive": 1,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96827",
     "96290",
     "96258",
     "95827",

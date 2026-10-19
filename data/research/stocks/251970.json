@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "251970",
   "itemName": "펌텍코리아",
-  "reportCount": 12,
-  "latestReportNid": "96619",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 13,
+  "latestReportNid": "96834",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96619",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "하반기 실적의 다크호스",
-    "goalPrice": 90000,
-    "normalizedOpinion": "BUY",
+    "nid": "96834",
+    "writeDate": "2026-10-19",
+    "brokerName": "교보증권",
+    "title": "탄탄한게 매력, 높아지는 실적",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 6,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 2,
-        "원가": 1,
-        "환율": 1
+        "가격": 3,
+        "수요": 1,
+        "수주": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96834",
     "96619",
     "96466",
     "96332",

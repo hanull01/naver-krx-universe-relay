@@ -2,34 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "000150",
   "itemName": "두산",
-  "reportCount": 28,
-  "latestReportNid": "96762",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 29,
+  "latestReportNid": "96824",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96762",
-    "writeDate": "2026-10-15",
-    "brokerName": "교보증권",
-    "title": "뚜렷한 저평가 구간",
-    "goalPrice": 2200000,
+    "nid": "96824",
+    "writeDate": "2026-10-19",
+    "brokerName": "대신증권",
+    "title": "흔들리지 않는 성장",
+    "goalPrice": 1970000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 1,
+        "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "수요": 2,
-        "가격": 1,
-        "반도체": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96824",
     "96762",
     "96334",
     "96253",

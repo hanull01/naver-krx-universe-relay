@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "170900",
   "itemName": "동아에스티",
-  "reportCount": 3,
-  "latestReportNid": "94648",
-  "latestWriteDate": "2026-07-29",
+  "reportCount": 4,
+  "latestReportNid": "96807",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "94648",
-    "writeDate": "2026-07-29",
-    "brokerName": "iM증권",
-    "title": "조금 더딜 뿐이다",
+    "nid": "96807",
+    "writeDate": "2026-10-19",
+    "brokerName": "키움증권",
+    "title": "이어지는 비용 감소로 양호한 실적 전망",
     "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 5,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3
+      }
     }
   },
   "reportNids": [
+    "96807",
     "94648",
     "92077",
     "91762"

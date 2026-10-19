@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "079550",
   "itemName": "LIG디펜스앤에어로스페이스",
-  "reportCount": 22,
-  "latestReportNid": "96613",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 23,
+  "latestReportNid": "96823",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96613",
-    "writeDate": "2026-10-12",
-    "brokerName": "유안타증권",
-    "title": "3Q Pre: 예고된 실적 부진, 시선은 수주로",
-    "goalPrice": 1050000,
+    "nid": "96823",
+    "writeDate": "2026-10-19",
+    "brokerName": "대신증권",
+    "title": "3Q26 Preview: 컨센서스 하회 전망",
+    "goalPrice": 830000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 3,
         "negative": 3
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원가": 2
+        "방산": 1,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "96823",
     "96613",
     "96394",
     "95352",

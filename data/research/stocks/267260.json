@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "267260",
   "itemName": "HD현대일렉트릭",
-  "reportCount": 29,
-  "latestReportNid": "96654",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 30,
+  "latestReportNid": "96816",
+  "latestWriteDate": "2026-10-19",
   "latest": {
-    "nid": "96654",
-    "writeDate": "2026-10-13",
-    "brokerName": "미래에셋증권",
-    "title": "빅테크향 PO를 기다리며",
-    "goalPrice": 1100000,
+    "nid": "96816",
+    "writeDate": "2026-10-19",
+    "brokerName": "SK증권",
+    "title": "일시적인 환율 역풍",
+    "goalPrice": 650000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 1,
         "negative": 3
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "수요": 1,
+        "환율": 6,
+        "수요": 2,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96816",
     "96654",
     "96637",
     "96504",
