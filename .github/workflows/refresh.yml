@@ -154,7 +154,7 @@ jobs:
           PY
           )
           echo "baseline targetDate=${target_date} readiness=${readiness}"
-          if [ "$readiness" != "READY" ]; then
+          if [ "$readiness" != "READY" ] && [ "$readiness" != "BASELINE_STALE" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "exit_code=0" >> "$GITHUB_OUTPUT"
             echo "market_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
@@ -163,6 +163,10 @@ jobs:
             exit 0
           fi
           echo "ready=true" >> "$GITHUB_OUTPUT"
+          if [ "$readiness" = "BASELINE_STALE" ]; then
+            echo "market_status=AVAILABLE_WITH_BASELINE_WARNING" >> "$GITHUB_OUTPUT"
+            echo "::warning::Baseline is stale; collecting a fresh snapshot and preserving the prior baseline until a validated update is published."
+          fi
           # The authoritative 2,768-stock snapshot is runner-temporary only.
           # It is collected once, exact-set validated by the collector, then
           # reused by the compact evidence builder without another API call.

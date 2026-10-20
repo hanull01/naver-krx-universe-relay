@@ -361,7 +361,11 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     now = now or datetime.now(KST)
     baseline = load_json(baseline_file)
     fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
-    if not fresh:
+    # A stale prior baseline is still a valid comparison input for a new
+    # full-market snapshot.  Do not let the freshness warning create a
+    # collection deadlock; the resulting evidence records the warning and
+    # must not be treated as a current-day baseline.
+    if not fresh and freshness_status != "BASELINE_STALE":
         return {"status": "NOT_PUBLISHED", "reason": freshness_status}
     current = load_json(current_file) if current_file else collector()
     if not snapshot_is_publishable(current):
