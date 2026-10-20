@@ -456,6 +456,47 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertFalse(lifecycle_path.exists())
         self.assertTrue(all(path.read_bytes() == content for path, content in before.items()))
 
+    def test_refresh_path_requires_verified_lifecycle_event_and_preserves_final(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "verified-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "verified-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "verified-baseline.json"; baseline_path.write_text('{"old":true}', encoding="utf-8")
+        lifecycle_path = self.root / "verified-lifecycle.json"
+        before = {p: p.read_bytes() for p in (universe, baseline_path, state_dir / "kospi.json", state_dir / "kosdaq.json")}
+        source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
+                  "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
+        with self.assertRaises(update.UniverseHistoryRequired):
+            update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                enforce_lifecycle_verification=True)
+        self.assertTrue(lifecycle_path.exists())
+        self.assertTrue(all(p.read_bytes() == value for p, value in before.items()))
+
+    def test_refresh_path_applies_only_explicit_verified_event(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "verified-add-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "verified-add-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "verified-add-baseline.json"; baseline_path.write_text('{"old":true}', encoding="utf-8")
+        lifecycle_path = self.root / "verified-add-lifecycle.json"
+        added = stock("000004", "D", "KOSDAQ")
+        stocks = [row for row in previous["assets"] if row.get("assetType") == "STOCK"] + [added]
+        source = {"stocks": stocks, "metadata": {"failedCount": 0,
+                  "markets": {m: sum(row["market"] == m for row in stocks) for m in update.MARKETS}}}
+        with patch.object(update, "baseline_from_state", return_value={"asOfDate":"20261008", "authoritativeCount":4, "count":4, "coveragePct":100.0, "historyStatus":"OK", "stocks":[{"code": code} for code in ("000001", "000002", "000003", "000004")]}) as baseline_mock:
+            result = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                fetcher=lambda *_args: self._daily_response("20261008"), retry_sleep=0,
+                enforce_lifecycle_verification=True,
+                lifecycle_candidates=[{"code":"000004", "deltaType":"NEW_LISTING",
+                    "evidence":{"sourceVerified":True, "effectiveDate":"2026-10-08",
+                                "sourceUrl":"fixture://listing"}}])
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertTrue(baseline_mock.called)
+
     def test_real_regression_shape_removes_196490_without_special_case(self):
         previous, stock = self._lifecycle_fixture()
         previous["assets"].append(stock("196490", "디에이테크놀로지", "KOSDAQ"))

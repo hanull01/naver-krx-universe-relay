@@ -14,6 +14,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from tools.market_universe_reconcile import (
+    classify_delta, classify_status_candidate, verified_lifecycle_events,
+    reconcile_verified,
+)
 
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
 KEEP = 301
@@ -469,13 +473,38 @@ def update_from_rows(existing, incoming, state_dir, target_date, universe_file, 
 
 def update_with_universe_refresh(state_dir, universe_file, baseline_output, lifecycle_output,
                                  target_date, stock_payload, fetcher=None, no_write=False, provisional=False,
-                                 **collection_options):
+                                 enforce_lifecycle_verification=False,
+                                 lifecycle_candidates=None, **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
     existing = load_state(state_dir)
     state_universe = universe_from_state(existing, previous_universe)
     current_universe, diagnostics = refresh_stock_universe(
         state_universe, stock_payload, target_date)
+    if enforce_lifecycle_verification:
+        delta = classify_delta(state_universe, current_universe)
+        candidates = list(lifecycle_candidates or stock_payload.get("statusCandidates") or [])
+        normalized = []
+        for item in candidates:
+            normalized.append(classify_status_candidate(
+                code=item.get("code"), delta_type=item.get("deltaType") or item.get("type"),
+                evidence=item.get("evidence"),
+                collection_missing=item.get("collectionMissing", False)))
+        verified_events = verified_lifecycle_events(normalized)
+        try:
+            reconciled_universe, lifecycle = reconcile_verified(
+                state_universe, current_universe, verified_events,
+                target_date=compact_date(target_date))
+        except ValueError as exc:
+            lifecycle = dict(diagnostics)
+            lifecycle.update({"status": "UNVERIFIED", "verificationError": str(exc),
+                              "candidates": normalized, "delta": delta})
+            if not no_write:
+                transactional_publish({Path(lifecycle_output): lifecycle})
+            raise UniverseHistoryRequired(lifecycle)
+        diagnostics = dict(diagnostics)
+        diagnostics["lifecycle"] = lifecycle
+        current_universe = reconciled_universe
     reconciled = reconcile_authoritative_universe(
         existing, state_universe, current_universe, diagnostics)
     target = compact_date(target_date)

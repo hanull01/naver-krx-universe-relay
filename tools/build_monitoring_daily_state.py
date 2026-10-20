@@ -97,7 +97,8 @@ def main():
                     ensure_complete(stock_payload)
                     outcome = update_with_universe_refresh(
                         a.output_dir, a.universe_file, a.baseline_output,
-                        a.lifecycle_output, a.date, stock_payload, no_write=a.no_write, provisional=a.provisional)
+                        a.lifecycle_output, a.date, stock_payload, no_write=a.no_write,
+                        provisional=a.provisional, enforce_lifecycle_verification=True)
                 else:
                     outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
                                                collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
