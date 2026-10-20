@@ -60,6 +60,18 @@ class FinalDailyHistoryTests(unittest.TestCase):
         self.assertIn("COVERAGE_MISMATCH", result["reason"])
         self.assertNotIn("TRADING_DATE_MISSING", result["reason"])
 
+    def test_complete_reconciliation_pending_uses_observed_active_set(self):
+        payload = snapshot([row("000001"), row("000002")])
+        payload.update({"status": "COMPLETE_RECONCILIATION_PENDING",
+                        "collectionStatus": "SUCCESS", "qualityStatus": "WARNING",
+                        "expectedCount": 3})
+        result = monitoring_daily_payload(
+            payload, {"asOfDate": "20261018", "historyStatus": "OK"},
+            ["000001", "000003"], target_date="20261019")
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual([row["code"] for row in result["rows"]], ["000001", "000002"])
+        self.assertIn("UNIVERSE_COMPOSITION_CHANGED", result["diagnostic"]["warnings"])
+
     def test_ohlc_relationship_is_rejected(self):
         result = snapshot_rows(snapshot([row(highPrice=8)]))
         self.assertEqual(result["status"], "REJECTED")
