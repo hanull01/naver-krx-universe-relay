@@ -456,7 +456,7 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertFalse(lifecycle_path.exists())
         self.assertTrue(all(path.read_bytes() == content for path, content in before.items()))
 
-    def test_refresh_path_requires_verified_lifecycle_event_and_preserves_final(self):
+    def test_refresh_path_uses_complete_naver_set_without_legal_delisting_claim(self):
         previous, stock = self._lifecycle_fixture()
         universe = self.root / "verified-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
         state_dir = self.root / "verified-state"; state_dir.mkdir()
@@ -467,11 +467,13 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         before = {p: p.read_bytes() for p in (universe, baseline_path, state_dir / "kospi.json", state_dir / "kosdaq.json")}
         source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
                   "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
-        with self.assertRaises(update.UniverseHistoryRequired):
-            update.update_with_universe_refresh(
+        with patch.object(update, "baseline_from_state", return_value={"asOfDate":"20261008", "authoritativeCount":2, "count":2, "coveragePct":100.0, "historyStatus":"OK", "stocks":[{"code":"000001"},{"code":"000002"}]}):
+            result = update.update_with_universe_refresh(
                 state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
-                enforce_lifecycle_verification=True)
-        self.assertTrue(lifecycle_path.exists())
+                enforce_lifecycle_verification=True, no_write=True,
+                fetcher=lambda *_args: self._daily_response("20261008"), retry_sleep=0)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual("NAVER_OBSERVED", result["lifecycle"]["lifecycle"]["status"])
         self.assertTrue(all(p.read_bytes() == value for p, value in before.items()))
 
     def test_refresh_path_applies_only_explicit_verified_event(self):

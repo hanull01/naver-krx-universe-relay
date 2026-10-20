@@ -16,7 +16,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from tools.market_universe_reconcile import (
     classify_delta, classify_status_candidate, verified_lifecycle_events,
-    reconcile_verified,
+    reconcile_verified, reconcile_naver_observed,
 )
 
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
@@ -576,17 +576,14 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
                 evidence=item.get("evidence"),
                 collection_missing=item.get("collectionMissing", False)))
         verified_events = verified_lifecycle_events(normalized)
-        try:
-            reconciled_universe, lifecycle = reconcile_verified(
-                state_universe, current_universe, verified_events,
-                target_date=compact_date(target_date))
-        except ValueError as exc:
-            lifecycle = dict(diagnostics)
-            lifecycle.update({"status": "UNVERIFIED", "verificationError": str(exc),
-                              "candidates": normalized, "delta": delta})
-            if not no_write:
-                transactional_publish({Path(lifecycle_output): lifecycle})
-            raise UniverseHistoryRequired(lifecycle)
+        # The complete NAVER list controls the operational active set.  Any
+        # legal interpretation remains explicitly UNVERIFIED; verified
+        # events are retained as optional evidence, never required to apply
+        # a complete observed set.
+        reconciled_universe, lifecycle = reconcile_naver_observed(
+            state_universe, current_universe, target_date=compact_date(target_date))
+        lifecycle["candidates"] = normalized
+        lifecycle["verifiedEvents"] = verified_events
         diagnostics = dict(diagnostics)
         diagnostics["lifecycle"] = lifecycle
         current_universe = reconciled_universe

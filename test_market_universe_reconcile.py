@@ -1,6 +1,6 @@
 import unittest
 
-from tools.market_universe_reconcile import classify_delta, pending_observation, reconcile_verified
+from tools.market_universe_reconcile import classify_delta, pending_observation, reconcile_verified, reconcile_naver_observed
 
 
 def universe(rows):
@@ -55,6 +55,17 @@ class UniverseReconcileTests(unittest.TestCase):
         observed = universe([{ "code": str(i), "name": str(i), "market": "KOSPI"} for i in range(10, 20)])
         with self.assertRaisesRegex(ValueError, "ABNORMAL"):
             reconcile_verified(previous, observed, [])
+
+    def test_complete_naver_observation_changes_active_set_without_legal_claim(self):
+        previous = universe([{"code": "028080", "name": "A", "market": "KOSDAQ"},
+                             {"code": "005930", "name": "B", "market": "KOSPI"}])
+        observed = universe([{"code": "005930", "name": "B", "market": "KOSPI"},
+                             {"code": "000001", "name": "C", "market": "KOSDAQ"}])
+        result, lifecycle = reconcile_naver_observed(previous, observed, target_date="2026-10-19")
+        self.assertEqual({row["code"] for row in result["assets"]}, {"005930", "000001"})
+        self.assertEqual("NAVER_OBSERVED", lifecycle["status"])
+        self.assertEqual("UNVERIFIED", lifecycle["legalStatus"])
+        self.assertIn("028080", {event["code"] for event in lifecycle["events"]})
 
 
 if __name__ == "__main__":

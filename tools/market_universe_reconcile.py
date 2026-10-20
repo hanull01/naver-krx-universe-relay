@@ -171,3 +171,40 @@ def reconcile_verified(previous, observed, verified_events, *, target_date=None,
                               "delta": delta, "events": events}
     output["metadata"] = metadata
     return output, metadata["lifecycle"]
+
+
+def reconcile_naver_observed(previous, observed, *, target_date=None):
+    """Use a complete NAVER list as the operational active-set authority.
+
+    This does not assert legal delisting or merger completion.  It records
+    NAVER_REMOVED/NAVER_ADDED observations separately from legal status.
+    """
+    delta = classify_delta(previous, observed)
+    old, new = _stocks(previous), _stocks(observed)
+    output = dict(previous)
+    nonstocks = [row for row in previous.get("assets", [])
+                 if row.get("assetType", "STOCK") != "STOCK"]
+    output["assets"] = sorted(list(new.values()) + nonstocks,
+                               key=lambda row: (row.get("market") or "", str(row.get("code") or "")))
+    events = []
+    for code in delta["added"]:
+        events.append({"type": "NAVER_ADDED", "code": code,
+                       "name": new[code].get("name"),
+                       "market": new[code].get("market")})
+    for code in delta["removed"]:
+        events.append({"type": "NAVER_REMOVED", "code": code,
+                       "name": old[code].get("name"),
+                       "market": old[code].get("market")})
+    for code in delta["marketChanged"]:
+        events.append({"type": "NAVER_MARKET_CHANGED", "code": code,
+                       "fromMarket": old[code].get("market"),
+                       "toMarket": new[code].get("market")})
+    for code in delta["nameChanged"]:
+        events.append({"type": "NAVER_NAME_CHANGED", "code": code,
+                       "oldName": old[code].get("name"),
+                       "newName": new[code].get("name")})
+    metadata = dict(previous.get("metadata") or {})
+    metadata["lifecycle"] = {"status": "NAVER_OBSERVED", "targetDate": target_date,
+                              "legalStatus": "UNVERIFIED", "delta": delta, "events": events}
+    output["metadata"] = metadata
+    return output, metadata["lifecycle"]
