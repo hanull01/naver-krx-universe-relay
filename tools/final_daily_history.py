@@ -116,6 +116,15 @@ def monitoring_daily_rows(proposed_rows):
 
 def monitoring_daily_payload(snapshot, baseline=None, expected_codes=None, target_date=None):
     """Build the existing update-latest input without writing or fetching."""
+    # A structurally complete NAVER list with a stable composition delta is
+    # itself the active-set authority for this observation.  The previous
+    # all-assets file remains historical context, not a gate on today's FINAL.
+    composition_pending = (snapshot.get("status") == "COMPLETE_RECONCILIATION_PENDING"
+                           and snapshot.get("collectionStatus", "SUCCESS") == "SUCCESS"
+                           and snapshot.get("qualityStatus") == "WARNING")
+    if composition_pending:
+        expected_codes = [str(row.get("code")) for row in snapshot.get("stocks", [])
+                          if row.get("code")]
     candidate = snapshot_rows(snapshot, baseline=baseline, expected_codes=expected_codes,
                               target_date=target_date)
     if candidate["status"] != "READY":

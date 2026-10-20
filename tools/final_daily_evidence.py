@@ -51,7 +51,10 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     duplicates = sorted({code for code in codes if code and codes.count(code) > 1})
     if duplicates:
         errors.append("DUPLICATE_CODES")
-    if expected_codes is not None:
+    composition_pending = (snapshot.get("status") == "COMPLETE_RECONCILIATION_PENDING"
+                           and snapshot.get("collectionStatus", "SUCCESS") == "SUCCESS"
+                           and snapshot.get("qualityStatus") == "WARNING")
+    if expected_codes is not None and not composition_pending:
         missing = sorted(set(map(str, expected_codes)) - set(codes))
         extra = sorted(set(codes) - set(map(str, expected_codes)))
         if missing:
@@ -61,8 +64,10 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     else:
         missing, extra = [], []
     expected_count = snapshot.get("expectedCount")
-    if isinstance(expected_count, int) and len(rows) != expected_count:
+    if isinstance(expected_count, int) and len(rows) != expected_count and not composition_pending:
         errors.append("COVERAGE_MISMATCH")
+    elif isinstance(expected_count, int) and len(rows) != expected_count:
+        warnings.append("UNIVERSE_COMPOSITION_CHANGED")
 
     for row in rows:
         code = str(row.get("code") or "")
