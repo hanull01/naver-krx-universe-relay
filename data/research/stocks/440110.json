@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "440110",
   "itemName": "파두",
-  "reportCount": 3,
-  "latestReportNid": "96782",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 4,
+  "latestReportNid": "96866",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96782",
-    "writeDate": "2026-10-16",
-    "brokerName": "신한투자증권",
-    "title": "약속의 3분기",
-    "goalPrice": 100000,
+    "nid": "96866",
+    "writeDate": "2026-10-20",
+    "brokerName": "유진투자증권",
+    "title": "eSSD 수요 서프라이즈에 주목",
+    "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 21,
+        "negative": 2
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 14,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "수요": 10,
+        "반도체": 5,
+        "가격": 3,
+        "환율": 2,
+        "AI": 1
+      }
     }
   },
   "reportNids": [
+    "96866",
     "96782",
     "96293",
     "94235"

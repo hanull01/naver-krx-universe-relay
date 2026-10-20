@@ -2,32 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "097520",
   "itemName": "엠씨넥스",
-  "reportCount": 4,
-  "latestReportNid": "96402",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 5,
+  "latestReportNid": "96855",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96402",
-    "writeDate": "2026-10-01",
-    "brokerName": "키움증권",
-    "title": "반등 시점을 주목",
-    "goalPrice": 30000,
+    "nid": "96855",
+    "writeDate": "2026-10-20",
+    "brokerName": "신한투자증권",
+    "title": "반등의 조건",
+    "goalPrice": 27000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 3,
         "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "가격": 2,
-        "환율": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "96855",
     "96402",
     "93064",
     "92873",

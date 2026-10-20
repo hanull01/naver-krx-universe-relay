@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "352820",
   "itemName": "하이브",
-  "reportCount": 34,
-  "latestReportNid": "96786",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 35,
+  "latestReportNid": "96856",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96786",
-    "writeDate": "2026-10-16",
-    "brokerName": "iM증권",
-    "title": "BTS 이후를 증명할 저연차의 성장",
+    "nid": "96856",
+    "writeDate": "2026-10-20",
+    "brokerName": "유진투자증권",
+    "title": "실적도 모멘텀도 좋은데",
     "goalPrice": 290000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 7
+        "positive": 20,
+        "negative": 3
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 9,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "topics": {
+        "수요": 2,
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "96856",
     "96786",
     "96764",
     "96652",

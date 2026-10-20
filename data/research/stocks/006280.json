@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "006280",
   "itemName": "녹십자",
-  "reportCount": 9,
-  "latestReportNid": "94349",
-  "latestWriteDate": "2026-07-22",
+  "reportCount": 11,
+  "latestReportNid": "96881",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "94349",
-    "writeDate": "2026-07-22",
-    "brokerName": "미래에셋증권",
-    "title": "2Q26 Preview: 상저하고 실적 기대",
-    "goalPrice": 180000,
+    "nid": "96881",
+    "writeDate": "2026-10-20",
+    "brokerName": "DS투자증권",
+    "title": "3Q26 Pre: 2분기 부진을 딛고",
+    "goalPrice": 185000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 3,
+        "negative": 6
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 6,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 2
+        "환율": 2,
+        "미국": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96881",
+    "96852",
     "94349",
     "94336",
     "94332",

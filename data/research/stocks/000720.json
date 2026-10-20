@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "000720",
   "itemName": "현대건설",
-  "reportCount": 36,
-  "latestReportNid": "96840",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 38,
+  "latestReportNid": "96871",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96840",
-    "writeDate": "2026-10-19",
-    "brokerName": "한화투자증권",
-    "title": "3분기 실적은 세이프",
-    "goalPrice": 170000,
+    "nid": "96871",
+    "writeDate": "2026-10-20",
+    "brokerName": "대신증권",
+    "title": "이익은 지키고, 수주는 쌓고",
+    "goalPrice": 168000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 4
+        "positive": 1,
+        "negative": 2
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
+        "원가": 2,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96871",
+    "96845",
     "96840",
     "96826",
     "96797",

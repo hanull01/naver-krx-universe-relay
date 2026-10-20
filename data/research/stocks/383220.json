@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "383220",
   "itemName": "F&F",
-  "reportCount": 17,
-  "latestReportNid": "95014",
-  "latestWriteDate": "2026-08-03",
+  "reportCount": 18,
+  "latestReportNid": "96864",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "95014",
-    "writeDate": "2026-08-03",
-    "brokerName": "한화투자증권",
-    "title": "2Q26 Review : 테일러메이드 인수 or 주주환원 강화 필요",
-    "goalPrice": 100000,
+    "nid": "96864",
+    "writeDate": "2026-10-20",
+    "brokerName": "SK증권",
+    "title": "중국 실적 눈높이 하향",
+    "goalPrice": 94000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 4
+        "positive": 1,
+        "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "중국": 2,
-        "원가": 1,
         "자동차": 1,
-        "재고": 1
+        "재고": 1,
+        "중국": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96864",
     "95014",
     "94968",
     "94359",

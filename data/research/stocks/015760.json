@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "015760",
   "itemName": "한국전력",
-  "reportCount": 21,
-  "latestReportNid": "96778",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 22,
+  "latestReportNid": "96870",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96778",
-    "writeDate": "2026-10-16",
-    "brokerName": "키움증권",
-    "title": "혼돈 속 피난처",
-    "goalPrice": 41000,
+    "nid": "96870",
+    "writeDate": "2026-10-20",
+    "brokerName": "대신증권",
+    "title": "저평가 국면 진입. 단, 유가 하향 안정화 필요",
+    "goalPrice": 40000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 4
+        "positive": 5,
+        "negative": 9
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
         "원전": 3,
-        "환율": 3
+        "미국": 2,
+        "가격": 1
       }
     }
   },
   "reportNids": [
+    "96870",
     "96778",
     "96727",
     "96626",

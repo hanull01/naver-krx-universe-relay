@@ -2,35 +2,31 @@
   "schemaVersion": 1,
   "itemCode": "376300",
   "itemName": "디어유",
-  "reportCount": 11,
-  "latestReportNid": "95441",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 13,
+  "latestReportNid": "96850",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "95441",
-    "writeDate": "2026-08-12",
-    "brokerName": "삼성증권",
-    "title": "성장의 무게 중심은 해외로",
-    "goalPrice": 30000,
+    "nid": "96850",
+    "writeDate": "2026-10-20",
+    "brokerName": "신한투자증권",
+    "title": "버블 바이럴을 위하여!",
+    "goalPrice": 27000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
-        "negative": 3
+        "positive": 2,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {
-        "미국": 6,
-        "원가": 4,
-        "중국": 4,
-        "자동차": 1,
-        "환율": 1
-      }
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "96850",
+    "96843",
     "95441",
     "95110",
     "95085",

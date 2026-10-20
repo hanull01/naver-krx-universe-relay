@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "012450",
   "itemName": "한화에어로스페이스",
-  "reportCount": 27,
-  "latestReportNid": "96395",
-  "latestWriteDate": "2026-10-01",
+  "reportCount": 28,
+  "latestReportNid": "96882",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96395",
-    "writeDate": "2026-10-01",
-    "brokerName": "미래에셋증권",
-    "title": "손이 뻗치지 않는 곳이 없다",
-    "goalPrice": 1550000,
+    "nid": "96882",
+    "writeDate": "2026-10-20",
+    "brokerName": "DS투자증권",
+    "title": "3Q에 대한 걱정 대신 4Q에 걸어볼 기대",
+    "goalPrice": 1650000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 0,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "방산": 5,
-        "미국": 2
+        "수요": 2,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "96882",
     "96395",
     "95965",
     "95841",

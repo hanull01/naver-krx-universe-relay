@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "041510",
   "itemName": "에스엠",
-  "reportCount": 28,
-  "latestReportNid": "96817",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 29,
+  "latestReportNid": "96861",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96817",
-    "writeDate": "2026-10-19",
-    "brokerName": "신한투자증권",
-    "title": "코스닥 엔터 pick 유지",
+    "nid": "96861",
+    "writeDate": "2026-10-20",
+    "brokerName": "유진투자증권",
+    "title": "올해보다는 내년이 좋다",
     "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 11,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "96861",
     "96817",
     "96304",
     "96279",

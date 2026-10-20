@@ -2,34 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "011210",
   "itemName": "현대위아",
-  "reportCount": 15,
-  "latestReportNid": "96728",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 16,
+  "latestReportNid": "96880",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96728",
-    "writeDate": "2026-10-15",
-    "brokerName": "신한투자증권",
-    "title": "성장으로의 환승 준비",
-    "goalPrice": 70000,
+    "nid": "96880",
+    "writeDate": "2026-10-20",
+    "brokerName": "하나증권",
+    "title": "방산 매각 후 열관리/로보틱스로 자본 재배분",
+    "goalPrice": 71000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 3,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "방산": 2,
-        "가격": 1,
-        "수주": 1,
+        "방산": 1,
+        "수요": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96880",
     "96728",
     "96687",
     "94697",

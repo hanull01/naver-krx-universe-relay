@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "006730",
   "itemName": "서부T&D",
-  "reportCount": 12,
-  "latestReportNid": "96743",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 13,
+  "latestReportNid": "96842",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96743",
-    "writeDate": "2026-10-15",
-    "brokerName": "유진투자증권",
-    "title": "본캐의 귀환: 개발의 시간이 온다",
-    "goalPrice": 19000,
+    "nid": "96842",
+    "writeDate": "2026-10-20",
+    "brokerName": "IBK투자증권",
+    "title": "탈바꿈(변태: 變態)",
+    "goalPrice": 18000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
-        "negative": 0
+        "positive": 10,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 8,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 2
+        "수요": 4,
+        "중국": 2
       }
     }
   },
   "reportNids": [
+    "96842",
     "96743",
     "96473",
     "95778",

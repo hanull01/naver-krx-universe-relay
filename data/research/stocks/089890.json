@@ -2,33 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "089890",
   "itemName": "코세스",
-  "reportCount": 1,
-  "latestReportNid": "94334",
-  "latestWriteDate": "2026-07-22",
+  "reportCount": 2,
+  "latestReportNid": "96854",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "94334",
-    "writeDate": "2026-07-22",
+    "nid": "96854",
+    "writeDate": "2026-10-20",
     "brokerName": "SK증권",
-    "title": "본격적인 수주 + 실적 사이클 진입",
-    "goalPrice": 48000,
+    "title": "수주에서 실적으로, 다시 주목할 시점",
+    "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 6,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1,
-        "반도체": 1,
-        "수주": 1
+        "수주": 2
       }
     }
   },
   "reportNids": [
+    "96854",
     "94334"
   ]
 }

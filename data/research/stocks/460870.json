@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "460870",
   "itemName": "에스엠씨지",
-  "reportCount": 1,
-  "latestReportNid": "93680",
-  "latestWriteDate": "2026-06-25",
+  "reportCount": 2,
+  "latestReportNid": "96848",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "93680",
-    "writeDate": "2026-06-25",
+    "nid": "96848",
+    "writeDate": "2026-10-20",
     "brokerName": "키움증권",
-    "title": "실적으로 증명해 가는 유리용기",
+    "title": "이익률 개선속도 빠르게 상승",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 6,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "재고": 1
+      }
     }
   },
   "reportNids": [
+    "96848",
     "93680"
   ]
 }

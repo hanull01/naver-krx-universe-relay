@@ -2,19 +2,19 @@
   "schemaVersion": 1,
   "itemCode": "002350",
   "itemName": "넥센타이어",
-  "reportCount": 12,
-  "latestReportNid": "95610",
-  "latestWriteDate": "2026-08-14",
+  "reportCount": 13,
+  "latestReportNid": "96859",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "95610",
-    "writeDate": "2026-08-14",
+    "nid": "96859",
+    "writeDate": "2026-10-20",
     "brokerName": "신한투자증권",
-    "title": "저평가의 이유는 줄고, 재평가의 조건은 쌓인다",
-    "goalPrice": 10000,
+    "title": "악재는 주가에 반영",
+    "goalPrice": 8500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 3,
         "negative": 1
       },
       "earningsTextDirection": "UP",
@@ -22,12 +22,13 @@
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "원가": 1
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96859",
     "95610",
     "95401",
     "94772",

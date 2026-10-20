@@ -2,32 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "064350",
   "itemName": "현대로템",
-  "reportCount": 26,
-  "latestReportNid": "96744",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 33,
+  "latestReportNid": "96875",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96744",
-    "writeDate": "2026-10-15",
-    "brokerName": "대신증권",
-    "title": "3Q26 Preview: 컨센서스 상회 전망",
-    "goalPrice": 200000,
+    "nid": "96875",
+    "writeDate": "2026-10-20",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Re: 양호한 수익성, 정상화될 추정치",
+    "goalPrice": 150000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 0,
-        "negative": 3
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 3,
-        "수주": 2
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96875",
+    "96869",
+    "96865",
+    "96862",
+    "96860",
+    "96858",
+    "96846",
     "96744",
     "96500",
     "96461",

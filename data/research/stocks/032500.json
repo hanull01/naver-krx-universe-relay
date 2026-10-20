@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "032500",
   "itemName": "케이엠더블유",
-  "reportCount": 6,
-  "latestReportNid": "96174",
-  "latestWriteDate": "2026-09-16",
+  "reportCount": 7,
+  "latestReportNid": "96879",
+  "latestWriteDate": "2026-10-20",
   "latest": {
-    "nid": "96174",
-    "writeDate": "2026-09-16",
+    "nid": "96879",
+    "writeDate": "2026-10-20",
     "brokerName": "하나증권",
-    "title": "2027년에는 새로운 역사 쓸 가능성이 높다",
+    "title": "이젠 편하게 매수해도 됩니다",
     "goalPrice": 70000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "미국": 2
+        "미국": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96879",
     "96174",
     "95805",
     "93940",
