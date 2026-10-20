@@ -70,6 +70,27 @@ class EvidenceTests(unittest.TestCase):
                                         publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
                                         today="20261015")
 
+    def test_complete_snapshot_allows_unverified_composition_change(self):
+        snapshot = {"status": "SUCCESS", "collectionStatus": "SUCCESS", "generatedAt": "t",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("005930"), current("0158S0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261014", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {},
+                                "rollingHighCounts": {}, "rollingHighs": {},
+                                "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            context = {"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"}
+            built, _ = evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                                publication_context=context, today="20261015")
+            self.assertEqual(built["latest-quality.json"]["publicationStatus"], "SUCCESS")
+            self.assertEqual(context["baselineDiagnostics"]["unverifiedCompositionChangeCodes"], ["0158S0"])
+            row = next(item for item in built["latest-stock-signals.json"]["stocks"]
+                       if item["code"] == "0158S0")
+            self.assertEqual(row["historyStatus"], "HISTORY_INSUFFICIENT")
+
     def test_current_history_merge_no_duplicate_and_no_mutation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); path = root / "005930.jsonl"

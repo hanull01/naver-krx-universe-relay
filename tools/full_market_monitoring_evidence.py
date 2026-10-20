@@ -395,9 +395,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             raise ValueError("same-day baseline requires validated final-session overlay")
         by_code = {row["code"]: row for row in baseline.get("stocks", [])}
         missing = [row["code"] for row in current_snapshot["stocks"] if row["code"] not in by_code]
-        # A newly listed stock can legitimately have no confirmed daily history
-        # yet.  Allow only codes recorded by the verified universe lifecycle for
-        # today's effective date; every other baseline gap remains fatal.
+        # A complete NAVER snapshot is the authoritative active-set observation
+        # for this run.  A non-empty previous baseline may legitimately lack
+        # newly observed codes (listing, transfer, or composition changes), but
+        # an empty baseline or an incomplete snapshot must remain fatal.
         universe = load_json(UNIVERSE_FILE, {}) or {}
         lifecycle = (universe.get("metadata", {}) or {}).get("lifecycle", {}) or {}
         lifecycle_new = {
@@ -406,8 +407,21 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             and str(event.get("effectiveDate", "")).replace("-", "") == str(today).replace("-", "")
             and event.get("sourceVerified") is True
         }
+        composition_change = bool(
+            baseline.get("stocks")
+            and current_snapshot.get("collectionStatus", "SUCCESS") == "SUCCESS"
+            and current_snapshot.get("duplicateCodes", []) == []
+            and current_snapshot.get("missingCodes", []) == []
+            and current_snapshot.get("coverageCount", len(current_snapshot.get("stocks", [])))
+            == len(current_snapshot.get("stocks", []))
+        )
         allowed_missing = [code for code in missing if code in lifecycle_new]
-        unexpected_missing = [code for code in missing if code not in lifecycle_new]
+        if composition_change:
+            allowed_missing = missing
+            publication_context.setdefault("baselineDiagnostics", {})[
+                "unverifiedCompositionChangeCodes"
+            ] = sorted(code for code in missing if code not in lifecycle_new)
+        unexpected_missing = [code for code in missing if code not in allowed_missing]
         if unexpected_missing:
             raise ValueError(f"baseline missing {len(unexpected_missing)} current codes: {unexpected_missing}")
         if allowed_missing:
