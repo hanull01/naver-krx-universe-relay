@@ -497,6 +497,32 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual("SUCCESS", result["status"])
         self.assertTrue(baseline_mock.called)
 
+    def test_partial_collection_reports_missing_without_marking_complete(self):
+        calls = []
+        def fetcher(code, _start, _end):
+            calls.append(code)
+            if code == "000002":
+                return {"raw": b'{"priceInfos": []}'}
+            return self._daily_response("20261008")
+        result = update.collect_today_rows_partial(
+            "2026-10-08", self.universe, fetcher=fetcher, retries=1, retry_sleep=0)
+        self.assertEqual("PARTIAL", result["status"])
+        self.assertEqual(["000002"], result["missingCodes"])
+        self.assertEqual(1, result["collectedCount"])
+        self.assertEqual(2, len(calls))
+
+    def test_partial_update_does_not_touch_baseline_and_preserves_missing_history(self):
+        state = update.load_state(self.state_dir, self.universe)
+        incoming = update.normalize_daily_rows({"rows": [{"code": "000001", "date": "20261008",
+            "close": 11, "high": 12, "volume": 3}]}, "20261008")
+        result = update.update_partial_state(
+            state, incoming, "2026-10-08", self.universe,
+            errors={"000002": "missing"}, no_write=True)
+        self.assertEqual("PARTIAL", result["status"])
+        self.assertFalse(result["baselineUpdated"])
+        self.assertEqual(1, result["coverage"])
+        self.assertEqual(301, len(update.decode_stock(result_state := update.load_state(self.state_dir, self.universe)["KOSDAQ"]["stocks"][0])))
+
     def test_real_regression_shape_removes_196490_without_special_case(self):
         previous, stock = self._lifecycle_fixture()
         previous["assets"].append(stock("196490", "디에이테크놀로지", "KOSDAQ"))

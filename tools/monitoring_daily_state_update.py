@@ -400,6 +400,91 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
     return normalize_daily_rows({"rows": output}, target)
 
 
+def collect_today_rows_partial(target_date, universe_file, fetcher=None, *,
+                               max_workers=COLLECT_MAX_WORKERS,
+                               retries=COLLECT_RETRIES,
+                               timeout=COLLECT_TIMEOUT_SECONDS,
+                               retry_sleep=COLLECT_RETRY_SLEEP_SECONDS):
+    """Collect rows without turning per-code failures into valid data.
+
+    The complete collector remains fail-closed.  This companion returns a
+    diagnostic envelope for controlled PARTIAL publication; it never writes
+    files or calls an additional endpoint.
+    """
+    groups = authoritative_groups(universe_file)
+    target = compact_date(target_date)
+    targets = sorted((code, market) for market, assets in groups.items() for code in assets)
+    import sys
+    tool_dir = str(Path(__file__).parent)
+    if tool_dir not in sys.path:
+        sys.path.insert(0, tool_dir)
+    import naver_daily_backfill as daily
+    def one(code, market):
+        last_error = None
+        for attempt in range(1, retries + 1):
+            try:
+                response = fetcher(code, datetime.strptime(target, "%Y%m%d"), datetime.strptime(target, "%Y%m%d")) if fetcher else daily.fetch(code, datetime.strptime(target, "%Y%m%d"), datetime.strptime(target, "%Y%m%d"), timeout=timeout, retries=1, sleep=0)
+                payload = json.loads(response["raw"].decode("utf-8"))
+                rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
+                candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
+                if len(candidates) != 1:
+                    raise ValueError("missing or duplicate target-date row")
+                row = candidates[0]; reasons = daily.row_validation_reasons(row)
+                if reasons:
+                    raise ValueError(";".join(reasons))
+                return code, {"code": code, "date": target, "close": row.get("closePrice"),
+                              "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
+                              "closeValid": True, "ohlcValid": True, "volumeValid": True, "market": market}
+            except Exception as exc:
+                last_error = str(exc)
+                if attempt < retries and retry_sleep: time_module.sleep(retry_sleep)
+        return code, None, last_error
+    rows, errors = {}, {}
+    with ThreadPoolExecutor(max_workers=min(max_workers, len(targets))) as executor:
+        futures = {executor.submit(one, code, market): code for code, market in targets}
+        for future in as_completed(futures):
+            result = future.result()
+            code = result[0]
+            if len(result) == 2: rows[code] = result[1]
+            else: errors[code] = result[2]
+    return {"status": "COMPLETE" if not errors else "PARTIAL", "targetDate": target,
+            "rows": normalize_daily_rows({"rows": list(rows.values())}, target) if rows else {},
+            "errors": errors, "missingCodes": sorted(errors),
+            "expectedCount": len(targets), "collectedCount": len(rows)}
+
+
+def update_partial_state(existing, daily_rows, target_date, universe_file, state_dir=None, *, errors=None, no_write=False):
+    """Apply only validated rows and leave the baseline untouched."""
+    target = compact_date(target_date); groups = authoritative_groups(universe_file)
+    expected = set().union(*(set(group) for group in groups.values()))
+    if not set(daily_rows).issubset(expected):
+        raise ValueError("partial daily authoritative code mismatch")
+    output = {}
+    for market in MARKETS:
+        stocks = []
+        for old_stock in existing[market]["stocks"]:
+            code = str(old_stock["code"]); rows = decode_stock(old_stock)
+            incoming = daily_rows.get(code)
+            if incoming is not None:
+                matching = next((i for i, row in enumerate(rows) if row["date"] == target), None)
+                if matching is None: rows.append(incoming)
+                elif rows[matching] == incoming: pass
+                else: raise ValueError(f"partial final daily conflict: {code} {target}")
+                rows.sort(key=lambda row: row["date"])
+            stocks.append(encode_stock(code, rows[-KEEP:]))
+        output[market] = {**existing[market], "stocks": sorted(stocks, key=lambda row: row["code"]),
+                          "publicationStatus": "PARTIAL", "asOfDate": target,
+                          "partialDiagnostics": {"missingCodes": sorted(errors or {}),
+                                                  "collectedCount": len(daily_rows),
+                                                  "expectedCount": len(expected)}}
+    if not no_write and state_dir is not None:
+        transactional_publish({Path(state_dir) / "kospi.json": output["KOSPI"],
+                               Path(state_dir) / "kosdaq.json": output["KOSDAQ"]})
+    return {"status": "PARTIAL", "changed": True, "asOfDate": target,
+            "coverage": len(daily_rows), "expectedCount": len(expected), "baselineUpdated": False,
+            "errors": dict(errors or {})}
+
+
 def update_state(existing, daily_rows, target_date, universe_file, publication_status="FINAL"):
     if publication_status not in {"PROVISIONAL", "FINAL"}:
         raise ValueError("invalid publication status")
@@ -474,7 +559,7 @@ def update_from_rows(existing, incoming, state_dir, target_date, universe_file, 
 def update_with_universe_refresh(state_dir, universe_file, baseline_output, lifecycle_output,
                                  target_date, stock_payload, fetcher=None, no_write=False, provisional=False,
                                  enforce_lifecycle_verification=False,
-                                 lifecycle_candidates=None, **collection_options):
+                                 lifecycle_candidates=None, allow_partial=False, **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
     existing = load_state(state_dir)
@@ -521,8 +606,17 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
             raise ValueError("same-day final generation baseline mismatch")
         return {"status": "SUCCESS", "changed": False, "asOfDate": target,
                 "coverage": len(expected), "lifecycle": diagnostics, "baseline": baseline}
-    incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
-                                  **collection_options)
+    if allow_partial:
+        partial = collect_today_rows_partial(target_date, current_universe, fetcher=fetcher,
+                                             **collection_options)
+        if partial["status"] == "PARTIAL":
+            return update_partial_state(
+                reconciled, partial["rows"], target_date, current_universe,
+                state_dir=state_dir, errors=partial["errors"], no_write=no_write)
+        incoming = partial["rows"]
+    else:
+        incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
+                                      **collection_options)
     publication_status = "PROVISIONAL" if provisional else "FINAL"
     updated, changed = update_state(reconciled, incoming, target_date, current_universe, publication_status)
     baseline = baseline_from_state(updated, target_date, current_universe, baseline_output)
