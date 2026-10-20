@@ -252,6 +252,9 @@ jobs:
             --date "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tradingDate"])' "$RUNNER_TEMP/full-market-current.json")" \
             > "$RUNNER_TEMP/final-daily-monitoring-result.json"
           cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
+          final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
+          echo "FINAL_DAILY_STATUS=$final_status"
+          test "$final_status" = "SUCCESS"
           echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Collect market indices
