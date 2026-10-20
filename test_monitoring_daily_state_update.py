@@ -456,7 +456,7 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertFalse(lifecycle_path.exists())
         self.assertTrue(all(path.read_bytes() == content for path, content in before.items()))
 
-    def test_refresh_path_requires_verified_lifecycle_event_and_preserves_final(self):
+    def test_refresh_path_uses_complete_naver_set_without_legal_delisting_claim(self):
         previous, stock = self._lifecycle_fixture()
         universe = self.root / "verified-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
         state_dir = self.root / "verified-state"; state_dir.mkdir()
@@ -467,11 +467,13 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         before = {p: p.read_bytes() for p in (universe, baseline_path, state_dir / "kospi.json", state_dir / "kosdaq.json")}
         source = {"stocks": [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ")],
                   "metadata": {"failedCount": 0, "markets": {"KOSPI": 1, "KOSDAQ": 1}}}
-        with self.assertRaises(update.UniverseHistoryRequired):
-            update.update_with_universe_refresh(
+        with patch.object(update, "baseline_from_state", return_value={"asOfDate":"20261008", "authoritativeCount":2, "count":2, "coveragePct":100.0, "historyStatus":"OK", "stocks":[{"code":"000001"},{"code":"000002"}]}):
+            result = update.update_with_universe_refresh(
                 state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
-                enforce_lifecycle_verification=True)
-        self.assertTrue(lifecycle_path.exists())
+                enforce_lifecycle_verification=True, no_write=True,
+                fetcher=lambda *_args: self._daily_response("20261008"), retry_sleep=0)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual("NAVER_OBSERVED", result["lifecycle"]["lifecycle"]["status"])
         self.assertTrue(all(p.read_bytes() == value for p, value in before.items()))
 
     def test_refresh_path_applies_only_explicit_verified_event(self):
@@ -522,6 +524,20 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertFalse(result["baselineUpdated"])
         self.assertEqual(1, result["coverage"])
         self.assertEqual(301, len(update.decode_stock(result_state := update.load_state(self.state_dir, self.universe)["KOSDAQ"]["stocks"][0])))
+
+    def test_retired_archive_preserves_rows_and_restores_on_reappearance(self):
+        previous, _stock = self._lifecycle_fixture()
+        state = self._state_for_payload(previous)
+        removed = next(stock for stock in state["KOSDAQ"]["stocks"] if stock["code"] == "000002")
+        observed = {"assets": [row for row in previous["assets"] if row["code"] != "000002"]}
+        archive = update.build_retired_archive(state, observed, {"schemaVersion": 1, "stocks": {}}, "20261008")
+        self.assertEqual(len(update.decode_stock(removed)), len(update.decode_stock(archive["stocks"]["000002"]["stock"])))
+        restored = update.restore_retired_states(
+            {"KOSPI": state["KOSPI"], "KOSDAQ": {**state["KOSDAQ"], "stocks": []}},
+            previous, archive)
+        self.assertEqual(len(update.decode_stock(removed)), len(update.decode_stock(next(
+            stock for stock in restored["KOSDAQ"]["stocks"] if stock["code"] == "000002"))))
+        self.assertEqual("UNVERIFIED", archive["stocks"]["000002"]["legalStatus"])
 
     def test_real_regression_shape_removes_196490_without_special_case(self):
         previous, stock = self._lifecycle_fixture()
