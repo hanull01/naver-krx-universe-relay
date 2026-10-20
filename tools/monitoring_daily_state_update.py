@@ -255,6 +255,56 @@ def reconcile_authoritative_universe(existing, previous_universe, current_univer
     return output
 
 
+def load_retired_archive(state_dir):
+    path = Path(state_dir) / "retired.json"
+    if not path.exists():
+        return {"schemaVersion": 1, "stocks": {}}
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schemaVersion") != 1 or not isinstance(value.get("stocks"), dict):
+        raise ValueError("invalid retired history archive")
+    return value
+
+
+def build_retired_archive(existing, current_universe, archive, target_date):
+    current = {str(row["code"]) for row in _universe_payload(current_universe).get("assets", [])
+               if row.get("assetType", "STOCK") == "STOCK"}
+    output = {"schemaVersion": 1, "stocks": dict(archive.get("stocks", {}))}
+    for market in MARKETS:
+        for stock in existing[market]["stocks"]:
+            code = str(stock["code"])
+            if code in current:
+                continue
+            entry = dict(output["stocks"].get(code) or {})
+            entry.update({"code": code, "market": market, "stock": stock,
+                          "legalStatus": "UNVERIFIED",
+                          "inactiveSince": entry.get("inactiveSince") or compact_date(target_date)})
+            output["stocks"][code] = entry
+    return output
+
+
+def restore_retired_states(existing, current_universe, archive):
+    current_groups = authoritative_groups(current_universe)
+    output = {market: dict(payload) for market, payload in existing.items()}
+    by_code = {str(stock["code"]): stock for market in MARKETS for stock in existing[market]["stocks"]}
+    for code, entry in archive.get("stocks", {}).items():
+        if code not in by_code and any(code in current_groups[market] for market in MARKETS):
+            market = next(market for market in MARKETS if code in current_groups[market])
+            output[market]["stocks"] = list(output[market]["stocks"]) + [entry["stock"]]
+    return output
+
+
+def universe_with_retired_archive(universe, state, current_universe, archive):
+    current_codes = {str(row["code"]) for row in _universe_payload(current_universe).get("assets", [])
+                     if row.get("assetType", "STOCK") == "STOCK"}
+    known = {str(row["code"]) for market in MARKETS for row in state[market]["stocks"]}
+    assets = list(_universe_payload(universe).get("assets", []))
+    for code, entry in archive.get("stocks", {}).items():
+        if code in current_codes and code not in known and entry.get("stock"):
+            assets.append({"code": code, "name": entry.get("name", code),
+                           "market": entry.get("market"), "assetType": "STOCK"})
+    return {**_universe_payload(universe), "assets": assets}
+
+
 def load_state(state_dir, universe_file=None):
     """Load structurally valid state, optionally enforcing an expected set."""
     expected = authoritative_groups(universe_file) if universe_file is not None else None; loaded = {}
@@ -563,6 +613,7 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
     existing = load_state(state_dir)
+    retired_archive = load_retired_archive(state_dir)
     state_universe = universe_from_state(existing, previous_universe)
     current_universe, diagnostics = refresh_stock_universe(
         state_universe, stock_payload, target_date)
@@ -587,8 +638,12 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
         diagnostics = dict(diagnostics)
         diagnostics["lifecycle"] = lifecycle
         current_universe = reconciled_universe
+    restored_state = restore_retired_states(existing, current_universe, retired_archive)
+    previous_for_reconcile = universe_with_retired_archive(
+        state_universe, restored_state, current_universe, retired_archive)
     reconciled = reconcile_authoritative_universe(
-        existing, state_universe, current_universe, diagnostics)
+        restored_state, previous_for_reconcile, current_universe, diagnostics)
+    retired_archive = build_retired_archive(existing, current_universe, retired_archive, target_date)
     target = compact_date(target_date)
     lifecycle_changed = bool(diagnostics["removed"] or diagnostics["added"])
     if not lifecycle_changed and all(
@@ -631,6 +686,7 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
             Path(state_dir) / "kospi.json": updated["KOSPI"],
             Path(state_dir) / "kosdaq.json": updated["KOSDAQ"],
             Path(lifecycle_output): diagnostics,
+            Path(state_dir) / "retired.json": retired_archive,
         }
         if not provisional:
             payloads[Path(baseline_output)] = baseline

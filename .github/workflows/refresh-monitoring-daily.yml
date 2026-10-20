@@ -137,13 +137,14 @@ jobs:
             data/market-universe/all-assets.json \
             data/monitoring-daily/kospi.json \
             data/monitoring-daily/kosdaq.json \
-            data/monitoring-daily/universe-lifecycle.json
+            data/monitoring-daily/universe-lifecycle.json \
+            data/monitoring-daily/retired.json
           if [ "${{ steps.update.outputs.partial }}" != "true" ]; then
             git add -- data/monitoring-baseline/latest.json
           else
             echo "PARTIAL result: baseline is intentionally not staged."
           fi
-          expected=$'data/market-universe/all-assets.json\ndata/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/kospi.json\ndata/monitoring-daily/universe-lifecycle.json'
+          expected=$'data/market-universe/all-assets.json\ndata/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/retired.json\ndata/monitoring-daily/universe-lifecycle.json'
           actual=$(git diff --cached --name-only | LC_ALL=C sort)
           if [ -z "$actual" ]; then
             echo "No rolling-state changes to commit (same-day NOOP)."
@@ -157,7 +158,8 @@ jobs:
               data/monitoring-baseline/latest.json|\
               data/monitoring-daily/kospi.json|\
               data/monitoring-daily/kosdaq.json|\
-              data/monitoring-daily/universe-lifecycle.json) ;;
+              data/monitoring-daily/universe-lifecycle.json|\
+              data/monitoring-daily/retired.json) ;;
               *) unexpected+="$path\n" ;;
             esac
           done <<< "$actual"
