@@ -78,6 +78,7 @@ def main():
     p.add_argument('--closing-window', action='store_true', help='print KST final-daily eligibility without collecting data')
     p.add_argument('--no-write',action='store_true')
     p.add_argument('--provisional', action='store_true', help='publish rolling state without changing the baseline')
+    p.add_argument('--allow-partial', action='store_true', help='publish validated rows as PARTIAL without updating baseline')
     a=p.parse_args()
     if a.closing_window:
         from monitoring_daily_state_update import closing_window
@@ -98,7 +99,8 @@ def main():
                     outcome = update_with_universe_refresh(
                         a.output_dir, a.universe_file, a.baseline_output,
                         a.lifecycle_output, a.date, stock_payload, no_write=a.no_write,
-                        provisional=a.provisional, enforce_lifecycle_verification=True)
+                        provisional=a.provisional, enforce_lifecycle_verification=True,
+                        allow_partial=a.allow_partial)
                 else:
                     outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
                                                collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
