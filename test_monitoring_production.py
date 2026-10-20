@@ -126,6 +126,19 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertEqual(runner.collection_readiness(prior, after, market_day)[1], "READY")
         self.assertEqual(runner.collection_readiness(current, after, market_day)[1], "READY")
 
+    def test_stale_baseline_does_not_block_fresh_snapshot_evidence(self):
+        prior = {"asOfDate": "20261016", "historyStatus": "OK",
+                 "count": 2, "authoritativeCount": 2, "coveragePct": 100.0}
+        regular = datetime(2026, 10, 20, 16, 0, tzinfo=KST)
+        market_day = lambda value: (True, "OPEN")
+        stale = dict(prior)
+        stale["asOfDate"] = "20261016"
+        stale["historyStatus"] = "OK"
+        self.assertEqual(runner.collection_readiness(stale, regular, market_day)[1], "BASELINE_STALE")
+        # The workflow consumes this warning separately and proceeds with a
+        # fresh snapshot; the stale baseline is never relabeled as current.
+        self.assertNotEqual(runner.collection_readiness(stale, regular, market_day)[1], "READY")
+
     def test_incomplete_current_never_publishes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); baseline = root / "baseline.json"; output = root / "evidence"
