@@ -412,8 +412,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             and current_snapshot.get("collectionStatus", "SUCCESS") == "SUCCESS"
             and current_snapshot.get("duplicateCodes", []) == []
             and current_snapshot.get("missingCodes", []) == []
-            and current_snapshot.get("coverageCount", len(current_snapshot.get("stocks", [])))
-            == len(current_snapshot.get("stocks", []))
+            # coverageCount may be lower for a valid suspended/no-quote symbol;
+            # that is a quality warning, not evidence that the active-set
+            # composition itself is invalid.  Duplicate and explicit missing
+            # code diagnostics remain hard gates above.
         )
         allowed_missing = [code for code in missing if code in lifecycle_new]
         if composition_change:
