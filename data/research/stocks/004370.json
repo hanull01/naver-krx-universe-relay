@@ -2,35 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "004370",
   "itemName": "농심",
-  "reportCount": 15,
-  "latestReportNid": "96555",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 16,
+  "latestReportNid": "96912",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96555",
-    "writeDate": "2026-10-08",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre: 시장 기대 부합 예상 + Capa 확대 기대감",
-    "goalPrice": 540000,
+    "nid": "96912",
+    "writeDate": "2026-10-21",
+    "brokerName": "유안타증권",
+    "title": "국내는 쉬어가지만, 해외는 달라지고 있다",
+    "goalPrice": 570000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 11,
-        "negative": 2
+        "negative": 4
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 1,
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 2,
-        "환율": 2,
-        "수요": 1,
-        "원가": 1,
+        "가격": 4,
+        "수요": 3,
+        "미국": 1,
+        "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "96912",
     "96555",
     "96041",
     "95730",

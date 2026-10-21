@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "214150",
   "itemName": "클래시스",
-  "reportCount": 19,
-  "latestReportNid": "96378",
-  "latestWriteDate": "2026-09-30",
+  "reportCount": 20,
+  "latestReportNid": "96920",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96378",
-    "writeDate": "2026-09-30",
-    "brokerName": "한국IR협의회",
-    "title": "글로벌 EBD 확장 지속, 밸류에이션 부담 완화",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96920",
+    "writeDate": "2026-10-21",
+    "brokerName": "교보증권",
+    "title": "3Q26 Preview: 눈높이를 조금 더 낮추자",
+    "goalPrice": 45000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 5
+        "positive": 6,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 2,
         "미국": 1,
-        "수요": 1
+        "자동차": 1,
+        "재고": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "96920",
     "96378",
     "95917",
     "95705",

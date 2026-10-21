@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "036460",
   "itemName": "한국가스공사",
-  "reportCount": 10,
-  "latestReportNid": "96230",
-  "latestWriteDate": "2026-09-18",
+  "reportCount": 12,
+  "latestReportNid": "96916",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96230",
-    "writeDate": "2026-09-18",
-    "brokerName": "한화투자증권",
-    "title": "다시 늘어나는 미수금",
-    "goalPrice": 50000,
+    "nid": "96916",
+    "writeDate": "2026-10-21",
+    "brokerName": "하나증권",
+    "title": "해외 자원개발 실적 급성장",
+    "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 7
+        "positive": 5,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 7,
-      "earningsNegativeSignalCount": 5,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "수요": 1,
-        "원가": 1
+        "가격": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96916",
+    "96902",
     "96230",
     "96076",
     "95741",

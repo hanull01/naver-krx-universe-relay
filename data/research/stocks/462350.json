@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "462350",
   "itemName": "이노스페이스",
-  "reportCount": 1,
-  "latestReportNid": "92485",
-  "latestWriteDate": "2026-05-06",
+  "reportCount": 2,
+  "latestReportNid": "96904",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "92485",
-    "writeDate": "2026-05-06",
-    "brokerName": "유안타증권",
-    "title": "나 쏠 수 있어!",
+    "nid": "96904",
+    "writeDate": "2026-10-21",
+    "brokerName": "한국IR협의회",
+    "title": "국내 민간 발사체 선도 기업, 상업화는 긴 호흡으로",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 3,
         "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "방산": 1
+        "수주": 3,
+        "환율": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96904",
     "92485"
   ]
 }

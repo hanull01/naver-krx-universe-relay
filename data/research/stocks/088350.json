@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "088350",
   "itemName": "한화생명",
-  "reportCount": 13,
-  "latestReportNid": "95580",
-  "latestWriteDate": "2026-08-13",
+  "reportCount": 14,
+  "latestReportNid": "96890",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "95580",
-    "writeDate": "2026-08-13",
-    "brokerName": "교보증권",
-    "title": "2Q26Review: 본업 경쟁력 강화 속, 사업 포트폴리오 다각화 기대",
-    "goalPrice": 7000,
+    "nid": "96890",
+    "writeDate": "2026-10-21",
+    "brokerName": "iM증권",
+    "title": "보험 Up, 투자 Down. 관건은 신계약, 배당",
+    "goalPrice": 5400,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 15,
-        "negative": 2
+        "positive": 7,
+        "negative": 9
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 5,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "금리": 4,
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96890",
     "95580",
     "95579",
     "95543",

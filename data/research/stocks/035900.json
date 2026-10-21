@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "035900",
   "itemName": "JYP Ent.",
-  "reportCount": 28,
-  "latestReportNid": "96785",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 29,
+  "latestReportNid": "96897",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96785",
-    "writeDate": "2026-10-16",
-    "brokerName": "iM증권",
-    "title": "내년에 쏠린 무게중심과 저연차 성장 과제",
+    "nid": "96897",
+    "writeDate": "2026-10-21",
+    "brokerName": "유진투자증권",
+    "title": "보릿고개",
     "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 8,
+        "negative": 5
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "topics": {
+        "수요": 3,
+        "원가": 3
+      }
     }
   },
   "reportNids": [
+    "96897",
     "96785",
     "96648",
     "96281",

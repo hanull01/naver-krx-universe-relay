@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "451760",
   "itemName": "컨텍",
-  "reportCount": 2,
-  "latestReportNid": "96128",
-  "latestWriteDate": "2026-09-14",
+  "reportCount": 3,
+  "latestReportNid": "96907",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96128",
-    "writeDate": "2026-09-14",
-    "brokerName": "대신증권",
-    "title": "지상국에서 국가단위 우주 인프라 사업자로",
+    "nid": "96907",
+    "writeDate": "2026-10-21",
+    "brokerName": "한국IR협의회",
+    "title": "업스트림부터 다운스트림까지 아우르는 우주 인프라 기업",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 7,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "수주": 2,
+        "원가": 2,
+        "가격": 1
+      }
     }
   },
   "reportNids": [
+    "96907",
     "96128",
     "92486"
   ]

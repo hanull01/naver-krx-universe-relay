@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "122640",
   "itemName": "예스티",
-  "reportCount": 2,
-  "latestReportNid": "95956",
-  "latestWriteDate": "2026-09-01",
+  "reportCount": 3,
+  "latestReportNid": "96901",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "95956",
-    "writeDate": "2026-09-01",
-    "brokerName": "유안타증권",
-    "title": "하반기부터 본격적 반도체 장비 실적 반영",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96901",
+    "writeDate": "2026-10-21",
+    "brokerName": "유진투자증권",
+    "title": "HPA 효과 시작",
+    "goalPrice": 57000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 0
+        "positive": 15,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 6,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 12,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "반도체": 3,
-        "수주": 1
+        "반도체": 9,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96901",
     "95956",
     "93423"
   ]

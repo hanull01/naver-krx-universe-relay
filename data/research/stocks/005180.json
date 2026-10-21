@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "005180",
   "itemName": "빙그레",
-  "reportCount": 3,
-  "latestReportNid": "95733",
-  "latestWriteDate": "2026-08-18",
+  "reportCount": 4,
+  "latestReportNid": "96914",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "95733",
-    "writeDate": "2026-08-18",
-    "brokerName": "한화투자증권",
-    "title": "드러나기 시작한 체질 개선 효과",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96914",
+    "writeDate": "2026-10-21",
+    "brokerName": "유안타증권",
+    "title": "성수기는 아쉬워도, 이익은 달라졌다",
+    "goalPrice": 120000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 5,
-        "negative": 0
+        "negative": 6
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "미국": 1,
         "원가": 1,
+        "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "96914",
     "95733",
     "95729",
     "91092"

@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "033780",
   "itemName": "KT&G",
-  "reportCount": 28,
-  "latestReportNid": "96730",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 29,
+  "latestReportNid": "96908",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96730",
-    "writeDate": "2026-10-15",
-    "brokerName": "신한투자증권",
-    "title": "이럴 때 생각나는 담배",
-    "goalPrice": 230000,
+    "nid": "96908",
+    "writeDate": "2026-10-21",
+    "brokerName": "유안타증권",
+    "title": "이익 성장에 더해지는 주주환원 프리미엄",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 8,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 3,
+        "수요": 2,
+        "가격": 1,
+        "자동차": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96908",
     "96730",
     "96562",
     "96449",

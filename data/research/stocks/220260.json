@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "220260",
   "itemName": "켐트로스",
-  "reportCount": 1,
-  "latestReportNid": "96330",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 2,
+  "latestReportNid": "96887",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96330",
-    "writeDate": "2026-09-28",
-    "brokerName": "유안타증권",
-    "title": "반도체 소재 매출 비중 50% 상회",
+    "nid": "96887",
+    "writeDate": "2026-10-21",
+    "brokerName": "신한투자증권",
+    "title": "PR 소재도 국산화",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 1,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 2,
-        "배터리": 1
+        "반도체": 4,
+        "배터리": 2,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96887",
     "96330"
   ]
 }

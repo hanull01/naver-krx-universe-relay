@@ -2,19 +2,19 @@
   "schemaVersion": 1,
   "itemCode": "171090",
   "itemName": "선익시스템",
-  "reportCount": 5,
-  "latestReportNid": "96643",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 6,
+  "latestReportNid": "96884",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "96643",
-    "writeDate": "2026-10-13",
-    "brokerName": "신한투자증권",
-    "title": "AI Agent, 스마트글라스로의 확산 수혜",
-    "goalPrice": 134000,
-    "normalizedOpinion": "BUY",
+    "nid": "96884",
+    "writeDate": "2026-10-21",
+    "brokerName": "한국IR협의회",
+    "title": "8.6세대 FMM, OLEDoS 수주 확대 기대",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 3,
         "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
@@ -22,11 +22,14 @@
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 2
+        "수주": 4,
+        "중국": 2,
+        "가격": 1
       }
     }
   },
   "reportNids": [
+    "96884",
     "96643",
     "95781",
     "93725",

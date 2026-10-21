@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "011760",
   "itemName": "현대코퍼레이션",
-  "reportCount": 4,
-  "latestReportNid": "95230",
-  "latestWriteDate": "2026-08-07",
+  "reportCount": 5,
+  "latestReportNid": "96917",
+  "latestWriteDate": "2026-10-21",
   "latest": {
-    "nid": "95230",
-    "writeDate": "2026-08-07",
-    "brokerName": "신한투자증권",
-    "title": "종합상사의 경쟁력이 증명되는 구간",
-    "goalPrice": 37000,
+    "nid": "96917",
+    "writeDate": "2026-10-21",
+    "brokerName": "하나증권",
+    "title": "분기 기준 최대 이익 달성 예상",
+    "goalPrice": 38000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 3,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96917",
     "95230",
     "94905",
     "92490",
