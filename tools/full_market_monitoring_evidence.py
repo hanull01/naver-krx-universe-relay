@@ -409,7 +409,9 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         }
         composition_change = bool(
             baseline.get("stocks")
-            and current_snapshot.get("collectionStatus", "SUCCESS") == "SUCCESS"
+            and current_snapshot.get("collectionStatus", "SUCCESS") in {
+                "SUCCESS", "COMPLETE_RECONCILIATION_PENDING"
+            }
             and current_snapshot.get("duplicateCodes", []) == []
             and current_snapshot.get("missingCodes", []) == []
             # coverageCount may be lower for a valid suspended/no-quote symbol;
