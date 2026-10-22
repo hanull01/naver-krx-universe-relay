@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "251270",
   "itemName": "넷마블",
-  "reportCount": 20,
-  "latestReportNid": "96832",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 21,
+  "latestReportNid": "96949",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96832",
-    "writeDate": "2026-10-19",
-    "brokerName": "교보증권",
-    "title": "기존작 하향 상쇄할 신작 등장이 절실",
-    "goalPrice": 51000,
+    "nid": "96949",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "길어지는 모멘텀 부재 구간",
+    "goalPrice": 46000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 5,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
-        "자동차": 1
+        "AI": 10,
+        "원가": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96949",
     "96832",
     "96442",
     "96406",

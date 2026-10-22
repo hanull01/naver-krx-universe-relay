@@ -2,34 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "222800",
   "itemName": "심텍",
-  "reportCount": 22,
-  "latestReportNid": "96434",
-  "latestWriteDate": "2026-10-06",
+  "reportCount": 23,
+  "latestReportNid": "96966",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96434",
-    "writeDate": "2026-10-06",
-    "brokerName": "iM증권",
-    "title": "CPU, LPDDR 수요 확대의 중심",
-    "goalPrice": 250000,
+    "nid": "96966",
+    "writeDate": "2026-10-22",
+    "brokerName": "교보증권",
+    "title": "순항 중인 성과 속 제한적인 외부 영향",
+    "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 18,
-        "negative": 0
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 9,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 3,
-        "수요": 3,
-        "수주": 3,
-        "환율": 2
+        "환율": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96966",
     "96434",
     "96053",
     "95880",

@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "036200",
   "itemName": "유니셈",
-  "reportCount": 2,
-  "latestReportNid": "91686",
-  "latestWriteDate": "2026-04-20",
+  "reportCount": 3,
+  "latestReportNid": "96929",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "91686",
-    "writeDate": "2026-04-20",
-    "brokerName": "한국IR협의회",
-    "title": "[AI] 반도체 유해가스 및 온도 제어 장비 전문기업",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96929",
+    "writeDate": "2026-10-22",
+    "brokerName": "신한투자증권",
+    "title": "밸류에이션콜: P/E 6x, 2yr CAGR +108%",
+    "goalPrice": 12000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 1,
-        "negative": 0
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 8
+        "가격": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96929",
     "91686",
     "91521"
   ]

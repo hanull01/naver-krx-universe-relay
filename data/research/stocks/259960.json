@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "259960",
   "itemName": "크래프톤",
-  "reportCount": 26,
-  "latestReportNid": "96664",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 27,
+  "latestReportNid": "96948",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96664",
-    "writeDate": "2026-10-13",
-    "brokerName": "유안타증권",
-    "title": "신작이 관건",
-    "goalPrice": 330000,
+    "nid": "96948",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "잠시 쉬어가는 구간",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 4,
-        "negative": 2
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "AI": 6,
         "원가": 2,
         "수요": 1
       }
     }
   },
   "reportNids": [
+    "96948",
     "96664",
     "96620",
     "96605",

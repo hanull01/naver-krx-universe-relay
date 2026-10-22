@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "336260",
   "itemName": "두산퓨얼셀",
-  "reportCount": 9,
-  "latestReportNid": "96051",
-  "latestWriteDate": "2026-09-09",
+  "reportCount": 10,
+  "latestReportNid": "96942",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96051",
-    "writeDate": "2026-09-09",
-    "brokerName": "SK증권",
-    "title": "PAFC, 미국진출 성공",
-    "goalPrice": 74000,
+    "nid": "96942",
+    "writeDate": "2026-10-22",
+    "brokerName": "유진투자증권",
+    "title": "미국, 유럽 공급 위한 준비 완료",
+    "goalPrice": 70000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 4
+        "positive": 4,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "미국": 3,
-        "AI": 2,
-        "원가": 1
+        "수주": 10,
+        "미국": 6,
+        "원가": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "96942",
     "96051",
     "95992",
     "94560",

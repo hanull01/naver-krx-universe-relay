@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "095660",
   "itemName": "네오위즈",
-  "reportCount": 12,
-  "latestReportNid": "96918",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 13,
+  "latestReportNid": "96956",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96918",
-    "writeDate": "2026-10-21",
-    "brokerName": "교보증권",
-    "title": "방향보다는 타이밍의 문제",
-    "goalPrice": 27000,
+    "nid": "96956",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "기다림의 시기",
+    "goalPrice": 24000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 4,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
-        "자동차": 1
+        "AI": 7,
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96956",
     "96918",
     "96888",
     "96607",

@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "036570",
   "itemName": "NC",
-  "reportCount": 29,
-  "latestReportNid": "96663",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 30,
+  "latestReportNid": "96950",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96663",
-    "writeDate": "2026-10-13",
-    "brokerName": "유안타증권",
-    "title": "첫 단추는 잘 끼웠다",
-    "goalPrice": 370000,
+    "nid": "96950",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "AI 시대, 우월전략을 갖춘 게임사",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 5
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1
+        "AI": 4,
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96950",
     "96663",
     "96627",
     "96623",

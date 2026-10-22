@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "039130",
   "itemName": "하나투어",
-  "reportCount": 5,
-  "latestReportNid": "95172",
-  "latestWriteDate": "2026-08-06",
+  "reportCount": 6,
+  "latestReportNid": "96930",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "95172",
-    "writeDate": "2026-08-06",
-    "brokerName": "하나증권",
-    "title": "조금만 더 기다려 볼까요",
-    "goalPrice": 53000,
+    "nid": "96930",
+    "writeDate": "2026-10-22",
+    "brokerName": "신한투자증권",
+    "title": "만반의 준비",
+    "goalPrice": 45000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 3,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1,
+        "수요": 2,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "96930",
     "95172",
     "94139",
     "92935",

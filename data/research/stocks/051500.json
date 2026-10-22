@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "051500",
   "itemName": "CJ프레시웨이",
-  "reportCount": 14,
-  "latestReportNid": "96767",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 15,
+  "latestReportNid": "96924",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96767",
-    "writeDate": "2026-10-15",
-    "brokerName": "DS투자증권",
-    "title": "온라인 성장 비용과 성과 공존",
-    "goalPrice": 40000,
+    "nid": "96924",
+    "writeDate": "2026-10-22",
+    "brokerName": "IBK투자증권",
+    "title": "무엇이 중요한가?",
+    "goalPrice": 42000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 18,
-        "negative": 4
+        "positive": 6,
+        "negative": 10
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 12,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 9,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3
+        "원가": 2,
+        "수주": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96924",
     "96767",
     "96556",
     "95243",

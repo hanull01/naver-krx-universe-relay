@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "006280",
   "itemName": "녹십자",
-  "reportCount": 12,
-  "latestReportNid": "96896",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 13,
+  "latestReportNid": "96923",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96896",
-    "writeDate": "2026-10-21",
-    "brokerName": "IBK투자증권",
-    "title": "3분기 외형은 줄어도 이익은 기대 이상",
-    "goalPrice": 190000,
+    "nid": "96923",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "3Q26 Preview: 영업이익 개선 전망",
+    "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 8
+        "positive": 9,
+        "negative": 7
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 5,
+      "earningsNegativeSignalCount": 6,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 4,
+        "미국": 3,
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "96923",
     "96896",
     "96881",
     "96852",

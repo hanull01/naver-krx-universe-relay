@@ -2,29 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "014830",
   "itemName": "유니드",
-  "reportCount": 5,
-  "latestReportNid": "94366",
-  "latestWriteDate": "2026-07-23",
+  "reportCount": 9,
+  "latestReportNid": "96954",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "94366",
-    "writeDate": "2026-07-23",
-    "brokerName": "iM증권",
-    "title": "칼륨비료 구조적 호황에도 역사적 최하단의 멀티플",
-    "goalPrice": 85000,
+    "nid": "96954",
+    "writeDate": "2026-10-22",
+    "brokerName": "IBK투자증권",
+    "title": "분기 적자보다 내년 이익의 구조를 보자",
+    "goalPrice": 90000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 4
+        "positive": 2,
+        "negative": 11
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "topics": {
+        "중국": 2,
+        "가격": 1,
+        "수요": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "96954",
+    "96947",
+    "96938",
+    "96935",
     "94366",
     "93329",
     "91825",

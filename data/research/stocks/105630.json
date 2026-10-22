@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "105630",
   "itemName": "한세실업",
-  "reportCount": 9,
-  "latestReportNid": "95765",
-  "latestWriteDate": "2026-08-19",
+  "reportCount": 10,
+  "latestReportNid": "96946",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "95765",
-    "writeDate": "2026-08-19",
-    "brokerName": "대신증권",
-    "title": "2분기 예상 밖 서프라이즈",
-    "goalPrice": 12000,
+    "nid": "96946",
+    "writeDate": "2026-10-22",
+    "brokerName": "SK증권",
+    "title": "이 비가 지나가기를",
+    "goalPrice": 11000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 2,
-        "negative": 0
+        "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "재고": 1,
+        "원가": 1,
+        "자동차": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "96946",
     "95765",
     "95736",
     "94303",

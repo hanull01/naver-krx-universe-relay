@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "293490",
   "itemName": "카카오게임즈",
-  "reportCount": 8,
-  "latestReportNid": "96768",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 9,
+  "latestReportNid": "96959",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96768",
-    "writeDate": "2026-10-15",
-    "brokerName": "한화투자증권",
-    "title": "기업가치 정상화를 위한 모든 변화 시작",
-    "goalPrice": 12000,
+    "nid": "96959",
+    "writeDate": "2026-10-22",
+    "brokerName": "미래에셋증권",
+    "title": "기다림의 끝, 턴어라운드의 시작",
+    "goalPrice": 15000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 5,
+        "negative": 3
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "96959",
     "96768",
     "96608",
     "95523",

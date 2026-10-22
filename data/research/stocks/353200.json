@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "353200",
   "itemName": "대덕전자",
-  "reportCount": 24,
-  "latestReportNid": "96821",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 25,
+  "latestReportNid": "96967",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96821",
-    "writeDate": "2026-10-19",
-    "brokerName": "미래에셋증권",
-    "title": "환율로 날 막을 순 없다",
+    "nid": "96967",
+    "writeDate": "2026-10-22",
+    "brokerName": "교보증권",
+    "title": "바뀌지 않은 청사진",
     "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
+        "positive": 3,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 2,
-        "환율": 2
+        "환율": 3,
+        "가격": 1,
+        "수요": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96967",
     "96821",
     "96810",
     "96576",

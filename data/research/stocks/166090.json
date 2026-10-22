@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "166090",
   "itemName": "하나머티리얼즈",
-  "reportCount": 4,
-  "latestReportNid": "95986",
-  "latestWriteDate": "2026-09-03",
+  "reportCount": 5,
+  "latestReportNid": "96961",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "95986",
-    "writeDate": "2026-09-03",
-    "brokerName": "SK증권",
-    "title": "노이즈보다 다가올 호황에 조명",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "96961",
+    "writeDate": "2026-10-22",
+    "brokerName": "유안타증권",
+    "title": "국내 실리콘 파츠 1위 기업",
+    "goalPrice": 100000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 3,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "반도체": 3,
-        "수요": 1
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "96961",
     "95986",
     "95881",
     "94328",

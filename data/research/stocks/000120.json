@@ -2,34 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "000120",
   "itemName": "CJ대한통운",
-  "reportCount": 17,
-  "latestReportNid": "96877",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 18,
+  "latestReportNid": "96958",
+  "latestWriteDate": "2026-10-22",
   "latest": {
-    "nid": "96877",
-    "writeDate": "2026-10-20",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre: 성장 지표 Inline, 도움닫기 중!",
+    "nid": "96958",
+    "writeDate": "2026-10-22",
+    "brokerName": "신한투자증권",
+    "title": "바닥 다지기",
     "goalPrice": 100000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 1,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "원가": 2,
-        "가격": 1,
-        "미국": 1,
-        "환율": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "96958",
     "96877",
     "96867",
     "95492",
