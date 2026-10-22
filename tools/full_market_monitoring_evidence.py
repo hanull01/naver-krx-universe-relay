@@ -407,17 +407,33 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             and str(event.get("effectiveDate", "")).replace("-", "") == str(today).replace("-", "")
             and event.get("sourceVerified") is True
         }
+        snapshot_status = current_snapshot.get("status")
+        collection_status = current_snapshot.get("collectionStatus", "SUCCESS")
+        missing_codes = [str(code) for code in current_snapshot.get("missingCodes", [])]
+        current_code_set = {str(row.get("code")) for row in current_snapshot.get("stocks", [])}
+        pending_quality_ok = (
+            snapshot_status != "COMPLETE_RECONCILIATION_PENDING"
+            or current_snapshot.get("qualityStatus") == "WARNING"
+        )
+        # missingCodes can describe a valid no-quote/suspended member when the
+        # collector completed the authoritative NAVER list.  Structural
+        # diagnostics remain hard gates, and the missing codes must belong to
+        # that current list; this does not permit page loss or corrupted data.
+        structural_ok = (
+            current_snapshot.get("count", len(current_snapshot.get("stocks", [])))
+            == current_snapshot.get("expectedCount", len(current_snapshot.get("stocks", [])))
+            and not current_snapshot.get("duplicateCodes")
+            and not current_snapshot.get("pageMissingCodes")
+            and not current_snapshot.get("structuralErrors")
+            and not current_snapshot.get("corruptCodes")
+            and all(code in current_code_set for code in missing_codes)
+        )
         composition_change = bool(
             baseline.get("stocks")
-            and current_snapshot.get("collectionStatus", "SUCCESS") in {
-                "SUCCESS", "COMPLETE_RECONCILIATION_PENDING"
-            }
-            and current_snapshot.get("duplicateCodes", []) == []
-            and current_snapshot.get("missingCodes", []) == []
-            # coverageCount may be lower for a valid suspended/no-quote symbol;
-            # that is a quality warning, not evidence that the active-set
-            # composition itself is invalid.  Duplicate and explicit missing
-            # code diagnostics remain hard gates above.
+            and snapshot_status in {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
+            and collection_status == "SUCCESS"
+            and pending_quality_ok
+            and structural_ok
         )
         allowed_missing = [code for code in missing if code in lifecycle_new]
         if composition_change:

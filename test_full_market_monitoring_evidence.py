@@ -111,7 +111,7 @@ class EvidenceTests(unittest.TestCase):
 
     def test_reconciliation_pending_snapshot_allows_composition_change(self):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING",
-                    "collectionStatus": "COMPLETE_RECONCILIATION_PENDING",
+                    "collectionStatus": "SUCCESS",
                     "qualityStatus": "WARNING", "generatedAt": "t",
                     "expectedCount": 2, "coverageCount": 1, "attemptCount": 2,
                     "duplicateCodes": [], "missingCodes": [],
@@ -129,6 +129,44 @@ class EvidenceTests(unittest.TestCase):
                 publication_context=context, today="20261021")
         self.assertEqual(built["latest-quality.json"]["publicationStatus"],
                          "COMPLETE_RECONCILIATION_PENDING")
+
+    def test_run_39538406973_missing_quote_is_publishable(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING",
+                    "collectionStatus": "SUCCESS", "qualityStatus": "WARNING",
+                    "generatedAt": "20261021T1224", "expectedCount": 2764,
+                    "count": 2764, "coverageCount": 2763, "attemptCount": 2,
+                    "duplicateCodes": [], "missingCodes": ["0158S0"],
+                    "stocks": [current("005930"), current("0158S0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261020", "count": 1,
+                    "authoritativeCount": 1, "coveragePct": 100.0,
+                    "historyStatus": "OK", "stocks": [{
+                        "code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                        "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                        "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            context = {"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"}
+            built, _ = evidence.build_evidence(
+                snapshot, Path(directory), baseline=baseline,
+                publication_context=context, today="20261021")
+        self.assertEqual(built["latest-quality.json"]["publicationStatus"],
+                         "COMPLETE_RECONCILIATION_PENDING")
+        self.assertIn("0158S0", context["baselineDiagnostics"]["unverifiedCompositionChangeCodes"])
+
+    def test_structural_page_missing_remains_blocked(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING",
+                    "collectionStatus": "SUCCESS", "qualityStatus": "WARNING",
+                    "generatedAt": "t", "expectedCount": 2, "count": 1,
+                    "coverageCount": 1, "attemptCount": 2, "duplicateCodes": [],
+                    "missingCodes": ["0158S0"], "pageMissingCodes": ["0158S0"],
+                    "stocks": [current("005930"), current("0158S0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261020", "count": 1,
+                    "authoritativeCount": 1, "coveragePct": 100.0,
+                    "historyStatus": "OK", "stocks": [{"code": "005930"}]}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(ValueError):
+                evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                        publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                                        today="20261021")
 
     def test_current_history_merge_no_duplicate_and_no_mutation(self):
         with tempfile.TemporaryDirectory() as directory:
