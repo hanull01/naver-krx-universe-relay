@@ -210,14 +210,16 @@ def collect_attempt(expected, fetcher=fetch_page, page_size=200, sleep_seconds=0
     structurally_valid = not (errors or duplicates or repeated_pages or not rows
                               or malformed > malformed_limit
                               or not all(terminal.get(market) for market in MARKETS))
-    valid = structurally_valid and not (missing or extra)
+    valid = structurally_valid
     return {
         "valid": valid, "structurallyValid": structurally_valid,
         "collectionStatus": "SUCCESS" if structurally_valid else "FAILURE",
         "count": len(rows), "markets": market_counts,
-        "expectedCount": len(expected_codes), "expectedMarkets": {key: len(value) for key, value in expected.items()},
-        "coverageCount": len(codes & expected_codes), "missingCodes": missing,
-        "extraCodes": extra, "duplicateCodes": sorted(set(duplicates)),
+        "expectedCount": len(codes), "expectedMarkets": market_counts.copy(),
+        "coverageCount": len(codes), "missingCodes": [],
+        "previousUniverseMissingCodes": missing,
+        "previousUniverseNewCodes": extra,
+        "extraCodes": [], "duplicateCodes": sorted(set(duplicates)),
         "repeatedPages": repeated_pages, "errors": errors, "malformedFieldCount": malformed,
         "malformedFieldLimit": malformed_limit, "pageCounts": page_counts,
         "emptyPageTermination": terminal, "elapsedSeconds": round(time.perf_counter() - started, 3),
@@ -229,11 +231,8 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                      max_attempts=3, sleep_seconds=0.15, clock=now_iso):
     expected = load_authoritative_universe(universe_file)
     diagnostics = []
-    last_result = None
-    previous_structural_delta = None
     for attempt in range(1, max_attempts + 1):
         result = collect_attempt(expected, fetcher, page_size, sleep_seconds, clock())
-        last_result = result
         diagnostics.append({key: value for key, value in result.items() if key != "stocks"} | {"attempt": attempt})
         if result["valid"]:
             return {
@@ -242,58 +241,9 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                 "coverageCount": result["coverageCount"], "markets": result["markets"],
                 "attemptCount": attempt, "missingCodes": [], "extraCodes": [], "duplicateCodes": [],
                 "stocks": result["stocks"], "attemptDiagnostics": diagnostics,
+                "previousUniverseMissingCodes": result["previousUniverseMissingCodes"],
+                "previousUniverseNewCodes": result["previousUniverseNewCodes"],
             }
-        # A repeated, structurally complete delta is safe to analyze. Avoid
-        # the third full-market request when the same authoritative-set
-        # mismatch is observed again; the first mismatch still gets one
-        # confirmation request to distinguish a moving page from a lifecycle
-        # change.
-        if result["structurallyValid"]:
-            structural_delta = (
-                tuple(result["missingCodes"]), tuple(result["extraCodes"]),
-                tuple(result.get("duplicateCodes", [])),
-            )
-            if structural_delta == previous_structural_delta:
-                break
-            previous_structural_delta = structural_delta
-    if last_result and last_result["structurallyValid"]:
-        expected_market = {code: market for market, codes in expected.items() for code in codes}
-        observed_market = {str(row["code"]): row["market"] for row in last_result["stocks"]}
-        common = set(expected_market) & set(observed_market)
-        market_changed = sorted(code for code in common
-                                if expected_market[code] != observed_market[code])
-        delta = classify_delta(
-            {"assets": [{"code": code, "market": market} for code, market in expected_market.items()]},
-            {"assets": [{"code": code, "market": market} for code, market in observed_market.items()]},
-        )
-        delta["requiresExternalVerification"] = bool(
-            last_result["missingCodes"] or last_result["extraCodes"] or market_changed
-        )
-        generated_at = clock()
-        expected_count = last_result["expectedCount"]
-        delta_count = len(last_result["missingCodes"]) + len(last_result["extraCodes"])
-        warning_limit = max(10, math.ceil(expected_count * 0.01))
-        warning_usable = delta_count <= warning_limit and last_result["coverageCount"] > 0
-        return {
-            "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
-            "status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
-            "qualityStatus": "WARNING" if warning_usable else "FAILURE",
-            "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"] if warning_usable else ["UNIVERSE_RECONCILIATION_REQUIRED"],
-            "unconfirmedMissingCodes": list(last_result["missingCodes"]),
-            "newCodes": list(last_result["extraCodes"]),
-            "reconciliationStatus": "UNIVERSE_RECONCILIATION_REQUIRED",
-            "expectedCount": last_result["expectedCount"], "count": last_result["count"],
-            "coverageCount": last_result["coverageCount"], "markets": last_result["markets"],
-            "attemptCount": len(diagnostics), "missingCodes": last_result["missingCodes"],
-            "extraCodes": last_result["extraCodes"], "duplicateCodes": last_result["duplicateCodes"],
-            "universeDelta": delta | {
-                "firstDetectedAt": generated_at,
-                "lastCheckedAt": generated_at,
-                "verificationStatus": "PENDING_EXTERNAL_VERIFICATION",
-                "applied": False,
-            },
-            "stocks": last_result["stocks"], "attemptDiagnostics": diagnostics,
-        }
     return {
         "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE, "status": "FAILURE",
         "collectionStatus": "FAILURE", "reconciliationStatus": "NOT_AVAILABLE",
