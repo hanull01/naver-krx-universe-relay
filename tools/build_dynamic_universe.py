@@ -60,7 +60,9 @@ def main(argv=None):
     industries = manager.load_json(args.industries, {}) or {}
     quality = industries.get("quality") or {}
     industry_rows, industry_quality_state = usable_industry_rows(industries)
+    trading_date = industries.get("tradingDate") or industries.get("tradeDate") or industries.get("marketDate")
     context = {"generatedAt": industries.get("generatedAt"),
+               "tradingDate": trading_date,
                "industries": {"status": "AVAILABLE" if industry_rows else "UNAVAILABLE",
                               "industries": industry_rows, "qualityStatus": industry_quality_state,
                               "quality": quality},
@@ -126,10 +128,10 @@ def main(argv=None):
                            "averageChangeRate": group.get("averageChangeRate"),
                            "sourceTime": group.get("sourceTime")})
         if ranked:
-            context["themes"] = {"status": "AVAILABLE", "periods": {"daily": {"themes": ranked}},
+            context["themes"] = {"status": "AVAILABLE", "tradingDate": trading_date, "periods": {"daily": {"themes": ranked}},
                                    "qualityStatus": "FULL", "quality": {"sourceStatus": "OK"}}
         else:
-            context["themes"] = {"status": "UNAVAILABLE", "reason": "NO_VERIFIED_THEME_QUOTES"}
+            context["themes"] = {"status": "UNAVAILABLE", "tradingDate": trading_date, "reason": "NO_VERIFIED_THEME_QUOTES"}
         result = manager.build_management_result(context, universe_payload,
                                                  discovery, previous, manager.load_json(args.policy, {}) or {})
         for key in ("leaders", "initialObservationCandidates"):
