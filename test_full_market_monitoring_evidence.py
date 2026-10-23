@@ -411,9 +411,6 @@ class EvidenceTests(unittest.TestCase):
         )
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
     def test_complete_pending_snapshot_accepts_missing_codes_outside_current_set(self):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
@@ -453,6 +450,11 @@ if __name__ == "__main__":
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, "baseline missing 1 current codes"):
                 evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
-                                        publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                                        publication_context={"baselineFreshnessStatus":
+                                                             "VALID_PREVIOUS_TRADING_DAY"},
                                         today="20261023")
+
+
+if __name__ == "__main__":
+    unittest.main()
 
