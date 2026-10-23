@@ -419,9 +419,20 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         # collector completed the authoritative NAVER list.  Structural
         # diagnostics remain hard gates, and the missing codes must belong to
         # that current list; this does not permit page loss or corrupted data.
-        structural_ok = (
+        attempt_diagnostics = current_snapshot.get("attemptDiagnostics") or []
+        structurally_complete = (
             current_snapshot.get("count", len(current_snapshot.get("stocks", [])))
             == current_snapshot.get("expectedCount", len(current_snapshot.get("stocks", [])))
+            or (
+                snapshot_status == "COMPLETE_RECONCILIATION_PENDING"
+                and collection_status == "SUCCESS"
+                and current_snapshot.get("qualityStatus") == "WARNING"
+                and bool(attempt_diagnostics)
+                and attempt_diagnostics[-1].get("structurallyValid") is True
+            )
+        )
+        structural_ok = (
+            structurally_complete
             and not current_snapshot.get("duplicateCodes")
             and not current_snapshot.get("pageMissingCodes")
             and not current_snapshot.get("structuralErrors")

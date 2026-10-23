@@ -381,6 +381,35 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(quality["industryEvidenceUsable"], "UNUSABLE")
         self.assertEqual(quality["partialReason"], "INDUSTRY_MEMBERSHIP_UNUSABLE")
 
+    def test_complete_reconciliation_pending_allows_verified_structural_composition_delta(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING",
+                    "collectionStatus": "SUCCESS", "qualityStatus": "WARNING",
+                    "generatedAt": "20261023T082000", "expectedCount": 4,
+                    "count": 3, "coverageCount": 1, "attemptCount": 2,
+                    "duplicateCodes": [], "pageMissingCodes": [],
+                    "structuralErrors": [], "corruptCodes": [],
+                    "missingCodes": ["0013Y0", "0158S0"],
+                    "attemptDiagnostics": [{"structurallyValid": True}],
+                    "stocks": [current("005930"), current("0013Y0", "KOSDAQ"),
+                               current("0158S0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261022", "count": 1,
+                    "authoritativeCount": 1, "coveragePct": 100.0,
+                    "historyStatus": "OK", "stocks": [{
+                        "code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                        "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                        "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            context = {"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"}
+            built, _ = evidence.build_evidence(
+                snapshot, Path(directory), baseline=baseline,
+                publication_context=context, today="20261023")
+        self.assertEqual(built["latest-quality.json"]["publicationStatus"],
+                         "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(
+            context["baselineDiagnostics"]["unverifiedCompositionChangeCodes"],
+            ["0013Y0", "0158S0"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
