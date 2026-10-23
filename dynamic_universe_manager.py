@@ -77,21 +77,37 @@ def _leader_decision(row, policy):
     if row.get("decision") is True:
         score = 100
     if score is None:
-        positives = [
-            (_number(row.get("changeRate"), 0) or 0) > 0,
-            technical.get("aboveMA20") is True or technical.get("priceVsMA20") == "above" or row.get("above_ma20") is True,
-            technical.get("breakout20") in {"attempt", "confirmed"} or row.get("breakout_20_intraday") is True,
-        ]
-        score = round(sum(positives) * 100 / len(positives), 2)
-    persistence = int(_number(row.get("persistence"), 1) or 0)
-    checks = {"minimumScore": score >= policy["minimumScore"], "minimumPersistence": persistence >= policy["minimumPersistence"]}
-    return all(checks.values()), score, checks
+        def _trading_date(context):
+    for key in ("tradingDate", "tradeDate", "marketDate"):
+        value = (context or {}).get(key)
+        if value:
+            return str(value).replace("-", "")
+    for block_name in ("fullMarket", "baseline", "evidence"):
+        block = (context or {}).get(block_name) or {}
+        for key in ("tradingDate", "tradeDate", "marketDate"):
+            value = block.get(key)
+            if value:
+                return str(value).replace("-", "")
+    return None
 
 
 def _transition(previous, qualified, policy):
     previous = previous or {}
+    observed_date = policy.get("_observedTradingDate")
+    last_date = str(previous.get("lastObservedTradingDate") or "")
+    if not observed_date or (last_date and observed_date <= last_date):
+        return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
     was_managed = previous.get("status") in {"ACTIVE", "WATCH", "REENTERED"}
     qualify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
+    weaken_streak = 0 if qualified else previous.get("weakenStreak", 0) + 1
+    if qualified:
+        if was_managed: status = "ACTIVE"
+        elif previous.get("status") == "REMOVED" and qualify_streak >= policy["activationConfirmations"]: status = "REENTERED"
+        elif qualify_streak >= policy["activationConfirmations"]: status = "ACTIVE"
+        else: status = "DISCOVERED"
+    elif was_managed and weaken_streak < policy["removalConfirmations"]: status = "WATCH"
+        return status, qualify_streak, weaken_streak
+    return status, qualify_streak, weaken_streakify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
     weaken_streak = 0 if qualified else previous.get("weakenStreak", 0) + 1
     if qualified:
         if was_managed: status = "ACTIVE"
@@ -114,7 +130,10 @@ def _managed(status):
 def build_management_result(context, universe, discovery=None, previous=None, policy=None, generated_at=None):
     """Select qualified groups/leaders and retain hysteresis state."""
     policy = policy or load_json(DEFAULT_POLICY, {})
-    generated_at = generated_at or datetime.now().astimezone().isoformat()
+    observed_trading_date = _trading_date(context)
+    if observed_trading_date:
+                policy = {**policy, "_observedTradingDate": observed_trading_date}
+        generated_at = generated_at or datetime.now().astimezone().isoformat()
     previous = previous or {}
     sector_previous = _previous_index(previous, "sectors")
     theme_previous = _previous_index(previous, "themes")
@@ -236,6 +255,10 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         member(row["code"], "AUTO_LEADER", f"{row['groupType']}:{row['groupId']}")
     for row in normalized_leaders:
         row["collectionAdmitted"] = row.get("code") in admitted_auto_codes
+        if observed_trading_date:
+        for collection in (sectors, themes, normalized_leaders):
+            for row in collection:
+                row["lastObservedTradingDate"] = observed_trading_date
     return {"version": "dynamic-universe-management-v1", "generatedAt": generated_at, "networkCalls": 0,
             "industryEvidence": {"status": industry_block.get("qualityStatus") or "UNKNOWN",
                                   "sourceStatus": (industry_block.get("quality") or {}).get("sourceStatus"),
