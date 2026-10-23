@@ -413,3 +413,46 @@ class EvidenceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+    def test_complete_pending_snapshot_accepts_missing_codes_outside_current_set(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
+                    "qualityStatus": "WARNING", "generatedAt": "t", "expectedCount": 3,
+                    "count": 2, "coverageCount": 2, "attemptCount": 2,
+                    "missingCodes": ["0158S0"], "duplicateCodes": [], "pageMissingCodes": [],
+                    "structuralErrors": [], "corruptCodes": [],
+                    "attemptDiagnostics": [{"structurallyValid": True}],
+                    "stocks": [current("005930"), current("0013Y0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261022", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            context = {"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"}
+            built, _ = evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                                publication_context=context, today="20261023")
+            self.assertEqual(context["baselineDiagnostics"]["newListingHistoryInsufficient"],
+                             ["0013Y0", "0158S0"])
+            self.assertEqual(built["latest-summary.json"]["qualityStatus"],
+                             "COMPLETE_RECONCILIATION_PENDING")
+
+    def test_missing_codes_present_in_current_set_remain_structural_failure(self):
+        snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
+                    "qualityStatus": "WARNING", "generatedAt": "t", "expectedCount": 2,
+                    "count": 2, "coverageCount": 2, "attemptCount": 2,
+                    "missingCodes": ["0158S0"], "duplicateCodes": [], "pageMissingCodes": [],
+                    "structuralErrors": [], "corruptCodes": [],
+                    "attemptDiagnostics": [{"structurallyValid": True}],
+                    "stocks": [current("005930"), current("0158S0", "KOSDAQ")]}
+        baseline = {"asOfDate": "20261022", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "baseline missing 1 current codes"):
+                evidence.build_evidence(snapshot, Path(directory), baseline=baseline,
+                                        publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                                        today="20261023")
+
