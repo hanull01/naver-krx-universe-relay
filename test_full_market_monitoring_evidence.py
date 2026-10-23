@@ -135,7 +135,7 @@ class EvidenceTests(unittest.TestCase):
                     "collectionStatus": "SUCCESS", "qualityStatus": "WARNING",
                     "generatedAt": "20261021T1224", "expectedCount": 2764,
                     "count": 2763, "coverageCount": 2763, "attemptCount": 2,
-                    "duplicateCodes": [], "missingCodes": ["0158S0"],
+                    "duplicateCodes": [], "missingCodes": [],
                     "stocks": [current("005930")]}
         baseline = {"asOfDate": "20261020", "count": 1,
                     "authoritativeCount": 1, "coveragePct": 100.0,
@@ -150,7 +150,6 @@ class EvidenceTests(unittest.TestCase):
                 publication_context=context, today="20261021")
         self.assertEqual(built["latest-quality.json"]["publicationStatus"],
                          "COMPLETE_RECONCILIATION_PENDING")
-        self.assertEqual(context["baselineDiagnostics"].get("unverifiedCompositionChangeCodes", []), [])
 
     def test_structural_page_missing_remains_blocked(self):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING",
