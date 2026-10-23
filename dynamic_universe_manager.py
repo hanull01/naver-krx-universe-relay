@@ -77,7 +77,17 @@ def _leader_decision(row, policy):
     if row.get("decision") is True:
         score = 100
     if score is None:
-        def _trading_date(context):
+                positives = [
+            (_number(row.get("changeRate"), 0) or 0) > 0,
+            technical.get("aboveMA20") is True or technical.get("priceVsMA20") == "above" or row.get("above_ma20") is True,
+            technical.get("breakout20") in {"attempt", "confirmed"} or row.get("breakout_20_intraday") is True,
+                ]
+        score = round(sum(positives) * 100 / len(positives), 2)
+    persistence = int(_number(row.get("persistence"), 1) or 0)
+    checks = {"minimumScore": score >= policy["minimumScore"], "minimumPersistence": persistence >= policy["minimumPersistence"]}
+    return all(checks.values()), score, checks
+
+def _trading_date(context):
     for key in ("tradingDate", "tradeDate", "marketDate"):
         value = (context or {}).get(key)
         if value:
@@ -89,7 +99,6 @@ def _leader_decision(row, policy):
             if value:
                 return str(value).replace("-", "")
     return None
-
 
 def _transition(previous, qualified, policy):
     previous = previous or {}
@@ -106,18 +115,9 @@ def _transition(previous, qualified, policy):
         elif qualify_streak >= policy["activationConfirmations"]: status = "ACTIVE"
         else: status = "DISCOVERED"
     elif was_managed and weaken_streak < policy["removalConfirmations"]: status = "WATCH"
-        return status, qualify_streak, weaken_streak
-    return status, qualify_streak, weaken_streakify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
-    weaken_streak = 0 if qualified else previous.get("weakenStreak", 0) + 1
-    if qualified:
-        if was_managed: status = "ACTIVE"
-        elif previous.get("status") == "REMOVED" and qualify_streak >= policy["activationConfirmations"]: status = "REENTERED"
-        elif qualify_streak >= policy["activationConfirmations"]: status = "ACTIVE"
-        else: status = "DISCOVERED"
-    elif was_managed and weaken_streak < policy["removalConfirmations"]: status = "WATCH"
     else: status = "REMOVED"
     return status, qualify_streak, weaken_streak
-
+    
 
 def _previous_index(previous, key):
     return {str(row.get("id")): row for row in (previous or {}).get(key, []) if isinstance(row, dict)}
