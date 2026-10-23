@@ -431,7 +431,7 @@ class EvidenceTests(unittest.TestCase):
                                                 publication_context=context, today="20261023")
             self.assertEqual(context["baselineDiagnostics"]["newListingHistoryInsufficient"],
                              ["0013Y0", "0158S0"])
-            self.assertEqual(built["latest-quality.json"]["qualityStatus"],
+            self.assertEqual(built["latest-quality.json"]["publicationStatus"],
                              "COMPLETE_RECONCILIATION_PENDING")
 
     def test_missing_codes_present_in_current_set_remain_structural_failure(self):
