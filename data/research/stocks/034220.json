@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "034220",
   "itemName": "LG디스플레이",
-  "reportCount": 23,
-  "latestReportNid": "96825",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 25,
+  "latestReportNid": "96992",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96825",
-    "writeDate": "2026-10-19",
-    "brokerName": "대신증권",
-    "title": "3Q 실적의 추가 하향 고통과 인내의 시간..",
-    "goalPrice": 10500,
+    "nid": "96992",
+    "writeDate": "2026-10-23",
+    "brokerName": "신한투자증권",
+    "title": "고군분투",
+    "goalPrice": 11000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 12
+        "positive": 3,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 7,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 3,
-        "환율": 2,
-        "반도체": 1,
-        "수요": 1
+        "가격": 1,
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "96992",
+    "96983",
     "96825",
     "96688",
     "96533",

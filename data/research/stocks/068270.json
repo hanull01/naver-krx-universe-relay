@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "068270",
   "itemName": "셀트리온",
-  "reportCount": 25,
-  "latestReportNid": "96337",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 27,
+  "latestReportNid": "97000",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96337",
-    "writeDate": "2026-09-28",
-    "brokerName": "메리츠증권",
-    "title": "바이오시밀러 Golden Decade의 준비된 플레이어",
-    "goalPrice": 300000,
+    "nid": "97000",
+    "writeDate": "2026-10-23",
+    "brokerName": "SK증권",
+    "title": "옴리클로, 3대시장 First-mover의 완성",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 1,
+        "negative": 2
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1
+        "원가": 2,
+        "환율": 2,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "97000",
+    "96985",
     "96337",
     "96208",
     "96183",

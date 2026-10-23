@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "062040",
   "itemName": "산일전기",
-  "reportCount": 19,
-  "latestReportNid": "96742",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 20,
+  "latestReportNid": "96991",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96742",
-    "writeDate": "2026-10-15",
-    "brokerName": "미래에셋증권",
-    "title": "멀리 볼수록 저평가",
-    "goalPrice": 270000,
+    "nid": "96991",
+    "writeDate": "2026-10-23",
+    "brokerName": "SK증권",
+    "title": "단기 실적보다 강한 수주",
+    "goalPrice": 280000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 5
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 4,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
+        "환율": 5,
+        "수주": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "96991",
     "96742",
     "96496",
     "95409",

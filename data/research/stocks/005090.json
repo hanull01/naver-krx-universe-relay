@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "005090",
   "itemName": "SGC에너지",
-  "reportCount": 9,
-  "latestReportNid": "96451",
-  "latestWriteDate": "2026-10-06",
+  "reportCount": 11,
+  "latestReportNid": "97005",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96451",
-    "writeDate": "2026-10-06",
+    "nid": "97005",
+    "writeDate": "2026-10-23",
     "brokerName": "하나증권",
-    "title": "AI DC 1차 사업 매각 가치에 주목",
-    "goalPrice": 76000,
+    "title": "본업보다 중요한 AI DC 사업 진행 상황",
+    "goalPrice": 68000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 3,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "가격": 3,
         "원가": 1
       }
     }
   },
   "reportNids": [
+    "97005",
+    "96980",
     "96451",
     "94476",
     "94461",

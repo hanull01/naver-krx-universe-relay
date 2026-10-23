@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "114090",
   "itemName": "GKL",
-  "reportCount": 6,
-  "latestReportNid": "95495",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 7,
+  "latestReportNid": "96987",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "95495",
-    "writeDate": "2026-08-12",
-    "brokerName": "하나증권",
-    "title": "세율 인상 영향은 상대적으로 제한적일 듯",
-    "goalPrice": 13000,
+    "nid": "96987",
+    "writeDate": "2026-10-23",
+    "brokerName": "iM증권",
+    "title": "중국·일본 VIP 성장 지속, 비용 효율화가 관건",
+    "goalPrice": 12000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 7,
         "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "중국": 4,
+        "원가": 2
+      }
     }
   },
   "reportNids": [
+    "96987",
     "95495",
     "95470",
     "93226",

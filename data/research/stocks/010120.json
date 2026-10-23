@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "010120",
   "itemName": "LS ELECTRIC",
-  "reportCount": 35,
-  "latestReportNid": "96968",
-  "latestWriteDate": "2026-10-22",
+  "reportCount": 36,
+  "latestReportNid": "96999",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96968",
-    "writeDate": "2026-10-22",
-    "brokerName": "한화투자증권",
-    "title": "3Q26 Review: 닫히지 않은 성장판",
-    "goalPrice": 260000,
+    "nid": "96999",
+    "writeDate": "2026-10-23",
+    "brokerName": "대신증권",
+    "title": "여전히 업사이클 초기단계일 뿐. 업사이드 존재",
+    "goalPrice": 250000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 11,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 7,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "가격": 2,
-        "원가": 1,
-        "자동차": 1,
-        "중국": 1
+        "수주": 3,
+        "미국": 2,
+        "AI": 1,
+        "배터리": 1
       }
     }
   },
   "reportNids": [
+    "96999",
     "96968",
     "96964",
     "96960",

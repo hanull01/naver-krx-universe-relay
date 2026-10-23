@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "066970",
   "itemName": "엘앤에프",
-  "reportCount": 15,
-  "latestReportNid": "96231",
-  "latestWriteDate": "2026-09-18",
+  "reportCount": 16,
+  "latestReportNid": "97007",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96231",
-    "writeDate": "2026-09-18",
-    "brokerName": "DS투자증권",
-    "title": "2026 Investor Day: 비중국 LFP First Mover",
-    "goalPrice": 350000,
+    "nid": "97007",
+    "writeDate": "2026-10-23",
+    "brokerName": "하나증권",
+    "title": "환율 및 광물 가격 하락으로 인한 적자",
+    "goalPrice": 140000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 1,
-        "negative": 0
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 4,
-        "수요": 2,
-        "가격": 1
+        "재고": 3,
+        "가격": 2,
+        "환율": 2,
+        "수요": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97007",
     "96231",
     "95244",
     "95239",

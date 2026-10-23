@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "034230",
   "itemName": "파라다이스",
-  "reportCount": 8,
-  "latestReportNid": "95374",
-  "latestWriteDate": "2026-08-10",
+  "reportCount": 9,
+  "latestReportNid": "96988",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "95374",
-    "writeDate": "2026-08-10",
-    "brokerName": "하나증권",
-    "title": "실적 부진과 세율 인상 우려까지 다 반영된 주가",
-    "goalPrice": 18000,
+    "nid": "96988",
+    "writeDate": "2026-10-23",
+    "brokerName": "iM증권",
+    "title": "3분기 실적 모멘텀 유효",
+    "goalPrice": 15000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 5
+        "positive": 13,
+        "negative": 7
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원가": 1
+        "원가": 2,
+        "수요": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "96988",
     "95374",
     "95335",
     "95115",

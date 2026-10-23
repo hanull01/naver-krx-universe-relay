@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "014830",
   "itemName": "유니드",
-  "reportCount": 9,
-  "latestReportNid": "96954",
-  "latestWriteDate": "2026-10-22",
+  "reportCount": 10,
+  "latestReportNid": "97009",
+  "latestWriteDate": "2026-10-23",
   "latest": {
-    "nid": "96954",
-    "writeDate": "2026-10-22",
-    "brokerName": "IBK투자증권",
-    "title": "분기 적자보다 내년 이익의 구조를 보자",
-    "goalPrice": 90000,
+    "nid": "97009",
+    "writeDate": "2026-10-23",
+    "brokerName": "하나증권",
+    "title": "외부 변수로 실적 부진 vs. 염화칼륨 상방 압력 확대",
+    "goalPrice": 70000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 11
+        "positive": 1,
+        "negative": 9
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 3,
+        "가격": 2,
         "중국": 2,
-        "가격": 1,
-        "수요": 1,
-        "환율": 1
+        "환율": 2,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97009",
     "96954",
     "96947",
     "96938",
