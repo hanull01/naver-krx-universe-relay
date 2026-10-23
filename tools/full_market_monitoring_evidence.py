@@ -437,7 +437,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             and not current_snapshot.get("pageMissingCodes")
             and not current_snapshot.get("structuralErrors")
             and not current_snapshot.get("corruptCodes")
-            and all(code in current_code_set for code in missing_codes)
+            and all(code not in current_code_set for code in missing_codes)
         )
         composition_change = bool(
             baseline.get("stocks")
@@ -689,3 +689,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
