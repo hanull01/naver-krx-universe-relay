@@ -101,7 +101,7 @@ class ReadyMailTests(unittest.TestCase):
             result = ready.validate_full_market_publication(summary, quality, current=self.current)
             self.assertEqual(result['count'], 2)
             payload['publicationStatus'] = 'COMPLETE_RECONCILIATION_PENDING'; summary.write_text(json.dumps(payload), encoding='utf-8')
-            with self.assertRaisesRegex(ready.ReadyValidationError, 'not successful'):
+            with self.assertRaisesRegex(ready.ReadyValidationError, 'statuses differ'):
                 ready.validate_full_market_publication(summary, quality, current=self.current)
 
     def test_same_commit_is_not_signaled_twice(self):
@@ -168,5 +168,88 @@ class ReadyMailTests(unittest.TestCase):
             self.assertEqual(metadata['coverageCount'], 2763)
             self.assertEqual(metadata['unconfirmedMissingCodes'], ['028080'])
             self.assertEqual(metadata['qualityStatus'], 'WARNING')
+
+
+    def test_pending_composition_publication_is_eligible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / "summary.json"
+            quality = root / "quality.json"
+            payload = {
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "generatedAt": "2026-09-29T10:39:00+09:00",
+                "fullMarket": {
+                    "scope": "AUTHORITATIVE_FULL_MARKET",
+                    "qualityStatus": "WARNING",
+                    "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"],
+                    "expectedCount": 2764,
+                    "coverageCount": 2763,
+                    "missingCodes": ["028080"],
+                    "newCodes": ["0013Y0", "0015M0", "0158S0"],
+                    "markets": {"TOTAL": {"stockCount": 2766, "validCount": 2766}}
+                }
+            }
+            summary.write_text(json.dumps(payload), encoding="utf-8")
+            quality.write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING"
+            }), encoding="utf-8")
+
+            result = ready.validate_full_market_publication(
+                summary, quality, current=self.current
+            )
+            self.assertEqual(
+                result["publicationStatus"],
+                "COMPLETE_RECONCILIATION_PENDING"
+            )
+            self.assertEqual(result["coverageCount"], 2763)
+
+            content = ready.ready_message(result, self.env()).get_content()
+            self.assertIn(
+                "fullMarket.publicationStatus=COMPLETE_RECONCILIATION_PENDING",
+                content
+            )
+            self.assertIn("fullMarket.newCodes=0013Y0,0015M0,0158S0", content)
+
+    def test_pending_composition_rejects_failed_quality(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / "summary.json"
+            quality = root / "quality.json"
+            payload = {
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "generatedAt": "2026-09-29T10:39:00+09:00",
+                "fullMarket": {
+                    "scope": "AUTHORITATIVE_FULL_MARKET",
+                    "qualityStatus": "FAILURE",
+                    "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"],
+                    "expectedCount": 2764,
+                    "coverageCount": 2763,
+                    "markets": {"TOTAL": {"stockCount": 2766, "validCount": 2766}}
+                }
+            }
+            summary.write_text(json.dumps(payload), encoding="utf-8")
+            quality.write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING"
+            }), encoding="utf-8")
+            with self.assertRaises(ready.ReadyValidationError):
+                ready.validate_full_market_publication(
+                    summary, quality, current=self.current
+                )
+
+    def test_pending_composition_rejects_status_mismatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / "summary.json"
+            quality = root / "quality.json"
+            summary.write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING"
+            }), encoding="utf-8")
+            quality.write_text(json.dumps({
+                "publicationStatus": "SUCCESS"
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(
+                ready.ReadyValidationError, "statuses differ"
+            ):
+                ready.validate_full_market_publication(summary, quality)
 
 if __name__ == '__main__': unittest.main()

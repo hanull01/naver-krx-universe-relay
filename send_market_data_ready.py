@@ -27,8 +27,17 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         quality = json.loads(Path(quality_path).read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError) as exc:
         raise ReadyValidationError('full-market publication metadata is unavailable') from exc
-    if summary.get('publicationStatus') != 'SUCCESS' or quality.get('publicationStatus') != 'SUCCESS':
+    publication_status = summary.get('publicationStatus')
+    if publication_status != quality.get('publicationStatus'):
+        raise ReadyValidationError('full-market publication statuses differ')
+    if publication_status not in ('SUCCESS', 'COMPLETE_RECONCILIATION_PENDING'):
         raise ReadyValidationError('full-market publication is not successful')
+    if publication_status == 'COMPLETE_RECONCILIATION_PENDING':
+        full = summary.get('fullMarket', {})
+        if (full.get('qualityStatus') != 'WARNING'
+                or 'UNIVERSE_COMPOSITION_CHANGED' not in
+                (full.get('qualityWarnings') or [])):
+            raise ReadyValidationError('pending composition is not validated')
     if summary.get('fullMarket', {}).get('scope') != 'AUTHORITATIVE_FULL_MARKET':
         raise ReadyValidationError('full-market scope is not authoritative')
     full_market = summary.get('fullMarket', {})
@@ -49,7 +58,9 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication is not from today')
     if collection_started_at and generated < parse_timestamp(collection_started_at, 'collectionStartedAt'):
         raise ReadyValidationError('full-market publication predates this collection run')
-    return {'mode': 'FULL_MARKET', 'status': 'SUCCESS', 'scope': 'AUTHORITATIVE_FULL_MARKET',
+    return {'mode': 'FULL_MARKET', 'status': 'SUCCESS',
+            'publicationStatus': publication_status,
+            'scope': 'AUTHORITATIVE_FULL_MARKET',
             'generatedAt': generated.isoformat(), 'count': count,
             'expectedCount': expected, 'coverageCount': coverage,
             'qualityStatus': quality_status,
@@ -142,7 +153,9 @@ def ready_message(metadata, env):
              f'run_url={server}/{repository}/actions/runs/{run_id}', f'commit_sha={commit_sha}']
     if metadata.get('mode') == 'FULL_MARKET':
         lines.extend([
-            'fullMarket.status=SUCCESS', 'fullMarket.scope=AUTHORITATIVE_FULL_MARKET',
+            'fullMarket.status=SUCCESS',
+            f'fullMarket.publicationStatus={metadata["publicationStatus"]}',
+            'fullMarket.scope=AUTHORITATIVE_FULL_MARKET',
             f'fullMarket.generatedAt={metadata["generatedAt"]}',
             f'fullMarket.tradingDate={metadata["tradingDate"]}',
             f'fullMarket.marketSession={metadata["marketSession"]}',
