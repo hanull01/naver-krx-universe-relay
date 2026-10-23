@@ -77,11 +77,11 @@ def _leader_decision(row, policy):
     if row.get("decision") is True:
         score = 100
     if score is None:
-                positives = [
+        positives = [
             (_number(row.get("changeRate"), 0) or 0) > 0,
             technical.get("aboveMA20") is True or technical.get("priceVsMA20") == "above" or row.get("above_ma20") is True,
             technical.get("breakout20") in {"attempt", "confirmed"} or row.get("breakout_20_intraday") is True,
-                ]
+        ]
         score = round(sum(positives) * 100 / len(positives), 2)
     persistence = int(_number(row.get("persistence"), 1) or 0)
     checks = {"minimumScore": score >= policy["minimumScore"], "minimumPersistence": persistence >= policy["minimumPersistence"]}
