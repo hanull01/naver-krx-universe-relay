@@ -388,7 +388,7 @@ class EvidenceTests(unittest.TestCase):
                     "count": 3, "coverageCount": 1, "attemptCount": 2,
                     "duplicateCodes": [], "pageMissingCodes": [],
                     "structuralErrors": [], "corruptCodes": [],
-                    "missingCodes": ["0013Y0", "0158S0"],
+                    "missingCodes": ["999999"],
                     "attemptDiagnostics": [{"structurallyValid": True}],
                     "stocks": [current("005930"), current("0013Y0", "KOSDAQ"),
                                current("0158S0", "KOSDAQ")]}
@@ -414,12 +414,13 @@ class EvidenceTests(unittest.TestCase):
 
     def test_complete_pending_snapshot_accepts_missing_codes_outside_current_set(self):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
-                    "qualityStatus": "WARNING", "generatedAt": "t", "expectedCount": 3,
-                    "count": 2, "coverageCount": 2, "attemptCount": 2,
+                    "qualityStatus": "WARNING", "generatedAt": "t", "expectedCount": 4,
+                    "count": 3, "coverageCount": 3, "attemptCount": 2,
                     "missingCodes": ["0158S0"], "duplicateCodes": [], "pageMissingCodes": [],
                     "structuralErrors": [], "corruptCodes": [],
                     "attemptDiagnostics": [{"structurallyValid": True}],
-                    "stocks": [current("005930"), current("0013Y0", "KOSDAQ")]}
+                    "stocks": [current("005930"), current("0013Y0", "KOSDAQ"),
+                               current("0158S0", "KOSDAQ")]}
         baseline = {"asOfDate": "20261022", "count": 1, "authoritativeCount": 1,
                     "coveragePct": 100.0, "historyStatus": "OK",
                     "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
@@ -457,4 +458,5 @@ class EvidenceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
 
