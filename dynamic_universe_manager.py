@@ -106,7 +106,7 @@ def _transition(previous, qualified, policy):
     previous = previous or {}
     observed_date = policy.get("_observedTradingDate")
     last_date = str(previous.get("lastObservedTradingDate") or "")
-    if not observed_date or (last_date and observed_date <= last_date):
+    if (not observed_date and last_date) or (observed_date and last_date and observed_date <= last_date):
         return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
     was_managed = previous.get("status") in {"ACTIVE", "WATCH", "REENTERED"}
     qualify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
