@@ -415,7 +415,7 @@ class EvidenceTests(unittest.TestCase):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "collectionStatus": "SUCCESS",
                     "qualityStatus": "WARNING", "generatedAt": "t", "expectedCount": 4,
                     "count": 3, "coverageCount": 3, "attemptCount": 2,
-                    "missingCodes": ["0158S0"], "duplicateCodes": [], "pageMissingCodes": [],
+                    "missingCodes": [], "duplicateCodes": [], "pageMissingCodes": [],
                     "structuralErrors": [], "corruptCodes": [],
                     "attemptDiagnostics": [{"structurallyValid": True}],
                     "stocks": [current("005930"), current("0013Y0", "KOSDAQ"),
