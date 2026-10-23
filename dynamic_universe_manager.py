@@ -87,6 +87,7 @@ def _leader_decision(row, policy):
     checks = {"minimumScore": score >= policy["minimumScore"], "minimumPersistence": persistence >= policy["minimumPersistence"]}
     return all(checks.values()), score, checks
 
+
 def _trading_date(context):
     for key in ("tradingDate", "tradeDate", "marketDate"):
         value = (context or {}).get(key)
@@ -99,6 +100,7 @@ def _trading_date(context):
             if value:
                 return str(value).replace("-", "")
     return None
+
 
 def _transition(previous, qualified, policy):
     previous = previous or {}
@@ -117,7 +119,7 @@ def _transition(previous, qualified, policy):
     elif was_managed and weaken_streak < policy["removalConfirmations"]: status = "WATCH"
     else: status = "REMOVED"
     return status, qualify_streak, weaken_streak
-    
+
 
 def _previous_index(previous, key):
     return {str(row.get("id")): row for row in (previous or {}).get(key, []) if isinstance(row, dict)}
@@ -132,8 +134,8 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     policy = policy or load_json(DEFAULT_POLICY, {})
     observed_trading_date = _trading_date(context)
     if observed_trading_date:
-                policy = {**policy, "_observedTradingDate": observed_trading_date}
-        generated_at = generated_at or datetime.now().astimezone().isoformat()
+        policy = {**policy, "_observedTradingDate": observed_trading_date}
+    generated_at = generated_at or datetime.now().astimezone().isoformat()
     previous = previous or {}
     sector_previous = _previous_index(previous, "sectors")
     theme_previous = _previous_index(previous, "themes")
@@ -255,7 +257,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         member(row["code"], "AUTO_LEADER", f"{row['groupType']}:{row['groupId']}")
     for row in normalized_leaders:
         row["collectionAdmitted"] = row.get("code") in admitted_auto_codes
-        if observed_trading_date:
+    if observed_trading_date:
         for collection in (sectors, themes, normalized_leaders):
             for row in collection:
                 row["lastObservedTradingDate"] = observed_trading_date
