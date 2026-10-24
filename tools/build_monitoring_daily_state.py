@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 CANONICAL=ROOT/'data/naver-history/canonical/daily'
 UNIVERSE=ROOT/'data/market-universe/all-assets.json'
+SESSION_DIAGNOSTIC_OUTPUT=ROOT/'data/monitoring-daily/trading-session-diagnostic.json'
 # Keep the same raw lookback used by the canonical baseline reader.  This is
 # intentionally raw-row based: invalid rows are retained, never synthesized.
 KEEP=301
@@ -75,6 +76,7 @@ def main():
     p.add_argument('--date', help='target KRX trading day (YYYY-MM-DD) for update-latest')
     p.add_argument('--baseline-output', default=str(ROOT/'data/monitoring-baseline/latest.json'))
     p.add_argument('--lifecycle-output', default=str(ROOT/'data/monitoring-daily/universe-lifecycle.json'))
+    p.add_argument('--session-diagnostic-output', default=str(SESSION_DIAGNOSTIC_OUTPUT))
     p.add_argument('--closing-window', action='store_true', help='print KST final-daily eligibility without collecting data')
     p.add_argument('--no-write',action='store_true')
     p.add_argument('--provisional', action='store_true', help='publish rolling state without changing the baseline')
@@ -100,10 +102,14 @@ def main():
                         a.output_dir, a.universe_file, a.baseline_output,
                         a.lifecycle_output, a.date, stock_payload, no_write=a.no_write,
                         provisional=a.provisional, enforce_lifecycle_verification=True,
-                        allow_partial=a.allow_partial)
+                        allow_partial=a.allow_partial,
+                        diagnostic_output=None if a.no_write else a.session_diagnostic_output)
                 else:
                     outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
-                                               collect_today_rows(a.date, a.universe_file), a.output_dir, a.date,
+                                               collect_today_rows(
+                                                   a.date, a.universe_file,
+                                                   diagnostic_output=None if a.no_write else a.session_diagnostic_output),
+                                               a.output_dir, a.date,
                                                a.universe_file, a.baseline_output, no_write=a.no_write, provisional=a.provisional)
             else:
                 if a.refresh_universe:
