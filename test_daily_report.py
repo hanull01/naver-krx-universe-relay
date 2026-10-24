@@ -636,6 +636,11 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("사유: MISSING_EVIDENCE_FILE", rendered)
             self.assertIn("확인된 지수 날짜: 2026-10-07", rendered)
             self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", rendered)
+            self.assertIn("다음 거래일 관찰 후보", rendered)
+            self.assertIn("정규장 돌파 실패 후 회복 관찰", rendered)
+            self.assertIn("현재 관찰값 차이", rendered)
+            self.assertIn("위험·주의 요인", rendered)
+            self.assertIn("정규장 돌파 실패 관찰", rendered)
             self.assertEqual(report["nextSessionCandidates"]["asOf"], "2026-10-06")
             self.assertEqual(report["coverage"]["researchStockCount"], 0)
             self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_CONFIGURED")
@@ -675,6 +680,7 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("전체시장 종목: 2766/2766종목", rendered)
             self.assertIn("설정 종목 수: 0종목", rendered)
             self.assertIn("이는 전체시장 종목 수 0을 의미하지 않습니다", rendered)
+            self.assertIn("관심종목 설정이 없어 후보를 생성하지 않았습니다", rendered)
 
     def test_build_report_keeps_normal_ok_when_date_alignment_is_ok(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -716,6 +722,59 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("KOSPI 전체시장 거래대금: 123,456,789원", rendered)
             self.assertEqual(rendered.count("KOSPI 전체시장 거래대금"), 1)
             self.assertIn("연구용 테마 자료(운영 선정 아님)", rendered)
+
+            misaligned_full_market = verified_full_market()
+            misaligned_full_market.update({
+                "asOfDate": "20261016",
+                "snapshotDate": "20261023",
+                "sourceTime": "2026-10-23T20:00:00+09:00",
+            })
+            misaligned_alignment = daily_report.date_alignment(
+                "2026-10-16",
+                {"indices": [{"sourceTime": "2026-10-23T20:15:00+09:00"}]},
+                misaligned_full_market,
+            )
+            report["asOf"] = "2026-10-16"
+            report["status"] = "PARTIAL"
+            report["dateAlignment"] = misaligned_alignment
+            report["marketSummary"]["fullMarket"] = daily_report.full_market_summary(
+                misaligned_full_market, misaligned_alignment
+            )
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+            self.assertIn("기준일 정합성 경고", rendered)
+            self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", rendered)
+            self.assertIn("전체시장 수치는 기준일 또는 원천 증거가 검증되지 않아", rendered)
+            self.assertNotIn("- 분석 상태: 검증된 전체시장 자료 사용", rendered)
+
+            regular = {
+                "status": "CONFIRMED", "breakout20": "confirmed", "breakout60": "none",
+                "price": 100, "ma20": 99, "ma60": 98,
+                "priceVsMA20": "above", "priceVsMA60": "above",
+                "sourceDate": "2026-10-06", "sourceTime": "2026-10-06T15:30:00+09:00",
+            }
+            current = {
+                "price": 101, "sourceTime": "2026-10-06T16:10:00+09:00",
+                "pullbackState": "none", "volumeState": "elevated", "volumeRatio20": 1.4,
+            }
+            rows = [
+                self.candidate_row(f"{index:06d}", regular, current, session_rate=1)
+                for index in range(1, 13)
+            ]
+            report["nextSessionCandidates"] = daily_report.next_session_candidates(rows, "2026-10-06")
+            report["nextSessionCandidates"]["excluded"] = [{
+                "itemCode": "999999", "itemName": "제외 종목",
+                "reason": "REGULAR_SESSION_UNAVAILABLE",
+            }]
+            report["nextSessionCandidates"]["excludedCount"] = 1
+            report["nextSessionCandidates"]["status"] = "PARTIAL"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+            self.assertIn("Stock 000001", rendered)
+            self.assertIn("Stock 000010", rendered)
+            self.assertNotIn("Stock 000011", rendered)
+            self.assertIn("제외 종목", rendered)
+            self.assertIn("정규장 확정 증거 미확인", rendered)
 
     def test_coverage_status_empty_configured_universe_is_distinct(self):
         self.assertEqual(
