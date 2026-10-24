@@ -368,7 +368,8 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
                        max_workers=COLLECT_MAX_WORKERS,
                        retries=COLLECT_RETRIES,
                        timeout=COLLECT_TIMEOUT_SECONDS,
-                       retry_sleep=COLLECT_RETRY_SLEEP_SECONDS):
+                       retry_sleep=COLLECT_RETRY_SLEEP_SECONDS,
+                       diagnostic_output=None):
     """Collect one observed daily row per authoritative code from NAVER.
 
     This is intentionally a bounded source adapter, not a publisher.  A
@@ -412,15 +413,24 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
             rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
             if not isinstance(rows, list):
                 raise ValueError(f"invalid daily response collection: {code}")
+            observed_values = []
+            for response_row in rows:
+                observed_values.append(str(response_row.get("localDate")))
+                compact_date(response_row.get("localDate"))
+            observed_date = observed_values[0] if observed_values else None
             candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
             if not candidates:
                 if attempt < retries:
                     if retry_sleep:
                         time_module.sleep(retry_sleep)
                     continue
-                return code, None
+                return code, None, observed_date, observed_values, False
             if len(candidates) != 1:
-                raise ValueError(f"duplicate today daily row: {code}")
+                error = ValueError(f"duplicate today daily row: {code}")
+                error.observed_date = observed_date
+                error.observed_date_values = observed_values
+                error.duplicate = True
+                raise error
             row = candidates[0]
             reasons = daily.row_validation_reasons(row)
             return code, {"code": code, "date": target, "close": row.get("closePrice"),
@@ -428,24 +438,76 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
                           "closeValid": not any("close" in item for item in reasons),
                           "ohlcValid": not reasons,
                           "volumeValid": not any("volume" in item for item in reasons),
-                          "market": market}
+                          "market": market}, str(row.get("localDate")), observed_values, False
         raise RuntimeError(f"daily fetch failed without result: {code}") from last_error
 
     collected = {}
+    observed_dates = {}
+    observed_date_values = {}
+    duplicate_codes = set()
+    worker_error = None
+    expected = {code for code, _market in targets}
     worker_count = min(max_workers, len(targets))
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
         futures = {executor.submit(fetch_one, code, market): code for code, market in targets}
         for future in as_completed(futures):
-            code, row = future.result()
+            try:
+                result = future.result()
+            except Exception as error:
+                code = futures[future]
+                if getattr(error, "observed_date", None) is not None:
+                    observed_dates[code] = error.observed_date
+                if getattr(error, "observed_date_values", None):
+                    observed_date_values[code] = list(error.observed_date_values)
+                if getattr(error, "duplicate", False):
+                    duplicate_codes.add(code)
+                if worker_error is None:
+                    worker_error = error
+                continue
+            code, row, observed_date, values, duplicate = result
             if code in collected:
                 raise ValueError(f"duplicate collected daily code: {code}")
             collected[code] = row
+            if observed_date is not None:
+                observed_dates[code] = observed_date
+            if values:
+                observed_date_values[code] = list(values)
+            if duplicate:
+                duplicate_codes.add(code)
+
+    def write_diagnostic():
+        if diagnostic_output is None:
+            return
+        from tools.trading_session_diagnostic import write_local_date_diagnostic
+        write_local_date_diagnostic(
+            diagnostic_output, target, observed_dates, expected,
+            duplicate_codes=duplicate_codes,
+            observed_date_values=observed_date_values,
+        )
+
+    # Drain every worker before reporting the first error so the diagnostic
+    # includes successful and failed observations from the whole batch.
+    if worker_error is not None:
+        try:
+            write_diagnostic()
+        except Exception:
+            # Preserve the existing collection failure contract.  A
+            # diagnostic write must never turn a source failure into a new
+            # collection result or hide the original exception.
+            pass
+        raise worker_error
+
     missing = [code for code, _market in targets if collected.get(code) is None]
     if missing:
+        try:
+            write_diagnostic()
+        except Exception:
+            # TodayRowsNotReady remains the authoritative collection result.
+            pass
         raise TodayRowsNotReady(target, missing)
-    expected = {code for code, _market in targets}
     if set(collected) != expected:
         raise ValueError("collected authoritative code mismatch")
+    write_diagnostic()
     output = [collected[code] for code in sorted(collected)]
     return normalize_daily_rows({"rows": output}, target)
 
@@ -454,12 +516,14 @@ def collect_today_rows_partial(target_date, universe_file, fetcher=None, *,
                                max_workers=COLLECT_MAX_WORKERS,
                                retries=COLLECT_RETRIES,
                                timeout=COLLECT_TIMEOUT_SECONDS,
-                               retry_sleep=COLLECT_RETRY_SLEEP_SECONDS):
+                               retry_sleep=COLLECT_RETRY_SLEEP_SECONDS,
+                               diagnostic_output=None):
     """Collect rows without turning per-code failures into valid data.
 
     The complete collector remains fail-closed.  This companion returns a
     diagnostic envelope for controlled PARTIAL publication; it never writes
-    files or calls an additional endpoint.
+    operational state files or calls an additional endpoint.  When requested,
+    it writes only the separate localDate diagnostic sidecar.
     """
     groups = authoritative_groups(universe_file)
     target = compact_date(target_date)
@@ -471,32 +535,62 @@ def collect_today_rows_partial(target_date, universe_file, fetcher=None, *,
     import naver_daily_backfill as daily
     def one(code, market):
         last_error = None
+        observed_date = None
+        observed_values = []
+        duplicate = False
         for attempt in range(1, retries + 1):
             try:
                 response = fetcher(code, datetime.strptime(target, "%Y%m%d"), datetime.strptime(target, "%Y%m%d")) if fetcher else daily.fetch(code, datetime.strptime(target, "%Y%m%d"), datetime.strptime(target, "%Y%m%d"), timeout=timeout, retries=1, sleep=0)
                 payload = json.loads(response["raw"].decode("utf-8"))
                 rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
+                observed_values = [str(item.get("localDate")) for item in rows]
+                for value in observed_values:
+                    compact_date(value)
+                observed_date = observed_values[0] if observed_values else None
                 candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
                 if len(candidates) != 1:
+                    duplicate = len(candidates) > 1
                     raise ValueError("missing or duplicate target-date row")
                 row = candidates[0]; reasons = daily.row_validation_reasons(row)
                 if reasons:
                     raise ValueError(";".join(reasons))
-                return code, {"code": code, "date": target, "close": row.get("closePrice"),
-                              "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
-                              "closeValid": True, "ohlcValid": True, "volumeValid": True, "market": market}
+                return (
+                    code,
+                    {"code": code, "date": target, "close": row.get("closePrice"),
+                     "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
+                     "closeValid": True, "ohlcValid": True, "volumeValid": True, "market": market},
+                    None, observed_date, observed_values, duplicate,
+                )
             except Exception as exc:
                 last_error = str(exc)
                 if attempt < retries and retry_sleep: time_module.sleep(retry_sleep)
-        return code, None, last_error
+        return code, None, last_error, observed_date, observed_values, duplicate
     rows, errors = {}, {}
+    observed_dates = {}
+    observed_date_values = {}
+    duplicate_codes = set()
     with ThreadPoolExecutor(max_workers=min(max_workers, len(targets))) as executor:
         futures = {executor.submit(one, code, market): code for code, market in targets}
         for future in as_completed(futures):
             result = future.result()
             code = result[0]
-            if len(result) == 2: rows[code] = result[1]
-            else: errors[code] = result[2]
+            if result[1] is not None:
+                rows[code] = result[1]
+            else:
+                errors[code] = result[2]
+            if result[3] is not None:
+                observed_dates[code] = result[3]
+            if result[4]:
+                observed_date_values[code] = list(result[4])
+            if result[5]:
+                duplicate_codes.add(code)
+    if diagnostic_output is not None:
+        from tools.trading_session_diagnostic import write_local_date_diagnostic
+        write_local_date_diagnostic(
+            diagnostic_output, target, observed_dates,
+            {code for code, _market in targets}, duplicate_codes=duplicate_codes,
+            observed_date_values=observed_date_values,
+        )
     return {"status": "COMPLETE" if not errors else "PARTIAL", "targetDate": target,
             "rows": normalize_daily_rows({"rows": list(rows.values())}, target) if rows else {},
             "errors": errors, "missingCodes": sorted(errors),
