@@ -147,7 +147,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertEqual(len(repeated["leaders"]), len(first["leaders"]))
 
     def test_undated_legacy_state_is_frozen(self):
-        previous = {"sectors": [{"id": "261", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
+        previous = {"sectors": [{"id": "반도체", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
         result = manager.build_management_result(self.context([sector()]), self.universe(), previous=previous, policy=POLICY)
         row = result["sectors"][0]
         self.assertEqual((row["status"], row["qualifyStreak"], row["weakenStreak"]), ("ACTIVE", 7, 0))
