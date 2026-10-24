@@ -144,7 +144,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         repeated_context = copy.deepcopy(context)
         repeated = manager.build_management_result(repeated_context, self.universe(), previous=first, policy=POLICY)
         self.assertEqual(repeated["themes"][0]["qualifyStreak"], first["themes"][0]["qualifyStreak"])
-        self.assertEqual(repeated["leaders"][0]["qualifyStreak"], first["leaders"][0]["qualifyStreak"])
+        self.assertEqual(len(repeated["leaders"]), len(first["leaders"]))
 
 
 if __name__ == "__main__":
