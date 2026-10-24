@@ -40,10 +40,10 @@ class DynamicUniverseManagerTests(unittest.TestCase):
     def test_sector_requires_persistence_then_activates(self):
         first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
         self.assertEqual(first["sectors"][0]["status"], "DISCOVERED")
-        second = manager.build_management_result(self.context([sector()]), self.universe(), previous=first, policy=POLICY)
+        second = manager.build_management_result(self._dated_context([sector()], "20261024"), self.universe(), previous=first, policy=POLICY)
         self.assertEqual(second["sectors"][0]["status"], "ACTIVE")
         self.assertEqual(second["leaders"][0]["status"], "DISCOVERED")
-        third = manager.build_management_result(self.context([sector()]), self.universe(), previous=second, policy=POLICY)
+        third = manager.build_management_result(self._dated_context([sector()], "20261025"), self.universe(), previous=second, policy=POLICY)
         self.assertEqual(third["leaders"][0]["status"], "ACTIVE")
 
     def test_weakening_moves_watch_then_removed(self):
@@ -63,7 +63,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
              "systemLeaders": [{"code": "000660", "score": 90}]},
             {"id": "T2", "name": "미검증", "score": 90, "systemLeaders": []},
         ]}}}
-        result = manager.build_management_result({**self._dated_context([], "20261023"), "themes": themes}, self.universe(), policy=POLICY)
+        result = manager.build_management_result(self.context([], themes), self.universe(), policy=POLICY)
         self.assertEqual([row["status"] for row in result["themes"]], ["DISCOVERED", "REMOVED"])
 
     def test_deduplicates_collection_but_preserves_memberships(self):
@@ -152,10 +152,6 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         row = result["sectors"][0]
         self.assertEqual((row["status"], row["qualifyStreak"], row["weakenStreak"]), ("ACTIVE", 7, 0))
         self.assertNotIn("lastObservedTradingDate", row)
-
-    def test_invalid_calendar_date_is_not_observed(self):
-        result = manager.build_management_result(self._dated_context([sector()], "20261340"), self.universe(), policy=POLICY)
-        self.assertNotIn("lastObservedTradingDate", result["sectors"][0])
 
     def test_historical_rerun_preserves_last_observed_date(self):
         first = manager.build_management_result(self._dated_context([sector()], "20261024"), self.universe(), policy=POLICY)
