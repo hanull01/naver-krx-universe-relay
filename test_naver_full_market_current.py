@@ -45,6 +45,7 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertTrue(result["valid"])
         self.assertEqual(result["count"], 4)
         self.assertEqual(result["stocks"][0]["snapshotGeneratedAt"], "2026-10-01T10:00:00+09:00")
+        self.assertTrue(all(row["assetType"] == "STOCK" for row in result["stocks"]))
         self.assertNotIn("sourceTime", result["stocks"][0])
         self.assertEqual(result["stocks"][0]["code"], "000660")
 

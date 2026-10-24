@@ -36,6 +36,28 @@ def snapshot_rows(snapshot, baseline=None, expected_codes=None, target_date=None
     if diagnostic["errors"]:
         return {"status": "REJECTED", "reason": diagnostic["errors"], "diagnostic": diagnostic,
                 "rows": []}
+    # A normalized NAVER full-market snapshot carries localDate per stock.
+    # Do not let one dated row certify an otherwise undated snapshot.  Keep
+    # compatibility with older top-level-date fixtures only when no row has
+    # an individual date at all; the production collector supplies row dates.
+    if expected_codes is not None and target_date:
+        expected = {str(code) for code in expected_codes}
+        row_date_values = {}
+        for raw in snapshot.get("stocks") or []:
+            code = str(raw.get("code") or "")
+            values = [str(raw[key]).replace("-", "").replace("/", "")
+                      for key in ("tradingDate", "tradeDate", "marketDate", "localDate", "date")
+                      if raw.get(key) not in (None, "")]
+            row_date_values[code] = values
+        if any(row_date_values.values()):
+            invalid = sorted(
+                code for code in expected
+                if row_date_values.get(code) != [str(target_date).replace("-", "").replace("/", "")]
+            )
+            if invalid:
+                return {"status": "REJECTED",
+                        "reason": [f"TRADING_DATE_ROW_MISSING_OR_INCONSISTENT:{code}" for code in invalid],
+                        "diagnostic": diagnostic, "rows": []}
     rows = []
     for raw in snapshot.get("stocks") or []:
         asset_type = str(raw.get("assetType") or "").upper()

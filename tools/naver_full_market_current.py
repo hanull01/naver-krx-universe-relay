@@ -126,7 +126,10 @@ def normalize(row, market, snapshot_generated_at):
         "marketCap": "marketSum", "high52Week": "week52HighPrice", "low52Week": "week52LowPrice",
         "foreignHoldingRate": "foreignRetentionRate",
     }
-    item = {"code": code, "name": name, "market": market,
+    # This endpoint is the authoritative KOSPI/KOSDAQ STOCK collection path.
+    # Preserve that source contract explicitly for the downstream daily-state
+    # adapter; do not make the verifier guess an omitted asset type.
+    item = {"code": code, "name": name, "market": market, "assetType": "STOCK",
             "marketStatus": row.get("marketStatus"),
             "tradingSessionType": row.get("tradingSessionType"),
             "tradeStopYn": row.get("tradeStopYn"),
