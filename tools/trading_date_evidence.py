@@ -94,15 +94,21 @@ def _read_final_state(path, market, candidate):
     return payload, None
 
 
-def _read_session_diagnostic(path, current_codes, candidate):
+def _read_session_diagnostic(path, current_codes, candidate=None):
     """Validate the optional localDate sidecar when it is published."""
     path = Path(path)
     if not path.is_file():
-        return {"status": "ABSENT", "reason": "MONITORING_DAILY_DIAGNOSTIC_ABSENT"}, None
+        return {"status": "ABSENT", "reason": "MONITORING_DAILY_DIAGNOSTIC_ABSENT",
+                "tradingDate": None}, None
     try:
         diagnostic = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError, json.JSONDecodeError):
         return None, {"reason": "MONITORING_DAILY_DIAGNOSTIC_INVALID"}
+    diagnostic_date = str(diagnostic.get("targetDate") or "").replace("-", "").replace("/", "")
+    effective_date = candidate or diagnostic_date
+    if not _valid_date(effective_date):
+        return None, {"reason": "MONITORING_DAILY_DIAGNOSTIC_DATE_INVALID",
+                      "targetDate": diagnostic.get("targetDate")}
     expected = sorted({str(code) for code in current_codes if code})
     observed = diagnostic.get("observedDates")
     invalid_lists = any(diagnostic.get(key) for key in (
@@ -111,14 +117,14 @@ def _read_session_diagnostic(path, current_codes, candidate):
     valid = (
         diagnostic.get("status") == "VERIFIED"
         and diagnostic.get("source") == "NAVER_LOCAL_DATE"
-        and str(diagnostic.get("targetDate") or "").replace("-", "") == candidate
+        and diagnostic_date == effective_date
         and diagnostic.get("expectedCount") == len(expected)
         and diagnostic.get("observedCount") == len(expected)
         and sorted(diagnostic.get("expectedCodes") or []) == expected
         and sorted(diagnostic.get("observedCodes") or []) == expected
         and isinstance(observed, dict)
         and {str(code): str(value).replace("-", "") for code, value in observed.items()}
-        == {code: candidate for code in expected}
+        == {code: effective_date for code in expected}
         and not invalid_lists
     )
     if not valid:
@@ -126,7 +132,53 @@ def _read_session_diagnostic(path, current_codes, candidate):
                       "status": diagnostic.get("status"),
                       "targetDate": diagnostic.get("targetDate")}
     return {"status": "VERIFIED", "reason": diagnostic.get("reason"),
-            "source": diagnostic.get("source")}, None
+            "source": diagnostic.get("source"), "tradingDate": effective_date}, None
+
+
+def _verify_snapshot_dates(current_codes, current_snapshot, candidate):
+    """Require one matching explicit date for every current snapshot code."""
+    expected = {str(code) for code in current_codes if code}
+    rows = (current_snapshot or {}).get("stocks") or []
+    observed = {}
+    invalid = {}
+    hard_failure = False
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("code"):
+            invalid[str(row.get("code") if isinstance(row, dict) else "")] = "SNAPSHOT_ROW_INVALID"
+            hard_failure = True
+            continue
+        code = str(row["code"])
+        if code in observed or code in invalid:
+            invalid[code] = "DUPLICATE_SNAPSHOT_CODE"
+            hard_failure = True
+            continue
+        if code not in expected:
+            invalid[code] = "UNEXPECTED_SNAPSHOT_CODE"
+            hard_failure = True
+            continue
+        values = []
+        for key in ("tradingDate", "tradeDate", "marketDate", "localDate", "date"):
+            if row.get(key) is not None:
+                values.append(str(row[key]).replace("-", "").replace("/", ""))
+        if not values:
+            invalid[code] = "SNAPSHOT_DATE_MISSING"
+            continue
+        if len(values) != 1 or values[0] != candidate or not _valid_date(values[0]):
+            invalid[code] = "SNAPSHOT_DATE_MISSING_OR_MISMATCH"
+            hard_failure = True
+            continue
+        observed[code] = candidate
+    missing = sorted(expected - set(observed))
+    unexpected = sorted(set(observed) - expected)
+    if invalid or missing or unexpected or set(observed) != expected:
+        return {"status": "UNVERIFIED", "reason": "SNAPSHOT_TRADING_DATE_EVIDENCE_INCOMPLETE",
+                "observedDateCounts": dict(Counter(observed.values())),
+                "missingSnapshotCodes": missing, "unexpectedSnapshotCodes": unexpected,
+                "invalidSnapshotCodes": invalid, "hardFailure": hard_failure}
+    return {"status": "VERIFIED", "reason": "SNAPSHOT_TRADING_DATE_EVIDENCE_COMPLETE",
+            "observedDateCounts": dict(Counter(observed.values())),
+            "missingSnapshotCodes": [], "unexpectedSnapshotCodes": [],
+            "invalidSnapshotCodes": {}, "hardFailure": False}
 
 
 def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=None,
@@ -145,8 +197,6 @@ def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=No
             "observedDateCounts": {}, "missingFinalCodes": codes,
             "unexpectedFinalCodes": [], "invalidFinalCodes": {},
             "explicitSessionDates": explicit}
-    if not candidate:
-        return {**base, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"}
     if not codes:
         return {**base, "reason": "AUTHORITATIVE_CODE_SET_EMPTY"}
 
@@ -154,6 +204,12 @@ def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=No
         Path(monitoring_dir) / "trading-session-diagnostic.json", codes, candidate)
     if diagnostic_error:
         return {**base, **diagnostic_error, "diagnosticStatus": "UNVERIFIED"}
+    if explicit and not candidate:
+        return {**base, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"}
+    candidate = candidate or diagnostic.get("tradingDate")
+    if not candidate:
+        return {**base, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"}
+    snapshot_evidence = _verify_snapshot_dates(codes, current_snapshot, candidate)
 
     found = {}
     invalid = {}
@@ -208,11 +264,18 @@ def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=No
     if invalid or missing or unexpected or found_codes != set(codes):
         return {**base, "reason": "MONITORING_DAILY_FINAL_COVERAGE_INCOMPLETE",
                 "observedDateCounts": counts, "missingFinalCodes": missing,
-                "unexpectedFinalCodes": unexpected, "invalidFinalCodes": invalid}
+                "unexpectedFinalCodes": unexpected, "invalidFinalCodes": invalid,
+                "snapshotDateEvidence": snapshot_evidence}
+    if (snapshot_evidence.get("hardFailure")
+            or (diagnostic.get("status") != "VERIFIED"
+                and snapshot_evidence["status"] != "VERIFIED")):
+        return {**base, "reason": snapshot_evidence["reason"],
+                **snapshot_evidence, "diagnosticStatus": diagnostic["status"]}
     return {**base, "tradingDate": candidate,
             "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
             "diagnosticStatus": diagnostic["status"],
             "diagnosticReason": diagnostic["reason"],
+            "snapshotDateEvidence": snapshot_evidence,
             "observedDateCounts": counts, "missingFinalCodes": [],
             "unexpectedFinalCodes": [], "invalidFinalCodes": {}}
 

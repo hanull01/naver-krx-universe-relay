@@ -497,19 +497,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     # Canonical history remains the primary contract.  When it is not yet
     # available, reuse the existing rolling FINAL state only as a separately
     # named source after validating its exact date and complete current set.
-    canonical_fully_absent = (
-        trading_date_result.get("reason") == "CANONICAL_SESSION_DATE_MISMATCH"
-        and not trading_date_result.get("observedDateCounts")
-        and set(trading_date_result.get("missingCanonicalCodes") or ()) == {
-            str(row.get("code")) for row in current_snapshot.get("stocks", []) if row.get("code")
-        }
-        and all(not (Path(history_dir) / (str(row.get("code")) + ".jsonl")).is_file()
-                for row in current_snapshot.get("stocks", []) if row.get("code"))
+    current_codes = {str(row.get("code")) for row in current_snapshot.get("stocks", []) if row.get("code")}
+    canonical_fully_absent = bool(current_codes) and all(
+        not (Path(history_dir) / (code + ".jsonl")).is_file() for code in current_codes
     )
-    if trading_date_result.get("tradingDate") is None and (
-            trading_date_result.get("reason") in {
-                "INSUFFICIENT_TRADING_DATE_EVIDENCE", "CANONICAL_COVERAGE_INCOMPLETE"
-            } or canonical_fully_absent):
+    if trading_date_result.get("tradingDate") is None and canonical_fully_absent:
         final_result = trading_date_evidence.verify_monitoring_daily_final(
             monitoring_daily_dir,
             [row.get("code") for row in current_snapshot.get("stocks", [])],

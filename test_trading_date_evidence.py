@@ -83,6 +83,96 @@ class TradingDateEvidenceTests(unittest.TestCase):
             self.assertEqual(result['reason'], 'MONITORING_DAILY_FINAL_COVERAGE_INCOMPLETE')
             self.assertEqual(result['missingFinalCodes'], ['B'])
 
+    def test_monitoring_daily_final_requires_every_snapshot_local_date_without_diagnostic(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B'])
+            result = verify_monitoring_daily_final(
+                root, ['A', 'B'], session_date='20261023',
+                current_snapshot={'stocks': [{'code': 'A', 'localDate': '20261023'},
+                                             {'code': 'B'}]})
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'SNAPSHOT_TRADING_DATE_EVIDENCE_INCOMPLETE')
+
+    def test_verified_complete_local_date_diagnostic_can_supply_date(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B'])
+            (root / 'trading-session-diagnostic.json').write_text(json.dumps({
+                'status': 'VERIFIED', 'source': 'NAVER_LOCAL_DATE',
+                'targetDate': '20261023', 'expectedCount': 2, 'observedCount': 2,
+                'expectedCodes': ['A', 'B'], 'observedCodes': ['A', 'B'],
+                'observedDates': {'A': '20261023', 'B': '20261023'},
+                'missingCodes': [], 'unexpectedCodes': [], 'duplicateCodes': [],
+                'mismatchCodes': [], 'dateMismatchCodes': [],
+            }), encoding='utf-8')
+            result = verify_monitoring_daily_final(
+                root, ['A', 'B'], current_snapshot={'stocks': [{'code': 'A'}, {'code': 'B'}]})
+            self.assertEqual(result['tradingDate'], '20261023')
+            self.assertEqual(result['diagnosticStatus'], 'VERIFIED')
+
+    def test_monitoring_daily_final_rejects_duplicate_snapshot_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B'])
+            result = verify_monitoring_daily_final(
+                root, ['A', 'B'], session_date='20261023',
+                current_snapshot={'stocks': [
+                    {'code': 'A', 'localDate': '20261023'},
+                    {'code': 'A', 'localDate': '20261023'},
+                    {'code': 'B', 'localDate': '20261023'},
+                ]})
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'SNAPSHOT_TRADING_DATE_EVIDENCE_INCOMPLETE')
+
+    def test_monitoring_daily_final_rejects_unexpected_final_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B', 'C'])
+            result = verify_monitoring_daily_final(
+                root, ['A', 'B'], session_date='20261023',
+                current_snapshot={'stocks': [
+                    {'code': 'A', 'localDate': '20261023'},
+                    {'code': 'B', 'localDate': '20261023'},
+                ]})
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'MONITORING_DAILY_FINAL_COVERAGE_INCOMPLETE')
+            self.assertEqual(result['unexpectedFinalCodes'], ['C'])
+
+    def test_monitoring_daily_final_rejects_duplicate_final_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['A'])
+            result = verify_monitoring_daily_final(
+                root, ['A'], session_date='20261023',
+                current_snapshot={'stocks': [{'code': 'A', 'localDate': '20261023'}]})
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'MONITORING_DAILY_FINAL_COVERAGE_INCOMPLETE')
+
+    def test_verified_diagnostic_cannot_rescue_duplicate_snapshot_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B'])
+            (root / 'trading-session-diagnostic.json').write_text(json.dumps({
+                'status': 'VERIFIED', 'source': 'NAVER_LOCAL_DATE',
+                'targetDate': '20261023', 'expectedCount': 2, 'observedCount': 2,
+                'expectedCodes': ['A', 'B'], 'observedCodes': ['A', 'B'],
+                'observedDates': {'A': '20261023', 'B': '20261023'},
+                'missingCodes': [], 'unexpectedCodes': [], 'duplicateCodes': [],
+                'mismatchCodes': [], 'dateMismatchCodes': [],
+            }), encoding='utf-8')
+            result = verify_monitoring_daily_final(
+                root, ['A', 'B'], current_snapshot={'stocks': [
+                    {'code': 'A'}, {'code': 'A'}, {'code': 'B'}]})
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'SNAPSHOT_TRADING_DATE_EVIDENCE_INCOMPLETE')
+
     def test_monitoring_daily_final_rejects_empty_authoritative_set(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
