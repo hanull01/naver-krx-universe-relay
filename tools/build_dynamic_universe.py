@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +44,23 @@ def usable_industry_rows(payload):
     return selected, status
 
 
+def verified_trading_date(payload):
+    """Return only an explicit, calendar-valid trading-date field."""
+    for key in ("tradingDate", "tradeDate", "marketDate"):
+        value = (payload or {}).get(key)
+        if value is None:
+            continue
+        normalized = str(value).replace("-", "").replace("/", "")
+        if len(normalized) != 8 or not normalized.isdigit():
+            continue
+        try:
+            datetime.strptime(normalized, "%Y%m%d")
+        except ValueError:
+            continue
+        return normalized
+    return None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--industries", default=str(ROOT / "data/monitoring/latest-industries.json"))
@@ -60,7 +78,9 @@ def main(argv=None):
     industries = manager.load_json(args.industries, {}) or {}
     quality = industries.get("quality") or {}
     industry_rows, industry_quality_state = usable_industry_rows(industries)
+    trading_date = verified_trading_date(industries)
     context = {"generatedAt": industries.get("generatedAt"),
+               "tradingDate": trading_date,
                "industries": {"status": "AVAILABLE" if industry_rows else "UNAVAILABLE",
                               "industries": industry_rows, "qualityStatus": industry_quality_state,
                               "quality": quality},
@@ -126,10 +146,10 @@ def main(argv=None):
                            "averageChangeRate": group.get("averageChangeRate"),
                            "sourceTime": group.get("sourceTime")})
         if ranked:
-            context["themes"] = {"status": "AVAILABLE", "periods": {"daily": {"themes": ranked}},
+            context["themes"] = {"status": "AVAILABLE", "tradingDate": trading_date, "periods": {"daily": {"themes": ranked}},
                                    "qualityStatus": "FULL", "quality": {"sourceStatus": "OK"}}
         else:
-            context["themes"] = {"status": "UNAVAILABLE", "reason": "NO_VERIFIED_THEME_QUOTES"}
+            context["themes"] = {"status": "UNAVAILABLE", "tradingDate": trading_date, "reason": "NO_VERIFIED_THEME_QUOTES"}
         result = manager.build_management_result(context, universe_payload,
                                                  discovery, previous, manager.load_json(args.policy, {}) or {})
         for key in ("leaders", "initialObservationCandidates"):
