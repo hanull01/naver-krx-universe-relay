@@ -55,6 +55,12 @@ CANDIDATE_STATE_LABELS = {
     "pullback_ma60": "MA60 눌림",
 }
 
+CANDIDATE_DATE_REASON_LABELS = {
+    "REPORT_AS_OF_MISSING": "리포트 기준일 미확인",
+    "REGULAR_SOURCE_DATE_MISSING": "정규장 원천 날짜 미확인",
+    "REGULAR_SOURCE_DATE_MISMATCH": "정규장 원천 날짜 불일치",
+}
+
 
 def korean_status(value):
     """Render status labels for readers while retaining raw JSON values."""
@@ -73,6 +79,37 @@ def display_candidate_state(value):
     if value in (None, ""):
         return "확인 불가"
     return CANDIDATE_STATE_LABELS.get(str(value), str(value))
+
+
+def comparable_report_date(value):
+    if value in (None, ""):
+        return None
+    text = str(value).strip()
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return text
+
+
+def split_candidates_for_markdown(candidates, report_as_of):
+    """Keep only candidates with regular-session evidence for report asOf."""
+    verified = []
+    unverified = []
+    comparable_report_as_of = comparable_report_date(report_as_of)
+    for candidate in candidates:
+        regular = candidate.get("regularSession") or {}
+        source_date = regular.get("sourceDate")
+        comparable_source_date = comparable_report_date(source_date)
+        if not comparable_report_as_of:
+            reason = "REPORT_AS_OF_MISSING"
+        elif not comparable_source_date:
+            reason = "REGULAR_SOURCE_DATE_MISSING"
+        elif comparable_source_date != comparable_report_as_of:
+            reason = "REGULAR_SOURCE_DATE_MISMATCH"
+        else:
+            verified.append(candidate)
+            continue
+        unverified.append((candidate, reason))
+    return verified, unverified
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -1659,21 +1696,28 @@ def write_markdown(report, path):
     candidate_scope = monitored_summary.get("scope") or "확인 불가"
     candidates = next_candidates.get("priority") or []
     excluded_candidates = next_candidates.get("excluded") or []
+    report_as_of = report.get("asOf")
+    verified_candidates, unverified_candidates = split_candidates_for_markdown(
+        candidates, report_as_of
+    )
     lines.extend(["", "### 다음 거래일 관찰 후보", ""])
     lines.extend([
-        f"- 대상 거래일: {next_candidates.get('asOf') or report.get('asOf') or '확인 불가'}",
+        f"- 후보 분석 기준일: {next_candidates.get('asOf') or '확인 불가'}",
+        f"- 리포트 기준일 대조: {report_as_of or '확인 불가'}",
         f"- 분석 기준일: {alignment.get('reportTradingDate') or report.get('asOf') or '확인 불가'}",
         f"- 분석 범위: {candidate_scope}; 전체시장 후보를 임의 생성하지 않습니다.",
         f"- 후보 선정 상태: {korean_status(next_candidates.get('status'))}; "
         "우선순위는 기존 정규장 확정 버킷과 거래량·장후 관찰값의 사전식 정렬입니다.",
         f"- 후보 총수: {next_candidates.get('candidateCount', 0)}종목; "
-        f"제외: {next_candidates.get('excludedCount', len(excluded_candidates))}종목",
+        f"제외: {next_candidates.get('excludedCount', len(excluded_candidates))}종목; "
+        f"정규장 날짜 일치 검증: {len(verified_candidates)}종목; "
+        f"날짜 불일치·누락: {len(unverified_candidates)}종목",
     ])
     if candidate_scope == "MONITORED_UNIVERSE_EMPTY":
         lines.append("- 관심종목 설정이 없어 후보를 생성하지 않았습니다.")
-    elif candidates:
+    elif verified_candidates:
         lines.append("- 아래 목록은 기존 우선순위 상위 10개이며 매매 추천이나 점수가 아닙니다.")
-        for candidate in candidates[:10]:
+        for candidate in verified_candidates[:10]:
             regular = candidate.get("regularSession") or {}
             current = candidate.get("current") or {}
             after = candidate.get("afterSession") or {}
@@ -1714,12 +1758,27 @@ def write_markdown(report, path):
                 f"현재 관찰값 차이 {price_delta_text}, "
                 f"장후 등락률 {display_number(after.get('sessionChangeRate'), '%')}",
                 f"  - 거래량: {display_number(volume.get('volumeRatio20'), '배')}, "
-                f"상태 {volume_state}; 정규장 근거 {candidate.get('metadata', {}).get('technicalBasis') or '확인 불가'}",
+                f"상태 {volume_state}; 정규장 근거 {(candidate.get('metadata') or {}).get('technicalBasis') or '확인 불가'}",
             ])
+    elif candidates:
+        lines.append(
+            "- 정규장 원천 날짜가 리포트 기준일과 일치하는 검증 후보가 없어 목록에 표시하지 않았습니다."
+        )
     else:
         lines.append(
             "- 확인 가능한 후보가 없습니다. 정규장 확정 증거 또는 기존 관찰 조건이 부족한 상태입니다."
         )
+    if unverified_candidates:
+        lines.append("- 정규장 날짜 검증 제외:")
+        for candidate, reason_code in unverified_candidates[:10]:
+            regular = candidate.get("regularSession") or {}
+            reason = CANDIDATE_DATE_REASON_LABELS.get(reason_code, reason_code)
+            lines.append(
+                f"  - {candidate.get('itemName') or '이름 미확인'} "
+                f"({candidate.get('itemCode') or '코드 미확인'}): {reason}; "
+                f"원천 날짜 {regular.get('sourceDate') or '확인 불가'}, "
+                f"리포트 기준일 {report_as_of or '확인 불가'}"
+            )
     if excluded_candidates:
         lines.append("- 후보 제외 사유:")
         for excluded in excluded_candidates[:10]:
@@ -1769,12 +1828,12 @@ def write_markdown(report, path):
             f"60일 {breakout60_failed}종목"
         )
     missing_ma = sum(
-        1 for candidate in candidates
+        1 for candidate in verified_candidates
         if (candidate.get("regularSession") or {}).get("priceVsMA20") in (None, "")
         or (candidate.get("regularSession") or {}).get("priceVsMA60") in (None, "")
     )
     missing_volume = sum(
-        1 for candidate in candidates
+        1 for candidate in verified_candidates
         if (candidate.get("volume") or {}).get("volumeRatio20") in (None, "")
     )
     if missing_ma:
@@ -1784,6 +1843,10 @@ def write_markdown(report, path):
     if excluded_candidates:
         technical_warnings.append(
             f"후보 {len(excluded_candidates)}종목은 정규장 증거 부족 등으로 분석에서 제외됐습니다."
+        )
+    if unverified_candidates:
+        technical_warnings.append(
+            f"후보 {len(unverified_candidates)}종목은 정규장 원천 날짜 불일치·누락으로 표시에서 제외됐습니다."
         )
     if technical_warnings:
         lines.extend(f"- {warning}" for warning in technical_warnings)

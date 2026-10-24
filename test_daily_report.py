@@ -591,7 +591,8 @@ class DailyReportTests(unittest.TestCase):
                     "current": {"status": "ok", "price": 103, "priceVsMA20": "above",
                                 "breakout20": "confirmed"},
                     "regularSession": {"status": "CONFIRMED", "price": 99,
-                                       "priceVsMA20": "below", "breakout20": "failed"},
+                                       "priceVsMA20": "below", "breakout20": "failed",
+                                       "sourceDate": "2026-10-06"},
                 }]},
                 "research.json": {"stocks": [{"itemCode": "000999", "status": "OK", "rankingEligible": True}]},
             }
@@ -637,6 +638,8 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("확인된 지수 날짜: 2026-10-07", rendered)
             self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", rendered)
             self.assertIn("다음 거래일 관찰 후보", rendered)
+            self.assertIn("후보 분석 기준일: 2026-10-06", rendered)
+            self.assertNotIn("대상 거래일: 2026-10-06", rendered)
             self.assertIn("정규장 돌파 실패 후 회복 관찰", rendered)
             self.assertIn("현재 관찰값 차이", rendered)
             self.assertIn("위험·주의 요인", rendered)
@@ -681,6 +684,127 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("설정 종목 수: 0종목", rendered)
             self.assertIn("이는 전체시장 종목 수 0을 의미하지 않습니다", rendered)
             self.assertIn("관심종목 설정이 없어 후보를 생성하지 않았습니다", rendered)
+
+    def test_markdown_excludes_candidate_with_mismatched_regular_source_date(self):
+        report = {
+            "asOf": "2026-10-16",
+            "generatedAt": "2026-10-23T20:00:00+09:00",
+            "status": "PARTIAL",
+            "coverageStatus": "OK",
+            "dateAlignment": {"status": "PARTIAL", "reportTradingDate": "2026-10-16"},
+            "coverage": {
+                "enabledStockCount": 1, "missingMarketCount": 0,
+                "missingMarketStocks": [],
+            },
+            "marketSummary": {
+                "fullMarket": {"status": "UNAVAILABLE", "reason": "DATE_MISMATCH"},
+                "monitoredUniverse": {"configuredCount": 1, "coverageStatus": "OK"},
+                "breadth": {
+                    "observedCount": 0, "upCount": 0, "downCount": 0, "flatCount": 0,
+                    "ma20AboveCount": 0, "ma20BelowCount": 0, "ma60AboveCount": 0,
+                    "ma60BelowCount": 0, "breakout20ConfirmedCount": 0,
+                    "breakout20AttemptCount": 0, "breakout20FailedCount": 0,
+                    "volumeSurgeCount": 0, "volumeElevatedCount": 0,
+                }, "indices": {"status": "UNAVAILABLE"},
+            },
+            "monitoredUniverse": {
+                "scope": "MONITORED_UNIVERSE_CONFIGURED", "configuredCount": 1,
+            },
+            "groupSummary": [],
+            "technicalEventsRegularSession": {
+                key: [] for key in (
+                    "breakout20Confirmed", "breakout20Attempt", "breakout20Failed",
+                    "breakout60Confirmed", "breakout60Attempt", "breakout60Failed",
+                    "volumeSurge", "volumeElevated", "nearBreakout", "pullback",
+                )
+            },
+            "researchSummary": {
+                "statusCounts": {}, "recentCoverageActiveCount": 0,
+                "targetRevisionObservedCount": 0, "risingTopicObservedCount": 0,
+                "activeStocks": [],
+            },
+            "sources": {
+                "quotes": {"fresh": False, "status": "UNAVAILABLE", "sourceTime": None, "generatedAt": None},
+                "researchIntelligence": {"asOf": None}, "themeSignals": {},
+            },
+            "marketResearchCross": {}, "fullMarket": {},
+            "nextSessionCandidates": {
+                "asOf": "2026-10-16", "status": "PARTIAL", "candidateCount": 1,
+                "excludedCount": 0, "priority": [{
+                    "rank": 1, "itemCode": "000001", "itemName": "혼합 날짜 종목",
+                    "allBuckets": ["REGULAR_BREAKOUT_STRONG"],
+                    "regularSession": {"sourceDate": "2026-10-23"},
+                }], "excluded": [],
+            },
+            "stocks": [], "dynamicUniverse": {}, "research": {},
+            "themeResearch": {}, "shadowAnalysis": {},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            markdown = Path(directory) / "report.md"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+        self.assertIn("정규장 날짜 일치 검증: 0종목", rendered)
+        self.assertIn("정규장 원천 날짜 불일치", rendered)
+        self.assertNotIn("- 1. 혼합 날짜 종목", rendered)
+
+    def test_markdown_excludes_candidate_with_missing_regular_source_date(self):
+        report = {
+            "asOf": "2026-10-16", "generatedAt": "2026-10-16T20:00:00+09:00",
+            "status": "PARTIAL", "coverageStatus": "OK",
+            "dateAlignment": {"status": "PARTIAL", "reportTradingDate": "2026-10-16"},
+            "coverage": {
+                "enabledStockCount": 1, "missingMarketCount": 0,
+                "missingMarketStocks": [],
+            },
+            "marketSummary": {
+                "fullMarket": {"status": "UNAVAILABLE", "reason": "MISSING_EVIDENCE"},
+                "monitoredUniverse": {"configuredCount": 1, "coverageStatus": "OK"},
+                "breadth": {
+                    "observedCount": 0, "upCount": 0, "downCount": 0, "flatCount": 0,
+                    "ma20AboveCount": 0, "ma20BelowCount": 0, "ma60AboveCount": 0,
+                    "ma60BelowCount": 0, "breakout20ConfirmedCount": 0,
+                    "breakout20AttemptCount": 0, "breakout20FailedCount": 0,
+                    "volumeSurgeCount": 0, "volumeElevatedCount": 0,
+                }, "indices": {"status": "UNAVAILABLE"},
+            },
+            "monitoredUniverse": {
+                "scope": "MONITORED_UNIVERSE_CONFIGURED", "configuredCount": 1,
+            },
+            "groupSummary": [],
+            "technicalEventsRegularSession": {
+                key: [] for key in (
+                    "breakout20Confirmed", "breakout20Attempt", "breakout20Failed",
+                    "breakout60Confirmed", "breakout60Attempt", "breakout60Failed",
+                    "volumeSurge", "volumeElevated", "nearBreakout", "pullback",
+                )
+            },
+            "researchSummary": {
+                "statusCounts": {}, "recentCoverageActiveCount": 0,
+                "targetRevisionObservedCount": 0, "risingTopicObservedCount": 0,
+                "activeStocks": [],
+            },
+            "sources": {
+                "quotes": {"fresh": False, "status": "UNAVAILABLE", "sourceTime": None, "generatedAt": None},
+                "researchIntelligence": {"asOf": None}, "themeSignals": {},
+            },
+            "marketResearchCross": {}, "fullMarket": {},
+            "nextSessionCandidates": {
+                "asOf": "2026-10-16", "status": "UNAVAILABLE", "candidateCount": 1,
+                "excludedCount": 0, "priority": [{
+                    "rank": 1, "itemCode": "000002", "itemName": "날짜 미확인 종목",
+                    "allBuckets": ["REGULAR_BREAKOUT_STRONG"],
+                    "regularSession": {},
+                }], "excluded": [],
+            },
+            "stocks": [], "dynamicUniverse": {}, "research": {},
+            "themeResearch": {}, "shadowAnalysis": {},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            markdown = Path(directory) / "report.md"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+        self.assertIn("정규장 원천 날짜 미확인", rendered)
+        self.assertNotIn("- 1. 날짜 미확인 종목", rendered)
 
     def test_build_report_keeps_normal_ok_when_date_alignment_is_ok(self):
         with tempfile.TemporaryDirectory() as directory:
