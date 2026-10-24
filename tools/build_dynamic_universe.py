@@ -43,6 +43,17 @@ def usable_industry_rows(payload):
     return selected, status
 
 
+def verified_trading_date(payload):
+    for key in ("tradingDate", "tradeDate", "marketDate"):
+        value = payload.get(key)
+        if value is None:
+            continue
+        normalized = str(value).replace("-", "")
+        if len(normalized) == 8 and normalized.isdigit():
+            return normalized
+    return None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--industries", default=str(ROOT / "data/monitoring/latest-industries.json"))
@@ -60,7 +71,7 @@ def main(argv=None):
     industries = manager.load_json(args.industries, {}) or {}
     quality = industries.get("quality") or {}
     industry_rows, industry_quality_state = usable_industry_rows(industries)
-    trading_date = industries.get("tradingDate") or industries.get("tradeDate") or industries.get("marketDate")
+    trading_date = verified_trading_date(industries)
     context = {"generatedAt": industries.get("generatedAt"),
                "tradingDate": trading_date,
                "industries": {"status": "AVAILABLE" if industry_rows else "UNAVAILABLE",
