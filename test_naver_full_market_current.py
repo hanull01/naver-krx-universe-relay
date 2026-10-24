@@ -228,6 +228,16 @@ class FullMarketCurrentTests(unittest.TestCase):
         self.assertEqual(item["accumulatedTradingVolume"], 0)
         self.assertEqual(item["openPrice"], 0)
 
+    def test_explicit_naver_session_date_is_preserved_for_verification(self):
+        item, malformed = current.normalize(
+            raw("005930", localDate="20261023"),
+            "KOSPI",
+            "2026-10-23T20:00:00+09:00",
+        )
+        self.assertEqual(malformed, [])
+        self.assertEqual(item["localDate"], "20261023")
+        self.assertNotEqual(item["localDate"], item["snapshotGeneratedAt"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -149,6 +149,32 @@ class DailyReportTests(unittest.TestCase):
                 "BASELINE_DATE_MISMATCH",
             )
 
+    def test_full_market_evidence_reads_verified_date_from_published_scope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            generated = "2026-10-15T20:00:00+09:00"
+            for name in daily_report.FULL_MARKET_FILES:
+                (root / name).write_text(json.dumps({"generatedAt": generated}), encoding="utf-8")
+            (root / "latest-quality.json").write_text(json.dumps({
+                "generatedAt": generated, "baselineAsOfDate": "20261014",
+                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
+                "publicationStatus": "SUCCESS", "authoritativeCount": 1,
+                "currentCount": 1, "currentCoveragePct": 100.0,
+                "duplicateCodes": [], "missingCurrentCodes": [],
+            }), encoding="utf-8")
+            (root / "latest-breadth.json").write_text(json.dumps({
+                "generatedAt": generated,
+                "breadth": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}},
+                "fullMarket": {
+                    "tradingDate": "20261015",
+                    "tradingDateEvidence": {"reason": "VERIFIED_CANONICAL_SESSION"},
+                },
+            }), encoding="utf-8")
+            got = daily_report.full_market_evidence("2026-10-15", root)
+            self.assertEqual(got["status"], "AVAILABLE")
+            self.assertEqual(got["snapshotDate"], "20261015")
+            self.assertEqual(got["snapshotDateStatus"], "VERIFIED_EXPLICIT")
+
     def test_quote_summary(self):
         row = {
             "price": 100,
