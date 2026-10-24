@@ -587,6 +587,29 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["status"], "OK")
         self.assertEqual(got["mismatches"], [])
 
+    def test_date_alignment_reports_unavailable_full_market_and_index_mismatch(self):
+        got = daily_report.date_alignment(
+            "2026-10-16",
+            {"indices": [{"sourceTime": "2026-10-23T20:15:00+09:00"}]},
+            {"status": "UNAVAILABLE", "reason": "MISSING_EVIDENCE_FILE"},
+        )
+        self.assertEqual(got["status"], "UNAVAILABLE")
+        self.assertEqual(got["fullMarketReason"], "MISSING_EVIDENCE_FILE")
+        self.assertEqual(got["indexAlignmentStatus"], "MISMATCH")
+        self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", got["mismatches"])
+        self.assertIn("FULL_MARKET_EVIDENCE", got["missingEvidence"])
+
+    def test_date_alignment_reports_unavailable_full_market_and_index_match(self):
+        got = daily_report.date_alignment(
+            "2026-10-16",
+            {"indices": [{"sourceTime": "2026-10-16T20:15:00+09:00"}]},
+            {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"},
+        )
+        self.assertEqual(got["status"], "UNAVAILABLE")
+        self.assertEqual(got["indexAlignmentStatus"], "ALIGNED")
+        self.assertEqual(got["mismatches"], [])
+        self.assertIn("FULL_MARKET_EVIDENCE", got["missingEvidence"])
+
     def test_research_summary_requires_ranking_eligible_for_active_stocks(self):
         rows = [
             {
