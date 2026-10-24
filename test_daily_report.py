@@ -28,12 +28,19 @@ def verified_full_market():
             "volumeAbove20DayAverage": {"count": 700, "eligibleCount": 2600, "pct": 26.9231},
         },
         "marketTradingValue": {
-            "KOSPI": {"value": 123456789, "sourceTime": "2026-10-16T20:00:00+09:00"},
-            "KOSDAQ": {"value": 98765432, "sourceTime": "2026-10-16T20:00:00+09:00"},
+            "KOSPI": {"value": 123456789, "sourceTime": "2026-10-16T20:00:00+09:00",
+                       "availableCount": 1800, "observedCount": 1800},
+            "KOSDAQ": {"value": 98765432, "sourceTime": "2026-10-16T20:00:00+09:00",
+                        "availableCount": 966, "observedCount": 966},
         },
-        "industries": [{"id": "1", "name": "검증 업종", "relativeStrengthVsMarket": 2.5,
+        "industries": [{"id": "1", "name": "검증 업종", "avgReturn1D": 1.8,
+                        "advancePct": 62.5, "relativeStrengthVsMarket": 2.5,
+                        "tradingValue": {"total": 1234567, "availableCount": 10},
                         "persistence": {"status": "AVAILABLE"}}],
-        "leaders": [{"code": "005930", "name": "검증 주도주"}],
+        "leaders": [{"code": "005930", "name": "검증 주도주", "changeRate": 3.2,
+                     "current_volume_ratio_20": 1.8, "above_ma20": True, "above_ma60": False,
+                     "selectionReasons": ["POSITIVE_RETURN", "VOLUME_ABOVE_20D_AVERAGE"],
+                     "technicalEvidence": {"status": "AVAILABLE"}}],
     }
 
 
@@ -53,6 +60,23 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(partial["status"], "PARTIAL")
         self.assertIsNone(partial["breadth"])
         self.assertEqual(partial["marketTradingValue"], {})
+
+    def test_full_market_summary_preserves_missing_industry_and_leader_evidence(self):
+        payload = verified_full_market()
+        payload["industries"][0].update({
+            "avgReturn1D": None,
+            "advancePct": None,
+            "relativeStrengthVsMarket": None,
+            "tradingValue": {"total": None},
+        })
+        payload["leaders"][0] = {
+            "code": "005930", "name": "검증 주도주",
+            "selectionReasons": [], "technicalEvidence": {"status": "UNAVAILABLE"},
+        }
+        summary = daily_report.full_market_summary(payload, {"status": "OK"})
+        self.assertIsNone(summary["industries"][0]["avgReturn1D"])
+        self.assertIsNone(summary["industries"][0]["tradingValue"]["total"])
+        self.assertEqual(summary["leaders"][0]["technicalEvidence"]["status"], "UNAVAILABLE")
 
     def test_resolve_report_trading_date_requires_matching_published_material(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -680,6 +704,18 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "AVAILABLE")
             self.assertEqual(report["marketSummary"]["monitoredUniverse"]["configuredCount"], 1)
             self.assertEqual(report["marketSummary"]["breadth"]["observedCount"], 1)
+            self.assertEqual(report["marketSummary"]["topGainersScope"], "MONITORED_UNIVERSE_CONFIGURED")
+            self.assertEqual(report["marketSummary"]["monitoredUniverse"]["rankingBasis"],
+                             "MONITORED_UNIVERSE_CHANGE_RATE")
+            markdown = root / "report.md"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+            self.assertIn("전체시장 주도주 근거", rendered)
+            self.assertIn("관심종목 등락 상위", rendered)
+            self.assertIn("업종 정렬: 1일 평균 수익률 내림차순", rendered)
+            self.assertIn("KOSPI 전체시장 거래대금: 123,456,789원", rendered)
+            self.assertEqual(rendered.count("KOSPI 전체시장 거래대금"), 1)
+            self.assertIn("연구용 테마 자료(운영 선정 아님)", rendered)
 
     def test_coverage_status_empty_configured_universe_is_distinct(self):
         self.assertEqual(

@@ -10,6 +10,27 @@ import trading_discovery
 
 KST = ZoneInfo("Asia/Seoul")
 
+STATUS_LABELS = {
+    "AVAILABLE": "확인 가능",
+    "AVAILABLE_EMPTY": "확인 가능(대상 없음)",
+    "AVAILABLE_WITH_BASELINE_WARNING": "확인 가능(기준선 경고)",
+    "OK": "정상",
+    "SUCCESS": "성공",
+    "PARTIAL": "부분 확인",
+    "UNAVAILABLE": "확인 불가",
+    "UNUSABLE": "사용 불가",
+    "DISABLED_PENDING_RESEARCH_GATE": "연구 검증 대기",
+    "MONITORED_UNIVERSE_EMPTY": "관심종목 미설정",
+    "MONITORED_UNIVERSE_CONFIGURED": "관심종목 설정됨",
+}
+
+
+def korean_status(value):
+    """Render status labels for readers while retaining raw JSON values."""
+    if value in (None, ""):
+        return "확인 불가"
+    return STATUS_LABELS.get(str(value), str(value))
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 UNIVERSE_PATH = ROOT / "config" / "universe.json"
@@ -664,6 +685,15 @@ def full_market_summary(full_market, alignment):
         reason = full_market.get("reason") or "FULL_MARKET_EVIDENCE_UNAVAILABLE"
 
     quality = full_market.get("quality") if verified else {}
+    industries = full_market.get("industries", []) if verified else []
+    industries = [row for row in industries if isinstance(row, dict)]
+    industries.sort(
+        key=lambda row: (
+            row.get("avgReturn1D") is not None,
+            row.get("avgReturn1D") if row.get("avgReturn1D") is not None else -9999,
+        ),
+        reverse=True,
+    )
     return {
         "status": status,
         "evidenceStatus": evidence_status,
@@ -678,7 +708,8 @@ def full_market_summary(full_market, alignment):
         "quality": quality,
         "breadth": full_market.get("breadth") if verified else None,
         "marketTradingValue": full_market.get("marketTradingValue", {}) if verified else {},
-        "industries": full_market.get("industries", []) if verified else [],
+        "industries": industries,
+        "industrySortBasis": "AVG_RETURN_1D_DESC_NULLS_LAST",
         "leaders": full_market.get("leaders", []) if verified else [],
         "mismatches": alignment.get("mismatches", []),
         "missingEvidence": alignment.get("missingEvidence", []),
@@ -1279,6 +1310,29 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "current": monitored_current,
         "regularSession": monitored_regular,
     }
+    monitored_top_gainers = [
+        {
+            "itemCode": row["itemCode"],
+            "itemName": row.get("stockName") or row.get("itemName"),
+            "changeRate": row["market"]["changeRate"],
+            "price": row["market"]["price"],
+        }
+        for row in market_movers[:10]
+    ]
+    monitored_top_decliners = [
+        {
+            "itemCode": row["itemCode"],
+            "itemName": row.get("stockName") or row.get("itemName"),
+            "changeRate": row["market"]["changeRate"],
+            "price": row["market"]["price"],
+        }
+        for row in reversed(market_movers[-10:])
+    ]
+    monitored_summary.update({
+        "topGainers": monitored_top_gainers,
+        "topDecliners": monitored_top_decliners,
+        "rankingBasis": "MONITORED_UNIVERSE_CHANGE_RATE",
+    })
 
     return {
         "status": report_status,
@@ -1347,24 +1401,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "indices": indices,
             "marketTradingValue": full_market_summary_data["marketTradingValue"],
             "dynamicThemes": dynamic_universe.get("themes", []),
-            "topGainers": [
-                {
-                    "itemCode": row["itemCode"],
-                    "itemName": row["itemName"],
-                    "changeRate": row["market"]["changeRate"],
-                    "price": row["market"]["price"],
-                }
-                for row in market_movers[:10]
-            ],
-            "topDecliners": [
-                {
-                    "itemCode": row["itemCode"],
-                    "itemName": row["itemName"],
-                    "changeRate": row["market"]["changeRate"],
-                    "price": row["market"]["price"],
-                }
-                for row in reversed(market_movers[-10:])
-            ],
+            "topGainers": monitored_top_gainers,
+            "topDecliners": monitored_top_decliners,
+            "topGainersScope": monitored_scope,
+            "topDeclinersScope": monitored_scope,
         },
         "monitoredUniverse": monitored_summary,
         "fullMarket": full_market,
@@ -1478,24 +1518,60 @@ def write_markdown(report, path):
             value = (full_summary.get("marketTradingValue") or {}).get(market) or {}
             amount = value.get("value")
             source_time = value.get("sourceTime") or "확인 불가"
+            available_count = value.get("availableCount", "확인 불가")
+            observed_count = value.get("observedCount", "확인 불가")
             lines.append(
-                f"- {market} 거래대금: {amount:,.0f} (기준시각 {source_time})"
+                f"- {market} 전체시장 거래대금: {amount:,.0f}원 "
+                f"(확보 {available_count}/{observed_count}종목, 기준시각 {source_time})"
                 if isinstance(amount, (int, float))
-                else f"- {market} 거래대금: 확인 불가"
+                else f"- {market} 전체시장 거래대금: 확인 불가 "
+                f"(확보 {available_count}/{observed_count}종목, 기준시각 {source_time})"
             )
         industries = full_summary.get("industries") or []
         lines.append(f"- 업종 분석: {len(industries)}개 업종")
+        lines.append("- 업종 정렬: 1일 평균 수익률 내림차순(값 미확인 업종은 후순위)")
         for industry in industries[:5]:
             name = industry.get("name") or industry.get("id") or "이름 미확인"
+            average = industry.get("avgReturn1D")
             relative = industry.get("relativeStrengthVsMarket")
+            advance = industry.get("advancePct")
+            turnover = industry.get("tradingValue") or {}
+            total_turnover = turnover.get("total")
+            average_text = f"1일 평균 {average:+.2f}%" if isinstance(average, (int, float)) else "1일 평균 확인 불가"
             relative_text = f"상대강도 {relative:+.2f}" if isinstance(relative, (int, float)) else "상대강도 확인 불가"
-            lines.append(f"  - {name}: {relative_text}, 상태 {industry.get('persistence', {}).get('status', '확인 불가')}")
+            advance_text = f"상승 비율 {advance:.2f}%" if isinstance(advance, (int, float)) else "상승 비율 확인 불가"
+            turnover_text = (
+                f"거래대금 {total_turnover:,.0f}원(확보 {turnover.get('availableCount', 0)}/{industry.get('memberCount', '확인 불가')})"
+                if isinstance(total_turnover, (int, float))
+                else "거래대금 확인 불가"
+            )
+            lines.append(
+                f"  - {name}: {average_text}, {relative_text}, {advance_text}, "
+                f"{turnover_text}, 상태 {korean_status(industry.get('persistence', {}).get('status'))}"
+            )
         leaders = full_summary.get("leaders") or []
-        leader_names = ", ".join(
-            f"{row.get('name') or '이름 미확인'}({row.get('code') or '코드 미확인'})"
-            for row in leaders[:5]
-        )
-        lines.append(f"- 주도주 근거: {len(leaders)}종목" + (f" — {leader_names}" if leader_names else ""))
+        lines.append(f"- 전체시장 주도주 근거: {len(leaders)}종목")
+        reason_labels = {
+            "POSITIVE_RETURN": "상승률 양호", "VOLUME_ABOVE_20D_AVERAGE": "20일 평균 대비 거래량 증가",
+            "ABOVE_MA20": "MA20 상회", "ABOVE_MA60": "MA60 상회",
+            "BREAKOUT_20_INTRADAY": "20일 고점 돌파", "RETAINED_FROM_PREVIOUS": "전회 유지",
+            "NEW_IN_CURRENT_LEADERS": "신규 편입",
+        }
+        for leader in leaders[:5]:
+            change = leader.get("changeRate")
+            volume_ratio = leader.get("current_volume_ratio_20")
+            change_text = f"등락률 {change:+.2f}%" if isinstance(change, (int, float)) else "등락률 확인 불가"
+            volume_text = f"거래량 배수 {volume_ratio:.2f}" if isinstance(volume_ratio, (int, float)) else "거래량 지표 확인 불가"
+            ma_text = ", ".join(
+                f"{label} {'상회' if leader.get(key) is True else '하회' if leader.get(key) is False else '확인 불가'}"
+                for label, key in (("MA20", "above_ma20"), ("MA60", "above_ma60"))
+            )
+            evidence_status = korean_status((leader.get("technicalEvidence") or {}).get("status"))
+            reasons = ", ".join(reason_labels.get(reason, reason) for reason in (leader.get("selectionReasons") or [])) or "선정 사유 확인 불가"
+            lines.append(
+                f"  - {leader.get('name') or '이름 미확인'}({leader.get('code') or '코드 미확인'}): "
+                f"{change_text}, {volume_text}, {ma_text}, 선정 사유 {reasons}, 증거 {evidence_status}"
+            )
     else:
         reason = full_summary.get("reason") or "확인 불가"
         lines.extend([
@@ -1533,29 +1609,43 @@ def write_markdown(report, path):
                 f"시장상태 {index.get('marketStatus') or '확인 불가'}, "
                 f"원천시각 {index.get('sourceTime') or '확인 불가'}"
             )
-        trading_values = report["marketSummary"].get("marketTradingValue") or {}
-        for market in ("KOSPI", "KOSDAQ"):
-            row = trading_values.get(market) or {}
-            value = row.get("value")
-            if value is None:
-                lines.append(f"- {market} 시장 거래대금: 확인 불가 (확보 {row.get('availableCount', 0)}/{row.get('observedCount', 0)}종목)")
-            else:
-                lines.append(f"- {market} 시장 거래대금: {value:,.0f} (시세 기준시각 {row.get('sourceTime') or '확인 불가'})")
     else:
         lines.append(f"- 지수 자료 확인 불가: {index_snapshot.get('errors') or 'UNKNOWN'}")
 
     dynamic = report.get("dynamicUniverse", {})
-    lines.extend(["", "### 동적 테마·관찰 결과", ""])
-    lines.append(f"- 원천: GitHub 동적 Universe (생성시각 {dynamic.get('generatedAt') or '확인 불가'})")
+    lines.extend(["", "### 동적 Universe 테마·관찰 결과", ""])
+    lines.append(
+        f"- 운영 선정 상태: {korean_status(dynamic.get('status'))}; "
+        f"원천: GitHub 동적 Universe; 생성시각 {dynamic.get('generatedAt') or '확인 불가'}"
+    )
     evidence = dynamic.get("industryEvidence") or {}
-    lines.append(f"- 업종 근거: {evidence.get('status') or evidence.get('industryEvidenceUsable') or '확인 불가'}")
+    lines.append(f"- 업종 근거: {korean_status(evidence.get('status') or evidence.get('industryEvidenceUsable'))}")
     themes = dynamic.get("themes") or []
     if themes:
-        lines.append(f"- 검증된 동적 테마: {len(themes)}개")
+        lines.append(f"- 운영 동적 테마: {len(themes)}개")
         for theme in themes[:10]:
-            lines.append(f"- {theme.get('name') or theme.get('id')}: 상태 {theme.get('status', '확인 불가')}")
+            lines.append(f"- {theme.get('name') or theme.get('id')}: 상태 {korean_status(theme.get('status'))}")
     else:
-        lines.append("- 검증된 동적 테마: 현재 선정 없음")
+        lines.append("- 운영 동적 테마: 현재 선정 없음")
+
+    research_themes = dynamic.get("themeAnalysis") or []
+    lines.extend(["", "### 연구용 테마 자료(운영 선정 아님)", ""])
+    theme_source = report.get("sources", {}).get("themeSignals", {})
+    lines.append(
+        f"- 자료 상태: {korean_status(theme_source.get('status') or theme_source.get('sourceStatus'))}; "
+        "운영 Universe·관심종목 선정에 직접 사용하지 않습니다."
+    )
+    if research_themes:
+        lines.append(f"- 연구용 테마 수: {len(research_themes)}개")
+        for theme in research_themes[:10]:
+            lines.append(
+                f"- {theme.get('name') or theme.get('id') or '이름 미확인'}: "
+                f"회원 {theme.get('memberCount', '확인 불가')}종목, "
+                f"커버리지 {theme.get('coveragePct', '확인 불가')}%, "
+                f"회원 상태 {korean_status(theme.get('membershipStatus'))}"
+            )
+    else:
+        lines.append("- 연구용 테마 자료: 확인 가능한 항목 없음")
 
     comparison = report.get("v1V2Analysis") or {}
     v1 = comparison.get("v1") or {}
@@ -1577,9 +1667,14 @@ def write_markdown(report, path):
     if sources.get("uiObservationCount") is None:
         lines.append(f"- UI 관찰 종목 차이: {sources.get('unresolvedDifference')}")
 
-    lines.extend(["", "### 등락 상위", ""])
+    lines.extend([
+        "",
+        "### 관심종목 등락 상위",
+        "",
+        f"- 분석 범위: {monitored_summary.get('scope') or '확인 불가'}; 전체시장 순위가 아닙니다.",
+    ])
 
-    for row in report["marketSummary"]["topGainers"][:5]:
+    for row in (monitored_summary.get("topGainers") or report["marketSummary"].get("topGainers", []))[:5]:
         lines.append(
             f"- {row['itemName']} ({row['itemCode']}): "
             f"{row['changeRate']:+.2f}%"
@@ -1588,12 +1683,12 @@ def write_markdown(report, path):
     lines.extend(
         [
             "",
-            "### 등락 하위",
+            "### 관심종목 등락 하위",
             "",
         ]
     )
 
-    for row in report["marketSummary"]["topDecliners"][:5]:
+    for row in (monitored_summary.get("topDecliners") or report["marketSummary"].get("topDecliners", []))[:5]:
         lines.append(
             f"- {row['itemName']} ({row['itemCode']}): "
             f"{row['changeRate']:+.2f}%"
@@ -1630,7 +1725,7 @@ def write_markdown(report, path):
     lines.extend(
         [
             "",
-            "## 2. 섹터·그룹 확산",
+            "## 2. 관심종목 그룹 확산",
             "",
         ]
     )
@@ -1643,7 +1738,7 @@ def write_markdown(report, path):
             f"확산 {group['diffusionState']}, 상태 {group['status']}"
         )
 
-    lines.extend(["", "## 3. 정규장 확정 기술 이벤트", ""])
+    lines.extend(["", "## 3. 관심종목 정규장 확정 기술 이벤트", ""])
     for label, key in (
         ("20일 돌파 확인", "breakout20Confirmed"),
         ("20일 돌파 시도", "breakout20Attempt"),
