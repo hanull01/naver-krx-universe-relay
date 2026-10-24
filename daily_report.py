@@ -42,6 +42,121 @@ FULL_MARKET_FILES = (
 )
 
 
+def compact_date(value):
+    """Return an explicit calendar date in YYYYMMDD form, or None."""
+    text = str(value or "").strip().replace("-", "").replace("/", "")
+    if len(text) != 8 or not text.isdigit():
+        return None
+    try:
+        datetime.strptime(text, "%Y%m%d")
+    except ValueError:
+        return None
+    return text
+
+
+def source_date(value):
+    """Return the local source-observation date without calling it a trading date."""
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is not None:
+            parsed = parsed.astimezone(KST)
+        return parsed.strftime("%Y%m%d")
+    except ValueError:
+        return compact_date(text)
+
+
+def _explicit_dates(payload, keys):
+    if not isinstance(payload, dict):
+        return []
+    return [date for key in keys if (date := compact_date(payload.get(key)))]
+
+
+def full_market_date_evidence(payloads):
+    """Extract explicit session and MA dates; generatedAt is never a date source."""
+    session_keys = ("tradingDate", "tradeDate", "marketDate", "snapshotTradingDate")
+    session_dates = []
+    for name in ("latest-quality.json", "latest-breadth.json", "latest-industries.json", "latest-summary.json"):
+        payload = payloads.get(name) or {}
+        session_dates.extend(_explicit_dates(payload, session_keys))
+        session_dates.extend(_explicit_dates(payload.get("fullMarket"), session_keys))
+
+    ma_dates = []
+    for row in (payloads.get("latest-leaders.json", {}).get("fullMarketLeaders") or []):
+        evidence = row.get("technicalEvidence") if isinstance(row, dict) else {}
+        ma_dates.extend(_explicit_dates(evidence, ("lastConfirmedDailyDate", "maBasisDate")))
+
+    unique_session = sorted(set(session_dates))
+    unique_ma = sorted(set(ma_dates))
+    return {
+        "snapshotDate": unique_session[0] if len(unique_session) == 1 else None,
+        "snapshotDates": unique_session,
+        "maBasisDates": unique_ma,
+        "snapshotDateStatus": (
+            "VERIFIED_EXPLICIT" if len(unique_session) == 1
+            else "MISSING" if not unique_session
+            else "INCONSISTENT"
+        ),
+    }
+
+
+def date_alignment(report_date, indices, full_market):
+    """Describe date alignment without treating source timestamps as trading dates."""
+    report_compact = compact_date(report_date)
+    result = {
+        "status": "NOT_APPLICABLE" if full_market.get("status") != "AVAILABLE" else "OK",
+        "reportTradingDate": report_compact,
+        "baselineDate": compact_date(full_market.get("asOfDate")),
+        "indexSourceDates": [],
+        "marketTradingValueSourceDates": [],
+        "fullMarketSnapshotDate": full_market.get("snapshotDate"),
+        "fullMarketSnapshotDateStatus": full_market.get("snapshotDateStatus", "MISSING"),
+        "maBasisDates": full_market.get("maBasisDates", []),
+        "mismatches": [],
+        "missingEvidence": [],
+    }
+    if result["status"] == "NOT_APPLICABLE":
+        return result
+
+    result["indexSourceDates"] = sorted({
+        date for row in (indices.get("indices") or [])
+        if (date := source_date(row.get("sourceTime")))
+    })
+    result["marketTradingValueSourceDates"] = sorted({
+        date for row in (full_market.get("marketTradingValue") or {}).values()
+        if (date := source_date(row.get("sourceTime")))
+    })
+
+    if not result["fullMarketSnapshotDate"]:
+        result["missingEvidence"].append("FULL_MARKET_TRADING_DATE")
+    if not result["indexSourceDates"]:
+        result["missingEvidence"].append("INDEX_SOURCE_DATE")
+    if not result["marketTradingValueSourceDates"]:
+        result["missingEvidence"].append("MARKET_TRADING_VALUE_SOURCE_DATE")
+    if not result["maBasisDates"]:
+        result["missingEvidence"].append("MA_BASIS_DATE")
+
+    observed = {
+        "INDEX_SOURCE_DATE": result["indexSourceDates"],
+        "MARKET_TRADING_VALUE_SOURCE_DATE": result["marketTradingValueSourceDates"],
+        "FULL_MARKET_TRADING_DATE": [result["fullMarketSnapshotDate"]] if result["fullMarketSnapshotDate"] else [],
+        "MA_BASIS_DATE": result["maBasisDates"],
+    }
+    for label, dates in observed.items():
+        if dates and report_compact and any(date != report_compact for date in dates):
+            result["mismatches"].append(f"REPORT_VS_{label}")
+    present = [date for dates in observed.values() for date in dates]
+    if present and len(set(present)) > 1:
+        result["mismatches"].append("SOURCE_DATE_MISMATCH")
+    if result["fullMarketSnapshotDateStatus"] == "INCONSISTENT":
+        result["mismatches"].append("FULL_MARKET_TRADING_DATE_INCONSISTENT")
+    if result["missingEvidence"] or result["mismatches"]:
+        result["status"] = "PARTIAL"
+    return result
+
+
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
@@ -64,12 +179,9 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
     baseline_date = str(quality.get("baselineAsOfDate") or "")
     if quality.get("publicationStatus") not in ("FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
         return {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"}
+    date_evidence = full_market_date_evidence(payloads)
     if expected_date and baseline_date != expected_date:
-        snapshot_time = quality.get("currentSnapshotGeneratedAt")
-        try:
-            snapshot_date = datetime.fromisoformat(str(snapshot_time).replace("Z", "+00:00")).astimezone(KST).strftime("%Y%m%d")
-        except (TypeError, ValueError):
-            snapshot_date = None
+        snapshot_date = date_evidence.get("snapshotDate")
         if (quality.get("baselineFreshnessStatus") != "VALID_PREVIOUS_TRADING_DAY"
                 or snapshot_date != expected_date):
             return {"status": "UNAVAILABLE", "reason": "BASELINE_DATE_MISMATCH"}
@@ -96,6 +208,10 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "asOfDate": baseline_date,
         "generatedAt": next(iter(generated), None),
         "sourceTime": quality.get("currentSnapshotGeneratedAt"),
+        "snapshotDate": date_evidence.get("snapshotDate"),
+        "snapshotDates": date_evidence.get("snapshotDates", []),
+        "snapshotDateStatus": date_evidence.get("snapshotDateStatus"),
+        "maBasisDates": date_evidence.get("maBasisDates", []),
         "quality": quality,
         "qualityStatus": quality.get("collectionQualityStatus", "UNKNOWN"),
         "breadth": {
@@ -411,6 +527,8 @@ def coverage_status(
     quote_status=None,
     quote_fresh=None,
 ):
+    if enabled_count == 0:
+        return "EMPTY_CONFIGURED_UNIVERSE"
     complete = (
         quote_count >= enabled_count
         and technical_count >= enabled_count
@@ -960,6 +1078,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
 
     report_date = as_of or datetime.now(KST).date().isoformat()
     full_market = full_market_evidence(report_date)
+    alignment = date_alignment(report_date, indices, full_market)
     discovery = trading_discovery.discovery_status(report_date, TRADING_DISCOVERY_PATH)
     try:
         full_market_signals = load_json(FULL_MARKET_SIGNALS_PATH)
@@ -1082,11 +1201,20 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     monitored_current = monitored_evidence.get("current", current_breadth)
     monitored_regular = monitored_evidence.get("regularSession", regular_breadth)
 
+    report_status = "OK" if coverage_state == "OK" else "DEGRADED"
+    if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or alignment["status"] == "PARTIAL":
+        report_status = "PARTIAL"
+    monitored_scope = (
+        "MONITORED_UNIVERSE_EMPTY" if not enabled
+        else "MONITORED_UNIVERSE_CONFIGURED"
+    )
+
     return {
-        "status": "OK" if coverage_state == "OK" else "DEGRADED",
+        "status": report_status,
         "coverageStatus": coverage_state,
         "version": "daily-market-research-report-v2",
         "asOf": report_date,
+        "dateAlignment": alignment,
         "generatedAt": datetime.now(KST).isoformat(),
         "sources": {
             "quotes": {
@@ -1167,7 +1295,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         },
         "monitoredUniverse": {
             "breadth": breadth,
-            "scope": "MONITORED_UNIVERSE_STATIC_42",
+            "scope": monitored_scope,
+            "configuredCount": len(enabled),
+            "coverageStatus": coverage_state,
             "current": monitored_current,
             "regularSession": monitored_regular,
         },
@@ -1212,7 +1342,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
 
 def write_markdown(report, path):
     breadth = report["marketSummary"]["breadth"]
-    degraded = report["status"] == "DEGRADED"
+    degraded = report["status"] != "OK"
     lines = [
         f"# 국내증시 일일 종합 리포트 - {report['asOf']}",
         "",
@@ -1224,6 +1354,16 @@ def write_markdown(report, path):
             "",
             f"> **데이터 품질 경고:** {report['coverageStatus']} 상태입니다. "
             "아래 내용은 불완전하거나 오래된 시장 데이터를 포함할 수 있습니다.",
+        ])
+
+    alignment = report.get("dateAlignment") or {}
+    if alignment.get("status") == "PARTIAL":
+        lines.extend([
+            "",
+            f"> **기준일 정합성 경고:** 리포트 기준일 {alignment.get('reportTradingDate') or '확인 불가'}과 "
+            "지수·시장 스냅샷·이동평균 자료의 원천 기준일을 동일 시점으로 간주하지 않습니다.",
+            f"> 원천 날짜 차이: {', '.join(alignment.get('mismatches', [])) or '확인 불가'}; "
+            f"누락 증거: {', '.join(alignment.get('missingEvidence', [])) or '없음'}",
         ])
 
     lines.extend([

@@ -117,6 +117,11 @@ jobs:
           print("researchStockCount:", research)
           print("missingMarketCount:", len(missing))
 
+          alignment = x.get("dateAlignment") or {}
+          print("dateAlignment:", alignment.get("status"))
+          if x["status"] == "OK" and alignment.get("status") not in ("OK", "NOT_APPLICABLE"):
+              raise SystemExit("Invalid OK date alignment")
+
           if research != enabled:
               raise SystemExit(
                   f"Research coverage mismatch: {research}/{enabled}"
@@ -133,6 +138,8 @@ jobs:
               print("Market coverage incomplete; report will be published as DEGRADED.")
           elif x["coverageStatus"] == "STALE_MARKET_DATA":
               print("Market data is stale; report will be published as DEGRADED.")
+          elif x["coverageStatus"] == "EMPTY_CONFIGURED_UNIVERSE":
+              print("Configured Universe is empty; full-market evidence remains separate and report is PARTIAL.")
           else:
               raise SystemExit("Unknown market coverage status")
           PY

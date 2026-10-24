@@ -48,6 +48,11 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                 "sourceTime": "2026-10-08T10:00:00+09:00",
             })
             quote_fixture.write_text(json.dumps(quote_payload), encoding="utf-8")
+            universe_fixture = fixture / "universe.json"
+            universe_fixture.write_text(json.dumps({
+                "stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}],
+                "sectors": {}, "themes": {}, "watchlists": {},
+            }), encoding="utf-8")
             technical_fixture = fixture / "technicals.json"
             technical_fixture.write_text(Path(daily_report.TECHNICALS_PATH).read_text(encoding="utf-8"), encoding="utf-8")
             state_fixture = fixture / "states.json"
@@ -55,6 +60,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             with patch.multiple(
                 daily_report,
                 QUOTES_PATH=quote_fixture,
+                UNIVERSE_PATH=universe_fixture,
                 TECHNICALS_PATH=technical_fixture,
                 STATES_PATH=state_fixture,
                 TRADING_DISCOVERY_PATH=discovery_path,
@@ -119,7 +125,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             section = report["kiwoomPreviousCandidates"]
             self.assertEqual(section["additionalQuoteLookup"]["networkCalls"], 1)
             self.assertEqual(section["stocks"][2]["source"], "DISCOVERY_NAVER_LOOKUP")
-            self.assertEqual(report["status"], "OK")
+            self.assertEqual(report["status"], "PARTIAL")
 
     def test_lookup_failure_is_section_local(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -133,7 +139,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                     "2026-10-08", fetch_discovery_missing=True,
                     discovery_quote_fetcher=fail,
                     discovery_quote_normalizer=lambda row, _now: row)
-            self.assertEqual(report["status"], "OK")
+            self.assertEqual(report["status"], "PARTIAL")
             self.assertEqual(report["kiwoomPreviousCandidates"]["stocks"][0]["dataStatus"], "UNAVAILABLE")
             lookup = report["kiwoomPreviousCandidates"]["additionalQuoteLookup"]
             self.assertEqual(lookup["networkCalls"], 1)

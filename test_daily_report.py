@@ -112,6 +112,7 @@ class DailyReportTests(unittest.TestCase):
                 (root / name).write_text(json.dumps({"generatedAt": generated}), encoding="utf-8")
             quality = {
                 "generatedAt": generated, "baselineAsOfDate": "20261008",
+                "tradingDate": "20261012",
                 "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
                 "currentSnapshotGeneratedAt": generated, "publicationStatus": "SUCCESS",
                 "authoritativeCount": 2767, "currentCount": 2767,
@@ -125,9 +126,28 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
                              "AVAILABLE")
             quality["currentSnapshotGeneratedAt"] = "2026-10-08T10:00:00+09:00"
+            quality["tradingDate"] = "20261008"
             (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
             self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
                              "UNAVAILABLE")
+
+    def test_full_market_evidence_does_not_infer_trading_date_from_generated_at(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in daily_report.FULL_MARKET_FILES:
+                (root / name).write_text(json.dumps({"generatedAt": "2026-10-12T10:00:00+09:00"}), encoding="utf-8")
+            (root / "latest-quality.json").write_text(json.dumps({
+                "baselineAsOfDate": "20261008",
+                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
+                "currentSnapshotGeneratedAt": "2026-10-12T10:00:00+09:00",
+                "publicationStatus": "SUCCESS", "authoritativeCount": 1,
+                "currentCount": 1, "currentCoveragePct": 100.0,
+                "duplicateCodes": [], "missingCurrentCodes": [],
+            }), encoding="utf-8")
+            self.assertEqual(
+                daily_report.full_market_evidence("2026-10-12", root)["reason"],
+                "BASELINE_DATE_MISMATCH",
+            )
 
     def test_quote_summary(self):
         row = {
@@ -500,6 +520,72 @@ class DailyReportTests(unittest.TestCase):
             )
             self.assertEqual(report["nextSessionCandidates"]["asOf"], "2026-10-06")
             self.assertEqual(report["coverage"]["researchStockCount"], 0)
+            self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_CONFIGURED")
+
+    def test_build_report_separates_empty_configured_universe_from_full_market(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            files = {
+                "universe.json": {"stocks": [], "sectors": {}, "themes": {}, "watchlists": {}},
+                "quotes.json": {"status": "ok", "fresh": True, "datas": []},
+                "technicals.json": {"datas": []},
+                "states.json": {"datas": []},
+                "research.json": {"stocks": []},
+            }
+            for name, payload in files.items():
+                (root / name).write_text(json.dumps(payload), encoding="utf-8")
+            with patch.multiple(
+                    daily_report,
+                    UNIVERSE_PATH=root / "universe.json", QUOTES_PATH=root / "quotes.json",
+                    TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
+                    RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
+                    MONITORING_PATH=root / "missing-monitoring"):
+                report = daily_report.build_report("2026-10-06")
+            self.assertEqual(report["coverageStatus"], "EMPTY_CONFIGURED_UNIVERSE")
+            self.assertEqual(report["status"], "PARTIAL")
+            self.assertEqual(report["coverage"]["enabledStockCount"], 0)
+            self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_EMPTY")
+            self.assertEqual(report["monitoredUniverse"]["configuredCount"], 0)
+
+    def test_coverage_status_empty_configured_universe_is_distinct(self):
+        self.assertEqual(
+            daily_report.coverage_status(0, 42, 42, 42, "ok", True),
+            "EMPTY_CONFIGURED_UNIVERSE",
+        )
+
+    def test_date_alignment_keeps_baseline_and_current_sources_separate(self):
+        got = daily_report.date_alignment(
+            "2026-10-16",
+            {"indices": [{"sourceTime": "2026-10-23T20:15:00+09:00"}]},
+            {
+                "status": "AVAILABLE", "asOfDate": "20261016",
+                "snapshotDate": None, "snapshotDateStatus": "MISSING",
+                "maBasisDates": ["20261023"],
+                "marketTradingValue": {
+                    "KOSPI": {"sourceTime": "2026-10-23T14:41:53+00:00"},
+                },
+            },
+        )
+        self.assertEqual(got["status"], "PARTIAL")
+        self.assertIn("FULL_MARKET_TRADING_DATE", got["missingEvidence"])
+        self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", got["mismatches"])
+        self.assertIn("REPORT_VS_MA_BASIS_DATE", got["mismatches"])
+
+    def test_date_alignment_accepts_explicit_same_date_evidence(self):
+        got = daily_report.date_alignment(
+            "2026-10-16",
+            {"indices": [{"sourceTime": "2026-10-16T20:15:00+09:00"}]},
+            {
+                "status": "AVAILABLE", "asOfDate": "20261016",
+                "snapshotDate": "20261016", "snapshotDateStatus": "VERIFIED_EXPLICIT",
+                "maBasisDates": ["20261016"],
+                "marketTradingValue": {
+                    "KOSPI": {"sourceTime": "2026-10-16T14:41:53+00:00"},
+                },
+            },
+        )
+        self.assertEqual(got["status"], "OK")
+        self.assertEqual(got["mismatches"], [])
 
     def test_research_summary_requires_ranking_eligible_for_active_stocks(self):
         rows = [
