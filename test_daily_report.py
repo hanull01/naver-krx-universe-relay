@@ -84,8 +84,14 @@ class DailyReportTests(unittest.TestCase):
             monitoring = root / "monitoring"
             monitoring.mkdir()
             (monitoring / "latest-quality.json").write_text(json.dumps({
-                "baselineAsOfDate": "20261016", "publicationStatus": "SUCCESS",
+                "tradingDate": "20261016", "publicationStatus": "SUCCESS",
                 "generatedAt": "q",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "fullMarket": {
+                    "tradingDate": "20261016",
+                    "tradingDateEvidence": {"reason": "VERIFIED_CANONICAL_SESSION"},
+                },
             }), encoding="utf-8")
             baseline = root / "baseline.json"
             baseline.write_text(json.dumps({
@@ -97,13 +103,37 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(daily_report.resolve_report_trading_date(
                 monitoring, baseline, "2026-10-17")["reason"], "REQUESTED_DATE_MISMATCH")
 
+    def test_resolve_report_trading_date_does_not_promote_old_baseline(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "tradingDate": "20261015", "publicationStatus": "SUCCESS",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "fullMarket": {"tradingDate": None, "tradingDateEvidence": {
+                    "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"
+                }}
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({"asOfDate": "20261016", "historyStatus": "OK"}), encoding="utf-8")
+            result = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(result["status"], "WAIT")
+            self.assertEqual(result["reason"], "TRADING_DATE_EVIDENCE_UNAVAILABLE")
+
     def test_resolve_report_trading_date_rejects_mismatch_or_missing(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             monitoring = root / "monitoring"
             monitoring.mkdir()
             (monitoring / "latest-quality.json").write_text(json.dumps({
-                "baselineAsOfDate": "20261016", "publicationStatus": "SUCCESS",
+                "tradingDate": "20261015", "publicationStatus": "SUCCESS",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "fullMarket": {"tradingDate": "20261016", "tradingDateEvidence": {
+                    "reason": "VERIFIED_CANONICAL_SESSION"
+                }}
             }), encoding="utf-8")
             baseline = root / "baseline.json"
             baseline.write_text(json.dumps({"asOfDate": "20261015", "historyStatus": "OK"}), encoding="utf-8")

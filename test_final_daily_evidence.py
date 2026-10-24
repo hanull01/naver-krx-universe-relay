@@ -1,5 +1,11 @@
+import json
+import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
+from pathlib import Path
 
+from tools import final_daily_evidence
 from tools.final_daily_evidence import validate_snapshot
 
 
@@ -65,6 +71,31 @@ class FinalDailyEvidenceTests(unittest.TestCase):
                                    {"asOfDate": "20261019", "historyStatus": "OK"})
         self.assertTrue(result["finalEligible"])
         self.assertEqual(result["finalityPolicy"], "NAVER_OFFICIAL_POST_20_CANDIDATE")
+
+    def test_cli_uses_explicit_snapshot_date_not_prior_baseline(self):
+        snapshot = {"tradingDate": "20261026",
+                    "generatedAt": "2026-10-26T20:30:00+09:00",
+                    "stocks": [row()]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot_path = root / "snapshot.json"
+            baseline_path = root / "baseline.json"
+            snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+            baseline_path.write_text(json.dumps({"asOfDate": "20261016", "historyStatus": "OK"}), encoding="utf-8")
+            output = StringIO()
+            with redirect_stdout(output):
+                self.assertEqual(final_daily_evidence.main([
+                    "--snapshot", str(snapshot_path), "--baseline", str(baseline_path)
+                ]), 0)
+            self.assertEqual(json.loads(output.getvalue())["tradingDate"], "20261026")
+
+    def test_as_of_date_is_not_a_trading_date_source(self):
+        result = validate_snapshot({"asOfDate": "20261016",
+                                    "generatedAt": "2026-10-26T20:30:00+09:00",
+                                    "stocks": [row()]},
+                                   {"asOfDate": "20261016", "historyStatus": "OK"})
+        self.assertIn("TRADING_DATE_MISSING", result["errors"])
+        self.assertFalse(result["finalEligible"])
 
 
 if __name__ == "__main__":

@@ -456,7 +456,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
+        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.publication_changed == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}

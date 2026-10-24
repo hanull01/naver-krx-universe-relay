@@ -44,6 +44,10 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("write_local_date_diagnostic", self.final_step)
         self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
 
+    def test_ready_signal_requires_a_new_publication_commit(self):
+        mail = self.text[self.text.index("id: ready_email"):]
+        self.assertIn("steps.publish.outputs.publication_changed == 'true'", mail[:1200])
+
 
 if __name__ == "__main__":
     unittest.main()
