@@ -7,7 +7,53 @@ from unittest.mock import patch
 import daily_report
 
 
+def verified_full_market():
+    return {
+        "status": "AVAILABLE",
+        "asOfDate": "20261015",
+        "snapshotDate": "20261016",
+        "snapshotDateStatus": "VERIFIED_EXPLICIT",
+        "sourceTime": "2026-10-16T20:00:00+09:00",
+        "generatedAt": "2026-10-16T20:05:00+09:00",
+        "qualityStatus": "SUCCESS",
+        "quality": {"currentCount": 2766, "authoritativeCount": 2766},
+        "breadth": {
+            "advancers": 1200, "decliners": 1300, "unchanged": 266,
+            "aboveMA20": {"count": 900, "eligibleCount": 2700, "pct": 33.3333},
+            "aboveMA60": {"count": 1000, "eligibleCount": 2680, "pct": 37.3134},
+            "aboveMA120": {"count": 800, "eligibleCount": 2650, "pct": 30.1887},
+            "breakout20": {"count": 300, "eligibleCount": 2600, "pct": 11.5385},
+            "breakout60": {"count": 200, "eligibleCount": 2500, "pct": 8.0},
+            "near52wHigh": {"count": 100, "eligibleCount": 2400, "pct": 4.1667},
+            "volumeAbove20DayAverage": {"count": 700, "eligibleCount": 2600, "pct": 26.9231},
+        },
+        "marketTradingValue": {
+            "KOSPI": {"value": 123456789, "sourceTime": "2026-10-16T20:00:00+09:00"},
+            "KOSDAQ": {"value": 98765432, "sourceTime": "2026-10-16T20:00:00+09:00"},
+        },
+        "industries": [{"id": "1", "name": "검증 업종", "relativeStrengthVsMarket": 2.5,
+                        "persistence": {"status": "AVAILABLE"}}],
+        "leaders": [{"code": "005930", "name": "검증 주도주"}],
+    }
+
+
 class DailyReportTests(unittest.TestCase):
+    def test_full_market_summary_requires_verified_alignment(self):
+        available = daily_report.full_market_summary(
+            verified_full_market(), {"status": "OK"}
+        )
+        self.assertEqual(available["status"], "AVAILABLE")
+        self.assertEqual(available["breadth"]["advancers"], 1200)
+        self.assertEqual(available["marketTradingValue"]["KOSPI"]["value"], 123456789)
+
+        partial = daily_report.full_market_summary(
+            verified_full_market(),
+            {"status": "PARTIAL", "mismatches": ["SOURCE_DATE_MISMATCH"]},
+        )
+        self.assertEqual(partial["status"], "PARTIAL")
+        self.assertIsNone(partial["breadth"])
+        self.assertEqual(partial["marketTradingValue"], {})
+
     def test_resolve_report_trading_date_requires_matching_published_material(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -546,6 +592,8 @@ class DailyReportTests(unittest.TestCase):
             )
             self.assertEqual(report["status"], "PARTIAL")
             self.assertEqual(report["dateAlignment"]["status"], "UNAVAILABLE")
+            self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "UNAVAILABLE")
+            self.assertIsNone(report["marketSummary"]["fullMarket"]["breadth"])
             self.assertIn(report["dateAlignment"]["fullMarketReason"],
                           {"MISSING_EVIDENCE_FILE", "BASELINE_DATE_MISMATCH"})
             report["dateAlignment"] = {
@@ -559,6 +607,8 @@ class DailyReportTests(unittest.TestCase):
             daily_report.write_markdown(report, markdown)
             rendered = markdown.read_text(encoding="utf-8")
             self.assertIn("Full-market 상태: UNAVAILABLE", rendered)
+            self.assertIn("전체시장 수치는 기준일 또는 원천 증거가 검증되지 않아", rendered)
+            self.assertIn("설정 종목 수: 1종목", rendered)
             self.assertIn("사유: MISSING_EVIDENCE_FILE", rendered)
             self.assertIn("확인된 지수 날짜: 2026-10-07", rendered)
             self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", rendered)
@@ -583,13 +633,24 @@ class DailyReportTests(unittest.TestCase):
                     UNIVERSE_PATH=root / "universe.json", QUOTES_PATH=root / "quotes.json",
                     TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
                     RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
-                    MONITORING_PATH=root / "missing-monitoring"):
+                    MONITORING_PATH=root / "missing-monitoring"), \
+                    patch.object(daily_report, "full_market_evidence", return_value=verified_full_market()), \
+                    patch.object(daily_report, "date_alignment", return_value={"status": "OK"}):
                 report = daily_report.build_report("2026-10-06")
             self.assertEqual(report["coverageStatus"], "EMPTY_CONFIGURED_UNIVERSE")
             self.assertEqual(report["status"], "PARTIAL")
             self.assertEqual(report["coverage"]["enabledStockCount"], 0)
             self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_EMPTY")
             self.assertEqual(report["monitoredUniverse"]["configuredCount"], 0)
+            self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "AVAILABLE")
+            self.assertEqual(report["marketSummary"]["fullMarket"]["breadth"]["advancers"], 1200)
+            self.assertEqual(report["marketSummary"]["monitoredUniverse"]["configuredCount"], 0)
+            markdown = root / "report.md"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+            self.assertIn("전체시장 종목: 2766/2766종목", rendered)
+            self.assertIn("설정 종목 수: 0종목", rendered)
+            self.assertIn("이는 전체시장 종목 수 0을 의미하지 않습니다", rendered)
 
     def test_build_report_keeps_normal_ok_when_date_alignment_is_ok(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -612,9 +673,13 @@ class DailyReportTests(unittest.TestCase):
                     TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
                     RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
                     MONITORING_PATH=root / "missing-monitoring"), \
-                    patch.object(daily_report, "date_alignment", return_value={"status": "OK"}):
+                    patch.object(daily_report, "date_alignment", return_value={"status": "OK"}), \
+                    patch.object(daily_report, "full_market_evidence", return_value=verified_full_market()):
                 report = daily_report.build_report("2026-10-06")
             self.assertEqual(report["status"], "OK")
+            self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "AVAILABLE")
+            self.assertEqual(report["marketSummary"]["monitoredUniverse"]["configuredCount"], 1)
+            self.assertEqual(report["marketSummary"]["breadth"]["observedCount"], 1)
 
     def test_coverage_status_empty_configured_universe_is_distinct(self):
         self.assertEqual(

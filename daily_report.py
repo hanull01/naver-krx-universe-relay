@@ -640,6 +640,51 @@ def market_breadth(rows, state_key="state", include_directions=True):
     }
 
 
+def full_market_summary(full_market, alignment):
+    """Expose verified full-market material separately from monitored stocks."""
+    full_market = full_market if isinstance(full_market, dict) else {}
+    alignment = alignment if isinstance(alignment, dict) else {}
+    evidence_status = full_market.get("status", "UNAVAILABLE")
+    alignment_status = alignment.get("status", "UNAVAILABLE")
+    snapshot_status = full_market.get("snapshotDateStatus", "MISSING")
+    verified = (
+        evidence_status == "AVAILABLE"
+        and alignment_status == "OK"
+        and snapshot_status == "VERIFIED_EXPLICIT"
+        and bool(full_market.get("snapshotDate"))
+    )
+    if verified:
+        status = "AVAILABLE"
+        reason = None
+    elif evidence_status == "AVAILABLE":
+        status = "PARTIAL"
+        reason = "DATE_ALIGNMENT_NOT_VERIFIED"
+    else:
+        status = "UNAVAILABLE"
+        reason = full_market.get("reason") or "FULL_MARKET_EVIDENCE_UNAVAILABLE"
+
+    quality = full_market.get("quality") if verified else {}
+    return {
+        "status": status,
+        "evidenceStatus": evidence_status,
+        "alignmentStatus": alignment_status,
+        "reason": reason,
+        "tradingDate": full_market.get("snapshotDate"),
+        "baselineDate": full_market.get("asOfDate"),
+        "snapshotDateStatus": snapshot_status,
+        "sourceTime": full_market.get("sourceTime") if verified else None,
+        "generatedAt": full_market.get("generatedAt") if verified else None,
+        "qualityStatus": full_market.get("qualityStatus") if verified else None,
+        "quality": quality,
+        "breadth": full_market.get("breadth") if verified else None,
+        "marketTradingValue": full_market.get("marketTradingValue", {}) if verified else {},
+        "industries": full_market.get("industries", []) if verified else [],
+        "leaders": full_market.get("leaders", []) if verified else [],
+        "mismatches": alignment.get("mismatches", []),
+        "missingEvidence": alignment.get("missingEvidence", []),
+    }
+
+
 def normalized_group_summary(payload):
     """Keep the dynamic group-state contract, with no group-name assumptions."""
     groups = payload.get("groups", []) if isinstance(payload, dict) else []
@@ -1215,6 +1260,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     monitored_evidence = full_market.get("monitoredUniverse", {})
     monitored_current = monitored_evidence.get("current", current_breadth)
     monitored_regular = monitored_evidence.get("regularSession", regular_breadth)
+    full_market_summary_data = full_market_summary(full_market, alignment)
 
     report_status = "OK" if coverage_state == "OK" else "DEGRADED"
     if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or alignment["status"] != "OK":
@@ -1223,6 +1269,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "MONITORED_UNIVERSE_EMPTY" if not enabled
         else "MONITORED_UNIVERSE_CONFIGURED"
     )
+    monitored_summary = {
+        "status": coverage_state,
+        "scope": monitored_scope,
+        "configuredCount": len(enabled),
+        "observedCount": breadth.get("observedCount", 0),
+        "coverageStatus": coverage_state,
+        "breadth": breadth,
+        "current": monitored_current,
+        "regularSession": monitored_regular,
+    }
 
     return {
         "status": report_status,
@@ -1285,9 +1341,11 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "missingMarketStocks": missing_market,
         },
         "marketSummary": {
+            "fullMarket": full_market_summary_data,
+            "monitoredUniverse": monitored_summary,
             "breadth": breadth,
             "indices": indices,
-            "marketTradingValue": full_market.get("marketTradingValue", {}),
+            "marketTradingValue": full_market_summary_data["marketTradingValue"],
             "dynamicThemes": dynamic_universe.get("themes", []),
             "topGainers": [
                 {
@@ -1308,14 +1366,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 for row in reversed(market_movers[-10:])
             ],
         },
-        "monitoredUniverse": {
-            "breadth": breadth,
-            "scope": monitored_scope,
-            "configuredCount": len(enabled),
-            "coverageStatus": coverage_state,
-            "current": monitored_current,
-            "regularSession": monitored_regular,
-        },
+        "monitoredUniverse": monitored_summary,
         "fullMarket": full_market,
         "dynamicUniverse": {
             "status": dynamic_universe.get("status", "AVAILABLE"),
@@ -1357,12 +1408,15 @@ def build_report(as_of=None, fetch_discovery_missing=False,
 
 def write_markdown(report, path):
     breadth = report["marketSummary"]["breadth"]
+    market_summary = report.get("marketSummary") or {}
+    full_summary = market_summary.get("fullMarket") or {}
+    monitored_summary = market_summary.get("monitoredUniverse") or report.get("monitoredUniverse") or {}
     degraded = report["status"] != "OK"
     lines = [
         f"# 국내증시 일일 종합 리포트 - {report['asOf']}",
         "",
         f"- 생성시각: {report['generatedAt']}",
-        f"- Universe: {report['coverage']['enabledStockCount']}종목",
+        f"- 관심종목 설정: {report['coverage']['enabledStockCount']}종목",
     ]
     if degraded:
         lines.extend([
@@ -1390,16 +1444,85 @@ def write_markdown(report, path):
         "",
         "## 1. 시장 요약",
         "",
-        f"- 관측 종목: {breadth['observedCount']}종목",
-        f"- 상승/하락/보합: {breadth['upCount']}/{breadth['downCount']}/{breadth['flatCount']}",
-        f"- MA20 위/아래: {breadth['ma20AboveCount']}/{breadth['ma20BelowCount']}",
-        f"- MA60 위/아래: {breadth['ma60AboveCount']}/{breadth['ma60BelowCount']}",
-        f"- 20일 돌파 확인/시도/실패: {breadth['breakout20ConfirmedCount']}/{breadth['breakout20AttemptCount']}/{breadth['breakout20FailedCount']}",
-        f"- 거래량 급증/증가: {breadth['volumeSurgeCount']}/{breadth['volumeElevatedCount']}",
-        "",
-        "### 코스피·코스닥 지수",
+        "### 전체시장 분석",
         "",
     ])
+
+    if full_summary.get("status") == "AVAILABLE":
+        full_breadth = full_summary.get("breadth") or {}
+        lines.extend([
+            "- 분석 상태: 검증된 전체시장 자료 사용",
+            f"- 기준일: {full_summary.get('tradingDate') or '확인 불가'}; "
+            f"Baseline 기준일: {full_summary.get('baselineDate') or '확인 불가'}",
+            f"- 기준시각: {full_summary.get('sourceTime') or '확인 불가'}; "
+            f"자료 품질: {full_summary.get('qualityStatus') or '확인 불가'}",
+            f"- 전체시장 종목: {full_summary.get('quality', {}).get('currentCount', '확인 불가')}/"
+            f"{full_summary.get('quality', {}).get('authoritativeCount', '확인 불가')}종목",
+            f"- 상승/하락/보합: {full_breadth.get('advancers', '확인 불가')}/"
+            f"{full_breadth.get('decliners', '확인 불가')}/{full_breadth.get('unchanged', '확인 불가')}",
+        ])
+        for label, key in (("MA20", "aboveMA20"), ("MA60", "aboveMA60"), ("MA120", "aboveMA120")):
+            metric = full_breadth.get(key) or {}
+            lines.append(
+                f"- {label} 위: {metric.get('count', '확인 불가')}종목 "
+                f"(대상 {metric.get('eligibleCount', '확인 불가')}, "
+                f"비율 {metric.get('pct', '확인 불가')}%)"
+            )
+        volume = full_breadth.get("volumeAbove20DayAverage") or {}
+        lines.append(
+            f"- 평균 대비 거래량 증가: {volume.get('count', '확인 불가')}종목 "
+            f"(대상 {volume.get('eligibleCount', '확인 불가')}, "
+            f"비율 {volume.get('pct', '확인 불가')}%)"
+        )
+        for market in ("KOSPI", "KOSDAQ"):
+            value = (full_summary.get("marketTradingValue") or {}).get(market) or {}
+            amount = value.get("value")
+            source_time = value.get("sourceTime") or "확인 불가"
+            lines.append(
+                f"- {market} 거래대금: {amount:,.0f} (기준시각 {source_time})"
+                if isinstance(amount, (int, float))
+                else f"- {market} 거래대금: 확인 불가"
+            )
+        industries = full_summary.get("industries") or []
+        lines.append(f"- 업종 분석: {len(industries)}개 업종")
+        for industry in industries[:5]:
+            name = industry.get("name") or industry.get("id") or "이름 미확인"
+            relative = industry.get("relativeStrengthVsMarket")
+            relative_text = f"상대강도 {relative:+.2f}" if isinstance(relative, (int, float)) else "상대강도 확인 불가"
+            lines.append(f"  - {name}: {relative_text}, 상태 {industry.get('persistence', {}).get('status', '확인 불가')}")
+        leaders = full_summary.get("leaders") or []
+        leader_names = ", ".join(
+            f"{row.get('name') or '이름 미확인'}({row.get('code') or '코드 미확인'})"
+            for row in leaders[:5]
+        )
+        lines.append(f"- 주도주 근거: {len(leaders)}종목" + (f" — {leader_names}" if leader_names else ""))
+    else:
+        reason = full_summary.get("reason") or "확인 불가"
+        lines.extend([
+            f"- 분석 상태: {('부분 확인' if full_summary.get('status') == 'PARTIAL' else '확인 불가')} ({reason})",
+            "- 전체시장 수치는 기준일 또는 원천 증거가 검증되지 않아 당일 정상값으로 대체하지 않았습니다.",
+        ])
+
+    lines.extend([
+        "",
+        "### 관심종목 분석",
+        "",
+        f"- 설정 종목 수: {monitored_summary.get('configuredCount', 0)}종목",
+        f"- 분석 상태: {monitored_summary.get('coverageStatus') or '확인 불가'}",
+    ])
+    if monitored_summary.get("configuredCount", 0) == 0:
+        lines.append("- 관심종목이 설정되지 않았습니다. 이는 전체시장 종목 수 0을 의미하지 않습니다.")
+    else:
+        lines.extend([
+            f"- 관측 종목: {breadth['observedCount']}종목",
+            f"- 상승/하락/보합: {breadth['upCount']}/{breadth['downCount']}/{breadth['flatCount']}",
+            f"- MA20 위/아래: {breadth['ma20AboveCount']}/{breadth['ma20BelowCount']}",
+            f"- MA60 위/아래: {breadth['ma60AboveCount']}/{breadth['ma60BelowCount']}",
+            f"- 20일 돌파 확인/시도/실패: {breadth['breakout20ConfirmedCount']}/{breadth['breakout20AttemptCount']}/{breadth['breakout20FailedCount']}",
+            f"- 거래량 급증/증가: {breadth['volumeSurgeCount']}/{breadth['volumeElevatedCount']}",
+        ])
+
+    lines.extend(["", "### 코스피·코스닥 지수", ""])
 
     index_snapshot = report["marketSummary"].get("indices") or {}
     if index_snapshot.get("status") == "OK":
