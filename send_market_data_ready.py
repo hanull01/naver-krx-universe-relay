@@ -14,6 +14,10 @@ QUOTES_LITE_PATH = ROOT / 'data/quotes-lite.json'
 FULL_MARKET_SUMMARY_PATH = ROOT / 'data/monitoring/latest-summary.json'
 FULL_MARKET_QUALITY_PATH = ROOT / 'data/monitoring/latest-quality.json'
 SUBJECT_PREFIX = 'MARKET_DATA_READY'
+VERIFIED_TRADING_DATE_REASONS = {
+    'VERIFIED_CANONICAL_SESSION',
+    'VERIFIED_MONITORING_DAILY_FINAL_SESSION',
+}
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""
@@ -58,6 +62,11 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication is not from today')
     if collection_started_at and generated < parse_timestamp(collection_started_at, 'collectionStartedAt'):
         raise ReadyValidationError('full-market publication predates this collection run')
+    trading_evidence = full_market.get('tradingDateEvidence') or {}
+    trading_date = full_market.get('tradingDate')
+    trading_reason = trading_evidence.get('reason')
+    trading_verified = (isinstance(trading_date, str)
+                        and trading_reason in VERIFIED_TRADING_DATE_REASONS)
     return {'mode': 'FULL_MARKET', 'status': 'SUCCESS',
             'publicationStatus': publication_status,
             'scope': 'AUTHORITATIVE_FULL_MARKET',
@@ -68,7 +77,12 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
             'unconfirmedMissingCodes': full_market.get('unconfirmedMissingCodes', full_market.get('missingCodes', [])),
             'newCodes': full_market.get('newCodes', []),
             'qualityWarnings': full_market.get('qualityWarnings', []),
-            'tradingDate': generated.date().isoformat(), 'marketSession': 'REGULAR_MARKET'}
+            # A Gmail signal remains eligible for downstream diagnostics, but
+            # its trading date must never be synthesized from generatedAt.
+            'tradingDate': trading_date if trading_verified else None,
+            'tradingDateStatus': 'VERIFIED' if trading_verified else 'UNAVAILABLE',
+            'tradingDateEvidenceReason': trading_reason or 'TRADING_DATE_EVIDENCE_MISSING',
+            'marketSession': 'REGULAR_MARKET'}
 
 def parse_timestamp(value, field):
     if not isinstance(value, str) or not value:
@@ -157,7 +171,9 @@ def ready_message(metadata, env):
             f'fullMarket.publicationStatus={metadata["publicationStatus"]}',
             'fullMarket.scope=AUTHORITATIVE_FULL_MARKET',
             f'fullMarket.generatedAt={metadata["generatedAt"]}',
-            f'fullMarket.tradingDate={metadata["tradingDate"]}',
+            f'fullMarket.tradingDate={metadata["tradingDate"] or "UNAVAILABLE"}',
+            f'fullMarket.tradingDateStatus={metadata["tradingDateStatus"]}',
+            f'fullMarket.tradingDateEvidenceReason={metadata["tradingDateEvidenceReason"]}',
             f'fullMarket.marketSession={metadata["marketSession"]}',
             f'fullMarket.count={metadata["count"]}',
             f'fullMarket.expectedCount={metadata["expectedCount"]}',

@@ -53,10 +53,169 @@ def _explicit_session_dates(payload):
         for key in ("tradingDate", "tradeDate", "marketDate", "localDate", "date"):
             if row.get(key) is not None:
                 row_values.append(str(row[key]))
-                break
     if row_values:
         values.extend(row_values)
     return values
+
+
+def _session_date_evidence(session_date=None, current_snapshot=None):
+    explicit = []
+    if session_date is not None:
+        explicit.append(str(session_date))
+    explicit.extend(_explicit_session_dates(current_snapshot))
+    explicit = [value.replace("-", "").replace("/", "") for value in explicit]
+    candidate = explicit[0] if explicit and _valid_date(explicit[0]) else ""
+    if not candidate or any(value != candidate or not _valid_date(value) for value in explicit):
+        return None, sorted(set(explicit))
+    return candidate, [candidate]
+
+
+def explicit_session_date(session_date=None, current_snapshot=None):
+    """Return only an explicitly observed session date, never a clock date."""
+    candidate, _ = _session_date_evidence(session_date, current_snapshot)
+    return candidate
+
+
+def _read_final_state(path, market, candidate):
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None, {"reason": "INVALID_MONITORING_DAILY_FINAL_FILE", "market": market}
+    if (payload.get("format") != "COLUMN_ARRAY_V1"
+            or payload.get("publicationStatus") != "FINAL"
+            or str(payload.get("market") or "").upper() != market
+            or str(payload.get("asOfDate") or "").replace("-", "") != candidate):
+        return None, {"reason": "MONITORING_DAILY_FINAL_CONTRACT_INVALID", "market": market,
+                      "asOfDate": payload.get("asOfDate"),
+                      "publicationStatus": payload.get("publicationStatus")}
+    stocks = payload.get("stocks")
+    if not isinstance(stocks, list):
+        return None, {"reason": "MONITORING_DAILY_FINAL_STOCKS_INVALID", "market": market}
+    return payload, None
+
+
+def _read_session_diagnostic(path, current_codes, candidate):
+    """Validate the optional localDate sidecar when it is published."""
+    path = Path(path)
+    if not path.is_file():
+        return {"status": "ABSENT", "reason": "MONITORING_DAILY_DIAGNOSTIC_ABSENT"}, None
+    try:
+        diagnostic = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None, {"reason": "MONITORING_DAILY_DIAGNOSTIC_INVALID"}
+    expected = sorted({str(code) for code in current_codes if code})
+    observed = diagnostic.get("observedDates")
+    invalid_lists = any(diagnostic.get(key) for key in (
+        "missingCodes", "unexpectedCodes", "duplicateCodes", "mismatchCodes",
+        "dateMismatchCodes"))
+    valid = (
+        diagnostic.get("status") == "VERIFIED"
+        and diagnostic.get("source") == "NAVER_LOCAL_DATE"
+        and str(diagnostic.get("targetDate") or "").replace("-", "") == candidate
+        and diagnostic.get("expectedCount") == len(expected)
+        and diagnostic.get("observedCount") == len(expected)
+        and sorted(diagnostic.get("expectedCodes") or []) == expected
+        and sorted(diagnostic.get("observedCodes") or []) == expected
+        and isinstance(observed, dict)
+        and {str(code): str(value).replace("-", "") for code, value in observed.items()}
+        == {code: candidate for code in expected}
+        and not invalid_lists
+    )
+    if not valid:
+        return None, {"reason": "MONITORING_DAILY_DIAGNOSTIC_UNVERIFIED",
+                      "status": diagnostic.get("status"),
+                      "targetDate": diagnostic.get("targetDate")}
+    return {"status": "VERIFIED", "reason": diagnostic.get("reason"),
+            "source": diagnostic.get("source")}, None
+
+
+def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=None,
+                                  current_snapshot=None):
+    """Verify an exact-date rolling FINAL state without treating it as canonical history.
+
+    The rolling state is accepted only as an independent, explicitly named
+    source.  It must cover the current authoritative code set exactly, contain
+    one valid target-date row per code, and agree with an explicit date from
+    the current NAVER snapshot.  No execution timestamp or local calendar
+    date is used as a substitute.
+    """
+    codes = sorted({str(code) for code in (current_codes or []) if code})
+    candidate, explicit = _session_date_evidence(session_date, current_snapshot)
+    base = {"tradingDate": None, "source": "MONITORING_DAILY_FINAL",
+            "observedDateCounts": {}, "missingFinalCodes": codes,
+            "unexpectedFinalCodes": [], "invalidFinalCodes": {},
+            "explicitSessionDates": explicit}
+    if not candidate:
+        return {**base, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"}
+    if not codes:
+        return {**base, "reason": "AUTHORITATIVE_CODE_SET_EMPTY"}
+
+    diagnostic, diagnostic_error = _read_session_diagnostic(
+        Path(monitoring_dir) / "trading-session-diagnostic.json", codes, candidate)
+    if diagnostic_error:
+        return {**base, **diagnostic_error, "diagnosticStatus": "UNVERIFIED"}
+
+    found = {}
+    invalid = {}
+    for market in ("KOSPI", "KOSDAQ"):
+        payload, error = _read_final_state(Path(monitoring_dir) / (market.lower() + ".json"),
+                                           market, candidate)
+        if error:
+            invalid[market] = error
+            continue
+        for stock in payload["stocks"]:
+            if not isinstance(stock, dict):
+                invalid[market] = {"reason": "MONITORING_DAILY_FINAL_ROW_INVALID"}
+                continue
+            code = str(stock.get("code") or "")
+            if not code:
+                invalid[market] = {"reason": "MONITORING_DAILY_FINAL_CODE_MISSING"}
+                continue
+            if code in found:
+                invalid[code] = {"reason": "DUPLICATE_MONITORING_DAILY_FINAL_CODE"}
+                continue
+            columns = ("dates", "close", "high", "volume", "validity")
+            if any(not isinstance(stock.get(key), list) for key in columns):
+                invalid[code] = {"reason": "MONITORING_DAILY_FINAL_COLUMNS_INVALID"}
+                continue
+            lengths = {len(stock[key]) for key in columns}
+            if len(lengths) != 1:
+                invalid[code] = {"reason": "MONITORING_DAILY_FINAL_COLUMN_LENGTH_MISMATCH"}
+                continue
+            normalized_dates = [str(day).replace("-", "") for day in stock["dates"]]
+            if (len(normalized_dates) != len(set(normalized_dates))
+                    or any(not _valid_date(day) for day in normalized_dates)):
+                invalid[code] = {"reason": "MONITORING_DAILY_FINAL_DATES_INVALID"}
+                continue
+            matches = [index for index, day in enumerate(stock["dates"])
+                       if str(day).replace("-", "") == candidate]
+            if len(matches) != 1:
+                invalid[code] = {"reason": "MONITORING_DAILY_FINAL_TARGET_DATE_MISSING"}
+                continue
+            index = matches[0]
+            close, high, volume = (stock[key][index] for key in ("close", "high", "volume"))
+            numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool)
+            if (stock["validity"][index] != 0 or not numeric(close) or close <= 0
+                    or not numeric(high) or high < close or not numeric(volume) or volume < 0):
+                invalid[code] = {"reason": "MONITORING_DAILY_FINAL_TARGET_ROW_INVALID"}
+                continue
+            found[code] = candidate
+
+    found_codes = set(found)
+    missing = sorted(set(codes) - found_codes)
+    unexpected = sorted(found_codes - set(codes))
+    counts = dict(Counter(found.values()))
+    if invalid or missing or unexpected or found_codes != set(codes):
+        return {**base, "reason": "MONITORING_DAILY_FINAL_COVERAGE_INCOMPLETE",
+                "observedDateCounts": counts, "missingFinalCodes": missing,
+                "unexpectedFinalCodes": unexpected, "invalidFinalCodes": invalid}
+    return {**base, "tradingDate": candidate,
+            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+            "diagnosticStatus": diagnostic["status"],
+            "diagnosticReason": diagnostic["reason"],
+            "observedDateCounts": counts, "missingFinalCodes": [],
+            "unexpectedFinalCodes": [], "invalidFinalCodes": {}}
+
 
 def verify_trading_date(history_dir, current_codes, session_date=None, current_snapshot=None):
     """Return a verified date, or null with a diagnostic reason.
@@ -73,10 +232,8 @@ def verify_trading_date(history_dir, current_codes, session_date=None, current_s
             invalid[code] = reason
         elif latest:
             observed[code] = latest
-    explicit = [str(session_date)] if session_date is not None else _explicit_session_dates(current_snapshot)
-    explicit = [value.replace("-", "").replace("/", "") for value in explicit]
-    candidate = explicit[0] if explicit and _valid_date(explicit[0]) else ""
-    if not candidate or any(value != candidate or not _valid_date(value) for value in explicit):
+    candidate, explicit = _session_date_evidence(session_date, current_snapshot)
+    if not candidate:
         return {"tradingDate": None, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE",
                 "observedDateCounts": dict(Counter(observed.values())),
                 "missingCanonicalCodes": sorted(set(codes) - set(observed)),

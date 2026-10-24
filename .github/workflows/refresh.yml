@@ -235,25 +235,58 @@ jobs:
           import json, sys
           from pathlib import Path
           from tools.final_daily_history import monitoring_daily_payload
+          from tools.trading_date_evidence import explicit_session_date
+          from tools.trading_session_diagnostic import write_local_date_diagnostic
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
           universe = json.loads(Path("data/market-universe/all-assets.json").read_text(encoding="utf-8"))
           expected = [str(row["code"]) for row in universe.get("assets", []) if row.get("assetType") == "STOCK"]
-          target_date = snapshot.get("tradingDate") or snapshot.get("asOfDate")
+          target_date = explicit_session_date(current_snapshot=snapshot)
           if not target_date:
-              from datetime import datetime
-              from zoneinfo import ZoneInfo
-              target_date = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:TRADING_DATE_MISSING_OR_INCONSISTENT")
           result = monitoring_daily_payload(snapshot, baseline, expected, target_date=target_date)
           if result["status"] != "READY":
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + json.dumps(result["reason"], ensure_ascii=False))
+          expected_set = set(expected)
+          observed_dates = {}
+          duplicate_codes = set()
+          for row in snapshot.get("stocks") or []:
+              code = str(row.get("code") or "")
+              if code in observed_dates:
+                  duplicate_codes.add(code)
+                  continue
+              if code not in expected_set:
+                  observed_dates[code] = row.get("localDate")
+                  continue
+              value = next((row.get(key) for key in
+                            ("tradingDate", "tradeDate", "marketDate", "localDate")
+                            if row.get(key) not in (None, "")), None)
+              if value:
+                  observed_dates[code] = value
+          diagnostic = write_local_date_diagnostic(
+              "data/monitoring-daily/trading-session-diagnostic.json",
+              target_date, observed_dates, expected,
+              duplicate_codes=duplicate_codes)
+          if diagnostic["status"] != "VERIFIED":
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
           Path(sys.argv[2]).write_text(json.dumps({"rows": result["rows"]}, ensure_ascii=False), encoding="utf-8")
           print(json.dumps({"status": result["status"], "rows": len(result["rows"]),
                             "excluded": len(result["excluded"]), "networkCalls": 0}, ensure_ascii=False))
           PY
+          target_date=$(python3 - "$RUNNER_TEMP/full-market-current.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          from tools.trading_date_evidence import explicit_session_date
+          snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          target_date = explicit_session_date(current_snapshot=snapshot)
+          if not target_date:
+              raise SystemExit("TRADING_DATE_MISSING_OR_INCONSISTENT")
+          print(target_date)
+          PY
+          )
           python tools/build_monitoring_daily_state.py update-latest \
             --daily-input "$RUNNER_TEMP/final-daily-monitoring-input.json" \
-            --date "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tradingDate"])' "$RUNNER_TEMP/full-market-current.json")" \
+            --date "$target_date" \
             > "$RUNNER_TEMP/final-daily-monitoring-result.json"
           cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
           final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
@@ -359,7 +392,8 @@ jobs:
             git add \
               data/monitoring-daily/kospi.json \
               data/monitoring-daily/kosdaq.json \
-              data/monitoring-baseline/latest.json
+              data/monitoring-baseline/latest.json \
+              data/monitoring-daily/trading-session-diagnostic.json
           else
             echo "Final daily history not eligible for publish; preserving prior monitoring-daily files."
           fi

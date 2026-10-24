@@ -21,6 +21,7 @@ import trading_date_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
 HISTORY_DIR = ROOT / "data/naver-history/canonical/daily"
+MONITORING_DAILY_DIR = ROOT / "data/monitoring-daily"
 MARKET_DIR = ROOT / "data/market"
 MONITORING_DIR = ROOT / "data/monitoring"
 THEME_MEMBERSHIP_FILE = ROOT / "data/research/theme-membership/latest.json"
@@ -380,7 +381,8 @@ def signal_subset(features, required_codes=None):
 
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
                    previous_summary=None, today=None, previous_good_industries=None, baseline=None,
-                   publication_context=None, theme_membership=None):
+                   publication_context=None, theme_membership=None,
+                   monitoring_daily_dir=MONITORING_DAILY_DIR):
     if current_snapshot.get("status") not in ("SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"):
         raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
@@ -492,6 +494,35 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate"),
         current_snapshot=current_snapshot
     )
+    # Canonical history remains the primary contract.  When it is not yet
+    # available, reuse the existing rolling FINAL state only as a separately
+    # named source after validating its exact date and complete current set.
+    canonical_fully_absent = (
+        trading_date_result.get("reason") == "CANONICAL_SESSION_DATE_MISMATCH"
+        and not trading_date_result.get("observedDateCounts")
+        and set(trading_date_result.get("missingCanonicalCodes") or ()) == {
+            str(row.get("code")) for row in current_snapshot.get("stocks", []) if row.get("code")
+        }
+        and all(not (Path(history_dir) / (str(row.get("code")) + ".jsonl")).is_file()
+                for row in current_snapshot.get("stocks", []) if row.get("code"))
+    )
+    if trading_date_result.get("tradingDate") is None and (
+            trading_date_result.get("reason") in {
+                "INSUFFICIENT_TRADING_DATE_EVIDENCE", "CANONICAL_COVERAGE_INCOMPLETE"
+            } or canonical_fully_absent):
+        final_result = trading_date_evidence.verify_monitoring_daily_final(
+            monitoring_daily_dir,
+            [row.get("code") for row in current_snapshot.get("stocks", [])],
+            session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate"),
+            current_snapshot=current_snapshot,
+        )
+        if final_result.get("tradingDate") is not None:
+            trading_date_result = final_result
+        else:
+            trading_date_result = {
+                **trading_date_result,
+                "secondaryEvidence": final_result,
+            }
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     theme_status = str(theme_membership.get("status") or "UNUSABLE")
     theme_rows = theme_membership.get("themes") or []

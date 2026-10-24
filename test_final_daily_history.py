@@ -60,6 +60,24 @@ class FinalDailyHistoryTests(unittest.TestCase):
         self.assertIn("COVERAGE_MISMATCH", result["reason"])
         self.assertNotIn("TRADING_DATE_MISSING", result["reason"])
 
+    def test_missing_snapshot_date_is_not_replaced_by_execution_date(self):
+        payload = {"generatedAt": "2026-10-19T20:30:00+09:00",
+                   "stocks": [row("000001")]}
+        result = monitoring_daily_payload(payload,
+                                          {"asOfDate": "20261018", "historyStatus": "OK"},
+                                          ["000001"])
+        self.assertEqual(result["status"], "WAIT")
+        self.assertIn("TRADING_DATE_MISSING_OR_INCONSISTENT", result["reason"])
+
+    def test_row_level_explicit_local_date_can_drive_final_candidate(self):
+        payload = {"generatedAt": "2026-10-19T20:30:00+09:00",
+                   "stocks": [row("000001", localDate="20261019")]}
+        result = monitoring_daily_payload(payload,
+                                          {"asOfDate": "20261018", "historyStatus": "OK"},
+                                          ["000001"])
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual(result["rows"][0]["date"], "20261019")
+
     def test_complete_reconciliation_pending_uses_observed_active_set(self):
         payload = snapshot([row("000001"), row("000002")])
         payload.update({"status": "COMPLETE_RECONCILIATION_PENDING",
