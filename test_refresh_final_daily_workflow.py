@@ -24,6 +24,13 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertNotIn("--no-write", self.final_step)
         self.assertIn('echo "write=true" >> "$GITHUB_OUTPUT"', self.final_step)
 
+    def test_final_success_rebuilds_evidence_from_same_snapshot_without_refetch(self):
+        update = self.final_step.index("build_monitoring_daily_state.py update-latest")
+        rebuild = self.final_step.index("tools/run_full_market_monitoring.py", update)
+        self.assertLess(update, rebuild)
+        self.assertIn('--current-file "$RUNNER_TEMP/full-market-current.json"', self.final_step[rebuild:])
+        self.assertNotIn("naver_full_market_current.py", self.final_step[rebuild:])
+
     def test_final_update_requires_explicit_snapshot_session_date(self):
         self.assertIn("from tools.trading_date_evidence import explicit_session_date", self.final_step)
         self.assertIn("TRADING_DATE_MISSING_OR_INCONSISTENT", self.final_step)
@@ -39,6 +46,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("data/monitoring-daily/kosdaq.json", self.publish)
         self.assertIn("data/monitoring-daily/trading-session-diagnostic.json", self.publish)
         self.assertIn("data/monitoring-baseline/latest.json", self.publish)
+        self.assertIn("final_daily_gate_required", self.publish)
+        self.assertIn('preserving prior evidence', self.publish)
 
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
         self.assertIn("write_local_date_diagnostic", self.final_step)

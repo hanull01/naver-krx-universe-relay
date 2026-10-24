@@ -292,6 +292,12 @@ jobs:
           final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
           echo "FINAL_DAILY_STATUS=$final_status"
           test "$final_status" = "SUCCESS"
+          # FINAL is now part of the date-evidence path.  Rebuild the compact
+          # full-market artifacts from the already validated runner snapshot
+          # so latest-summary.json observes the just-published FINAL state.
+          # This intentionally makes no additional NAVER request.
+          python tools/run_full_market_monitoring.py \
+            --current-file "$RUNNER_TEMP/full-market-current.json"
           echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Collect market indices
@@ -372,7 +378,17 @@ jobs:
             echo "Market index snapshot unavailable; preserving prior snapshot."
           fi
 
-          if [ "${{ steps.full_market.outputs.ready }}" = "true" ] && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ]; then
+          final_daily_gate_required=false
+          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
+            && [ "${{ github.event_name }}" = "schedule" ] \
+            && [ "${{ github.event.schedule }}" = "30 11 * * 1-5" ] \
+            && [ "${{ steps.final_daily_history.outcome }}" != "success" ]; then
+            final_daily_gate_required=true
+          fi
+
+          if [ "${{ steps.full_market.outputs.ready }}" = "true" ] \
+            && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ] \
+            && [ "$final_daily_gate_required" = "false" ]; then
             git add \
               data/monitoring/latest-breadth.json \
               data/monitoring/latest-stock-signals.json \
@@ -385,7 +401,7 @@ jobs:
               data/dynamic-universe/latest.json \
               data/dynamic-universe/history.json
           else
-            echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
+            echo "Evidence files are not eligible for publish; preserving prior evidence. Core 42-stock data remains publishable."
           fi
 
           if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
