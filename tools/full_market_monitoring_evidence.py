@@ -489,7 +489,8 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     trading_date_result = trading_date_evidence.verify_trading_date(
         history_dir,
         [row.get("code") for row in current_snapshot.get("stocks", [])],
-        session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate")
+        session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate"),
+        current_snapshot=current_snapshot
     )
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     theme_status = str(theme_membership.get("status") or "UNUSABLE")
