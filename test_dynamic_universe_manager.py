@@ -107,6 +107,45 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertIn("777777", result["collectionCodes"])
         self.assertEqual(result["load"]["limitExceededByProtectedSources"], 2)
 
+    def _dated_context(self, sectors, trading_date):
+        context = self.context(sectors)
+        context["tradingDate"] = trading_date
+        return context
+
+    def test_same_trading_date_repeated_does_not_increment_streak(self):
+        first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
+        repeated = first
+        for _ in range(10):
+            repeated = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=repeated, policy=POLICY)
+        self.assertEqual(repeated["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"])
+        self.assertEqual(repeated["sectors"][0]["lastObservedTradingDate"], "20261023")
+
+    def test_same_day_condition_change_does_not_add_persistence(self):
+        first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
+        weak = sector(score=0, leaders=[])
+        changed = manager.build_management_result(self._dated_context([weak], "20261023"), self.universe(), previous=first, policy=POLICY)
+        self.assertEqual(changed["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"])
+        restored = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=changed, policy=POLICY)
+        self.assertEqual(restored["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"])
+
+    def test_new_trading_date_advances_and_undated_preserves(self):
+        first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
+        second = manager.build_management_result(self._dated_context([sector()], "20261024"), self.universe(), previous=first, policy=POLICY)
+        self.assertEqual(second["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"] + 1)
+        undated = manager.build_management_result(self.context([sector()]), self.universe(), previous=second, policy=POLICY)
+        self.assertEqual(undated["sectors"][0]["qualifyStreak"], second["sectors"][0]["qualifyStreak"])
+
+    def test_theme_and_leader_use_same_trading_date_guard(self):
+        theme = {"status": "AVAILABLE", "periods": {"daily": {"themes": [{"id": "theme-1", "name": "테마", "score": 80, "verifiedMembership": True, "systemLeaders": [{"code": "005930", "score": 80}]}]}}}
+        context = self.context([sector()])
+        context["tradingDate"] = "20261023"
+        context["themes"] = theme
+        first = manager.build_management_result(context, self.universe(), policy=POLICY)
+        repeated_context = copy.deepcopy(context)
+        repeated = manager.build_management_result(repeated_context, self.universe(), previous=first, policy=POLICY)
+        self.assertEqual(repeated["themes"][0]["qualifyStreak"], first["themes"][0]["qualifyStreak"])
+        self.assertEqual(repeated["leaders"][0]["qualifyStreak"], first["leaders"][0]["qualifyStreak"])
+
 
 if __name__ == "__main__":
     unittest.main()
