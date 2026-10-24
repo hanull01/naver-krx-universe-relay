@@ -88,25 +88,38 @@ def _leader_decision(row, policy):
     return all(checks.values()), score, checks
 
 
+def _normalize_trading_date(value):
+    if value is None:
+        return None
+    normalized = str(value).replace("-", "").replace("/", "")
+    if len(normalized) != 8 or not normalized.isdigit():
+        return None
+    try:
+        datetime.strptime(normalized, "%Y%m%d")
+    except ValueError:
+        return None
+    return normalized
+
+
 def _trading_date(context):
     for key in ("tradingDate", "tradeDate", "marketDate"):
-        value = (context or {}).get(key)
+        value = _normalize_trading_date((context or {}).get(key))
         if value:
-            return str(value).replace("-", "")
+            return value
     for block_name in ("fullMarket", "baseline", "evidence"):
         block = (context or {}).get(block_name) or {}
         for key in ("tradingDate", "tradeDate", "marketDate"):
-            value = block.get(key)
+            value = _normalize_trading_date(block.get(key))
             if value:
-                return str(value).replace("-", "")
+                return value
     return None
-
-
 def _transition(previous, qualified, policy):
     previous = previous or {}
     observed_date = policy.get("_observedTradingDate")
     last_date = str(previous.get("lastObservedTradingDate") or "")
-    if (not observed_date and last_date) or (observed_date and last_date and observed_date <= last_date):
+    if not observed_date:
+        return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
+    if last_date and observed_date <= last_date:
         return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
     was_managed = previous.get("status") in {"ACTIVE", "WATCH", "REENTERED"}
     qualify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
@@ -257,10 +270,14 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         member(row["code"], "AUTO_LEADER", f"{row['groupType']}:{row['groupId']}")
     for row in normalized_leaders:
         row["collectionAdmitted"] = row.get("code") in admitted_auto_codes
-    if observed_trading_date:
-        for collection in (sectors, themes, normalized_leaders):
-            for row in collection:
+    for collection, previous_index in ((sectors, sector_previous), (themes, theme_previous), (normalized_leaders, leader_previous)):
+        for row in collection:
+            prior = previous_index.get(row.get("id"), {})
+            prior_date = _normalize_trading_date(prior.get("lastObservedTradingDate"))
+            if observed_trading_date and (not prior_date or observed_trading_date > prior_date):
                 row["lastObservedTradingDate"] = observed_trading_date
+            elif prior_date:
+                row["lastObservedTradingDate"] = prior_date
     return {"version": "dynamic-universe-management-v1", "generatedAt": generated_at, "networkCalls": 0,
             "industryEvidence": {"status": industry_block.get("qualityStatus") or "UNKNOWN",
                                   "sourceStatus": (industry_block.get("quality") or {}).get("sourceStatus"),
