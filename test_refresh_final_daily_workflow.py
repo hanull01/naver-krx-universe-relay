@@ -21,6 +21,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
 
     def test_opt_in_path_writes_and_no_longer_forces_no_write(self):
         self.assertIn("build_monitoring_daily_state.py update-latest", self.final_step)
+        self.assertIn('--observed-snapshot "$RUNNER_TEMP/full-market-current.json"', self.final_step)
+        self.assertIn("--refresh-universe", self.final_step)
         self.assertNotIn("--no-write", self.final_step)
         self.assertIn('echo "write=true" >> "$GITHUB_OUTPUT"', self.final_step)
 
@@ -44,12 +46,17 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn(gate, self.publish)
         self.assertIn("data/monitoring-daily/kospi.json", self.publish)
         self.assertIn("data/monitoring-daily/kosdaq.json", self.publish)
+        self.assertIn("data/market-universe/all-assets.json", self.publish)
+        self.assertIn("data/monitoring-daily/retired.json", self.publish)
+        self.assertIn("data/monitoring-daily/universe-lifecycle.json", self.publish)
         self.assertIn("data/monitoring-daily/trading-session-diagnostic.json", self.publish)
         self.assertIn("data/monitoring-baseline/latest.json", self.publish)
         self.assertIn("final_daily_gate_required", self.publish)
         self.assertIn('preserving prior evidence', self.publish)
 
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
+        self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
+        self.assertIn("OBSERVED_STOCK_UNIVERSE_INVALID", self.final_step)
         self.assertIn("write_local_date_diagnostic", self.final_step)
         self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
 

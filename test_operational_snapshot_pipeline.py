@@ -166,7 +166,7 @@ class OperationalSnapshotPipelineTests(unittest.TestCase):
         self.assertEqual(result["status"], "WAIT")
         self.assertIn("TRADING_DATE_MISSING_OR_INCONSISTENT", result["reason"])
 
-    def test_composition_mismatch_blocks_without_confirming_listing_status(self):
+    def test_composition_mismatch_uses_complete_naver_set_without_legal_claim(self):
         rows = {"000001": raw("000001"), "000002": raw("000002")}
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -186,10 +186,9 @@ class OperationalSnapshotPipelineTests(unittest.TestCase):
                 snapshot, {"asOfDate": PREVIOUS, "historyStatus": "OK"},
                 expected_codes=[asset["code"] for asset in ASSETS],
             )
-        self.assertEqual(snapshot["status"], "SUCCESS")
-        self.assertEqual(result["status"], "WAIT")
-        self.assertTrue(any("MISSING_CODES" in reason or "EXTRA_CODES" in reason
-                            for reason in result["reason"]))
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual({row["code"] for row in result["rows"]}, {"000001", "999999"})
         self.assertNotIn("NEW_LISTING", json.dumps(result, ensure_ascii=False))
 
     def test_missing_ohlcv_blocks_final_candidate(self):

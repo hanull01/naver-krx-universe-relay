@@ -103,7 +103,9 @@ class FullMarketCurrentTests(unittest.TestCase):
                 universe, fetch, 2, 3, 0,
                 lambda: "2026-10-13T08:00:00+09:00"
             )
-        self.assertEqual(snapshot["status"], "SUCCESS")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(snapshot["qualityStatus"], "WARNING")
+        self.assertEqual(snapshot["reconciliationStatus"], "NAVER_OBSERVED")
         self.assertEqual(snapshot["count"], 4)
         self.assertEqual(snapshot["expectedCount"], 4)
         self.assertEqual(snapshot["coverageCount"], 4)
@@ -170,7 +172,7 @@ class FullMarketCurrentTests(unittest.TestCase):
             output = root / "stocks-current.json"
             diagnostic = root / "stocks-current-error.json"
             current.publish(snapshot, output, diagnostic)
-            self.assertEqual(snapshot["status"], "SUCCESS")
+            self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
             self.assertEqual(
                 json.loads(output.read_text(encoding="utf-8"))["expectedCount"], 4
             )
@@ -189,14 +191,14 @@ class FullMarketCurrentTests(unittest.TestCase):
                 for market, codes in self.expected.items() for code in codes
             ]}), encoding="utf-8")
             snapshot = current.collect_snapshot(universe, fetch, 2, 3, 0)
-        self.assertEqual(snapshot["status"], "SUCCESS")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
         self.assertEqual(snapshot["attemptCount"], 1)
         self.assertNotIn("qualityWarnings", snapshot)
         self.assertEqual(snapshot["previousUniverseMissingCodes"], ["123456"])
         self.assertEqual(snapshot["previousUniverseNewCodes"], ["999999"])
 
 
-    def test_large_composition_delta_is_not_marked_usable(self):
+    def test_large_composition_delta_remains_observed_and_pending(self):
         expected = {
             "KOSPI": {f"{i:06d}" for i in range(100)},
             "KOSDAQ": {f"{i:06d}" for i in range(100, 200)},
@@ -214,7 +216,7 @@ class FullMarketCurrentTests(unittest.TestCase):
             snapshot = current.collect_snapshot(
                 universe, paged(observed), 200, 3, 0
             )
-        self.assertEqual(snapshot["status"], "SUCCESS")
+        self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
         self.assertEqual(snapshot["expectedCount"], 180)
         self.assertEqual(snapshot["coverageCount"], 180)
         self.assertEqual(snapshot["attemptCount"], 1)

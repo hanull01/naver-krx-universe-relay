@@ -703,7 +703,8 @@ def update_from_rows(existing, incoming, state_dir, target_date, universe_file, 
 def update_with_universe_refresh(state_dir, universe_file, baseline_output, lifecycle_output,
                                  target_date, stock_payload, fetcher=None, no_write=False, provisional=False,
                                  enforce_lifecycle_verification=False,
-                                 lifecycle_candidates=None, allow_partial=False, **collection_options):
+                                 lifecycle_candidates=None, allow_partial=False, daily_rows=None,
+                                 **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
     existing = load_state(state_dir)
@@ -752,7 +753,15 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
             raise ValueError("same-day final generation baseline mismatch")
         return {"status": "SUCCESS", "changed": False, "asOfDate": target,
                 "coverage": len(expected), "lifecycle": diagnostics, "baseline": baseline}
-    if allow_partial:
+    if daily_rows is not None:
+        # The full-market snapshot is already a complete, validated NAVER
+        # observation.  Reuse its daily rows after the universe reconciliation
+        # above; never issue a second per-code NAVER request for this path.
+        incoming = normalize_daily_rows(
+            {"rows": daily_rows} if isinstance(daily_rows, list) else daily_rows,
+            target_date,
+        )
+    elif allow_partial:
         partial = collect_today_rows_partial(target_date, current_universe, fetcher=fetcher,
                                              **collection_options)
         if partial["status"] == "PARTIAL":

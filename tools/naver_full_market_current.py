@@ -244,9 +244,15 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
         result = collect_attempt(expected, fetcher, page_size, sleep_seconds, clock())
         diagnostics.append({key: value for key, value in result.items() if key != "stocks"} | {"attempt": attempt})
         if result["valid"]:
+            composition_changed = bool(result["previousUniverseMissingCodes"] or
+                                       result["previousUniverseNewCodes"])
             return {
                 "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
-                "status": "SUCCESS", "expectedCount": result["expectedCount"], "count": result["count"],
+                "status": ("COMPLETE_RECONCILIATION_PENDING" if composition_changed else "SUCCESS"),
+                "collectionStatus": "SUCCESS",
+                "qualityStatus": "WARNING" if composition_changed else "SUCCESS",
+                "reconciliationStatus": "NAVER_OBSERVED" if composition_changed else "NO_CHANGE",
+                "expectedCount": result["expectedCount"], "count": result["count"],
                 "coverageCount": result["coverageCount"], "markets": result["markets"],
                 "attemptCount": attempt, "missingCodes": [], "extraCodes": [], "duplicateCodes": [],
                 "stocks": result["stocks"], "attemptDiagnostics": diagnostics,

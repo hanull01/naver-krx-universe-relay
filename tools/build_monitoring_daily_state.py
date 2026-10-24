@@ -70,6 +70,7 @@ def main():
     p.add_argument('--output-dir',default=str(ROOT/'data/monitoring-daily'))
     p.add_argument('--canonical-dir',default=str(CANONICAL)); p.add_argument('--universe-file',default=str(UNIVERSE))
     p.add_argument('--daily-input', help='complete validated whole-market daily rows JSON for update-latest')
+    p.add_argument('--observed-snapshot', help='complete NAVER full-market snapshot to reconcile as today\'s STOCK universe')
     p.add_argument('--fetch-today', action='store_true', help='collect one current daily row per authoritative code from NAVER')
     p.add_argument('--refresh-universe', action='store_true',
                    help='refresh NAVER STOCK universe and atomically reconcile removed stocks')
@@ -93,7 +94,36 @@ def main():
             collect_today_rows, load_state, update_from_file, update_from_rows,
             update_with_universe_refresh)
         try:
-            if a.fetch_today:
+            if a.observed_snapshot:
+                if a.fetch_today or not a.daily_input or not a.refresh_universe:
+                    p.error('--observed-snapshot requires --daily-input and --refresh-universe without --fetch-today')
+                snapshot = json.loads(Path(a.observed_snapshot).read_text(encoding='utf-8'))
+                stocks = snapshot.get('stocks')
+                if (snapshot.get('status') not in {'SUCCESS', 'COMPLETE_RECONCILIATION_PENDING'} or
+                        snapshot.get('collectionStatus', 'SUCCESS') != 'SUCCESS' or
+                        not isinstance(stocks, list) or not stocks):
+                    raise ValueError('observed full-market snapshot is not structurally complete')
+                codes = [str(row.get('code') or '') for row in stocks]
+                if (len(codes) != len(set(codes)) or
+                        any(str(row.get('assetType') or '').upper() != 'STOCK' for row in stocks)):
+                    raise ValueError('observed full-market snapshot STOCK set is invalid')
+                stock_payload = {
+                    'stocks': stocks,
+                    'metadata': {
+                        'failedCount': 0,
+                        'generatedAt': snapshot.get('generatedAt'),
+                        'markets': {market: sum(row.get('market') == market for row in stocks)
+                                    for market in ('KOSPI', 'KOSDAQ')},
+                    },
+                }
+                daily_payload = json.loads(Path(a.daily_input).read_text(encoding='utf-8'))
+                outcome = update_with_universe_refresh(
+                    a.output_dir, a.universe_file, a.baseline_output,
+                    a.lifecycle_output, a.date, stock_payload,
+                    daily_rows=daily_payload, no_write=a.no_write,
+                    provisional=a.provisional, enforce_lifecycle_verification=True,
+                )
+            elif a.fetch_today:
                 if a.refresh_universe:
                     from naver_market_universe_builder import collect_stocklist, ensure_complete
                     stock_payload = collect_stocklist()
@@ -113,7 +143,7 @@ def main():
                                                a.universe_file, a.baseline_output, no_write=a.no_write, provisional=a.provisional)
             else:
                 if a.refresh_universe:
-                    p.error('--refresh-universe requires --fetch-today')
+                    p.error('--refresh-universe requires --fetch-today or --observed-snapshot')
                 outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
                                            a.baseline_output, no_write=a.no_write, provisional=a.provisional)
         except TodayRowsNotReady as exc:
