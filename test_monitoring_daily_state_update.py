@@ -476,6 +476,91 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual("NAVER_OBSERVED", result["lifecycle"]["lifecycle"]["status"])
         self.assertTrue(all(p.read_bytes() == value for p, value in before.items()))
 
+    def test_observed_snapshot_reconciles_active_set_without_refetching_daily_rows(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "snapshot-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "snapshot-state"; state_dir.mkdir()
+        for market, payload in self._state_for_payload(previous).items():
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "snapshot-baseline.json"; baseline_path.write_text("{}", encoding="utf-8")
+        lifecycle_path = self.root / "snapshot-lifecycle.json"
+        observed = [stock("000001", "A", "KOSPI"), stock("000002", "B", "KOSDAQ"),
+                    stock("000004", "D", "KOSDAQ")]
+        source = {"stocks": observed, "metadata": {"failedCount": 0,
+                  "markets": {market: sum(row["market"] == market for row in observed)
+                              for market in update.MARKETS}}}
+        daily_rows = [{"code": row["code"], "date": "20261008", "close": 11,
+                       "high": 12, "volume": 3} for row in observed]
+        def fake_baseline(state, target, current, _output):
+            groups = update.authoritative_groups(current)
+            return {"asOfDate": update.compact_date(target), "authoritativeCount": 3,
+                    "count": 3, "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "market": market}
+                               for market in update.MARKETS for code in sorted(groups[market])],
+                    "refreshDiagnostics": {}}
+        def forbidden_fetch(*_args, **_kwargs):
+            raise AssertionError("observed snapshot path must not refetch NAVER daily rows")
+        with patch.object(update, "baseline_from_state", side_effect=fake_baseline):
+            result = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+                fetcher=forbidden_fetch, daily_rows=daily_rows,
+                enforce_lifecycle_verification=True, retry_sleep=0)
+        self.assertEqual("SUCCESS", result["status"])
+        lifecycle = json.loads(lifecycle_path.read_text(encoding="utf-8"))
+        self.assertEqual("NAVER_OBSERVED", lifecycle["lifecycle"]["status"])
+        self.assertEqual("UNVERIFIED", lifecycle["lifecycle"]["legalStatus"])
+        self.assertEqual({event["type"] for event in lifecycle["lifecycle"]["events"]},
+                         {"NAVER_ADDED", "NAVER_REMOVED"})
+        archived = json.loads((state_dir / "retired.json").read_text(encoding="utf-8"))
+        self.assertEqual("UNVERIFIED", archived["stocks"]["000003"]["legalStatus"])
+        self.assertEqual({"000001", "000002", "000004"},
+                         {stock["code"] for market in update.MARKETS
+                          for stock in json.loads((state_dir / f"{market.lower()}.json").read_text())["stocks"]})
+
+    def test_2764_to_2766_observed_snapshot_is_current_authority(self):
+        old_assets = [{"code": f"{index:06d}", "name": f"old-{index}",
+                       "market": "KOSPI" if index % 2 else "KOSDAQ", "assetType": "STOCK"}
+                      for index in range(1, 2765)]
+        new_assets = old_assets + [
+            {"code": "0013Y0", "name": "new-a", "market": "KOSDAQ", "assetType": "STOCK"},
+            {"code": "0015M0", "name": "new-b", "market": "KOSDAQ", "assetType": "STOCK"},
+        ]
+        universe = self.root / "full-universe.json"; universe.write_text(
+            json.dumps({"assets": old_assets}), encoding="utf-8")
+        state_dir = self.root / "full-state"; state_dir.mkdir()
+        for market in update.MARKETS:
+            stocks = [update.encode_stock(row["code"], [{
+                "date": "20261023", "close": 100, "high": 101, "volume": 10,
+                "closeValid": True, "ohlcValid": True, "volumeValid": True,
+            }]) for row in old_assets if row["market"] == market]
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps({
+                "schemaVersion": 1, "format": update.FORMAT, "market": market,
+                "retainedObservations": update.KEEP, "publicationStatus": "FINAL", "stocks": stocks,
+            }), encoding="utf-8")
+        baseline_path = self.root / "full-baseline.json"; baseline_path.write_text("{}", encoding="utf-8")
+        lifecycle_path = self.root / "full-lifecycle.json"
+        source = {"stocks": new_assets, "metadata": {"failedCount": 0,
+                  "markets": {market: sum(row["market"] == market for row in new_assets)
+                              for market in update.MARKETS}}}
+        daily_rows = [{"code": row["code"], "date": "20261026", "close": 101,
+                       "high": 102, "volume": 11} for row in new_assets]
+        def fake_baseline(state, target, current, _output):
+            groups = update.authoritative_groups(current)
+            return {"asOfDate": update.compact_date(target), "authoritativeCount": 2766,
+                    "count": 2766, "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "market": market}
+                               for market in update.MARKETS for code in sorted(groups[market])],
+                    "refreshDiagnostics": {}}
+        with patch.object(update, "baseline_from_state", side_effect=fake_baseline):
+            result = update.update_with_universe_refresh(
+                state_dir, universe, baseline_path, lifecycle_path, "2026-10-26", source,
+                daily_rows=daily_rows, enforce_lifecycle_verification=True)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual(2766, result["coverage"])
+        lifecycle = json.loads(lifecycle_path.read_text(encoding="utf-8"))["lifecycle"]
+        self.assertEqual({event["type"] for event in lifecycle["events"]}, {"NAVER_ADDED"})
+        self.assertEqual("UNVERIFIED", lifecycle["legalStatus"])
+
     def test_refresh_path_applies_only_explicit_verified_event(self):
         previous, stock = self._lifecycle_fixture()
         universe = self.root / "verified-add-universe.json"; universe.write_text(json.dumps(previous), encoding="utf-8")

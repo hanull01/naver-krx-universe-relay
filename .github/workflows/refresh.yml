@@ -167,9 +167,9 @@ jobs:
             echo "market_status=AVAILABLE_WITH_BASELINE_WARNING" >> "$GITHUB_OUTPUT"
             echo "::warning::Baseline is stale; collecting a fresh snapshot and preserving the prior baseline until a validated update is published."
           fi
-          # The authoritative 2,768-stock snapshot is runner-temporary only.
-          # It is collected once, exact-set validated by the collector, then
-          # reused by the compact evidence builder without another API call.
+          # The complete NAVER STOCK snapshot is runner-temporary only.  It is
+          # collected once, structurally validated by the collector, then
+          # reused by evidence and FINAL reconciliation without another API call.
           started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
           echo "Full-market collection started at ${started_at}"
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
@@ -239,8 +239,12 @@ jobs:
           from tools.trading_session_diagnostic import write_local_date_diagnostic
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
-          universe = json.loads(Path("data/market-universe/all-assets.json").read_text(encoding="utf-8"))
-          expected = [str(row["code"]) for row in universe.get("assets", []) if row.get("assetType") == "STOCK"]
+          observed_stocks = snapshot.get("stocks") or []
+          expected = [str(row.get("code") or "") for row in observed_stocks
+                      if str(row.get("assetType") or "").upper() == "STOCK"]
+          if (len(expected) != len(observed_stocks) or len(expected) != len(set(expected)) or
+                  not expected):
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_UNIVERSE_INVALID")
           target_date = explicit_session_date(current_snapshot=snapshot)
           if not target_date:
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:TRADING_DATE_MISSING_OR_INCONSISTENT")
@@ -287,11 +291,19 @@ jobs:
           python tools/build_monitoring_daily_state.py update-latest \
             --daily-input "$RUNNER_TEMP/final-daily-monitoring-input.json" \
             --date "$target_date" \
+            --observed-snapshot "$RUNNER_TEMP/full-market-current.json" \
+            --refresh-universe \
             > "$RUNNER_TEMP/final-daily-monitoring-result.json"
           cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
           final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
           echo "FINAL_DAILY_STATUS=$final_status"
           test "$final_status" = "SUCCESS"
+          # FINAL is now part of the date-evidence path.  Rebuild the compact
+          # full-market artifacts from the already validated runner snapshot
+          # so latest-summary.json observes the just-published FINAL state.
+          # This intentionally makes no additional NAVER request.
+          python tools/run_full_market_monitoring.py \
+            --current-file "$RUNNER_TEMP/full-market-current.json"
           echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Collect market indices
@@ -372,7 +384,17 @@ jobs:
             echo "Market index snapshot unavailable; preserving prior snapshot."
           fi
 
-          if [ "${{ steps.full_market.outputs.ready }}" = "true" ] && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ]; then
+          final_daily_gate_required=false
+          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
+            && [ "${{ github.event_name }}" = "schedule" ] \
+            && [ "${{ github.event.schedule }}" = "30 11 * * 1-5" ] \
+            && [ "${{ steps.final_daily_history.outcome }}" != "success" ]; then
+            final_daily_gate_required=true
+          fi
+
+          if [ "${{ steps.full_market.outputs.ready }}" = "true" ] \
+            && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ] \
+            && [ "$final_daily_gate_required" = "false" ]; then
             git add \
               data/monitoring/latest-breadth.json \
               data/monitoring/latest-stock-signals.json \
@@ -385,13 +407,16 @@ jobs:
               data/dynamic-universe/latest.json \
               data/dynamic-universe/history.json
           else
-            echo "Evidence files are not eligible for publish; core 42-stock data remains publishable."
+            echo "Evidence files are not eligible for publish; preserving prior evidence. Core 42-stock data remains publishable."
           fi
 
           if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
             git add \
+              data/market-universe/all-assets.json \
               data/monitoring-daily/kospi.json \
               data/monitoring-daily/kosdaq.json \
+              data/monitoring-daily/retired.json \
+              data/monitoring-daily/universe-lifecycle.json \
               data/monitoring-baseline/latest.json \
               data/monitoring-daily/trading-session-diagnostic.json
           else
@@ -456,7 +481,7 @@ jobs:
 
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
+        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.publication_changed == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}

@@ -42,19 +42,26 @@ jobs:
           # Manual runs are allowed for validation even on non-trading days.
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "expected_date=" >> "$GITHUB_OUTPUT"
             echo "Manual dispatch: trading-day gate bypassed."
             exit 0
           fi
 
+          # This is the scheduled KRX-calendar target, not trading-date
+          # evidence.  The report must still resolve its date from published
+          # evidence and match this calendar-verified target below.
+          scheduled_date=$(TZ=Asia/Seoul date +%F)
           set +e
-          python krx_market_day.py
+          python krx_market_day.py --date "$scheduled_date"
           code=$?
           set -e
 
           if [ "$code" -eq 0 ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "expected_date=$scheduled_date" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "expected_date=" >> "$GITHUB_OUTPUT"
             echo "Skipping daily report: closed or unverifiable KRX trading day."
           fi
 
@@ -85,9 +92,15 @@ jobs:
           )
           as_of=$(printf '%s\n' "$report_date" | tail -n 1)
           echo "Resolved report trading date: ${as_of}"
+          expected=${EXPECTED_KRX_TRADING_DATE:-}
+          if [ -n "$expected" ] && [ "$as_of" != "$expected" ]; then
+            echo "Resolved published trading date ${as_of} does not match KRX scheduled target ${expected}." >&2
+            exit 1
+          fi
           python3 daily_report.py --as-of "$as_of" --output-dir data/reports
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}
+          EXPECTED_KRX_TRADING_DATE: ${{ steps.market_day.outputs.expected_date }}
 
       - name: Validate daily report
         if: steps.market_day.outputs.run == 'true'

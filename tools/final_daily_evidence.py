@@ -32,7 +32,12 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     """Return deterministic diagnostics; no network or filesystem access."""
     snapshot = snapshot if isinstance(snapshot, dict) else {}
     rows = snapshot.get("stocks") or []
-    target = _date(target_date or snapshot.get("tradingDate") or snapshot.get("asOfDate"))
+    # Only explicit session fields can establish the target date.  In
+    # particular, snapshot.asOfDate is not a session-date source because it
+    # may be inherited from the prior baseline.
+    target = _date(target_date or snapshot.get("tradingDate")
+                   or snapshot.get("tradeDate") or snapshot.get("marketDate")
+                   or snapshot.get("localDate"))
     generated = snapshot.get("generatedAt")
     errors, warnings = [], []
     if not target:
@@ -132,7 +137,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     snapshot = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
     baseline = json.loads(Path(args.baseline).read_text(encoding="utf-8"))
-    result = validate_snapshot(snapshot, baseline, baseline.get("asOfDate"))
+    result = validate_snapshot(snapshot, baseline)
     print(json.dumps({key: result[key] for key in (
         "status", "tradingDate", "generatedAt", "rowCount", "expectedCount",
         "sessionStatus", "finalEligible", "finalityPolicy", "errors", "warnings", "networkCalls"
