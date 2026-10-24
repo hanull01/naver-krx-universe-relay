@@ -511,6 +511,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                    "newCodes": current_snapshot.get("extraCodes", []),
                    "qualityWarnings": current_snapshot.get("qualityWarnings", []),
                    "universeDelta": current_snapshot.get("universeDelta"),
+                   # This is the verified canonical-session result.  A null
+                   # date and its reason are intentional when the source
+                   # evidence is missing, mixed, or incomplete.
+                   "tradingDate": trading_date_result.get("tradingDate"),
+                   "tradingDateEvidence": trading_date_result,
                    "marketTradingValue": market_trading_value}
     summary = {"schemaVersion": 1, "generatedAt": current_snapshot["generatedAt"], "source": "NAVER_FULL_MARKET_EVIDENCE",
                # Keep breadth for current readers; fullMarket is the explicit

@@ -133,6 +133,12 @@ def normalize(row, market, snapshot_generated_at):
             "tradableStatus": row.get("tradableStatus"),
             "tradableStatusUpdatedAt": row.get("tradableStatusUpdatedAt"),
             "snapshotGeneratedAt": snapshot_generated_at}
+    # Preserve an explicit session date when NAVER supplies one.  The
+    # downstream trading-date verifier corroborates it against canonical
+    # daily history; generatedAt remains observation time only.
+    for key in ("tradingDate", "tradeDate", "marketDate", "localDate"):
+        if row.get(key) not in (None, ""):
+            item[key] = row[key]
     malformed = []
     for target, source in fields.items():
         item[target] = number(row.get(source))

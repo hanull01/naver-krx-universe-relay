@@ -18,14 +18,90 @@ def history(date, close, volume=100, feature_valid=True, high=None, low=None):
             "feature_valid": feature_valid}
 
 
-def current(code="005930", market="KOSPI", price=130, volume=200):
-    return {"code": code, "name": code, "market": market, "currentPrice": price, "change": 2,
+def current(code="005930", market="KOSPI", price=130, volume=200, **extra):
+    row = {"code": code, "name": code, "market": market, "currentPrice": price, "change": 2,
             "changeRate": 1.56, "openPrice": price - 1, "highPrice": price + 2, "lowPrice": price - 3,
             "accumulatedTradingVolume": volume, "accumulatedTradingValue": 1000, "marketCap": 1000,
             "high52Week": 132, "low52Week": 50, "snapshotGeneratedAt": "2026-10-01T10:00:00+09:00"}
+    row.update(extra)
+    return row
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_verified_full_market_date_is_published_with_evidence(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015")]}
+        baseline = {"asOfDate": "20261014", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "005930.jsonl").write_text(json.dumps(history("20261015", 129)) + "\n",
+                                                   encoding="utf-8")
+            built, _ = evidence.build_evidence(
+                snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015",
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertEqual(full_market["tradingDate"], "20261015")
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "VERIFIED_CANONICAL_SESSION")
+        self.assertEqual(built["latest-summary.json"]["fullMarket"]["tradingDate"], "20261015")
+
+    def test_missing_full_market_date_is_published_as_unavailable_evidence(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current()]}
+        baseline = {"asOfDate": "20261014", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "005930.jsonl").write_text(json.dumps(history("20261015", 129)) + "\n",
+                                                   encoding="utf-8")
+            built, _ = evidence.build_evidence(
+                snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015",
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertIsNone(full_market["tradingDate"])
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "INSUFFICIENT_TRADING_DATE_EVIDENCE")
+
+    def test_mixed_full_market_date_evidence_is_not_verified(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015"), current("006400", "KOSDAQ", localDate="20261016")]}
+        baseline = {"asOfDate": "20261014", "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None} for code in ("005930", "006400")]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for code, date in (("005930", "20261015"), ("006400", "20261016")):
+                (root / f"{code}.jsonl").write_text(json.dumps(history(date, 129)) + "\n",
+                                                       encoding="utf-8")
+            built, _ = evidence.build_evidence(
+                snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015",
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertIsNone(full_market["tradingDate"])
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "INSUFFICIENT_TRADING_DATE_EVIDENCE")
+
     def test_required_discovery_codes_are_retained_in_signal_subset(self):
         rows = [evidence.feature_row(current("005930"), [history("20260930", 100)] * 20, "20261015"),
                 evidence.feature_row(current("006400"), [history("20260930", 100)] * 20, "20261015")]
