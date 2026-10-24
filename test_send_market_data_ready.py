@@ -128,6 +128,26 @@ class ReadyMailTests(unittest.TestCase):
             self.assertIn('fullMarket.count=2764', content)
             self.assertIn('legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY', content)
 
+    def test_full_market_signal_does_not_infer_trading_date_from_generated_at(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({
+                'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET',
+                    'markets': {'TOTAL': {'stockCount': 2, 'validCount': 2}},
+                    'tradingDate': None,
+                    'tradingDateEvidence': {'reason': 'CANONICAL_COVERAGE_INCOMPLETE'},
+                }}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            metadata = ready.validate_full_market_publication(summary, quality, current=self.current)
+            self.assertIsNone(metadata['tradingDate'])
+            self.assertEqual(metadata['tradingDateStatus'], 'UNAVAILABLE')
+            message = ready.ready_message(metadata, dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
+            content = message.get_content()
+            self.assertIn('fullMarket.tradingDate=UNAVAILABLE', content)
+            self.assertIn('fullMarket.tradingDateEvidenceReason=CANONICAL_COVERAGE_INCOMPLETE', content)
+
     def test_full_market_primary_rejects_stale_publication(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'

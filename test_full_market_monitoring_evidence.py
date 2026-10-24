@@ -77,6 +77,118 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(full_market["tradingDateEvidence"]["reason"],
                          "INSUFFICIENT_TRADING_DATE_EVIDENCE")
 
+    def test_rolling_final_is_used_only_as_named_full_market_date_source(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015")]}
+        baseline = {"asOfDate": "20261014", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            final = root / "final"
+            final.mkdir()
+            state = {
+                "schemaVersion": 1, "format": "COLUMN_ARRAY_V1", "market": "KOSPI",
+                "publicationStatus": "FINAL", "asOfDate": "20261015",
+                "stocks": [{"code": "005930", "dates": ["20261014", "20261015"],
+                            "close": [128, 129], "high": [129, 130],
+                            "volume": [100, 200], "validity": [0, 0]}],
+            }
+            (final / "kospi.json").write_text(json.dumps(state), encoding="utf-8")
+            (final / "kosdaq.json").write_text(json.dumps({
+                "schemaVersion": 1, "format": "COLUMN_ARRAY_V1", "market": "KOSDAQ",
+                "publicationStatus": "FINAL", "asOfDate": "20261015", "stocks": [],
+            }), encoding="utf-8")
+            built, _ = evidence.build_evidence(
+                snapshot, root / "canonical", baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015", monitoring_daily_dir=final,
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertEqual(full_market["tradingDate"], "20261015")
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "VERIFIED_MONITORING_DAILY_FINAL_SESSION")
+        self.assertEqual(full_market["tradingDateEvidence"]["source"], "MONITORING_DAILY_FINAL")
+
+    def test_rolling_final_cannot_bypass_partial_canonical_history(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015"),
+                               current("006400", "KOSDAQ", localDate="20261015")]}
+        baseline = {"asOfDate": "20261014", "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None} for code in ("005930", "006400")]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); final = root / "final"; final.mkdir()
+            (root / "005930.jsonl").write_text(json.dumps(history("20261015", 129)) + "\n", encoding="utf-8")
+            state = {"schemaVersion": 1, "format": "COLUMN_ARRAY_V1", "market": "KOSPI",
+                     "publicationStatus": "FINAL", "asOfDate": "20261015",
+                     "stocks": [{"code": "005930", "dates": ["20261015"],
+                                 "close": [129], "high": [130], "volume": [200], "validity": [0]}]}
+            (final / "kospi.json").write_text(json.dumps(state), encoding="utf-8")
+            (final / "kosdaq.json").write_text(json.dumps({**state, "market": "KOSDAQ", "stocks": []}), encoding="utf-8")
+            built, _ = evidence.build_evidence(snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015", monitoring_daily_dir=final)
+        result = built["latest-breadth.json"]["fullMarket"]["tradingDateEvidence"]
+        self.assertIsNone(result["tradingDate"])
+        self.assertEqual(result["reason"], "CANONICAL_COVERAGE_INCOMPLETE")
+
+    def test_rolling_final_cannot_bypass_damaged_canonical_history(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015"),
+                               current("006400", "KOSDAQ", localDate="20261015")]}
+        baseline = {"asOfDate": "20261014", "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None} for code in ("005930", "006400")]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); final = root / "final"; final.mkdir()
+            (root / "005930.jsonl").write_text(json.dumps(history("20261015", 129)) + "\n", encoding="utf-8")
+            (root / "006400.jsonl").write_text("not-json\n", encoding="utf-8")
+            for market, stocks in (("KOSPI", [{"code": "005930", "dates": ["20261015"], "close": [129], "high": [130], "volume": [200], "validity": [0]}]), ("KOSDAQ", [])):
+                (final / f"{market.lower()}.json").write_text(json.dumps({"format": "COLUMN_ARRAY_V1", "market": market, "publicationStatus": "FINAL", "asOfDate": "20261015", "stocks": stocks}), encoding="utf-8")
+            built, _ = evidence.build_evidence(snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015", monitoring_daily_dir=final)
+        result = built["latest-breadth.json"]["fullMarket"]["tradingDateEvidence"]
+        self.assertIsNone(result["tradingDate"])
+        self.assertEqual(result["reason"], "CANONICAL_COVERAGE_INCOMPLETE")
+
+    def test_rolling_final_cannot_bypass_mixed_canonical_history(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(localDate="20261015"),
+                               current("006400", "KOSDAQ", localDate="20261015")]}
+        baseline = {"asOfDate": "20261014", "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None} for code in ("005930", "006400")]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); final = root / "final"; final.mkdir()
+            for code, day in (("005930", "20261015"), ("006400", "20261014")):
+                (root / f"{code}.jsonl").write_text(json.dumps(history(day, 129)) + "\n", encoding="utf-8")
+            for market, stocks in (("KOSPI", [{"code": "005930", "dates": ["20261015"], "close": [129], "high": [130], "volume": [200], "validity": [0]}]), ("KOSDAQ", [])):
+                (final / f"{market.lower()}.json").write_text(json.dumps({"format": "COLUMN_ARRAY_V1", "market": market, "publicationStatus": "FINAL", "asOfDate": "20261015", "stocks": stocks}), encoding="utf-8")
+            built, _ = evidence.build_evidence(snapshot, root, baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261015", monitoring_daily_dir=final)
+        result = built["latest-breadth.json"]["fullMarket"]["tradingDateEvidence"]
+        self.assertIsNone(result["tradingDate"])
+        self.assertEqual(result["reason"], "MIXED_CANONICAL_TRADING_DATES")
+
     def test_mixed_full_market_date_evidence_is_not_verified(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",
                     "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,

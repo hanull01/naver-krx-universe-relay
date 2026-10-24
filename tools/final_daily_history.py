@@ -10,8 +10,10 @@ from copy import deepcopy
 
 try:
     from .final_daily_evidence import validate_snapshot
+    from .trading_date_evidence import explicit_session_date
 except ImportError:  # direct script/test loading compatibility
     from final_daily_evidence import validate_snapshot
+    from trading_date_evidence import explicit_session_date
 
 
 ASSET_TYPES = {"STOCK", "ETF", "ETN"}
@@ -116,6 +118,11 @@ def monitoring_daily_rows(proposed_rows):
 
 def monitoring_daily_payload(snapshot, baseline=None, expected_codes=None, target_date=None):
     """Build the existing update-latest input without writing or fetching."""
+    target_date = target_date or explicit_session_date(current_snapshot=snapshot)
+    if not target_date:
+        return {"status": "WAIT", "reason": ["TRADING_DATE_MISSING_OR_INCONSISTENT"],
+                "diagnostic": {"status": "UNUSABLE", "errors": ["TRADING_DATE_MISSING_OR_INCONSISTENT"],
+                               "networkCalls": 0}, "rows": [], "excluded": []}
     # A structurally complete NAVER list with a stable composition delta is
     # itself the active-set authority for this observation.  The previous
     # all-assets file remains historical context, not a gate on today's FINAL.

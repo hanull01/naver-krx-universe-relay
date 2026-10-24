@@ -24,6 +24,11 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertNotIn("--no-write", self.final_step)
         self.assertIn('echo "write=true" >> "$GITHUB_OUTPUT"', self.final_step)
 
+    def test_final_update_requires_explicit_snapshot_session_date(self):
+        self.assertIn("from tools.trading_date_evidence import explicit_session_date", self.final_step)
+        self.assertIn("TRADING_DATE_MISSING_OR_INCONSISTENT", self.final_step)
+        self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
+
     def test_only_successful_opt_in_update_is_publishable(self):
         gate = (
             '[ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && '
@@ -32,7 +37,12 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn(gate, self.publish)
         self.assertIn("data/monitoring-daily/kospi.json", self.publish)
         self.assertIn("data/monitoring-daily/kosdaq.json", self.publish)
+        self.assertIn("data/monitoring-daily/trading-session-diagnostic.json", self.publish)
         self.assertIn("data/monitoring-baseline/latest.json", self.publish)
+
+    def test_final_update_writes_and_validates_local_date_diagnostic(self):
+        self.assertIn("write_local_date_diagnostic", self.final_step)
+        self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
 
 
 if __name__ == "__main__":
