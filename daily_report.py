@@ -24,12 +24,92 @@ STATUS_LABELS = {
     "MONITORED_UNIVERSE_CONFIGURED": "관심종목 설정됨",
 }
 
+CANDIDATE_BUCKET_LABELS = {
+    "REGULAR_BREAKOUT_STRONG": "정규장 돌파 강도 관찰",
+    "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY": "정규장 돌파 실패 후 회복 관찰",
+    "REGULAR_ABOVE_MA_MOMENTUM": "정규장 MA20·MA60 상회 관찰",
+    "NEAR_BREAKOUT_WATCH": "돌파 근접 관찰",
+    "PULLBACK_WATCH": "눌림목 관찰",
+}
+
+CANDIDATE_EXCLUSION_LABELS = {
+    "REGULAR_SESSION_UNAVAILABLE": "정규장 확정 증거 미확인",
+}
+
+CANDIDATE_VOLUME_LABELS = {
+    "surge": "급증",
+    "elevated": "증가",
+    "normal": "정상 범위",
+    "unknown": "확인 불가",
+}
+
+CANDIDATE_STATE_LABELS = {
+    "above": "상회",
+    "below": "하회",
+    "confirmed": "확인",
+    "failed": "실패",
+    "none": "없음",
+    "near_breakout20": "20일 돌파 근접",
+    "near_breakout60": "60일 돌파 근접",
+    "pullback_ma20": "MA20 눌림",
+    "pullback_ma60": "MA60 눌림",
+}
+
+CANDIDATE_DATE_REASON_LABELS = {
+    "REPORT_AS_OF_MISSING": "리포트 기준일 미확인",
+    "REGULAR_SOURCE_DATE_MISSING": "정규장 원천 날짜 미확인",
+    "REGULAR_SOURCE_DATE_MISMATCH": "정규장 원천 날짜 불일치",
+}
+
 
 def korean_status(value):
     """Render status labels for readers while retaining raw JSON values."""
     if value in (None, ""):
         return "확인 불가"
     return STATUS_LABELS.get(str(value), str(value))
+
+
+def display_number(value, suffix=""):
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return f"{value:,.2f}{suffix}"
+    return "확인 불가"
+
+
+def display_candidate_state(value):
+    if value in (None, ""):
+        return "확인 불가"
+    return CANDIDATE_STATE_LABELS.get(str(value), str(value))
+
+
+def comparable_report_date(value):
+    if value in (None, ""):
+        return None
+    text = str(value).strip()
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return text
+
+
+def split_candidates_for_markdown(candidates, report_as_of):
+    """Keep only candidates with regular-session evidence for report asOf."""
+    verified = []
+    unverified = []
+    comparable_report_as_of = comparable_report_date(report_as_of)
+    for candidate in candidates:
+        regular = candidate.get("regularSession") or {}
+        source_date = regular.get("sourceDate")
+        comparable_source_date = comparable_report_date(source_date)
+        if not comparable_report_as_of:
+            reason = "REPORT_AS_OF_MISSING"
+        elif not comparable_source_date:
+            reason = "REGULAR_SOURCE_DATE_MISSING"
+        elif comparable_source_date != comparable_report_as_of:
+            reason = "REGULAR_SOURCE_DATE_MISMATCH"
+        else:
+            verified.append(candidate)
+            continue
+        unverified.append((candidate, reason))
+    return verified, unverified
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -1611,6 +1691,167 @@ def write_markdown(report, path):
             )
     else:
         lines.append(f"- 지수 자료 확인 불가: {index_snapshot.get('errors') or 'UNKNOWN'}")
+
+    next_candidates = report.get("nextSessionCandidates") or {}
+    candidate_scope = monitored_summary.get("scope") or "확인 불가"
+    candidates = next_candidates.get("priority") or []
+    excluded_candidates = next_candidates.get("excluded") or []
+    report_as_of = report.get("asOf")
+    verified_candidates, unverified_candidates = split_candidates_for_markdown(
+        candidates, report_as_of
+    )
+    lines.extend(["", "### 다음 거래일 관찰 후보", ""])
+    lines.extend([
+        f"- 후보 분석 기준일: {next_candidates.get('asOf') or '확인 불가'}",
+        f"- 리포트 기준일 대조: {report_as_of or '확인 불가'}",
+        f"- 분석 기준일: {alignment.get('reportTradingDate') or report.get('asOf') or '확인 불가'}",
+        f"- 분석 범위: {candidate_scope}; 전체시장 후보를 임의 생성하지 않습니다.",
+        f"- 후보 선정 상태: {korean_status(next_candidates.get('status'))}; "
+        "우선순위는 기존 정규장 확정 버킷과 거래량·장후 관찰값의 사전식 정렬입니다.",
+        f"- 후보 총수: {next_candidates.get('candidateCount', 0)}종목; "
+        f"제외: {next_candidates.get('excludedCount', len(excluded_candidates))}종목; "
+        f"정규장 날짜 일치 검증: {len(verified_candidates)}종목; "
+        f"날짜 불일치·누락: {len(unverified_candidates)}종목",
+    ])
+    if candidate_scope == "MONITORED_UNIVERSE_EMPTY":
+        lines.append("- 관심종목 설정이 없어 후보를 생성하지 않았습니다.")
+    elif verified_candidates:
+        lines.append("- 아래 목록은 기존 우선순위 상위 10개이며 매매 추천이나 점수가 아닙니다.")
+        for candidate in verified_candidates[:10]:
+            regular = candidate.get("regularSession") or {}
+            current = candidate.get("current") or {}
+            after = candidate.get("afterSession") or {}
+            volume = candidate.get("volume") or {}
+            regular_price = regular.get("price")
+            current_price = current.get("price")
+            price_delta = (
+                current_price - regular_price
+                if isinstance(current_price, (int, float))
+                and isinstance(regular_price, (int, float))
+                else None
+            )
+            bucket_text = ", ".join(
+                CANDIDATE_BUCKET_LABELS.get(bucket, bucket)
+                for bucket in candidate.get("allBuckets", [])
+            ) or "관찰 유형 확인 불가"
+            volume_state = CANDIDATE_VOLUME_LABELS.get(
+                volume.get("volumeState"), "확인 불가"
+            )
+            price_delta_text = display_number(price_delta, "")
+            if price_delta is not None:
+                price_delta_text += "원"
+            lines.extend([
+                f"- {candidate.get('rank', '확인 불가')}. "
+                f"{candidate.get('itemName') or '이름 미확인'} "
+                f"({candidate.get('itemCode') or '코드 미확인'})",
+                f"  - 관찰 유형: {bucket_text}",
+                f"  - 정규장 확정: 기준일 {regular.get('sourceDate') or '확인 불가'}, "
+                f"기준시각 {regular.get('sourceTime') or '확인 불가'}, "
+                f"MA20 {display_candidate_state(regular.get('priceVsMA20'))}, "
+                f"MA60 {display_candidate_state(regular.get('priceVsMA60'))}, "
+                f"20일 돌파 {display_candidate_state(regular.get('breakout20'))}, "
+                f"60일 돌파 {display_candidate_state(regular.get('breakout60'))}",
+                f"  - 현재 관찰값: 가격 {display_number(current_price, '원')}, "
+                f"눌림 상태 {display_candidate_state(current.get('pullbackState'))}, "
+                f"기준시각 {current.get('sourceTime') or '확인 불가'}",
+                f"  - 정규장 대비: 정규장 가격 {display_number(regular_price, '원')}, "
+                f"현재 관찰값 차이 {price_delta_text}, "
+                f"장후 등락률 {display_number(after.get('sessionChangeRate'), '%')}",
+                f"  - 거래량: {display_number(volume.get('volumeRatio20'), '배')}, "
+                f"상태 {volume_state}; 정규장 근거 {(candidate.get('metadata') or {}).get('technicalBasis') or '확인 불가'}",
+            ])
+    elif candidates:
+        lines.append(
+            "- 정규장 원천 날짜가 리포트 기준일과 일치하는 검증 후보가 없어 목록에 표시하지 않았습니다."
+        )
+    else:
+        lines.append(
+            "- 확인 가능한 후보가 없습니다. 정규장 확정 증거 또는 기존 관찰 조건이 부족한 상태입니다."
+        )
+    if unverified_candidates:
+        lines.append("- 정규장 날짜 검증 제외:")
+        for candidate, reason_code in unverified_candidates[:10]:
+            regular = candidate.get("regularSession") or {}
+            reason = CANDIDATE_DATE_REASON_LABELS.get(reason_code, reason_code)
+            lines.append(
+                f"  - {candidate.get('itemName') or '이름 미확인'} "
+                f"({candidate.get('itemCode') or '코드 미확인'}): {reason}; "
+                f"원천 날짜 {regular.get('sourceDate') or '확인 불가'}, "
+                f"리포트 기준일 {report_as_of or '확인 불가'}"
+            )
+    if excluded_candidates:
+        lines.append("- 후보 제외 사유:")
+        for excluded in excluded_candidates[:10]:
+            reason = CANDIDATE_EXCLUSION_LABELS.get(
+                excluded.get("reason"), excluded.get("reason") or "확인 불가"
+            )
+            lines.append(
+                f"  - {excluded.get('itemName') or '이름 미확인'} "
+                f"({excluded.get('itemCode') or '코드 미확인'}): {reason}"
+            )
+
+    lines.extend(["", "### 위험·주의 요인", "", "#### 데이터 품질 경고"])
+    quality_warnings = []
+    if not alignment:
+        quality_warnings.append("기준일 정합성 검증 결과가 없습니다.")
+    elif alignment.get("status") != "OK":
+        quality_warnings.append(
+            f"기준일 정합성 {korean_status(alignment.get('status'))}: "
+            f"{', '.join(alignment.get('mismatches', [])) or '불일치·누락 세부사유 확인 불가'}"
+        )
+    if full_summary.get("status") != "AVAILABLE":
+        quality_warnings.append(
+            f"전체시장 증거 {korean_status(full_summary.get('status'))}: "
+            f"{full_summary.get('reason') or '원천 증거 확인 불가'}"
+        )
+    if report.get("coverageStatus") != "OK":
+        quality_warnings.append(
+            f"관심종목 데이터 범위 {korean_status(report.get('coverageStatus'))}"
+        )
+    if candidate_scope == "MONITORED_UNIVERSE_EMPTY":
+        quality_warnings.append("관심종목 분석이 설정되지 않았습니다.")
+    if next_candidates.get("status") == "UNAVAILABLE":
+        quality_warnings.append("정규장 기술 증거가 부족해 후보를 확정할 수 없습니다.")
+    if quality_warnings:
+        lines.extend(f"- {warning}" for warning in quality_warnings)
+    else:
+        lines.append("- 확인된 데이터 품질 경고 없음")
+
+    lines.extend(["", "#### 기술적 관찰 주의사항"])
+    technical_warnings = []
+    regular_events = report.get("technicalEventsRegularSession") or {}
+    breakout20_failed = len(regular_events.get("breakout20Failed") or [])
+    breakout60_failed = len(regular_events.get("breakout60Failed") or [])
+    if breakout20_failed or breakout60_failed:
+        technical_warnings.append(
+            f"정규장 돌파 실패 관찰: 20일 {breakout20_failed}종목, "
+            f"60일 {breakout60_failed}종목"
+        )
+    missing_ma = sum(
+        1 for candidate in verified_candidates
+        if (candidate.get("regularSession") or {}).get("priceVsMA20") in (None, "")
+        or (candidate.get("regularSession") or {}).get("priceVsMA60") in (None, "")
+    )
+    missing_volume = sum(
+        1 for candidate in verified_candidates
+        if (candidate.get("volume") or {}).get("volumeRatio20") in (None, "")
+    )
+    if missing_ma:
+        technical_warnings.append(f"후보 {missing_ma}종목의 이동평균 상태가 확인 불가입니다.")
+    if missing_volume:
+        technical_warnings.append(f"후보 {missing_volume}종목의 거래량 배수가 확인 불가입니다.")
+    if excluded_candidates:
+        technical_warnings.append(
+            f"후보 {len(excluded_candidates)}종목은 정규장 증거 부족 등으로 분석에서 제외됐습니다."
+        )
+    if unverified_candidates:
+        technical_warnings.append(
+            f"후보 {len(unverified_candidates)}종목은 정규장 원천 날짜 불일치·누락으로 표시에서 제외됐습니다."
+        )
+    if technical_warnings:
+        lines.extend(f"- {warning}" for warning in technical_warnings)
+    else:
+        lines.append("- 확인된 기술적 관찰 주의사항 없음")
 
     dynamic = report.get("dynamicUniverse", {})
     lines.extend(["", "### 동적 Universe 테마·관찰 결과", ""])
