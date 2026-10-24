@@ -43,12 +43,12 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         second = manager.build_management_result(self._dated_context([sector()], "20261022"), self.universe(), previous=first, policy=POLICY)
         self.assertEqual(second["sectors"][0]["status"], "ACTIVE")
         self.assertEqual(second["leaders"][0]["status"], "DISCOVERED")
-        third = manager.build_management_result(self._dated_context([sector()], "20261019"), self.universe(), previous=second, policy=POLICY)
+        third = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=second, policy=POLICY)
         self.assertEqual(third["leaders"][0]["status"], "ACTIVE")
 
     def test_weakening_moves_watch_then_removed(self):
-        active = manager.build_management_result(self._dated_context([sector()], "20261020"), self.universe(), policy=POLICY)
-        active = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=active, policy=POLICY)
+        active = manager.build_management_result(self._dated_context([sector()], "20261019"), self.universe(), policy=POLICY)
+        active = manager.build_management_result(self._dated_context([sector()], "20261020"), self.universe(), previous=active, policy=POLICY)
         weak = sector(score=10); weak["advancerPct"] = 0
         watch = manager.build_management_result(self._dated_context([weak], "20261021"), self.universe(), previous=active, policy=POLICY)
         self.assertEqual(watch["sectors"][0]["status"], "WATCH")
