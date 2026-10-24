@@ -34,7 +34,12 @@ class IndustryEvidenceTests(unittest.TestCase):
         self.assertEqual(verified_trading_date({"tradingDate": "2026-10-23"}), "20261023")
         self.assertEqual(verified_trading_date({"tradingDate": "20261023"}), "20261023")
         self.assertIsNone(verified_trading_date({"tradingDate": "2026-10-2"}))
+        self.assertIsNone(verified_trading_date({"tradingDate": "2026-02-30"}))
         self.assertIsNone(verified_trading_date({"generatedAt": "2026-10-23T20:59:00+09:00"}))
+
+    def test_operational_latest_industries_without_date_does_not_fabricate_one(self):
+        payload = {"generatedAt": "2026-10-23T14:41:53+00:00", "quality": {"sourceStatus": "OK"}, "industries": []}
+        self.assertIsNone(verified_trading_date(payload))
 
 
 if __name__ == "__main__":
