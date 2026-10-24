@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import naver_full_market_current as current_collector
 import daily_monitoring_baseline as baseline_builder
+import trading_date_evidence
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -485,6 +486,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             "sourceTime": current_snapshot.get("generatedAt"),
         }
     publication_context = publication_context or {}
+    trading_date_result = trading_date_evidence.verify_trading_date(
+        history_dir,
+        [row.get("code") for row in current_snapshot.get("stocks", [])],
+        session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate")
+    )
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     theme_status = str(theme_membership.get("status") or "UNUSABLE")
     theme_rows = theme_membership.get("themes") or []
@@ -563,7 +569,9 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                       "trackedDiscoveryCoverage": sum(str(code) in {str(row.get("code")) for row in tracked_signals}
                                                                        for code in tracked_codes)},
         "latest-theme-signals.json": build_theme_signals(summary["generatedAt"], features, theme_membership),
-        "latest-industries.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "quality": quality,
+        "latest-industries.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
+                                     "tradingDate": trading_date_result.get("tradingDate"),
+                                     "tradingDateEvidence": trading_date_result, "quality": quality,
                                      "membershipSourceStatus": membership.get("status"),
                                      "sourceIndustryCount": len(industries.get("industries", [])),
                                      "aggregationUsableIndustryCount": len(industry_rows), "industries": industry_rows},
@@ -575,6 +583,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "candidates": leader_rows},
         "latest-changes.json": compare_breadth(previous_summary, summary),
         "latest-quality.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
+                                "tradingDate": trading_date_result.get("tradingDate"), "tradingDateEvidence": trading_date_result,
                                 "currentCount": len(current_codes), "currentCoveragePct": pct(len(current_codes), current_snapshot["expectedCount"]),
                                 # Deprecated compatibility alias: this is the
                                 # canonical file diagnostic, never baseline coverage.
