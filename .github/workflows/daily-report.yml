@@ -119,7 +119,7 @@ jobs:
 
           alignment = x.get("dateAlignment") or {}
           print("dateAlignment:", alignment.get("status"))
-          if x["status"] == "OK" and alignment.get("status") not in ("OK", "NOT_APPLICABLE"):
+          if x["status"] == "OK" and alignment.get("status") != "OK":
               raise SystemExit("Invalid OK date alignment")
 
           if research != enabled:

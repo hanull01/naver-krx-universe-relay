@@ -518,6 +518,24 @@ class DailyReportTests(unittest.TestCase):
                 report["nextSessionCandidates"]["priority"][0]["primaryBucket"],
                 "REGULAR_BREAKOUT_FAILED_AFTER_RECOVERY",
             )
+            self.assertEqual(report["status"], "PARTIAL")
+            self.assertEqual(report["dateAlignment"]["status"], "UNAVAILABLE")
+            self.assertIn(report["dateAlignment"]["fullMarketReason"],
+                          {"MISSING_EVIDENCE_FILE", "BASELINE_DATE_MISMATCH"})
+            report["dateAlignment"] = {
+                "status": "UNAVAILABLE", "fullMarketStatus": "UNAVAILABLE",
+                "fullMarketReason": "MISSING_EVIDENCE_FILE", "reportTradingDate": "2026-10-06",
+                "indexAlignmentStatus": "MISMATCH", "indexSourceDates": ["2026-10-07"],
+                "mismatches": ["REPORT_VS_INDEX_SOURCE_DATE"],
+                "missingEvidence": ["FULL_MARKET_EVIDENCE"],
+            }
+            markdown = root / "report.md"
+            daily_report.write_markdown(report, markdown)
+            rendered = markdown.read_text(encoding="utf-8")
+            self.assertIn("Full-market 상태: UNAVAILABLE", rendered)
+            self.assertIn("사유: MISSING_EVIDENCE_FILE", rendered)
+            self.assertIn("확인된 지수 날짜: 2026-10-07", rendered)
+            self.assertIn("REPORT_VS_INDEX_SOURCE_DATE", rendered)
             self.assertEqual(report["nextSessionCandidates"]["asOf"], "2026-10-06")
             self.assertEqual(report["coverage"]["researchStockCount"], 0)
             self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_CONFIGURED")
@@ -546,6 +564,31 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(report["coverage"]["enabledStockCount"], 0)
             self.assertEqual(report["monitoredUniverse"]["scope"], "MONITORED_UNIVERSE_EMPTY")
             self.assertEqual(report["monitoredUniverse"]["configuredCount"], 0)
+
+    def test_build_report_keeps_normal_ok_when_date_alignment_is_ok(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            files = {
+                "universe.json": {"stocks": [{"itemCode": "000001", "stockName": "A", "enabled": True}],
+                                  "sectors": {}, "themes": {}, "watchlists": {}},
+                "quotes.json": {"status": "ok", "fresh": True, "datas": [{
+                    "itemCode": "000001", "closePrice": 103, "fluctuationsRatio": 3,
+                }]},
+                "technicals.json": {"datas": [{"itemCode": "000001", "ma20": 100}]},
+                "states.json": {"datas": [{"itemCode": "000001", "priceVsMA20": "above"}]},
+                "research.json": {"stocks": []},
+            }
+            for name, payload in files.items():
+                (root / name).write_text(json.dumps(payload), encoding="utf-8")
+            with patch.multiple(
+                    daily_report,
+                    UNIVERSE_PATH=root / "universe.json", QUOTES_PATH=root / "quotes.json",
+                    TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
+                    RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
+                    MONITORING_PATH=root / "missing-monitoring"), \
+                    patch.object(daily_report, "date_alignment", return_value={"status": "OK"}):
+                report = daily_report.build_report("2026-10-06")
+            self.assertEqual(report["status"], "OK")
 
     def test_coverage_status_empty_configured_universe_is_distinct(self):
         self.assertEqual(

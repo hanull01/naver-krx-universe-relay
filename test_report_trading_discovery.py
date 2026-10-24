@@ -96,7 +96,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
             discovery.write_text(json.dumps(self.published(["005930", "999999"])), encoding="utf-8")
             report = self.build(discovery, previous)
-            self.assertEqual(report["status"], "OK")
+            self.assertEqual(report["status"], "PARTIAL")
             section = report["kiwoomPreviousCandidates"]
             self.assertEqual(section["status"], "AVAILABLE")
             self.assertEqual(section["missingCount"], 1)

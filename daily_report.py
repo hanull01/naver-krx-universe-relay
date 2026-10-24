@@ -1217,7 +1217,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     monitored_regular = monitored_evidence.get("regularSession", regular_breadth)
 
     report_status = "OK" if coverage_state == "OK" else "DEGRADED"
-    if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or alignment["status"] == "PARTIAL":
+    if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or alignment["status"] != "OK":
         report_status = "PARTIAL"
     monitored_scope = (
         "MONITORED_UNIVERSE_EMPTY" if not enabled
@@ -1372,12 +1372,17 @@ def write_markdown(report, path):
         ])
 
     alignment = report.get("dateAlignment") or {}
-    if alignment.get("status") == "PARTIAL":
+    if alignment.get("status") != "OK":
         lines.extend([
             "",
-            f"> **기준일 정합성 경고:** 리포트 기준일 {alignment.get('reportTradingDate') or '확인 불가'}과 "
+            f"> **기준일 정합성 경고:** 상태 {alignment.get('status') or '확인 불가'}, "
+            f"리포트 기준일 {alignment.get('reportTradingDate') or '확인 불가'}과 "
             "지수·시장 스냅샷·이동평균 자료의 원천 기준일을 동일 시점으로 간주하지 않습니다.",
-            f"> 원천 날짜 차이: {', '.join(alignment.get('mismatches', [])) or '확인 불가'}; "
+            f"> Full-market 상태: {alignment.get('fullMarketStatus') or '확인 불가'}; "
+            f"사유: {alignment.get('fullMarketReason') or '없음'}",
+            f"> 지수 날짜 검증: {alignment.get('indexAlignmentStatus') or '확인 불가'}; "
+            f"확인된 지수 날짜: {', '.join(alignment.get('indexSourceDates', [])) or '확인 불가'}",
+            f"> 원천 날짜 차이: {', '.join(alignment.get('mismatches', [])) or '없음'}; "
             f"누락 증거: {', '.join(alignment.get('missingEvidence', [])) or '없음'}",
         ])
 
