@@ -38,21 +38,21 @@ class DynamicUniverseManagerTests(unittest.TestCase):
                 "leaders": {"sector": {}, "theme": {}, "watchlist": {}}}
 
     def test_sector_requires_persistence_then_activates(self):
-        first = manager.build_management_result(self._dated_context([sector()], "20261021"), self.universe(), policy=POLICY)
+        first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
         self.assertEqual(first["sectors"][0]["status"], "DISCOVERED")
-        second = manager.build_management_result(self._dated_context([sector()], "20261022"), self.universe(), previous=first, policy=POLICY)
+        second = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=first, policy=POLICY)
         self.assertEqual(second["sectors"][0]["status"], "ACTIVE")
         self.assertEqual(second["leaders"][0]["status"], "DISCOVERED")
         third = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=second, policy=POLICY)
         self.assertEqual(third["leaders"][0]["status"], "ACTIVE")
 
     def test_weakening_moves_watch_then_removed(self):
-        active = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
-        active = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=active, policy=POLICY)
+        active = manager.build_management_result(self._dated_context([sector()], "20261019"), self.universe(), policy=POLICY)
+        active = manager.build_management_result(self._dated_context([sector()], "20261020"), self.universe(), previous=active, policy=POLICY)
         weak = sector(score=10); weak["advancerPct"] = 0
-        watch = manager.build_management_result(self._dated_context([weak], "20261024"), self.universe(), previous=active, policy=POLICY)
+        watch = manager.build_management_result(self._dated_context([weak], "20261021"), self.universe(), previous=active, policy=POLICY)
         self.assertEqual(watch["sectors"][0]["status"], "WATCH")
-        removed = manager.build_management_result(self._dated_context([weak], "20261024"), self.universe(), previous=watch, policy=POLICY)
+        removed = manager.build_management_result(self._dated_context([weak], "20261022"), self.universe(), previous=watch, policy=POLICY)
         self.assertEqual(removed["sectors"][0]["status"], "REMOVED")
 
     def test_verified_theme_and_missing_theme_handling(self):
@@ -147,7 +147,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertEqual(len(repeated["leaders"]), len(first["leaders"]))
 
     def test_undated_legacy_state_is_frozen(self):
-        previous = {"sectors": [{"id": "반도체", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
+        previous = {"sectors": [{"id": "261", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
         result = manager.build_management_result(self.context([sector()]), self.universe(), previous=previous, policy=POLICY)
         row = result["sectors"][0]
         self.assertEqual((row["status"], row["qualifyStreak"], row["weakenStreak"]), ("ACTIVE", 7, 0))
