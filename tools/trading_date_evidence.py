@@ -38,28 +38,49 @@ def _read_latest(path):
         return None, "DUPLICATE_CANONICAL_DATE"
     return max(dates), None
 
-def verify_trading_date(history_dir, current_codes, session_date=None):
+def _explicit_session_dates(payload):
+    if not isinstance(payload, dict):
+        return []
+    values = []
+    for key in ("tradingDate", "tradeDate", "marketDate"):
+        if payload.get(key) is not None:
+            values.append(str(payload[key]))
+    rows = payload.get("stocks") or []
+    row_values = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        for key in ("tradingDate", "tradeDate", "marketDate", "localDate", "date"):
+            if row.get(key) is not None:
+                row_values.append(str(row[key]))
+                break
+    if row_values:
+        values.extend(row_values)
+    return values
+
+def verify_trading_date(history_dir, current_codes, session_date=None, current_snapshot=None):
     """Return a verified date, or null with a diagnostic reason.
 
-    A canonical date is accepted only when it is valid and independently
-    corroborated by the current snapshot's explicit session date.  Execution
-    timestamps, generatedAt, and a date mode are never used as substitutes.
+    Canonical dates are accepted only when corroborated by an explicit market
+    session date from the supplied snapshot.  Execution timestamps,
+    generatedAt, and a date mode are never substitutes.
     """
     codes = sorted({str(code) for code in (current_codes or []) if code})
-    observed = {}
-    invalid = {}
+    observed, invalid = {}, {}
     for code in codes:
         latest, reason = _read_latest(Path(history_dir) / (code + ".jsonl"))
         if reason:
             invalid[code] = reason
         elif latest:
             observed[code] = latest
-    candidate = str(session_date or "")
-    if not candidate or not _valid_date(candidate):
+    explicit = [str(session_date)] if session_date is not None else _explicit_session_dates(current_snapshot)
+    explicit = [value.replace("-", "").replace("/", "") for value in explicit]
+    candidate = explicit[0] if explicit and _valid_date(explicit[0]) else ""
+    if not candidate or any(value != candidate or not _valid_date(value) for value in explicit):
         return {"tradingDate": None, "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE",
                 "observedDateCounts": dict(Counter(observed.values())),
                 "missingCanonicalCodes": sorted(set(codes) - set(observed)),
-                "invalidCanonicalCodes": invalid}
+                "invalidCanonicalCodes": invalid, "explicitSessionDates": sorted(set(explicit))}
     counts = Counter(observed.values())
     if candidate not in counts:
         reason = "CANONICAL_SESSION_DATE_MISMATCH"
@@ -70,8 +91,8 @@ def verify_trading_date(history_dir, current_codes, session_date=None):
     else:
         return {"tradingDate": candidate, "reason": "VERIFIED_CANONICAL_SESSION",
                 "observedDateCounts": dict(counts), "missingCanonicalCodes": [],
-                "invalidCanonicalCodes": {}}
+                "invalidCanonicalCodes": {}, "explicitSessionDates": [candidate]}
     return {"tradingDate": None, "reason": reason,
             "observedDateCounts": dict(counts),
             "missingCanonicalCodes": sorted(set(codes) - set(observed)),
-            "invalidCanonicalCodes": invalid}
+            "invalidCanonicalCodes": invalid, "explicitSessionDates": [candidate]}
