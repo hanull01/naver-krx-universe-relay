@@ -38,9 +38,9 @@ class DynamicUniverseManagerTests(unittest.TestCase):
                 "leaders": {"sector": {}, "theme": {}, "watchlist": {}}}
 
     def test_sector_requires_persistence_then_activates(self):
-        first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)
+        first = manager.build_management_result(self._dated_context([sector()], "20261021"), self.universe(), policy=POLICY)
         self.assertEqual(first["sectors"][0]["status"], "DISCOVERED")
-        second = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=first, policy=POLICY)
+        second = manager.build_management_result(self._dated_context([sector()], "20261022"), self.universe(), previous=first, policy=POLICY)
         self.assertEqual(second["sectors"][0]["status"], "ACTIVE")
         self.assertEqual(second["leaders"][0]["status"], "DISCOVERED")
         third = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=second, policy=POLICY)
@@ -147,7 +147,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertEqual(len(repeated["leaders"]), len(first["leaders"]))
 
     def test_undated_legacy_state_is_frozen(self):
-        previous = {"sectors": [{"id": "261", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
+        previous = {"sectors": [{"id": "반도체", "status": "ACTIVE", "qualifyStreak": 7, "weakenStreak": 0}], "themes": [], "leaders": []}
         result = manager.build_management_result(self.context([sector()]), self.universe(), previous=previous, policy=POLICY)
         row = result["sectors"][0]
         self.assertEqual((row["status"], row["qualifyStreak"], row["weakenStreak"]), ("ACTIVE", 7, 0))
