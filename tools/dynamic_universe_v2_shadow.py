@@ -65,9 +65,14 @@ def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
         trading_values = [_num(stock.get("accumulatedTradingValue")) for stock in valid_stocks]
         trading_values = [value for value in trading_values if value is not None]
         if trading_values:
+            total_trading_value = sum(trading_values)
+            top3_concentration = (
+                0.0 if total_trading_value == 0 else
+                sum(sorted(trading_values, reverse=True)[:3]) / total_trading_value * 100
+            )
             metrics.setdefault("tradingValue", {"coveragePct": len(trading_values) / len(valid_stocks) * 100,
-                                                  "total": sum(trading_values),
-                                                  "top3ConcentrationPct": sum(sorted(trading_values, reverse=True)[:3]) / sum(trading_values) * 100})
+                                                  "total": total_trading_value,
+                                                  "top3ConcentrationPct": top3_concentration})
         trading = metrics.get("tradingValue") if isinstance(metrics.get("tradingValue"), dict) else trading
     advance = _pct(metrics.get("advancePct", metrics.get("advancerPct")))
     rel = _num(metrics.get("relativeStrengthVsMarket"))
