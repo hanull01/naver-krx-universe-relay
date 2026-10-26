@@ -8,13 +8,16 @@ def row(code="000001", assetType="STOCK", **extra):
     result = {"code": code, "assetType": assetType, "openPrice": 10,
               "highPrice": 12, "lowPrice": 9, "currentPrice": 11,
               "accumulatedTradingVolume": 100, "accumulatedTradingValue": 1000,
-              "marketStatus": "CLOSE", "tradingSessionType": "AFTER_MARKET"}
+              "marketStatus": "CLOSE", "tradingSessionType": "AFTER_MARKET",
+              "sourceMarketCode": "0", "tradeStopYn": "N", "tradableStatus": "TRADABLE"}
     result.update(extra)
     return result
 
 
 def snapshot(rows, date="20261019"):
     return {"source": "NAVER_STOCKLIST_CURRENT", "sourceMarket": "KRX",
+            "sourceMarketEvidence": {"provider": "NAVER", "requestTradeType": "KRX",
+                                      "responseField": "sosok", "markets": ["KOSPI", "KOSDAQ"]},
             "tradingDate": date, "generatedAt": "2026-10-19T20:30:00+09:00",
             "stocks": rows}
 
@@ -73,6 +76,8 @@ class FinalDailyHistoryTests(unittest.TestCase):
 
     def test_row_level_explicit_local_date_can_drive_final_candidate(self):
         payload = {"source": "NAVER_STOCKLIST_CURRENT", "sourceMarket": "KRX",
+                   "sourceMarketEvidence": {"provider": "NAVER", "requestTradeType": "KRX",
+                                             "responseField": "sosok", "markets": ["KOSPI", "KOSDAQ"]},
                    "generatedAt": "2026-10-19T20:30:00+09:00",
                    "stocks": [row("000001", localDate="20261019")]}
         result = monitoring_daily_payload(payload,

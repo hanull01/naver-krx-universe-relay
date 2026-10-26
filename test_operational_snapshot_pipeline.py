@@ -26,6 +26,7 @@ def raw(code, market_status="CLOSED", **changes):
     row = {
         "itemcode": code,
         "itemname": f"테스트{code}",
+        "sosok": "1" if code == "000002" else "0",
         "nowPrice": "100",
         "prevChangePrice": "2",
         "prevChangeRate": "2.04",
@@ -175,7 +176,7 @@ class OperationalSnapshotPipelineTests(unittest.TestCase):
 
             def fetch(market, index, _size):
                 pages = {"KOSPI": [[rows["000001"]], []],
-                         "KOSDAQ": [[raw("999999", marketStatus="CLOSED")], []]}
+                         "KOSDAQ": [[raw("999999", marketStatus="CLOSED", sosok="1")], []]}
                 return pages[market][index]
 
             snapshot = naver_full_market_current.collect_snapshot(
