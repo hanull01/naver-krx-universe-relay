@@ -1,6 +1,6 @@
 import unittest
 
-from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
+from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize, _evaluate, _trading_value_summary
 
 
 class DynamicUniverseV2ShadowTests(unittest.TestCase):
@@ -64,6 +64,28 @@ class DynamicUniverseV2ShadowTests(unittest.TestCase):
         self.assertEqual(summary["themes"]["count"], 1)
         self.assertEqual(result["industries"][0]["v1Status"], "ACTIVE")
         self.assertEqual(result["themes"][0]["v1Status"], "WATCH")
+
+    def test_zero_trading_value_total_does_not_divide_by_zero(self):
+        row = {"id": "theme-1", "name": "테스트", "memberCount": 2, "metrics": {
+            "relativeStrengthVsMarket": 1, "persistence": {"availableTradingDays": 5}},
+            "stocks": [{"changeRate": 1, "above_ma20": True, "accumulatedTradingValue": 0},
+                       {"changeRate": 1, "above_ma20": True, "accumulatedTradingValue": 0}]}
+        result = _evaluate(row, "theme")
+        self.assertEqual(result["components"]["turnoverParticipation"], 100.0)
+        summary = _trading_value_summary([0.0, 0.0], 2)
+        self.assertEqual(summary["total"], 0.0)
+        self.assertIsNone(summary["top3ConcentrationPct"])
+
+    def test_positive_trading_value_total_keeps_concentration_calculation(self):
+        row = {"id": "theme-1", "name": "테스트", "memberCount": 2, "metrics": {
+            "relativeStrengthVsMarket": 1, "persistence": {"availableTradingDays": 5}},
+            "stocks": [{"changeRate": 1, "above_ma20": True, "accumulatedTradingValue": 100},
+                       {"changeRate": 1, "above_ma20": True, "accumulatedTradingValue": 200}]}
+        result = _evaluate(row, "theme")
+        self.assertEqual(result["components"]["turnoverParticipation"], 100.0)
+        summary = _trading_value_summary([100.0, 200.0], 2)
+        self.assertEqual(summary["total"], 300.0)
+        self.assertEqual(summary["top3ConcentrationPct"], 100.0)
 
 
 if __name__ == "__main__":

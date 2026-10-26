@@ -31,6 +31,16 @@ def _pct(value: Any) -> Optional[float]:
     return None if value is None else max(0.0, min(100.0, value))
 
 
+def _trading_value_summary(values: List[float], member_count: int) -> Dict[str, Optional[float]]:
+    total = sum(values)
+    concentration = None if total == 0 else sum(sorted(values, reverse=True)[:3]) / total * 100
+    return {
+        "coveragePct": len(values) / member_count * 100,
+        "total": total,
+        "top3ConcentrationPct": concentration,
+    }
+
+
 def _weighted(parts: Dict[str, Optional[float]]) -> Tuple[Optional[float], List[str], float]:
     missing = [name for name, value in parts.items() if value is None]
     available_weight = sum(WEIGHTS[name] for name, value in parts.items() if value is not None)
@@ -65,9 +75,7 @@ def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
         trading_values = [_num(stock.get("accumulatedTradingValue")) for stock in valid_stocks]
         trading_values = [value for value in trading_values if value is not None]
         if trading_values:
-            metrics.setdefault("tradingValue", {"coveragePct": len(trading_values) / len(valid_stocks) * 100,
-                                                  "total": sum(trading_values),
-                                                  "top3ConcentrationPct": sum(sorted(trading_values, reverse=True)[:3]) / sum(trading_values) * 100})
+            metrics.setdefault("tradingValue", _trading_value_summary(trading_values, len(valid_stocks)))
         trading = metrics.get("tradingValue") if isinstance(metrics.get("tradingValue"), dict) else trading
     advance = _pct(metrics.get("advancePct", metrics.get("advancerPct")))
     rel = _num(metrics.get("relativeStrengthVsMarket"))
