@@ -38,7 +38,7 @@ def raw(code, market_status="CLOSED", **changes):
         "week52HighPrice": "120",
         "week52LowPrice": "80",
         "marketStatus": market_status,
-        "tradingSessionType": "REGULAR",
+        "tradingSessionType": "AFTER_MARKET",
         "tradeStopYn": "N",
         "tradableStatus": "TRADABLE",
         "localDate": TARGET,

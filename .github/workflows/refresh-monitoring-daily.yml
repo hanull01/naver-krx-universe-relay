@@ -59,7 +59,7 @@ jobs:
             test_monitoring_local_date_collection.py \
             test_daily_monitoring_baseline.py -v
 
-      - name: Check KST regular-close window
+      - name: Check KST final-close window
         id: closing_window
         if: steps.market_day.outputs.run == 'true'
         shell: bash
@@ -70,11 +70,11 @@ jobs:
           target_date=$(python -c 'import json,sys; print(json.load(sys.stdin)["targetDate"])' <<<"$window")
           echo "status=$status" >> "$GITHUB_OUTPUT"
           echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
-          if [ "$status" = "AFTER_REGULAR_CLOSE" ]; then
+          if [ "$status" = "AFTER_FINAL_CLOSE" ]; then
             echo "eligible=true" >> "$GITHUB_OUTPUT"
           else
             echo "eligible=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::BEFORE_REGULAR_CLOSE: skipping NAVER fetch, retry, and publish."
+            echo "::notice::BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish."
           fi
 
       - name: Sync latest main before collection

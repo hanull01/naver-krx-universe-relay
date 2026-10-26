@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 
 KST = ZoneInfo("Asia/Seoul")
 TERMINAL_MARKERS = {"CLOSED", "AFTER_MARKET_CLOSED", "FINAL"}
-OFFICIAL_POLICY = "NAVER_OFFICIAL_POST_20_CANDIDATE"
+OFFICIAL_POLICY = "KRX_AFTER_MARKET_CLOSE_20_CANDIDATE"
 
 
 def _date(value):
@@ -40,6 +40,8 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
                    or snapshot.get("localDate"))
     generated = snapshot.get("generatedAt")
     errors, warnings = [], []
+    if snapshot.get("source") != "NAVER_STOCKLIST_CURRENT" or snapshot.get("sourceMarket") != "KRX":
+        errors.append("SNAPSHOT_SOURCE_NOT_KRX")
     if not target:
         errors.append("TRADING_DATE_MISSING")
     if not generated:
@@ -83,6 +85,10 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
             errors.append(f"VOLUME_INVALID:{code}")
         if _number(row.get("accumulatedTradingValue")) and row["accumulatedTradingValue"] < 0:
             errors.append(f"VALUE_INVALID:{code}")
+        if str(row.get("marketStatus") or "").upper() not in {"CLOSE", "CLOSED"}:
+            errors.append(f"MARKET_NOT_CLOSED:{code}")
+        if str(row.get("tradingSessionType") or "").upper() != "AFTER_MARKET":
+            errors.append(f"AFTER_MARKET_EVIDENCE_MISSING:{code}")
 
     baseline_date = _date((baseline or {}).get("asOfDate"))
     if baseline_date and target:
@@ -105,7 +111,7 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     if terminal:
         session_status = "EXPLICIT_TERMINAL"
     elif official_candidate:
-        session_status = "NAVER_OFFICIAL_POST_20"
+        session_status = "KRX_AFTER_MARKET_CLOSE_20"
     else:
         session_status = "UNKNOWN"
         warnings.append("SESSION_FINALITY_UNKNOWN")

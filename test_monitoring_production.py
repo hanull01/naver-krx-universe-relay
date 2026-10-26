@@ -74,10 +74,16 @@ class MonitoringProductionTests(unittest.TestCase):
         prior = {"historyStatus": "OK", "asOfDate": "20260930", "count": 1, "authoritativeCount": 1, "coveragePct": 100.0}
         current = dict(prior, asOfDate="20261001")
         regular = datetime(2026, 10, 1, 10, 0, tzinfo=KST)
-        after = datetime(2026, 10, 1, 16, 0, tzinfo=KST)
+        after = datetime(2026, 10, 1, 20, 0, tzinfo=KST)
         self.assertEqual(runner.baseline_freshness(prior, regular, open_day)[1], "VALID_PREVIOUS_TRADING_DAY")
         self.assertFalse(runner.baseline_freshness(current, regular, open_day)[0])
         self.assertEqual(runner.baseline_freshness(current, after, open_day)[1], "VALID_CURRENT_DAY_FINAL")
+
+        before_after_market_close = datetime(2026, 10, 1, 19, 59, tzinfo=KST)
+        self.assertEqual(
+            runner.baseline_freshness(current, before_after_market_close, open_day)[1],
+            "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION",
+        )
 
     def test_scalar_baseline_readiness_accepts_valid_without_publication_status(self):
         baseline = {"asOfDate": "20261002", "historyStatus": "OK", "count": 2,
@@ -122,7 +128,7 @@ class MonitoringProductionTests(unittest.TestCase):
                  "count": 2, "authoritativeCount": 2,
                  "coveragePct": 100.0}
         current = dict(prior, asOfDate="20261012")
-        after = datetime(2026, 10, 12, 16, 0, tzinfo=KST)
+        after = datetime(2026, 10, 12, 20, 0, tzinfo=KST)
         self.assertEqual(runner.collection_readiness(prior, after, market_day)[1], "READY")
         self.assertEqual(runner.collection_readiness(current, after, market_day)[1], "READY")
 
