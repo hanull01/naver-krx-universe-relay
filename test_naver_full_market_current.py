@@ -151,6 +151,7 @@ class FullMarketCurrentTests(unittest.TestCase):
                 lambda: "2026-10-01T10:00:00+09:00"
             )
         self.assertEqual(snapshot["status"], "SUCCESS")
+        self.assertEqual(snapshot["qualityWarnings"], [])
         self.assertEqual(snapshot["attemptCount"], 2)
         self.assertFalse(snapshot["attemptDiagnostics"][0]["structurallyValid"])
         self.assertTrue(snapshot["attemptDiagnostics"][1]["structurallyValid"])
@@ -193,7 +194,7 @@ class FullMarketCurrentTests(unittest.TestCase):
             snapshot = current.collect_snapshot(universe, fetch, 2, 3, 0)
         self.assertEqual(snapshot["status"], "COMPLETE_RECONCILIATION_PENDING")
         self.assertEqual(snapshot["attemptCount"], 1)
-        self.assertNotIn("qualityWarnings", snapshot)
+        self.assertEqual(snapshot["qualityWarnings"], ["UNIVERSE_COMPOSITION_CHANGED"])
         self.assertEqual(snapshot["previousUniverseMissingCodes"], ["123456"])
         self.assertEqual(snapshot["previousUniverseNewCodes"], ["999999"])
 

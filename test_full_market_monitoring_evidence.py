@@ -505,6 +505,8 @@ class EvidenceTests(unittest.TestCase):
     def test_reconciliation_pending_snapshot_remains_analyzable_with_quality_status(self):
         snapshot = {"status": "COMPLETE_RECONCILIATION_PENDING", "generatedAt": "t", "expectedCount": 1,
                     "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [], "missingCodes": [],
+                    "qualityStatus": "WARNING",
+                    "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"],
                     "universeDelta": {"added": ["005930"], "verificationStatus": "PENDING_EXTERNAL_VERIFICATION"},
                     "stocks": [current()]}
         with tempfile.TemporaryDirectory() as directory:
@@ -512,7 +514,11 @@ class EvidenceTests(unittest.TestCase):
             (root / "005930.jsonl").write_text(json.dumps(history("20260930", 100)) + "\n", encoding="utf-8")
             built, _ = evidence.build_evidence(snapshot, root, None, None, None, "20261001")
         self.assertEqual(built["latest-quality.json"]["collectionQualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
-        self.assertEqual(built["latest-summary.json"]["fullMarket"]["qualityStatus"], "COMPLETE_RECONCILIATION_PENDING")
+        self.assertEqual(built["latest-summary.json"]["fullMarket"]["qualityStatus"], "WARNING")
+        self.assertEqual(
+            built["latest-summary.json"]["fullMarket"]["qualityWarnings"],
+            ["UNIVERSE_COMPOSITION_CHANGED"],
+        )
 
     def test_leaders_include_evidence_backed_reasons_and_technical_checks(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-01T10:00:00+09:00", "expectedCount": 2,
