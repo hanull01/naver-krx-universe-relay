@@ -25,7 +25,10 @@ FORMAT = "COLUMN_ARRAY_V1"
 OPTIONAL_COLUMNS = ("open", "low", "value")
 MARKETS = ("KOSPI", "KOSDAQ")
 KST = ZoneInfo("Asia/Seoul")
+# A regular-session close is not a FINAL observation.  The rolling state is
+# only eligible after the KRX after-market window has ended at 20:00 KST.
 REGULAR_CLOSE_KST = time(15, 30)
+FINAL_CLOSE_KST = time(20, 0)
 COLLECT_MAX_WORKERS = 4
 COLLECT_MAX_WORKERS_LIMIT = 8
 COLLECT_RETRIES = 3
@@ -67,13 +70,14 @@ def closing_window(now=None):
         raise ValueError("closing-window time must be timezone-aware")
     else:
         now = now.astimezone(KST)
-    after_close = now.time() >= REGULAR_CLOSE_KST
+    after_close = now.time() >= FINAL_CLOSE_KST
     return {
-        "status": "AFTER_REGULAR_CLOSE" if after_close else "BEFORE_REGULAR_CLOSE",
+        "status": "AFTER_FINAL_CLOSE" if after_close else "BEFORE_FINAL_CLOSE",
         "eligible": after_close,
         "nowKst": now.isoformat(),
         "targetDate": now.date().isoformat(),
         "regularCloseKst": "15:30",
+        "finalCloseKst": "20:00",
     }
 
 

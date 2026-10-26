@@ -293,7 +293,9 @@ def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day
     # snapshot has been validated and appended.
     if as_of == previous:
         return True, "VALID_PREVIOUS_TRADING_DAY", previous
-    if as_of == today.strftime("%Y%m%d") and session in {"AFTER", "CLOSED"}:
+    # 15:30 regular close and the 20:00 after-market close are separate
+    # states.  A same-day baseline is FINAL only after the latter.
+    if as_of == today.strftime("%Y%m%d") and session == "CLOSED":
         return True, "VALID_CURRENT_DAY_FINAL", previous
     if as_of == today.strftime("%Y%m%d"):
         return False, "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION", previous

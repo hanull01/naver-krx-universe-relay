@@ -252,6 +252,7 @@ jobs:
           import json, sys
           from pathlib import Path
           from market_indices import validate_final_payload
+          from tools.final_daily_evidence import validate_snapshot
 
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           indices = json.loads(Path("data/market/indices.json").read_text(encoding="utf-8"))
@@ -271,6 +272,14 @@ jobs:
           except ValueError as exc:
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + str(exc))
           target_date = index_evidence["targetDate"]
+
+          final_evidence = validate_snapshot(
+              snapshot, json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8")),
+              target_date=target_date, expected_codes=expected)
+          print(json.dumps({"finalDailyEvidence": final_evidence}, ensure_ascii=False))
+          if not final_evidence["finalEligible"]:
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:FINAL_DAILY_EVIDENCE_UNUSABLE:" +
+                               ",".join(final_evidence["errors"]))
 
           Path(sys.argv[2]).write_text(target_date, encoding="utf-8")
           print(json.dumps({"status": "READY", "targetDate": target_date,

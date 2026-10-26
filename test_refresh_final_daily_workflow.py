@@ -43,6 +43,12 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("collection_finished_at", self.final_step)
         self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
 
+    def test_final_daily_evidence_is_a_publication_gate(self):
+        self.assertIn("from tools.final_daily_evidence import validate_snapshot", self.final_step)
+        self.assertIn("final_evidence = validate_snapshot", self.final_step)
+        self.assertIn('if not final_evidence["finalEligible"]:', self.final_step)
+        self.assertIn("FINAL_DAILY_HISTORY_NOT_READY:FINAL_DAILY_EVIDENCE_UNUSABLE", self.final_step)
+
     def test_index_collection_records_a_fresh_execution_window(self):
         self.assertIn("started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)
         self.assertIn("finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)

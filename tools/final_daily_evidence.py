@@ -16,7 +16,8 @@ from zoneinfo import ZoneInfo
 
 KST = ZoneInfo("Asia/Seoul")
 TERMINAL_MARKERS = {"CLOSED", "AFTER_MARKET_CLOSED", "FINAL"}
-OFFICIAL_POLICY = "NAVER_OFFICIAL_POST_20_CANDIDATE"
+OFFICIAL_POLICY = "KRX_AFTER_MARKET_CLOSE_20_CANDIDATE"
+MARKET_CODES = {"0": "KOSPI", "1": "KOSDAQ"}
 
 
 def _date(value):
@@ -40,6 +41,15 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
                    or snapshot.get("localDate"))
     generated = snapshot.get("generatedAt")
     errors, warnings = [], []
+    if snapshot.get("source") != "NAVER_STOCKLIST_CURRENT":
+        errors.append("SNAPSHOT_SOURCE_UNVERIFIED")
+    evidence = snapshot.get("sourceMarketEvidence") or {}
+    if (snapshot.get("sourceMarket") != "KRX"
+            or evidence.get("provider") != "NAVER"
+            or evidence.get("requestTradeType") != "KRX"
+            or evidence.get("responseField") != "sosok"
+            or set(evidence.get("markets") or []) != {"KOSPI", "KOSDAQ"}):
+        errors.append("SOURCE_MARKET_EVIDENCE_UNVERIFIED")
     if not target:
         errors.append("TRADING_DATE_MISSING")
     if not generated:
@@ -76,6 +86,13 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
 
     for row in rows:
         code = str(row.get("code") or "")
+        raw_source_market_code = row.get("sourceMarketCode")
+        source_market = MARKET_CODES.get("" if raw_source_market_code is None
+                                         else str(raw_source_market_code))
+        if source_market not in {"KOSPI", "KOSDAQ"}:
+            errors.append(f"SOURCE_MARKET_CODE_UNVERIFIED:{code}")
+        elif str(row.get("market") or "").upper() != source_market:
+            errors.append(f"SOURCE_MARKET_CODE_MISMATCH:{code}")
         prices = [row.get(key) for key in ("openPrice", "highPrice", "lowPrice", "currentPrice")]
         if not all(_number(value) and value >= 0 for value in prices):
             errors.append(f"OHLCV_PRICE_INVALID:{code}")
@@ -83,6 +100,26 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
             errors.append(f"VOLUME_INVALID:{code}")
         if _number(row.get("accumulatedTradingValue")) and row["accumulatedTradingValue"] < 0:
             errors.append(f"VALUE_INVALID:{code}")
+        market_status = str(row.get("marketStatus") or "").upper()
+        session = str(row.get("tradingSessionType") or "").upper()
+        closed_status = (market_status in {"CLOSE", "CLOSED"}
+                         or market_status in TERMINAL_MARKERS
+                         or session in TERMINAL_MARKERS)
+        if not closed_status:
+            errors.append(f"MARKET_NOT_CLOSED:{code}")
+        halted = (str(row.get("tradeStopYn") or "").upper() == "Y"
+                  or str(row.get("tradableStatus") or "").upper() in {"HALTED", "SUSPENDED", "STOPPED"})
+        if halted:
+            row["sessionEvidence"] = "TRADE_STOPPED"
+        elif market_status in TERMINAL_MARKERS or session in TERMINAL_MARKERS:
+            row["sessionEvidence"] = "EXPLICIT_TERMINAL"
+        elif session == "AFTER_MARKET":
+            row["sessionEvidence"] = "AFTER_MARKET"
+        elif session in {"REGULAR_CLOSED", "REGULAR_ONLY"} or row.get("afterMarketEligible") is False:
+            row["sessionEvidence"] = "AFTER_MARKET_EXCLUDED"
+        else:
+            row["sessionEvidence"] = "UNVERIFIED"
+            errors.append(f"SESSION_EVIDENCE_UNVERIFIED:{code}")
 
     baseline_date = _date((baseline or {}).get("asOfDate"))
     if baseline_date and target:
@@ -105,7 +142,7 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     if terminal:
         session_status = "EXPLICIT_TERMINAL"
     elif official_candidate:
-        session_status = "NAVER_OFFICIAL_POST_20"
+        session_status = "KRX_AFTER_MARKET_CLOSE_20"
     else:
         session_status = "UNKNOWN"
         warnings.append("SESSION_FINALITY_UNKNOWN")
@@ -127,6 +164,7 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
         "warnings": sorted(set(warnings)),
         "baselineDate": baseline_date,
         "networkCalls": 0,
+        "sessionEvidence": {str(row.get("code") or ""): row.get("sessionEvidence") for row in rows},
     }
 
 

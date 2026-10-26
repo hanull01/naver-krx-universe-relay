@@ -33,8 +33,8 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('preserving all production artifacts', self.text)
 
     def test_before_close_skips_fetch_and_only_incomplete_rows_retry(self):
-        self.assertIn('Check KST regular-close window', self.text)
-        self.assertIn('BEFORE_REGULAR_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
+        self.assertIn('Check KST final-close window', self.text)
+        self.assertIn('BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
         self.assertIn("steps.closing_window.outputs.eligible == 'true'", self.text)
         self.assertIn('if [ "$code" -eq 2 ]', self.text)
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)
@@ -135,7 +135,7 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
                                 capture_output=True, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
-        self.assertIn(payload['status'], ('BEFORE_REGULAR_CLOSE', 'AFTER_REGULAR_CLOSE'))
+        self.assertIn(payload['status'], ('BEFORE_FINAL_CLOSE', 'AFTER_FINAL_CLOSE'))
         self.assertIn('targetDate', payload)
 
 

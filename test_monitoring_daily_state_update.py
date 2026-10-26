@@ -223,14 +223,18 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
                                       fetcher=lambda *_args: self._daily_response(),
                                       max_workers=9, retry_sleep=0)
 
-    def test_closing_window_uses_explicit_kst_boundary(self):
+    def test_closing_window_separates_regular_and_final_close(self):
         midnight = update.closing_window(datetime(2026, 10, 1, 15, 22, tzinfo=timezone.utc))
-        self.assertEqual("BEFORE_REGULAR_CLOSE", midnight["status"])
+        self.assertEqual("BEFORE_FINAL_CLOSE", midnight["status"])
         self.assertEqual("2026-10-02", midnight["targetDate"])
-        before = update.closing_window(datetime(2026, 10, 2, 15, 29, tzinfo=update.KST))
-        after = update.closing_window(datetime(2026, 10, 2, 15, 30, tzinfo=update.KST))
-        self.assertFalse(before["eligible"])
-        self.assertTrue(after["eligible"])
+        regular_close = update.closing_window(datetime(2026, 10, 2, 15, 30, tzinfo=update.KST))
+        before_final = update.closing_window(datetime(2026, 10, 2, 19, 59, 59, tzinfo=update.KST))
+        final_close = update.closing_window(datetime(2026, 10, 2, 20, 0, tzinfo=update.KST))
+        self.assertFalse(regular_close["eligible"])
+        self.assertEqual(regular_close["finalCloseKst"], "20:00")
+        self.assertFalse(before_final["eligible"])
+        self.assertTrue(final_close["eligible"])
+        self.assertEqual(final_close["status"], "AFTER_FINAL_CLOSE")
 
     def test_reader_preserves_rows_and_shared_baseline_calculation(self):
         state = update.load_state(self.state_dir, self.universe)

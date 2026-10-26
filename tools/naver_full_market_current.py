@@ -130,6 +130,7 @@ def normalize(row, market, snapshot_generated_at):
     # Preserve that source contract explicitly for the downstream daily-state
     # adapter; do not make the verifier guess an omitted asset type.
     item = {"code": code, "name": name, "market": market, "assetType": "STOCK",
+            "sourceMarketCode": row.get("sosok"),
             "marketStatus": row.get("marketStatus"),
             "tradingSessionType": row.get("tradingSessionType"),
             "tradeStopYn": row.get("tradeStopYn"),
@@ -249,6 +250,9 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
             quality_warnings = ["UNIVERSE_COMPOSITION_CHANGED"] if composition_changed else []
             return {
                 "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
+                "sourceMarket": "KRX",
+                "sourceMarketEvidence": {"provider": "NAVER", "requestTradeType": "KRX",
+                                          "responseField": "sosok", "markets": list(MARKETS)},
                 "status": ("COMPLETE_RECONCILIATION_PENDING" if composition_changed else "SUCCESS"),
                 "collectionStatus": "SUCCESS",
                 "qualityStatus": "WARNING" if composition_changed else "SUCCESS",
@@ -262,7 +266,11 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                 "previousUniverseNewCodes": result["previousUniverseNewCodes"],
             }
     return {
-        "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE, "status": "FAILURE",
+        "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
+        "sourceMarket": "KRX",
+        "sourceMarketEvidence": {"provider": "NAVER", "requestTradeType": "KRX",
+                                  "responseField": "sosok", "markets": list(MARKETS)},
+        "status": "FAILURE",
         "collectionStatus": "FAILURE", "reconciliationStatus": "NOT_AVAILABLE",
         "qualityWarnings": [],
         "expectedCount": sum(len(codes) for codes in expected.values()), "count": 0, "coverageCount": 0,
