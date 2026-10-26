@@ -22,7 +22,7 @@ def sector(name="반도체", score=80, leaders=None):
     return {"name": name, "score": score, "relativeStrength": 1,
             "advancerPct": 70, "turnoverConcentrationPct": 10,
             "pctAboveMA20": 70, "leaderCount": len(leaders or [{"code": "005930", "score": 80}]),
-            "leaders": leaders or [{"code": "005930", "score": 80}]}
+            "leaders": leaders or [{"code": "005930", "score": 80, "assetType": "STOCK"}]}
 
 
 class DynamicUniverseManagerTests(unittest.TestCase):
@@ -60,7 +60,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertEqual(unavailable["pending"][0]["status"], "PENDING")
         themes = {"status": "AVAILABLE", "periods": {"daily": {"themes": [
             {"id": "T1", "name": "AI", "score": 90, "verifiedMembership": True,
-             "systemLeaders": [{"code": "000660", "score": 90}]},
+             "systemLeaders": [{"code": "000660", "score": 90, "assetType": "STOCK"}]},
             {"id": "T2", "name": "미검증", "score": 90, "systemLeaders": []},
         ]}}}
         result = manager.build_management_result({**self._dated_context([], "20261023"), "themes": themes}, self.universe(), policy=POLICY)
@@ -136,7 +136,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         self.assertEqual(undated["sectors"][0]["qualifyStreak"], second["sectors"][0]["qualifyStreak"])
 
     def test_theme_and_leader_use_same_trading_date_guard(self):
-        theme = {"status": "AVAILABLE", "periods": {"daily": {"themes": [{"id": "theme-1", "name": "테마", "score": 80, "verifiedMembership": True, "systemLeaders": [{"code": "005930", "score": 80}]}]}}}
+        theme = {"status": "AVAILABLE", "periods": {"daily": {"themes": [{"id": "theme-1", "name": "테마", "score": 80, "verifiedMembership": True, "systemLeaders": [{"code": "005930", "score": 80, "assetType": "STOCK"}]}]}}}
         context = self._dated_context([sector()], "20261023")
         context["tradingDate"] = "20261023"
         context["themes"] = theme
@@ -158,6 +158,65 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         older = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=first, policy=POLICY)
         self.assertEqual(older["sectors"][0]["lastObservedTradingDate"], "20261024")
         self.assertEqual(older["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"])
+
+    def test_structured_asset_types_preserve_stock_and_block_non_equity(self):
+        self.assertEqual(manager.leader_asset_type({"code": "005930", "assetType": "STOCK"}), "STOCK")
+        self.assertEqual(manager.leader_asset_type({"code": "33626K", "assetType": "STOCK"}), "STOCK")
+        self.assertEqual(manager.leader_asset_type({"code": "123456", "assetType": "STOCK", "tags": ["PREFERRED_LIKE"]}), "STOCK")
+        self.assertEqual(manager.leader_asset_type({"code": "102110", "assetType": "ETF"}), "ETF")
+        self.assertEqual(manager.leader_asset_type({"code": "530107", "assetType": "ETN"}), "ETN")
+        self.assertEqual(manager.leader_asset_type({"code": "0030R0", "assetType": "STOCK", "stockType": "RT"}), "REIT")
+        self.assertEqual(manager.leader_asset_type({"code": "0088M0", "assetType": "STOCK", "tags": ["SPAC"]}), "SPAC")
+        self.assertEqual(manager.leader_asset_type({"code": "0120X0", "assetType": "STOCK", "stockType": "PF"}), "FUND")
+        self.assertEqual(manager.leader_asset_type({"code": "999999"}), "UNKNOWN")
+
+    def test_score_is_preserved_but_fund_candidate_is_not_eligible(self):
+        ok, score, checks = manager._leader_decision(
+            {"code": "0120X0", "score": 100, "persistence": 2}, POLICY["leader"],
+            [{"code": "0120X0", "assetType": "STOCK", "stockType": "PF"}], "20261026")
+        self.assertFalse(ok)
+        self.assertEqual(score, 100)
+        self.assertEqual(checks["assetType"], "FUND")
+        self.assertFalse(checks["assetTypeEligible"])
+
+    def test_unverified_asset_type_and_trading_date_are_pending(self):
+        unknown_context = self._dated_context([sector(leaders=[{"code": "999999", "score": 100}])], "20261026")
+        unknown_context["industries"].update({"qualityStatus": "FULL", "quality": {"industryEvidenceUsable": "FULL"}})
+        unknown = manager.build_management_result(unknown_context, self.universe(), policy=POLICY)
+        self.assertTrue(any(item.get("reason") == "LEADER_ASSET_TYPE_UNVERIFIED" for item in unknown["pending"]))
+        mismatch = {"code": "005930", "score": 100, "assetType": "STOCK",
+                    "technicalEvidence": {"lastConfirmedDailyDate": "20261025"}}
+        ok, _, checks = manager._leader_decision(mismatch, POLICY["leader"], None, "20261026")
+        self.assertFalse(ok)
+        self.assertFalse(checks["tradingDateVerified"])
+        undated = manager._leader_decision({"code": "005930", "score": 100, "assetType": "STOCK"},
+                                           POLICY["leader"], None, None)
+        self.assertFalse(undated[0])
+
+    def test_known_non_equity_previous_leader_is_removed_and_not_admitted(self):
+        previous = {
+            "sectors": [{"id": "반도체", "status": "ACTIVE", "qualifyStreak": 2, "weakenStreak": 0}],
+            "leaders": [{"id": "sector:반도체:0120X0", "code": "0120X0", "status": "ACTIVE",
+                         "qualifyStreak": 2, "weakenStreak": 0, "collectionAdmitted": True}],
+        }
+        result = manager.build_management_result(
+            self._dated_context([sector(leaders=[{"code": "0120X0", "score": 100}])], "20261026"),
+            self.universe(), previous=previous, policy=POLICY,
+            asset_registry={"assets": [{"code": "0120X0", "assetType": "STOCK", "stockType": "PF"}]})
+        row = next(item for item in result["leaders"] if item["id"] == "sector:반도체:0120X0")
+        self.assertEqual(row["status"], "REMOVED")
+        self.assertFalse(row["collectionAdmitted"])
+        self.assertNotIn("0120X0", result["collectionCodes"])
+
+    def test_asset_registry_does_not_change_full_market_asset_codes(self):
+        import json
+        assets = json.loads((Path(__file__).parent / "data/market-universe/all-assets.json").read_text())['assets']
+        before = {row["code"] for row in assets}
+        result = manager.build_management_result(
+            self._dated_context([sector(leaders=[{"code": "0120X0", "score": 100}])], "20261026"),
+            self.universe(), policy=POLICY, asset_registry={"assets": assets})
+        self.assertNotIn("0120X0", result["collectionCodes"])
+        self.assertEqual(before, {row["code"] for row in assets})
 
 
 if __name__ == "__main__":

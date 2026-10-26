@@ -565,11 +565,21 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         required = ("ma5", "ma20", "ma60", "currentPrice")
         missing = [key for key in required if item.get(key) is None]
         basis_date = item.get("temporaryCurrentBarDate")
-        confirmed = bool(item.get("close_valid") and item.get("ohlc_valid") and basis_date)
+        verified_session_date = trading_date_result.get("tradingDate")
+        date_matches_session = bool(verified_session_date and basis_date == verified_session_date)
+        confirmed = bool(item.get("close_valid") and item.get("ohlc_valid")
+                         and basis_date and date_matches_session)
+        if not verified_session_date:
+            evidence_reason = "TRADING_DATE_EVIDENCE_UNAVAILABLE"
+        elif not date_matches_session:
+            evidence_reason = "TECHNICAL_DATE_MISMATCH"
+        elif missing:
+            evidence_reason = "MISSING_CONFIRMED_DAILY_FEATURE"
+        else:
+            evidence_reason = "CONFIRMED_DAILY_BASELINE"
         row["technicalEvidence"] = {
             "status": "AVAILABLE" if confirmed and not missing else "UNAVAILABLE",
-            "reason": ("CONFIRMED_DAILY_BASELINE" if confirmed and not missing
-                       else "MISSING_CONFIRMED_DAILY_FEATURE"),
+            "reason": evidence_reason,
             "lastConfirmedDailyDate": basis_date,
             "maBasisDate": basis_date,
             "closeConfirmed": bool(item.get("close_valid")),

@@ -70,6 +70,7 @@ def main(argv=None):
     parser.add_argument("--theme-ranking", default=str(ROOT / "data/research/theme-ranking/latest.json"))
     parser.add_argument("--theme-membership", default=str(ROOT / "data/research/theme-membership/latest.json"))
     parser.add_argument("--discovery", default=str(ROOT / "data/trading-discovery/latest.json"))
+    parser.add_argument("--asset-registry", default=str(ROOT / "data/market-universe/all-assets.json"))
     parser.add_argument("--policy", default=str(manager.DEFAULT_POLICY))
     parser.add_argument("--output", default=str(ROOT / "data/dynamic-universe/latest.json"))
     parser.add_argument("--history", default=str(ROOT / "data/dynamic-universe/history.json"))
@@ -88,9 +89,11 @@ def main(argv=None):
     previous = manager.load_json(args.output, {}) or {}
     discovery = manager.load_json(args.discovery, {}) or {}
     universe_payload = manager.load_json(args.universe, {}) or {}
+    asset_registry = manager.load_json(args.asset_registry, {}) or {}
     result = manager.build_management_result(context, universe_payload,
                                               discovery, previous,
-                                              manager.load_json(args.policy, {}) or {})
+                                              manager.load_json(args.policy, {}) or {},
+                                              asset_registry=asset_registry)
     signals = manager.load_json(args.signals, {}) or {}
     quotes = {str(row.get("code")): row for row in signals.get("stocks", []) if row.get("code")}
     theme_signals = manager.load_json(args.theme_signals, {}) or {}
@@ -151,7 +154,8 @@ def main(argv=None):
         else:
             context["themes"] = {"status": "UNAVAILABLE", "tradingDate": trading_date, "reason": "NO_VERIFIED_THEME_QUOTES"}
         result = manager.build_management_result(context, universe_payload,
-                                                 discovery, previous, manager.load_json(args.policy, {}) or {})
+                                                 discovery, previous, manager.load_json(args.policy, {}) or {},
+                                                 asset_registry=asset_registry)
         for key in ("leaders", "initialObservationCandidates"):
             for row in result.get(key, []):
                 quote = quotes.get(str(row.get("code")))

@@ -536,6 +536,8 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(leaders[0]["code"], "A")
         self.assertIn("POSITIVE_RETURN", leaders[0]["selectionReasons"])
         self.assertIn("above_ma20", leaders[0]["technicalChecks"])
+        self.assertEqual(leaders[0]["technicalEvidence"]["status"], "UNAVAILABLE")
+        self.assertEqual(leaders[0]["technicalEvidence"]["reason"], "TRADING_DATE_EVIDENCE_UNAVAILABLE")
         self.assertEqual(built["latest-leaders.json"]["leaderChanges"]["status"], "AVAILABLE")
         self.assertIn("A", built["latest-leaders.json"]["leaderChanges"]["new"])
 
