@@ -103,6 +103,66 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(daily_report.resolve_report_trading_date(
                 monitoring, baseline, "2026-10-17")["reason"], "REQUESTED_DATE_MISMATCH")
 
+    def test_pending_composition_is_blocked_without_exact_final_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "tradingDate": "20261026",
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "fullMarket": {
+                    "tradingDate": "20261026", "authoritativeCount": 2766,
+                    "expectedCount": 2766, "coverageCount": 2766,
+                    "tradingDateEvidence": {
+                        "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                        "diagnosticStatus": "UNVERIFIED",
+                    },
+                },
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({
+                "asOfDate": "20261026", "historyStatus": "OK",
+                "count": 2766, "authoritativeCount": 2766, "coveragePct": 100.0,
+            }), encoding="utf-8")
+            result = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(result["status"], "WAIT")
+            self.assertEqual(result["reason"], "QUALITY_NOT_PUBLISHED")
+
+    def test_pending_composition_is_allowed_only_with_exact_final_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            evidence = {
+                "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                "diagnosticStatus": "VERIFIED", "missingFinalCodes": [],
+                "unexpectedFinalCodes": [], "invalidFinalCodes": {},
+            }
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "tradingDate": "20261026",
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "fullMarket": {
+                    "tradingDate": "20261026", "authoritativeCount": 2766,
+                    "expectedCount": 2766, "coverageCount": 2766,
+                    "tradingDateEvidence": evidence,
+                },
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({
+                "asOfDate": "20261026", "historyStatus": "OK",
+                "count": 2766, "authoritativeCount": 2766, "coveragePct": 100.0,
+            }), encoding="utf-8")
+            result = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(result["status"], "READY")
+            self.assertEqual(result["tradingDate"], "2026-10-26")
+
     def test_resolve_report_trading_date_does_not_promote_old_baseline(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -137,7 +197,7 @@ class DailyReportTests(unittest.TestCase):
             }), encoding="utf-8")
             baseline = root / "baseline.json"
             baseline.write_text(json.dumps({"asOfDate": "20261015", "historyStatus": "OK"}), encoding="utf-8")
-            self.assertEqual(daily_report.resolve_report_trading_date(monitoring, baseline)["reason"], "TRADING_DATE_MISMATCH")
+            self.assertEqual(daily_report.resolve_report_trading_date(monitoring, baseline)["reason"], "BASELINE_DATE_MISMATCH")
     def test_shadow_comparison_keeps_v1_and_v2_separate(self):
         dynamic = {
             "sectors": [{"id": "s1", "status": "ACTIVE"}],

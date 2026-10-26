@@ -45,6 +45,59 @@ class LocalDateCollectionIntegrationTests(unittest.TestCase):
         self.assertEqual({"000001": "2026-10-23", "000002": "2026-10-23"}, saved["observedDates"])
         self.assertEqual("VERIFIED", saved["status"])
 
+    def test_collect_returns_source_ohlcv_and_trading_value_for_final_adapter(self):
+        def fetcher(_code, _start, _end):
+            return self.response(rows=[{
+                "localDate": "2026-10-23", "openPrice": 10, "highPrice": 12,
+                "lowPrice": 9, "closePrice": 11, "accumulatedTradingVolume": 3,
+                "accumulatedTradingValue": 1000,
+            }])
+
+        rows = collect_today_rows("2026-10-23", self.universe, fetcher=fetcher,
+                                  retry_sleep=0)
+        self.assertEqual(rows["000001"]["date"], "20261023")
+        self.assertEqual(rows["000001"]["open"], 10)
+        self.assertEqual(rows["000001"]["high"], 12)
+        self.assertEqual(rows["000001"]["low"], 9)
+        self.assertEqual(rows["000001"]["close"], 11)
+        self.assertEqual(rows["000001"]["volume"], 3)
+        self.assertEqual(rows["000001"]["value"], 1000)
+
+    def test_observed_2766_set_is_used_without_mutating_previous_2764_universe(self):
+        previous = self.root / "previous-universe.json"
+        previous_payload = {"assets": [
+            {"code": f"{index:06d}", "market": "KOSPI" if index % 2 else "KOSDAQ",
+             "assetType": "STOCK"}
+            for index in range(2764)
+        ]}
+        previous.write_text(json.dumps(previous_payload), encoding="utf-8")
+        observed = self.root / "observed-universe.json"
+        observed_payload = {"assets": previous_payload["assets"] + [
+            {"code": "990001", "market": "KOSPI", "assetType": "STOCK"},
+            {"code": "990002", "market": "KOSDAQ", "assetType": "STOCK"},
+        ]}
+        observed.write_text(json.dumps(observed_payload), encoding="utf-8")
+
+        rows = collect_today_rows(
+            "2026-10-23", observed,
+            fetcher=lambda *_args: self.response("2026-10-23"),
+            max_workers=8, retry_sleep=0,
+        )
+        self.assertEqual(len(rows), 2766)
+        self.assertEqual(json.loads(previous.read_text(encoding="utf-8")), previous_payload)
+
+    def test_invalid_ohlcv_is_flagged_and_not_final_quality(self):
+        def fetcher(_code, _start, _end):
+            return self.response(rows=[{
+                "localDate": "2026-10-23", "openPrice": 10, "highPrice": 8,
+                "lowPrice": 9, "closePrice": 11, "accumulatedTradingVolume": 3,
+            }])
+
+        rows = collect_today_rows("2026-10-23", self.universe, fetcher=fetcher,
+                                  retry_sleep=0)
+        self.assertFalse(rows["000001"]["ohlcValid"])
+        self.assertTrue(rows["000001"]["closeValid"])
+
     def test_date_mismatch_is_recorded_before_existing_not_ready_failure(self):
         diagnostic = self.root / "diagnostic.json"
 

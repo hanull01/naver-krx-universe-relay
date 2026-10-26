@@ -95,8 +95,8 @@ def main():
             update_with_universe_refresh)
         try:
             if a.observed_snapshot:
-                if a.fetch_today or not a.daily_input or not a.refresh_universe:
-                    p.error('--observed-snapshot requires --daily-input and --refresh-universe without --fetch-today')
+                if not a.refresh_universe or (not a.daily_input and not a.fetch_today):
+                    p.error('--observed-snapshot requires --refresh-universe and either --daily-input or --fetch-today')
                 snapshot = json.loads(Path(a.observed_snapshot).read_text(encoding='utf-8'))
                 stocks = snapshot.get('stocks')
                 if (snapshot.get('status') not in {'SUCCESS', 'COMPLETE_RECONCILIATION_PENDING'} or
@@ -116,13 +116,22 @@ def main():
                                     for market in ('KOSPI', 'KOSDAQ')},
                     },
                 }
-                daily_payload = json.loads(Path(a.daily_input).read_text(encoding='utf-8'))
-                outcome = update_with_universe_refresh(
-                    a.output_dir, a.universe_file, a.baseline_output,
-                    a.lifecycle_output, a.date, stock_payload,
-                    daily_rows=daily_payload, no_write=a.no_write,
-                    provisional=a.provisional, enforce_lifecycle_verification=True,
-                )
+                if a.daily_input:
+                    daily_payload = json.loads(Path(a.daily_input).read_text(encoding='utf-8'))
+                    outcome = update_with_universe_refresh(
+                        a.output_dir, a.universe_file, a.baseline_output,
+                        a.lifecycle_output, a.date, stock_payload,
+                        daily_rows=daily_payload, no_write=a.no_write,
+                        provisional=a.provisional, enforce_lifecycle_verification=True,
+                    )
+                else:
+                    outcome = update_with_universe_refresh(
+                        a.output_dir, a.universe_file, a.baseline_output,
+                        a.lifecycle_output, a.date, stock_payload,
+                        no_write=a.no_write, provisional=a.provisional,
+                        enforce_lifecycle_verification=True,
+                        diagnostic_output=None if a.no_write else a.session_diagnostic_output,
+                    )
             elif a.fetch_today:
                 if a.refresh_universe:
                     from naver_market_universe_builder import collect_stocklist, ensure_complete

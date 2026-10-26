@@ -389,6 +389,44 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
         return {"status": "WAIT", "reason": "TRADING_DATE_EVIDENCE_UNAVAILABLE",
                 "publishedDate": summary_date, "evidenceReason": evidence_reason,
                 "baselineDate": baseline_date}
+    if baseline_date != summary_date:
+        return {"status": "WAIT", "reason": "BASELINE_DATE_MISMATCH",
+                "publishedDate": summary_date, "baselineDate": baseline_date}
+    if baseline.get("historyStatus") not in (None, "OK"):
+        return {"status": "WAIT", "reason": "BASELINE_NOT_READY",
+                "historyStatus": baseline.get("historyStatus")}
+
+    publication_statuses = {
+        quality.get("publicationStatus"), summary.get("publicationStatus")
+    }
+    if "COMPLETE_RECONCILIATION_PENDING" in publication_statuses:
+        authoritative = summary_full_market.get("authoritativeCount")
+        expected = summary_full_market.get("expectedCount", authoritative)
+        coverage = summary_full_market.get("coverageCount", authoritative)
+        baseline_exact = (
+            baseline.get("count") == baseline.get("authoritativeCount") == authoritative
+            and baseline.get("coveragePct") == 100.0
+        )
+        canonical_exact = (
+            evidence_reason == "VERIFIED_CANONICAL_SESSION"
+            and not evidence.get("missingCanonicalCodes")
+            and not evidence.get("invalidCanonicalCodes")
+        )
+        final_exact = (
+            evidence_reason == "VERIFIED_MONITORING_DAILY_FINAL_SESSION"
+            and evidence.get("diagnosticStatus") == "VERIFIED"
+            and not evidence.get("missingFinalCodes")
+            and not evidence.get("unexpectedFinalCodes")
+            and not evidence.get("invalidFinalCodes")
+        )
+        if not (
+            isinstance(authoritative, int) and authoritative > 0
+            and expected == authoritative == coverage
+            and baseline_exact and (canonical_exact or final_exact)
+        ):
+            return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
+                    "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                    "evidenceReason": evidence_reason}
     if quality_date and quality_date != summary_date:
         return {"status": "WAIT", "reason": "TRADING_DATE_MISMATCH",
                 "qualityDate": quality_date, "publishedDate": summary_date,
@@ -396,12 +434,10 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
     if requested and requested != summary_date:
         return {"status": "WAIT", "reason": "REQUESTED_DATE_MISMATCH",
                 "requestedDate": requested, "availableDate": summary_date}
-    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS"):
+    if (quality.get("publicationStatus") not in ("FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING")
+            or summary.get("publicationStatus") not in (None, "FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING")):
         return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
                 "publicationStatus": quality.get("publicationStatus")}
-    if baseline.get("historyStatus") not in (None, "OK"):
-        return {"status": "WAIT", "reason": "BASELINE_NOT_READY",
-                "historyStatus": baseline.get("historyStatus")}
     return {"status": "READY", "tradingDate": f"{summary_date[:4]}-{summary_date[4:6]}-{summary_date[6:]}",
             "source": "monitoring-full-market-evidence-and-baseline",
             "baselineDate": baseline_date,
