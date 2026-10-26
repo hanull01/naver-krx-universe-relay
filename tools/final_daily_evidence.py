@@ -86,10 +86,12 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
 
     for row in rows:
         code = str(row.get("code") or "")
-        source_market = MARKET_CODES.get(str(row.get("sourceMarketCode") or ""))
+        raw_source_market_code = row.get("sourceMarketCode")
+        source_market = MARKET_CODES.get("" if raw_source_market_code is None
+                                         else str(raw_source_market_code))
         if source_market not in {"KOSPI", "KOSDAQ"}:
             errors.append(f"SOURCE_MARKET_CODE_UNVERIFIED:{code}")
-        elif row.get("market") and str(row.get("market")).upper() != source_market:
+        elif str(row.get("market") or "").upper() != source_market:
             errors.append(f"SOURCE_MARKET_CODE_MISMATCH:{code}")
         prices = [row.get(key) for key in ("openPrice", "highPrice", "lowPrice", "currentPrice")]
         if not all(_number(value) and value >= 0 for value in prices):
@@ -98,13 +100,19 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
             errors.append(f"VOLUME_INVALID:{code}")
         if _number(row.get("accumulatedTradingValue")) and row["accumulatedTradingValue"] < 0:
             errors.append(f"VALUE_INVALID:{code}")
-        if str(row.get("marketStatus") or "").upper() not in {"CLOSE", "CLOSED"}:
-            errors.append(f"MARKET_NOT_CLOSED:{code}")
+        market_status = str(row.get("marketStatus") or "").upper()
         session = str(row.get("tradingSessionType") or "").upper()
+        closed_status = (market_status in {"CLOSE", "CLOSED"}
+                         or market_status in TERMINAL_MARKERS
+                         or session in TERMINAL_MARKERS)
+        if not closed_status:
+            errors.append(f"MARKET_NOT_CLOSED:{code}")
         halted = (str(row.get("tradeStopYn") or "").upper() == "Y"
                   or str(row.get("tradableStatus") or "").upper() in {"HALTED", "SUSPENDED", "STOPPED"})
         if halted:
             row["sessionEvidence"] = "TRADE_STOPPED"
+        elif market_status in TERMINAL_MARKERS or session in TERMINAL_MARKERS:
+            row["sessionEvidence"] = "EXPLICIT_TERMINAL"
         elif session == "AFTER_MARKET":
             row["sessionEvidence"] = "AFTER_MARKET"
         elif session in {"REGULAR_CLOSED", "REGULAR_ONLY"} or row.get("afterMarketEligible") is False:

@@ -14,7 +14,7 @@ def row(code="000001", **extra):
              "currentPrice": 11, "accumulatedTradingVolume": 100,
              "accumulatedTradingValue": 1000, "marketStatus": "CLOSE",
              "tradingSessionType": "AFTER_MARKET", "sourceMarketCode": "0",
-             "tradeStopYn": "N", "tradableStatus": "TRADABLE"}
+             "tradeStopYn": "N", "tradableStatus": "TRADABLE", "market": "KOSPI"}
     value.update(extra)
     return value
 
@@ -42,6 +42,33 @@ class FinalDailyEvidenceTests(unittest.TestCase):
                                    {"asOfDate": "20261019", "historyStatus": "OK"})
         self.assertTrue(result["finalEligible"])
         self.assertEqual(result["sessionStatus"], "EXPLICIT_TERMINAL")
+
+    def test_terminal_session_marker_is_accepted_as_closed(self):
+        result = validate_snapshot(self.snapshot([row(marketStatus="CLOSE",
+                                                      tradingSessionType="AFTER_MARKET_CLOSED")]))
+        self.assertTrue(result["finalEligible"])
+        self.assertEqual(result["sessionEvidence"]["000001"], "EXPLICIT_TERMINAL")
+
+    def test_integer_source_market_code_is_normalized(self):
+        result = validate_snapshot(self.snapshot([row(sourceMarketCode=0)]))
+        self.assertTrue(result["finalEligible"])
+
+    def test_invalid_or_missing_source_market_code_is_rejected(self):
+        for value in (None, "", "2"):
+            with self.subTest(value=value):
+                result = validate_snapshot(self.snapshot([row(sourceMarketCode=value)]))
+                self.assertFalse(result["finalEligible"])
+                self.assertIn("SOURCE_MARKET_CODE_UNVERIFIED:000001", result["errors"])
+
+    def test_source_market_code_must_match_market(self):
+        result = validate_snapshot(self.snapshot([row(sourceMarketCode=1)]))
+        self.assertFalse(result["finalEligible"])
+        self.assertIn("SOURCE_MARKET_CODE_MISMATCH:000001", result["errors"])
+
+    def test_open_market_status_remains_blocked(self):
+        result = validate_snapshot(self.snapshot([row(marketStatus="OPEN")]))
+        self.assertFalse(result["finalEligible"])
+        self.assertIn("MARKET_NOT_CLOSED:000001", result["errors"])
 
     def test_before_close_date_mismatch_and_duplicates_are_rejected(self):
         result = validate_snapshot({**self.snapshot([row(), row()]), "generatedAt": "2026-10-19T19:59:00+09:00"},

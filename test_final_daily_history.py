@@ -9,7 +9,8 @@ def row(code="000001", assetType="STOCK", **extra):
               "highPrice": 12, "lowPrice": 9, "currentPrice": 11,
               "accumulatedTradingVolume": 100, "accumulatedTradingValue": 1000,
               "marketStatus": "CLOSE", "tradingSessionType": "AFTER_MARKET",
-              "sourceMarketCode": "0", "tradeStopYn": "N", "tradableStatus": "TRADABLE"}
+              "sourceMarketCode": "0", "tradeStopYn": "N", "tradableStatus": "TRADABLE",
+              "market": "KOSPI"}
     result.update(extra)
     return result
 
