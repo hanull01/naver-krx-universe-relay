@@ -5,10 +5,12 @@ Research canonical history remains untouched.  This file is intentionally a
 bootstrap/validation tool; publishing it is a separate, reviewed operation.
 """
 from __future__ import annotations
-import argparse, json, os, tempfile
+import argparse, json, os, sys, tempfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 CANONICAL=ROOT/'data/naver-history/canonical/daily'
 UNIVERSE=ROOT/'data/market-universe/all-assets.json'
 SESSION_DIAGNOSTIC_OUTPUT=ROOT/'data/monitoring-daily/trading-session-diagnostic.json'

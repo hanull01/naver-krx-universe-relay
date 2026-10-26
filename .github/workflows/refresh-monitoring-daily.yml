@@ -91,6 +91,7 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
         run: |
           set +e
+          set -o pipefail
           target_date='${{ steps.closing_window.outputs.target_date }}'
           extra=()
           if [ "$DRY_RUN" = "true" ]; then extra+=(--no-write); fi
@@ -100,22 +101,26 @@ jobs:
           result_file="$RUNNER_TEMP/monitoring-daily-update-result.json"
           python tools/build_monitoring_daily_state.py update-latest \
             --fetch-today --refresh-universe --date "$target_date" "${extra[@]}" | tee "$result_file"
-          code=$?
+          pipeline_codes=("${PIPESTATUS[@]}")
+          code=${pipeline_codes[0]}
+          log_code=${pipeline_codes[1]}
+          echo "python_exit_code=$code" >> "$GITHUB_OUTPUT"
+          echo "log_exit_code=$log_code" >> "$GITHUB_OUTPUT"
+          echo "Daily update exit codes: python=$code tee=$log_code"
           status=$(tail -n 1 "$result_file" | python -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))' 2>/dev/null || echo FAILED)
           echo "final_status=$status" >> "$GITHUB_OUTPUT"
-          if [ "$status" = "PARTIAL" ] && [ "$code" -eq 0 ]; then
-            echo "partial=true" >> "$GITHUB_OUTPUT"
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::Partial FINAL: validated rows were written; baseline remains unchanged."
-            exit 0
-          fi
-          if [ "$code" -eq 0 ]; then
+          if [ "$code" -eq 0 ] && [ "$log_code" -eq 0 ] && [ "$status" = "SUCCESS" ]; then
             echo "partial=false" >> "$GITHUB_OUTPUT"
             echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "partial=false" >> "$GITHUB_OUTPUT"
+          if [ "$status" = "PARTIAL" ]; then
+            echo "partial=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "partial=false" >> "$GITHUB_OUTPUT"
+          fi
           echo "ready=false" >> "$GITHUB_OUTPUT"
+          echo "::error::Daily update not publishable: status=$status python_exit=$code tee_exit=$log_code"
           if [ "$code" -eq 2 ]; then
             echo "::error::Daily rows remained incomplete after per-code bounded retries; preserving prior universe, rolling state, and baseline."
           elif [ "$code" -eq 4 ]; then
@@ -123,11 +128,13 @@ jobs:
           else
             echo "::error::Non-retryable daily update failure (exit=${code}); preserving all production artifacts."
           fi
-          exit "$code"
+          if [ "$code" -ne 0 ]; then exit "$code"; fi
+          if [ "$log_code" -ne 0 ]; then exit "$log_code"; fi
+          exit 1
 
       - name: Commit final rolling state and baseline
         id: publish
-        if: steps.market_day.outputs.run == 'true' && steps.update.outputs.ready == 'true' && inputs.dry_run != true
+        if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run != true
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -192,5 +199,5 @@ jobs:
           exit 1
 
       - name: Report dry-run success
-        if: steps.market_day.outputs.run == 'true' && steps.update.outputs.ready == 'true' && inputs.dry_run == true
+        if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run == true
         run: echo "Dry-run succeeded; no rolling state or baseline was published."
