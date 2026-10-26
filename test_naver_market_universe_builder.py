@@ -45,6 +45,14 @@ class UniverseBuilderTests(unittest.TestCase):
         self.assertIn("SPAC", rows["0088M0"]["tags"])
         self.assertIn("PREFERRED_LIKE", rows["123456"]["tags"])
 
+    def test_stocklist_preserves_structured_product_type_for_leader_gate(self):
+        row = builder.normalize_stock_row(stock("0120X0", "유진 챔피언중단기크레딧 X클래스", "0", "PF"), "KOSPI")
+        # The full-market collection remains in the NAVER STOCK source, while
+        # the structured PF subtype is available to the leader eligibility gate.
+        self.assertEqual(row["assetType"], "STOCK")
+        self.assertEqual(row["stockType"], "PF")
+        self.assertEqual(row["source"], "naver_stocklist")
+
     def test_stock_failure_duplicate_missing_and_market_mismatch_are_visible(self):
         pages = {
             ("KOSPI", 0): [stock("000001", "정상", "0"), stock("000002", "불일치", "1"),

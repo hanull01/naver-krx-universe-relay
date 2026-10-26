@@ -18,6 +18,70 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_POLICY = ROOT / "config/dynamic_universe_policy.json"
 AUTO_SOURCES = ("AUTO_SECTOR", "AUTO_THEME", "AUTO_LEADER", "KIWOOM_DISCOVERY")
 STATUSES = ("DISCOVERED", "ACTIVE", "WATCH", "REMOVED", "REENTERED")
+NON_EQUITY_LEADER_TYPES = {"ETF", "ETN", "FUND", "REIT", "SPAC", "INFRASTRUCTURE_FUND"}
+
+
+def _upper(value):
+    return str(value or "").strip().upper()
+
+
+def _asset_registry_rows(asset_registry):
+    """Return structured asset rows without treating names or symbol syntax as types."""
+    if isinstance(asset_registry, dict):
+        if isinstance(asset_registry.get("assets"), list):
+            return asset_registry["assets"]
+        rows = []
+        for key in ("stocks", "etfs", "etns"):
+            if isinstance(asset_registry.get(key), list):
+                rows.extend(asset_registry[key])
+        if rows:
+            return rows
+        return [row for row in asset_registry.values() if isinstance(row, dict)]
+    return asset_registry if isinstance(asset_registry, list) else []
+
+
+def leader_asset_type(candidate, asset_registry=None):
+    """Classify a leader from structured source fields; unknown is fail-closed."""
+    candidate = candidate if isinstance(candidate, dict) else {}
+    code = _code(candidate)
+    source = next((row for row in _asset_registry_rows(asset_registry)
+                   if isinstance(row, dict) and _code(row) == code), {})
+    # Candidate fields are allowed to refine the registry row, while the
+    # registry remains the source for candidates that only contain signals.
+    metadata = {**source, **{key: value for key, value in candidate.items()
+                             if value is not None}}
+    asset_type = _upper(metadata.get("assetType") or metadata.get("securityType"))
+    stock_type = _upper(metadata.get("stockType") or metadata.get("type"))
+    tags = {_upper(tag) for tag in (metadata.get("tags") or [])}
+
+    if asset_type in NON_EQUITY_LEADER_TYPES:
+        return asset_type
+    if asset_type in {"ETF", "ETN"}:
+        return asset_type
+    if stock_type == "PF" or stock_type in {"MF"}:
+        return "FUND"
+    if stock_type == "IF":
+        return "INFRASTRUCTURE_FUND"
+    if stock_type == "RT" or "REIT" in tags:
+        return "REIT"
+    if "SPAC" in tags or stock_type == "SPAC":
+        return "SPAC"
+    if asset_type == "STOCK" and stock_type in {"", "ST", "FS", "DR"}:
+        # Preferred shares remain STOCK; PREFERRED_LIKE is deliberately only
+        # a subtype tag and never a name-based exclusion.
+        return "STOCK"
+    if asset_type == "STOCK" and stock_type:
+        return "UNKNOWN"
+    return "UNKNOWN"
+
+
+def _candidate_trading_date(candidate):
+    for key in ("tradingDate", "tradeDate", "marketDate", "sourceDate", "lastConfirmedDailyDate"):
+        value = _normalize_trading_date((candidate or {}).get(key))
+        if value:
+            return value
+    evidence = (candidate or {}).get("technicalEvidence") or {}
+    return _normalize_trading_date(evidence.get("lastConfirmedDailyDate"))
 
 
 def load_json(path, default=None):
@@ -71,7 +135,7 @@ def _theme_decision(row, policy):
     return (not policy.get("requireVerifiedMembership") or verified) and checks["minimumScore"], score, checks
 
 
-def _leader_decision(row, policy):
+def _leader_decision(row, policy, asset_registry=None, observed_trading_date=None):
     technical = row.get("technical") or {}
     score = _number(row.get("score"), _number(technical.get("score")))
     if row.get("decision") is True:
@@ -84,7 +148,16 @@ def _leader_decision(row, policy):
         ]
         score = round(sum(positives) * 100 / len(positives), 2)
     persistence = int(_number(row.get("persistence"), 1) or 0)
-    checks = {"minimumScore": score >= policy["minimumScore"], "minimumPersistence": persistence >= policy["minimumPersistence"]}
+    asset_type = leader_asset_type(row, asset_registry)
+    candidate_date = _candidate_trading_date(row)
+    date_verified = bool(observed_trading_date) and (not candidate_date or candidate_date == observed_trading_date)
+    checks = {
+        "minimumScore": score >= policy["minimumScore"],
+        "minimumPersistence": persistence >= policy["minimumPersistence"],
+        "assetType": asset_type,
+        "assetTypeEligible": asset_type == "STOCK",
+        "tradingDateVerified": date_verified,
+    }
     return all(checks.values()), score, checks
 
 
@@ -142,7 +215,8 @@ def _managed(status):
     return status in {"ACTIVE", "WATCH", "REENTERED"}
 
 
-def build_management_result(context, universe, discovery=None, previous=None, policy=None, generated_at=None):
+def build_management_result(context, universe, discovery=None, previous=None, policy=None, generated_at=None,
+                            asset_registry=None):
     """Select qualified groups/leaders and retain hysteresis state."""
     policy = policy or load_json(DEFAULT_POLICY, {})
     observed_trading_date = _trading_date(context)
@@ -154,6 +228,26 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     theme_previous = _previous_index(previous, "themes")
     leader_previous = _previous_index(previous, "leaders")
     sectors, themes, leaders, initial_candidates, pending, changes = [], [], [], [], [], []
+    blocked_leaders = {}
+
+    def record_block(group_type, group_id, candidate, checks):
+        code = _code(candidate)
+        if not code:
+            return
+        asset_type = checks.get("assetType")
+        if not checks.get("assetTypeEligible"):
+            reason = "LEADER_ASSET_TYPE_UNVERIFIED" if asset_type == "UNKNOWN" else "NON_EQUITY_ASSET_TYPE"
+        elif not checks.get("tradingDateVerified"):
+            candidate_date = _candidate_trading_date(candidate)
+            reason = "LEADER_TRADING_DATE_MISMATCH" if candidate_date else "LEADER_TRADING_DATE_UNVERIFIED"
+        else:
+            return
+        identity = f"{group_type}:{group_id}:{code}"
+        if identity in blocked_leaders:
+            return
+        blocked_leaders[identity] = {"reason": reason, "assetType": asset_type, "code": code}
+        pending.append({"type": "AUTO_LEADER", "id": identity, "code": code,
+                        "status": "PENDING", "reason": reason, "assetType": asset_type})
 
     industry_block = (context or {}).get("industries") or {}
     industry_rows = industry_block.get("industries") or industry_block.get("strong") or []
@@ -169,21 +263,33 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                  "evidenceQuality": industry_block.get("qualityStatus") or "UNKNOWN"}
         sectors.append(entry)
         if not old or old.get("status") != status: changes.append({"type": "AUTO_SECTOR", "id": identity, "from": (old or {}).get("status"), "to": status})
+        # Asset disqualification is independent of industry/date usability.
+        # This prevents an already-active non-equity leader from being frozen
+        # merely because the current market evidence is partial or undated.
+        for candidate in row.get("leaders") or []:
+            if leader_asset_type(candidate, asset_registry) != "STOCK":
+                _, _, candidate_checks = _leader_decision(
+                    candidate, policy["leader"], asset_registry, observed_trading_date)
+                record_block("sector", identity, candidate, candidate_checks)
         evidence_usable = ((industry_block.get("qualityStatus") or "").upper() in {"FULL", "OK"}
                            or (industry_block.get("quality") or {}).get("industryEvidenceUsable") in {"FULL", "OK"})
         if status == "DISCOVERED" and evidence_usable:
             accepted_initial = []
             for candidate in row.get("leaders") or []:
-                ok, candidate_score, candidate_checks = _leader_decision(candidate, policy["leader"])
+                ok, candidate_score, candidate_checks = _leader_decision(
+                    candidate, policy["leader"], asset_registry, observed_trading_date)
                 if ok:
                     accepted_initial.append((candidate_score, candidate, candidate_checks))
+                else:
+                    record_block("sector", identity, candidate, candidate_checks)
             for candidate_score, candidate, candidate_checks in sorted(
                     accepted_initial, key=lambda item: (-item[0], _code(item[1]) or ""))[:3]:
                 code = _code(candidate)
                 if code:
                     initial_candidates.append({"id": f"initial:{identity}:{code}", "code": code,
                         "name": candidate.get("name"), "groupType": "sector", "groupId": identity,
-                        "score": candidate_score, "checks": candidate_checks,
+                        "score": candidate_score, "assetType": candidate_checks.get("assetType"),
+                        "checks": candidate_checks,
                         "status": "INITIAL_OBSERVATION", "source": "INITIAL_OBSERVATION",
                         "sourceTime": candidate.get("sourceTime") or row.get("sourceTime") or context.get("generatedAt")})
             if not accepted_initial:
@@ -195,11 +301,13 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         if _managed(status):
             accepted = []
             for candidate in row.get("leaders") or []:
-                ok, leader_score, leader_checks = _leader_decision(candidate, policy["leader"])
+                ok, leader_score, leader_checks = _leader_decision(
+                    candidate, policy["leader"], asset_registry, observed_trading_date)
                 if ok: accepted.append((leader_score, candidate, leader_checks))
+                else: record_block("sector", identity, candidate, leader_checks)
             for leader_score, candidate, leader_checks in sorted(accepted, key=lambda item: (-item[0], _code(item[1]) or ""))[:policy["leaderLimitPerGroup"]]:
                 code = _code(candidate)
-                if code: leaders.append({"id": f"sector:{identity}:{code}", "code": code, "name": candidate.get("name"), "groupType": "sector", "groupId": identity, "score": leader_score, "checks": leader_checks, "source": "AUTO_LEADER"})
+                if code: leaders.append({"id": f"sector:{identity}:{code}", "code": code, "name": candidate.get("name"), "groupType": "sector", "groupId": identity, "score": leader_score, "assetType": leader_checks.get("assetType"), "checks": leader_checks, "source": "AUTO_LEADER"})
 
     theme_block = (context or {}).get("themes") or {}
     if theme_block.get("status") != "AVAILABLE":
@@ -221,11 +329,13 @@ def build_management_result(context, universe, discovery=None, previous=None, po
             if _managed(status):
                 accepted = []
                 for candidate in row.get("systemLeaders") or []:
-                    ok, leader_score, leader_checks = _leader_decision(candidate, policy["leader"])
+                    ok, leader_score, leader_checks = _leader_decision(
+                        candidate, policy["leader"], asset_registry, observed_trading_date)
                     if ok: accepted.append((leader_score, candidate, leader_checks))
+                    else: record_block("theme", identity, candidate, leader_checks)
                 for leader_score, candidate, leader_checks in sorted(accepted, key=lambda item: (-item[0], _code(item[1]) or ""))[:policy["leaderLimitPerGroup"]]:
                     code = _code(candidate)
-                    if code: leaders.append({"id": f"theme:{identity}:{code}", "code": code, "name": candidate.get("name"), "groupType": "theme", "groupId": identity, "score": leader_score, "checks": leader_checks, "source": "AUTO_LEADER"})
+                    if code: leaders.append({"id": f"theme:{identity}:{code}", "code": code, "name": candidate.get("name"), "groupType": "theme", "groupId": identity, "score": leader_score, "assetType": leader_checks.get("assetType"), "checks": leader_checks, "source": "AUTO_LEADER"})
         for identity, old in theme_previous.items():
             if identity not in current_theme_ids:
                 themes.append({**old, "dataQuality": "LIST_NOT_FOUND", "selectionDeferred": True,
@@ -240,8 +350,23 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     current_ids = {row["id"] for row in normalized_leaders}
     for identity, old in leader_previous.items():
         if identity in current_ids: continue
+        blocked = blocked_leaders.get(identity)
+        if blocked:
+            # A known non-equity candidate is hard-removed immediately; an
+            # unverified type/date is retained only as non-admitted audit state.
+            if blocked["reason"] == "NON_EQUITY_ASSET_TYPE":
+                row = {**old, "status": "REMOVED", "qualifyStreak": 0, "weakenStreak": old.get("weakenStreak", 0),
+                       "selectionBlocked": True, "selectionBlockReason": blocked["reason"],
+                       "assetType": blocked["assetType"], "collectionAdmitted": False}
+                normalized_leaders.append(row)
+                if old.get("status") != "REMOVED":
+                    changes.append({"type": "AUTO_LEADER", "id": identity, "from": old.get("status"), "to": "REMOVED"})
+                continue
         status, qs, ws = _transition(old, False, policy)
-        row = {**old, "status": status, "qualifyStreak": qs, "weakenStreak": ws}
+        row = {**old, "status": status, "qualifyStreak": qs, "weakenStreak": ws,
+               "selectionDeferred": bool(blocked), "selectionBlockReason": blocked.get("reason") if blocked else old.get("selectionBlockReason"),
+               "assetType": blocked.get("assetType") if blocked else old.get("assetType"),
+               "collectionAdmitted": False if blocked else old.get("collectionAdmitted")}
         normalized_leaders.append(row)
         if old.get("status") != status: changes.append({"type": "AUTO_LEADER", "id": identity, "from": old.get("status"), "to": status})
 
@@ -263,7 +388,8 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         for code in codes: member(str(code), "USER_WATCHLIST", name)
     limit = int(policy.get("collectionLimit", 120))
     admitted_auto_codes = set()
-    for row in sorted((row for row in normalized_leaders if _managed(row["status"])),
+    for row in sorted((row for row in normalized_leaders
+                       if _managed(row["status"]) and not row.get("selectionBlocked") and not row.get("selectionDeferred")),
                       key=lambda item: (-item.get("score", 0), item["code"], item["id"])):
         if row["code"] not in memberships and len(memberships) >= limit: continue
         admitted_auto_codes.add(row["code"])
