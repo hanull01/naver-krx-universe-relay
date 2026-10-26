@@ -1,25 +1,1448 @@
 {
   "version": "dynamic-universe-management-v1",
-  "generatedAt": "2026-10-25T23:13:04.209369+00:00",
+  "generatedAt": "2026-10-26T03:13:47.008004+00:00",
   "networkCalls": 0,
   "industryEvidence": {
     "status": "FULL",
     "sourceStatus": "OK",
     "industryEvidenceUsable": "FULL",
-    "analyzedIndustryCount": 0
+    "analyzedIndustryCount": 79
   },
-  "sectors": [],
+  "sectors": [
+    {
+      "id": "288",
+      "name": "건강관리기술",
+      "status": "DISCOVERED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "282",
+      "name": "전자장비와기기",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "274",
+      "name": "섬유,의류,신발,호화품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "300",
+      "name": "양방향미디어와서비스",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "275",
+      "name": "담배",
+      "status": "DISCOVERED",
+      "score": 100.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "315",
+      "name": "손해보험",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "310",
+      "name": "광고",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "25",
+      "name": "기타",
+      "status": "DISCOVERED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "277",
+      "name": "창업투자",
+      "status": "DISCOVERED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "261",
+      "name": "제약",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "328",
+      "name": "전문소매",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "303",
+      "name": "가구",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "279",
+      "name": "건설",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "271",
+      "name": "레저용장비와제품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "337",
+      "name": "카드",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "299",
+      "name": "기계",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "286",
+      "name": "생물공학",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "273",
+      "name": "자동차",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "267",
+      "name": "IT서비스",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "329",
+      "name": "도로와철도운송",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "314",
+      "name": "출판",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "327",
+      "name": "디스플레이패널",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "338",
+      "name": "사무용전자제품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "324",
+      "name": "상업서비스와공급품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "305",
+      "name": "항공사",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "280",
+      "name": "부동산",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "312",
+      "name": "가스유틸리티",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "298",
+      "name": "가정용기기와용품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "285",
+      "name": "방송과엔터테인먼트",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "270",
+      "name": "자동차부품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "317",
+      "name": "호텔,레스토랑,레저",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "292",
+      "name": "핸드셋",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "316",
+      "name": "건강관리업체및서비스",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "319",
+      "name": "기타금융",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "330",
+      "name": "생명보험",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "263",
+      "name": "게임엔터테인먼트",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "332",
+      "name": "문구류",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "287",
+      "name": "소프트웨어",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "262",
+      "name": "생명과학도구및서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "269",
+      "name": "디스플레이장비및부품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "339",
+      "name": "다각화된소비자서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "311",
+      "name": "포장재",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "289",
+      "name": "건축자재",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "308",
+      "name": "인터넷과카탈로그소매",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "290",
+      "name": "교육서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "309",
+      "name": "음료",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "296",
+      "name": "운송인프라",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "284",
+      "name": "우주항공과국방",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "321",
+      "name": "증권",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "302",
+      "name": "식품과기본식료품소매",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "281",
+      "name": "건강관리장비와용품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "272",
+      "name": "화학",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "322",
+      "name": "비철금속",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "313",
+      "name": "석유와가스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "293",
+      "name": "컴퓨터와주변기기",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "268",
+      "name": "식품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "320",
+      "name": "건축제품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "266",
+      "name": "화장품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "325",
+      "name": "전기유틸리티",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "294",
+      "name": "통신장비",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "264",
+      "name": "백화점과일반상점",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "265",
+      "name": "판매업체",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "304",
+      "name": "철강",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "297",
+      "name": "가정용품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "326",
+      "name": "항공화물운송과물류",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "334",
+      "name": "무역회사와판매업체",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "276",
+      "name": "복합기업",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "301",
+      "name": "은행",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "331",
+      "name": "복합유틸리티",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "307",
+      "name": "전자제품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "333",
+      "name": "무선통신서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "336",
+      "name": "다각화된통신서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "323",
+      "name": "해운사",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "318",
+      "name": "종이와목재",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "295",
+      "name": "에너지장비및서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "283",
+      "name": "전기제품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "306",
+      "name": "전기장비",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "291",
+      "name": "조선",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    },
+    {
+      "id": "278",
+      "name": "반도체와반도체장비",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "evidenceQuality": "FULL"
+    }
+  ],
   "themes": [
     {
       "id": "597",
       "name": "오가노이드",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 39,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -27,12 +1450,12 @@
       "id": "467",
       "name": "모더나(MODERNA)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -40,12 +1463,12 @@
       "id": "172",
       "name": "제약업체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -53,12 +1476,12 @@
       "id": "155",
       "name": "반도체 대표주(생산)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 14,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -66,12 +1489,12 @@
       "id": "533",
       "name": "전력반도체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -79,12 +1502,12 @@
       "id": "547",
       "name": "CXL(컴퓨트익스프레스링크)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -92,12 +1515,12 @@
       "id": "599",
       "name": "소캠(SOCAMM)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -105,12 +1528,12 @@
       "id": "536",
       "name": "HBM(고대역폭메모리)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -118,12 +1541,12 @@
       "id": "307",
       "name": "시스템반도체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -144,12 +1567,12 @@
       "id": "310",
       "name": "리츠(REITs)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -157,12 +1580,12 @@
       "id": "545",
       "name": "온디바이스 AI",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -170,12 +1593,12 @@
       "id": "377",
       "name": "치매",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -183,12 +1606,12 @@
       "id": "614",
       "name": "S7(삼성전자/SK하이닉스 등)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 5,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -196,12 +1619,12 @@
       "id": "388",
       "name": "아이폰",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -209,12 +1632,12 @@
       "id": "362",
       "name": "자율주행차",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -222,12 +1645,12 @@
       "id": "464",
       "name": "콜드체인(저온 유통)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -235,12 +1658,12 @@
       "id": "468",
       "name": "화이자(PFIZER)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -248,12 +1671,12 @@
       "id": "567",
       "name": "밸류업(24년 기업가치 제고계획 발표)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -261,7 +1684,7 @@
       "id": "615",
       "name": "2026 하반기 신규상장",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -274,12 +1697,12 @@
       "id": "270",
       "name": "모바일콘텐츠(스마트폰/태블릿PC)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -287,12 +1710,12 @@
       "id": "402",
       "name": "아스콘(아스팔트 콘크리트)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 39,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -313,12 +1736,12 @@
       "id": "525",
       "name": "렌터카",
       "status": "ACTIVE",
-      "score": 80.0,
+      "score": 40.0,
       "qualifyStreak": 4,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -326,12 +1749,12 @@
       "id": "568",
       "name": "코리아 밸류업 지수(Korea Value-up Index)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -339,12 +1762,12 @@
       "id": "389",
       "name": "면역항암제",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -365,12 +1788,12 @@
       "id": "400",
       "name": "조림사업",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -378,12 +1801,12 @@
       "id": "496",
       "name": "골프",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -391,12 +1814,12 @@
       "id": "170",
       "name": "골판지 제조",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -404,12 +1827,12 @@
       "id": "517",
       "name": "전후 재건(우크라/중동 전쟁 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -417,12 +1840,12 @@
       "id": "232",
       "name": "미디어(방송/신문)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -430,12 +1853,12 @@
       "id": "348",
       "name": "삼성페이",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -443,12 +1866,12 @@
       "id": "556",
       "name": "뉴로모픽 반도체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -469,12 +1892,12 @@
       "id": "311",
       "name": "고령화 사회(노인복지)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -482,12 +1905,12 @@
       "id": "390",
       "name": "마이크로 LED",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -495,12 +1918,12 @@
       "id": "492",
       "name": "NFT(대체불가토큰)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -508,12 +1931,12 @@
       "id": "112",
       "name": "공기청정기",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -521,12 +1944,12 @@
       "id": "328",
       "name": "제습기",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -534,12 +1957,12 @@
       "id": "33",
       "name": "LED",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -547,12 +1970,12 @@
       "id": "352",
       "name": "가상현실(VR)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -560,12 +1983,12 @@
       "id": "382",
       "name": "플렉서블 디스플레이",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -573,12 +1996,12 @@
       "id": "176",
       "name": "도시가스",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -586,12 +2009,12 @@
       "id": "104",
       "name": "스마트홈(홈네트워크)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -599,12 +2022,12 @@
       "id": "321",
       "name": "무선충전기술",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -612,12 +2035,12 @@
       "id": "290",
       "name": "스포츠행사 수혜(올림픽, 월드컵 등)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -625,12 +2048,12 @@
       "id": "373",
       "name": "5G(5세대 이동통신)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -638,12 +2061,12 @@
       "id": "9",
       "name": "OLED(유기 발광 다이오드)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -651,12 +2074,12 @@
       "id": "322",
       "name": "건설 중소형",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -664,12 +2087,12 @@
       "id": "393",
       "name": "갤럭시 부품주",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -677,12 +2100,12 @@
       "id": "279",
       "name": "스마트폰",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -690,12 +2113,12 @@
       "id": "404",
       "name": "폴더블폰",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -703,12 +2126,12 @@
       "id": "124",
       "name": "제대혈",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -716,12 +2139,12 @@
       "id": "154",
       "name": "건설 대표주",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 6,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -729,12 +2152,12 @@
       "id": "474",
       "name": "쿠팡(coupang)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -742,12 +2165,12 @@
       "id": "285",
       "name": "마스크",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -768,12 +2191,12 @@
       "id": "113",
       "name": "음식료업종",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -781,12 +2204,12 @@
       "id": "266",
       "name": "겨울",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -794,12 +2217,12 @@
       "id": "197",
       "name": "폐기물처리",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -807,12 +2230,12 @@
       "id": "105",
       "name": "사료",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -820,12 +2243,12 @@
       "id": "36",
       "name": "해운",
       "status": "ACTIVE",
-      "score": 80.0,
+      "score": 40.0,
       "qualifyStreak": 47,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -833,12 +2256,12 @@
       "id": "398",
       "name": "DMZ 평화공원",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -846,12 +2269,12 @@
       "id": "407",
       "name": "호텔/리조트",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -859,12 +2282,12 @@
       "id": "415",
       "name": "그래핀",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 2,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -872,12 +2295,12 @@
       "id": "52",
       "name": "교육/온라인 교육",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -885,12 +2308,12 @@
       "id": "86",
       "name": "주류업(주정, 에탄올 등)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -898,12 +2321,12 @@
       "id": "47",
       "name": "카지노",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -911,12 +2334,12 @@
       "id": "521",
       "name": "애플페이",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -924,12 +2347,12 @@
       "id": "575",
       "name": "지역화폐",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 4,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -937,12 +2360,12 @@
       "id": "276",
       "name": "클라우드 컴퓨팅",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -950,12 +2373,12 @@
       "id": "174",
       "name": "치아 치료(임플란트 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -963,12 +2386,12 @@
       "id": "421",
       "name": "日제품 불매운동(수혜)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -976,12 +2399,12 @@
       "id": "234",
       "name": "보안주(물리)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -989,12 +2412,12 @@
       "id": "316",
       "name": "엔젤산업",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1002,12 +2425,12 @@
       "id": "56",
       "name": "NI(네트워크통합)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1015,12 +2438,12 @@
       "id": "164",
       "name": "손해보험",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1028,12 +2451,12 @@
       "id": "447",
       "name": "코로나19(진단키트)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1041,12 +2464,12 @@
       "id": "417",
       "name": "아프리카 돼지열병(ASF)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1054,12 +2477,12 @@
       "id": "19",
       "name": "황사/미세먼지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1067,12 +2490,12 @@
       "id": "529",
       "name": "AI 챗봇(챗GPT 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1080,12 +2503,12 @@
       "id": "28",
       "name": "CCTV＆DVR",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1093,12 +2516,12 @@
       "id": "387",
       "name": "블록체인",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1106,12 +2529,12 @@
       "id": "325",
       "name": "종합상사",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1119,12 +2542,12 @@
       "id": "335",
       "name": "재난/안전(지진/화재 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1145,12 +2568,12 @@
       "id": "595",
       "name": "우주태양광(페로브스카이트 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1158,12 +2581,12 @@
       "id": "108",
       "name": "백신/진단시약/방역(신종플루, AI 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1171,12 +2594,12 @@
       "id": "16",
       "name": "구제역/광우병 수혜",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1184,12 +2607,12 @@
       "id": "342",
       "name": "핀테크(FinTech)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1197,12 +2620,12 @@
       "id": "452",
       "name": "코로나19(음압병실/음압구급차)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1223,12 +2646,12 @@
       "id": "66",
       "name": "줄기세포",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1236,12 +2659,12 @@
       "id": "76",
       "name": "여름",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1249,12 +2672,12 @@
       "id": "376",
       "name": "유전자 치료제/분석",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1262,12 +2685,12 @@
       "id": "184",
       "name": "수자원(양적/질적 개선)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1275,12 +2698,12 @@
       "id": "581",
       "name": "탈 플라스틱(친환경/생분해성 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1288,12 +2711,12 @@
       "id": "392",
       "name": "스마트팩토리(스마트공장)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1301,12 +2724,12 @@
       "id": "167",
       "name": "타이어",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1314,12 +2737,12 @@
       "id": "32",
       "name": "패션/의류",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1327,12 +2750,12 @@
       "id": "139",
       "name": "출산장려정책",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1340,7 +2763,7 @@
       "id": "543",
       "name": "의료AI",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -1353,12 +2776,12 @@
       "id": "228",
       "name": "국내 상장 중국기업",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1366,12 +2789,12 @@
       "id": "59",
       "name": "광고",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1379,12 +2802,12 @@
       "id": "18",
       "name": "전자파",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1392,12 +2815,12 @@
       "id": "147",
       "name": "여행",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1405,12 +2828,12 @@
       "id": "44",
       "name": "시멘트/레미콘",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1418,7 +2841,7 @@
       "id": "210",
       "name": "자전거",
       "status": "ACTIVE",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 21,
       "weakenStreak": 0,
       "checks": {
@@ -1444,12 +2867,12 @@
       "id": "128",
       "name": "엔터테인먼트",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1457,12 +2880,12 @@
       "id": "571",
       "name": "밸류업(25년 기업가치 제고계획 발표)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1470,12 +2893,12 @@
       "id": "585",
       "name": "김밥(냉동김밥 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1483,12 +2906,12 @@
       "id": "592",
       "name": "부동산 보유 자산주",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1496,12 +2919,12 @@
       "id": "98",
       "name": "음원/음반",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1509,12 +2932,12 @@
       "id": "90",
       "name": "수산",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1522,12 +2945,12 @@
       "id": "111",
       "name": "지주사",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1535,12 +2958,12 @@
       "id": "206",
       "name": "농업",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1548,12 +2971,12 @@
       "id": "63",
       "name": "제지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1561,12 +2984,12 @@
       "id": "598",
       "name": "콩/대두",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1574,12 +2997,12 @@
       "id": "385",
       "name": "키오스크(KIOSK)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1587,12 +3010,12 @@
       "id": "524",
       "name": "모듈러주택",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1600,12 +3023,12 @@
       "id": "45",
       "name": "캐릭터상품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1613,12 +3036,12 @@
       "id": "127",
       "name": "영상콘텐츠",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1626,12 +3049,12 @@
       "id": "166",
       "name": "항공/저가 항공사(LCC)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1639,12 +3062,12 @@
       "id": "17",
       "name": "SI(시스템통합)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1652,12 +3075,12 @@
       "id": "546",
       "name": "마이코플라스마 폐렴",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1665,12 +3088,12 @@
       "id": "237",
       "name": "GTX(수도권 광역급행철도)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1678,12 +3101,12 @@
       "id": "540",
       "name": "비만치료제",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1691,12 +3114,12 @@
       "id": "381",
       "name": "LNG(액화천연가스)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1704,12 +3127,12 @@
       "id": "241",
       "name": "바이오시밀러(복제 바이오의약품)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1717,12 +3140,12 @@
       "id": "436",
       "name": "코로나19(진단/치료제/백신 개발 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1730,12 +3153,12 @@
       "id": "79",
       "name": "자원개발",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1743,12 +3166,12 @@
       "id": "384",
       "name": "편의점",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1756,12 +3179,12 @@
       "id": "12",
       "name": "반도체 장비",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1769,12 +3192,12 @@
       "id": "330",
       "name": "페인트",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1782,12 +3205,12 @@
       "id": "514",
       "name": "전기차(충전소/충전기)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1795,12 +3218,12 @@
       "id": "317",
       "name": "SNS(소셜네트워크서비스)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1808,12 +3231,12 @@
       "id": "151",
       "name": "증권",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1834,12 +3257,12 @@
       "id": "331",
       "name": "가상화폐(비트코인 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1847,12 +3270,12 @@
       "id": "481",
       "name": "마켓컬리(kurly)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1860,7 +3283,7 @@
       "id": "48",
       "name": "영화",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -1873,12 +3296,12 @@
       "id": "582",
       "name": "스테이블코인",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1886,12 +3309,12 @@
       "id": "99",
       "name": "지능형로봇/인공지능(AI)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1899,12 +3322,12 @@
       "id": "82",
       "name": "태풍 및 장마",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1912,12 +3335,12 @@
       "id": "49",
       "name": "인터넷 대표주",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1925,12 +3348,12 @@
       "id": "55",
       "name": "보안주(정보)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1938,12 +3361,12 @@
       "id": "297",
       "name": "공작기계",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1951,12 +3374,12 @@
       "id": "482",
       "name": "두나무(Dunamu)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1964,12 +3387,12 @@
       "id": "504",
       "name": "요소수",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1977,12 +3400,12 @@
       "id": "181",
       "name": "테마파크",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1990,12 +3413,12 @@
       "id": "507",
       "name": "마이데이터",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2003,12 +3426,12 @@
       "id": "126",
       "name": "통신",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2016,12 +3439,12 @@
       "id": "580",
       "name": "유심(USIM)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 12,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2029,12 +3452,12 @@
       "id": "319",
       "name": "화학섬유",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2042,12 +3465,12 @@
       "id": "487",
       "name": "건강기능식품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2055,12 +3478,12 @@
       "id": "13",
       "name": "리모델링/인테리어",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2068,12 +3491,12 @@
       "id": "584",
       "name": "스페이스X(SpaceX)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2081,12 +3504,12 @@
       "id": "141",
       "name": "종합 물류",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2094,12 +3517,12 @@
       "id": "513",
       "name": "미용기기",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2107,12 +3530,12 @@
       "id": "506",
       "name": "탈모 치료",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2120,12 +3543,12 @@
       "id": "265",
       "name": "모바일게임(스마트폰)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2133,12 +3556,12 @@
       "id": "488",
       "name": "웹툰",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2146,12 +3569,12 @@
       "id": "110",
       "name": "화장품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2159,12 +3582,12 @@
       "id": "42",
       "name": "게임",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2172,12 +3595,12 @@
       "id": "426",
       "name": "양자암호/양자컴퓨팅",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2185,12 +3608,12 @@
       "id": "191",
       "name": "태양광에너지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2198,12 +3621,12 @@
       "id": "204",
       "name": "비료",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2211,12 +3634,12 @@
       "id": "380",
       "name": "면세점",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2224,12 +3647,12 @@
       "id": "448",
       "name": "코로나19(치료제/백신 개발 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2237,12 +3660,12 @@
       "id": "480",
       "name": "메타버스(Metaverse)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2250,12 +3673,12 @@
       "id": "497",
       "name": "토스(toss)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2263,12 +3686,12 @@
       "id": "397",
       "name": "보톡스(보툴리눔톡신)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2276,12 +3699,12 @@
       "id": "343",
       "name": "인터넷은행",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2289,12 +3712,12 @@
       "id": "493",
       "name": "mRNA(메신저 리보핵산)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2302,12 +3725,12 @@
       "id": "503",
       "name": "2차전지(LFP/리튬인산철)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2315,12 +3738,12 @@
       "id": "288",
       "name": "모바일솔루션(스마트폰)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2328,12 +3751,12 @@
       "id": "386",
       "name": "수소에너지(수소차/연료전지 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2354,12 +3777,12 @@
       "id": "30",
       "name": "조선",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2367,12 +3790,12 @@
       "id": "324",
       "name": "일자리(취업)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2380,12 +3803,12 @@
       "id": "136",
       "name": "소매유통",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2393,7 +3816,7 @@
       "id": "591",
       "name": "서울고속버스터미널 재개발 수혜",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -2406,12 +3829,12 @@
       "id": "590",
       "name": "2026 상반기 신규상장",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2419,12 +3842,12 @@
       "id": "489",
       "name": "카카오뱅크(kakao BANK)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2432,12 +3855,12 @@
       "id": "159",
       "name": "자동차 대표주",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2445,12 +3868,12 @@
       "id": "302",
       "name": "음성인식",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2458,12 +3881,12 @@
       "id": "165",
       "name": "은행",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2471,12 +3894,12 @@
       "id": "560",
       "name": "냉각시스템(액침냉각 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2484,12 +3907,12 @@
       "id": "534",
       "name": "페라이트",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 2,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2497,12 +3920,12 @@
       "id": "531",
       "name": "STO(토큰증권 발행)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2510,12 +3933,12 @@
       "id": "511",
       "name": "니켈",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2523,12 +3946,12 @@
       "id": "8",
       "name": "화폐/금융자동화기기(디지털화폐 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2536,12 +3959,12 @@
       "id": "500",
       "name": "폐배터리",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2549,12 +3972,12 @@
       "id": "27",
       "name": "자동차부품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2562,12 +3985,12 @@
       "id": "92",
       "name": "통신장비",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2575,12 +3998,12 @@
       "id": "180",
       "name": "석유화학",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2588,12 +4011,12 @@
       "id": "31",
       "name": "환율하락 수혜",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2601,12 +4024,12 @@
       "id": "422",
       "name": "日 수출 규제(국산화 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2614,12 +4037,12 @@
       "id": "470",
       "name": "마이크로바이옴",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2627,12 +4050,12 @@
       "id": "14",
       "name": "반도체 재료/부품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2640,12 +4063,12 @@
       "id": "586",
       "name": "광통신(광케이블/광섬유 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2653,12 +4076,12 @@
       "id": "289",
       "name": "증강현실(AR)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2666,12 +4089,12 @@
       "id": "559",
       "name": "고체산화물 연료전지(SOFC)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2679,12 +4102,12 @@
       "id": "106",
       "name": "바이오인식(생체인식)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2692,12 +4115,12 @@
       "id": "523",
       "name": "리튬",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2705,12 +4128,12 @@
       "id": "227",
       "name": "전기차",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2718,12 +4141,12 @@
       "id": "557",
       "name": "유리 기판",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2731,12 +4154,12 @@
       "id": "205",
       "name": "원자력발전",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2744,12 +4167,12 @@
       "id": "72",
       "name": "철강 중소형",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2757,7 +4180,7 @@
       "id": "449",
       "name": "2차전지(생산)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -2770,12 +4193,12 @@
       "id": "41",
       "name": "카메라모듈/부품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2783,12 +4206,12 @@
       "id": "405",
       "name": "MLCC(적층세라믹콘덴서)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2796,12 +4219,12 @@
       "id": "576",
       "name": "퓨리오사AI",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2809,12 +4232,12 @@
       "id": "94",
       "name": "조선기자재",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2822,12 +4245,12 @@
       "id": "272",
       "name": "전자결제(전자화폐)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2835,12 +4258,12 @@
       "id": "313",
       "name": "남-북-러 가스관사업",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2848,12 +4271,12 @@
       "id": "323",
       "name": "셰일가스(Shale Gas)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2861,12 +4284,12 @@
       "id": "326",
       "name": "3D 프린터",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2874,12 +4297,12 @@
       "id": "445",
       "name": "2차전지(장비)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2887,12 +4310,12 @@
       "id": "472",
       "name": "2차전지(전고체)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2900,12 +4323,12 @@
       "id": "119",
       "name": "창투사",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2913,12 +4336,12 @@
       "id": "564",
       "name": "전기차 화재 방지(배터리 열폭주 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2926,12 +4349,12 @@
       "id": "520",
       "name": "피팅(관이음쇠)/밸브",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2939,12 +4362,12 @@
       "id": "483",
       "name": "야놀자(Yanolja)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2952,12 +4375,12 @@
       "id": "329",
       "name": "전력저장장치(ESS)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2965,12 +4388,12 @@
       "id": "269",
       "name": "LED장비",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2978,12 +4401,12 @@
       "id": "462",
       "name": "UAM(도심항공모빌리티)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2991,12 +4414,12 @@
       "id": "188",
       "name": "풍력에너지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3004,12 +4427,12 @@
       "id": "144",
       "name": "방위산업/전쟁 및 테러",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3017,12 +4440,12 @@
       "id": "378",
       "name": "건설기계",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3030,12 +4453,12 @@
       "id": "62",
       "name": "철강 주요종목",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3043,12 +4466,12 @@
       "id": "287",
       "name": "PCB(FPCB 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3056,12 +4479,12 @@
       "id": "608",
       "name": "반도체 기판(FC-BGA/PCB/MLB 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3082,12 +4505,12 @@
       "id": "250",
       "name": "철도",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3095,12 +4518,12 @@
       "id": "318",
       "name": "백화점",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3108,12 +4531,12 @@
       "id": "579",
       "name": "2차전지(나트륨이온)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3121,12 +4544,12 @@
       "id": "332",
       "name": "스마트카(SMART CAR)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3134,12 +4557,12 @@
       "id": "223",
       "name": "강관업체(Steel pipe)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3147,12 +4570,12 @@
       "id": "600",
       "name": "주유소",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3160,12 +4583,12 @@
       "id": "379",
       "name": "항공기부품",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3173,12 +4596,12 @@
       "id": "242",
       "name": "탄소나노튜브(CNT)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3186,12 +4609,12 @@
       "id": "64",
       "name": "2차전지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3199,12 +4622,12 @@
       "id": "213",
       "name": "해저터널(지하화/지하도로 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3212,12 +4635,12 @@
       "id": "401",
       "name": "원자력발전소 해체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3225,12 +4648,12 @@
       "id": "298",
       "name": "희귀금속(희토류 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3238,12 +4661,12 @@
       "id": "527",
       "name": "윤활유",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3251,12 +4674,12 @@
       "id": "123",
       "name": "전력설비",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3264,12 +4687,12 @@
       "id": "537",
       "name": "초전도체",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3277,12 +4700,12 @@
       "id": "185",
       "name": "정유",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3290,12 +4713,12 @@
       "id": "349",
       "name": "드론(Drone)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3303,12 +4726,12 @@
       "id": "177",
       "name": "LPG(액화석유가스)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3316,12 +4739,12 @@
       "id": "229",
       "name": "스마트그리드(지능형전력망)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3329,12 +4752,12 @@
       "id": "200",
       "name": "우주항공산업(누리호/인공위성 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3342,12 +4765,12 @@
       "id": "171",
       "name": "비철금속",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3355,12 +4778,12 @@
       "id": "593",
       "name": "귀금속(금/은)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3368,12 +4791,12 @@
       "id": "187",
       "name": "핵융합에너지",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3381,12 +4804,12 @@
       "id": "178",
       "name": "전선",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3394,12 +4817,12 @@
       "id": "446",
       "name": "2차전지(소재/부품)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3407,12 +4830,12 @@
       "id": "501",
       "name": "리비안(RIVIAN)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3420,12 +4843,12 @@
       "id": "152",
       "name": "온실가스(탄소배출권)/탄소 포집·활용·저장(CCUS)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3433,12 +4856,12 @@
       "id": "435",
       "name": "재택근무/스마트워크",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     }
@@ -3479,8 +4902,8 @@
       "qualifyStreak": 0,
       "weakenStreak": 7,
       "collectionAdmitted": false,
-      "currentPrice": 1165.0,
-      "changeRate": 0.0
+      "currentPrice": 1125.0,
+      "changeRate": -3.43
     },
     {
       "id": "sector:283:148930",
@@ -3498,8 +4921,8 @@
       "qualifyStreak": 0,
       "weakenStreak": 7,
       "collectionAdmitted": false,
-      "currentPrice": 3530.0,
-      "changeRate": 0.0
+      "currentPrice": 3630.0,
+      "changeRate": 2.83
     },
     {
       "id": "sector:283:012340",
@@ -3641,7 +5064,9 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 12,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "currentPrice": 2615.0,
+      "changeRate": -8.25
     },
     {
       "id": "sector:334:047050",
@@ -3839,8 +5264,8 @@
       "qualifyStreak": 0,
       "weakenStreak": 48,
       "collectionAdmitted": false,
-      "currentPrice": 37650.0,
-      "changeRate": -4.92
+      "currentPrice": 34200.0,
+      "changeRate": 7.21
     },
     {
       "id": "sector:283:458650",
@@ -4095,7 +5520,1031 @@
       "collectionAdmitted": false
     }
   ],
-  "initialObservationCandidates": [],
+  "initialObservationCandidates": [
+    {
+      "id": "initial:288:328130",
+      "code": "328130",
+      "name": "루닛",
+      "groupType": "sector",
+      "groupId": "288",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 14690.0,
+      "changeRate": 30.0
+    },
+    {
+      "id": "initial:288:338220",
+      "code": "338220",
+      "name": "뷰노",
+      "groupType": "sector",
+      "groupId": "288",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 7210.0,
+      "changeRate": 22.0
+    },
+    {
+      "id": "initial:288:380550",
+      "code": "380550",
+      "name": "뉴로핏",
+      "groupType": "sector",
+      "groupId": "288",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 7160.0,
+      "changeRate": 26.95
+    },
+    {
+      "id": "initial:282:011690",
+      "code": "011690",
+      "name": "와이투솔루션",
+      "groupType": "sector",
+      "groupId": "282",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 3950.0,
+      "changeRate": 5.9
+    },
+    {
+      "id": "initial:282:396300",
+      "code": "396300",
+      "name": "HT로보틱스",
+      "groupType": "sector",
+      "groupId": "282",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 9600.0,
+      "changeRate": 4.23
+    },
+    {
+      "id": "initial:282:225190",
+      "code": "225190",
+      "name": "LK삼양",
+      "groupType": "sector",
+      "groupId": "282",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 4730.0,
+      "changeRate": 7.62
+    },
+    {
+      "id": "initial:274:033340",
+      "code": "033340",
+      "name": "좋은사람들",
+      "groupType": "sector",
+      "groupId": "274",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 2065.0,
+      "changeRate": 20.41
+    },
+    {
+      "id": "initial:300:289220",
+      "code": "289220",
+      "name": "자이언트스텝",
+      "groupType": "sector",
+      "groupId": "300",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 1561.0,
+      "changeRate": 2.7
+    },
+    {
+      "id": "initial:300:376300",
+      "code": "376300",
+      "name": "디어유",
+      "groupType": "sector",
+      "groupId": "300",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 20550.0,
+      "changeRate": 2.49
+    },
+    {
+      "id": "initial:275:033780",
+      "code": "033780",
+      "name": "KT&G",
+      "groupType": "sector",
+      "groupId": "275",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:310:458350",
+      "code": "458350",
+      "name": "에스팀",
+      "groupType": "sector",
+      "groupId": "310",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 4425.0,
+      "changeRate": 17.06
+    },
+    {
+      "id": "initial:25:0120X0",
+      "code": "0120X0",
+      "name": "유진 챔피언중단기크레딧 X클래스",
+      "groupType": "sector",
+      "groupId": "25",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 10160.0,
+      "changeRate": 0.0
+    },
+    {
+      "id": "initial:277:0088D0",
+      "code": "0088D0",
+      "name": "메리츠제1호스팩",
+      "groupType": "sector",
+      "groupId": "277",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:277:0098T0",
+      "code": "0098T0",
+      "name": "교보19호스팩",
+      "groupType": "sector",
+      "groupId": "277",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:277:0099W0",
+      "code": "0099W0",
+      "name": "미래에셋비전스팩11호",
+      "groupType": "sector",
+      "groupId": "277",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:261:220100",
+      "code": "220100",
+      "name": "퓨쳐켐",
+      "groupType": "sector",
+      "groupId": "261",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 9430.0,
+      "changeRate": 4.89
+    },
+    {
+      "id": "initial:261:053030",
+      "code": "053030",
+      "name": "바이넥스",
+      "groupType": "sector",
+      "groupId": "261",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 6480.0,
+      "changeRate": 4.85
+    },
+    {
+      "id": "initial:303:309930",
+      "code": "309930",
+      "name": "조이웍스앤코",
+      "groupType": "sector",
+      "groupId": "303",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:279:069920",
+      "code": "069920",
+      "name": "엑시온그룹",
+      "groupType": "sector",
+      "groupId": "279",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 1505.0,
+      "changeRate": 12.65
+    },
+    {
+      "id": "initial:299:138360",
+      "code": "138360",
+      "name": "앤로보틱스",
+      "groupType": "sector",
+      "groupId": "299",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 2120.0,
+      "changeRate": 9.05
+    },
+    {
+      "id": "initial:286:0009K0",
+      "code": "0009K0",
+      "name": "에임드바이오",
+      "groupType": "sector",
+      "groupId": "286",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 22300.0,
+      "changeRate": 6.7
+    },
+    {
+      "id": "initial:286:468530",
+      "code": "468530",
+      "name": "프로티나",
+      "groupType": "sector",
+      "groupId": "286",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 49000.0,
+      "changeRate": 12.77
+    },
+    {
+      "id": "initial:286:950260",
+      "code": "950260",
+      "name": "인제니아테라퓨틱스(Reg.S)",
+      "groupType": "sector",
+      "groupId": "286",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 23700.0,
+      "changeRate": 9.47
+    },
+    {
+      "id": "initial:267:039980",
+      "code": "039980",
+      "name": "폴라리스AI",
+      "groupType": "sector",
+      "groupId": "267",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 6230.0,
+      "changeRate": 8.92
+    },
+    {
+      "id": "initial:267:357880",
+      "code": "357880",
+      "name": "SKAI",
+      "groupType": "sector",
+      "groupId": "267",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 1948.0,
+      "changeRate": 15.81
+    },
+    {
+      "id": "initial:329:000650",
+      "code": "000650",
+      "name": "천일고속",
+      "groupType": "sector",
+      "groupId": "329",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:329:084670",
+      "code": "084670",
+      "name": "동양고속",
+      "groupType": "sector",
+      "groupId": "329",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 34200.0,
+      "changeRate": 7.21
+    },
+    {
+      "id": "initial:324:030190",
+      "code": "030190",
+      "name": "NICE평가정보",
+      "groupType": "sector",
+      "groupId": "324",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 17210.0,
+      "changeRate": 2.81
+    },
+    {
+      "id": "initial:324:030960",
+      "code": "030960",
+      "name": "양지사",
+      "groupType": "sector",
+      "groupId": "324",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:305:089590",
+      "code": "089590",
+      "name": "제주항공",
+      "groupType": "sector",
+      "groupId": "305",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:280:001000",
+      "code": "001000",
+      "name": "신라섬유",
+      "groupType": "sector",
+      "groupId": "280",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:280:145270",
+      "code": "145270",
+      "name": "케이탑리츠",
+      "groupType": "sector",
+      "groupId": "280",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:298:270660",
+      "code": "270660",
+      "name": "에브리봇",
+      "groupType": "sector",
+      "groupId": "298",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 14110.0,
+      "changeRate": 6.09
+    },
+    {
+      "id": "initial:298:342870",
+      "code": "342870",
+      "name": "오아",
+      "groupType": "sector",
+      "groupId": "298",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:285:206560",
+      "code": "206560",
+      "name": "덱스터",
+      "groupType": "sector",
+      "groupId": "285",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 1038.0,
+      "changeRate": 2.77
+    },
+    {
+      "id": "initial:270:241690",
+      "code": "241690",
+      "name": "유니테크노",
+      "groupType": "sector",
+      "groupId": "270",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 3170.0,
+      "changeRate": 14.86
+    },
+    {
+      "id": "initial:316:365660",
+      "code": "365660",
+      "name": "레몬헬스케어",
+      "groupType": "sector",
+      "groupId": "316",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 4405.0,
+      "changeRate": 22.7
+    },
+    {
+      "id": "initial:263:069080",
+      "code": "069080",
+      "name": "웹젠",
+      "groupType": "sector",
+      "groupId": "263",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:263:263750",
+      "code": "263750",
+      "name": "펄어비스",
+      "groupType": "sector",
+      "groupId": "263",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:262:039860",
+      "code": "039860",
+      "name": "나노엔텍",
+      "groupType": "sector",
+      "groupId": "262",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 4890.0,
+      "changeRate": 6.54
+    },
+    {
+      "id": "initial:262:475960",
+      "code": "475960",
+      "name": "토모큐브",
+      "groupType": "sector",
+      "groupId": "262",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 31900.0,
+      "changeRate": 5.98
+    },
+    {
+      "id": "initial:269:484120",
+      "code": "484120",
+      "name": "도우인시스",
+      "groupType": "sector",
+      "groupId": "269",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 30000.0,
+      "changeRate": 6.57
+    },
+    {
+      "id": "initial:269:083470",
+      "code": "083470",
+      "name": "이엠앤아이",
+      "groupType": "sector",
+      "groupId": "269",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 917.0,
+      "changeRate": 6.63
+    },
+    {
+      "id": "initial:269:155650",
+      "code": "155650",
+      "name": "와이엠씨",
+      "groupType": "sector",
+      "groupId": "269",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:289:186230",
+      "code": "186230",
+      "name": "그린플러스",
+      "groupType": "sector",
+      "groupId": "289",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 4020.0,
+      "changeRate": 9.84
+    },
+    {
+      "id": "initial:290:215200",
+      "code": "215200",
+      "name": "메가스터디교육",
+      "groupType": "sector",
+      "groupId": "290",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:309:000080",
+      "code": "000080",
+      "name": "하이트진로",
+      "groupType": "sector",
+      "groupId": "309",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:296:065710",
+      "code": "065710",
+      "name": "서호전기",
+      "groupType": "sector",
+      "groupId": "296",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:284:451760",
+      "code": "451760",
+      "name": "컨텍",
+      "groupType": "sector",
+      "groupId": "284",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 10560.0,
+      "changeRate": 29.89
+    },
+    {
+      "id": "initial:281:376930",
+      "code": "376930",
+      "name": "노을",
+      "groupType": "sector",
+      "groupId": "281",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 2170.0,
+      "changeRate": 29.94
+    },
+    {
+      "id": "initial:272:003780",
+      "code": "003780",
+      "name": "진양산업",
+      "groupType": "sector",
+      "groupId": "272",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 5880.0,
+      "changeRate": 7.1
+    },
+    {
+      "id": "initial:272:222420",
+      "code": "222420",
+      "name": "쎄노텍",
+      "groupType": "sector",
+      "groupId": "272",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:322:009620",
+      "code": "009620",
+      "name": "삼보산업",
+      "groupType": "sector",
+      "groupId": "322",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:293:046970",
+      "code": "046970",
+      "name": "우리로",
+      "groupType": "sector",
+      "groupId": "293",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 8020.0,
+      "changeRate": 5.94
+    },
+    {
+      "id": "initial:293:065650",
+      "code": "065650",
+      "name": "하이퍼코퍼레이션",
+      "groupType": "sector",
+      "groupId": "293",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 1965.0,
+      "changeRate": 7.44
+    },
+    {
+      "id": "initial:268:006980",
+      "code": "006980",
+      "name": "우성",
+      "groupType": "sector",
+      "groupId": "268",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:268:271560",
+      "code": "271560",
+      "name": "오리온",
+      "groupType": "sector",
+      "groupId": "268",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:294:211270",
+      "code": "211270",
+      "name": "AP위성",
+      "groupType": "sector",
+      "groupId": "294",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 9400.0,
+      "changeRate": 13.12
+    },
+    {
+      "id": "initial:294:900260",
+      "code": "900260",
+      "name": "로스웰",
+      "groupType": "sector",
+      "groupId": "294",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:276:0220W0",
+      "code": "0220W0",
+      "name": "한화머시너리앤서비스홀딩스",
+      "groupType": "sector",
+      "groupId": "276",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:295:060900",
+      "code": "060900",
+      "name": "에이전트AI",
+      "groupType": "sector",
+      "groupId": "295",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 3060.0,
+      "changeRate": 10.07
+    },
+    {
+      "id": "initial:295:115530",
+      "code": "115530",
+      "name": "씨엔플러스",
+      "groupType": "sector",
+      "groupId": "295",
+      "score": 66.67,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00"
+    },
+    {
+      "id": "initial:283:148930",
+      "code": "148930",
+      "name": "에이치와이티씨",
+      "groupType": "sector",
+      "groupId": "283",
+      "score": 100.0,
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-10-26T03:13:44.803839+00:00",
+      "currentPrice": 3630.0,
+      "changeRate": 2.83
+    }
+  ],
   "kiwoomDiscovery": [
     {
       "code": "028050",
@@ -4161,8 +6610,724 @@
     "126340",
     "207940"
   ],
-  "pending": [],
-  "changes": [],
+  "pending": [
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "315",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "328",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "271",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "337",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "273",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "314",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "327",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "338",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "312",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "317",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "292",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "319",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "330",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "332",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "287",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "339",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "311",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "308",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "321",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "302",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "313",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "320",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "266",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "325",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "264",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "265",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "304",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "297",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "326",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "334",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "301",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "331",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "307",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "333",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "336",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "323",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "318",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "306",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "291",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "278",
+      "status": "PENDING",
+      "reason": "NO_VALID_GROUP_CANDIDATE"
+    }
+  ],
+  "changes": [
+    {
+      "type": "AUTO_SECTOR",
+      "id": "288",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "282",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "274",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "300",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "275",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "315",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "310",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "25",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "277",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "261",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "328",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "303",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "279",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "271",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "337",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "299",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "286",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "273",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "267",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "329",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "314",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "327",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "338",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "324",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "305",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "280",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "312",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "298",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "285",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "270",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "317",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "292",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "316",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "319",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "330",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "263",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "332",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "287",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "262",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "269",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "339",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "311",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "289",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "308",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "290",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "309",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "296",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "284",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "321",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "302",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "281",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "272",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "322",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "313",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "293",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "268",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "320",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "266",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "325",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "294",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "264",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "265",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "304",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "297",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "326",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "334",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "276",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "301",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "331",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "307",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "333",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "336",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "323",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "318",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "295",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "283",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "306",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "291",
+      "from": null,
+      "to": "DISCOVERED"
+    },
+    {
+      "type": "AUTO_SECTOR",
+      "id": "278",
+      "from": null,
+      "to": "DISCOVERED"
+    }
+  ],
   "policy": {
     "version": "dynamic-universe-policy-v1",
     "refreshIntervalMinutes": 60,
