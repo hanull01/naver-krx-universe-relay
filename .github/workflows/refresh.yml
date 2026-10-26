@@ -14,10 +14,11 @@ on:
   schedule:
     # MARKET_DATA_READY is event-driven. Refresh price data on market-hour
     # 08:00 KST Mon-Fri = 23:00 UTC Sun-Thu.
-    # 09:00-19:00 KST Mon-Fri = 00:00-10:00 UTC Mon-Fri.
+    # 09:00-19:00 KST Mon-Fri = 00:07-10:07 UTC Mon-Fri.
+    # The seven-minute offset reduces top-of-hour scheduler miss/latency risk.
     # Final refresh at 20:30 KST = 11:30 UTC Mon-Fri.
     - cron: "0 23 * * 0-4"
-    - cron: "0 0-10 * * 1-5"
+    - cron: "7 0-10 * * 1-5"
     - cron: "30 11 * * 1-5"
 
 permissions:
