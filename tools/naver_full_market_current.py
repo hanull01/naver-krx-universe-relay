@@ -246,11 +246,13 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
         if result["valid"]:
             composition_changed = bool(result["previousUniverseMissingCodes"] or
                                        result["previousUniverseNewCodes"])
+            quality_warnings = ["UNIVERSE_COMPOSITION_CHANGED"] if composition_changed else []
             return {
                 "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
                 "status": ("COMPLETE_RECONCILIATION_PENDING" if composition_changed else "SUCCESS"),
                 "collectionStatus": "SUCCESS",
                 "qualityStatus": "WARNING" if composition_changed else "SUCCESS",
+                "qualityWarnings": quality_warnings,
                 "reconciliationStatus": "NAVER_OBSERVED" if composition_changed else "NO_CHANGE",
                 "expectedCount": result["expectedCount"], "count": result["count"],
                 "coverageCount": result["coverageCount"], "markets": result["markets"],
@@ -262,6 +264,7 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
     return {
         "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE, "status": "FAILURE",
         "collectionStatus": "FAILURE", "reconciliationStatus": "NOT_AVAILABLE",
+        "qualityWarnings": [],
         "expectedCount": sum(len(codes) for codes in expected.values()), "count": 0, "coverageCount": 0,
         "markets": {market: 0 for market in MARKETS}, "attemptCount": max_attempts,
         "missingCodes": [], "extraCodes": [], "duplicateCodes": [], "stocks": [],

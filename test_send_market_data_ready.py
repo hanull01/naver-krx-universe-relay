@@ -158,6 +158,18 @@ class ReadyMailTests(unittest.TestCase):
             with self.assertRaisesRegex(ready.ReadyValidationError, 'not from today'):
                 ready.validate_full_market_publication(summary, quality, current=self.current)
 
+    def test_full_market_primary_rejects_incomplete_coverage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
+            summary.write_text(json.dumps({'publicationStatus': 'SUCCESS',
+                'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET',
+                    'qualityStatus': 'SUCCESS', 'expectedCount': 2, 'coverageCount': 1,
+                    'markets': {'TOTAL': {'stockCount': 1, 'validCount': 1}}}}), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            with self.assertRaisesRegex(ready.ReadyValidationError, 'coverage is incomplete'):
+                ready.validate_full_market_publication(summary, quality, current=self.current)
+
     def test_small_composition_warning_is_signaled_with_codes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); summary = root / 'summary.json'; quality = root / 'quality.json'
@@ -255,6 +267,28 @@ class ReadyMailTests(unittest.TestCase):
                 ready.validate_full_market_publication(
                     summary, quality, current=self.current
                 )
+
+    def test_pending_composition_rejects_missing_warning(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / "summary.json"
+            quality = root / "quality.json"
+            summary.write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "generatedAt": "2026-09-29T10:39:00+09:00",
+                "fullMarket": {
+                    "scope": "AUTHORITATIVE_FULL_MARKET",
+                    "qualityStatus": "WARNING",
+                    "expectedCount": 2764,
+                    "coverageCount": 2763,
+                    "markets": {"TOTAL": {"stockCount": 2763, "validCount": 2763}}
+                }
+            }), encoding="utf-8")
+            quality.write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING"
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(ready.ReadyValidationError, "pending composition is not validated"):
+                ready.validate_full_market_publication(summary, quality, current=self.current)
 
     def test_pending_composition_rejects_status_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:
