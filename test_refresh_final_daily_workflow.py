@@ -37,9 +37,22 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
 
     def test_final_update_requires_explicit_snapshot_session_date(self):
         self.assertIn("data/market/indices.json", self.final_step)
-        self.assertIn("NAVER_MOBILE_INDEX_BASIC", self.final_step)
-        self.assertIn("INDEX_SOURCE_DATE_MISMATCH", self.final_step)
+        self.assertIn("validate_final_payload", self.final_step)
+        self.assertIn("from market_indices import validate_final_payload", self.final_step)
+        self.assertIn("collection_started_at", self.final_step)
+        self.assertIn("collection_finished_at", self.final_step)
         self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
+
+    def test_index_collection_records_a_fresh_execution_window(self):
+        self.assertIn("started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)
+        self.assertIn("finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)
+        self.assertIn("collection_started_at", self.indices_step)
+        self.assertIn("collection_finished_at", self.indices_step)
+
+    def test_final_requires_closed_indices_before_local_date_collection(self):
+        self.assertIn("validate_final_payload", self.final_step)
+        self.assertIn("--fetch-today", self.final_step)
+        self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
 
     def test_final_update_collects_naver_daily_local_dates_for_observed_set(self):
         self.assertIn("--observed-snapshot", self.final_step)
