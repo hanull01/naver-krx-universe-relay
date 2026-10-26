@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "484120",
   "itemName": "도우인시스",
-  "reportCount": 2,
-  "latestReportNid": "93920",
-  "latestWriteDate": "2026-07-07",
+  "reportCount": 3,
+  "latestReportNid": "97035",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "93920",
-    "writeDate": "2026-07-07",
+    "nid": "97035",
+    "writeDate": "2026-10-26",
     "brokerName": "SK증권",
-    "title": "글로벌 UTG 선도 공급사, 관건은 신규 매출처",
+    "title": "비에이치와 자화전자의 향기",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 7,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 2
+      }
     }
   },
   "reportNids": [
+    "97035",
     "93920",
     "93520"
   ]

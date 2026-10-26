@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "034220",
   "itemName": "LG디스플레이",
-  "reportCount": 25,
-  "latestReportNid": "96992",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 26,
+  "latestReportNid": "97029",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96992",
-    "writeDate": "2026-10-23",
-    "brokerName": "신한투자증권",
-    "title": "고군분투",
+    "nid": "97029",
+    "writeDate": "2026-10-26",
+    "brokerName": "키움증권",
+    "title": "비우호적 대외환경 속 인고의 시간",
     "goalPrice": 11000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 1,
+        "negative": 7
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 6,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "원가": 1,
-        "환율": 1
+        "수요": 6,
+        "환율": 2,
+        "반도체": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97029",
     "96992",
     "96983",
     "96825",

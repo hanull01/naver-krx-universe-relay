@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "200470",
   "itemName": "에이팩트",
-  "reportCount": 2,
-  "latestReportNid": "96636",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 3,
+  "latestReportNid": "97020",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96636",
-    "writeDate": "2026-10-12",
-    "brokerName": "DS투자증권",
-    "title": "저도 OSAT고요 아직 덜 올랐어요",
-    "goalPrice": 14300,
-    "normalizedOpinion": "BUY",
+    "nid": "97020",
+    "writeDate": "2026-10-26",
+    "brokerName": "iM증권",
+    "title": "낙수효과 가시화로 올해/내년 사상 최대 실적",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 0,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "반도체": 6
+      }
     }
   },
   "reportNids": [
+    "97020",
     "96636",
     "91925"
   ]

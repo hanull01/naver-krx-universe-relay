@@ -2,29 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "086790",
   "itemName": "하나금융지주",
-  "reportCount": 22,
-  "latestReportNid": "96477",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 29,
+  "latestReportNid": "97049",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96477",
-    "writeDate": "2026-10-07",
-    "brokerName": "SK증권",
-    "title": "금리 오르고 환율 내려가고, 오히려 좋아",
-    "goalPrice": 167000,
+    "nid": "97049",
+    "writeDate": "2026-10-26",
+    "brokerName": "한화투자증권",
+    "title": "CET1비율 ＋18bp QoQ, 환원 여력은 유효",
+    "goalPrice": 165000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "금리": 2,
+        "원가": 2,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "97049",
+    "97046",
+    "97043",
+    "97030",
+    "97021",
+    "97019",
+    "97016",
     "96477",
     "95971",
     "94569",

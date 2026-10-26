@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "178320",
   "itemName": "서진시스템",
-  "reportCount": 9,
-  "latestReportNid": "96320",
-  "latestWriteDate": "2026-09-28",
+  "reportCount": 10,
+  "latestReportNid": "97027",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96320",
-    "writeDate": "2026-09-28",
-    "brokerName": "SK증권",
-    "title": "글로벌 AI 인프라 축을 담당한다",
-    "goalPrice": 70000,
+    "nid": "97027",
+    "writeDate": "2026-10-26",
+    "brokerName": "iM증권",
+    "title": "정상화되는 방향성에 집중하자",
+    "goalPrice": 65000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
-        "negative": 0
+        "positive": 19,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "earningsPositiveSignalCount": 8,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 2,
-        "미국": 1,
-        "수요": 1
+        "미국": 5,
+        "반도체": 5,
+        "수요": 3,
+        "자동차": 2,
+        "AI": 1,
+        "수주": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97027",
     "96320",
     "95894",
     "95886",

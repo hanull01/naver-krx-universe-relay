@@ -2,31 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "316140",
   "itemName": "우리금융지주",
-  "reportCount": 22,
-  "latestReportNid": "96478",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 28,
+  "latestReportNid": "97048",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96478",
-    "writeDate": "2026-10-07",
-    "brokerName": "SK증권",
-    "title": "두 걸음 나아가는 중",
-    "goalPrice": 43000,
+    "nid": "97048",
+    "writeDate": "2026-10-26",
+    "brokerName": "한화투자증권",
+    "title": "대손비용 감소로 호실적 기록",
+    "goalPrice": 41500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 8,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "원가": 4,
+        "금리": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "97048",
+    "97045",
+    "97042",
+    "97032",
+    "97022",
+    "97017",
     "96478",
     "95900",
     "94616",

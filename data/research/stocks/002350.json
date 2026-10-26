@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "002350",
   "itemName": "넥센타이어",
-  "reportCount": 13,
-  "latestReportNid": "96859",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 14,
+  "latestReportNid": "97023",
+  "latestWriteDate": "2026-10-26",
   "latest": {
-    "nid": "96859",
-    "writeDate": "2026-10-20",
-    "brokerName": "신한투자증권",
-    "title": "악재는 주가에 반영",
+    "nid": "97023",
+    "writeDate": "2026-10-26",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Preview: 환율, 원가 상승 영향",
     "goalPrice": 8500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 6,
+        "negative": 8
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원가": 1,
-        "환율": 1
+        "가격": 6,
+        "원가": 5,
+        "중국": 3,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "97023",
     "96859",
     "95610",
     "95401",
