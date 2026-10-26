@@ -219,9 +219,13 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
+          started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
           set +e
           python market_indices.py
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
 
       - name: Diagnose final daily-bar evidence
         id: final_daily_evidence
@@ -241,10 +245,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-target.txt" <<'PY'
+          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-target.txt" \
+            "${{ steps.indices.outputs.collection_started_at }}" \
+            "${{ steps.indices.outputs.collection_finished_at }}" <<'PY'
           import json, sys
-          from datetime import datetime
           from pathlib import Path
+          from market_indices import validate_final_payload
 
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           indices = json.loads(Path("data/market/indices.json").read_text(encoding="utf-8"))
@@ -258,22 +264,12 @@ jobs:
                                          for row in observed_stocks)):
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_UNIVERSE_INVALID")
 
-          index_rows = indices.get("indices") or []
-          if (indices.get("status") != "OK" or indices.get("source") != "NAVER_MOBILE_INDEX_BASIC"
-                  or {row.get("code") for row in index_rows} != {"KOSPI", "KOSDAQ"}
-                  or any(row.get("session") not in {"REGULAR", "POST_MARKET_OR_CLOSED"}
-                         for row in index_rows)):
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SESSION_UNAVAILABLE")
-          index_dates = []
-          for row in index_rows:
-              source_time = str(row.get("sourceTime") or "")
-              try:
-                  index_dates.append(datetime.fromisoformat(source_time.replace("Z", "+00:00")).date().strftime("%Y%m%d"))
-              except ValueError:
-                  raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SOURCE_DATE_INVALID")
-          if len(set(index_dates)) != 1:
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SOURCE_DATE_MISMATCH")
-          target_date = index_dates[0]
+          try:
+              index_evidence = validate_final_payload(
+                  indices, sys.argv[3], sys.argv[4])
+          except ValueError as exc:
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + str(exc))
+          target_date = index_evidence["targetDate"]
 
           Path(sys.argv[2]).write_text(target_date, encoding="utf-8")
           print(json.dumps({"status": "READY", "targetDate": target_date,
