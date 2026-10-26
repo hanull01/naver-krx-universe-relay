@@ -278,7 +278,7 @@ class MonitoringProductionTests(unittest.TestCase):
     def test_hourly_workflow_collects_full_snapshot_once_and_publishes_compact_evidence(self):
         workflow = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
         self.assertIn('- cron: "0 23 * * 0-4"', workflow)
-        self.assertIn('- cron: "0 0-10 * * 1-5"', workflow)
+        self.assertIn('- cron: "7 0-10 * * 1-5"', workflow)
         self.assertIn('- cron: "30 11 * * 1-5"', workflow)
         self.assertNotIn('cron: "32 ', workflow)
         self.assertEqual(workflow.count("python tools/naver_full_market_current.py"), 1)
