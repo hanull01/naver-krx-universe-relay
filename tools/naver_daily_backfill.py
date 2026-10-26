@@ -67,6 +67,17 @@ def years_ago(dt, years):
         return dt.replace(year=dt.year - years, day=28)
 
 
+def parse_date_arg(value, *, end_of_day=False):
+    """Parse an explicit local calendar date for a bounded backfill."""
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"invalid date (expected YYYY-MM-DD): {value!r}") from exc
+    if end_of_day:
+        return parsed.replace(hour=23, minute=59, second=59)
+    return parsed
+
+
 def parse_codes(value):
     if not value:
         return []
@@ -415,7 +426,13 @@ def collect_one(
         raise RuntimeError(f"invalid JSON response: {e}") from e
 
     rows = payload.get("priceInfos", []) if isinstance(payload, dict) else []
-    validation = validate_rows(rows)
+    start_date = start_dt.strftime("%Y%m%d")
+    end_date = end_dt.strftime("%Y%m%d")
+    selected_rows = [
+        row for row in rows
+        if start_date <= str(row.get("localDate") or "") <= end_date
+    ]
+    validation = validate_rows(selected_rows)
 
     collected_at = now_local()
     day_dir = collected_at.strftime("%Y%m%d")
@@ -461,7 +478,7 @@ def collect_one(
     canonical_path = None
 
     if validation["collection_valid"]:
-        canonical_rows = canonicalize(rows, code, asset_type, market)
+        canonical_rows = canonicalize(selected_rows, code, asset_type, market)
         canonical_path = output_root / "canonical" / "daily" / f"{code}.jsonl"
         canonical_count = write_canonical(canonical_path, canonical_rows)
 
@@ -600,6 +617,8 @@ def main():
     parser.add_argument("--asset-type", choices=("stock", "etf", "etn", "all"), default="stock")
     parser.add_argument("--limit", type=int, help="limit universe targets for a smoke run")
     parser.add_argument("--years", type=int, default=3)
+    parser.add_argument("--start-date", help="bounded local start date (YYYY-MM-DD)")
+    parser.add_argument("--end-date", help="bounded local end date (YYYY-MM-DD)")
     parser.add_argument(
         "--output-root",
         default=str(DEFAULT_OUTPUT),
@@ -627,6 +646,20 @@ def main():
 
     if args.max_workers < 1:
         parser.error("--max-workers must be >= 1")
+
+    if bool(args.start_date) != bool(args.end_date):
+        parser.error("--start-date and --end-date must be provided together")
+    if args.start_date:
+        try:
+            start_dt = parse_date_arg(args.start_date)
+            end_dt = parse_date_arg(args.end_date, end_of_day=True)
+        except ValueError as exc:
+            parser.error(str(exc))
+        if end_dt < start_dt:
+            parser.error("--end-date must not precede --start-date")
+    else:
+        end_dt = now_local().replace(second=0, microsecond=0)
+        start_dt = years_ago(end_dt, args.years)
 
     selected_sources = sum(bool(value) for value in (args.codes, args.universe_file, args.all_market))
     if selected_sources != 1:
@@ -659,9 +692,6 @@ def main():
             print("unavailable=" + ",".join(recovery["unavailable"]), file=sys.stderr)
             return 1
         return 0
-
-    end_dt = now_local().replace(second=0, microsecond=0)
-    start_dt = years_ago(end_dt, args.years)
 
     checkpoints = load_json(checkpoint_path, {}) if args.resume else {}
 
