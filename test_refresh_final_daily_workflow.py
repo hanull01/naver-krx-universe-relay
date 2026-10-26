@@ -10,8 +10,10 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
     def setUpClass(cls):
         cls.text = WORKFLOW.read_text(encoding="utf-8")
         cls.start = cls.text.index("      - name: Prepare final daily monitoring update")
-        cls.end = cls.text.index("      - name: Collect market indices", cls.start)
+        cls.end = cls.text.index("      - name: Run V2 shadow observation", cls.start)
         cls.final_step = cls.text[cls.start:cls.end]
+        cls.indices_start = cls.text.index("      - name: Collect market indices")
+        cls.indices_step = cls.text[cls.indices_start:cls.start]
         cls.publish_start = cls.text.index("      - name: Commit refreshed production data")
         cls.publish = cls.text[cls.publish_start:]
 
@@ -34,9 +36,29 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertNotIn("naver_full_market_current.py", self.final_step[rebuild:])
 
     def test_final_update_requires_explicit_snapshot_session_date(self):
-        self.assertIn("from tools.trading_date_evidence import explicit_session_date", self.final_step)
-        self.assertIn("TRADING_DATE_MISSING_OR_INCONSISTENT", self.final_step)
+        self.assertIn("data/market/indices.json", self.final_step)
+        self.assertIn("NAVER_MOBILE_INDEX_BASIC", self.final_step)
+        self.assertIn("INDEX_SOURCE_DATE_MISMATCH", self.final_step)
         self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
+
+    def test_final_update_collects_naver_daily_local_dates_for_observed_set(self):
+        self.assertIn("--observed-snapshot", self.final_step)
+        self.assertIn("--fetch-today", self.final_step)
+        self.assertIn("--session-diagnostic-output", self.final_step)
+        self.assertIn("final-daily-target.txt", self.final_step)
+        self.assertNotIn("from tools.monitoring_daily_state_update import collect_today_rows", self.final_step)
+        self.assertNotIn("monitoring_daily_payload", self.final_step)
+
+    def test_duplicate_final_run_reuses_same_day_state_without_daily_refetch_contract(self):
+        self.assertIn("--fetch-today", self.final_step)
+        self.assertIn("update_with_universe_refresh", Path(__file__).parent.joinpath(
+            "tools", "monitoring_daily_state_update.py").read_text(encoding="utf-8"))
+        self.assertIn("same-day final generation", Path(__file__).parent.joinpath(
+            "tools", "monitoring_daily_state_update.py").read_text(encoding="utf-8"))
+
+    def test_indices_are_collected_before_final_date_resolution(self):
+        self.assertIn("id: indices", self.indices_step)
+        self.assertLess(self.indices_start, self.start)
 
     def test_only_successful_opt_in_update_is_publishable(self):
         gate = (
@@ -57,7 +79,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
         self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
         self.assertIn("OBSERVED_STOCK_UNIVERSE_INVALID", self.final_step)
-        self.assertIn("write_local_date_diagnostic", self.final_step)
+        self.assertIn("--session-diagnostic-output", self.final_step)
+        self.assertIn("diagnostic_path=\"$RUNNER_TEMP/trading-session-diagnostic.json\"", self.final_step)
         self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
 
     def test_ready_signal_requires_a_new_publication_commit(self):

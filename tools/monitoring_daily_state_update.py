@@ -433,8 +433,10 @@ def collect_today_rows(target_date, universe_file, fetcher=None, *,
                 raise error
             row = candidates[0]
             reasons = daily.row_validation_reasons(row)
-            return code, {"code": code, "date": target, "close": row.get("closePrice"),
-                          "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
+            return code, {"code": code, "date": target, "open": row.get("openPrice"),
+                          "high": row.get("highPrice"), "low": row.get("lowPrice"),
+                          "close": row.get("closePrice"), "volume": row.get("accumulatedTradingVolume"),
+                          "value": row.get("accumulatedTradingValue"),
                           "closeValid": not any("close" in item for item in reasons),
                           "ohlcValid": not reasons,
                           "volumeValid": not any("volume" in item for item in reasons),
@@ -556,8 +558,10 @@ def collect_today_rows_partial(target_date, universe_file, fetcher=None, *,
                     raise ValueError(";".join(reasons))
                 return (
                     code,
-                    {"code": code, "date": target, "close": row.get("closePrice"),
-                     "high": row.get("highPrice"), "volume": row.get("accumulatedTradingVolume"),
+                    {"code": code, "date": target, "open": row.get("openPrice"),
+                     "high": row.get("highPrice"), "low": row.get("lowPrice"),
+                     "close": row.get("closePrice"), "volume": row.get("accumulatedTradingVolume"),
+                     "value": row.get("accumulatedTradingValue"),
                      "closeValid": True, "ohlcValid": True, "volumeValid": True, "market": market},
                     None, observed_date, observed_values, duplicate,
                 )
@@ -772,6 +776,16 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
     else:
         incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
                                       **collection_options)
+    if daily_rows is None and not provisional:
+        invalid_codes = sorted(
+            code for code, row in incoming.items()
+            if not all(row.get(key) is True for key in
+                       ("closeValid", "ohlcValid", "volumeValid"))
+        )
+        if invalid_codes:
+            raise ValueError(
+                "daily OHLCV invalid: " + ",".join(invalid_codes[:20])
+            )
     publication_status = "PROVISIONAL" if provisional else "FINAL"
     updated, changed = update_state(reconciled, incoming, target_date, current_universe, publication_status)
     baseline = baseline_from_state(updated, target_date, current_universe, baseline_output)

@@ -213,6 +213,16 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Collect market indices
+        id: indices
+        if: steps.market_day.outputs.run == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python market_indices.py
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
       - name: Diagnose final daily-bar evidence
         id: final_daily_evidence
         if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && github.event_name == 'schedule' && github.event.schedule == '30 11 * * 1-5'
@@ -231,73 +241,79 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-monitoring-input.json" <<'PY'
+          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-target.txt" <<'PY'
           import json, sys
+          from datetime import datetime
           from pathlib import Path
-          from tools.final_daily_history import monitoring_daily_payload
-          from tools.trading_date_evidence import explicit_session_date
-          from tools.trading_session_diagnostic import write_local_date_diagnostic
+
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
+          indices = json.loads(Path("data/market/indices.json").read_text(encoding="utf-8"))
           observed_stocks = snapshot.get("stocks") or []
-          expected = [str(row.get("code") or "") for row in observed_stocks
-                      if str(row.get("assetType") or "").upper() == "STOCK"]
-          if (len(expected) != len(observed_stocks) or len(expected) != len(set(expected)) or
-                  not expected):
+          if (snapshot.get("status") not in {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
+                  or snapshot.get("collectionStatus", "SUCCESS") != "SUCCESS"):
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_SNAPSHOT_INVALID")
+          expected = [str(row.get("code") or "") for row in observed_stocks]
+          if (len(expected) != len(observed_stocks) or len(expected) != len(set(expected))
+                  or not expected or any(str(row.get("assetType") or "").upper() != "STOCK"
+                                         for row in observed_stocks)):
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_UNIVERSE_INVALID")
-          target_date = explicit_session_date(current_snapshot=snapshot)
-          if not target_date:
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:TRADING_DATE_MISSING_OR_INCONSISTENT")
-          result = monitoring_daily_payload(snapshot, baseline, expected, target_date=target_date)
-          if result["status"] != "READY":
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + json.dumps(result["reason"], ensure_ascii=False))
-          expected_set = set(expected)
-          observed_dates = {}
-          duplicate_codes = set()
-          for row in snapshot.get("stocks") or []:
-              code = str(row.get("code") or "")
-              if code in observed_dates:
-                  duplicate_codes.add(code)
-                  continue
-              if code not in expected_set:
-                  observed_dates[code] = row.get("localDate")
-                  continue
-              value = next((row.get(key) for key in
-                            ("tradingDate", "tradeDate", "marketDate", "localDate")
-                            if row.get(key) not in (None, "")), None)
-              if value:
-                  observed_dates[code] = value
-          diagnostic = write_local_date_diagnostic(
-              "data/monitoring-daily/trading-session-diagnostic.json",
-              target_date, observed_dates, expected,
-              duplicate_codes=duplicate_codes)
-          if diagnostic["status"] != "VERIFIED":
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
-          Path(sys.argv[2]).write_text(json.dumps({"rows": result["rows"]}, ensure_ascii=False), encoding="utf-8")
-          print(json.dumps({"status": result["status"], "rows": len(result["rows"]),
-                            "excluded": len(result["excluded"]), "networkCalls": 0}, ensure_ascii=False))
+
+          index_rows = indices.get("indices") or []
+          if (indices.get("status") != "OK" or indices.get("source") != "NAVER_MOBILE_INDEX_BASIC"
+                  or {row.get("code") for row in index_rows} != {"KOSPI", "KOSDAQ"}
+                  or any(row.get("session") not in {"REGULAR", "POST_MARKET_OR_CLOSED"}
+                         for row in index_rows)):
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SESSION_UNAVAILABLE")
+          index_dates = []
+          for row in index_rows:
+              source_time = str(row.get("sourceTime") or "")
+              try:
+                  index_dates.append(datetime.fromisoformat(source_time.replace("Z", "+00:00")).date().strftime("%Y%m%d"))
+              except ValueError:
+                  raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SOURCE_DATE_INVALID")
+          if len(set(index_dates)) != 1:
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:INDEX_SOURCE_DATE_MISMATCH")
+          target_date = index_dates[0]
+
+          Path(sys.argv[2]).write_text(target_date, encoding="utf-8")
+          print(json.dumps({"status": "READY", "targetDate": target_date,
+                            "observedCodes": len(expected)}, ensure_ascii=False))
           PY
-          target_date=$(python3 - "$RUNNER_TEMP/full-market-current.json" <<'PY'
-          import json, sys
-          from pathlib import Path
-          from tools.trading_date_evidence import explicit_session_date
-          snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          target_date = explicit_session_date(current_snapshot=snapshot)
-          if not target_date:
-              raise SystemExit("TRADING_DATE_MISSING_OR_INCONSISTENT")
-          print(target_date)
-          PY
-          )
           python tools/build_monitoring_daily_state.py update-latest \
-            --daily-input "$RUNNER_TEMP/final-daily-monitoring-input.json" \
-            --date "$target_date" \
+            --date "$(cat "$RUNNER_TEMP/final-daily-target.txt")" \
             --observed-snapshot "$RUNNER_TEMP/full-market-current.json" \
-            --refresh-universe \
+            --refresh-universe --fetch-today \
+            --session-diagnostic-output "$RUNNER_TEMP/trading-session-diagnostic.json" \
             > "$RUNNER_TEMP/final-daily-monitoring-result.json"
           cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
           final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
           echo "FINAL_DAILY_STATUS=$final_status"
           test "$final_status" = "SUCCESS"
+          diagnostic_path="$RUNNER_TEMP/trading-session-diagnostic.json"
+          if [ ! -f "$diagnostic_path" ]; then
+            diagnostic_path=data/monitoring-daily/trading-session-diagnostic.json
+          fi
+          target_date=$(python3 - "$diagnostic_path" "$RUNNER_TEMP/full-market-current.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          diagnostic = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          snapshot = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+          if diagnostic.get("status") != "VERIFIED":
+              raise SystemExit("TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
+          expected = {str(row.get("code") or "") for row in snapshot.get("stocks") or []}
+          if (set(diagnostic.get("expectedCodes") or []) != expected
+                  or set(diagnostic.get("observedCodes") or []) != expected
+                  or diagnostic.get("missingCodes")
+                  or diagnostic.get("unexpectedCodes")
+                  or diagnostic.get("duplicateCodes")
+                  or diagnostic.get("mismatchCodes")
+                  or diagnostic.get("dateMismatchCodes")):
+              raise SystemExit("TRADING_DATE_DIAGNOSTIC_CODE_SET_UNVERIFIED")
+          print(str(diagnostic.get("targetDate") or "").replace("-", ""))
+          PY
+          )
+          test "$target_date" = "$(cat "$RUNNER_TEMP/final-daily-target.txt")"
+          cp "$diagnostic_path" data/monitoring-daily/trading-session-diagnostic.json
           # FINAL is now part of the date-evidence path.  Rebuild the compact
           # full-market artifacts from the already validated runner snapshot
           # so latest-summary.json observes the just-published FINAL state.
@@ -305,16 +321,6 @@ jobs:
           python tools/run_full_market_monitoring.py \
             --current-file "$RUNNER_TEMP/full-market-current.json"
           echo "write=true" >> "$GITHUB_OUTPUT"
-
-      - name: Collect market indices
-        id: indices
-        if: steps.market_day.outputs.run == 'true'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          python market_indices.py
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Run V2 shadow observation
         id: v2_shadow
