@@ -1,6 +1,6 @@
 {
   "version": "dynamic-universe-management-v1",
-  "generatedAt": "2026-10-26T05:26:20.273062+00:00",
+  "generatedAt": "2026-10-26T06:48:11.087525+00:00",
   "networkCalls": 0,
   "industryEvidence": {
     "status": "PARTIAL_WITH_COVERAGE",
@@ -24,7 +24,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -42,7 +42,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -60,7 +60,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -78,7 +78,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -96,7 +96,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -114,43 +114,25 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
       "id": "25",
       "name": "기타",
       "status": "DISCOVERED",
-      "score": 80.0,
+      "score": 100.0,
       "qualifyStreak": 0,
       "weakenStreak": 0,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": false,
+        "advancerPct": true,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": true,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "315",
-      "name": "손해보험",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -168,12 +150,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "328",
-      "name": "전문소매",
+      "id": "315",
+      "name": "손해보험",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -186,7 +168,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -204,7 +186,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -222,7 +204,25 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "328",
+      "name": "전문소매",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -240,43 +240,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "299",
-      "name": "기계",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "303",
-      "name": "가구",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -294,12 +258,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "286",
-      "name": "생물공학",
+      "id": "303",
+      "name": "가구",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -312,12 +276,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "327",
-      "name": "디스플레이패널",
+      "id": "299",
+      "name": "기계",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -330,79 +294,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "267",
-      "name": "IT서비스",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "329",
-      "name": "도로와철도운송",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "292",
-      "name": "핸드셋",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "273",
-      "name": "자동차",
-      "status": "DISCOVERED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -420,12 +312,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "298",
-      "name": "가정용기기와용품",
+      "id": "267",
+      "name": "IT서비스",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -438,12 +330,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "270",
-      "name": "자동차부품",
+      "id": "327",
+      "name": "디스플레이패널",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -456,7 +348,79 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "339",
+      "name": "다각화된소비자서비스",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "286",
+      "name": "생물공학",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "329",
+      "name": "도로와철도운송",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "273",
+      "name": "자동차",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -474,12 +438,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "317",
-      "name": "호텔,레스토랑,레저",
+      "id": "298",
+      "name": "가정용기기와용품",
       "status": "DISCOVERED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -492,7 +456,25 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "270",
+      "name": "자동차부품",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -510,7 +492,79 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "280",
+      "name": "부동산",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "312",
+      "name": "가스유틸리티",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "317",
+      "name": "호텔,레스토랑,레저",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "292",
+      "name": "핸드셋",
+      "status": "DISCOVERED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -528,97 +582,43 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "280",
-      "name": "부동산",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "312",
-      "name": "가스유틸리티",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "338",
-      "name": "사무용전자제품",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
       "id": "285",
       "name": "방송과엔터테인먼트",
       "status": "DISCOVERED",
-      "score": 40.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 0,
       "checks": {
-        "relativeStrength": false,
+        "relativeStrength": true,
         "advancerPct": false,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "305",
-      "name": "항공사",
+      "id": "262",
+      "name": "생명과학도구및서비스",
       "status": "DISCOVERED",
-      "score": 40.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 0,
       "checks": {
-        "relativeStrength": false,
+        "relativeStrength": true,
         "advancerPct": false,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -636,97 +636,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "262",
-      "name": "생명과학도구및서비스",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "332",
-      "name": "문구류",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "308",
-      "name": "인터넷과카탈로그소매",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "284",
-      "name": "우주항공과국방",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "287",
-      "name": "소프트웨어",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -744,61 +654,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "289",
-      "name": "건축자재",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "269",
-      "name": "디스플레이장비및부품",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "339",
-      "name": "다각화된소비자서비스",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -816,97 +672,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "321",
-      "name": "증권",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "296",
-      "name": "운송인프라",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "290",
-      "name": "교육서비스",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "320",
-      "name": "건축제품",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "316",
-      "name": "건강관리업체및서비스",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -924,12 +690,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "281",
-      "name": "건강관리장비와용품",
+      "id": "338",
+      "name": "사무용전자제품",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -942,12 +708,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "294",
-      "name": "통신장비",
+      "id": "287",
+      "name": "소프트웨어",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -960,7 +726,133 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "320",
+      "name": "건축제품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "290",
+      "name": "교육서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "305",
+      "name": "항공사",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "289",
+      "name": "건축자재",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "316",
+      "name": "건강관리업체및서비스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "308",
+      "name": "인터넷과카탈로그소매",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "296",
+      "name": "운송인프라",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -978,12 +870,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "272",
-      "name": "화학",
+      "id": "321",
+      "name": "증권",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -996,12 +888,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "322",
-      "name": "비철금속",
+      "id": "269",
+      "name": "디스플레이장비및부품",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -1014,12 +906,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "325",
-      "name": "전기유틸리티",
+      "id": "281",
+      "name": "건강관리장비와용품",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -1032,7 +924,43 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "284",
+      "name": "우주항공과국방",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "294",
+      "name": "통신장비",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1050,12 +978,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "297",
-      "name": "가정용품",
+      "id": "272",
+      "name": "화학",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -1068,79 +996,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "313",
-      "name": "석유와가스",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "265",
-      "name": "판매업체",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "264",
-      "name": "백화점과일반상점",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "268",
-      "name": "식품",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1158,12 +1014,12 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
-      "id": "304",
-      "name": "철강",
+      "id": "322",
+      "name": "비철금속",
       "status": "DISCOVERED",
       "score": 40.0,
       "qualifyStreak": 0,
@@ -1176,7 +1032,97 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "268",
+      "name": "식품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "265",
+      "name": "판매업체",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "332",
+      "name": "문구류",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "297",
+      "name": "가정용품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "313",
+      "name": "석유와가스",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1194,25 +1140,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "334",
-      "name": "무역회사와판매업체",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1230,7 +1158,79 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "325",
+      "name": "전기유틸리티",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "264",
+      "name": "백화점과일반상점",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "304",
+      "name": "철강",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "334",
+      "name": "무역회사와판매업체",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1248,7 +1248,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1266,25 +1266,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "283",
-      "name": "전기제품",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1302,7 +1284,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1320,7 +1302,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1338,7 +1320,25 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "283",
+      "name": "전기제품",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1356,7 +1356,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1374,7 +1374,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1392,25 +1392,7 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
-    },
-    {
-      "id": "278",
-      "name": "반도체와반도체장비",
-      "status": "DISCOVERED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     },
     {
@@ -1428,7 +1410,25 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-10-26T05:26:18.214517+00:00",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
+      "evidenceQuality": "PARTIAL_WITH_COVERAGE"
+    },
+    {
+      "id": "278",
+      "name": "반도체와반도체장비",
+      "status": "DISCOVERED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-10-26T06:48:08.038911+00:00",
       "evidenceQuality": "PARTIAL_WITH_COVERAGE"
     }
   ],
@@ -1437,12 +1437,12 @@
       "id": "597",
       "name": "오가노이드",
       "status": "ACTIVE",
-      "score": 40.0,
+      "score": 60.0,
       "qualifyStreak": 39,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": false
+        "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1554,12 +1554,12 @@
       "id": "173",
       "name": "IT 대표주",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1606,12 +1606,12 @@
       "id": "614",
       "name": "S7(삼성전자/SK하이닉스 등)",
       "status": "ACTIVE",
-      "score": 80.0,
+      "score": 40.0,
       "qualifyStreak": 5,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -1684,7 +1684,7 @@
       "id": "615",
       "name": "2026 하반기 신규상장",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -1723,7 +1723,7 @@
       "id": "283",
       "name": "생명보험",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -2035,12 +2035,12 @@
       "id": "290",
       "name": "스포츠행사 수혜(올림픽, 월드컵 등)",
       "status": "ACTIVE",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 3,
       "weakenStreak": 0,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2178,7 +2178,7 @@
       "id": "587",
       "name": "피지컬 AI/휴머노이드 로봇",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -2373,12 +2373,12 @@
       "id": "174",
       "name": "치아 치료(임플란트 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2555,12 +2555,12 @@
       "id": "121",
       "name": "남북경협",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -2802,12 +2802,12 @@
       "id": "18",
       "name": "전자파",
       "status": "REMOVED",
-      "score": 40.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": false
+        "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3283,12 +3283,12 @@
       "id": "48",
       "name": "영화",
       "status": "REMOVED",
-      "score": 40.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": false
+        "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3309,12 +3309,12 @@
       "id": "99",
       "name": "지능형로봇/인공지능(AI)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3413,12 +3413,12 @@
       "id": "507",
       "name": "마이데이터",
       "status": "REMOVED",
-      "score": 40.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": false
+        "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3816,12 +3816,12 @@
       "id": "591",
       "name": "서울고속버스터미널 재개발 수혜",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3933,12 +3933,12 @@
       "id": "511",
       "name": "니켈",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -3946,12 +3946,12 @@
       "id": "8",
       "name": "화폐/금융자동화기기(디지털화폐 등)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -4180,12 +4180,12 @@
       "id": "449",
       "name": "2차전지(생산)",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -4284,12 +4284,12 @@
       "id": "326",
       "name": "3D 프린터",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 40.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
         "verifiedMembership": true,
-        "minimumScore": true
+        "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE"
     },
@@ -4492,7 +4492,7 @@
       "id": "505",
       "name": "로봇(산업용/협동로봇 등)",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 8,
       "checks": {
@@ -4879,12 +4879,15 @@
         "minimumPersistence": true
       },
       "source": "AUTO_LEADER",
-      "status": "ACTIVE",
-      "qualifyStreak": 2,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
       "weakenStreak": 0,
-      "collectionAdmitted": true,
-      "currentPrice": 10160.0,
-      "changeRate": 0.0
+      "collectionAdmitted": false,
+      "currentPrice": 10170.0,
+      "changeRate": 0.1,
+      "selectionBlocked": true,
+      "selectionBlockReason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "FUND"
     },
     {
       "id": "sector:273:000040",
@@ -4903,7 +4906,10 @@
       "weakenStreak": 7,
       "collectionAdmitted": false,
       "currentPrice": 1117.0,
-      "changeRate": -4.12
+      "changeRate": -4.12,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:148930",
@@ -4921,8 +4927,11 @@
       "qualifyStreak": 0,
       "weakenStreak": 7,
       "collectionAdmitted": false,
-      "currentPrice": 3615.0,
-      "changeRate": 2.41
+      "currentPrice": 3595.0,
+      "changeRate": 1.84,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:012340",
@@ -4941,7 +4950,10 @@
       "weakenStreak": 8,
       "collectionAdmitted": false,
       "currentPrice": 878.0,
-      "changeRate": 29.88
+      "changeRate": 29.88,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:091580",
@@ -4960,7 +4972,10 @@
       "weakenStreak": 8,
       "collectionAdmitted": false,
       "currentPrice": 23450.0,
-      "changeRate": -7.5
+      "changeRate": -7.5,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:450080",
@@ -4979,7 +4994,10 @@
       "weakenStreak": 8,
       "collectionAdmitted": false,
       "currentPrice": 36950.0,
-      "changeRate": 14.75
+      "changeRate": 14.75,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:273:005385",
@@ -4996,7 +5014,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 8,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:273:005387",
@@ -5013,7 +5034,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 8,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:275:033780",
@@ -5030,7 +5054,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 10,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:273:000270",
@@ -5047,7 +5074,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 12,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:334:001250",
@@ -5065,8 +5095,11 @@
       "qualifyStreak": 0,
       "weakenStreak": 12,
       "collectionAdmitted": false,
-      "currentPrice": 2610.0,
-      "changeRate": -8.42
+      "currentPrice": 2575.0,
+      "changeRate": -9.65,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:334:047050",
@@ -5083,7 +5116,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 12,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:334:38380K",
@@ -5100,7 +5136,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 12,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:308:362320",
@@ -5117,7 +5156,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 23,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:285:253450",
@@ -5136,7 +5178,10 @@
       "weakenStreak": 24,
       "collectionAdmitted": false,
       "currentPrice": 23650.0,
-      "changeRate": 8.99
+      "changeRate": 8.99,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:285:473980",
@@ -5155,7 +5200,10 @@
       "weakenStreak": 24,
       "collectionAdmitted": false,
       "currentPrice": 11760.0,
-      "changeRate": 6.04
+      "changeRate": 6.04,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:285:037270",
@@ -5174,7 +5222,10 @@
       "weakenStreak": 24,
       "collectionAdmitted": false,
       "currentPrice": 3200.0,
-      "changeRate": 3.9
+      "changeRate": 3.9,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:285:041510",
@@ -5191,7 +5242,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 26,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:333:032640",
@@ -5210,7 +5264,10 @@
       "weakenStreak": 31,
       "collectionAdmitted": false,
       "currentPrice": 15530.0,
-      "changeRate": 0.13
+      "changeRate": 0.13,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:333:065530",
@@ -5227,7 +5284,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 31,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:329:000650",
@@ -5246,7 +5306,10 @@
       "weakenStreak": 48,
       "collectionAdmitted": false,
       "currentPrice": 233000.0,
-      "changeRate": 8.88
+      "changeRate": 8.88,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:329:084670",
@@ -5264,8 +5327,11 @@
       "qualifyStreak": 0,
       "weakenStreak": 48,
       "collectionAdmitted": false,
-      "currentPrice": 34650.0,
-      "changeRate": 8.62
+      "currentPrice": 34000.0,
+      "changeRate": 6.58,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:458650",
@@ -5284,7 +5350,10 @@
       "weakenStreak": 48,
       "collectionAdmitted": false,
       "currentPrice": 8450.0,
-      "changeRate": 2.3
+      "changeRate": 2.3,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:393890",
@@ -5303,7 +5372,10 @@
       "weakenStreak": 48,
       "collectionAdmitted": false,
       "currentPrice": 10440.0,
-      "changeRate": 10.95
+      "changeRate": 10.95,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:331:071320",
@@ -5320,7 +5392,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 48,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:323:011200",
@@ -5339,7 +5414,10 @@
       "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 23600.0,
-      "changeRate": 1.72
+      "changeRate": 1.72,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:323:028670",
@@ -5358,7 +5436,10 @@
       "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 6730.0,
-      "changeRate": -7.04
+      "changeRate": -7.04,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:326:004360",
@@ -5375,7 +5456,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 56,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:326:009070",
@@ -5392,7 +5476,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 56,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:326:033290",
@@ -5411,7 +5498,10 @@
       "weakenStreak": 57,
       "collectionAdmitted": false,
       "currentPrice": 1610.0,
-      "changeRate": 2.09
+      "changeRate": 2.09,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:329:403550",
@@ -5428,7 +5518,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 61,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:240600",
@@ -5447,7 +5540,10 @@
       "weakenStreak": 61,
       "collectionAdmitted": false,
       "currentPrice": 925.0,
-      "changeRate": -7.87
+      "changeRate": -7.87,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:329:095570",
@@ -5464,7 +5560,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 62,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:283:417200",
@@ -5483,7 +5582,10 @@
       "weakenStreak": 62,
       "collectionAdmitted": false,
       "currentPrice": 12730.0,
-      "changeRate": -8.61
+      "changeRate": -8.61,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:329:038390",
@@ -5500,7 +5602,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 64,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     },
     {
       "id": "sector:326:000700",
@@ -5517,7 +5622,10 @@
       "status": "REMOVED",
       "qualifyStreak": 0,
       "weakenStreak": 64,
-      "collectionAdmitted": false
+      "collectionAdmitted": false,
+      "selectionDeferred": false,
+      "selectionBlockReason": null,
+      "assetType": null
     }
   ],
   "initialObservationCandidates": [],
@@ -5543,15 +5651,6 @@
   ],
   "userWatchlists": {},
   "memberships": [
-    {
-      "code": "0120X0",
-      "sources": [
-        "AUTO_LEADER"
-      ],
-      "reasons": [
-        "sector:25"
-      ]
-    },
     {
       "code": "028050",
       "sources": [
@@ -5581,7 +5680,6 @@
     }
   ],
   "collectionCodes": [
-    "0120X0",
     "028050",
     "126340",
     "207940"
@@ -5624,16 +5722,34 @@
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
+      "type": "AUTO_LEADER",
+      "id": "sector:25:0120X0",
+      "code": "0120X0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "FUND"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:25:0106J0",
+      "code": "0106J0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "FUND"
+    },
+    {
       "type": "INITIAL_OBSERVATION",
       "groupId": "25",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "315",
+      "type": "AUTO_LEADER",
+      "id": "sector:277:0099W0",
+      "code": "0099W0",
       "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "SPAC"
     },
     {
       "type": "INITIAL_OBSERVATION",
@@ -5643,7 +5759,7 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "328",
+      "groupId": "315",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5661,19 +5777,13 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
+      "groupId": "328",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
       "groupId": "279",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "299",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "303",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5685,13 +5795,19 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "286",
+      "groupId": "303",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "327",
+      "groupId": "299",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "314",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5703,13 +5819,25 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "329",
+      "groupId": "327",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "292",
+      "groupId": "339",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "286",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "329",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5721,7 +5849,7 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "314",
+      "groupId": "324",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5739,27 +5867,25 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "324",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "317",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
       "groupId": "319",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "330",
+      "type": "AUTO_LEADER",
+      "id": "sector:280:293940",
+      "code": "293940",
       "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "REIT"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:280:0030R0",
+      "code": "0030R0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "REIT"
     },
     {
       "type": "INITIAL_OBSERVATION",
@@ -5775,7 +5901,19 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "338",
+      "groupId": "317",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "292",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "330",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5787,7 +5925,7 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "305",
+      "groupId": "262",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5799,55 +5937,7 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "262",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "332",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "308",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "284",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "287",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
       "groupId": "302",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "289",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "269",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "339",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5859,19 +5949,19 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "321",
+      "groupId": "293",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "296",
+      "groupId": "338",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "290",
+      "groupId": "287",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5883,25 +5973,37 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
+      "groupId": "290",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "305",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "289",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
       "groupId": "316",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "293",
+      "groupId": "308",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "281",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "294",
+      "groupId": "296",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5913,7 +6015,57 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
+      "groupId": "321",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "269",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:281:0013Y0",
+      "code": "0013Y0",
+      "status": "PENDING",
+      "reason": "LEADER_ASSET_TYPE_UNVERIFIED",
+      "assetType": "UNKNOWN"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "281",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "284",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "294",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "266",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
       "groupId": "272",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "326",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5925,13 +6077,19 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "325",
+      "groupId": "268",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "266",
+      "groupId": "265",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "332",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5949,7 +6107,19 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "265",
+      "groupId": "336",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "276",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
+      "groupId": "325",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -5961,37 +6131,13 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "268",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "326",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
       "groupId": "304",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "336",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
       "groupId": "334",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "276",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -6004,12 +6150,6 @@
     {
       "type": "INITIAL_OBSERVATION",
       "groupId": "307",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
-      "groupId": "283",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
@@ -6033,6 +6173,12 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
+      "groupId": "283",
+      "status": "PENDING",
+      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "INITIAL_OBSERVATION",
       "groupId": "333",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
@@ -6051,18 +6197,601 @@
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "278",
+      "groupId": "291",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
     },
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "291",
+      "groupId": "278",
       "status": "PENDING",
       "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:597:475960",
+      "code": "475960",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:597:217730",
+      "code": "217730",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:597:246710",
+      "code": "246710",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:467:950200",
+      "code": "950200",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:467:207940",
+      "code": "207940",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:467:237690",
+      "code": "237690",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:155:000660",
+      "code": "000660",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:155:005930",
+      "code": "005930",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:155:000990",
+      "code": "000990",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:547:019680",
+      "code": "019680",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:547:000660",
+      "code": "000660",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:547:043650",
+      "code": "043650",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:310:293940",
+      "code": "293940",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "REIT"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:310:0030R0",
+      "code": "0030R0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "REIT"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:310:330590",
+      "code": "330590",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "REIT"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:614:028260",
+      "code": "028260",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:614:032830",
+      "code": "032830",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:614:000660",
+      "code": "000660",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:402:225530",
+      "code": "225530",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:402:014530",
+      "code": "014530",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:402:023410",
+      "code": "023410",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:525:038390",
+      "code": "038390",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:525:403550",
+      "code": "403550",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:525:381970",
+      "code": "381970",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:284:0099W0",
+      "code": "0099W0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "SPAC"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:284:0041B0",
+      "code": "0041B0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "SPAC"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:284:0088D0",
+      "code": "0088D0",
+      "status": "PENDING",
+      "reason": "NON_EQUITY_ASSET_TYPE",
+      "assetType": "SPAC"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:496:025980",
+      "code": "025980",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:496:365900",
+      "code": "365900",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:496:110790",
+      "code": "110790",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:290:065150",
+      "code": "065150",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:290:000080",
+      "code": "000080",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:290:067160",
+      "code": "067160",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:154:294870",
+      "code": "294870",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:154:028260",
+      "code": "028260",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:154:000720",
+      "code": "000720",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:36:003280",
+      "code": "003280",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:36:465770",
+      "code": "465770",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:36:044450",
+      "code": "044450",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:398:007110",
+      "code": "007110",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:398:065950",
+      "code": "065950",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:398:005740",
+      "code": "005740",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:86:000080",
+      "code": "000080",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:86:018120",
+      "code": "018120",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:86:405920",
+      "code": "405920",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:234:446840",
+      "code": "446840",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:234:087600",
+      "code": "087600",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:234:039010",
+      "code": "039010",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:28:083640",
+      "code": "083640",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:28:143160",
+      "code": "143160",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:28:015710",
+      "code": "015710",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:210:123750",
+      "code": "123750",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:210:024950",
+      "code": "024950",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:210:065450",
+      "code": "065450",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:206:119500",
+      "code": "119500",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:206:186230",
+      "code": "186230",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:206:101170",
+      "code": "101170",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:524:028260",
+      "code": "028260",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:524:475230",
+      "code": "475230",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:524:003070",
+      "code": "003070",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:317:067160",
+      "code": "067160",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:317:035420",
+      "code": "035420",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:317:104200",
+      "code": "104200",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:319:003830",
+      "code": "003830",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:319:298020",
+      "code": "298020",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:319:079980",
+      "code": "079980",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:497:084680",
+      "code": "084680",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:497:236810",
+      "code": "236810",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:497:020180",
+      "code": "020180",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:534:148250",
+      "code": "148250",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:534:263810",
+      "code": "263810",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "theme:534:037370",
+      "code": "037370",
+      "status": "PENDING",
+      "reason": "LEADER_TRADING_DATE_UNVERIFIED",
+      "assetType": "STOCK"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:25:0120X0",
+      "from": "ACTIVE",
+      "to": "REMOVED"
+    }
+  ],
   "policy": {
     "version": "dynamic-universe-policy-v1",
     "refreshIntervalMinutes": 60,
@@ -6090,7 +6819,7 @@
   },
   "load": {
     "limit": 120,
-    "count": 4,
+    "count": 3,
     "limitExceededByProtectedSources": 0
   },
   "safety": {
