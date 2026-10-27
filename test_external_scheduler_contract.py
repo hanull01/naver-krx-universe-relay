@@ -24,11 +24,17 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         self.assertIn("GITHUB_TOKEN", self.worker)
         self.assertIn("DISPATCH_FAILED", self.worker)
         self.assertIn("UNVERIFIED", self.worker)
+        self.assertIn("SLOT_GRACE_BEFORE_MS", self.worker)
+        self.assertIn("SLOT_GRACE_AFTER_MS", self.worker)
         self.assertIn("Secret 등록·실제 Cron 활성화는 별도 승인", self.readme)
 
     def test_delivery_is_not_claimed_from_run_success(self):
         self.assertIn('runResult.deliveryStatus = "UNVERIFIED"', self.worker)
         self.assertIn("게시 커밋 SHA", self.readme)
+
+    def test_final_publication_contract_is_explicit(self):
+        for value in ("FINAL_DATE_MISMATCH", "FINAL_DIAGNOSTIC_UNVERIFIED", "FINAL_BASELINE_INVALID", "FINAL_PUBLICATION_VERIFIED"):
+            self.assertIn(value, self.worker)
 
 
 if __name__ == "__main__":

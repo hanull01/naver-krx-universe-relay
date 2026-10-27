@@ -6,7 +6,8 @@
 
 - `GITHUB_TOKEN`은 Worker Secret으로만 주입하며 코드와 로그에 출력하지 않는다.
 - `GITHUB_REPOSITORY`는 Worker 환경 변수로 주입한다.
-- Durable Object `SLOT_GATE`가 슬롯별 원자적 claim을 수행한다. 이미 claim된 슬롯은 workflow dispatch하지 않는다.
+- Durable Object `SLOT_GATE`가 슬롯별 원자적 claim을 수행한다. 상태는 `CLAIMED → DISPATCHED → RUN_VERIFIED → PUBLISHED` 또는 `FAILED`로 기록한다.
+- 외부 슬롯 판정 유예시간은 예정시각 전 5분, 후 15분이다. 이 범위에서 `schedule` 또는 `workflow_dispatch` Run이 있으면 동일 슬롯으로 간주해 dispatch하지 않는다. 범위 밖은 누락으로만 판정한다.
 - dispatch 성공은 Run 생성 성공이 아니다. Run ID, 실행 HEAD, 완료 결론을 별도로 확인한다.
 - 게시가 필요한 workflow는 게시 커밋 SHA를 확인한 뒤에만 게시 검증을 성공으로 기록한다.
 - Gmail 수신과 Work 전달은 이 Worker만으로 확인하지 않으며 `UNVERIFIED`로 남긴다.
@@ -23,6 +24,6 @@
 | 23:00 | Build daily market report | 없음 |
 | 기존 Research/Snapshots 슬롯 | 각 workflow | 없음 |
 
-20:30 슬롯은 거래일·지수·원천 일봉·게시 기준일 검증이 workflow 내부에서 통과한 경우에만 정상 결과로 취급한다. `RUN_SUCCESS`만으로 FINAL 또는 사용자 전달 성공을 선언하지 않는다.
+20:30 슬롯은 `asOfDate`, KOSPI/KOSDAQ FINAL, Baseline, trading-session diagnostic, 게시 커밋 SHA가 서로 일치하는 경우에만 `FINAL_PUBLICATION_VERIFIED`로 기록한다. `RUN_SUCCESS`만으로 FINAL 또는 사용자 전달 성공을 선언하지 않는다.
 
 실제 배포 전에는 동일 슬롯의 GitHub Run 존재 여부, 게시 SHA, Gmail 수신, Work 결과를 별도 시험해야 한다.
