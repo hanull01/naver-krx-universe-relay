@@ -14,12 +14,12 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         cls.refresh_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh.yml").read_text(encoding="utf-8")
 
     def test_final_slot_dispatches_explicit_recovery_mode(self):
-        self.assertIn('cron === "30 11 * * 1-5"', self.worker)
+        self.assertIn('cron === "30 11 * * MON-FRI"', self.worker)
         self.assertIn('run_mode: "final_recovery"', self.worker)
 
     def test_intraday_slot_keeps_intraday_mode(self):
         self.assertIn('run_mode: "intraday"', self.worker)
-        self.assertIn('cron === "7 0-10 * * 1-5"', self.worker)
+        self.assertIn('cron === "7 0-10 * * MON-FRI"', self.worker)
 
     def test_duplicate_claim_and_secret_protection_are_explicit(self):
         self.assertIn("SLOT_GATE", self.worker)
@@ -43,7 +43,7 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         self.assertIn('production-publication-', self.worker)
         self.assertIn('production_commit_sha', self.readme)
         self.assertEqual(self.wrangler.count('crons ='), 1)
-        self.assertIn('10,17,20,30,50 * * * 0-5', self.wrangler)
+        self.assertIn('10,17,20,30,50 * * * SUN-FRI', self.wrangler)
         self.assertIn('new_sqlite_classes = ["SlotGate"]', self.wrangler)
         self.assertIn("production-publication-${{ github.run_id }}-${{ steps.publish.outputs.production_commit_sha }}-${{ steps.publish.outputs.publication_changed }}", self.refresh_workflow)
         self.assertIn("Upload production publication provenance", self.refresh_workflow)

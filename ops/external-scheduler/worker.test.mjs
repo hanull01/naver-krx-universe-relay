@@ -49,7 +49,7 @@ test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => 
 
 test("the consolidated cron covers Monday KST early slots and rejects weekend KST", () => {
   const cron = "10,17,20,30,50 * * * 0-5";
-  const monday = (hour, minute) => Date.UTC(2026, 9, 25, hour - 9, minute);
+  const monday = (hour, minute) => Date.UTC(2026, 9, 26, hour - 9, minute);
   assert.equal(resolveScheduledPlan(cron, monday(7, 20)).plan.key, "research");
   assert.equal(resolveScheduledPlan(cron, monday(8, 10)).plan.key, "snapshots");
 
