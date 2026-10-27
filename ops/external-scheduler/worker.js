@@ -8,21 +8,22 @@ const WORKFLOWS = {
 
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
-export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
+export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * SUN-FRI";
+const LEGACY_CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
 
 export function planForCron(cron) {
-  if (cron === "30 11 * * 1-5") {
+  if (cron === "30 11 * * MON-FRI" || cron === "30 11 * * 1-5") {
     return { slot: "20:30", key: "refresh-final", ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } };
   }
-  if (cron === "0 23 * * 0-4" || cron === "7 0-10 * * 1-5") {
-    return { slot: cron === "0 23 * * 0-4" ? "08:00" : "09:07-19:07", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
+  if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "7 0-10 * * MON-FRI" || cron === "7 0-10 * * 1-5") {
+    return { slot: cron.startsWith("0 23") ? "08:00" : "09:07-19:07", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
   }
-  if (cron === "0 14 * * 1-5") return { slot: "23:00", key: "daily-report", ...WORKFLOWS.report, inputs: {} };
-  if (cron === "17 0 * * 1-5") return { slot: "09:17", key: "schedule-diagnostic", ...WORKFLOWS.diagnostic, inputs: {} };
-  if (cron === "20 22 * * 0-4" || cron === "20 3 * * 1-5" || cron === "20 10 * * 1-5") {
+  if (cron === "0 14 * * MON-FRI" || cron === "0 14 * * 1-5") return { slot: "23:00", key: "daily-report", ...WORKFLOWS.report, inputs: {} };
+  if (cron === "17 0 * * MON-FRI" || cron === "17 0 * * 1-5") return { slot: "09:17", key: "schedule-diagnostic", ...WORKFLOWS.diagnostic, inputs: {} };
+  if (cron === "20 22 * * SUN-THU" || cron === "20 22 * * 0-4" || cron === "20 3 * * MON-FRI" || cron === "20 3 * * 1-5" || cron === "20 10 * * MON-FRI" || cron === "20 10 * * 1-5") {
     return { slot: "research", key: "research", ...WORKFLOWS.research, inputs: {} };
   }
-  if (cron === "10,30,50 23 * * 0-4" || cron === "10,30,50 0-10 * * 1-5") {
+  if (cron === "10,30,50 23 * * SUN-THU" || cron === "10,30,50 23 * * 0-4" || cron === "10,30,50 0-10 * * MON-FRI" || cron === "10,30,50 0-10 * * 1-5") {
     return { slot: "snapshots", key: "snapshots", ...WORKFLOWS.snapshots, inputs: {} };
   }
   return null;
@@ -54,7 +55,7 @@ export function slotKeyFor(plan, cron, scheduledTime) {
 }
 
 export function resolveScheduledPlan(cron, scheduledTime) {
-  if (cron !== CONSOLIDATED_CRON) {
+  if (cron !== CONSOLIDATED_CRON && cron !== LEGACY_CONSOLIDATED_CRON) {
     const plan = planForCron(cron);
     return plan ? { plan, slotCron: cron } : null;
   }

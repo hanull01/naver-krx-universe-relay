@@ -20,6 +20,7 @@
 - `wrangler.toml`에는 배포에 필요한 Cron 목록, `SLOT_GATE` Durable Object 바인딩, `SlotGate` SQLite migration을 선언한다. 실제 Cron 활성화와 Secret 등록은 별도 승인 없이는 수행하지 않는다.
 - Free 플랜의 5개 Cron 한도를 위해 장중·FINAL·리포트·보조 슬롯을 5개 표현식으로 통합한다. 보조 통합 Cron은 KST 시각 필터로 Research(07:20/12:20/19:20), Snapshots(08:10~19:50의 10/30/50분), 진단(09:17)만 실행한다.
 - 보조 통합 Cron은 월요일 KST 이른 슬롯을 포함하도록 UTC 일요일~금요일에 발생시키고, Worker가 KST 토·일을 필터링한다. 따라서 UTC 보정으로 인한 주말 실행은 dispatch하지 않는다.
+- Cloudflare Cron은 요일 표기가 `1=일요일`인 규칙을 사용하므로 `SUN-THU`, `MON-FRI`, `SUN-FRI` 명칭을 사용한다. GitHub Actions의 숫자 요일 표기와 혼동하지 않는다.
 - `production-publication-<runId>-<sha>-<changed>` artifact가 Run ID·게시 SHA·변경 여부를 연결한다. artifact가 없거나 SHA 검증이 실패하면 게시 성공으로 승격하지 않는다.
 
 ## 슬롯
