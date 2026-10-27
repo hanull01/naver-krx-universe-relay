@@ -292,6 +292,7 @@ def collect(
     seen: set[str] = set()
     page = 0
     expected_total: int | None = None
+    duplicate_count = 0
 
     while True:
         data = fetch_page(page, start_date, end_date)
@@ -303,12 +304,24 @@ def collect(
         if not isinstance(items, list):
             raise RuntimeError(f"items is not a list at page={page}")
 
+        page_seen: set[str] = set()
         for item in items:
             nid = str(item.get("nid") or "")
             if not nid:
                 raise RuntimeError(f"missing nid at page={page}")
+            if nid in page_seen:
+                raise RuntimeError(f"duplicate nid within page={page}: {nid}")
+            page_seen.add(nid)
             if nid in seen:
-                raise RuntimeError(f"duplicate nid during collection: {nid}")
+                previous = next(
+                    report for report in reports if str(report.get("nid")) == nid
+                )
+                if item != previous:
+                    raise RuntimeError(
+                        f"conflicting duplicate nid across pages: {nid}"
+                    )
+                duplicate_count += 1
+                continue
             seen.add(nid)
             reports.append(item)
 
@@ -329,7 +342,8 @@ def collect(
 
     if len(reports) != expected_total:
         raise RuntimeError(
-            f"totalCount mismatch: api={expected_total} collected={len(reports)}"
+            f"totalCount mismatch: api={expected_total} collected={len(reports)} "
+            f"pageBoundaryDuplicates={duplicate_count}"
         )
 
     return reports, expected_total

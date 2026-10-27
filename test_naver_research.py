@@ -222,6 +222,49 @@ class NaverResearchTest(unittest.TestCase):
             self.assertTrue(result["unchanged"])
             self.assertEqual(before, after)
 
+    def test_identical_page_boundary_overlap_is_deduplicated(self):
+        pages = {
+            0: {"totalCount": 2, "items": [{"nid": "1", "title": "A"}], "hasNext": True},
+            1: {"totalCount": 2, "items": [{"nid": "1", "title": "A"}, {"nid": "2", "title": "B"}], "hasNext": False},
+        }
+
+        original = nr.fetch_page
+        try:
+            nr.fetch_page = lambda page, start_date, end_date: pages[page]
+            reports, total = nr.collect("2026-10-01", "2026-10-28", sleep_seconds=0)
+        finally:
+            nr.fetch_page = original
+
+        self.assertEqual(total, 2)
+        self.assertEqual([row["nid"] for row in reports], ["1", "2"])
+
+    def test_conflicting_page_boundary_overlap_fails_closed(self):
+        pages = {
+            0: {"totalCount": 2, "items": [{"nid": "1", "title": "A"}], "hasNext": True},
+            1: {"totalCount": 2, "items": [{"nid": "1", "title": "changed"}, {"nid": "2", "title": "B"}], "hasNext": False},
+        }
+
+        original = nr.fetch_page
+        try:
+            nr.fetch_page = lambda page, start_date, end_date: pages[page]
+            with self.assertRaisesRegex(RuntimeError, "conflicting duplicate nid"):
+                nr.collect("2026-10-01", "2026-10-28", sleep_seconds=0)
+        finally:
+            nr.fetch_page = original
+
+    def test_same_page_duplicate_fails_closed(self):
+        original = nr.fetch_page
+        try:
+            nr.fetch_page = lambda page, start_date, end_date: {
+                "totalCount": 1,
+                "items": [{"nid": "1"}, {"nid": "1"}],
+                "hasNext": False,
+            }
+            with self.assertRaisesRegex(RuntimeError, "duplicate nid within page"):
+                nr.collect("2026-10-01", "2026-10-28", sleep_seconds=0)
+        finally:
+            nr.fetch_page = original
+
     def test_build_outputs_does_not_store_content(self):
         raw = [{
             "nid": "10",
