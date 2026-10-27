@@ -1,6 +1,6 @@
 name = "naver-krx-external-scheduler"
 main = "worker.js"
-compatibility_date = "2026-10-28"
+compatibility_date = "2026-10-27"
 
 [observability]
 enabled = true
@@ -11,6 +11,9 @@ head_sampling_rate = 1
 crons = ["0 23 * * SUN-THU", "7 0-10 * * MON-FRI", "30 11 * * MON-FRI", "0 14 * * MON-FRI", "10,17,20,30,50 * * * SUN-FRI"]
 
 [vars]
+GITHUB_REPOSITORY = "hanull01/naver-krx-universe-relay"
+SCHEDULE_OBSERVE_ONLY = "false"
+SCHEDULE_RECHECK_ONLY = "false"
 SCHEDULE_RECHECK_STARTED = "true"
 
 [[durable_objects.bindings]]
