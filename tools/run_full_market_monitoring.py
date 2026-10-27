@@ -30,6 +30,7 @@ OUTPUT_DIR = ROOT / "data/monitoring"
 UNIVERSE_CONFIG = ROOT / "config/universe.json"
 RELAY_QUOTES_FILE = ROOT / "data/quotes.json"
 RELAY_STATES_FILE = ROOT / "data/states.json"
+MONITORING_DAILY_DIR = ROOT / "data/monitoring-daily"
 KST = ZoneInfo("Asia/Seoul")
 
 
@@ -359,10 +360,22 @@ def snapshot_is_publishable(current):
 def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,
-        relay_states_file=RELAY_STATES_FILE):
+        relay_states_file=RELAY_STATES_FILE, monitoring_daily_dir=MONITORING_DAILY_DIR,
+        allow_source_observed_final=False, source_observed_date=None):
     now = now or datetime.now(KST)
     baseline = load_json(baseline_file)
-    fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
+    source_observed_recovery = bool(
+        allow_source_observed_final
+        and baseline.get("historyStatus") == "SOURCE_OBSERVED"
+        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+        and source_observed_date
+        and str(baseline.get("asOfDate") or "").replace("-", "")
+        == str(source_observed_date).replace("-", "")
+    )
+    if source_observed_recovery:
+        fresh, freshness_status = True, "VALID_CURRENT_DAY_SOURCE_OBSERVED"
+    else:
+        fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
     # A stale prior baseline is still a valid comparison input for a new
     # full-market snapshot.  Do not let the freshness warning create a
     # collection deadlock; the resulting evidence records the warning and
@@ -401,10 +414,14 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     previous_good = evidence.load_json(evidence.MARKET_DIR / "industries-latest-ok.json")
     previous = evidence.load_json(Path(output_dir) / "latest-summary.json") or {}
     previous["previousLeaders"] = (evidence.load_json(Path(output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
+    evidence_today = (str(source_observed_date).replace("-", "")
+                      if source_observed_recovery else now.strftime("%Y%m%d"))
     payloads, _ = evidence.build_evidence(
         current, industries=industries, membership=membership, previous_summary=previous,
-        today=now.strftime("%Y%m%d"), previous_good_industries=previous_good,
+        today=evidence_today, previous_good_industries=previous_good,
         baseline=baseline, publication_context=context, theme_membership=theme_membership,
+        monitoring_daily_dir=monitoring_daily_dir,
+        allow_source_observed_final=source_observed_recovery,
     )
     sizes = {} if no_write else evidence.write_evidence(payloads, output_dir)
     return {"status": "SUCCESS", "baselineAsOfDate": baseline["asOfDate"],
@@ -420,11 +437,16 @@ def main():
     parser.add_argument("--current-file")
     parser.add_argument("--relay-quotes-file", default=str(RELAY_QUOTES_FILE))
     parser.add_argument("--relay-states-file", default=str(RELAY_STATES_FILE))
+    parser.add_argument("--monitoring-daily-dir", default=str(MONITORING_DAILY_DIR))
+    parser.add_argument("--allow-source-observed-final", action="store_true")
+    parser.add_argument("--source-observed-date")
     parser.add_argument("--no-write", action="store_true")
     args = parser.parse_args()
     result = run(baseline_file=args.baseline_file, output_dir=args.output_dir, current_file=args.current_file,
                  relay_quotes_file=args.relay_quotes_file, relay_states_file=args.relay_states_file,
-                 no_write=args.no_write)
+                 monitoring_daily_dir=args.monitoring_daily_dir,
+                 allow_source_observed_final=args.allow_source_observed_final,
+                 source_observed_date=args.source_observed_date, no_write=args.no_write)
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["status"] == "SUCCESS" else 2
 

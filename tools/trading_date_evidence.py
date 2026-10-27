@@ -280,6 +280,109 @@ def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=No
             "unexpectedFinalCodes": [], "invalidFinalCodes": {}}
 
 
+def verify_source_observed_monitoring_daily_final(monitoring_dir, expected_codes,
+                                                  session_date=None):
+    """Validate an explicit SOURCE_OBSERVED rolling FINAL date.
+
+    This is an opt-in recovery contract for a preserved NAVER-origin state.
+    It deliberately does not claim that every current snapshot row carried a
+    localDate; the state files' explicit asOfDate and source-quality marker
+    remain a separate, weaker evidence class.
+    """
+    codes = sorted({str(code) for code in (expected_codes or []) if code})
+    candidate = str(session_date or "").replace("-", "").replace("/", "")
+    base = {"tradingDate": None, "source": "MONITORING_DAILY_FINAL",
+            "status": "UNAVAILABLE", "observedDateCounts": {},
+            "missingFinalCodes": codes, "unexpectedFinalCodes": [],
+            "invalidFinalCodes": {}, "evidenceClass": "SOURCE_OBSERVED"}
+    if not codes or not _valid_date(candidate):
+        return {**base, "reason": "SOURCE_OBSERVED_DATE_UNAVAILABLE"}
+
+    found = {}
+    invalid = {}
+    declared_missing = set()
+    for market in ("KOSPI", "KOSDAQ"):
+        payload, error = _read_final_state(
+            Path(monitoring_dir) / (market.lower() + ".json"), market, candidate
+        )
+        if error:
+            invalid[market] = error
+            continue
+        if payload.get("sourceQualityStatus") != "SOURCE_OBSERVED":
+            invalid[market] = {"reason": "SOURCE_OBSERVED_MARKER_MISSING",
+                               "sourceQualityStatus": payload.get("sourceQualityStatus")}
+            continue
+        market_missing = {
+            str(code) for code in (payload.get("sourceMissingCodes") or [])
+            if str(code)
+        }
+        if not market_missing <= set(codes):
+            invalid[market] = {"reason": "SOURCE_OBSERVED_MISSING_CODE_OUT_OF_SCOPE",
+                               "codes": sorted(market_missing - set(codes))}
+            continue
+        declared_missing.update(market_missing)
+        for stock in payload["stocks"]:
+            code = str(stock.get("code") or "") if isinstance(stock, dict) else ""
+            if not code or code in found:
+                invalid[code or market] = {"reason": "DUPLICATE_OR_MISSING_SOURCE_CODE"}
+                continue
+            if code in market_missing:
+                dates = [str(day).replace("-", "")
+                         for day in (stock.get("dates") or [])]
+                if candidate in dates:
+                    invalid[code] = {"reason": "SOURCE_OBSERVED_MISSING_CODE_HAS_DATA"}
+                continue
+            columns = ("dates", "close", "high", "volume", "validity",
+                       "source_valid", "source_status")
+            if any(not isinstance(stock.get(key), list) for key in columns):
+                invalid[code] = {"reason": "SOURCE_OBSERVED_COLUMNS_INVALID"}
+                continue
+            if len({len(stock[key]) for key in columns}) != 1:
+                invalid[code] = {"reason": "SOURCE_OBSERVED_COLUMN_LENGTH_MISMATCH"}
+                continue
+            dates = [str(day).replace("-", "") for day in stock["dates"]]
+            matches = [index for index, day in enumerate(dates) if day == candidate]
+            if len(dates) != len(set(dates)) or any(not _valid_date(day) for day in dates):
+                invalid[code] = {"reason": "SOURCE_OBSERVED_DATES_INVALID"}
+                continue
+            if len(matches) != 1:
+                invalid[code] = {"reason": "SOURCE_OBSERVED_TARGET_DATE_MISSING"}
+                continue
+            index = matches[0]
+            close, high, volume = (stock[key][index] for key in ("close", "high", "volume"))
+            numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool)
+            source_valid = stock["source_valid"][index]
+            source_status = stock["source_status"][index]
+            if (source_valid is not True or source_status != "OBSERVED"
+                    or not numeric(close) or close <= 0
+                    or not numeric(volume) or volume < 0):
+                invalid[code] = {"reason": "SOURCE_OBSERVED_TARGET_ROW_INVALID"}
+                continue
+            found[code] = candidate
+
+    expected = set(codes)
+    found_codes = set(found)
+    missing = sorted(expected - found_codes)
+    unexpected = sorted(found_codes - expected)
+    counts = dict(Counter(found.values()))
+    missing_without_declared_source = set(missing) - declared_missing
+    undeclared_missing = declared_missing - set(missing)
+    if undeclared_missing:
+        invalid["sourceMissingCodes"] = {
+            "reason": "SOURCE_OBSERVED_MISSING_CODE_HAS_DATA",
+            "codes": sorted(undeclared_missing),
+        }
+    if invalid or missing_without_declared_source or unexpected:
+        return {**base, "reason": "SOURCE_OBSERVED_FINAL_COVERAGE_INCOMPLETE",
+                "observedDateCounts": counts, "missingFinalCodes": missing,
+                "unexpectedFinalCodes": unexpected, "invalidFinalCodes": invalid}
+    return {**base, "status": "SOURCE_OBSERVED", "tradingDate": candidate,
+            "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
+            "observedDateCounts": counts, "missingFinalCodes": [],
+            "unexpectedFinalCodes": [], "invalidFinalCodes": {},
+            "sourceMissingCodes": sorted(declared_missing)}
+
+
 def verify_trading_date(history_dir, current_codes, session_date=None, current_snapshot=None):
     """Return a verified date, or null with a diagnostic reason.
 

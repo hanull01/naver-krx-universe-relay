@@ -40,8 +40,19 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
         v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
+        quality_path = root / "data/monitoring/latest-quality.json"
+        quality = json.loads(quality_path.read_text()) if quality_path.is_file() else {}
         trading_date = trading_date or _infer_trading_date(ind, theme)
         result = evaluate_snapshot(ind, theme, v1)
+        source_commit = quality.get("sourceCommit") or ind.get("sourceCommit")
+        result["inputEvidence"] = {
+            "tradingDate": trading_date,
+            "sourceQualityStatus": (quality.get("sourceQualityStatus")
+                                     or ind.get("sourceQualityStatus")
+                                     or "UNAVAILABLE"),
+            "sourceCommit": source_commit,
+            "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
+        }
         result["summary"] = summarize(result)
         (root / "data/dynamic-universe/v2-shadow-latest.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2) + "\n")
@@ -49,6 +60,7 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         history = record_current(root, trading_date)
         outcome = {"status": "OK", "observedAt": observed_at or datetime.now(timezone.utc).isoformat(),
                    "tradingDate": trading_date, "summary": result["summary"],
+                   "inputEvidence": result["inputEvidence"],
                    "observationCount": len(history["observations"])}
     except Exception as exc:  # V2 isolation boundary; V1 is not called here.
         outcome = {"status": "FAILED", "observedAt": observed_at or datetime.now(timezone.utc).isoformat(),

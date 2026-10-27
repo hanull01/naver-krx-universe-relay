@@ -163,6 +163,39 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(result["status"], "READY")
             self.assertEqual(result["tradingDate"], "2026-10-26")
 
+    def test_source_observed_final_is_ready_with_distinct_quality_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            monitoring = root / "monitoring"
+            monitoring.mkdir()
+            evidence = {
+                "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
+                "status": "SOURCE_OBSERVED",
+                "missingFinalCodes": [], "unexpectedFinalCodes": [],
+                "invalidFinalCodes": {},
+            }
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "tradingDate": "20261026",
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+            }), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
+                "fullMarket": {
+                    "tradingDate": "20261026", "authoritativeCount": 2764,
+                    "expectedCount": 2764, "coverageCount": 2764,
+                    "tradingDateEvidence": evidence,
+                },
+            }), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({
+                "asOfDate": "20261026", "historyStatus": "SOURCE_OBSERVED",
+                "sourceQualityStatus": "SOURCE_OBSERVED",
+                "count": 2764, "authoritativeCount": 2764, "coveragePct": 100.0,
+            }), encoding="utf-8")
+            result = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(result["status"], "READY")
+            self.assertEqual(result["sourceQualityStatus"], "SOURCE_OBSERVED")
+
     def test_resolve_report_trading_date_does_not_promote_old_baseline(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

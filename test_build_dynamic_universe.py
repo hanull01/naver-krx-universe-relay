@@ -1,6 +1,6 @@
 import unittest
 
-from tools.build_dynamic_universe import usable_industry_rows, verified_trading_date
+from tools.build_dynamic_universe import input_evidence, usable_industry_rows, verified_trading_date
 
 
 class IndustryEvidenceTests(unittest.TestCase):
@@ -40,6 +40,16 @@ class IndustryEvidenceTests(unittest.TestCase):
     def test_operational_latest_industries_without_date_does_not_fabricate_one(self):
         payload = {"generatedAt": "2026-10-23T14:41:53+00:00", "quality": {"sourceStatus": "OK"}, "industries": []}
         self.assertIsNone(verified_trading_date(payload))
+
+    def test_input_evidence_preserves_date_quality_and_unknown_commit(self):
+        evidence = input_evidence(
+            {"tradingDate": "20261026"},
+            {"sourceQualityStatus": "SOURCE_OBSERVED"},
+        )
+        self.assertEqual(evidence["tradingDate"], "20261026")
+        self.assertEqual(evidence["sourceQualityStatus"], "SOURCE_OBSERVED")
+        self.assertIsNone(evidence["sourceCommit"])
+        self.assertEqual(evidence["sourceCommitStatus"], "UNAVAILABLE")
 
 
 if __name__ == "__main__":
