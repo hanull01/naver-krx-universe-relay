@@ -520,8 +520,12 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     )
     if trading_date_result.get("tradingDate") is None and source_observed_final:
         source_codes = [row.get("code") for row in (baseline or {}).get("stocks", [])]
+        source_by_market = {}
+        for row in (baseline or {}).get("stocks", []):
+            source_by_market.setdefault(str(row.get("market") or ""), []).append(row.get("code"))
         source_result = trading_date_evidence.verify_source_observed_monitoring_daily_final(
-            monitoring_daily_dir, source_codes, session_date=(baseline or {}).get("asOfDate")
+            monitoring_daily_dir, source_codes, session_date=(baseline or {}).get("asOfDate"),
+            expected_by_market=source_by_market,
         )
         if source_result.get("tradingDate") is not None:
             trading_date_result = source_result

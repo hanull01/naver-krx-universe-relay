@@ -638,9 +638,11 @@ def collect_today_rows_source_observed(target_date, universe_file, fetcher=None,
                                 datetime.strptime(target, "%Y%m%d"),
                                 timeout=timeout, retries=1, sleep=0))
                 payload = json.loads(response["raw"].decode("utf-8"))
-                rows = payload.get("priceInfos", payload.get("data", [])) if isinstance(payload, dict) else []
+                if not isinstance(payload, dict) or "priceInfos" not in payload:
+                    raise ValueError("daily response missing priceInfos array")
+                rows = payload["priceInfos"]
                 if not isinstance(rows, list):
-                    raise ValueError("invalid daily response collection")
+                    raise ValueError("daily response priceInfos is not an array")
                 observed_values = [str(item.get("localDate")) for item in rows]
                 for value in observed_values:
                     compact_date(value)
@@ -693,6 +695,8 @@ def collect_today_rows_source_observed(target_date, universe_file, fetcher=None,
             source_missing_codes=missing_reasons,
             source_missing_reasons=missing_reasons,
         )
+    if not rows and not errors and targets:
+        errors["__all__"] = "ALL_NORMAL_EMPTY_DAILY"
     return {
         "status": "SUCCESS" if not errors else "FAILED",
         "targetDate": target,
@@ -764,11 +768,17 @@ def update_state(existing, daily_rows, target_date, universe_file, publication_s
                 raise ValueError(f"final daily conflict: {code} {target}")
             rows.sort(key=lambda row: row["date"])
             stocks.append(encode_stock(code, rows[-KEEP:]))
+        market_expected = set(groups[market])
+        market_missing = sorted(market_expected - set(daily_rows)) if allow_source_observed else []
+        market_reasons = {
+            code: str((source_missing_reasons or {}).get(code) or "NORMAL_EMPTY_DAILY")
+            for code in market_missing
+        }
         output[market] = {"schemaVersion": 1, "format": FORMAT, "market": market, "retainedObservations": KEEP,
                           "publicationStatus": publication_status, "asOfDate": target,
                           "sourceQualityStatus": "SOURCE_OBSERVED" if allow_source_observed else "VALIDATED",
-                          "sourceMissingCodes": sorted(set(expected) - set(daily_rows)) if allow_source_observed else [],
-                          "sourceMissingReasons": dict(source_missing_reasons or {}) if allow_source_observed else {},
+                          "sourceMissingCodes": market_missing,
+                          "sourceMissingReasons": market_reasons,
                           "stocks": sorted(stocks, key=lambda row: row["code"])}
     return output, changed
 

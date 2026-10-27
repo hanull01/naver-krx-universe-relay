@@ -281,7 +281,7 @@ def verify_monitoring_daily_final(monitoring_dir, current_codes, session_date=No
 
 
 def verify_source_observed_monitoring_daily_final(monitoring_dir, expected_codes,
-                                                  session_date=None):
+                                                  session_date=None, expected_by_market=None):
     """Validate an explicit SOURCE_OBSERVED rolling FINAL date.
 
     This is an opt-in recovery contract for a preserved NAVER-origin state.
@@ -290,6 +290,10 @@ def verify_source_observed_monitoring_daily_final(monitoring_dir, expected_codes
     remain a separate, weaker evidence class.
     """
     codes = sorted({str(code) for code in (expected_codes or []) if code})
+    market_expected = {
+        str(market): {str(code) for code in (values or []) if code}
+        for market, values in (expected_by_market or {}).items()
+    }
     candidate = str(session_date or "").replace("-", "").replace("/", "")
     base = {"tradingDate": None, "source": "MONITORING_DAILY_FINAL",
             "status": "UNAVAILABLE", "observedDateCounts": {},
@@ -319,6 +323,10 @@ def verify_source_observed_monitoring_daily_final(monitoring_dir, expected_codes
         if not market_missing <= set(codes):
             invalid[market] = {"reason": "SOURCE_OBSERVED_MISSING_CODE_OUT_OF_SCOPE",
                                "codes": sorted(market_missing - set(codes))}
+            continue
+        if market in market_expected and not market_missing <= market_expected[market]:
+            invalid[market] = {"reason": "SOURCE_OBSERVED_MISSING_CODE_WRONG_MARKET",
+                               "codes": sorted(market_missing - market_expected[market])}
             continue
         declared_missing.update(market_missing)
         for stock in payload["stocks"]:

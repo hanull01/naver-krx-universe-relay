@@ -148,6 +148,32 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertIn("000001", result["errors"])
         self.assertEqual([], result["sourceMissingCodes"])
 
+    def test_source_observed_rejects_error_object_as_normal_empty(self):
+        result = update.collect_today_rows_source_observed(
+            "2026-01-01", self.universe,
+            fetcher=lambda *_args: {"raw": b'{"error":"temporarily unavailable"}'},
+            retries=1, retry_sleep=0)
+        self.assertEqual("FAILED", result["status"])
+        self.assertTrue(all("missing priceInfos" in reason for reason in result["errors"].values()))
+
+    def test_source_observed_rejects_missing_or_non_array_price_infos(self):
+        for raw in (b'{}', b'{"priceInfos": null}', b'[]'):
+            with self.subTest(raw=raw):
+                result = update.collect_today_rows_source_observed(
+                    "2026-01-01", self.universe,
+                    fetcher=lambda *_args, raw=raw: {"raw": raw},
+                    retries=1, retry_sleep=0)
+                self.assertEqual("FAILED", result["status"])
+                self.assertEqual([], result["sourceMissingCodes"])
+
+    def test_source_observed_rejects_all_normal_empty_responses(self):
+        result = update.collect_today_rows_source_observed(
+            "2026-01-01", self.universe,
+            fetcher=lambda *_args: {"raw": b'{"priceInfos": []}'},
+            retries=1, retry_sleep=0)
+        self.assertEqual("FAILED", result["status"])
+        self.assertEqual("ALL_NORMAL_EMPTY_DAILY", result["errors"]["__all__"])
+
     def test_source_observed_refresh_builds_final_baseline_without_synthesizing_empty_day(self):
         previous, stock = self._lifecycle_fixture()
         universe = self.root / "source-observed-universe.json"
@@ -183,6 +209,7 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         saved = json.loads((state_dir / "kosdaq.json").read_text(encoding="utf-8"))
         self.assertEqual("SOURCE_OBSERVED", saved["sourceQualityStatus"])
         self.assertEqual(["000002"], saved["sourceMissingCodes"])
+        self.assertEqual([], json.loads((state_dir / "kospi.json").read_text(encoding="utf-8"))["sourceMissingCodes"])
 
     @staticmethod
     def _daily_response(date="20260101", close=11):

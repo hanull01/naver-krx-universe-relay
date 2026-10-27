@@ -107,6 +107,23 @@ class TradingDateEvidenceTests(unittest.TestCase):
             self.assertEqual(result['status'], 'SOURCE_OBSERVED')
             self.assertEqual(result['sourceMissingCodes'], ['M'])
 
+    def test_source_observed_final_rejects_missing_code_declared_in_wrong_market(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_final(root, 'KOSPI', ['A'])
+            self.write_final(root, 'KOSDAQ', ['B'])
+            for market in ('KOSPI', 'KOSDAQ'):
+                path = root / f'{market.lower()}.json'
+                payload = json.loads(path.read_text())
+                payload['sourceQualityStatus'] = 'SOURCE_OBSERVED'
+                payload['sourceMissingCodes'] = ['M'] if market == 'KOSPI' else []
+                path.write_text(json.dumps(payload), encoding='utf-8')
+            result = verify_source_observed_monitoring_daily_final(
+                root, ['A', 'B', 'M'], session_date='20261023',
+                expected_by_market={'KOSPI': ['A'], 'KOSDAQ': ['B', 'M']})
+            self.assertEqual(result['status'], 'UNAVAILABLE')
+            self.assertIn('KOSPI', result['invalidFinalCodes'])
+
     def test_monitoring_daily_final_requires_current_exact_code_set(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
