@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-27T16:32:43.131369+00:00",
+  "generatedAt": "2026-10-27T23:19:16.744726+00:00",
   "status": "OK",
   "source": "NAVER_MOBILE_INDEX_BASIC",
   "indices": [
@@ -8,11 +8,11 @@
       "code": "KOSPI",
       "name": "코스피",
       "close": 5638.34,
-      "changePoints": 168.87,
-      "changeRate": 3.09,
-      "marketStatus": "CLOSE",
-      "session": "POST_MARKET_OR_CLOSED",
-      "sourceTime": "2026-10-27T20:15:00+09:00",
+      "changePoints": 0.0,
+      "changeRate": 0.0,
+      "marketStatus": "PREOPEN",
+      "session": "UNKNOWN",
+      "sourceTime": "2026-10-28T08:19:16+09:00",
       "source": "NAVER_MOBILE_INDEX_BASIC",
       "sourceUrl": "https://m.stock.naver.com/api/index/KOSPI/basic"
     },
@@ -20,11 +20,11 @@
       "code": "KOSDAQ",
       "name": "코스닥",
       "close": 743.83,
-      "changePoints": 16.62,
-      "changeRate": 2.29,
-      "marketStatus": "CLOSE",
-      "session": "POST_MARKET_OR_CLOSED",
-      "sourceTime": "2026-10-27T20:15:00+09:00",
+      "changePoints": 0.0,
+      "changeRate": 0.0,
+      "marketStatus": "PREOPEN",
+      "session": "UNKNOWN",
+      "sourceTime": "2026-10-28T08:19:16+09:00",
       "source": "NAVER_MOBILE_INDEX_BASIC",
       "sourceUrl": "https://m.stock.naver.com/api/index/KOSDAQ/basic"
     }
