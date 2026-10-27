@@ -2,6 +2,10 @@ name = "naver-krx-external-scheduler"
 main = "worker.js"
 compatibility_date = "2026-10-28"
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # Cron activation and Secret registration remain a separate approved operation.
 [triggers]
 crons = ["0 23 * * SUN-THU", "7 0-10 * * MON-FRI", "30 11 * * MON-FRI", "0 14 * * MON-FRI", "10,17,20,30,50 * * * SUN-FRI"]
