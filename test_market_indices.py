@@ -47,6 +47,13 @@ class MarketIndicesTests(unittest.TestCase):
             "2026-10-26T20:30:00+09:00", "2026-10-26T20:30:05+09:00")
         self.assertEqual(result["targetDate"], "20261026")
 
+    def test_final_payload_accepts_microsecond_generation_with_precise_window(self):
+        result = market_indices.validate_final_payload(
+            self.final_window_payload(generated="2026-10-26T20:30:05.123456+09:00"),
+            "2026-10-26T20:30:00.000000+09:00",
+            "2026-10-26T20:30:05.654321+09:00")
+        self.assertEqual(result["targetDate"], "20261026")
+
     def test_final_payload_rejects_intraday_index_even_when_date_is_today(self):
         payload = self.final_window_payload(session="REGULAR")
         with self.assertRaisesRegex(ValueError, "INDEX_SESSION_NOT_CLOSED"):
