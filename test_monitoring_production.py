@@ -85,6 +85,39 @@ class MonitoringProductionTests(unittest.TestCase):
             "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION",
         )
 
+    def test_source_observed_freshness_preserves_prior_and_final_boundaries(self):
+        prior = {"historyStatus": "SOURCE_OBSERVED", "sourceQualityStatus": "SOURCE_OBSERVED",
+                 "asOfDate": "20260930", "count": 1, "authoritativeCount": 1, "coveragePct": 100.0}
+        current = dict(prior, asOfDate="20261001")
+        regular = datetime(2026, 10, 1, 19, 59, tzinfo=KST)
+        closed = datetime(2026, 10, 1, 20, 0, tzinfo=KST)
+        self.assertEqual(
+            runner.baseline_freshness(prior, regular, open_day)[1],
+            "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED",
+        )
+        self.assertEqual(
+            runner.baseline_freshness(current, regular, open_day)[1],
+            "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION",
+        )
+        self.assertEqual(
+            runner.baseline_freshness(current, closed, open_day)[1],
+            "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
+        )
+        self.assertEqual(
+            runner.baseline_freshness(dict(prior, asOfDate="20260929"), regular, open_day)[1],
+            "BASELINE_STALE",
+        )
+
+    def test_source_observed_marker_mismatch_is_not_fresh(self):
+        baseline = {"historyStatus": "SOURCE_OBSERVED", "sourceQualityStatus": "UNKNOWN",
+                    "asOfDate": "20260930", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0}
+        self.assertEqual(
+            runner.baseline_freshness(
+                baseline, datetime(2026, 10, 1, 10, 0, tzinfo=KST), open_day)[1],
+            "BASELINE_UNAVAILABLE",
+        )
+
     def test_scalar_baseline_readiness_accepts_valid_without_publication_status(self):
         baseline = {"asOfDate": "20261002", "historyStatus": "OK", "count": 2,
                     "authoritativeCount": 2, "coveragePct": 100.0,

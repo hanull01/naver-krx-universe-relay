@@ -180,7 +180,9 @@ jobs:
           code=$?
           if [ "$code" -eq 0 ]; then
             python tools/run_full_market_monitoring.py \
-              --current-file "$RUNNER_TEMP/full-market-current.json"
+              --current-file "$RUNNER_TEMP/full-market-current.json" \
+              --allow-source-observed-final \
+              --source-observed-date "$target_date"
             code=$?
           fi
           if [ "$code" -eq 0 ]; then
@@ -325,7 +327,9 @@ jobs:
           # so latest-summary.json observes the just-published FINAL state.
           # This intentionally makes no additional NAVER request.
           python tools/run_full_market_monitoring.py \
-            --current-file "$RUNNER_TEMP/full-market-current.json"
+            --current-file "$RUNNER_TEMP/full-market-current.json" \
+            --allow-source-observed-final \
+            --source-observed-date "$target_date"
           echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Run V2 shadow observation

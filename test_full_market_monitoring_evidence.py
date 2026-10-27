@@ -100,7 +100,7 @@ class EvidenceTests(unittest.TestCase):
             (final / "kosdaq.json").write_text(json.dumps({**state, "market": "KOSDAQ", "stocks": []}), encoding="utf-8")
             built, _ = evidence.build_evidence(
                 snapshot, root / "canonical", baseline=baseline,
-                publication_context={"baselineFreshnessStatus": "VALID_CURRENT_DAY_SOURCE_OBSERVED"},
+                publication_context={"baselineFreshnessStatus": "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"},
                 today="20261026", monitoring_daily_dir=final,
                 allow_source_observed_final=True,
             )
@@ -110,6 +110,30 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(full_market["tradingDateEvidence"]["status"], "SOURCE_OBSERVED")
         self.assertEqual(full_market["tradingDateEvidence"]["reason"],
                          "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE")
+
+    def test_source_observed_previous_baseline_is_not_promoted_to_next_day(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-27T09:07:00+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [], "stocks": [current()]}
+        baseline = {"asOfDate": "20261026", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "SOURCE_OBSERVED",
+                    "sourceQualityStatus": "SOURCE_OBSERVED",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            built, _ = evidence.build_evidence(
+                snapshot, root / "canonical", baseline=baseline,
+                publication_context={
+                    "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED"
+                },
+                today="20261027", allow_source_observed_final=False,
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertIsNone(full_market["tradingDate"])
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "INSUFFICIENT_TRADING_DATE_EVIDENCE")
 
     def test_rolling_final_is_used_only_as_named_full_market_date_source(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-15T20:00:00+09:00",

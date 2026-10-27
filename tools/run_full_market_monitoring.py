@@ -276,7 +276,15 @@ def previous_open_day(target, market_day_check=krx_market_day.market_day):
 
 
 def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day):
-    if not baseline or baseline.get("historyStatus") != "OK":
+    if not baseline:
+        return False, "BASELINE_UNAVAILABLE", None
+    history_status = baseline.get("historyStatus")
+    source_observed = (
+        history_status == "SOURCE_OBSERVED"
+        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+    )
+    if history_status not in {"OK", "SOURCE_OBSERVED"} or (
+            history_status == "SOURCE_OBSERVED" and not source_observed):
         return False, "BASELINE_UNAVAILABLE", None
     try:
         today = now.date(); is_open, reason = market_day_check(today)
@@ -293,11 +301,17 @@ def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day
     # 20:30 snapshot. The current-day baseline is generated only after that
     # snapshot has been validated and appended.
     if as_of == previous:
-        return True, "VALID_PREVIOUS_TRADING_DAY", previous
+        return True, (
+            "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED"
+            if source_observed else "VALID_PREVIOUS_TRADING_DAY"
+        ), previous
     # 15:30 regular close and the 20:00 after-market close are separate
     # states.  A same-day baseline is FINAL only after the latter.
     if as_of == today.strftime("%Y%m%d") and session == "CLOSED":
-        return True, "VALID_CURRENT_DAY_FINAL", previous
+        return True, (
+            "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"
+            if source_observed else "VALID_CURRENT_DAY_FINAL"
+        ), previous
     if as_of == today.strftime("%Y%m%d"):
         return False, "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION", previous
     return False, "BASELINE_STALE", previous
@@ -364,17 +378,20 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         allow_source_observed_final=False, source_observed_date=None):
     now = now or datetime.now(KST)
     baseline = load_json(baseline_file)
-    source_observed_recovery = bool(
+    source_observed_requested = bool(
         allow_source_observed_final
         and baseline.get("historyStatus") == "SOURCE_OBSERVED"
         and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
         and source_observed_date
+        and str(source_observed_date).replace("-", "") == now.strftime("%Y%m%d")
         and str(baseline.get("asOfDate") or "").replace("-", "")
         == str(source_observed_date).replace("-", "")
     )
-    if source_observed_recovery:
-        fresh, freshness_status = True, "VALID_CURRENT_DAY_SOURCE_OBSERVED"
+    if source_observed_requested:
+        fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
+        source_observed_recovery = fresh and freshness_status == "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"
     else:
+        source_observed_recovery = False
         fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
     # A stale prior baseline is still a valid comparison input for a new
     # full-market snapshot.  Do not let the freshness warning create a

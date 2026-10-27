@@ -394,7 +394,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
     )
     if baseline is not None:
-        if baseline.get("historyStatus") != "OK" and not source_observed_final:
+        source_observed_baseline = (
+            baseline.get("historyStatus") == "SOURCE_OBSERVED"
+            and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+        )
+        if baseline.get("historyStatus") != "OK" and not source_observed_baseline:
             raise ValueError("baseline history is not OK")
         publication_context = publication_context or {}
         as_of = str(baseline.get("asOfDate") or "")
@@ -403,7 +407,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             raise ValueError("current date must be after baseline asOfDate")
         allowed_overlay_statuses = {"VALID_CURRENT_DAY_FINAL"}
         if source_observed_final:
-            allowed_overlay_statuses.add("VALID_CURRENT_DAY_SOURCE_OBSERVED")
+            allowed_overlay_statuses.update({
+                "VALID_CURRENT_DAY_SOURCE_OBSERVED",
+                "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
+            })
         if overlay and publication_context.get("baselineFreshnessStatus") not in allowed_overlay_statuses:
             raise ValueError("same-day baseline requires validated final-session overlay")
         by_code = {row["code"]: row for row in baseline.get("stocks", [])}

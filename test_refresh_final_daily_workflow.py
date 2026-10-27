@@ -106,6 +106,13 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         mail = self.text[self.text.index("id: ready_email"):]
         self.assertIn("steps.publish.outputs.publication_changed == 'true'", mail[:1200])
 
+    def test_full_market_entrypoint_opts_into_source_observed_only_with_explicit_date(self):
+        calls = self.text.count("--allow-source-observed-final")
+        self.assertEqual(calls, 2)
+        self.assertEqual(self.text.count('--source-observed-date "$target_date"'), 2)
+        self.assertIn("baselineFreshnessStatus", Path(__file__).parent.joinpath(
+            "tools", "run_full_market_monitoring.py").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()
