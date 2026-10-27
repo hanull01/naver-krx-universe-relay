@@ -7,10 +7,6 @@ on:
         description: 'Optional already-published trading date (YYYY-MM-DD) for manual validation'
         required: false
         type: string
-  schedule:
-    # 23:00 KST Mon-Fri = 14:00 UTC Mon-Fri
-    - cron: '0 14 * * 1-5'
-
 permissions:
   contents: write
 
