@@ -108,7 +108,7 @@ class SafePublisherTests(unittest.TestCase):
         root = Path(__file__).parent
         for name in ("refresh.yml", "refresh-market-snapshots.yml"):
             workflow = (root / ".github/workflows" / name).read_text(encoding="utf-8")
-            trigger_paths = workflow.split("schedule:", 1)[0]
+            trigger_paths = workflow.split("permissions:", 1)[0]
             self.assertNotIn("data/trading-discovery", trigger_paths)
             self.assertNotIn("trading_discovery.py", trigger_paths)
             self.assertNotIn("publish_trading_discovery.py", workflow)

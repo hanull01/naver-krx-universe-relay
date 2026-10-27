@@ -2,11 +2,6 @@ name: Refresh NAVER Research
 
 on:
   workflow_dispatch:
-  schedule:
-    # 07:20, 12:20, 19:20 KST on weekdays
-    - cron: '20 22 * * 0-4'  # 07:20 KST Mon-Fri
-    - cron: '20 3 * * 1-5'   # 12:20 KST Mon-Fri
-    - cron: '20 10 * * 1-5'  # 19:20 KST Mon-Fri
 
 permissions:
   contents: write

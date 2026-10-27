@@ -316,9 +316,9 @@ class MonitoringProductionTests(unittest.TestCase):
 
     def test_hourly_workflow_collects_full_snapshot_once_and_publishes_compact_evidence(self):
         workflow = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
-        self.assertIn('- cron: "0 23 * * 0-4"', workflow)
-        self.assertIn('- cron: "7 0-10 * * 1-5"', workflow)
-        self.assertIn('- cron: "30 11 * * 1-5"', workflow)
+        self.assertNotIn("\n  schedule:", workflow)
+        self.assertIn("\n  workflow_dispatch:", workflow)
+        self.assertIn("\n  push:", workflow)
         self.assertNotIn('cron: "32 ', workflow)
         self.assertEqual(workflow.count("python tools/naver_full_market_current.py"), 1)
         self.assertIn('--current-file "$RUNNER_TEMP/full-market-current.json"', workflow)
@@ -337,10 +337,12 @@ class MonitoringProductionTests(unittest.TestCase):
         snapshots = (ROOT / ".github/workflows/refresh-market-snapshots.yml").read_text(encoding="utf-8")
         daily = (ROOT / ".github/workflows/refresh-daily.yml").read_text(encoding="utf-8")
         report = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
-        self.assertIn('cron: "10,30,50 23 * * 0-4"', snapshots)
-        self.assertIn('cron: "10,30,50 0-10 * * 1-5"', snapshots)
+        self.assertNotIn("\n  schedule:", snapshots)
+        self.assertIn("\n  workflow_dispatch:", snapshots)
+        self.assertIn("\n  push:", snapshots)
         self.assertNotIn('cron: "35 7 * * 1-5"', daily)
-        self.assertIn("cron: '0 14 * * 1-5'", report)
+        self.assertNotIn("\n  schedule:", report)
+        self.assertIn("\n  workflow_dispatch:", report)
 
 
 if __name__ == "__main__":
