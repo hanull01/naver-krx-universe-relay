@@ -248,12 +248,12 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          started_at=$(python3 -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="microseconds"))')
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
           set +e
           python market_indices.py
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
-          finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          finished_at=$(python3 -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="microseconds"))')
           echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
 
       - name: Diagnose final daily-bar evidence
@@ -519,22 +519,33 @@ jobs:
             git commit -m "Refresh NAVER market data"
             if [ "$final_daily_gate_required" = "true" ]; then
               echo "Final daily update failed; restoring only its generated production paths before synchronization."
-              git restore --source=HEAD --worktree -- \
+              restore_generated_path() {
+                path="$1"
+                if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+                  git restore --source=HEAD --worktree -- "$path"
+                elif [ -e "$path" ]; then
+                  rm -f -- "$path"
+                fi
+              }
+              for path in \
                 data/market-universe/all-assets.json \
                 data/monitoring-daily/kospi.json \
                 data/monitoring-daily/kosdaq.json \
                 data/monitoring-daily/retired.json \
                 data/monitoring-daily/universe-lifecycle.json \
                 data/monitoring-daily/trading-session-diagnostic.json \
-                data/monitoring-baseline/latest.json || true
-              git clean -f -- \
-                data/market-universe/all-assets.json \
-                data/monitoring-daily/kospi.json \
-                data/monitoring-daily/kosdaq.json \
-                data/monitoring-daily/retired.json \
-                data/monitoring-daily/universe-lifecycle.json \
-                data/monitoring-daily/trading-session-diagnostic.json \
-                data/monitoring-baseline/latest.json || true
+                data/monitoring-baseline/latest.json \
+                data/dynamic-universe/latest.json \
+                data/monitoring/latest-breadth.json \
+                data/monitoring/latest-changes.json \
+                data/monitoring/latest-industries.json \
+                data/monitoring/latest-leaders.json \
+                data/monitoring/latest-quality.json \
+                data/monitoring/latest-stock-signals.json \
+                data/monitoring/latest-summary.json \
+                data/monitoring/latest-theme-signals.json; do
+                restore_generated_path "$path"
+              done
             fi
             if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
               echo "::error::Unexpected unstaged or untracked files remain before data synchronization; preserving production data."

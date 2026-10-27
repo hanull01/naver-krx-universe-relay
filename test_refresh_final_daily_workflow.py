@@ -66,8 +66,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("FINAL_DAILY_HISTORY_NOT_READY:FINAL_DAILY_EVIDENCE_UNUSABLE", self.final_step)
 
     def test_index_collection_records_a_fresh_execution_window(self):
-        self.assertIn("started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)
-        self.assertIn("finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)", self.indices_step)
+        self.assertIn('isoformat(timespec="microseconds")', self.indices_step)
+        self.assertEqual(self.indices_step.count('timespec="microseconds"'), 2)
         self.assertIn("collection_started_at", self.indices_step)
         self.assertIn("collection_finished_at", self.indices_step)
 
@@ -113,8 +113,21 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
 
     def test_failed_final_paths_are_restored_before_rebase(self):
         self.assertIn("Final daily update failed; restoring only its generated production paths", self.publish)
-        self.assertIn("git restore --source=HEAD --worktree", self.publish)
-        self.assertIn("git clean -f --", self.publish)
+        self.assertIn("restore_generated_path()", self.publish)
+        self.assertIn("git ls-files --error-unmatch", self.publish)
+        self.assertIn("rm -f --", self.publish)
+        for path in (
+            "data/dynamic-universe/latest.json",
+            "data/monitoring/latest-breadth.json",
+            "data/monitoring/latest-changes.json",
+            "data/monitoring/latest-industries.json",
+            "data/monitoring/latest-leaders.json",
+            "data/monitoring/latest-quality.json",
+            "data/monitoring/latest-stock-signals.json",
+            "data/monitoring/latest-summary.json",
+            "data/monitoring/latest-theme-signals.json",
+        ):
+            self.assertIn(path, self.publish)
         self.assertIn("git ls-files --others --exclude-standard", self.publish)
 
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
