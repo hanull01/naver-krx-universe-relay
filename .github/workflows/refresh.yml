@@ -290,7 +290,7 @@ jobs:
           python tools/build_monitoring_daily_state.py update-latest \
             --date "$(cat "$RUNNER_TEMP/final-daily-target.txt")" \
             --observed-snapshot "$RUNNER_TEMP/full-market-current.json" \
-            --refresh-universe --fetch-today \
+            --refresh-universe --fetch-today --allow-source-observed \
             --session-diagnostic-output "$RUNNER_TEMP/trading-session-diagnostic.json" \
             > "$RUNNER_TEMP/final-daily-monitoring-result.json"
           cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
@@ -306,17 +306,33 @@ jobs:
           from pathlib import Path
           diagnostic = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           snapshot = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-          if diagnostic.get("status") != "VERIFIED":
-              raise SystemExit("TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
           expected = {str(row.get("code") or "") for row in snapshot.get("stocks") or []}
-          if (set(diagnostic.get("expectedCodes") or []) != expected
-                  or set(diagnostic.get("observedCodes") or []) != expected
-                  or diagnostic.get("missingCodes")
-                  or diagnostic.get("unexpectedCodes")
-                  or diagnostic.get("duplicateCodes")
-                  or diagnostic.get("mismatchCodes")
-                  or diagnostic.get("dateMismatchCodes")):
-              raise SystemExit("TRADING_DATE_DIAGNOSTIC_CODE_SET_UNVERIFIED")
+          if diagnostic.get("status") == "VERIFIED":
+              if (set(diagnostic.get("expectedCodes") or []) != expected
+                      or set(diagnostic.get("observedCodes") or []) != expected
+                      or diagnostic.get("missingCodes")
+                      or diagnostic.get("unexpectedCodes")
+                      or diagnostic.get("duplicateCodes")
+                      or diagnostic.get("mismatchCodes")
+                      or diagnostic.get("dateMismatchCodes")):
+                  raise SystemExit("TRADING_DATE_DIAGNOSTIC_CODE_SET_UNVERIFIED")
+          elif diagnostic.get("status") == "SOURCE_OBSERVED":
+              missing = set(diagnostic.get("missingCodes") or [])
+              source_missing = set(diagnostic.get("sourceMissingCodes") or [])
+              reasons = diagnostic.get("sourceMissingReasons") or {}
+              if (set(diagnostic.get("expectedCodes") or []) != expected
+                      or not source_missing.issubset(expected)
+                      or missing != source_missing
+                      or set(diagnostic.get("observedCodes") or []) != expected - source_missing
+                      or diagnostic.get("unexpectedCodes")
+                      or diagnostic.get("duplicateCodes")
+                      or diagnostic.get("mismatchCodes")
+                      or diagnostic.get("dateMismatchCodes")
+                      or set(reasons) != source_missing
+                      or any(value != "NORMAL_EMPTY_DAILY" for value in reasons.values())):
+                  raise SystemExit("TRADING_DATE_DIAGNOSTIC_SOURCE_OBSERVED_UNSAFE")
+          else:
+              raise SystemExit("TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
           print(str(diagnostic.get("targetDate") or "").replace("-", ""))
           PY
           )
@@ -330,6 +346,10 @@ jobs:
             --current-file "$RUNNER_TEMP/full-market-current.json" \
             --allow-source-observed-final \
             --source-observed-date "$target_date"
+          # FINAL/Baseline now represents the same target date.  Reuse the
+          # generated full-market artifacts and rebuild V1 before V2 observes
+          # them; this adds no NAVER request.
+          python tools/build_dynamic_universe.py
           echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Run V2 shadow observation

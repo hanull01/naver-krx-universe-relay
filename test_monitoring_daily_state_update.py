@@ -121,6 +121,69 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertEqual(2, caught.exception.diagnostics["missingTodayCount"])
         self.assertEqual(["000001", "000002"], caught.exception.diagnostics["firstMissingCodes"])
 
+    def test_source_observed_collection_preserves_normal_empty_and_feature_invalid_rows(self):
+        def fetcher(code, _start, _end):
+            if code == "000002":
+                return {"raw": b'{"priceInfos": []}'}
+            return {"raw": json.dumps({"priceInfos": [{
+                "localDate": "20260101", "openPrice": 10, "highPrice": 8,
+                "lowPrice": 9, "closePrice": 11, "accumulatedTradingVolume": 0,
+            }]}).encode()}
+
+        result = update.collect_today_rows_source_observed(
+            "2026-01-01", self.universe, fetcher=fetcher, retries=1, retry_sleep=0)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual(["000002"], result["sourceMissingCodes"])
+        self.assertEqual("NORMAL_EMPTY_DAILY", result["sourceMissingReasons"]["000002"])
+        self.assertFalse(result["rows"]["000001"]["ohlcValid"])
+        self.assertTrue(result["rows"]["000001"]["source_valid"])
+        self.assertEqual("OBSERVED", result["rows"]["000001"]["source_status"])
+
+    def test_source_observed_collection_blocks_api_failure(self):
+        result = update.collect_today_rows_source_observed(
+            "2026-01-01", self.universe,
+            fetcher=lambda *_args: (_ for _ in ()).throw(OSError("offline")),
+            retries=1, retry_sleep=0)
+        self.assertEqual("FAILED", result["status"])
+        self.assertIn("000001", result["errors"])
+        self.assertEqual([], result["sourceMissingCodes"])
+
+    def test_source_observed_refresh_builds_final_baseline_without_synthesizing_empty_day(self):
+        previous, stock = self._lifecycle_fixture()
+        universe = self.root / "source-observed-universe.json"
+        universe.write_text(json.dumps(previous), encoding="utf-8")
+        state_dir = self.root / "source-observed-state"; state_dir.mkdir()
+        state = self._state_for_payload(previous)
+        for market, payload in state.items():
+            payload["asOfDate"] = "20261007"
+            (state_dir / f"{market.lower()}.json").write_text(json.dumps(payload), encoding="utf-8")
+        baseline_path = self.root / "source-observed-baseline.json"
+        baseline_path.write_text(json.dumps({"asOfDate": "20261007", "historyStatus": "SOURCE_OBSERVED",
+            "sourceQualityStatus": "SOURCE_OBSERVED", "authoritativeCount": 3, "count": 3,
+            "coveragePct": 100.0, "stocks": []}), encoding="utf-8")
+        lifecycle_path = self.root / "source-observed-lifecycle.json"
+        stocks = [row for row in previous["assets"] if row.get("assetType") == "STOCK"]
+        source = {"stocks": stocks, "metadata": {"failedCount": 0,
+            "markets": {market: sum(row["market"] == market for row in stocks)
+                        for market in update.MARKETS}}}
+
+        def fetcher(code, _start, _end):
+            if code == "000002":
+                return {"raw": b'{"priceInfos": []}'}
+            return self._daily_response("20261008")
+
+        result = update.update_with_universe_refresh(
+            state_dir, universe, baseline_path, lifecycle_path, "2026-10-08", source,
+            fetcher=fetcher, retry_sleep=0, allow_source_observed=True,
+            market_day_check=lambda _target: (True, "OPEN"),
+            enforce_lifecycle_verification=True)
+        self.assertEqual("SUCCESS", result["status"])
+        self.assertEqual("SOURCE_OBSERVED", result["baseline"]["historyStatus"])
+        self.assertEqual(["000002"], result["baseline"]["missingLatestCodes"])
+        saved = json.loads((state_dir / "kosdaq.json").read_text(encoding="utf-8"))
+        self.assertEqual("SOURCE_OBSERVED", saved["sourceQualityStatus"])
+        self.assertEqual(["000002"], saved["sourceMissingCodes"])
+
     @staticmethod
     def _daily_response(date="20260101", close=11):
         return {"raw": json.dumps({"priceInfos": [{"localDate": date, "openPrice": 10,
