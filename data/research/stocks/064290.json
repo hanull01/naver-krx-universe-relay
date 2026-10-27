@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "064290",
   "itemName": "인텍플러스",
-  "reportCount": 6,
-  "latestReportNid": "96242",
-  "latestWriteDate": "2026-09-21",
+  "reportCount": 7,
+  "latestReportNid": "97077",
+  "latestWriteDate": "2026-10-27",
   "latest": {
-    "nid": "96242",
-    "writeDate": "2026-09-21",
-    "brokerName": "iM증권",
-    "title": "수주급증 믹스개선 비용감소 삼박자",
-    "goalPrice": 84000,
-    "normalizedOpinion": "BUY",
+    "nid": "97077",
+    "writeDate": "2026-10-27",
+    "brokerName": "유안타증권",
+    "title": "실적보다는 수주잔고 추이가 중요",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 2
+        "positive": 6,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsPositiveSignalCount": 6,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 3,
-        "반도체": 1
+        "수주": 11,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97077",
     "96242",
     "96057",
     "95803",

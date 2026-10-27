@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "itemCode": "005940",
   "itemName": "NH투자증권",
-  "reportCount": 25,
-  "latestReportNid": "96503",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 29,
+  "latestReportNid": "97083",
+  "latestWriteDate": "2026-10-27",
   "latest": {
-    "nid": "96503",
-    "writeDate": "2026-10-07",
+    "nid": "97083",
+    "writeDate": "2026-10-27",
     "brokerName": "하나증권",
-    "title": "3Q26 Pre - 컨센 12% 하회 전망",
-    "goalPrice": 39000,
+    "title": "3Q26 Re - 컨센 8% 상회",
+    "goalPrice": 36000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 4
+        "positive": 2,
+        "negative": 8
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "금리": 1
@@ -27,6 +27,10 @@
     }
   },
   "reportNids": [
+    "97083",
+    "97066",
+    "97059",
+    "97057",
     "96503",
     "96080",
     "95851",

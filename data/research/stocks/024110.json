@@ -2,34 +2,41 @@
   "schemaVersion": 1,
   "itemCode": "024110",
   "itemName": "기업은행",
-  "reportCount": 13,
-  "latestReportNid": "96615",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 21,
+  "latestReportNid": "97092",
+  "latestWriteDate": "2026-10-27",
   "latest": {
-    "nid": "96615",
-    "writeDate": "2026-10-12",
-    "brokerName": "하나증권",
-    "title": "타행들과는 다른 NIM 상승 현상 긍정적",
+    "nid": "97092",
+    "writeDate": "2026-10-27",
+    "brokerName": "한화투자증권",
+    "title": "지금이 가장 예쁠 때",
     "goalPrice": 28500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 6
+        "positive": 5,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 4,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "원가": 2,
-        "중국": 2,
-        "금리": 1
+        "금리": 5,
+        "원가": 3,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97092",
+    "97088",
+    "97084",
+    "97080",
+    "97064",
+    "97063",
+    "97061",
+    "97055",
     "96615",
     "96480",
     "94920",

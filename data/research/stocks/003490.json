@@ -2,34 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "003490",
   "itemName": "대한항공",
-  "reportCount": 26,
-  "latestReportNid": "96812",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 27,
+  "latestReportNid": "97094",
+  "latestWriteDate": "2026-10-27",
   "latest": {
-    "nid": "96812",
-    "writeDate": "2026-10-19",
-    "brokerName": "iM증권",
-    "title": "과도한 주가 하락은 매수 기회",
-    "goalPrice": 40000,
+    "nid": "97094",
+    "writeDate": "2026-10-27",
+    "brokerName": "한화투자증권",
+    "title": "다시 계산해본 통합 시너지, MAX 1조원",
+    "goalPrice": 43000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 0,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 9,
-        "가격": 4,
-        "자동차": 2,
-        "반도체": 1
+        "원가": 2
       }
     }
   },
   "reportNids": [
+    "97094",
     "96812",
     "96803",
     "96800",

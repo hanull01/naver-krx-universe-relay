@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "112610",
   "itemName": "씨에스윈드",
-  "reportCount": 16,
-  "latestReportNid": "97006",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 17,
+  "latestReportNid": "97065",
+  "latestWriteDate": "2026-10-27",
   "latest": {
-    "nid": "97006",
-    "writeDate": "2026-10-23",
-    "brokerName": "하나증권",
-    "title": "환율 약세, 매출 이연에도 양호한 마진 기대",
-    "goalPrice": 80000,
+    "nid": "97065",
+    "writeDate": "2026-10-27",
+    "brokerName": "신한투자증권",
+    "title": "우려가 더 크게 반영된 주가",
+    "goalPrice": 68000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 3
+        "positive": 4,
+        "negative": 2
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 4,
-        "환율": 3
+        "미국": 1,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "97065",
     "97006",
     "96103",
     "95393",
