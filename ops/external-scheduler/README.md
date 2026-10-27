@@ -14,8 +14,10 @@
 - GitHub 기존 schedule과 동시 운영할 때도 기존 workflow의 `generated-data-write` 동시성 보호를 유지한다.
 - `SCHEDULE_OBSERVE_ONLY=true`인 실행은 GitHub 실행 이력만 확인하고 dispatch하지 않는다. 관찰 결과는 `RUN_OBSERVED` 또는 `NO_RUN`으로 기록한다.
 - Run 생성 확인과 Run 완료 확인은 분리한다. 60초 안에 완료되지 않아도 Run ID와 HEAD를 `RUN_STARTED`로 보존하고, 후속 조회에서 완료·게시를 검증한다.
-- 게시 커밋은 해당 Run의 생성~완료 구간, 예상 자동화 커밋 메시지, `github-actions` 커밋 주체, 허용 경로를 모두 만족해야 선택한다. 단순 시간 범위의 임의 커밋은 게시 증거로 사용하지 않는다.
+- 게시 커밋은 workflow가 제공한 `production_commit_sha`를 우선 사용하고, 해당 SHA의 커밋 메시지·자동화 주체·허용 경로·Run 구간을 모두 검증한다. Run 출력에 SHA가 없으면 `PUBLISH_UNVERIFIED`로 남긴다. 단순 시간 범위의 임의 커밋은 게시 증거로 사용하지 않는다.
+- 현재 GitHub Actions의 `production_commit_sha`는 step output이므로 Run API의 일반 응답에 자동 노출된다고 가정하지 않는다. 별도 Run 출력·artifact·API 연결이 없으면 Worker는 보수적으로 게시를 미확인 처리한다.
 - `refresh.yml`과 `daily-report.yml`의 `generated-data-write` concurrency가 저장소 수준의 동시 게시를 직렬화한다. Worker는 슬롯별 사전 Run 확인과 Durable Object claim으로 외부 중복을 차단한다.
+- `wrangler.toml`에는 배포에 필요한 Cron 목록, `SLOT_GATE` Durable Object 바인딩, `SlotGate` SQLite migration을 선언한다. 실제 Cron 활성화와 Secret 등록은 별도 승인 없이는 수행하지 않는다.
 
 ## 슬롯
 

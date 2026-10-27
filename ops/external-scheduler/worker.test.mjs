@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SlotGate, dispatchAndVerify, observeSlot, planForCron, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import { SlotGate, dispatchAndVerify, observeSlot, planForCron, recheckRun, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
@@ -88,14 +88,14 @@ test("GitHub dispatch errors are surfaced", async () => {
 
 test("FINAL publication checks all dates and diagnostic status", async () => {
   const now = new Date();
-  const run = { id: 102, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "def" };
+  const run = { id: 102, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "def", production_commit_sha: "pub123" };
   const commit = { sha: "pub123" };
   const common = { asOfDate: "20261027" };
   const contents = {
-    "data/monitoring-daily/kospi.json?ref=main": encoded(common),
-    "data/monitoring-daily/kosdaq.json?ref=main": encoded(common),
-    "data/monitoring-baseline/latest.json?ref=main": encoded({ ...common, historyStatus: "SOURCE_OBSERVED" }),
-    "data/monitoring-daily/trading-session-diagnostic.json?ref=main": encoded({ targetDate: "20261027", status: "VERIFIED" }),
+    "data/monitoring-daily/kospi.json?ref=pub123": encoded(common),
+    "data/monitoring-daily/kosdaq.json?ref=pub123": encoded(common),
+    "data/monitoring-baseline/latest.json?ref=pub123": encoded({ ...common, historyStatus: "SOURCE_OBSERVED" }),
+    "data/monitoring-daily/trading-session-diagnostic.json?ref=pub123": encoded({ targetDate: "20261027", status: "VERIFIED" }),
   };
   const api = apiWith({ run, commits: [commit], contents });
   api.detail = true;
@@ -107,17 +107,19 @@ test("FINAL publication checks all dates and diagnostic status", async () => {
   const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:slot", finalTime, { github: wrapped, sleep: async () => {} });
   assert.equal(result.status, "FINAL_PUBLICATION_VERIFIED");
   assert.equal(result.publicationSha, "pub123");
+  assert.equal(api.calls.some((path) => path.includes("/contents/") && path.includes("ref=pub123")), true);
+  assert.equal(api.calls.some((path) => path.includes("/contents/") && path.includes("ref=main")), false);
 });
 
 test("FINAL date mismatch is not accepted", async () => {
   const now = new Date();
-  const run = { id: 103, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "ghi" };
+  const run = { id: 103, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "ghi", production_commit_sha: "pub456" };
   const commit = { sha: "pub456" };
   const contents = {
-    "data/monitoring-daily/kospi.json?ref=main": encoded({ asOfDate: "20261026" }),
-    "data/monitoring-daily/kosdaq.json?ref=main": encoded({ asOfDate: "20261027" }),
-    "data/monitoring-baseline/latest.json?ref=main": encoded({ asOfDate: "20261027", historyStatus: "SOURCE_OBSERVED" }),
-    "data/monitoring-daily/trading-session-diagnostic.json?ref=main": encoded({ targetDate: "20261027", status: "VERIFIED" }),
+    "data/monitoring-daily/kospi.json?ref=pub456": encoded({ asOfDate: "20261026" }),
+    "data/monitoring-daily/kosdaq.json?ref=pub456": encoded({ asOfDate: "20261027" }),
+    "data/monitoring-baseline/latest.json?ref=pub456": encoded({ asOfDate: "20261027", historyStatus: "SOURCE_OBSERVED" }),
+    "data/monitoring-daily/trading-session-diagnostic.json?ref=pub456": encoded({ targetDate: "20261027", status: "VERIFIED" }),
   };
   const api = apiWith({ run, commits: [commit], contents });
   const wrapped = async (path, init) => path === `/repos/${repo}/commits/pub456`
@@ -141,6 +143,28 @@ test("a long-running Run returns its identity for later completion polling", asy
   const later = await verifyRunCompletion(completionApi, repo, planForCron("7 0-10 * * 1-5"), run);
   assert.equal(later.status, "RUN_VERIFIED");
   assert.equal(later.publicationStatus, "PUBLISH_UNVERIFIED");
+});
+
+test("recheckRun restores RUN_STARTED state and invokes completion verification", async () => {
+  const values = new Map([["refresh-final:2026-10-27T20:30:30 11 * * 1-5", {
+    status: "RUN_STARTED",
+    details: { runId: 109, runHead: "resume", expectedDate: "20261027" },
+  }]]);
+  const gate = new SlotGate({ storage: {
+    get: async (key) => values.get(key),
+    put: async (key, value) => values.set(key, value),
+  } });
+  const env = {
+    GITHUB_REPOSITORY: repo,
+    SLOT_GATE: { idFromName: () => "id", get: () => ({ fetch: (request, init) => gate.fetch(request instanceof Request ? request : new Request(request, init)) }) },
+  };
+  const api = async (path) => {
+    if (path.includes("/actions/runs/109")) return { id: 109, head_sha: "resume", status: "completed", conclusion: "failure" };
+    throw new Error(`unexpected path ${path}`);
+  };
+  const result = await recheckRun(env, "refresh-final:2026-10-27T20:30:30 11 * * 1-5", finalPlan, { github: api });
+  assert.equal(result.status, "RUN_FAILED");
+  assert.equal(values.get("refresh-final:2026-10-27T20:30:30 11 * * 1-5").status, "RUN_FAILED");
 });
 
 test("Run creation remains observable at the 60-second boundary", async () => {

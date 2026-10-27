@@ -1,0 +1,15 @@
+name = "naver-krx-external-scheduler"
+main = "worker.js"
+compatibility_date = "2026-10-28"
+
+# Cron activation and Secret registration remain a separate approved operation.
+[triggers]
+crons = ["0 23 * * 0-4", "7 0-10 * * 1-5", "30 11 * * 1-5", "0 14 * * 1-5", "17 0 * * 1-5", "20 22 * * 0-4", "20 3 * * 1-5", "20 10 * * 1-5", "10,30,50 23 * * 0-4", "10,30,50 0-10 * * 1-5"]
+
+[[durable_objects.bindings]]
+name = "SLOT_GATE"
+class_name = "SlotGate"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SlotGate"]

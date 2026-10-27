@@ -118,8 +118,13 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
   const result = { runId: current.id, runHead: current.head_sha,
     status: current.conclusion === "success" ? "RUN_VERIFIED" : "RUN_FAILED" };
   if (result.status !== "RUN_VERIFIED") return result;
-  const commits = await api(`/repos/${repository}/commits?sha=main&since=${encodeURIComponent(current.created_at)}&until=${encodeURIComponent(current.updated_at || current.created_at)}&per_page=20`);
-  result.publicationSha = await commitChangedPaths(api, repository, commits, plan.publicationPaths, current, plan.commitMessage);
+  const publicationSha = current.production_commit_sha || current.outputs?.production_commit_sha;
+  if (!publicationSha) {
+    result.publicationStatus = "PUBLISH_UNVERIFIED";
+    result.deliveryStatus = "UNVERIFIED";
+    return result;
+  }
+  result.publicationSha = await commitChangedPaths(api, repository, [{ sha: publicationSha }], plan.publicationPaths, current, plan.commitMessage);
   result.publicationStatus = result.publicationSha ? "PUBLISHED" : "PUBLISH_UNVERIFIED";
   if (plan.key === "refresh-final" && result.publicationSha) {
     const expectedDate = options.expectedDate;
@@ -129,6 +134,31 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
   return result;
 }
 
+async function readState(env, slotKey) {
+  const id = env.SLOT_GATE.idFromName(slotKey);
+  const stub = env.SLOT_GATE.get(id);
+  const response = await stub.fetch("https://slot-gate/state?slotKey=" + encodeURIComponent(slotKey));
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`SLOT_STATE_HTTP_${response.status}`);
+  return response.json();
+}
+
+export async function recheckRun(env, slotKey, plan, options = {}) {
+  const stored = await readState(env, slotKey);
+  const details = stored?.details || {};
+  if (!details.runId) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
+  const api = options.github || ((path, init) => github(env, path, init));
+  const result = await verifyRunCompletion(api, env.GITHUB_REPOSITORY, plan, {
+    id: details.runId,
+    head_sha: details.runHead,
+    created_at: details.runCreatedAt,
+    updated_at: details.runUpdatedAt,
+  }, { expectedDate: details.expectedDate });
+  const state = result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status;
+  await setState(env, slotKey, state, { ...details, ...result });
+  return { slotKey, workflow: plan.workflow, ...result };
+}
+
 export async function observeSlot(api, repository, plan, scheduledTime) {
   const run = await findExistingRun(api, repository, plan, scheduledTime);
   if (!run) return { workflow: plan.workflow, status: "NO_RUN", observed: true };
@@ -136,7 +166,7 @@ export async function observeSlot(api, repository, plan, scheduledTime) {
     runId: run.id, runHead: run.head_sha, runEvent: run.event };
 }
 
-async function verifyFinalPublication(api, repository, expectedDate, publicationSha) {
+export async function verifyFinalPublication(api, repository, expectedDate, publicationSha) {
   const paths = [
     "data/monitoring-daily/kospi.json",
     "data/monitoring-daily/kosdaq.json",
@@ -144,7 +174,7 @@ async function verifyFinalPublication(api, repository, expectedDate, publication
     "data/monitoring-daily/trading-session-diagnostic.json",
   ];
   const payloads = {};
-  for (const path of paths) payloads[path] = await api(`/repos/${repository}/contents/${path}?ref=main`);
+  for (const path of paths) payloads[path] = await api(`/repos/${repository}/contents/${path}?ref=${encodeURIComponent(publicationSha)}`);
   const decode = (item) => JSON.parse(atob(item.content.replace(/\n/g, "")));
   const kospi = decode(payloads[paths[0]]);
   const kosdaq = decode(payloads[paths[1]]);
@@ -174,7 +204,8 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
   const kst = kstParts(scheduledTime);
   const expectedDate = `${kst.year}${kst.month}${kst.day}`;
   const result = { slotKey, workflow: plan.workflow, runId: creation.run.id, runHead: creation.run.head_sha,
-    status: creation.status };
+    runCreatedAt: creation.run.created_at, runUpdatedAt: creation.run.updated_at,
+    expectedDate, status: creation.status };
   if (creation.status !== "COMPLETED") return result;
   return { ...result, ...(await verifyRunCompletion(api, repository, plan, creation.run, { expectedDate })) };
 }
@@ -203,13 +234,18 @@ export default {
         console.log(JSON.stringify({ slotKey, ...result }));
         return;
       }
+      if (env.SCHEDULE_RECHECK_ONLY === "true") {
+        const result = await recheckRun(env, slotKey, plan);
+        console.log(JSON.stringify({ slotKey, ...result }));
+        return;
+      }
       if (!(await claim(env, slotKey))) return;
       await setState(env, slotKey, "CLAIMED");
       try {
         await setState(env, slotKey, "DISPATCHED");
         const runResult = await dispatchAndVerify(env, plan, slotKey, event.scheduledTime);
         runResult.deliveryStatus = "UNVERIFIED";
-        const result = runResult;
+        const result = { ...runResult, scheduledTime: event.scheduledTime };
         const state = result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status;
         await setState(env, slotKey, state, result);
         console.log(JSON.stringify(result));
@@ -225,6 +261,12 @@ export class SlotGate {
   constructor(state) { this.state = state; }
 
   async fetch(request) {
+    if (request.method === "GET") {
+      const slotKey = new URL(request.url).searchParams.get("slotKey");
+      if (!slotKey) return new Response("slot required", { status: 400 });
+      const current = await this.state.storage.get(slotKey);
+      return current ? Response.json(current) : new Response("not found", { status: 404 });
+    }
     if (request.method !== "POST") return new Response("method not allowed", { status: 405 });
     const body = await request.json();
     if (!body.slotKey) return new Response("slot required", { status: 400 });
