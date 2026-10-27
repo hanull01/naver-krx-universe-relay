@@ -84,6 +84,8 @@ def main():
     p.add_argument('--no-write',action='store_true')
     p.add_argument('--provisional', action='store_true', help='publish rolling state without changing the baseline')
     p.add_argument('--allow-partial', action='store_true', help='publish validated rows as PARTIAL without updating baseline')
+    p.add_argument('--allow-source-observed', action='store_true',
+                   help='preserve successful NAVER observations and normal empty daily responses as SOURCE_OBSERVED')
     a=p.parse_args()
     if a.closing_window:
         from monitoring_daily_state_update import closing_window
@@ -93,7 +95,7 @@ def main():
         if not a.date or bool(a.daily_input) == bool(a.fetch_today):
             p.error('update-latest requires --date and exactly one of --daily-input or --fetch-today')
         from monitoring_daily_state_update import (TodayRowsNotReady, UniverseHistoryRequired,
-            collect_today_rows, load_state, update_from_file, update_from_rows,
+            collect_today_rows, collect_today_rows_source_observed, load_state, update_from_file, update_from_rows,
             update_with_universe_refresh)
         try:
             if a.observed_snapshot:
@@ -125,6 +127,7 @@ def main():
                         a.lifecycle_output, a.date, stock_payload,
                         daily_rows=daily_payload, no_write=a.no_write,
                         provisional=a.provisional, enforce_lifecycle_verification=True,
+                        allow_source_observed=a.allow_source_observed,
                     )
                 else:
                     outcome = update_with_universe_refresh(
@@ -132,6 +135,7 @@ def main():
                         a.lifecycle_output, a.date, stock_payload,
                         no_write=a.no_write, provisional=a.provisional,
                         enforce_lifecycle_verification=True,
+                        allow_source_observed=a.allow_source_observed,
                         diagnostic_output=None if a.no_write else a.session_diagnostic_output,
                     )
             elif a.fetch_today:
@@ -143,20 +147,32 @@ def main():
                         a.output_dir, a.universe_file, a.baseline_output,
                         a.lifecycle_output, a.date, stock_payload, no_write=a.no_write,
                         provisional=a.provisional, enforce_lifecycle_verification=True,
+                        allow_source_observed=a.allow_source_observed,
                         allow_partial=a.allow_partial,
                         diagnostic_output=None if a.no_write else a.session_diagnostic_output)
                 else:
+                    collector = (collect_today_rows_source_observed
+                                 if a.allow_source_observed else collect_today_rows)
+                    collected = collector(
+                        a.date, a.universe_file,
+                        diagnostic_output=None if a.no_write else a.session_diagnostic_output)
+                    if a.allow_source_observed and collected["status"] != "SUCCESS":
+                        raise ValueError("SOURCE_OBSERVED_COLLECTION_FAILED:" + ",".join(
+                            f"{code}={reason}" for code, reason in sorted(collected["errors"].items())))
                     outcome = update_from_rows(load_state(a.output_dir, a.universe_file),
-                                               collect_today_rows(
-                                                   a.date, a.universe_file,
-                                                   diagnostic_output=None if a.no_write else a.session_diagnostic_output),
+                                               collected["rows"] if a.allow_source_observed else collected,
                                                a.output_dir, a.date,
-                                               a.universe_file, a.baseline_output, no_write=a.no_write, provisional=a.provisional)
+                                               a.universe_file, a.baseline_output, no_write=a.no_write,
+                                               provisional=a.provisional,
+                                               allow_source_observed=a.allow_source_observed,
+                                               source_missing_reasons=(collected.get("sourceMissingReasons", {})
+                                                                       if a.allow_source_observed else None))
             else:
                 if a.refresh_universe:
                     p.error('--refresh-universe requires --fetch-today or --observed-snapshot')
                 outcome = update_from_file(a.output_dir, a.daily_input, a.date, a.universe_file,
-                                           a.baseline_output, no_write=a.no_write, provisional=a.provisional)
+                                           a.baseline_output, no_write=a.no_write, provisional=a.provisional,
+                                           allow_source_observed=a.allow_source_observed)
         except TodayRowsNotReady as exc:
             print(json.dumps(exc.diagnostics, ensure_ascii=False))
             return 2

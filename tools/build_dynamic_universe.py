@@ -61,6 +61,22 @@ def verified_trading_date(payload):
     return None
 
 
+def input_evidence(industry_payload, quality_payload):
+    """Keep V1's input date and source quality separate from result time."""
+    industry_payload = industry_payload or {}
+    quality_payload = quality_payload or {}
+    source_commit = (quality_payload.get("sourceCommit")
+                     or industry_payload.get("sourceCommit"))
+    return {
+        "tradingDate": verified_trading_date(industry_payload),
+        "sourceQualityStatus": (quality_payload.get("sourceQualityStatus")
+                                 or industry_payload.get("sourceQualityStatus")
+                                 or "UNAVAILABLE"),
+        "sourceCommit": source_commit,
+        "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
+    }
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--industries", default=str(ROOT / "data/monitoring/latest-industries.json"))
@@ -69,6 +85,7 @@ def main(argv=None):
     parser.add_argument("--theme-signals", default=str(ROOT / "data/monitoring/latest-theme-signals.json"))
     parser.add_argument("--theme-ranking", default=str(ROOT / "data/research/theme-ranking/latest.json"))
     parser.add_argument("--theme-membership", default=str(ROOT / "data/research/theme-membership/latest.json"))
+    parser.add_argument("--quality")
     parser.add_argument("--discovery", default=str(ROOT / "data/trading-discovery/latest.json"))
     parser.add_argument("--asset-registry", default=str(ROOT / "data/market-universe/all-assets.json"))
     parser.add_argument("--policy", default=str(manager.DEFAULT_POLICY))
@@ -77,6 +94,8 @@ def main(argv=None):
     parser.add_argument("--no-write", action="store_true")
     args = parser.parse_args(argv)
     industries = manager.load_json(args.industries, {}) or {}
+    quality_payload = manager.load_json(
+        args.quality or str(Path(args.industries).with_name("latest-quality.json")), {}) or {}
     quality = industries.get("quality") or {}
     industry_rows, industry_quality_state = usable_industry_rows(industries)
     trading_date = verified_trading_date(industries)
@@ -164,7 +183,10 @@ def main(argv=None):
                         if quote.get(field) is not None:
                             row[field] = quote[field]
     if not args.no_write:
+        result["inputEvidence"] = input_evidence(industries, quality_payload)
         manager.publish_result(result, args.output, args.output, args.history)
+    else:
+        result["inputEvidence"] = input_evidence(industries, quality_payload)
     print(json.dumps({"status": "SUCCESS", "networkCalls": 0, "industryQuality": industry_quality_state,
                       "sectorCount": len(result["sectors"]),
                       "themePending": bool(result["pending"]), "leaderCount": len(result["leaders"]),

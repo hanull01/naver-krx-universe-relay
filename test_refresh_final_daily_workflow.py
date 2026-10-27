@@ -35,6 +35,11 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn('--current-file "$RUNNER_TEMP/full-market-current.json"', self.final_step[rebuild:])
         self.assertNotIn("naver_full_market_current.py", self.final_step[rebuild:])
 
+    def test_final_success_rebuilds_v1_after_final_baseline(self):
+        rebuild = self.final_step.index("tools/run_full_market_monitoring.py")
+        v1 = self.final_step.index("tools/build_dynamic_universe.py", rebuild)
+        self.assertLess(rebuild, v1)
+
     def test_final_update_requires_explicit_snapshot_session_date(self):
         self.assertIn("data/market/indices.json", self.final_step)
         self.assertIn("validate_final_payload", self.final_step)
@@ -63,6 +68,7 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
     def test_final_update_collects_naver_daily_local_dates_for_observed_set(self):
         self.assertIn("--observed-snapshot", self.final_step)
         self.assertIn("--fetch-today", self.final_step)
+        self.assertIn("--allow-source-observed", self.final_step)
         self.assertIn("--session-diagnostic-output", self.final_step)
         self.assertIn("final-daily-target.txt", self.final_step)
         self.assertNotIn("from tools.monitoring_daily_state_update import collect_today_rows", self.final_step)
@@ -105,6 +111,13 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
     def test_ready_signal_requires_a_new_publication_commit(self):
         mail = self.text[self.text.index("id: ready_email"):]
         self.assertIn("steps.publish.outputs.publication_changed == 'true'", mail[:1200])
+
+    def test_full_market_entrypoint_opts_into_source_observed_only_with_explicit_date(self):
+        calls = self.text.count("--allow-source-observed-final")
+        self.assertEqual(calls, 2)
+        self.assertEqual(self.text.count('--source-observed-date "$target_date"'), 2)
+        self.assertIn("baselineFreshnessStatus", Path(__file__).parent.joinpath(
+            "tools", "run_full_market_monitoring.py").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

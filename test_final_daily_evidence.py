@@ -37,6 +37,15 @@ class FinalDailyEvidenceTests(unittest.TestCase):
         self.assertEqual(result["finalityPolicy"], "KRX_AFTER_MARKET_CLOSE_20_CANDIDATE")
         self.assertEqual(result["networkCalls"], 0)
 
+    def test_source_observed_baseline_marker_is_accepted_without_promoting_unknown_quality(self):
+        result = validate_snapshot(
+            self.snapshot([row()]),
+            {"asOfDate": "20261018", "historyStatus": "SOURCE_OBSERVED",
+             "sourceQualityStatus": "SOURCE_OBSERVED"},
+        )
+        self.assertTrue(result["finalEligible"])
+        self.assertNotIn("BASELINE_NOT_READY", result["errors"])
+
     def test_terminal_marker_can_be_reported_but_not_inferred(self):
         result = validate_snapshot(self.snapshot([row(marketStatus="CLOSED")]),
                                    {"asOfDate": "20261019", "historyStatus": "OK"})

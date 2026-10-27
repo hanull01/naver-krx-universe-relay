@@ -328,6 +328,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "snapshotDates": date_evidence.get("snapshotDates", []),
         "snapshotDateStatus": date_evidence.get("snapshotDateStatus"),
         "maBasisDates": date_evidence.get("maBasisDates", []),
+        "sourceQualityStatus": quality.get("sourceQualityStatus"),
         "quality": quality,
         "qualityStatus": quality.get("collectionQualityStatus", "UNKNOWN"),
         "breadth": {
@@ -385,6 +386,7 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
     if not summary_date or evidence_reason not in {
         "VERIFIED_CANONICAL_SESSION",
         "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+        "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
     }:
         return {"status": "WAIT", "reason": "TRADING_DATE_EVIDENCE_UNAVAILABLE",
                 "publishedDate": summary_date, "evidenceReason": evidence_reason,
@@ -392,9 +394,13 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
     if baseline_date != summary_date:
         return {"status": "WAIT", "reason": "BASELINE_DATE_MISMATCH",
                 "publishedDate": summary_date, "baselineDate": baseline_date}
-    if baseline.get("historyStatus") not in (None, "OK"):
+    if baseline.get("historyStatus") not in (None, "OK", "SOURCE_OBSERVED"):
         return {"status": "WAIT", "reason": "BASELINE_NOT_READY",
                 "historyStatus": baseline.get("historyStatus")}
+    if (baseline.get("historyStatus") == "SOURCE_OBSERVED"
+            and baseline.get("sourceQualityStatus") != "SOURCE_OBSERVED"):
+        return {"status": "WAIT", "reason": "BASELINE_SOURCE_QUALITY_UNAVAILABLE",
+                "sourceQualityStatus": baseline.get("sourceQualityStatus")}
 
     publication_statuses = {
         quality.get("publicationStatus"), summary.get("publicationStatus")
@@ -419,10 +425,19 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
             and not evidence.get("unexpectedFinalCodes")
             and not evidence.get("invalidFinalCodes")
         )
+        source_observed_exact = (
+            evidence_reason == "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
+            and evidence.get("status") == "SOURCE_OBSERVED"
+            and not evidence.get("missingFinalCodes")
+            and not evidence.get("unexpectedFinalCodes")
+            and not evidence.get("invalidFinalCodes")
+            and baseline.get("historyStatus") == "SOURCE_OBSERVED"
+            and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+        )
         if not (
             isinstance(authoritative, int) and authoritative > 0
             and expected == authoritative == coverage
-            and baseline_exact and (canonical_exact or final_exact)
+            and baseline_exact and (canonical_exact or final_exact or source_observed_exact)
         ):
             return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
                     "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
@@ -442,6 +457,7 @@ def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
             "source": "monitoring-full-market-evidence-and-baseline",
             "baselineDate": baseline_date,
             "tradingDateEvidenceReason": evidence_reason,
+            "sourceQualityStatus": baseline.get("sourceQualityStatus"),
             "qualityGeneratedAt": quality.get("generatedAt"),
             "baselineGeneratedAt": baseline.get("generatedAt")}
 
@@ -835,6 +851,7 @@ def full_market_summary(full_market, alignment):
         "sourceTime": full_market.get("sourceTime") if verified else None,
         "generatedAt": full_market.get("generatedAt") if verified else None,
         "qualityStatus": full_market.get("qualityStatus") if verified else None,
+        "sourceQualityStatus": full_market.get("sourceQualityStatus") if verified else None,
         "quality": quality,
         "breadth": full_market.get("breadth") if verified else None,
         "marketTradingValue": full_market.get("marketTradingValue", {}) if verified else {},
@@ -1625,7 +1642,8 @@ def write_markdown(report, path):
             f"- 기준일: {full_summary.get('tradingDate') or '확인 불가'}; "
             f"Baseline 기준일: {full_summary.get('baselineDate') or '확인 불가'}",
             f"- 기준시각: {full_summary.get('sourceTime') or '확인 불가'}; "
-            f"자료 품질: {full_summary.get('qualityStatus') or '확인 불가'}",
+            f"자료 품질: {full_summary.get('qualityStatus') or '확인 불가'}; "
+            f"원천 상태: {full_summary.get('sourceQualityStatus') or '확인 불가'}",
             f"- 전체시장 종목: {full_summary.get('quality', {}).get('currentCount', '확인 불가')}/"
             f"{full_summary.get('quality', {}).get('authoritativeCount', '확인 불가')}종목",
             f"- 상승/하락/보합: {full_breadth.get('advancers', '확인 불가')}/"

@@ -131,7 +131,12 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
                 errors.append("BASELINE_DATE_MISMATCH")
         except ValueError:
             errors.append("BASELINE_DATE_MISMATCH")
-    if (baseline or {}).get("historyStatus") not in (None, "OK"):
+    baseline_source_observed = (
+        (baseline or {}).get("historyStatus") == "SOURCE_OBSERVED"
+        and (baseline or {}).get("sourceQualityStatus") == "SOURCE_OBSERVED"
+    )
+    if ((baseline or {}).get("historyStatus") not in (None, "OK")
+            and not baseline_source_observed):
         errors.append("BASELINE_NOT_READY")
 
     markers = {str(row.get("marketStatus") or "").upper() for row in rows}

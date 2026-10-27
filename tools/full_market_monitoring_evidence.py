@@ -382,19 +382,36 @@ def signal_subset(features, required_codes=None):
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
                    previous_summary=None, today=None, previous_good_industries=None, baseline=None,
                    publication_context=None, theme_membership=None,
-                   monitoring_daily_dir=MONITORING_DAILY_DIR):
+                   monitoring_daily_dir=MONITORING_DAILY_DIR,
+                   allow_source_observed_final=False):
     if current_snapshot.get("status") not in ("SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"):
         raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
+    source_observed_final = bool(
+        allow_source_observed_final
+        and baseline is not None
+        and baseline.get("historyStatus") == "SOURCE_OBSERVED"
+        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+    )
     if baseline is not None:
-        if baseline.get("historyStatus") != "OK":
+        source_observed_baseline = (
+            baseline.get("historyStatus") == "SOURCE_OBSERVED"
+            and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
+        )
+        if baseline.get("historyStatus") != "OK" and not source_observed_baseline:
             raise ValueError("baseline history is not OK")
         publication_context = publication_context or {}
         as_of = str(baseline.get("asOfDate") or "")
         overlay = today == as_of
         if as_of and today < as_of:
             raise ValueError("current date must be after baseline asOfDate")
-        if overlay and publication_context.get("baselineFreshnessStatus") != "VALID_CURRENT_DAY_FINAL":
+        allowed_overlay_statuses = {"VALID_CURRENT_DAY_FINAL"}
+        if source_observed_final:
+            allowed_overlay_statuses.update({
+                "VALID_CURRENT_DAY_SOURCE_OBSERVED",
+                "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
+            })
+        if overlay and publication_context.get("baselineFreshnessStatus") not in allowed_overlay_statuses:
             raise ValueError("same-day baseline requires validated final-session overlay")
         by_code = {row["code"]: row for row in baseline.get("stocks", [])}
         missing = [row["code"] for row in current_snapshot["stocks"] if row["code"] not in by_code]
@@ -501,6 +518,19 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     canonical_fully_absent = bool(current_codes) and all(
         not (Path(history_dir) / (code + ".jsonl")).is_file() for code in current_codes
     )
+    if trading_date_result.get("tradingDate") is None and source_observed_final:
+        source_codes = [row.get("code") for row in (baseline or {}).get("stocks", [])]
+        source_by_market = {}
+        for row in (baseline or {}).get("stocks", []):
+            source_by_market.setdefault(str(row.get("market") or ""), []).append(row.get("code"))
+        source_result = trading_date_evidence.verify_source_observed_monitoring_daily_final(
+            monitoring_daily_dir, source_codes, session_date=(baseline or {}).get("asOfDate"),
+            expected_by_market=source_by_market,
+        )
+        if source_result.get("tradingDate") is not None:
+            trading_date_result = source_result
+        else:
+            trading_date_result = {**trading_date_result, "sourceObservedEvidence": source_result}
     if trading_date_result.get("tradingDate") is None and canonical_fully_absent:
         final_result = trading_date_evidence.verify_monitoring_daily_final(
             monitoring_daily_dir,
@@ -527,6 +557,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     }
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                    "markets": breadth_data, "qualityStatus": current_snapshot.get("qualityStatus", collection_quality),
+                   "sourceQualityStatus": (baseline or {}).get("sourceQualityStatus") if source_observed_final else None,
                    "expectedCount": current_snapshot.get("expectedCount"),
                    "coverageCount": current_snapshot.get("coverageCount"),
                    "missingCodes": current_snapshot.get("missingCodes", []),
@@ -632,6 +663,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "productionBaselineCount": baseline_count,
                                 "productionBaselineAuthoritativeCount": baseline_authoritative,
                                 "productionBaselineHistoryStatus": baseline_history_status,
+                                "sourceQualityStatus": (baseline or {}).get("sourceQualityStatus") if source_observed_final else None,
                                 "canonicalHistoryFileCoveragePct": canonical_coverage,
                                 "duplicateCodes": current_snapshot.get("duplicateCodes", []), "missingCurrentCodes": current_snapshot.get("missingCodes", []),
                                 "missingHistoryCodes": sorted(current_codes - history_codes),

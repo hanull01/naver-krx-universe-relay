@@ -605,6 +605,110 @@ def collect_today_rows_partial(target_date, universe_file, fetcher=None, *,
             "expectedCount": len(targets), "collectedCount": len(rows)}
 
 
+def collect_today_rows_source_observed(target_date, universe_file, fetcher=None, *,
+                                       max_workers=COLLECT_MAX_WORKERS,
+                                       retries=COLLECT_RETRIES,
+                                       timeout=COLLECT_TIMEOUT_SECONDS,
+                                       retry_sleep=COLLECT_RETRY_SLEEP_SECONDS,
+                                       diagnostic_output=None):
+    """Collect a dated NAVER observation while preserving normal empty days.
+
+    A successful response with no target-date bar is a source-observed
+    absence, not a request failure.  Transport, parsing, date-mismatch, and
+    duplicate responses remain fail-closed and prevent publication.
+    """
+    groups = authoritative_groups(universe_file)
+    target = compact_date(target_date)
+    targets = sorted((code, market) for market, assets in groups.items() for code in assets)
+    import sys
+    tool_dir = str(Path(__file__).parent)
+    if tool_dir not in sys.path:
+        sys.path.insert(0, tool_dir)
+    import naver_daily_backfill as daily
+
+    def one(code, market):
+        last_error = None
+        observed_values = []
+        for attempt in range(1, retries + 1):
+            try:
+                response = (fetcher(code, datetime.strptime(target, "%Y%m%d"),
+                                    datetime.strptime(target, "%Y%m%d"))
+                            if fetcher else daily.fetch(
+                                code, datetime.strptime(target, "%Y%m%d"),
+                                datetime.strptime(target, "%Y%m%d"),
+                                timeout=timeout, retries=1, sleep=0))
+                payload = json.loads(response["raw"].decode("utf-8"))
+                if not isinstance(payload, dict) or "priceInfos" not in payload:
+                    raise ValueError("daily response missing priceInfos array")
+                rows = payload["priceInfos"]
+                if not isinstance(rows, list):
+                    raise ValueError("daily response priceInfos is not an array")
+                observed_values = [str(item.get("localDate")) for item in rows]
+                for value in observed_values:
+                    compact_date(value)
+                candidates = [row for row in rows if compact_date(row.get("localDate")) == target]
+                if not candidates:
+                    if observed_values:
+                        return code, None, "DATE_MISMATCH", observed_values, market
+                    return code, None, "NORMAL_EMPTY_DAILY", observed_values, market
+                if len(candidates) != 1:
+                    return code, None, "DUPLICATE_LOCAL_DATE", observed_values, market
+                row = candidates[0]
+                reasons = daily.row_validation_reasons(row)
+                return code, {
+                    "code": code, "date": target, "open": row.get("openPrice"),
+                    "high": row.get("highPrice"), "low": row.get("lowPrice"),
+                    "close": row.get("closePrice"), "volume": row.get("accumulatedTradingVolume"),
+                    "value": row.get("accumulatedTradingValue"),
+                    "closeValid": not any("close" in item for item in reasons),
+                    "ohlcValid": not reasons,
+                    "volumeValid": not any("volume" in item for item in reasons),
+                    "source_valid": True, "source_status": "OBSERVED",
+                    "missing_reason": None, "market": market,
+                }, None, observed_values, market
+            except Exception as exc:
+                last_error = f"API_OR_PARSE_FAILURE:{type(exc).__name__}:{exc}"
+                if attempt < retries and retry_sleep:
+                    time_module.sleep(retry_sleep)
+        return code, None, last_error or "API_OR_PARSE_FAILURE", observed_values, market
+
+    rows, missing_reasons, errors, observed_dates = {}, {}, {}, {}
+    with ThreadPoolExecutor(max_workers=min(max_workers, len(targets))) as executor:
+        futures = {executor.submit(one, code, market): code for code, market in targets}
+        for future in as_completed(futures):
+            code, row, reason, values, _market = future.result()
+            if values:
+                observed_dates[code] = values[0]
+            if row is not None:
+                rows[code] = row
+            elif reason == "NORMAL_EMPTY_DAILY":
+                missing_reasons[code] = reason
+            else:
+                errors[code] = reason
+
+    if diagnostic_output is not None:
+        from tools.trading_session_diagnostic import write_local_date_diagnostic
+        write_local_date_diagnostic(
+            diagnostic_output, target, observed_dates,
+            {code for code, _market in targets},
+            observed_date_values={code: [value] for code, value in observed_dates.items()},
+            source_missing_codes=missing_reasons,
+            source_missing_reasons=missing_reasons,
+        )
+    if not rows and not errors and targets:
+        errors["__all__"] = "ALL_NORMAL_EMPTY_DAILY"
+    return {
+        "status": "SUCCESS" if not errors else "FAILED",
+        "targetDate": target,
+        "rows": normalize_daily_rows({"rows": list(rows.values())}, target) if rows else {},
+        "sourceMissingCodes": sorted(missing_reasons),
+        "sourceMissingReasons": missing_reasons,
+        "errors": errors,
+        "expectedCount": len(targets),
+        "collectedCount": len(rows),
+    }
+
+
 def update_partial_state(existing, daily_rows, target_date, universe_file, state_dir=None, *, errors=None, no_write=False):
     """Apply only validated rows and leave the baseline untouched."""
     target = compact_date(target_date); groups = authoritative_groups(universe_file)
@@ -638,7 +742,7 @@ def update_partial_state(existing, daily_rows, target_date, universe_file, state
 
 
 def update_state(existing, daily_rows, target_date, universe_file, publication_status="FINAL",
-                 allow_source_observed=False):
+                 allow_source_observed=False, source_missing_reasons=None):
     if publication_status not in {"PROVISIONAL", "FINAL"}:
         raise ValueError("invalid publication status")
     target = compact_date(target_date); groups = authoritative_groups(universe_file)
@@ -664,10 +768,17 @@ def update_state(existing, daily_rows, target_date, universe_file, publication_s
                 raise ValueError(f"final daily conflict: {code} {target}")
             rows.sort(key=lambda row: row["date"])
             stocks.append(encode_stock(code, rows[-KEEP:]))
+        market_expected = set(groups[market])
+        market_missing = sorted(market_expected - set(daily_rows)) if allow_source_observed else []
+        market_reasons = {
+            code: str((source_missing_reasons or {}).get(code) or "NORMAL_EMPTY_DAILY")
+            for code in market_missing
+        }
         output[market] = {"schemaVersion": 1, "format": FORMAT, "market": market, "retainedObservations": KEEP,
                           "publicationStatus": publication_status, "asOfDate": target,
                           "sourceQualityStatus": "SOURCE_OBSERVED" if allow_source_observed else "VALIDATED",
-                          "sourceMissingCodes": sorted(set(expected) - set(daily_rows)) if allow_source_observed else [],
+                          "sourceMissingCodes": market_missing,
+                          "sourceMissingReasons": market_reasons,
                           "stocks": sorted(stocks, key=lambda row: row["code"])}
     return output, changed
 
@@ -701,17 +812,20 @@ def baseline_from_state(state, target_date, universe_file, output, generated_at=
     return baseline
 
 
-def update_from_file(state_dir, daily_input, target_date, universe_file, baseline_output, no_write=False, provisional=False):
+def update_from_file(state_dir, daily_input, target_date, universe_file, baseline_output, no_write=False,
+                     provisional=False, allow_source_observed=False):
     existing = load_state(state_dir, universe_file)
     incoming = normalize_daily_rows(json.loads(Path(daily_input).read_text(encoding="utf-8")), target_date)
-    return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write, provisional)
+    return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output,
+                            no_write, provisional, allow_source_observed=allow_source_observed)
 
 
 def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False,
-                     provisional=False, allow_source_observed=False):
+                     provisional=False, allow_source_observed=False, source_missing_reasons=None):
     publication_status = "PROVISIONAL" if provisional else "FINAL"
     updated, changed = update_state(existing, incoming, target_date, universe_file, publication_status,
-                                     allow_source_observed=allow_source_observed)
+                                     allow_source_observed=allow_source_observed,
+                                     source_missing_reasons=source_missing_reasons)
     baseline = baseline_from_state(updated, target_date, universe_file, baseline_output,
                                    allow_source_observed=allow_source_observed)
     if changed and not no_write:
@@ -727,6 +841,7 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
                                  target_date, stock_payload, fetcher=None, no_write=False, provisional=False,
                                  enforce_lifecycle_verification=False,
                                  lifecycle_candidates=None, allow_partial=False, daily_rows=None,
+                                 allow_source_observed=False, market_day_check=None,
                                  **collection_options):
     """Reconcile retired stocks and publish one exact universe/state/baseline generation."""
     previous_universe = _universe_payload(universe_file)
@@ -770,12 +885,16 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
         baseline = json.loads(Path(baseline_output).read_text(encoding="utf-8"))
         expected = set().union(*(set(group) for group in authoritative_groups(current_universe).values()))
         baseline_codes = {str(stock.get("code")) for stock in baseline.get("stocks", [])}
+        source_baseline = (baseline.get("historyStatus") == "SOURCE_OBSERVED" and
+                           baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED")
         if (compact_date(baseline.get("asOfDate")) != target or baseline_codes != expected or
                 baseline.get("authoritativeCount") != len(expected) or baseline.get("count") != len(expected) or
-                baseline.get("coveragePct") != 100.0 or baseline.get("historyStatus") != "OK"):
+                baseline.get("coveragePct") != 100.0 or
+                (baseline.get("historyStatus") != "OK" and not source_baseline)):
             raise ValueError("same-day final generation baseline mismatch")
         return {"status": "SUCCESS", "changed": False, "asOfDate": target,
                 "coverage": len(expected), "lifecycle": diagnostics, "baseline": baseline}
+    source_missing_reasons = {}
     if daily_rows is not None:
         # The full-market snapshot is already a complete, validated NAVER
         # observation.  Reuse its daily rows after the universe reconciliation
@@ -784,6 +903,14 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
             {"rows": daily_rows} if isinstance(daily_rows, list) else daily_rows,
             target_date,
         )
+    elif allow_source_observed:
+        observed = collect_today_rows_source_observed(target_date, current_universe,
+                                                      fetcher=fetcher, **collection_options)
+        if observed["status"] != "SUCCESS":
+            raise ValueError("SOURCE_OBSERVED_COLLECTION_FAILED:" + ",".join(
+                f"{code}={reason}" for code, reason in sorted(observed["errors"].items())))
+        incoming = observed["rows"]
+        source_missing_reasons = observed["sourceMissingReasons"]
     elif allow_partial:
         partial = collect_today_rows_partial(target_date, current_universe, fetcher=fetcher,
                                              **collection_options)
@@ -795,7 +922,7 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
     else:
         incoming = collect_today_rows(target_date, current_universe, fetcher=fetcher,
                                       **collection_options)
-    if daily_rows is None and not provisional:
+    if daily_rows is None and not provisional and not allow_source_observed:
         invalid_codes = sorted(
             code for code, row in incoming.items()
             if not all(row.get(key) is True for key in
@@ -806,8 +933,18 @@ def update_with_universe_refresh(state_dir, universe_file, baseline_output, life
                 "daily OHLCV invalid: " + ",".join(invalid_codes[:20])
             )
     publication_status = "PROVISIONAL" if provisional else "FINAL"
-    updated, changed = update_state(reconciled, incoming, target_date, current_universe, publication_status)
-    baseline = baseline_from_state(updated, target_date, current_universe, baseline_output)
+    updated, changed = update_state(
+        reconciled, incoming, target_date, current_universe, publication_status,
+        allow_source_observed=allow_source_observed,
+        source_missing_reasons=source_missing_reasons,
+    )
+    baseline_kwargs = {"allow_source_observed": True} if allow_source_observed else {}
+    if market_day_check is not None:
+        baseline_kwargs["market_day_check"] = market_day_check
+    baseline = baseline_from_state(
+        updated, target_date, current_universe, baseline_output, **baseline_kwargs)
+    if allow_source_observed:
+        baseline.setdefault("sourceDiagnostics", {})["missingReasons"] = source_missing_reasons
     groups = authoritative_groups(current_universe)
     expected = set().union(*(set(group) for group in groups.values()))
     state_codes = {str(stock["code"]) for market in MARKETS for stock in updated[market]["stocks"]}

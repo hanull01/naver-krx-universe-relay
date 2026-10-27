@@ -30,7 +30,8 @@ def _atomic_json(path, value):
 
 
 def write_local_date_diagnostic(output_path, target_date, observed_dates, expected_codes=None,
-                               duplicate_codes=None, observed_date_values=None):
+                               duplicate_codes=None, observed_date_values=None,
+                               source_missing_codes=None, source_missing_reasons=None):
     """Write diagnostics without changing collection output or state."""
     observed = {str(code): value for code, value in (observed_dates or {}).items()}
     expected = {str(code) for code in (expected_codes or observed)}
@@ -44,11 +45,19 @@ def write_local_date_diagnostic(output_path, target_date, observed_dates, expect
                    "duplicateCodes": duplicates,
                    "dateMismatchCodes": list(result.get("mismatchCodes", [])),
                    "source": "NAVER_LOCAL_DATE"})
+    if source_missing_codes:
+        result["sourceMissingCodes"] = sorted({str(code) for code in source_missing_codes})
+        result["sourceMissingReasons"] = dict(sorted((source_missing_reasons or {}).items()))
+        result["status"] = "SOURCE_OBSERVED"
+        result["reason"] = "SOURCE_OBSERVED_WITH_NORMAL_EMPTY_DAILY"
     if observed_date_values:
         result["observedDateValues"] = {
             str(code): list(values) for code, values in sorted(observed_date_values.items())
         }
-    if result["missingCodes"] or result["unexpectedCodes"]:
+    normal_empty = set(result.get("sourceMissingCodes") or ())
+    if (result["missingCodes"] and not normal_empty
+            or set(result["missingCodes"]) != normal_empty
+            or result["unexpectedCodes"]):
         result["status"] = "UNVERIFIED"
         result["reason"] = "CODE_SET_MISMATCH"
     elif duplicates:
