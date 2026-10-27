@@ -1,4 +1,7 @@
+import io
 import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
 
 import market_indices
 
@@ -70,6 +73,20 @@ class MarketIndicesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "INDEX_SOURCE_DATE_GENERATED_DATE_MISMATCH"):
             market_indices.validate_final_payload(
                 payload, "2026-10-26T20:30:00+09:00", "2026-10-26T20:30:05+09:00")
+
+    def test_cli_returns_failure_for_partial_collection(self):
+        payload = {"status": "PARTIAL", "indices": [], "errors": [{"code": "KOSDAQ"}]}
+        with patch.object(market_indices, "collect", return_value=payload), \
+             patch.object(market_indices, "write"), \
+             redirect_stdout(io.StringIO()):
+            self.assertEqual(market_indices.main(), 1)
+
+    def test_cli_returns_success_only_for_complete_collection(self):
+        payload = {"status": "OK", "indices": [{"code": "KOSPI"}, {"code": "KOSDAQ"}], "errors": []}
+        with patch.object(market_indices, "collect", return_value=payload), \
+             patch.object(market_indices, "write"), \
+             redirect_stdout(io.StringIO()):
+            self.assertEqual(market_indices.main(), 0)
 
 
 if __name__ == "__main__":

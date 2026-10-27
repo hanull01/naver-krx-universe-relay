@@ -75,6 +75,7 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("validate_final_payload", self.final_step)
         self.assertIn("--fetch-today", self.final_step)
         self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
+        self.assertIn("steps.indices.outputs.exit_code == '0'", self.final_step)
 
     def test_final_update_collects_naver_daily_local_dates_for_observed_set(self):
         self.assertIn("--observed-snapshot", self.final_step)
@@ -109,6 +110,12 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("data/monitoring-baseline/latest.json", self.publish)
         self.assertIn("final_daily_gate_required", self.publish)
         self.assertIn('preserving prior evidence', self.publish)
+
+    def test_failed_final_paths_are_restored_before_rebase(self):
+        self.assertIn("Final daily update failed; restoring only its generated production paths", self.publish)
+        self.assertIn("git restore --source=HEAD --worktree", self.publish)
+        self.assertIn("git clean -f --", self.publish)
+        self.assertIn("git ls-files --others --exclude-standard", self.publish)
 
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
         self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
