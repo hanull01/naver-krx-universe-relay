@@ -139,7 +139,12 @@ def write(payload, path=OUTPUT):
         if os.path.exists(tmp): os.unlink(tmp)
 
 
-if __name__ == "__main__":
-    payload = collect()
-    write(payload)
+def main(fetcher=None, path=OUTPUT, now=None):
+    payload = collect(fetcher=fetcher, now=now)
+    write(payload, path)
     print(json.dumps({"status": payload["status"], "count": len(payload["indices"]), "errors": payload["errors"]}, ensure_ascii=False))
+    return 0 if payload["status"] == "OK" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -258,7 +258,7 @@ jobs:
 
       - name: Diagnose final daily-bar evidence
         id: final_daily_evidence
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.mode.outputs.final_run == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.indices.outputs.exit_code == '0' && steps.mode.outputs.final_run == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -269,7 +269,7 @@ jobs:
 
       - name: Prepare final daily monitoring update (disabled by default)
         id: final_daily_history
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.mode.outputs.final_run == 'true' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.indices.outputs.exit_code == '0' && steps.mode.outputs.final_run == 'true' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -517,6 +517,30 @@ jobs:
             echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Refresh NAVER market data"
+            if [ "$final_daily_gate_required" = "true" ]; then
+              echo "Final daily update failed; restoring only its generated production paths before synchronization."
+              git restore --source=HEAD --worktree -- \
+                data/market-universe/all-assets.json \
+                data/monitoring-daily/kospi.json \
+                data/monitoring-daily/kosdaq.json \
+                data/monitoring-daily/retired.json \
+                data/monitoring-daily/universe-lifecycle.json \
+                data/monitoring-daily/trading-session-diagnostic.json \
+                data/monitoring-baseline/latest.json || true
+              git clean -f -- \
+                data/market-universe/all-assets.json \
+                data/monitoring-daily/kospi.json \
+                data/monitoring-daily/kosdaq.json \
+                data/monitoring-daily/retired.json \
+                data/monitoring-daily/universe-lifecycle.json \
+                data/monitoring-daily/trading-session-diagnostic.json \
+                data/monitoring-baseline/latest.json || true
+            fi
+            if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+              echo "::error::Unexpected unstaged or untracked files remain before data synchronization; preserving production data."
+              git status --short
+              exit 1
+            fi
             echo "Market data collection succeeded; synchronizing its data commit."
             for attempt in 1 2 3; do
               echo "Push synchronization attempt ${attempt}/3"
