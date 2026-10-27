@@ -19,7 +19,18 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
 
     def test_final_history_is_opt_in_and_schedule_gated(self):
         self.assertIn("vars.FINAL_DAILY_HISTORY_WRITE == 'true'", self.final_step)
-        self.assertIn("github.event.schedule == '30 11 * * 1-5'", self.final_step)
+        self.assertIn("steps.mode.outputs.final_run == 'true'", self.final_step)
+        self.assertIn("run_mode:", self.text)
+        self.assertIn("final_recovery", self.text)
+
+    def test_final_recovery_mode_is_explicit_and_intraday_dispatch_remains_default(self):
+        mode_start = self.text.index("      - name: Resolve refresh mode")
+        mode_end = self.text.index("      - name: Set up Python", mode_start)
+        mode = self.text[mode_start:mode_end]
+        self.assertIn('RUN_MODE: ${{ inputs.run_mode || \'intraday\' }}', mode)
+        self.assertIn('EVENT_SCHEDULE" = "30 11 * * 1-5"', mode)
+        self.assertIn('RUN_MODE" = "final_recovery"', mode)
+        self.assertIn('final_run=false', mode)
 
     def test_opt_in_path_writes_and_no_longer_forces_no_write(self):
         self.assertIn("build_monitoring_daily_state.py update-latest", self.final_step)
@@ -86,11 +97,9 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertLess(self.indices_start, self.start)
 
     def test_only_successful_opt_in_update_is_publishable(self):
-        gate = (
-            '[ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && '
-            '[ "${{ steps.final_daily_history.outcome }}" = "success" ]'
-        )
-        self.assertIn(gate, self.publish)
+        self.assertIn('[ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ]', self.publish)
+        self.assertIn('[ "${{ steps.mode.outputs.final_run }}" = "true" ]', self.publish)
+        self.assertIn('[ "${{ steps.final_daily_history.outcome }}" = "success" ]', self.publish)
         self.assertIn("data/monitoring-daily/kospi.json", self.publish)
         self.assertIn("data/monitoring-daily/kosdaq.json", self.publish)
         self.assertIn("data/market-universe/all-assets.json", self.publish)

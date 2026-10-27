@@ -2,6 +2,15 @@ name: Refresh market data
 
 on:
   workflow_dispatch:
+    inputs:
+      run_mode:
+        description: 'Refresh mode; final_recovery is only for an explicitly approved recovery run'
+        required: false
+        default: intraday
+        type: choice
+        options:
+          - intraday
+          - final_recovery
   push:
     branches: [main]
     paths:
@@ -37,6 +46,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve refresh mode
+        id: mode
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          RUN_MODE: ${{ inputs.run_mode || 'intraday' }}
+        shell: bash
+        run: |
+          final_run=false
+          if [ "$EVENT_NAME" = "schedule" ] && [ "$EVENT_SCHEDULE" = "30 11 * * 1-5" ]; then
+            final_run=true
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$RUN_MODE" = "final_recovery" ]; then
+            final_run=true
+          fi
+          echo "final_run=$final_run" >> "$GITHUB_OUTPUT"
+          echo "Resolved refresh mode: event=$EVENT_NAME schedule=${EVENT_SCHEDULE:-none} run_mode=$RUN_MODE final_run=$final_run"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -232,7 +258,7 @@ jobs:
 
       - name: Diagnose final daily-bar evidence
         id: final_daily_evidence
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && github.event_name == 'schedule' && github.event.schedule == '30 11 * * 1-5'
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.mode.outputs.final_run == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -243,7 +269,7 @@ jobs:
 
       - name: Prepare final daily monitoring update (disabled by default)
         id: final_daily_history
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && github.event_name == 'schedule' && github.event.schedule == '30 11 * * 1-5' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.mode.outputs.final_run == 'true' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -422,8 +448,7 @@ jobs:
 
           final_daily_gate_required=false
           if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
-            && [ "${{ github.event_name }}" = "schedule" ] \
-            && [ "${{ github.event.schedule }}" = "30 11 * * 1-5" ] \
+            && [ "${{ steps.mode.outputs.final_run }}" = "true" ] \
             && [ "${{ steps.final_daily_history.outcome }}" != "success" ]; then
             final_daily_gate_required=true
           fi
@@ -446,7 +471,9 @@ jobs:
             echo "Evidence files are not eligible for publish; preserving prior evidence. Core 42-stock data remains publishable."
           fi
 
-          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
+          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
+            && [ "${{ steps.mode.outputs.final_run }}" = "true" ] \
+            && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
             git add \
               data/market-universe/all-assets.json \
               data/monitoring-daily/kospi.json \
