@@ -43,7 +43,7 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         self.assertIn('production-publication-', self.worker)
         self.assertIn('production_commit_sha', self.readme)
         self.assertEqual(self.wrangler.count('crons ='), 1)
-        self.assertIn('10,17,20,30,50 * * * 1-5', self.wrangler)
+        self.assertIn('10,17,20,30,50 * * * 0-5', self.wrangler)
         self.assertIn('new_sqlite_classes = ["SlotGate"]', self.wrangler)
         self.assertIn("production-publication-${{ github.run_id }}-${{ steps.publish.outputs.production_commit_sha }}-${{ steps.publish.outputs.publication_changed }}", self.refresh_workflow)
         self.assertIn("Upload production publication provenance", self.refresh_workflow)

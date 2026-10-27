@@ -8,7 +8,7 @@ const WORKFLOWS = {
 
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
-export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * 1-5";
+export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
 
 export function planForCron(cron) {
   if (cron === "30 11 * * 1-5") {
@@ -42,7 +42,7 @@ export function planForKey(key) {
 
 function kstParts(scheduledTime) {
   const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: "Asia/Seoul", weekday: "short", year: "numeric", month: "2-digit", day: "2-digit",
     hour: "2-digit", minute: "2-digit", hour12: false,
   }).formatToParts(new Date(scheduledTime));
   return Object.fromEntries(parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]));
@@ -59,6 +59,7 @@ export function resolveScheduledPlan(cron, scheduledTime) {
     return plan ? { plan, slotCron: cron } : null;
   }
   const kst = kstParts(scheduledTime);
+  if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
   const hour = Number(kst.hour);
   const minute = Number(kst.minute);
   if (hour === 9 && minute === 17) return { plan: planForKey("schedule-diagnostic"), slotCron: "17 0 * * 1-5" };

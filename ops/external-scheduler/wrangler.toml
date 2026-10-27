@@ -4,7 +4,7 @@ compatibility_date = "2026-10-28"
 
 # Cron activation and Secret registration remain a separate approved operation.
 [triggers]
-crons = ["0 23 * * 0-4", "7 0-10 * * 1-5", "30 11 * * 1-5", "0 14 * * 1-5", "10,17,20,30,50 * * * 1-5"]
+crons = ["0 23 * * 0-4", "7 0-10 * * 1-5", "30 11 * * 1-5", "0 14 * * 1-5", "10,17,20,30,50 * * * 0-5"]
 
 [vars]
 SCHEDULE_RECHECK_STARTED = "true"
