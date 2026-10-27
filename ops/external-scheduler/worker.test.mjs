@@ -36,7 +36,7 @@ test("09:07 and 10:07 are independent slots", () => {
 });
 
 test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => {
-  const cron = "10,17,20,30,50 * * * 1-5";
+  const cron = "10,17,20,30,50 * * * 0-5";
   const at = (hour, minute) => Date.UTC(2026, 9, 27, hour - 9, minute);
   assert.equal(resolveScheduledPlan(cron, at(9, 17)).plan.key, "schedule-diagnostic");
   assert.equal(resolveScheduledPlan(cron, at(7, 20)).plan.key, "research");
@@ -45,6 +45,16 @@ test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => 
   assert.equal(resolveScheduledPlan(cron, at(8, 10)).plan.key, "snapshots");
   assert.equal(resolveScheduledPlan(cron, at(19, 50)).plan.key, "snapshots");
   assert.equal(resolveScheduledPlan(cron, at(9, 18)), null);
+});
+
+test("the consolidated cron covers Monday KST early slots and rejects weekend KST", () => {
+  const cron = "10,17,20,30,50 * * * 0-5";
+  const monday = (hour, minute) => Date.UTC(2026, 9, 25, hour - 9, minute);
+  assert.equal(resolveScheduledPlan(cron, monday(7, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(cron, monday(8, 10)).plan.key, "snapshots");
+
+  const sundayKst = Date.UTC(2026, 9, 24, 23, 20);
+  assert.equal(resolveScheduledPlan(cron, sundayKst), null);
 });
 
 test("Durable Object claim is idempotent and records state", async () => {
