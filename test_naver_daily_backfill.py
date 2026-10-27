@@ -75,6 +75,9 @@ class DailyBackfillUniverseTests(unittest.TestCase):
         self.assertEqual(canonical[0]["close"], 1310)
         self.assertEqual(canonical[0]["open"], 0)
         self.assertFalse(canonical[0]["feature_valid"])
+        self.assertTrue(canonical[0]["source_valid"])
+        self.assertEqual(canonical[0]["source_status"], "OBSERVED")
+        self.assertIsNone(canonical[0]["missing_reason"])
         self.assertIn("zero_volume_zero_ohl_with_close", canonical[0]["validation_reasons"])
 
     def test_low_inconsistency_is_preserved_but_feature_invalid(self):

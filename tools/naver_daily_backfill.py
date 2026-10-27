@@ -320,6 +320,9 @@ def canonicalize(rows, code, asset_type="STOCK", market=None):
                 "market": market,
                 "feature_valid": not reasons,
                 "validation_reasons": reasons,
+                "source_valid": True,
+                "source_status": "OBSERVED",
+                "missing_reason": None,
                 "label_valid": True,
             }
         )
@@ -491,6 +494,9 @@ def collect_one(
         "market": market,
         "checkpoint_key": key,
         "collection_status": "SUCCESS",
+        "source_valid": result["status"] == 200,
+        "source_status": "OBSERVED" if validation["row_count"] else "EMPTY",
+        "missing_reason": "NO_DAILY_BAR" if not validation["row_count"] else None,
         "feature_valid": validation["invalid_row_count"] == 0,
         "label_valid": validation["invalid_row_count"] == 0,
         "canonical_written": canonical_path is not None,

@@ -22,7 +22,7 @@ from tools.market_universe_reconcile import (
 # Match daily_monitoring_baseline.read_history(max_rows=300) exactly.
 KEEP = 301
 FORMAT = "COLUMN_ARRAY_V1"
-OPTIONAL_COLUMNS = ("open", "low", "value")
+OPTIONAL_COLUMNS = ("open", "low", "value", "source_valid", "source_status", "missing_reason")
 MARKETS = ("KOSPI", "KOSDAQ")
 KST = ZoneInfo("Asia/Seoul")
 # A regular-session close is not a FINAL observation.  The rolling state is
@@ -637,18 +637,22 @@ def update_partial_state(existing, daily_rows, target_date, universe_file, state
             "errors": dict(errors or {})}
 
 
-def update_state(existing, daily_rows, target_date, universe_file, publication_status="FINAL"):
+def update_state(existing, daily_rows, target_date, universe_file, publication_status="FINAL",
+                 allow_source_observed=False):
     if publication_status not in {"PROVISIONAL", "FINAL"}:
         raise ValueError("invalid publication status")
     target = compact_date(target_date); groups = authoritative_groups(universe_file)
     expected = set().union(*(set(group) for group in groups.values()))
-    if set(daily_rows) != expected:
+    if (set(daily_rows) != expected and not allow_source_observed) or not set(daily_rows).issubset(expected):
         raise ValueError("daily authoritative code mismatch")
     output, changed = {}, False
     for market in MARKETS:
         prior = existing[market]; prior_final = prior.get("publicationStatus", "FINAL") == "FINAL"; stocks = []
         for old_stock in prior["stocks"]:
-            code = str(old_stock["code"]); rows = decode_stock(old_stock); incoming = daily_rows[code]
+            code = str(old_stock["code"]); rows = decode_stock(old_stock); incoming = daily_rows.get(code)
+            if incoming is None:
+                stocks.append(encode_stock(code, rows[-KEEP:]))
+                continue
             matching = next((index for index, row in enumerate(rows) if row["date"] == target), None)
             if matching is None:
                 rows.append(incoming); changed = True
@@ -661,7 +665,10 @@ def update_state(existing, daily_rows, target_date, universe_file, publication_s
             rows.sort(key=lambda row: row["date"])
             stocks.append(encode_stock(code, rows[-KEEP:]))
         output[market] = {"schemaVersion": 1, "format": FORMAT, "market": market, "retainedObservations": KEEP,
-                          "publicationStatus": publication_status, "asOfDate": target, "stocks": sorted(stocks, key=lambda row: row["code"])}
+                          "publicationStatus": publication_status, "asOfDate": target,
+                          "sourceQualityStatus": "SOURCE_OBSERVED" if allow_source_observed else "VALIDATED",
+                          "sourceMissingCodes": sorted(set(expected) - set(daily_rows)) if allow_source_observed else [],
+                          "stocks": sorted(stocks, key=lambda row: row["code"])}
     return output, changed
 
 
@@ -676,10 +683,15 @@ def state_history_reader(state):
     return reader
 
 
-def baseline_from_state(state, target_date, universe_file, output, generated_at=None):
+def baseline_from_state(state, target_date, universe_file, output, generated_at=None,
+                        allow_source_observed=False, market_day_check=None):
     from daily_monitoring_baseline import refresh_baseline
-    outcome = refresh_baseline(target_date, output=output, universe_file=universe_file, generated_at=generated_at,
-                               history_reader=state_history_reader(state), no_write=True)
+    kwargs = {"output": output, "universe_file": universe_file, "generated_at": generated_at,
+              "history_reader": state_history_reader(state), "no_write": True,
+              "allow_source_observed": allow_source_observed}
+    if market_day_check is not None:
+        kwargs["market_day_check"] = market_day_check
+    outcome = refresh_baseline(target_date, **kwargs)
     if outcome.get("status") != "SUCCESS":
         raise ValueError("baseline validation failed: " + str(outcome.get("reason")))
     baseline = outcome["baseline"]; groups = authoritative_groups(universe_file)
@@ -695,10 +707,13 @@ def update_from_file(state_dir, daily_input, target_date, universe_file, baselin
     return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write, provisional)
 
 
-def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False, provisional=False):
+def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False,
+                     provisional=False, allow_source_observed=False):
     publication_status = "PROVISIONAL" if provisional else "FINAL"
-    updated, changed = update_state(existing, incoming, target_date, universe_file, publication_status)
-    baseline = baseline_from_state(updated, target_date, universe_file, baseline_output)
+    updated, changed = update_state(existing, incoming, target_date, universe_file, publication_status,
+                                     allow_source_observed=allow_source_observed)
+    baseline = baseline_from_state(updated, target_date, universe_file, baseline_output,
+                                   allow_source_observed=allow_source_observed)
     if changed and not no_write:
         payloads = {Path(state_dir) / "kospi.json": updated["KOSPI"], Path(state_dir) / "kosdaq.json": updated["KOSDAQ"]}
         if not provisional:
