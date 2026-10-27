@@ -8,6 +8,7 @@ const WORKFLOWS = {
 
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
+export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * 1-5";
 
 export function planForCron(cron) {
   if (cron === "30 11 * * 1-5") {
@@ -27,6 +28,18 @@ export function planForCron(cron) {
   return null;
 }
 
+export function planForKey(key) {
+  const plans = {
+    "refresh-final": { slot: "20:30", key, ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } },
+    "refresh-intraday": { slot: "08:00-19:07", key, ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } },
+    "daily-report": { slot: "23:00", key, ...WORKFLOWS.report, inputs: {} },
+    "schedule-diagnostic": { slot: "09:17", key, ...WORKFLOWS.diagnostic, inputs: {} },
+    research: { slot: "research", key, ...WORKFLOWS.research, inputs: {} },
+    snapshots: { slot: "snapshots", key, ...WORKFLOWS.snapshots, inputs: {} },
+  };
+  return plans[key] || null;
+}
+
 function kstParts(scheduledTime) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
@@ -38,6 +51,20 @@ function kstParts(scheduledTime) {
 export function slotKeyFor(plan, cron, scheduledTime) {
   const kst = kstParts(scheduledTime);
   return `${plan.key}:${kst.year}-${kst.month}-${kst.day}T${kst.hour}:${kst.minute}:${cron}`;
+}
+
+export function resolveScheduledPlan(cron, scheduledTime) {
+  if (cron !== CONSOLIDATED_CRON) {
+    const plan = planForCron(cron);
+    return plan ? { plan, slotCron: cron } : null;
+  }
+  const kst = kstParts(scheduledTime);
+  const hour = Number(kst.hour);
+  const minute = Number(kst.minute);
+  if (hour === 9 && minute === 17) return { plan: planForKey("schedule-diagnostic"), slotCron: "17 0 * * 1-5" };
+  if (minute === 20 && [7, 12, 19].includes(hour)) return { plan: planForKey("research"), slotCron: "20 research" };
+  if ([10, 30, 50].includes(minute) && hour >= 8 && hour <= 19) return { plan: planForKey("snapshots"), slotCron: "10,30,50 snapshots" };
+  return null;
 }
 
 function headers(env) {
@@ -110,6 +137,15 @@ async function commitChangedPaths(api, repository, commits, publicationPaths, ru
   return null;
 }
 
+async function publicationFromArtifact(api, repository, run) {
+  const result = await api(`/repos/${repository}/actions/runs/${run.id}/artifacts?per_page=100`);
+  const prefix = `production-publication-${run.id}-`;
+  const artifact = (result.artifacts || []).find((item) => item.name?.startsWith(prefix));
+  if (!artifact) return null;
+  const suffix = artifact.name.slice(prefix.length).split("-");
+  return { sha: suffix[0], changed: suffix[1] === "true" };
+}
+
 export async function verifyRunCompletion(api, repository, plan, run, options = {}) {
   const current = await api(`/repos/${repository}/actions/runs/${run.id}`);
   if (current.status !== "completed") {
@@ -118,14 +154,21 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
   const result = { runId: current.id, runHead: current.head_sha,
     status: current.conclusion === "success" ? "RUN_VERIFIED" : "RUN_FAILED" };
   if (result.status !== "RUN_VERIFIED") return result;
-  const publicationSha = current.production_commit_sha || current.outputs?.production_commit_sha;
+  const directSha = current.production_commit_sha || current.outputs?.production_commit_sha;
+  const artifactPublication = directSha ? null : await publicationFromArtifact(api, repository, current);
+  const publicationSha = directSha || artifactPublication?.sha;
   if (!publicationSha) {
     result.publicationStatus = "PUBLISH_UNVERIFIED";
     result.deliveryStatus = "UNVERIFIED";
     return result;
   }
   result.publicationSha = await commitChangedPaths(api, repository, [{ sha: publicationSha }], plan.publicationPaths, current, plan.commitMessage);
-  result.publicationStatus = result.publicationSha ? "PUBLISHED" : "PUBLISH_UNVERIFIED";
+  result.publicationChanged = directSha ? current.publication_changed !== false : artifactPublication.changed;
+  result.publicationStatus = result.publicationSha ? (result.publicationChanged ? "PUBLISHED" : "UNCHANGED") : "PUBLISH_UNVERIFIED";
+  if (!result.publicationChanged) {
+    result.deliveryStatus = "UNVERIFIED";
+    return result;
+  }
   if (plan.key === "refresh-final" && result.publicationSha) {
     const expectedDate = options.expectedDate;
     Object.assign(result, await verifyFinalPublication(api, repository, expectedDate, result.publicationSha));
@@ -135,8 +178,7 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
 }
 
 async function readState(env, slotKey) {
-  const id = env.SLOT_GATE.idFromName(slotKey);
-  const stub = env.SLOT_GATE.get(id);
+  const stub = schedulerStub(env);
   const response = await stub.fetch("https://slot-gate/state?slotKey=" + encodeURIComponent(slotKey));
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`SLOT_STATE_HTTP_${response.status}`);
@@ -154,9 +196,33 @@ export async function recheckRun(env, slotKey, plan, options = {}) {
     created_at: details.runCreatedAt,
     updated_at: details.runUpdatedAt,
   }, { expectedDate: details.expectedDate });
-  const state = result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status;
+  const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
+    ? "RUN_STARTED"
+    : (result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status);
   await setState(env, slotKey, state, { ...details, ...result });
   return { slotKey, workflow: plan.workflow, ...result };
+}
+
+function schedulerStub(env) {
+  const id = env.SLOT_GATE.idFromName("scheduler");
+  return env.SLOT_GATE.get(id);
+}
+
+export async function recheckStartedRuns(env, options = {}) {
+  const stub = schedulerStub(env);
+  const response = await stub.fetch("https://slot-gate/started");
+  if (!response.ok) throw new Error(`SLOT_STARTED_HTTP_${response.status}`);
+  const entries = await response.json();
+  const results = [];
+  for (const entry of entries) {
+    const plan = planForKey(entry.details?.planKey);
+    if (!plan) {
+      results.push({ slotKey: entry.slotKey, status: "RUN_UNVERIFIED" });
+      continue;
+    }
+    results.push(await recheckRun(env, entry.slotKey, plan, options));
+  }
+  return results;
 }
 
 export async function observeSlot(api, repository, plan, scheduledTime) {
@@ -203,7 +269,7 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
   if (!creation.run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
   const kst = kstParts(scheduledTime);
   const expectedDate = `${kst.year}${kst.month}${kst.day}`;
-  const result = { slotKey, workflow: plan.workflow, runId: creation.run.id, runHead: creation.run.head_sha,
+  const result = { slotKey, planKey: plan.key, workflow: plan.workflow, runId: creation.run.id, runHead: creation.run.head_sha,
     runCreatedAt: creation.run.created_at, runUpdatedAt: creation.run.updated_at,
     expectedDate, status: creation.status };
   if (creation.status !== "COMPLETED") return result;
@@ -211,32 +277,35 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
 }
 
 async function setState(env, slotKey, status, details = {}) {
-  const id = env.SLOT_GATE.idFromName(slotKey);
-  const stub = env.SLOT_GATE.get(id);
+  const stub = schedulerStub(env);
   await stub.fetch("https://slot-gate/state", { method: "POST", body: JSON.stringify({ slotKey, status, details }) });
 }
 
 async function claim(env, slotKey) {
-  const id = env.SLOT_GATE.idFromName(slotKey);
-  const stub = env.SLOT_GATE.get(id);
+  const stub = schedulerStub(env);
   const response = await stub.fetch("https://slot-gate/claim", { method: "POST", body: JSON.stringify({ slotKey }) });
   return response.status === 201;
 }
 
 export default {
   async scheduled(event, env, ctx) {
-    const plan = planForCron(event.cron);
-    if (!plan) return;
-    const slotKey = slotKeyFor(plan, event.cron, event.scheduledTime);
+    const resolved = resolveScheduledPlan(event.cron, event.scheduledTime);
+    if (!resolved) return;
+    const { plan, slotCron } = resolved;
+    const slotKey = slotKeyFor(plan, slotCron, event.scheduledTime);
     ctx.waitUntil((async () => {
+      if (env.SCHEDULE_RECHECK_STARTED === "true") {
+        const rechecked = await recheckStartedRuns(env);
+        if (rechecked.length) console.log(JSON.stringify({ status: "STARTED_RUNS_RECHECKED", results: rechecked }));
+      }
       if (env.SCHEDULE_OBSERVE_ONLY === "true") {
         const result = await observeSlot((path, init) => github(env, path, init), env.GITHUB_REPOSITORY, plan, event.scheduledTime);
         console.log(JSON.stringify({ slotKey, ...result }));
         return;
       }
       if (env.SCHEDULE_RECHECK_ONLY === "true") {
-        const result = await recheckRun(env, slotKey, plan);
-        console.log(JSON.stringify({ slotKey, ...result }));
+        const result = await recheckStartedRuns(env);
+        console.log(JSON.stringify({ slotKey, status: "RECHECKED", results: result }));
         return;
       }
       if (!(await claim(env, slotKey))) return;
@@ -246,7 +315,9 @@ export default {
         const runResult = await dispatchAndVerify(env, plan, slotKey, event.scheduledTime);
         runResult.deliveryStatus = "UNVERIFIED";
         const result = { ...runResult, scheduledTime: event.scheduledTime };
-        const state = result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status;
+        const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
+          ? "RUN_STARTED"
+          : (result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status);
         await setState(env, slotKey, state, result);
         console.log(JSON.stringify(result));
       } catch (error) {
@@ -262,7 +333,15 @@ export class SlotGate {
 
   async fetch(request) {
     if (request.method === "GET") {
-      const slotKey = new URL(request.url).searchParams.get("slotKey");
+      const url = new URL(request.url);
+      if (url.pathname.endsWith("/started")) {
+        const entries = [];
+        for (const [slotKey, value] of await this.state.storage.list()) {
+          if (value?.status === "RUN_STARTED") entries.push({ slotKey, ...value });
+        }
+        return Response.json(entries);
+      }
+      const slotKey = url.searchParams.get("slotKey");
       if (!slotKey) return new Response("slot required", { status: 400 });
       const current = await this.state.storage.get(slotKey);
       return current ? Response.json(current) : new Response("not found", { status: 404 });
@@ -277,7 +356,7 @@ export class SlotGate {
       return new Response("updated", { status: 200 });
     }
     if (await this.state.storage.get(body.slotKey)) return new Response("duplicate", { status: 409 });
-    await this.state.storage.put(body.slotKey, { status: "CLAIMED", claimedAt: new Date().toISOString() }, { expirationTtl: 172800 });
+    await this.state.storage.put(body.slotKey, { slotKey: body.slotKey, status: "CLAIMED", claimedAt: new Date().toISOString() }, { expirationTtl: 172800 });
     return new Response("claimed", { status: 201 });
   }
 }

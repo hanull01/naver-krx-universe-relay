@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SlotGate, dispatchAndVerify, observeSlot, planForCron, recheckRun, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import { SlotGate, dispatchAndVerify, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
@@ -18,6 +18,7 @@ function apiWith({ existing = null, run = null, commits = [], contents = {} } = 
     if (path.includes("/dispatches")) { dispatched = true; return {}; }
     if (path.includes("/runs?event=schedule")) return { workflow_runs: existing ? [existing] : [] };
     if (path.includes("/runs?event=workflow_dispatch")) return { workflow_runs: dispatched && run ? [run] : [] };
+    if (path.includes("/artifacts?")) return { artifacts: [] };
     if (path.includes("/actions/runs/")) return run || {};
     if (path.includes("/commits?")) return commits;
     if (path.includes("/contents/")) return contents[path.split("/contents/")[1]];
@@ -34,11 +35,24 @@ test("09:07 and 10:07 are independent slots", () => {
   assert.notEqual(nine, ten);
 });
 
+test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => {
+  const cron = "10,17,20,30,50 * * * 1-5";
+  const at = (hour, minute) => Date.UTC(2026, 9, 27, hour - 9, minute);
+  assert.equal(resolveScheduledPlan(cron, at(9, 17)).plan.key, "schedule-diagnostic");
+  assert.equal(resolveScheduledPlan(cron, at(7, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(cron, at(12, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(cron, at(19, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(cron, at(8, 10)).plan.key, "snapshots");
+  assert.equal(resolveScheduledPlan(cron, at(19, 50)).plan.key, "snapshots");
+  assert.equal(resolveScheduledPlan(cron, at(9, 18)), null);
+});
+
 test("Durable Object claim is idempotent and records state", async () => {
   const values = new Map();
   const state = { storage: {
     get: async (key) => values.get(key),
     put: async (key, value) => values.set(key, value),
+    list: async () => values,
   } };
   const gate = new SlotGate(state);
   const request = () => new Request("https://slot-gate/claim", { method: "POST", body: JSON.stringify({ slotKey: "refresh:2026-10-27T09:07" }) });
@@ -153,6 +167,7 @@ test("recheckRun restores RUN_STARTED state and invokes completion verification"
   const gate = new SlotGate({ storage: {
     get: async (key) => values.get(key),
     put: async (key, value) => values.set(key, value),
+    list: async () => values,
   } });
   const env = {
     GITHUB_REPOSITORY: repo,
@@ -165,6 +180,27 @@ test("recheckRun restores RUN_STARTED state and invokes completion verification"
   const result = await recheckRun(env, "refresh-final:2026-10-27T20:30:30 11 * * 1-5", finalPlan, { github: api });
   assert.equal(result.status, "RUN_FAILED");
   assert.equal(values.get("refresh-final:2026-10-27T20:30:30 11 * * 1-5").status, "RUN_FAILED");
+});
+
+test("recheckStartedRuns scans persisted RUN_STARTED slots after restart", async () => {
+  const slotKey = "refresh-final:2026-10-27T20:30:30 11 * * 1-5";
+  const values = new Map([[slotKey, { slotKey, status: "RUN_STARTED", details: { planKey: "refresh-final", runId: 111, runHead: "restart", expectedDate: "20261027" } }]]);
+  const gate = new SlotGate({ storage: {
+    get: async (key) => values.get(key),
+    put: async (key, value) => values.set(key, value),
+    list: async () => values,
+  } });
+  const env = {
+    GITHUB_REPOSITORY: repo,
+    SLOT_GATE: { idFromName: () => "scheduler", get: () => ({ fetch: (request, init) => gate.fetch(request instanceof Request ? request : new Request(request, init)) }) },
+  };
+  const api = async (path) => path.includes("/actions/runs/111")
+    ? { id: 111, head_sha: "restart", status: "completed", conclusion: "failure" }
+    : (() => { throw new Error(`unexpected path ${path}`); })();
+  const result = await recheckStartedRuns(env, { github: api });
+  assert.equal(result.length, 1);
+  assert.equal(result[0].status, "RUN_FAILED");
+  assert.equal(values.get(slotKey).status, "RUN_FAILED");
 });
 
 test("Run creation remains observable at the 60-second boundary", async () => {
@@ -193,6 +229,20 @@ test("a publication commit from another workflow is not selected", async () => {
   const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:other-publication", Date.now(), { github: wrapped, sleep: async () => {} });
   assert.equal(result.status, "RUN_VERIFIED");
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
+});
+
+test("the Run provenance artifact directly supplies its publication SHA", async () => {
+  const now = new Date();
+  const run = { id: 112, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "artifact-run" };
+  const api = apiWith({ run });
+  const wrapped = async (path, init) => {
+    if (path.includes("/artifacts?")) return { artifacts: [{ name: "production-publication-112-artifactsha-true" }] };
+    if (path === `/repos/${repo}/commits/artifactsha`) return { files: [{ filename: "data/reports/latest.json" }], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
+    return api(path, init);
+  };
+  const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
+  assert.equal(result.publicationSha, "artifactsha");
+  assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
 test("cron observation mode never dispatches", async () => {

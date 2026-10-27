@@ -577,6 +577,34 @@ jobs:
             exit 1
           fi
 
+      - name: Record production publication provenance
+        if: steps.publish.outputs.production_commit_sha != ''
+        shell: bash
+        env:
+          PRODUCTION_COMMIT_SHA: ${{ steps.publish.outputs.production_commit_sha }}
+          PUBLICATION_CHANGED: ${{ steps.publish.outputs.publication_changed }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          Path(os.environ["RUNNER_TEMP"], "production-publication.json").write_text(json.dumps({
+              "runId": os.environ["GITHUB_RUN_ID"],
+              "headSha": os.environ["GITHUB_SHA"],
+              "productionCommitSha": os.environ["PRODUCTION_COMMIT_SHA"],
+              "publicationChanged": os.environ["PUBLICATION_CHANGED"] == "true",
+          }, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+          PY
+
+      - name: Upload production publication provenance
+        if: steps.publish.outputs.production_commit_sha != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-publication-${{ github.run_id }}-${{ steps.publish.outputs.production_commit_sha }}-${{ steps.publish.outputs.publication_changed }}
+          path: ${{ runner.temp }}/production-publication.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Send MARKET_DATA_READY signal
         id: ready_email
         if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.publication_changed == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
