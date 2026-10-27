@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SlotGate, dispatchAndVerify, planForCron, slotKeyFor } from "./worker.js";
+import { SlotGate, dispatchAndVerify, observeSlot, planForCron, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
@@ -87,7 +87,8 @@ test("GitHub dispatch errors are surfaced", async () => {
 });
 
 test("FINAL publication checks all dates and diagnostic status", async () => {
-  const run = { id: 102, event: "workflow_dispatch", created_at: new Date(Date.now()).toISOString(), status: "completed", conclusion: "success", head_sha: "def" };
+  const now = new Date();
+  const run = { id: 102, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "def" };
   const commit = { sha: "pub123" };
   const common = { asOfDate: "20261027" };
   const contents = {
@@ -100,7 +101,7 @@ test("FINAL publication checks all dates and diagnostic status", async () => {
   api.detail = true;
   const original = api;
   const wrapped = async (path, init) => {
-    if (path === `/repos/${repo}/commits/pub123`) return { files: [{ filename: "data/monitoring/latest-quality.json" }] };
+    if (path === `/repos/${repo}/commits/pub123`) return { files: [{ filename: "data/monitoring/latest-quality.json" }], commit: { message: "Refresh NAVER market data", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return original(path, init);
   };
   const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:slot", finalTime, { github: wrapped, sleep: async () => {} });
@@ -109,7 +110,8 @@ test("FINAL publication checks all dates and diagnostic status", async () => {
 });
 
 test("FINAL date mismatch is not accepted", async () => {
-  const run = { id: 103, event: "workflow_dispatch", created_at: new Date(Date.now()).toISOString(), status: "completed", conclusion: "success", head_sha: "ghi" };
+  const now = new Date();
+  const run = { id: 103, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "ghi" };
   const commit = { sha: "pub456" };
   const contents = {
     "data/monitoring-daily/kospi.json?ref=main": encoded({ asOfDate: "20261026" }),
@@ -119,9 +121,63 @@ test("FINAL date mismatch is not accepted", async () => {
   };
   const api = apiWith({ run, commits: [commit], contents });
   const wrapped = async (path, init) => path === `/repos/${repo}/commits/pub456`
-    ? { files: [{ filename: "data/monitoring/latest-quality.json" }] } : api(path, init);
+    ? { files: [{ filename: "data/monitoring/latest-quality.json" }], commit: { message: "Refresh NAVER market data", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } } : api(path, init);
   const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:slot", finalTime, { github: wrapped, sleep: async () => {} });
   assert.equal(result.status, "FINAL_DATE_MISMATCH");
+});
+
+test("a long-running Run returns its identity for later completion polling", async () => {
+  const run = { id: 105, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "in_progress", head_sha: "long" };
+  const api = apiWith({ run });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
+  assert.equal(result.status, "RUN_STARTED");
+  assert.equal(result.runId, 105);
+  const completed = { ...run, status: "completed", conclusion: "success", updated_at: new Date().toISOString() };
+  const completionApi = async (path) => {
+    if (path.includes("/actions/runs/105")) return completed;
+    if (path.includes("/commits?")) return [];
+    throw new Error(`unexpected path ${path}`);
+  };
+  const later = await verifyRunCompletion(completionApi, repo, planForCron("7 0-10 * * 1-5"), run);
+  assert.equal(later.status, "RUN_VERIFIED");
+  assert.equal(later.publicationStatus, "PUBLISH_UNVERIFIED");
+});
+
+test("Run creation remains observable at the 60-second boundary", async () => {
+  const run = { id: 107, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "in_progress", head_sha: "boundary" };
+  let polls = 0;
+  let sleeps = 0;
+  const api = async (path) => {
+    if (path.includes("/runs?event=schedule")) return { workflow_runs: [] };
+    if (path.includes("/runs?event=workflow_dispatch")) return { workflow_runs: polls++ >= 11 ? [run] : [] };
+    if (path.includes("/actions/runs/107")) return run;
+    throw new Error(`unexpected path ${path}`);
+  };
+  const result = await waitForDispatchedRun(api, repo, planForCron("7 0-10 * * 1-5"), Date.now(), async () => { sleeps += 1; });
+  assert.equal(sleeps, 12);
+  assert.equal(result.status, "RUN_STARTED");
+  assert.equal(result.run.id, 107);
+});
+
+test("a publication commit from another workflow is not selected", async () => {
+  const now = new Date();
+  const run = { id: 108, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "other" };
+  const commit = { sha: "other-pub" };
+  const api = apiWith({ run, commits: [commit] });
+  const wrapped = async (path, init) => path === `/repos/${repo}/commits/other-pub`
+    ? { files: [{ filename: "data/monitoring/latest-quality.json" }], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } } : api(path, init);
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:other-publication", Date.now(), { github: wrapped, sleep: async () => {} });
+  assert.equal(result.status, "RUN_VERIFIED");
+  assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
+});
+
+test("cron observation mode never dispatches", async () => {
+  const scheduledTime = Date.now();
+  const api = apiWith({ existing: { id: 106, event: "schedule", created_at: new Date(scheduledTime).toISOString(), head_sha: "obs" } });
+  const result = await observeSlot(api, repo, finalPlan, scheduledTime);
+  assert.equal(result.status, "RUN_OBSERVED");
+  assert.equal(result.observed, true);
+  assert.equal(api.calls.some((path) => path.includes("/dispatches")), false);
 });
 
 test("research and snapshots keep execution times in their slot keys", () => {

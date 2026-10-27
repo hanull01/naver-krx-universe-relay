@@ -12,6 +12,10 @@
 - 게시가 필요한 workflow는 게시 커밋 SHA를 확인한 뒤에만 게시 검증을 성공으로 기록한다.
 - Gmail 수신과 Work 전달은 이 Worker만으로 확인하지 않으며 `UNVERIFIED`로 남긴다.
 - GitHub 기존 schedule과 동시 운영할 때도 기존 workflow의 `generated-data-write` 동시성 보호를 유지한다.
+- `SCHEDULE_OBSERVE_ONLY=true`인 실행은 GitHub 실행 이력만 확인하고 dispatch하지 않는다. 관찰 결과는 `RUN_OBSERVED` 또는 `NO_RUN`으로 기록한다.
+- Run 생성 확인과 Run 완료 확인은 분리한다. 60초 안에 완료되지 않아도 Run ID와 HEAD를 `RUN_STARTED`로 보존하고, 후속 조회에서 완료·게시를 검증한다.
+- 게시 커밋은 해당 Run의 생성~완료 구간, 예상 자동화 커밋 메시지, `github-actions` 커밋 주체, 허용 경로를 모두 만족해야 선택한다. 단순 시간 범위의 임의 커밋은 게시 증거로 사용하지 않는다.
+- `refresh.yml`과 `daily-report.yml`의 `generated-data-write` concurrency가 저장소 수준의 동시 게시를 직렬화한다. Worker는 슬롯별 사전 Run 확인과 Durable Object claim으로 외부 중복을 차단한다.
 
 ## 슬롯
 

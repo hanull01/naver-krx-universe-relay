@@ -1,8 +1,8 @@
 const WORKFLOWS = {
-  refresh: { workflow: "refresh.yml", publicationPaths: ["data/monitoring/latest-quality.json"] },
-  report: { workflow: "daily-report.yml", publicationPaths: ["data/reports/latest.json"] },
-  research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"] },
-  snapshots: { workflow: "refresh-market-snapshots.yml", publicationPaths: ["data/market"] },
+  refresh: { workflow: "refresh.yml", publicationPaths: ["data/monitoring/latest-quality.json"], commitMessage: "Refresh NAVER market data" },
+  report: { workflow: "daily-report.yml", publicationPaths: ["data/reports/latest.json"], commitMessage: "Update daily market report" },
+  research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"], commitMessage: "Update NAVER research intelligence" },
+  snapshots: { workflow: "refresh-market-snapshots.yml", publicationPaths: ["data/market"], commitMessage: "Refresh NAVER market snapshots" },
   diagnostic: { workflow: "schedule-diagnostic.yml", publicationPaths: [] },
 };
 
@@ -78,7 +78,7 @@ export async function findExistingRun(api, repository, plan, scheduledTime) {
   }) || null;
 }
 
-async function waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep) {
+export async function waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep) {
   for (let attempt = 0; attempt < 12; attempt += 1) {
     await sleep(5000);
     const runs = await listRuns(api, repository, plan.workflow, "workflow_dispatch");
@@ -87,19 +87,53 @@ async function waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep) 
       .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))[0];
     if (!run) continue;
     const current = await api(`/repos/${repository}/actions/runs/${run.id}`);
-    if (current.status === "completed") return current;
+    if (current.status === "completed") return { status: "COMPLETED", run: current };
+    return { status: "RUN_STARTED", run: current };
   }
-  return null;
+  return { status: "RUN_UNVERIFIED", run: null };
 }
 
-async function commitChangedPaths(api, repository, commits, publicationPaths) {
+async function commitChangedPaths(api, repository, commits, publicationPaths, run, commitMessage) {
   for (const commit of commits || []) {
     const detail = await api(`/repos/${repository}/commits/${commit.sha}`);
+    const committedAt = Date.parse(detail.commit?.committer?.date || "");
+    const runStarted = Date.parse(run.created_at || "");
+    const runFinished = Date.parse(run.updated_at || run.created_at || "");
+    const authorLogin = detail.author?.login || detail.commit?.author?.name || "";
+    const message = (detail.commit?.message || "").split("\n", 1)[0];
+    if (!Number.isFinite(committedAt) || committedAt < runStarted || committedAt > runFinished
+        || !String(authorLogin).includes("github-actions") || message !== commitMessage) continue;
     const filenames = (detail.files || []).map((file) => file.filename || "");
     if (publicationPaths.some((path) => filenames.some((name) =>
       name === path || name.startsWith(`${path.replace(/\/$/, "")}/`)))) return commit.sha;
   }
   return null;
+}
+
+export async function verifyRunCompletion(api, repository, plan, run, options = {}) {
+  const current = await api(`/repos/${repository}/actions/runs/${run.id}`);
+  if (current.status !== "completed") {
+    return { runId: current.id, runHead: current.head_sha, status: "RUN_STARTED" };
+  }
+  const result = { runId: current.id, runHead: current.head_sha,
+    status: current.conclusion === "success" ? "RUN_VERIFIED" : "RUN_FAILED" };
+  if (result.status !== "RUN_VERIFIED") return result;
+  const commits = await api(`/repos/${repository}/commits?sha=main&since=${encodeURIComponent(current.created_at)}&until=${encodeURIComponent(current.updated_at || current.created_at)}&per_page=20`);
+  result.publicationSha = await commitChangedPaths(api, repository, commits, plan.publicationPaths, current, plan.commitMessage);
+  result.publicationStatus = result.publicationSha ? "PUBLISHED" : "PUBLISH_UNVERIFIED";
+  if (plan.key === "refresh-final" && result.publicationSha) {
+    const expectedDate = options.expectedDate;
+    Object.assign(result, await verifyFinalPublication(api, repository, expectedDate, result.publicationSha));
+  }
+  result.deliveryStatus = "UNVERIFIED";
+  return result;
+}
+
+export async function observeSlot(api, repository, plan, scheduledTime) {
+  const run = await findExistingRun(api, repository, plan, scheduledTime);
+  if (!run) return { workflow: plan.workflow, status: "NO_RUN", observed: true };
+  return { workflow: plan.workflow, status: "RUN_OBSERVED", observed: true,
+    runId: run.id, runHead: run.head_sha, runEvent: run.event };
 }
 
 async function verifyFinalPublication(api, repository, expectedDate, publicationSha) {
@@ -135,22 +169,14 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ref: "main", inputs: plan.inputs }),
   });
-  const run = await waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep);
-  if (!run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
-  const result = { slotKey, workflow: plan.workflow, runId: run.id, runHead: run.head_sha,
-    status: run.conclusion === "success" ? "RUN_VERIFIED" : "RUN_FAILED" };
-  if (result.status !== "RUN_VERIFIED") return result;
-
-  const commits = await api(`/repos/${repository}/commits?sha=main&since=${encodeURIComponent(run.created_at)}&per_page=20`);
-  result.publicationSha = await commitChangedPaths(api, repository, commits, plan.publicationPaths);
-  result.publicationStatus = result.publicationSha ? "PUBLISHED" : "PUBLISH_UNVERIFIED";
-  if (plan.key === "refresh-final" && result.publicationSha) {
-    const kst = kstParts(scheduledTime);
-    const expectedDate = `${kst.year}${kst.month}${kst.day}`;
-    Object.assign(result, await verifyFinalPublication(api, repository, expectedDate, result.publicationSha));
-  }
-  result.deliveryStatus = "UNVERIFIED";
-  return result;
+  const creation = await waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep);
+  if (!creation.run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
+  const kst = kstParts(scheduledTime);
+  const expectedDate = `${kst.year}${kst.month}${kst.day}`;
+  const result = { slotKey, workflow: plan.workflow, runId: creation.run.id, runHead: creation.run.head_sha,
+    status: creation.status };
+  if (creation.status !== "COMPLETED") return result;
+  return { ...result, ...(await verifyRunCompletion(api, repository, plan, creation.run, { expectedDate })) };
 }
 
 async function setState(env, slotKey, status, details = {}) {
@@ -172,6 +198,11 @@ export default {
     if (!plan) return;
     const slotKey = slotKeyFor(plan, event.cron, event.scheduledTime);
     ctx.waitUntil((async () => {
+      if (env.SCHEDULE_OBSERVE_ONLY === "true") {
+        const result = await observeSlot((path, init) => github(env, path, init), env.GITHUB_REPOSITORY, plan, event.scheduledTime);
+        console.log(JSON.stringify({ slotKey, ...result }));
+        return;
+      }
       if (!(await claim(env, slotKey))) return;
       await setState(env, slotKey, "CLAIMED");
       try {
