@@ -96,6 +96,15 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "authoritative code mismatch"):
             update.update_state(state, {"000001": update.normalize_daily_rows(self._rows(), "2026-01-01")["000001"]}, "2026-01-01", self.universe)
 
+    def test_source_observed_allows_missing_code_without_synthesizing_row(self):
+        state = update.load_state(self.state_dir, self.universe)
+        incoming = update.normalize_daily_rows({"rows": [self._rows()["rows"][0]]}, "2026-01-01")
+        result, changed = update.update_state(state, incoming, "2026-01-01", self.universe,
+                                              allow_source_observed=True)
+        self.assertTrue(changed)
+        self.assertEqual(result["KOSDAQ"]["sourceMissingCodes"], ["000002"])
+        self.assertNotEqual(update.decode_stock(result["KOSDAQ"]["stocks"][0])[-1]["date"], "20260101")
+
     def test_collect_today_rows_requires_exact_observed_today_row(self):
         def fetcher(code, _start, _end):
             return {"raw": json.dumps({"priceInfos": [{"localDate": "20260101", "openPrice": 10,

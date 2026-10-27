@@ -57,6 +57,21 @@ class DailyBaselineTests(unittest.TestCase):
         self.assertTrue(item["close_valid"])
         self.assertIsNone(item["breakout_20_intraday"])
 
+    def test_source_observed_baseline_allows_missing_latest_without_synthesizing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); history_dir = root / "history"; history_dir.mkdir()
+            universe = root / "universe.json"
+            universe.write_text(json.dumps({"assets": [dict(self._asset(), assetType="STOCK")]}), encoding="utf-8")
+            (history_dir / "000001.jsonl").write_text(json.dumps(history(1, 100)) + "\n", encoding="utf-8")
+            result = baseline.refresh_baseline(
+                "2026-10-19", history_dir=history_dir, universe_file=universe,
+                market_day_check=lambda _target: (_ for _ in ()).throw(RuntimeError("offline")),
+                allow_source_observed=True, no_write=True,
+            )
+            self.assertEqual(result["status"], "SUCCESS")
+            self.assertEqual(result["baseline"]["historyStatus"], "SOURCE_OBSERVED")
+            self.assertEqual(result["baseline"]["missingLatestCodes"], ["000001"])
+
     def test_build_is_read_only_and_has_authoritative_coverage(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); history_dir = root / "history"; history_dir.mkdir()

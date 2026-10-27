@@ -53,6 +53,12 @@ class DailyBackfillUniverseTests(unittest.TestCase):
         self.assertNotEqual(backfill.checkpoint_key("0088M0", start_a, end_a, "ETF"),
                             backfill.checkpoint_key("0088M0", start_a, end_a, "STOCK"))
 
+    def test_explicit_date_range_is_required_as_a_pair(self):
+        self.assertEqual(backfill.parse_date_arg("2026-10-19").strftime("%Y%m%d"), "20261019")
+        self.assertEqual(backfill.parse_date_arg("2026-10-26", end_of_day=True).hour, 23)
+        with self.assertRaises(ValueError):
+            backfill.parse_date_arg("20261019")
+
     def test_canonical_rows_preserve_asset_market_and_observed_dates_only(self):
         rows = [{"localDate": "20260928", "openPrice": "10", "highPrice": "12", "lowPrice": "9",
                  "closePrice": "11", "accumulatedTradingVolume": "100", "foreignRetentionRate": "2.3"}]
@@ -69,6 +75,9 @@ class DailyBackfillUniverseTests(unittest.TestCase):
         self.assertEqual(canonical[0]["close"], 1310)
         self.assertEqual(canonical[0]["open"], 0)
         self.assertFalse(canonical[0]["feature_valid"])
+        self.assertTrue(canonical[0]["source_valid"])
+        self.assertEqual(canonical[0]["source_status"], "OBSERVED")
+        self.assertIsNone(canonical[0]["missing_reason"])
         self.assertIn("zero_volume_zero_ohl_with_close", canonical[0]["validation_reasons"])
 
     def test_low_inconsistency_is_preserved_but_feature_invalid(self):
@@ -116,8 +125,8 @@ class DailyBackfillUniverseTests(unittest.TestCase):
                 "raw": json.dumps(payload).encode("utf-8"), "elapsed_ms": 1.0, "attempt": 1,
             }):
                 result = backfill.collect_one(
-                    "005930", datetime(2023, 1, 1, tzinfo=timezone.utc),
-                    datetime(2026, 1, 1, tzinfo=timezone.utc), Path(directory),
+                    "005930", datetime(2026, 9, 1, tzinfo=timezone.utc),
+                    datetime(2026, 9, 30, tzinfo=timezone.utc), Path(directory),
                     timeout=1, retries=1, request_sleep=0, dry_run=False,
                 )
             self.assertEqual(result["collection_status"], "SUCCESS")
@@ -126,6 +135,35 @@ class DailyBackfillUniverseTests(unittest.TestCase):
             rows = [json.loads(line) for line in (Path(directory) / "canonical" / "daily" / "005930.jsonl").read_text(encoding="utf-8").splitlines()]
             self.assertEqual(len(rows), 2)
             self.assertFalse(rows[1]["feature_valid"])
+
+    def test_collection_keeps_existing_canonical_and_filters_to_explicit_range(self):
+        payload = {"priceInfos": [
+            {"localDate": "20261018", "openPrice": 9, "highPrice": 10, "lowPrice": 8,
+             "closePrice": 9, "accumulatedTradingVolume": 90},
+            {"localDate": "20261019", "openPrice": 10, "highPrice": 12, "lowPrice": 9,
+             "closePrice": 11, "accumulatedTradingVolume": 100},
+            {"localDate": "20261020", "openPrice": 11, "highPrice": 13, "lowPrice": 10,
+             "closePrice": 12, "accumulatedTradingVolume": 110},
+            {"localDate": "20261027", "openPrice": 12, "highPrice": 14, "lowPrice": 11,
+             "closePrice": 13, "accumulatedTradingVolume": 120},
+        ]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            canonical = root / "canonical" / "daily" / "005930.jsonl"
+            canonical.parent.mkdir(parents=True)
+            canonical.write_text(json.dumps({"code": "005930", "date": "20261017"}) + "\n", encoding="utf-8")
+            with patch.object(backfill, "fetch", return_value={
+                "url": "https://example.invalid", "status": 200,
+                "raw": json.dumps(payload).encode("utf-8"), "elapsed_ms": 1.0, "attempt": 1,
+            }):
+                result = backfill.collect_one(
+                    "005930", backfill.parse_date_arg("2026-10-19"),
+                    backfill.parse_date_arg("2026-10-20", end_of_day=True), root,
+                    timeout=1, retries=1, request_sleep=0, dry_run=False,
+                )
+            self.assertEqual(result["canonical_total_rows"], 3)
+            rows = [json.loads(line) for line in canonical.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual([row["date"] for row in rows], ["20261017", "20261019", "20261020"])
 
     def test_recovery_uses_existing_raw_without_fetching(self):
         with tempfile.TemporaryDirectory() as directory:

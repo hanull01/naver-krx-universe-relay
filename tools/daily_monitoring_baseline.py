@@ -209,17 +209,21 @@ def baseline_sizes(baseline, history_dir=HISTORY_DIR, universe_file=UNIVERSE_FIL
 
 def refresh_baseline(target_date, output=DEFAULT_OUTPUT, history_dir=HISTORY_DIR, universe_file=UNIVERSE_FILE,
                      market_day_check=krx_market_day.market_day, generated_at=None, no_write=False,
-                     history_reader=None):
+                     history_reader=None, allow_source_observed=False):
     """Publish only an exact, confirmed trading-day baseline.
 
     No source history is changed.  A validation error leaves the previous
     latest.json untouched because atomic_json is called only after every gate.
     """
     target = date.fromisoformat(target_date) if isinstance(target_date, str) else target_date
+    calendar_status = "VERIFIED"
     try:
         is_open, reason = market_day_check(target)
     except Exception as exc:
-        return {"status": "NOT_READY", "reason": "KRX_CALENDAR_UNAVAILABLE", "detail": type(exc).__name__}
+        if not allow_source_observed:
+            return {"status": "NOT_READY", "reason": "KRX_CALENDAR_UNAVAILABLE", "detail": type(exc).__name__}
+        is_open, reason = True, "KRX_CALENDAR_UNAVAILABLE"
+        calendar_status = "UNVERIFIED"
     if not is_open:
         return {"status": "NOT_READY", "reason": reason, "date": target.isoformat()}
     target_compact = target.strftime("%Y%m%d")
@@ -236,8 +240,15 @@ def refresh_baseline(target_date, output=DEFAULT_OUTPUT, history_dir=HISTORY_DIR
     diagnostics = {"targetDate": target.isoformat(), "authoritativeCount": len(expected), "count": baseline["count"],
                    "missingCodes": missing, "extraCodes": extra, "missingLatestCodes": latest_missing,
                    "todayRowCount": len(today_rows), "todayInvalid": invalid}
-    if missing or extra or latest_missing or baseline.get("asOfDate") != target_compact or baseline.get("historyStatus") != "OK":
+    if not allow_source_observed and (missing or extra or latest_missing or baseline.get("asOfDate") != target_compact or baseline.get("historyStatus") != "OK"):
         return {"status": "NOT_READY", "reason": "DAILY_CANONICAL_NOT_CONFIRMED", "diagnostics": diagnostics}
+    if allow_source_observed:
+        baseline["historyStatus"] = "SOURCE_OBSERVED"
+        baseline["sourceQualityStatus"] = "SOURCE_OBSERVED"
+        baseline["calendarStatus"] = calendar_status
+        baseline["missingLatestCodes"] = latest_missing
+        baseline["sourceDiagnostics"] = {"missingCodes": missing, "extraCodes": extra,
+                                           "calendarReason": reason, "todayInvalid": invalid}
     baseline["refreshDiagnostics"] = diagnostics
     baseline["generatedAt"] = generated_at or datetime.now(ZoneInfo("Asia/Seoul")).isoformat()
     if not no_write:
