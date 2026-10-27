@@ -179,6 +179,35 @@ class FullMarketCurrentTests(unittest.TestCase):
             )
             self.assertFalse(diagnostic.exists())
 
+    def test_previous_100_current_101_preserves_delta_and_uses_current_scope(self):
+        previous = {
+            "KOSPI": [f"{index:06d}" for index in range(50)],
+            "KOSDAQ": [f"{index + 500:06d}" for index in range(50)],
+        }
+        current_codes = {
+            "KOSPI": previous["KOSPI"],
+            "KOSDAQ": previous["KOSDAQ"][2:] + ["000600", "000601", "000602"],
+        }
+
+        def fetch(market, page, _size):
+            rows = [raw(code) for code in current_codes[market]]
+            return rows if page == 0 else []
+
+        with tempfile.TemporaryDirectory() as directory:
+            universe = Path(directory) / "universe.json"
+            universe.write_text(json.dumps({"assets": [
+                {"code": code, "assetType": "STOCK", "market": market}
+                for market, codes in previous.items() for code in codes
+            ]}), encoding="utf-8")
+            snapshot = current.collect_snapshot(
+                universe, fetch, page_size=200, max_attempts=1, sleep_seconds=0)
+
+        self.assertEqual(101, snapshot["count"])
+        self.assertEqual(101, snapshot["expectedCount"])
+        self.assertEqual(["000500", "000501"], snapshot["previousUniverseMissingCodes"])
+        self.assertEqual(["000600", "000601", "000602"], snapshot["previousUniverseNewCodes"])
+        self.assertEqual("COMPLETE_RECONCILIATION_PENDING", snapshot["status"])
+
 
     def test_small_composition_delta_is_usable_with_warning_metadata(self):
         fetch = paged({
