@@ -85,8 +85,46 @@ async function github(env, path, init = {}) {
   const text = await response.text();
   let body;
   try { body = text ? JSON.parse(text) : {}; } catch { body = {}; }
-  if (!response.ok) throw new Error(`GITHUB_HTTP_${response.status}`);
+  if (!response.ok) {
+    const error = new Error(`GITHUB_HTTP_${response.status}`);
+    error.code = `GITHUB_HTTP_${response.status}`;
+    error.httpStatus = response.status;
+    throw error;
+  }
   return body;
+}
+
+function stageError(stage, error) {
+  if (error && typeof error === "object") {
+    if (!error.stage) error.stage = stage;
+    return error;
+  }
+  const wrapped = new Error(String(error));
+  wrapped.stage = stage;
+  return wrapped;
+}
+
+async function atStage(stage, operation) {
+  try {
+    return await operation();
+  } catch (error) {
+    throw stageError(stage, error);
+  }
+}
+
+export function failureDetails(error, fallbackStage = "UNKNOWN") {
+  const message = String(error?.message || error || "");
+  const code = String(error?.code || message.match(/(?:GITHUB|SLOT_STATE|SLOT_STARTED)_HTTP_\d+/)?.[0] || "WORKER_ERROR");
+  const statusMatch = code.match(/(?:GITHUB|SLOT_STATE|SLOT_STARTED)_HTTP_(\d+)/);
+  const httpStatus = error?.httpStatus || (statusMatch ? Number(statusMatch[1]) : undefined);
+  const errorType = code.startsWith("GITHUB_HTTP_") ? "GITHUB_API"
+    : (code.startsWith("SLOT_") ? "DURABLE_OBJECT" : "WORKER");
+  return {
+    stage: error?.stage || fallbackStage,
+    errorCode: code,
+    errorType,
+    ...(httpStatus ? { httpStatus } : {}),
+  };
 }
 
 async function listRuns(api, repository, workflow, event) {
@@ -183,7 +221,12 @@ async function readState(env, slotKey) {
   const stub = schedulerStub(env);
   const response = await stub.fetch("https://slot-gate/state?slotKey=" + encodeURIComponent(slotKey));
   if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`SLOT_STATE_HTTP_${response.status}`);
+  if (!response.ok) {
+    const error = new Error(`SLOT_STATE_HTTP_${response.status}`);
+    error.code = `SLOT_STATE_HTTP_${response.status}`;
+    error.httpStatus = response.status;
+    throw error;
+  }
   return response.json();
 }
 
@@ -259,15 +302,15 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
   const repository = env.GITHUB_REPOSITORY;
   const api = options.github || ((path, init) => github(env, path, init));
   const sleep = options.sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
-  const existing = await findExistingRun(api, repository, plan, scheduledTime);
+  const existing = await atStage("FIND_EXISTING_RUN", () => findExistingRun(api, repository, plan, scheduledTime));
   if (existing) return { slotKey, workflow: plan.workflow, status: "EXISTING_RUN", runId: existing.id, runHead: existing.head_sha, runEvent: existing.event };
 
   const dispatchedAt = Date.now();
-  await api(`/repos/${repository}/actions/workflows/${plan.workflow}/dispatches`, {
+  await atStage("POST_WORKFLOW_DISPATCH", () => api(`/repos/${repository}/actions/workflows/${plan.workflow}/dispatches`, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ref: "main", inputs: plan.inputs }),
-  });
-  const creation = await waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep);
+  }));
+  const creation = await atStage("WAIT_FOR_GITHUB_RUN", () => waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep));
   if (!creation.run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
   const kst = kstParts(scheduledTime);
   const expectedDate = `${kst.year}${kst.month}${kst.day}`;
@@ -275,18 +318,29 @@ export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, optio
     runCreatedAt: creation.run.created_at, runUpdatedAt: creation.run.updated_at,
     expectedDate, status: creation.status };
   if (creation.status !== "COMPLETED") return result;
-  return { ...result, ...(await verifyRunCompletion(api, repository, plan, creation.run, { expectedDate })) };
+  return { ...result, ...(await atStage("VERIFY_RUN", () => verifyRunCompletion(api, repository, plan, creation.run, { expectedDate }))) };
 }
 
 async function setState(env, slotKey, status, details = {}) {
   const stub = schedulerStub(env);
-  await stub.fetch("https://slot-gate/state", { method: "POST", body: JSON.stringify({ slotKey, status, details }) });
+  const response = await stub.fetch("https://slot-gate/state", { method: "POST", body: JSON.stringify({ slotKey, status, details }) });
+  if (!response.ok) {
+    const error = new Error(`SLOT_STATE_HTTP_${response.status}`);
+    error.code = `SLOT_STATE_HTTP_${response.status}`;
+    error.httpStatus = response.status;
+    throw error;
+  }
 }
 
 async function claim(env, slotKey) {
   const stub = schedulerStub(env);
   const response = await stub.fetch("https://slot-gate/claim", { method: "POST", body: JSON.stringify({ slotKey }) });
-  return response.status === 201;
+  if (response.status === 201) return true;
+  if (response.status === 409) return false;
+  const error = new Error(`SLOT_STATE_HTTP_${response.status}`);
+  error.code = `SLOT_STATE_HTTP_${response.status}`;
+  error.httpStatus = response.status;
+  throw error;
 }
 
 export default {
@@ -296,23 +350,27 @@ export default {
     const { plan, slotCron } = resolved;
     const slotKey = slotKeyFor(plan, slotCron, event.scheduledTime);
     ctx.waitUntil((async () => {
-      if (env.SCHEDULE_RECHECK_STARTED === "true") {
-        const rechecked = await recheckStartedRuns(env);
-        if (rechecked.length) console.log(JSON.stringify({ status: "STARTED_RUNS_RECHECKED", results: rechecked }));
-      }
-      if (env.SCHEDULE_OBSERVE_ONLY === "true") {
-        const result = await observeSlot((path, init) => github(env, path, init), env.GITHUB_REPOSITORY, plan, event.scheduledTime);
-        console.log(JSON.stringify({ slotKey, ...result }));
-        return;
-      }
-      if (env.SCHEDULE_RECHECK_ONLY === "true") {
-        const result = await recheckStartedRuns(env);
-        console.log(JSON.stringify({ slotKey, status: "RECHECKED", results: result }));
-        return;
-      }
-      if (!(await claim(env, slotKey))) return;
-      await setState(env, slotKey, "CLAIMED");
+      let stage = "RECHECK_STARTED";
       try {
+        if (env.SCHEDULE_RECHECK_STARTED === "true") {
+          const rechecked = await atStage("RECHECK_STARTED", () => recheckStartedRuns(env));
+          if (rechecked.length) console.log(JSON.stringify({ status: "STARTED_RUNS_RECHECKED", results: rechecked }));
+        }
+        if (env.SCHEDULE_OBSERVE_ONLY === "true") {
+          const result = await atStage("FIND_EXISTING_RUN", () => observeSlot((path, init) => github(env, path, init), env.GITHUB_REPOSITORY, plan, event.scheduledTime));
+          console.log(JSON.stringify({ slotKey, ...result }));
+          return;
+        }
+        if (env.SCHEDULE_RECHECK_ONLY === "true") {
+          const result = await atStage("RECHECK_STARTED", () => recheckStartedRuns(env));
+          console.log(JSON.stringify({ slotKey, status: "RECHECKED", results: result }));
+          return;
+        }
+        stage = "CLAIM_SLOT";
+        if (!(await claim(env, slotKey))) return;
+        stage = "SET_STATE";
+        await setState(env, slotKey, "CLAIMED");
+        stage = "SET_STATE";
         await setState(env, slotKey, "DISPATCHED");
         const runResult = await dispatchAndVerify(env, plan, slotKey, event.scheduledTime);
         runResult.deliveryStatus = "UNVERIFIED";
@@ -320,11 +378,20 @@ export default {
         const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
           ? "RUN_STARTED"
           : (result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status);
+        stage = "SAVE_RESULT";
         await setState(env, slotKey, state, result);
         console.log(JSON.stringify(result));
       } catch (error) {
-        await setState(env, slotKey, "FAILED", { error: error.message });
-        console.log(JSON.stringify({ slotKey, workflow: plan.workflow, status: "DISPATCH_FAILED" }));
+        const details = failureDetails(error, stage);
+        try {
+          await setState(env, slotKey, "FAILED", details);
+        } catch (stateError) {
+          console.log(JSON.stringify({ slotKey, workflow: plan.workflow, scheduledTime: event.scheduledTime,
+            stage: "SET_STATE", ...failureDetails(stateError, "SET_STATE"), status: "DISPATCH_FAILED" }));
+          return;
+        }
+        console.log(JSON.stringify({ slotKey, workflow: plan.workflow, scheduledTime: event.scheduledTime,
+          workerVersion: env.WORKER_VERSION || null, status: "DISPATCH_FAILED", ...details }));
       }
     })());
   },

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SlotGate, dispatchAndVerify, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
@@ -108,6 +108,71 @@ test("GitHub dispatch errors are surfaced", async () => {
     dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
     /GITHUB_HTTP_500/,
   );
+});
+
+test("failure details classify GitHub HTTP errors without retaining messages", () => {
+  for (const status of [401, 403, 404, 422, 429, 500]) {
+    const error = new Error(`GITHUB_HTTP_${status}: bearer secret-value`);
+    error.code = `GITHUB_HTTP_${status}`;
+    error.httpStatus = status;
+    error.stage = "POST_WORKFLOW_DISPATCH";
+    const details = failureDetails(error);
+    assert.deepEqual(details, {
+      stage: "POST_WORKFLOW_DISPATCH",
+      errorCode: `GITHUB_HTTP_${status}`,
+      errorType: "GITHUB_API",
+      httpStatus: status,
+    });
+    assert.equal(JSON.stringify(details).includes("secret-value"), false);
+  }
+});
+
+test("Durable Object claim failures are classified separately", () => {
+  const error = new Error("SLOT_STATE_HTTP_503");
+  error.code = "SLOT_STATE_HTTP_503";
+  error.httpStatus = 503;
+  const details = failureDetails(error, "CLAIM_SLOT");
+  assert.deepEqual(details, {
+    stage: "CLAIM_SLOT",
+    errorCode: "SLOT_STATE_HTTP_503",
+    errorType: "DURABLE_OBJECT",
+    httpStatus: 503,
+  });
+});
+
+test("scheduled claim failure logs a sanitized stage and code", async () => {
+  const logs = [];
+  const originalLog = console.log;
+  console.log = (value) => logs.push(String(value));
+  try {
+    const env = {
+      GITHUB_REPOSITORY: repo,
+      SCHEDULE_RECHECK_STARTED: "false",
+      SCHEDULE_OBSERVE_ONLY: "false",
+      SCHEDULE_RECHECK_ONLY: "false",
+      SLOT_GATE: {
+        idFromName: () => "scheduler",
+        get: () => ({ fetch: async (request) => {
+          const url = new URL(typeof request === "string" ? request : request.url);
+          if (url.pathname.endsWith("/claim")) return new Response("unavailable", { status: 503 });
+          if (url.pathname.endsWith("/state")) return new Response("updated", { status: 200 });
+          throw new Error("unexpected Durable Object request");
+        } }),
+      },
+    };
+    let pending;
+    const event = { cron: CONSOLIDATED_CRON, scheduledTime: Date.UTC(2026, 9, 27, 23, 30) };
+    const ctx = { waitUntil: (promise) => { pending = promise; } };
+    await worker.scheduled(event, env, ctx);
+    await pending;
+    const failure = logs.map((entry) => JSON.parse(entry)).find((entry) => entry.status === "DISPATCH_FAILED");
+    assert.equal(failure.stage, "CLAIM_SLOT");
+    assert.equal(failure.errorCode, "SLOT_STATE_HTTP_503");
+    assert.equal(failure.errorType, "DURABLE_OBJECT");
+    assert.equal("error" in failure, false);
+  } finally {
+    console.log = originalLog;
+  }
 });
 
 test("FINAL publication checks all dates and diagnostic status", async () => {
