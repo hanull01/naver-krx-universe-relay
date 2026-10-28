@@ -34,6 +34,54 @@ def _infer_trading_date(industry_payload: Dict[str, Any], theme_payload: Dict[st
     raise ValueError("TRADING_DATE_UNAVAILABLE")
 
 
+def _history_context(root: Path, trading_date: str) -> Dict[str, Dict[str, Any]]:
+    """Return prior V2 observations without resetting or inventing metrics."""
+    path = root / "data/dynamic-universe/v2-shadow-history.json"
+    try:
+        history = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    context: Dict[str, Dict[str, Any]] = {}
+    for observation in history.get("observations", []):
+        observed_date = str(observation.get("tradingDate") or "")
+        if not observed_date or observed_date > trading_date:
+            continue
+        for kind in ("industries", "themes"):
+            for row in observation.get(kind, []) if isinstance(observation.get(kind), list) else []:
+                key = f"{kind}:{row.get('id')}"
+                entry = context.setdefault(key, {"dates": set(), "previous": None})
+                entry["dates"].add(observed_date)
+                if observed_date < trading_date:
+                    previous_date = str((entry.get("previous") or {}).get("tradingDate") or "")
+                    if not previous_date or observed_date > previous_date:
+                        entry["previous"] = {"tradingDate": observed_date, **row}
+    return context
+
+
+def _enrich_persistence(payload: Dict[str, Any], kind: str,
+                        history_context: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Connect existing shadow history to today's input without changing V1."""
+    payload = dict(payload)
+    rows = []
+    for row in payload.get(kind, []) if isinstance(payload.get(kind), list) else []:
+        row = dict(row)
+        entry = history_context.get(f"{kind}:{row.get('id')}") or {}
+        persistence = dict(row.get("persistence") or {})
+        observed_days = len(entry.get("dates") or set())
+        current_days = persistence.get("availableTradingDays")
+        if isinstance(current_days, (int, float)) and not isinstance(current_days, bool):
+            observed_days = max(observed_days, int(current_days))
+        persistence["availableTradingDays"] = observed_days
+        persistence["status"] = "AVAILABLE" if observed_days >= 2 else persistence.get("status", "UNAVAILABLE_NO_GROUP_HISTORY")
+        row["persistence"] = persistence
+        previous = entry.get("previous")
+        if previous:
+            row["historyPreviousTradingDate"] = previous.get("tradingDate")
+        rows.append(row)
+    payload[kind] = rows
+    return payload
+
+
 def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
     status_path = root / "data/dynamic-universe/v2-shadow-run-status.json"
     try:
@@ -43,13 +91,21 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         quality_path = root / "data/monitoring/latest-quality.json"
         quality = json.loads(quality_path.read_text()) if quality_path.is_file() else {}
         trading_date = trading_date or _infer_trading_date(ind, theme)
+        history_context = _history_context(root, trading_date)
+        ind = _enrich_persistence(ind, "industries", history_context)
+        theme = _enrich_persistence(theme, "themes", history_context)
         result = evaluate_snapshot(ind, theme, v1)
         source_commit = quality.get("sourceCommit") or ind.get("sourceCommit")
+        industry_quality = ind.get("quality") if isinstance(ind.get("quality"), dict) else {}
+        source_quality = (quality.get("sourceQualityStatus")
+                          or quality.get("collectionQualityStatus")
+                          or ind.get("sourceQualityStatus")
+                          or industry_quality.get("sourceStatus"))
+        if source_quality == "OK" and ind.get("tradingDateEvidence", {}).get("evidenceClass") == "INTRADAY_SESSION":
+            source_quality = "INTRADAY_OBSERVED"
         result["inputEvidence"] = {
             "tradingDate": trading_date,
-            "sourceQualityStatus": (quality.get("sourceQualityStatus")
-                                     or ind.get("sourceQualityStatus")
-                                     or "UNAVAILABLE"),
+            "sourceQualityStatus": source_quality or "UNAVAILABLE",
             "sourceCommit": source_commit,
             "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
         }
