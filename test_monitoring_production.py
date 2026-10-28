@@ -178,6 +178,54 @@ class MonitoringProductionTests(unittest.TestCase):
         # fresh snapshot; the stale baseline is never relabeled as current.
         self.assertNotEqual(runner.collection_readiness(stale, regular, market_day)[1], "READY")
 
+    def test_intraday_date_evidence_uses_validated_current_snapshot(self):
+        now = datetime(2026, 10, 28, 10, 7, tzinfo=KST)
+        snapshot = {
+            "status": "SUCCESS", "collectionStatus": "SUCCESS",
+            "generatedAt": "2026-10-28T10:07:03+09:00",
+            "expectedCount": 2, "coverageCount": 2, "count": 2,
+            "stocks": [
+                {"code": "000001", "snapshotGeneratedAt": "2026-10-28T10:07:00+09:00"},
+                {"code": "000002", "snapshotGeneratedAt": "2026-10-28T10:07:00+09:00"},
+            ],
+        }
+        result = runner.intraday_trading_date_evidence(
+            snapshot, now, "VALID_PREVIOUS_TRADING_DAY", open_day)
+        self.assertEqual(result["tradingDate"], "20261028")
+        self.assertEqual(result["reason"], "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT")
+        self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
+        self.assertFalse(result["finalConfirmed"])
+
+    def test_intraday_date_evidence_rejects_bad_session_and_timestamps(self):
+        now = datetime(2026, 10, 28, 10, 7, tzinfo=KST)
+        base = {"status": "SUCCESS", "collectionStatus": "SUCCESS",
+                "generatedAt": "2026-10-27T10:07:03+09:00", "expectedCount": 1,
+                "coverageCount": 1, "count": 1,
+                "stocks": [{"code": "000001", "snapshotGeneratedAt": "2026-10-27T10:07:00+09:00"}]}
+        stale = runner.intraday_trading_date_evidence(base, now, "VALID_PREVIOUS_TRADING_DAY", open_day)
+        self.assertEqual(stale["reason"], "SNAPSHOT_COLLECTION_TIME_MISMATCH")
+        holiday_result = runner.intraday_trading_date_evidence(base, now, "KRX_HOLIDAY", holiday)
+        self.assertEqual(holiday_result["reason"], "KRX_HOLIDAY")
+        incomplete = dict(base, generatedAt="2026-10-28T10:07:03+09:00", stocks=[])
+        incomplete["coverageCount"] = 0
+        incomplete["expectedCount"] = 1
+        self.assertEqual(
+            runner.intraday_trading_date_evidence(incomplete, now, "VALID_PREVIOUS_TRADING_DAY", open_day)["reason"],
+            "CURRENT_SNAPSHOT_INCOMPLETE",
+        )
+        weekend = runner.intraday_trading_date_evidence(
+            base, datetime(2026, 10, 31, 10, 7, tzinfo=KST), "WEEKEND", open_day)
+        self.assertEqual(weekend["reason"], "WEEKEND")
+        before_session = runner.intraday_trading_date_evidence(
+            base, datetime(2026, 10, 28, 8, 59, tzinfo=KST), "VALID_PREVIOUS_TRADING_DAY", open_day)
+        self.assertEqual(before_session["reason"], "OUTSIDE_INTRADAY_SESSION")
+
+        def calendar_failure(_):
+            raise RuntimeError("calendar unavailable")
+
+        unavailable = runner.intraday_trading_date_evidence(base, now, "UNKNOWN", calendar_failure)
+        self.assertEqual(unavailable["reason"], "KRX_CALENDAR_UNAVAILABLE")
+
     def test_incomplete_current_never_publishes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); baseline = root / "baseline.json"; output = root / "evidence"

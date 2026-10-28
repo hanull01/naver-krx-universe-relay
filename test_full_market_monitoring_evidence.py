@@ -105,6 +105,30 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(full_market["tradingDateEvidence"]["reason"],
                          "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC")
 
+    def test_intraday_evidence_is_not_daily_confirmation(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-28T10:07:03+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current(snapshotGeneratedAt="2026-10-28T10:07:00+09:00")]}
+        baseline = {"asOfDate": "20261027", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        with tempfile.TemporaryDirectory() as directory:
+            built, _ = evidence.build_evidence(
+                snapshot, directory, baseline=baseline,
+                today="20261028", publication_context={
+                    "intradayTradingDateEvidence": {
+                        "tradingDate": "20261028", "status": "VERIFIED",
+                        "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+                        "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+                    }
+                })
+        result = built["latest-summary.json"]["fullMarket"]["tradingDateEvidence"]
+        self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
+        self.assertFalse(result["finalConfirmed"])
+
     def test_source_observed_final_connects_without_claiming_local_date_verification(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-26T20:30:00+09:00",
                     "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,

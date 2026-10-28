@@ -556,6 +556,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         else:
             trading_date_result = {**trading_date_result,
                                    "localDateDiagnostic": local_date_result}
+    if trading_date_result.get("tradingDate") is None:
+        intraday_result = publication_context.get("intradayTradingDateEvidence") or {}
+        if intraday_result.get("status") == "VERIFIED":
+            trading_date_result = intraday_result
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     theme_status = str(theme_membership.get("status") or "UNUSABLE")
     theme_rows = theme_membership.get("themes") or []
