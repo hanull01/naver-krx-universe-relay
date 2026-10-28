@@ -137,6 +137,19 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("contract_publish_eligible=false", self.publish)
         self.assertIn('contract_publish_eligible=true', self.publish)
 
+    def test_contract_publish_eligibility_matches_market_add_gate(self):
+        start = self.publish.index("contract_publish_eligible=false")
+        end = self.publish.index("if [ \"$contract_publish_eligible\" != \"true\" ]", start)
+        eligibility = self.publish[start:end]
+        for condition in (
+            'steps.full_market.outputs.ready }}" = "true"',
+            'steps.full_market.outputs.exit_code }}" = "0"',
+            '"$final_daily_gate_required" = "false"',
+            'steps.report_contract.outputs.status }}" = "SUCCESS"',
+            "-f data/monitoring/latest-report-contract.json",
+        ):
+            self.assertIn(condition, eligibility)
+
     def test_ineligible_report_contract_restores_or_removes_runner_file(self):
         cleanup = self.publish[self.publish.index("restore_generated_path()"):
                                self.publish.index("if git diff --cached --quiet")]
