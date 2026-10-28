@@ -8,6 +8,12 @@ import tools.build_report_contract as builder
 
 
 class BuildReportContractTests(unittest.TestCase):
+    def test_refresh_workflow_runs_contract_as_module(self):
+        workflow = Path(__file__).parent / ".github/workflows/refresh.yml"
+        text = workflow.read_text(encoding="utf-8")
+        self.assertIn("python -m tools.build_report_contract", text)
+        self.assertNotIn("python tools/build_report_contract.py", text)
+
     def test_main_writes_contract_from_report_model(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "latest-report-contract.json"
