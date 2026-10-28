@@ -41,6 +41,10 @@ def _trading_value_summary(values: List[float], member_count: int) -> Dict[str, 
     }
 
 
+def _usable_stock(stock: Any) -> bool:
+    return isinstance(stock, dict) and stock.get("derivedMetricsUsable", True) is True
+
+
 def _weighted(parts: Dict[str, Optional[float]]) -> Tuple[Optional[float], List[str], float]:
     missing = [name for name, value in parts.items() if value is None]
     available_weight = sum(WEIGHTS[name] for name, value in parts.items() if value is not None)
@@ -63,14 +67,20 @@ def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
     member_count = _num(row.get("memberCount"))
     coverage = _pct(row.get("coveragePct", row.get("featureValidMemberCount", 0) / member_count * 100 if member_count else None))
     stocks = row.get("stocks") if isinstance(row.get("stocks"), list) else []
-    valid_stocks = [stock for stock in stocks if isinstance(stock, dict) and _num(stock.get("changeRate", stock.get("ret_1d"))) is not None]
+    valid_stocks = [stock for stock in stocks
+                    if _usable_stock(stock)
+                    and (_num(stock.get("changeRate")) is not None or _num(stock.get("ret_1d")) is not None)]
     if kind == "theme" and valid_stocks:
-        returns = [_num(stock.get("changeRate", stock.get("ret_1d"))) for stock in valid_stocks]
-        advances = sum(value > 0 for value in returns)
+        absolute_returns = [_num(stock.get("ret_1d")) for stock in valid_stocks
+                            if _num(stock.get("ret_1d")) is not None]
+        change_rates = [_num(stock.get("changeRate")) for stock in valid_stocks
+                        if _num(stock.get("changeRate")) is not None]
+        advances = sum(value > 0 for value in change_rates)
         metrics = dict(metrics)
-        metrics.setdefault("advancerPct", advances / len(returns) * 100)
-        metrics.setdefault("averageReturn1D", sum(returns) / len(returns))
-        metrics.setdefault("medianReturn1D", sorted(returns)[len(returns) // 2])
+        metrics.setdefault("advancerPct", advances / len(change_rates) * 100 if change_rates else None)
+        if absolute_returns:
+            metrics.setdefault("averageReturn1D", sum(absolute_returns) / len(absolute_returns))
+            metrics.setdefault("medianReturn1D", sorted(absolute_returns)[len(absolute_returns) // 2])
         metrics.setdefault("pctAboveMA20", sum(bool(stock.get("above_ma20")) for stock in valid_stocks) / len(valid_stocks) * 100)
         trading_values = [_num(stock.get("accumulatedTradingValue")) for stock in valid_stocks]
         trading_values = [value for value in trading_values if value is not None]
@@ -89,8 +99,10 @@ def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
         # explicitly labelled as such; it does not alter V1 AUTO_LEADER.
         leader_count = min(3, sum((_num(stock.get("changeRate", stock.get("ret_1d"))) or 0) > 0 and
                                   (_num(stock.get("accumulatedTradingValue")) or 0) > 0 for stock in valid_stocks))
+    price_signal = rel if rel is not None else avg
+    price_basis = "RELATIVE_STRENGTH_VS_MARKET" if rel is not None else "ABSOLUTE_RETURN_1D"
     parts = {
-        "priceRelativeStrength": None if rel is None and avg is None else _pct((max(0, min(100, 50 + (rel or avg) * 5)))),
+        "priceRelativeStrength": None if price_signal is None else _pct(max(0, min(100, 50 + price_signal * 5))),
         "breadth": advance,
         "turnoverParticipation": turnover_cov,
         "leaderQuality": None if leader_count is None else min(100.0, leader_count / 3 * 100),
@@ -130,6 +142,9 @@ def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
         "v1Status": _base_state(row), "v2Status": state,
         "score": corrected_score, "rawScore": score, "weights": WEIGHTS,
         "components": parts,
+        "priceRelativeStrengthBasis": price_basis if price_signal is not None else "UNAVAILABLE",
+        "absoluteReturn1D": avg,
+        "relativeStrengthVsMarket": rel,
         "componentStatus": component_status,
         "missingComponents": missing, "coreMissingComponents": core_missing,
         "availableWeight": round(coverage_weight, 2),
