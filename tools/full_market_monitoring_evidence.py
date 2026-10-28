@@ -17,6 +17,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 import naver_full_market_current as current_collector
 import daily_monitoring_baseline as baseline_builder
 import trading_date_evidence
+try:
+    from tools.history_adjustment_guard import apply_to_feature, derived_metrics_usable, detect
+except ModuleNotFoundError:  # direct tools/ script invocation
+    from history_adjustment_guard import apply_to_feature, derived_metrics_usable, detect
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -175,7 +179,8 @@ def feature_row(current, history, today, overlay=False):
         "snapshotGeneratedAt": current.get("snapshotGeneratedAt"),
         "temporaryCurrentBarDate": today,
     }
-    return result
+    previous_close = close_history[-1] if close_history else None
+    return apply_to_feature(result, detect(current, previous_close))
 
 
 def breadth(rows, market="TOTAL"):
@@ -237,25 +242,34 @@ def aggregate_industries(features, industries, membership, previous_good=None):
     quality = industry_quality(industries, previous_good)
     source = {str(row.get("id")): row for row in industries.get("industries", [])}
     result = []
-    market_returns = [item["ret_1d"] for item in features if item["close_valid"] and item["ret_1d"] is not None]
+    market_returns = [item["ret_1d"] for item in features
+                      if item["close_valid"] and derived_metrics_usable(item) and item["ret_1d"] is not None]
     market_average = mean(market_returns)
     market_median = median(market_returns)
+    market_change_rates = [item["changeRate"] for item in features
+                           if item["close_valid"] and item.get("changeRate") is not None]
+    market_change_average = mean(market_change_rates)
+    market_change_median = median(market_change_rates)
     for group in membership.get("industries", []):
         if group.get("status") != "OK":
             continue
         members = [by_code[item.get("code")] for item in group.get("members", []) if item.get("code") in by_code]
         valid = [item for item in members if item["close_valid"]]
+        derived_valid = [item for item in valid if derived_metrics_usable(item)]
         feature_valid = [item for item in members if item["traded_bar"]]
-        returns = [item["ret_1d"] for item in valid if item["ret_1d"] is not None]
-        turnover = [item.get("accumulatedTradingValue") for item in valid
+        returns = [item["ret_1d"] for item in derived_valid if item["ret_1d"] is not None]
+        official_returns = [item["changeRate"] for item in valid if item.get("changeRate") is not None]
+        turnover = [item.get("accumulatedTradingValue") for item in derived_valid
                     if isinstance(item.get("accumulatedTradingValue"), (int, float))]
         top_turnover = sorted(turnover, reverse=True)[:3]
-        ma5_valid = [item for item in valid if item.get("ma5") is not None and item.get("currentPrice") is not None]
-        leaders = sorted(valid, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
+        ma5_valid = [item for item in derived_valid if item.get("ma5") is not None and item.get("currentPrice") is not None]
+        leaders = sorted(derived_valid, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
                                                    item["current_volume_ratio_20"] or -1), reverse=True)[:3]
         result.append({
             "id": group.get("id"), "name": group.get("name"), "memberCount": len(members),
             "featureValidMemberCount": len(feature_valid), "closeValidMemberCount": len(valid),
+            "derivedFeatureValidMemberCount": len([item for item in derived_valid if item["traded_bar"]]),
+            "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(item) for item in valid),
             "advancers": sum((item["changeRate"] or 0) > 0 for item in valid),
             "decliners": sum((item["changeRate"] or 0) < 0 for item in valid), "avgReturn1D": mean(returns),
             "medianReturn1D": median(returns), "avgReturn5D": mean([item["ret_5d"] for item in valid if item["ret_5d"] is not None]),
@@ -266,14 +280,31 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "relativeStrengthVsMarketMedian": round(median(returns) - market_median, 6) if returns and market_median is not None else None,
             "marketAverageReturn1D": market_average,
             "marketMedianReturn1D": market_median,
+            "performanceComparison": {
+                "existingCanonicalReturn": {
+                    "basis": "ret_1d", "average": mean(returns),
+                    "median": median(returns), "eligibleCount": len(returns),
+                },
+                "officialChangeRate": {
+                    "basis": "changeRate", "average": mean(official_returns),
+                    "median": median(official_returns), "eligibleCount": len(official_returns),
+                },
+                "marketOfficialChangeRate": {
+                    "average": market_change_average, "median": market_change_median,
+                },
+            },
+            "officialChangeRateRelativeStrength": (
+                round(mean(official_returns) - market_change_average, 6)
+                if official_returns and market_change_average is not None else None
+            ),
             "avgReturnSkew": round(mean(returns) - median(returns), 6) if returns else None,
             "avgReturnSkewInterpretation": "OUTLIER_SENSITIVE" if returns and abs(mean(returns) - median(returns)) >= 2 else "ALIGNED" if returns else "UNAVAILABLE",
             "pctAboveMA5": pct(sum(item.get("currentPrice") > item.get("ma5") for item in ma5_valid), len(ma5_valid)),
-            "pctAboveMA20": pct(sum(item["above_ma20"] is True for item in valid), sum(item["above_ma20"] is not None for item in valid)),
-            "pctAboveMA60": pct(sum(item["above_ma60"] is True for item in valid), sum(item["above_ma60"] is not None for item in valid)),
-            "pctBreakout20": pct(sum(item["breakout_20_intraday"] is True for item in valid), sum(item["breakout_20_intraday"] is not None for item in valid)),
-            "pctNear52WeekHigh": pct(sum(item["near_52week_high"] is True for item in valid), sum(item["near_52week_high"] is not None for item in valid)),
-            "pctVolumeAbove20DayAverage": pct(sum((item["current_volume_ratio_20"] or 0) > 1 for item in valid), sum(item["current_volume_ratio_20"] is not None for item in valid)),
+            "pctAboveMA20": pct(sum(item["above_ma20"] is True for item in derived_valid), sum(item["above_ma20"] is not None for item in derived_valid)),
+            "pctAboveMA60": pct(sum(item["above_ma60"] is True for item in derived_valid), sum(item["above_ma60"] is not None for item in derived_valid)),
+            "pctBreakout20": pct(sum(item["breakout_20_intraday"] is True for item in derived_valid), sum(item["breakout_20_intraday"] is not None for item in derived_valid)),
+            "pctNear52WeekHigh": pct(sum(item["near_52week_high"] is True for item in derived_valid), sum(item["near_52week_high"] is not None for item in derived_valid)),
+            "pctVolumeAbove20DayAverage": pct(sum((item["current_volume_ratio_20"] or 0) > 1 for item in derived_valid), sum(item["current_volume_ratio_20"] is not None for item in derived_valid)),
             "tradingValue": {
                 "total": sum(turnover) if turnover else None,
                 "availableCount": len(turnover),
@@ -373,7 +404,10 @@ def signal_subset(features, required_codes=None):
     selected.update({row["code"]: row for row in ordered(features, "current_volume_ratio_20")})
     selected.update({row["code"]: row for row in features if row.get("breakout_20_intraday") or row.get("near_52week_high")})
     selected.update({row["code"]: row for row in features if str(row.get("code")) in {str(code) for code in (required_codes or [])}})
-    keys = ("code", "name", "market", "currentPrice", "change", "changeRate", "historyStatus", "ret_1d", "ret_5d", "ret_20d",
+    keys = ("code", "name", "market", "currentPrice", "change", "changeRate", "historyStatus",
+            "historyAdjustmentStatus", "historyAdjustmentReason", "officialReferencePrice",
+            "canonicalPreviousClose", "historyScaleRatio", "derivedMetricsUsable",
+            "ret_1d", "ret_5d", "ret_20d",
             "dist_ma20", "dist_ma60", "dist_high_20", "above_ma20", "above_ma60", "breakout_20_intraday",
             "near_52week_high", "current_volume_ratio_20", "close_valid", "ohlc_valid", "volume_valid")
     return [{key: row.get(key) for key in keys} for row in sorted(selected.values(), key=lambda row: row["code"])]
@@ -597,8 +631,9 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         "session", "publicationStatus", "monitoredUniverse", "universeCrossCheck",
     ) if key in publication_context})
     quality, industry_rows = aggregate_industries(features, industries, membership, previous_good_industries)
-    leaders = sorted(features, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
-                                                  item["current_volume_ratio_20"] or -1), reverse=True)[:30]
+    leaders = sorted([item for item in features if derived_metrics_usable(item)],
+                     key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
+                                       item["current_volume_ratio_20"] or -1), reverse=True)[:30]
     previous_leaders = (previous_summary or {}).get("previousLeaders") or (previous_summary or {}).get("leaders", [])
     previous_leader_codes = {
         str(row.get("code")) for row in previous_leaders
@@ -685,6 +720,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "missingCanonicalHistoryCodes": sorted(current_codes - history_codes),
                                 "closeValidCount": sum(item["close_valid"] for item in features),
                                 "featureValidCount": sum(item["traded_bar"] for item in features),
+                                "derivedFeatureValidCount": sum(item["traded_bar"] and derived_metrics_usable(item)
+                                                                for item in features),
+                                "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(item)
+                                                                          for item in features),
                                 "ohlcInvalidCount": sum(not item["ohlc_valid"] for item in features), "volumeInvalidCount": sum(not item["volume_valid"] for item in features),
                                 "currentSnapshotAttemptCount": current_snapshot["attemptCount"], "collectionQualityStatus": collection_quality,
                                 "publicationStatus": collection_quality,
@@ -705,6 +744,9 @@ def build_theme_signals(generated_at, features, theme_membership):
         return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "UNAVAILABLE",
                 "sourceStatus": theme_membership.get("status", "UNUSABLE"), "themes": []}
     output = []
+    market_change_rates = [row.get("changeRate") for row in features
+                           if row.get("close_valid") and row.get("changeRate") is not None]
+    market_change_average = mean(market_change_rates)
     for theme in themes:
         members = theme.get("members") if isinstance(theme, dict) else None
         if not isinstance(members, list):
@@ -713,26 +755,45 @@ def build_theme_signals(generated_at, features, theme_membership):
         unique_codes = list(dict.fromkeys(codes))
         stocks = [rows_by_code[code] for code in unique_codes if code in rows_by_code]
         valid = [row for row in stocks if row.get("close_valid")]
-        returns = [row.get("ret_1d") for row in valid if isinstance(row.get("ret_1d"), (int, float))]
-        values = [row.get("accumulatedTradingValue") for row in valid
+        derived_valid = [row for row in valid if derived_metrics_usable(row)]
+        returns = [row.get("ret_1d") for row in derived_valid if isinstance(row.get("ret_1d"), (int, float))]
+        official_returns = [row.get("changeRate") for row in valid if isinstance(row.get("changeRate"), (int, float))]
+        values = [row.get("accumulatedTradingValue") for row in derived_valid
                   if isinstance(row.get("accumulatedTradingValue"), (int, float))]
         top_values = sorted(values, reverse=True)[:3]
-        ma5 = [row for row in valid if row.get("ma5") is not None and row.get("currentPrice") is not None]
+        ma5 = [row for row in derived_valid if row.get("ma5") is not None and row.get("currentPrice") is not None]
         theme_metrics = {
             "validQuoteCount": len(valid),
+            "derivedValidQuoteCount": len(derived_valid),
+            "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(row) for row in valid),
             "advancers": sum((row.get("changeRate") or 0) > 0 for row in valid),
             "decliners": sum((row.get("changeRate") or 0) < 0 for row in valid),
             "unchanged": sum((row.get("changeRate") or 0) == 0 for row in valid),
             "advancerPct": pct(sum((row.get("changeRate") or 0) > 0 for row in valid), len(valid)),
             "averageReturn1D": mean(returns),
             "medianReturn1D": median(returns),
+            "performanceComparison": {
+                "existingCanonicalReturn": {
+                    "basis": "ret_1d", "average": mean(returns),
+                    "median": median(returns), "eligibleCount": len(returns),
+                },
+                "officialChangeRate": {
+                    "basis": "changeRate", "average": mean(official_returns),
+                    "median": median(official_returns), "eligibleCount": len(official_returns),
+                },
+                "marketOfficialChangeRateAverage": market_change_average,
+            },
+            "officialChangeRateRelativeStrength": (
+                round(mean(official_returns) - market_change_average, 6)
+                if official_returns and market_change_average is not None else None
+            ),
             "pctAboveMA5": pct(sum(row.get("currentPrice") > row.get("ma5") for row in ma5), len(ma5)),
-            "pctAboveMA20": pct(sum(row.get("above_ma20") is True for row in valid), sum(row.get("above_ma20") is not None for row in valid)),
-            "volumeIncreasePct": pct(sum((row.get("current_volume_ratio_20") or 0) > 1 for row in valid), sum(row.get("current_volume_ratio_20") is not None for row in valid)),
+            "pctAboveMA20": pct(sum(row.get("above_ma20") is True for row in derived_valid), sum(row.get("above_ma20") is not None for row in derived_valid)),
+            "volumeIncreasePct": pct(sum((row.get("current_volume_ratio_20") or 0) > 1 for row in derived_valid), sum(row.get("current_volume_ratio_20") is not None for row in derived_valid)),
             "tradingValue": {
                 "total": sum(values) if values else None,
                 "availableCount": len(values),
-                "coveragePct": pct(len(values), len(valid)),
+                "coveragePct": pct(len(values), len(derived_valid)),
                 "top3ConcentrationPct": (sum(top_values) * 100 / sum(values)) if values and sum(values) else None,
                 "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
             },
