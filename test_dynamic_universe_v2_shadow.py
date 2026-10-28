@@ -87,6 +87,21 @@ class DynamicUniverseV2ShadowTests(unittest.TestCase):
         self.assertEqual(summary["total"], 300.0)
         self.assertEqual(summary["top3ConcentrationPct"], 100.0)
 
+    def test_stale_baseline_defers_v2_without_using_official_quote_as_return(self):
+        row = {"id": "1", "name": "오염방지", "memberCount": 10,
+               "baselineFreshnessStatus": "BASELINE_STALE",
+               "avgReturn1D": 99, "relativeStrengthVsMarket": 99,
+               "advancePct": 100, "pctAboveMA20": 100,
+               "tradingValue": {"coveragePct": 100},
+               "persistence": {"availableTradingDays": 7},
+               "leaders": [{"code": "1"}]}
+        result = _evaluate(row, "industry")
+        self.assertEqual(result["v2Status"], "WAIT")
+        self.assertIsNone(result["score"])
+        self.assertEqual(result["dataQuality"], "BASELINE_STALE")
+        self.assertEqual(result["priceRelativeStrengthBasis"], "UNAVAILABLE")
+        self.assertFalse(result["watchEligible"])
+
 
 if __name__ == "__main__":
     unittest.main()

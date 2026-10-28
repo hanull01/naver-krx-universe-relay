@@ -139,6 +139,14 @@ class MonitoringDailyStateUpdateTests(unittest.TestCase):
         self.assertTrue(result["rows"]["000001"]["source_valid"])
         self.assertEqual("OBSERVED", result["rows"]["000001"]["source_status"])
 
+    def test_daily_input_source_observed_requires_explicit_missing_reason(self):
+        daily_input = self.root / "daily-input.json"
+        daily_input.write_text(json.dumps({"rows": [self._rows()["rows"][0]]}), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "SOURCE_OBSERVED_MISSING_REASONS_REQUIRED"):
+            update.update_from_file(
+                self.state_dir, daily_input, "2026-01-01", self.universe,
+                self.root / "baseline.json", no_write=True, allow_source_observed=True,
+            )
     def test_source_observed_collection_blocks_api_failure(self):
         result = update.collect_today_rows_source_observed(
             "2026-01-01", self.universe,

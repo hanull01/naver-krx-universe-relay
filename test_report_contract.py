@@ -30,3 +30,21 @@ class ReportContractTests(unittest.TestCase):
         good = {"asOf": "2026-10-28", "observedAt": "t", "fullMarket": {"breadth": {"advancers": 1, "decliners": 2, "unchanged": 3}, "metrics": {"breakout20": {"count": 81}}, "marketTradingValue": {"KOSPI": {"value": 1}, "KOSDAQ": {"value": 2}}}, "v2": {"industries": [], "themes": []}, "candidates": []}
         bad = {**good, "fullMarket": {**good["fullMarket"], "metrics": {"breakout20": {"count": 80}}}}
         self.assertEqual(validate_rendered_models(good, bad), ["fullMarket.metrics.breakout20.count"])
+
+    def test_stale_baseline_is_explicit_and_contract_is_partial(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "t", "indices": []},
+            summary={"generatedAt": "t", "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261027", "fullMarket": {"tradingDate": "20261029"}},
+            breadth={"generatedAt": "t", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "t", "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261027"},
+            industries={"generatedAt": "t", "industries": []},
+            themes={"generatedAt": "t", "themes": []},
+            v2_latest={"industries": [], "themes": []}, v2_history={"observations": []},
+            leaders={},
+        )
+        self.assertEqual(contract["status"], "PARTIAL")
+        self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
+        self.assertTrue(contract["baseline"]["dateMismatch"])
+        self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")

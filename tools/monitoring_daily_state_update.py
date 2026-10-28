@@ -813,11 +813,23 @@ def baseline_from_state(state, target_date, universe_file, output, generated_at=
 
 
 def update_from_file(state_dir, daily_input, target_date, universe_file, baseline_output, no_write=False,
-                     provisional=False, allow_source_observed=False):
+                     provisional=False, allow_source_observed=False, source_missing_reasons=None):
     existing = load_state(state_dir, universe_file)
     incoming = normalize_daily_rows(json.loads(Path(daily_input).read_text(encoding="utf-8")), target_date)
+    if allow_source_observed:
+        expected = set().union(*(set(group) for group in authoritative_groups(universe_file).values()))
+        missing = expected - set(incoming)
+        extra = set(incoming) - expected
+        if missing or extra:
+            if not isinstance(source_missing_reasons, dict):
+                raise ValueError("SOURCE_OBSERVED_MISSING_REASONS_REQUIRED")
+            undeclared = sorted(code for code in missing
+                                if not str(source_missing_reasons.get(code) or "").strip())
+            if undeclared or extra:
+                raise ValueError("SOURCE_OBSERVED_MISSING_REASONS_INCOMPLETE")
     return update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output,
-                            no_write, provisional, allow_source_observed=allow_source_observed)
+                            no_write, provisional, allow_source_observed=allow_source_observed,
+                            source_missing_reasons=source_missing_reasons)
 
 
 def update_from_rows(existing, incoming, state_dir, target_date, universe_file, baseline_output, no_write=False,
