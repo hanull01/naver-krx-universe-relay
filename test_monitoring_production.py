@@ -196,6 +196,24 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
         self.assertFalse(result["finalConfirmed"])
 
+    def test_post_market_snapshot_keeps_same_day_observation_non_final(self):
+        now = datetime(2026, 10, 28, 20, 40, tzinfo=KST)
+        snapshot = {
+            "status": "SUCCESS", "collectionStatus": "SUCCESS",
+            "generatedAt": "2026-10-28T20:40:03+09:00",
+            "expectedCount": 2, "coverageCount": 2, "count": 2,
+            "stocks": [
+                {"code": "000001", "snapshotGeneratedAt": "2026-10-28T20:40:00+09:00"},
+                {"code": "000002", "snapshotGeneratedAt": "2026-10-28T20:40:00+09:00"},
+            ],
+        }
+        result = runner.intraday_trading_date_evidence(
+            snapshot, now, "VALID_PREVIOUS_TRADING_DAY", open_day
+        )
+        self.assertEqual(result["tradingDate"], "20261028")
+        self.assertEqual(result["evidenceClass"], "POST_MARKET_SNAPSHOT")
+        self.assertFalse(result["finalConfirmed"])
+
     def test_intraday_date_evidence_rejects_bad_session_and_timestamps(self):
         now = datetime(2026, 10, 28, 10, 7, tzinfo=KST)
         base = {"status": "SUCCESS", "collectionStatus": "SUCCESS",
