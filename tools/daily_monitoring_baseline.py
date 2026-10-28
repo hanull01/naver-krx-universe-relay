@@ -25,6 +25,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import krx_market_day
+try:
+    from tools.history_adjustment_guard import apply_to_feature, detect
+except ModuleNotFoundError:  # direct tools/ script invocation
+    from history_adjustment_guard import apply_to_feature, detect
 HISTORY_DIR = ROOT / "data/naver-history/canonical/daily"
 UNIVERSE_FILE = ROOT / "data/market-universe/all-assets.json"
 DEFAULT_OUTPUT = ROOT / "data/monitoring-baseline/latest.json"
@@ -299,7 +303,7 @@ def feature_row_from_baseline(current, stock, today, overlay=False):
     return_key = "overlayReturnBases" if overlay else "returnBases"
     ret = lambda window: (round((price / base - 1) * 100, 6)
                           if price and (base := number(stock.get(return_key, {}).get(str(window)))) else None)
-    return {
+    result = {
         "code": current["code"], "name": current["name"], "market": current["market"],
         "historyStatus": "HISTORY_INSUFFICIENT" if not stock.get("lastTradingDate") else "AVAILABLE",
         "currentPrice": price, "change": number(current.get("change")), "changeRate": number(current.get("changeRate")),
@@ -323,6 +327,7 @@ def feature_row_from_baseline(current, stock, today, overlay=False):
         "snapshotGeneratedAt": current.get("snapshotGeneratedAt"), "temporaryCurrentBarDate": today,
         "sameDayOverlay": overlay,
     }
+    return apply_to_feature(result, detect(current, stock.get("lastClose")))
 
 
 def main():
