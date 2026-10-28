@@ -14,6 +14,12 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
         value = copy.deepcopy(report)
         value.pop("kiwoomPreviousCandidates", None)
         value.pop("generatedAt", None)
+        contract = value.get("reportContract")
+        if isinstance(contract, dict):
+            contract.pop("kiwoomCandidates", None)
+            generations = contract.get("sourceGenerations")
+            if isinstance(generations, dict):
+                generations.pop("kiwoom", None)
         return value
 
     def published(self, symbols=None, monitoring="2026-10-08"):
@@ -101,6 +107,19 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(section["status"], "AVAILABLE")
             self.assertEqual(section["missingCount"], 1)
             self.assertEqual(section["stocks"][1]["dataStatus"], "UNAVAILABLE")
+
+    def test_kiwoom_contract_keeps_exact_published_symbols(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            symbols = ["042510", "064400", "253590"]
+            discovery.write_text(json.dumps(self.published(symbols)), encoding="utf-8")
+            report = self.build(discovery, previous)
+            contract = report["reportContract"]["kiwoomCandidates"]
+            self.assertEqual(contract["symbols"], symbols)
+            self.assertEqual(
+                [row["itemCode"] for row in contract["stocks"]], symbols
+            )
+            self.assertNotIn("028050", contract["symbols"])
 
     def test_opt_in_lookup_requests_only_candidates_missing_from_both_sources(self):
         with tempfile.TemporaryDirectory() as directory:
