@@ -1,13 +1,14 @@
 {
   "status": "OK",
-  "observedAt": "2026-10-28T07:09:11.534377+00:00",
+  "observedAt": "2026-10-28T08:09:07.842829+00:00",
   "tradingDate": "2026-10-28",
   "summary": {
     "industries": {
       "count": 79,
       "v2StatusDistribution": {
-        "WEAK": 76,
-        "WATCH": 3
+        "WEAK": 74,
+        "WATCH": 3,
+        "ACTIVE": 2
       },
       "v1V2StatusDifferences": 79,
       "unavailable": 0
@@ -15,11 +16,11 @@
     "themes": {
       "count": 264,
       "v2StatusDistribution": {
-        "WEAK": 259,
-        "ACTIVE": 2,
-        "WATCH": 3
+        "WEAK": 255,
+        "ACTIVE": 5,
+        "WATCH": 4
       },
-      "v1V2StatusDifferences": 263,
+      "v1V2StatusDifferences": 262,
       "unavailable": 0
     }
   },
@@ -29,5 +30,5 @@
     "sourceCommit": null,
     "sourceCommitStatus": "UNAVAILABLE"
   },
-  "observationCount": 56
+  "observationCount": 57
 }
