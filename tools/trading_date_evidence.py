@@ -135,6 +135,37 @@ def _read_session_diagnostic(path, current_codes, candidate=None):
             "source": diagnostic.get("source"), "tradingDate": effective_date}, None
 
 
+def verify_local_date_diagnostic(path, current_codes, expected_date=None):
+    """Verify a complete NAVER localDate diagnostic for the current set.
+
+    The stock-list snapshot endpoint does not provide a session date.  This
+    separate diagnostic is accepted only when its explicit per-code localDate
+    observations cover the current authoritative set exactly.  It is never
+    inferred from generatedAt, the execution date, or a prior FINAL.
+    """
+    codes = sorted({str(code) for code in (current_codes or []) if code})
+    base = {"tradingDate": None, "source": "NAVER_LOCAL_DATE",
+            "status": "UNAVAILABLE", "observedDateCounts": {},
+            "missingCanonicalCodes": codes, "explicitSessionDates": []}
+    if not codes:
+        return {**base, "reason": "AUTHORITATIVE_CODE_SET_EMPTY"}
+    diagnostic, error = _read_session_diagnostic(Path(path), codes)
+    if error:
+        return {**base, **error}
+    if expected_date and diagnostic["tradingDate"] != str(expected_date).replace("-", "").replace("/", ""):
+        return {**base,
+                "reason": "LOCAL_DATE_DIAGNOSTIC_DATE_MISMATCH",
+                "diagnosticDate": diagnostic["tradingDate"],
+                "expectedDate": expected_date,
+                "explicitSessionDates": [diagnostic["tradingDate"]]}
+    return {**base, "status": "VERIFIED", "tradingDate": diagnostic["tradingDate"],
+            "reason": "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
+            "observedDateCounts": {diagnostic["tradingDate"]: len(codes)},
+            "missingCanonicalCodes": [],
+            "explicitSessionDates": [diagnostic["tradingDate"]],
+            "diagnosticReason": diagnostic.get("reason")}
+
+
 def _verify_snapshot_dates(current_codes, current_snapshot, candidate):
     """Require one matching explicit date for every current snapshot code."""
     expected = {str(code) for code in current_codes if code}
