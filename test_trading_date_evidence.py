@@ -5,7 +5,8 @@ from pathlib import Path
 
 from tools.trading_date_evidence import (verify_monitoring_daily_final,
                                          verify_source_observed_monitoring_daily_final,
-                                         verify_trading_date)
+                                         verify_trading_date,
+                                         verify_local_date_diagnostic)
 
 class TradingDateEvidenceTests(unittest.TestCase):
     def write(self, root, code, day):
@@ -165,6 +166,53 @@ class TradingDateEvidenceTests(unittest.TestCase):
                 root, ['A', 'B'], current_snapshot={'stocks': [{'code': 'A'}, {'code': 'B'}]})
             self.assertEqual(result['tradingDate'], '20261023')
             self.assertEqual(result['diagnosticStatus'], 'VERIFIED')
+
+    def test_verified_local_date_diagnostic_covers_current_set_without_snapshot_dates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'trading-session-diagnostic.json').write_text(json.dumps({
+                'status': 'VERIFIED', 'source': 'NAVER_LOCAL_DATE',
+                'targetDate': '20261028', 'expectedCount': 2, 'observedCount': 2,
+                'expectedCodes': ['A', 'B'], 'observedCodes': ['A', 'B'],
+                'observedDates': {'A': '20261028', 'B': '20261028'},
+                'missingCodes': [], 'unexpectedCodes': [], 'duplicateCodes': [],
+                'mismatchCodes': [], 'dateMismatchCodes': [],
+            }), encoding='utf-8')
+            result = verify_local_date_diagnostic(
+                root / 'trading-session-diagnostic.json', ['A', 'B'], expected_date='20261028')
+            self.assertEqual(result['tradingDate'], '20261028')
+            self.assertEqual(result['reason'], 'VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC')
+
+    def test_local_date_diagnostic_rejects_prior_set_after_composition_change(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'trading-session-diagnostic.json').write_text(json.dumps({
+                'status': 'VERIFIED', 'source': 'NAVER_LOCAL_DATE',
+                'targetDate': '20261027', 'expectedCount': 3, 'observedCount': 3,
+                'expectedCodes': ['A', 'B', 'C'], 'observedCodes': ['A', 'B', 'C'],
+                'observedDates': {'A': '20261027', 'B': '20261027', 'C': '20261027'},
+                'missingCodes': [], 'unexpectedCodes': [], 'duplicateCodes': [],
+                'mismatchCodes': [], 'dateMismatchCodes': [],
+            }), encoding='utf-8')
+            result = verify_local_date_diagnostic(root / 'trading-session-diagnostic.json', ['A', 'B'])
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'MONITORING_DAILY_DIAGNOSTIC_UNVERIFIED')
+
+    def test_local_date_diagnostic_rejects_stale_date_for_current_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'trading-session-diagnostic.json').write_text(json.dumps({
+                'status': 'VERIFIED', 'source': 'NAVER_LOCAL_DATE',
+                'targetDate': '20261027', 'expectedCount': 2, 'observedCount': 2,
+                'expectedCodes': ['A', 'B'], 'observedCodes': ['A', 'B'],
+                'observedDates': {'A': '20261027', 'B': '20261027'},
+                'missingCodes': [], 'unexpectedCodes': [], 'duplicateCodes': [],
+                'mismatchCodes': [], 'dateMismatchCodes': [],
+            }), encoding='utf-8')
+            result = verify_local_date_diagnostic(
+                root / 'trading-session-diagnostic.json', ['A', 'B'], expected_date='20261028')
+            self.assertIsNone(result['tradingDate'])
+            self.assertEqual(result['reason'], 'LOCAL_DATE_DIAGNOSTIC_DATE_MISMATCH')
 
     def test_monitoring_daily_final_rejects_duplicate_snapshot_code(self):
         with tempfile.TemporaryDirectory() as tmp:

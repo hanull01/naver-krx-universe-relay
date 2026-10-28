@@ -545,6 +545,17 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                 **trading_date_result,
                 "secondaryEvidence": final_result,
             }
+    if trading_date_result.get("tradingDate") is None:
+        local_date_result = trading_date_evidence.verify_local_date_diagnostic(
+            Path(monitoring_daily_dir) / "trading-session-diagnostic.json",
+            current_codes,
+            expected_date=today,
+        )
+        if local_date_result.get("tradingDate") is not None:
+            trading_date_result = local_date_result
+        else:
+            trading_date_result = {**trading_date_result,
+                                   "localDateDiagnostic": local_date_result}
     collection_quality = current_snapshot.get("status", "UNKNOWN")
     theme_status = str(theme_membership.get("status") or "UNUSABLE")
     theme_rows = theme_membership.get("themes") or []

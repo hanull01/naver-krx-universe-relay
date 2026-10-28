@@ -77,6 +77,34 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(full_market["tradingDateEvidence"]["reason"],
                          "INSUFFICIENT_TRADING_DATE_EVIDENCE")
 
+    def test_complete_local_date_diagnostic_is_connected_to_full_market_evidence(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-28T09:07:00+09:00",
+                    "expectedCount": 2, "coverageCount": 2, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("A", localDate=None), current("B", "KOSDAQ", localDate=None)]}
+        baseline = {"asOfDate": "20261027", "count": 2, "authoritativeCount": 2,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": code, "returnBases": {}, "rollingHighCounts": {},
+                                "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None} for code in ("A", "B")]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "trading-session-diagnostic.json").write_text(json.dumps({
+                "status": "VERIFIED", "source": "NAVER_LOCAL_DATE", "targetDate": "20261028",
+                "expectedCount": 2, "observedCount": 2, "expectedCodes": ["A", "B"],
+                "observedCodes": ["A", "B"], "observedDates": {"A": "20261028", "B": "20261028"},
+                "missingCodes": [], "unexpectedCodes": [], "duplicateCodes": [],
+                "mismatchCodes": [], "dateMismatchCodes": []}), encoding="utf-8")
+            built, _ = evidence.build_evidence(
+                snapshot, root / "canonical", baseline=baseline,
+                publication_context={"baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY"},
+                today="20261028", monitoring_daily_dir=root,
+            )
+        full_market = built["latest-breadth.json"]["fullMarket"]
+        self.assertEqual(full_market["tradingDate"], "20261028")
+        self.assertEqual(full_market["tradingDateEvidence"]["reason"],
+                         "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC")
+
     def test_source_observed_final_connects_without_claiming_local_date_verification(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-26T20:30:00+09:00",
                     "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
