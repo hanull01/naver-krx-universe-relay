@@ -7,6 +7,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import trading_discovery
+from tools.report_contract import build_report_contract
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -1200,6 +1201,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     shadow_latest = optional_json(V2_SHADOW_LATEST_PATH, {})
     shadow_history = optional_json(V2_SHADOW_HISTORY_PATH, {})
     shadow_status = optional_json(V2_SHADOW_STATUS_PATH, {})
+    published_summary = optional_json(MONITORING_PATH / "latest-summary.json", {})
+    published_breadth = optional_json(MONITORING_PATH / "latest-breadth.json", {})
+    published_quality = optional_json(MONITORING_PATH / "latest-quality.json", {})
+    published_industries = optional_json(MONITORING_PATH / "latest-industries.json", {})
+    published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
+    published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
 
     group_states = {}
     if GROUP_STATES_PATH.exists():
@@ -1400,6 +1407,19 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "publishedStatus": published_supplemental.get("status"),
         "publishedReason": published_supplemental.get("reason"),
     }
+    report_contract = build_report_contract(
+        indices=indices,
+        summary=published_summary,
+        breadth=published_breadth,
+        quality=published_quality,
+        industries=published_industries,
+        themes=published_themes,
+        v2_latest=shadow_latest,
+        v2_history=shadow_history,
+        leaders=published_leaders,
+        candidates=kiwoom_section.get("stocks") or [],
+        research=research,
+    )
 
     missing_market = [
         {
@@ -1569,6 +1589,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "v1V2Analysis": shadow_v1_v2_analysis(
             dynamic_universe, shadow_latest, shadow_history, shadow_status
         ),
+        "reportContract": report_contract,
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
         "technicalEventsCurrent": technical_events(rows, "currentState"),
@@ -1969,6 +1990,22 @@ def write_markdown(report, path):
     lines.append(f"- V2 관측 거래일: {', '.join(v2.get('history', {}).get('uniqueTradingDates', [])) or '확인 불가'}; 지속성은 자료 부족 시 WAIT/PARTIAL")
     lines.append("- V2 판정 근거: 상대강도·상승 확산·MA20·거래대금·지속성의 실제값과 각 항목 상태를 원본 그대로 표시합니다.")
     lines.append("- V2 세부 근거는 생성된 JSON의 `v1V2Analysis.v2Shadow.*.rows`에서 확인할 수 있습니다.")
+    lines.extend(["", "#### V2 ACTIVE·WATCH 실명·점수·근거", ""])
+    for kind, label in (("industries", "업종"), ("themes", "테마")):
+        selected = [
+            row for row in (v2.get(kind, {}).get("rows") or [])
+            if row.get("v2Status") in ("ACTIVE", "WATCH")
+        ]
+        lines.append(f"- {label}: {len(selected)}개")
+        for row in selected:
+            criteria = row.get("criteria") or {}
+            observed_days = (criteria.get("persistence") or {}).get("observedDays", 0)
+            reason = ", ".join(row.get("reason") or []) or "선정 근거 확인 불가"
+            score = row.get("score") if isinstance(row.get("score"), (int, float)) else "확인 불가"
+            lines.append(
+                f"  - {row.get('name') or row.get('id') or '이름 미확인'}: "
+                f"{row.get('v2Status')}, 점수 {score}, 지속성 관측 {observed_days}거래일, 근거 {reason}"
+            )
     lines.append("</details>")
 
     sources = comparison.get("observationSources") or {}
