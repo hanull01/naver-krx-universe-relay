@@ -108,3 +108,15 @@ class BuildReportContractTests(unittest.TestCase):
         self.assertIn("status=FAILED", text)
         self.assertIn("Report contract unavailable; preserving the previous contract artifact.", text)
         self.assertIn("steps.publish.outputs.publication_changed == 'true'", text)
+
+    def test_successful_contract_is_staged_with_market_publication(self):
+        workflow = Path(__file__).parent / ".github/workflows/refresh.yml"
+        text = workflow.read_text(encoding="utf-8")
+        self.assertIn(
+            'git add data/monitoring/latest-report-contract.json',
+            text,
+        )
+        self.assertIn(
+            '"${{ steps.report_contract.outputs.status }}" = "SUCCESS"',
+            text,
+        )
