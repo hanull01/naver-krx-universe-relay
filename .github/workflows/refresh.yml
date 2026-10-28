@@ -387,6 +387,11 @@ jobs:
           PY
           )" >> "$GITHUB_OUTPUT"
 
+      - name: Build canonical market report contract
+        if: steps.full_market.outputs.ready == 'true'
+        run: |
+          python tools/build_report_contract.py
+
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true'
