@@ -9,6 +9,7 @@ const WORKFLOWS = {
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
 export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * SUN-FRI";
+export const GITHUB_USER_AGENT = "naver-krx-external-scheduler";
 const LEGACY_CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
 
 export function planForCron(cron) {
@@ -73,6 +74,7 @@ function headers(env) {
   return {
     Accept: "application/vnd.github+json",
     Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+    "User-Agent": GITHUB_USER_AGENT,
     "X-GitHub-Api-Version": "2022-11-28",
   };
 }

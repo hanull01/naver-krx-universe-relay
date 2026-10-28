@@ -24,6 +24,8 @@ class ExternalSchedulerContractTests(unittest.TestCase):
     def test_duplicate_claim_and_secret_protection_are_explicit(self):
         self.assertIn("SLOT_GATE", self.worker)
         self.assertIn("GITHUB_TOKEN", self.worker)
+        self.assertIn('"User-Agent": GITHUB_USER_AGENT', self.worker)
+        self.assertIn('GITHUB_USER_AGENT = "naver-krx-external-scheduler"', self.worker)
         self.assertIn("DISPATCH_FAILED", self.worker)
         self.assertIn("UNVERIFIED", self.worker)
         self.assertIn("SLOT_GRACE_BEFORE_MS", self.worker)
