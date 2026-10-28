@@ -45,6 +45,21 @@ def verified_full_market():
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_resolve_report_trading_date_rejects_intraday_session_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); monitoring = root / "monitoring"; monitoring.mkdir()
+            (monitoring / "latest-quality.json").write_text(json.dumps({
+                "tradingDate": "20261028", "publicationStatus": "SUCCESS"}), encoding="utf-8")
+            (monitoring / "latest-summary.json").write_text(json.dumps({
+                "fullMarket": {"tradingDate": "20261028", "tradingDateEvidence": {
+                    "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+                    "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False}}}), encoding="utf-8")
+            baseline = root / "baseline.json"
+            baseline.write_text(json.dumps({"asOfDate": "20261028", "historyStatus": "OK"}), encoding="utf-8")
+            result = daily_report.resolve_report_trading_date(monitoring, baseline)
+            self.assertEqual(result["status"], "WAIT")
+            self.assertEqual(result["reason"], "TRADING_DATE_EVIDENCE_UNAVAILABLE")
+
     def test_full_market_summary_requires_verified_alignment(self):
         available = daily_report.full_market_summary(
             verified_full_market(), {"status": "OK"}

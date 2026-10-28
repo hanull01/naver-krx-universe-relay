@@ -371,6 +371,69 @@ def snapshot_is_publishable(current):
     )
 
 
+def intraday_trading_date_evidence(current, now, freshness_status,
+                                   market_day_check=krx_market_day.market_day):
+    """Build non-final date evidence from the validated intraday snapshot.
+
+    ``freshness_status`` is the result of ``baseline_freshness``; for an open
+    KRX day it proves that the calendar check succeeded without making the
+    wall-clock date the source of truth.  This evidence is deliberately not a
+    daily-bar confirmation and is rejected by the report date resolver.
+    """
+    base = {
+        "tradingDate": None, "status": "UNAVAILABLE",
+        "reason": "INTRADAY_TRADING_DATE_EVIDENCE_UNAVAILABLE",
+        "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+    }
+    if not isinstance(current, dict):
+        return {**base, "reason": "CURRENT_SNAPSHOT_UNAVAILABLE"}
+    target = now.date()
+    calendar_verified_statuses = {
+        "VALID_PREVIOUS_TRADING_DAY", "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED",
+        "VALID_CURRENT_DAY_FINAL", "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
+        "BASELINE_STALE",
+    }
+    if freshness_status not in calendar_verified_statuses:
+        if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
+            return {**base, "reason": freshness_status}
+        try:
+            is_open, calendar_reason = market_day_check(target)
+        except Exception:
+            return {**base, "reason": "KRX_CALENDAR_UNAVAILABLE"}
+        if not is_open:
+            return {**base, "reason": calendar_reason}
+    if session_at(now) not in {"REGULAR", "REGULAR_CLOSED", "AFTER"}:
+        return {**base, "reason": "OUTSIDE_INTRADAY_SESSION"}
+    if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
+        return {**base, "reason": freshness_status}
+    if not snapshot_is_publishable(current):
+        return {**base, "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
+    target_date = target.strftime("%Y%m%d")
+    timestamps = [current.get("generatedAt")]
+    timestamps.extend(row.get("snapshotGeneratedAt") for row in current.get("stocks", []))
+    if not timestamps or any(not isinstance(value, str) or not value for value in timestamps):
+        return {**base, "reason": "SNAPSHOT_COLLECTION_TIME_MISSING"}
+    try:
+        observed_dates = {datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(KST).strftime("%Y%m%d")
+                          for value in timestamps}
+    except (TypeError, ValueError):
+        return {**base, "reason": "SNAPSHOT_COLLECTION_TIME_INVALID"}
+    if observed_dates != {target_date}:
+        return {**base, "reason": "SNAPSHOT_COLLECTION_TIME_MISMATCH",
+                "observedDates": sorted(observed_dates), "expectedDate": target_date}
+    if current.get("expectedCount") != current.get("coverageCount"):
+        return {**base, "reason": "SNAPSHOT_COVERAGE_INCOMPLETE"}
+    return {
+        "tradingDate": target_date, "status": "VERIFIED",
+        "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+        "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+        "source": "KRX_CALENDAR_AND_NAVER_CURRENT_SNAPSHOT",
+        "observedDateCounts": {target_date: current.get("coverageCount", 0)},
+        "collectionGeneratedAt": current.get("generatedAt"),
+        "collectionStatus": current.get("collectionStatus"),
+    }
+
+
 def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,
@@ -425,6 +488,9 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         "monitoredUniverse": monitored,
         "monitoredUniverseLeaders": monitored["monitoredUniverseLeaders"],
     }
+    context["intradayTradingDateEvidence"] = intraday_trading_date_evidence(
+        current, now, freshness_status, market_day_check
+    )
     industries = evidence.load_json(evidence.MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
     membership = evidence.load_json(evidence.MARKET_DIR / "industry-membership.json", {"status": "UNUSABLE", "industries": []})
     theme_membership = evidence.load_json(evidence.THEME_MEMBERSHIP_FILE, {"status": "UNUSABLE", "themes": []})
