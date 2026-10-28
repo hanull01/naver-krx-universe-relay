@@ -390,7 +390,7 @@ jobs:
       - name: Build canonical market report contract
         if: steps.full_market.outputs.ready == 'true'
         run: |
-          python tools/build_report_contract.py
+          python -m tools.build_report_contract
 
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
