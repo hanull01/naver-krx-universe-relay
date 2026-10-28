@@ -536,6 +536,63 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(industry["officialChangeRateRelativeStrength"], 0.0)
         self.assertEqual(industry["derivedMetricsStatus"], "UNAVAILABLE")
 
+    def test_incomplete_previous_bar_does_not_become_one_day_return(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-29T09:07:00+09:00",
+                    "expectedCount": 3, "coverageCount": 3, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [
+                        current("032685", price=307, localDate="20261029"),
+                        current("000300", price=4300, localDate="20261029"),
+                        current("005930", price=110, localDate="20261029"),
+                    ]}
+        valid = {"closeValid": True, "ohlcValid": True, "volumeValid": True}
+        invalid = {"closeValid": False, "ohlcValid": False, "volumeValid": False}
+        baseline = {"asOfDate": "20261028", "count": 3, "authoritativeCount": 3,
+                    "coveragePct": 100.0, "historyStatus": "SOURCE_OBSERVED",
+                    "sourceQualityStatus": "SOURCE_OBSERVED", "stocks": [
+                        {"code": "032685", "lastTradingDate": "20261027", "lastClose": 297,
+                         **valid, "returnBases": {"1": 297}, "rollingHighCounts": {},
+                         "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                         "previousMa60": None},
+                        {"code": "000300", "lastTradingDate": "20261028", "lastClose": 4200,
+                         **invalid, "returnBases": {"1": 4200}, "rollingHighCounts": {},
+                         "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                         "previousMa60": None},
+                        {"code": "005930", "lastTradingDate": "20261028", "lastClose": 100,
+                         **valid, "returnBases": {"1": 100}, "rollingHighCounts": {},
+                         "rollingHighs": {}, "volumeState20": {}, "previousMa20": None,
+                         "previousMa60": None},
+                    ]}
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "테스트"}]}
+        membership = {"status": "OK", "industries": [{"id": "1", "name": "테스트",
+                                                        "status": "OK", "members": [
+                                                            {"code": "032685"},
+                                                            {"code": "000300"},
+                                                            {"code": "005930"},
+                                                        ]}]}
+        with tempfile.TemporaryDirectory() as directory:
+            _, features = evidence.build_evidence(
+                snapshot, Path(directory), baseline=baseline, industries=industries,
+                membership=membership, theme_membership={"status": "UNUSABLE", "themes": []},
+                publication_context={"baselineFreshnessStatus":
+                                     "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED"},
+                today="20261029",
+            )
+        by_code = {row["code"]: row for row in features}
+        for code in ("032685", "000300"):
+            self.assertEqual(by_code[code]["currentPrice"],
+                             307.0 if code == "032685" else 4300.0)
+            self.assertFalse(by_code[code]["derivedMetricsUsable"])
+            self.assertEqual(by_code[code]["derivedMetricsReason"],
+                             "BASELINE_DAILY_BAR_INCOMPLETE")
+            self.assertIsNone(by_code[code]["ret_1d"])
+        self.assertEqual(by_code["032685"]["baselineDailyBarReason"],
+                         "LATEST_VALID_BAR_DATE_MISMATCH")
+        self.assertEqual(by_code["000300"]["baselineDailyBarReason"],
+                         "LATEST_BAR_INVALID")
+        self.assertTrue(by_code["005930"]["derivedMetricsUsable"])
+        self.assertEqual(by_code["005930"]["ret_1d"], 10.0)
+
     def test_breadth_has_market_splits(self):
         rows = []
         for item in (current("A", "KOSPI", 110), current("B", "KOSDAQ", 90)):
