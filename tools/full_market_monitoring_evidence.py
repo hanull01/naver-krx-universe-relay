@@ -96,6 +96,43 @@ def quarantine_stale_baseline_feature(feature, publication_context):
     return result
 
 
+def quarantine_incomplete_baseline_feature(feature, stock, baseline_as_of_date):
+    """Block derived metrics when a per-symbol baseline bar is incomplete.
+
+    The baseline may be valid for the market as a whole while an individual
+    symbol has no bar for that date (or has an invalid OHLCV row).  In that
+    case the independent current quote remains usable, but a return based on
+    the prior available close must not be presented as a one-day return.
+    Missing legacy fields are intentionally treated as unknown so older test
+    fixtures and composition-change rows continue to fail open.
+    """
+    result = dict(feature)
+    stock = stock or {}
+    expected = str(baseline_as_of_date or "").replace("-", "")
+    observed = str(stock.get("lastTradingDate") or "").replace("-", "")
+    reasons = []
+    if expected and observed and expected != observed:
+        reasons.append("LATEST_VALID_BAR_DATE_MISMATCH")
+    validity_keys = ("closeValid", "ohlcValid", "volumeValid")
+    observed_validity = [key for key in validity_keys if key in stock]
+    if observed_validity and any(stock.get(key) is not True for key in observed_validity):
+        reasons.append("LATEST_BAR_INVALID")
+    if not reasons:
+        return result
+    result.update({
+        "baselineDailyBarStatus": "INCOMPLETE",
+        "baselineDailyBarReason": ",".join(reasons),
+        "baselineDailyBarDate": observed or None,
+        "baselineDailyBarExpectedDate": expected or None,
+        "derivedMetricsUsable": False,
+        "derivedMetricsStatus": "UNAVAILABLE",
+        "derivedMetricsReason": "BASELINE_DAILY_BAR_INCOMPLETE",
+    })
+    for key in DERIVED_METRIC_FIELDS:
+        result[key] = None
+    return result
+
+
 def mean(values):
     return round(statistics.mean(values), 6) if values else None
 
@@ -557,13 +594,17 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             raise ValueError(f"baseline missing {len(unexpected_missing)} current codes: {unexpected_missing}")
         if allowed_missing:
             publication_context.setdefault("baselineDiagnostics", {})["newListingHistoryInsufficient"] = sorted(allowed_missing)
-        features = [baseline_builder.feature_row_from_baseline(
-            row, by_code.get(row["code"], {"code": row["code"], "name": row.get("name"),
+        features = []
+        for row in current_snapshot["stocks"]:
+            stock = by_code.get(row["code"], {"code": row["code"], "name": row.get("name"),
                                                 "market": row.get("market"), "returnBases": {},
                                                 "rollingHighs": {}, "rollingHighCounts": {},
                                                 "volumeState20": {}, "previousMa20": None,
-                                                "previousMa60": None}), today, overlay=overlay)
-                    for row in current_snapshot["stocks"]]
+                                                "previousMa60": None})
+            feature = baseline_builder.feature_row_from_baseline(
+                row, stock, today, overlay=overlay)
+            features.append(quarantine_incomplete_baseline_feature(
+                feature, stock, baseline.get("asOfDate")))
     else:
         features = [feature_row(row, read_history(row["code"], history_dir, today), today)
                     for row in current_snapshot["stocks"]]
