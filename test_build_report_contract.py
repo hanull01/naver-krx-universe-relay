@@ -59,6 +59,32 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(contract["asOf"], "20261028")
             self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
+    def test_post_market_snapshot_evidence_allows_non_final_contract(self):
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "POST_MARKET_SNAPSHOT",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": "2026-10-28T11:40:00+00:00",
+        }
+        quality = {"generatedAt": evidence["collectionGeneratedAt"], "tradingDateEvidence": evidence}
+        summary = {
+            "generatedAt": evidence["collectionGeneratedAt"],
+            "fullMarket": {"tradingDateEvidence": evidence},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "latest-report-contract.json"
+            def load(path):
+                return quality if str(path).endswith("latest-quality.json") else summary
+            with patch.object(builder, "load_json", side_effect=load), \
+                 patch.object(builder, "build_report", return_value={"reportContract": {"status": "AVAILABLE", "asOf": "20261028"}}), \
+                 patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
+                self.assertEqual(builder.main(), 0)
+            contract = json.loads(output.read_text())
+            self.assertEqual(contract["asOf"], "20261028")
+            self.assertEqual(contract["tradingDateEvidence"]["evidenceClass"], "POST_MARKET_SNAPSHOT")
+
     def test_missing_date_does_not_replace_existing_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "latest-report-contract.json"

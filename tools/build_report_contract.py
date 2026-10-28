@@ -46,7 +46,7 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
     # finalized daily-bar claim. Preserve that distinction in the contract.
     if INTRADAY_EVIDENCE_REASON in valid:
         intraday = next(e for e in candidates if e.get("reason") == INTRADAY_EVIDENCE_REASON)
-        if intraday.get("evidenceClass") != "INTRADAY_SESSION" or intraday.get("finalConfirmed") is not False:
+        if intraday.get("evidenceClass") not in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"} or intraday.get("finalConfirmed") is not False:
             raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
     generated_at = quality.get("generatedAt")

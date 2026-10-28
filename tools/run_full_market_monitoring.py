@@ -380,10 +380,14 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     wall-clock date the source of truth.  This evidence is deliberately not a
     daily-bar confirmation and is rejected by the report date resolver.
     """
+    session = session_at(now)
+    evidence_class = (
+        "POST_MARKET_SNAPSHOT" if session == "CLOSED" else "INTRADAY_SESSION"
+    )
     base = {
         "tradingDate": None, "status": "UNAVAILABLE",
         "reason": "INTRADAY_TRADING_DATE_EVIDENCE_UNAVAILABLE",
-        "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+        "evidenceClass": evidence_class, "finalConfirmed": False,
     }
     if not isinstance(current, dict):
         return {**base, "reason": "CURRENT_SNAPSHOT_UNAVAILABLE"}
@@ -402,7 +406,11 @@ def intraday_trading_date_evidence(current, now, freshness_status,
             return {**base, "reason": "KRX_CALENDAR_UNAVAILABLE"}
         if not is_open:
             return {**base, "reason": calendar_reason}
-    if session_at(now) not in {"REGULAR", "REGULAR_CLOSED", "AFTER"}:
+    # After 20:00 the current snapshot still identifies the KRX trading day
+    # when the calendar and every collection timestamp agree.  Keep it as a
+    # non-final post-market observation; final daily-bar validation remains a
+    # separate contract.
+    if session not in {"REGULAR", "REGULAR_CLOSED", "AFTER", "CLOSED"}:
         return {**base, "reason": "OUTSIDE_INTRADAY_SESSION"}
     if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
         return {**base, "reason": freshness_status}
@@ -426,7 +434,7 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     return {
         "tradingDate": target_date, "status": "VERIFIED",
         "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-        "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+        "evidenceClass": evidence_class, "finalConfirmed": False,
         "source": "KRX_CALENDAR_AND_NAVER_CURRENT_SNAPSHOT",
         "observedDateCounts": {target_date: current.get("coverageCount", 0)},
         "collectionGeneratedAt": current.get("generatedAt"),
