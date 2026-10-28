@@ -1,18 +1,30 @@
 import unittest
 
-from tools.report_contract import build_report_contract, validate_rendered_models
+from tools.report_contract import (
+    build_report_contract,
+    validate_kiwoom_candidate_binding,
+    validate_rendered_models,
+)
 
 
 class ReportContractTests(unittest.TestCase):
+    def evidence(self, date="20261028"):
+        return {
+            "tradingDate": date,
+            "status": "VERIFIED",
+            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+            "finalConfirmed": True,
+        }
+
     def test_contract_uses_one_generation_and_keeps_v2_names_scores_and_history(self):
         common = {"generatedAt": "2026-10-28T10:09:19+00:00"}
         contract = build_report_contract(
             indices={**common, "indices": [{"name": "KOSPI", "close": 6012.44}]},
-            summary={**common, "fullMarket": {"tradingDate": "20261028", "authoritativeCount": 2766,
+            summary={**common, "fullMarket": {"tradingDate": "20261028", "tradingDateEvidence": self.evidence(), "authoritativeCount": 2766,
                 "markets": {"TOTAL": {"advancers": 1850, "decliners": 713, "unchanged": 203,
                     "breakout20Count": 81, "breakout20EligibleCount": 2642, "pctBreakout20": 3.0659}}}},
             breadth={**common, "fullMarket": {"marketTradingValue": {"KOSPI": {"value": 1}, "KOSDAQ": {"value": 2}}}},
-            quality={**common, "collectionQualityStatus": "COMPLETE_RECONCILIATION_PENDING"},
+            quality={**common, "collectionQualityStatus": "COMPLETE_RECONCILIATION_PENDING", "tradingDateEvidence": self.evidence()},
             industries={**common, "industries": [{"name": "생명보험", "avgReturn1D": 6.35}]},
             themes={**common, "themes": [{"name": "S7", "membershipStatus": "ACTIVE"}]},
             v2_latest={"tradingDate": "2026-10-28", "industries": [{"id": "1", "name": "생명보험", "v2Status": "ACTIVE", "score": 69.46}],
@@ -26,8 +38,141 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
+    def test_kiwoom_candidates_are_separate_from_technical_candidates(self):
+        discovery = {
+            "status": "AVAILABLE",
+            "selectionDate": "2026-10-28",
+            "monitoringDate": "2026-10-29",
+            "sourceSha256": "a" * 64,
+            "symbols": ["042510", "064400", "253590"],
+            "validation": {"status": "VALID", "calendarSource": "KRX_OFFICIAL", "immutable": True, "codeNameBindings": {"042510": "라온시큐어", "064400": "LG씨엔에스", "253590": "네오셈"}},
+        }
+        kiwoom = {
+            **discovery,
+            "candidateCount": 3,
+            "stocks": [
+                {"itemCode": "042510", "itemName": "라온시큐어"},
+                {"itemCode": "064400", "itemName": "LG씨엔에스"},
+                {"itemCode": "253590", "itemName": "네오셈"},
+            ],
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261028", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            technical_candidates=[{"itemCode": "028050", "itemName": "삼성E&A"}],
+            kiwoom_candidates=kiwoom,
+        )
+        self.assertEqual(contract["technicalCandidates"][0]["itemCode"], "028050")
+        self.assertEqual(contract["kiwoomCandidates"]["symbols"], discovery["symbols"])
+        self.assertEqual(validate_kiwoom_candidate_binding(discovery, contract), [])
+
+    def test_kiwoom_candidate_outside_source_fails_binding(self):
+        discovery = {
+            "status": "AVAILABLE", "selectionDate": "2026-10-28",
+            "monitoringDate": "2026-10-29", "sourceSha256": "a" * 64,
+            "symbols": ["042510", "064400", "253590"],
+        }
+        contract = {"kiwoomCandidates": {
+            "selectionDate": "2026-10-28", "monitoringDate": "2026-10-29",
+            "sourceSha256": "a" * 64, "sourceCandidateCount": 3,
+            "symbols": ["028050", "064400", "253590"],
+            "stocks": [
+                {"itemCode": "028050", "itemName": "삼성E&A"},
+                {"itemCode": "064400", "itemName": "LG씨엔에스"},
+                {"itemCode": "253590", "itemName": "네오셈"},
+            ],
+        }}
+        errors = validate_kiwoom_candidate_binding(discovery, contract)
+        self.assertIn("KIWOOM_SYMBOLS_MISMATCH", errors)
+        self.assertIn("KIWOOM_STOCK_CODES_MISMATCH", errors)
+
+    def test_code_name_mapping_is_not_swapped(self):
+        discovery = {
+            "status": "AVAILABLE",
+            "symbols": ["042510", "300120"],
+            "sourceSha256": "a" * 64,
+            "selectionDate": "2026-10-28",
+            "monitoringDate": "2026-10-29",
+            "candidateCount": 2,
+            "validation": {"status": "VALID", "calendarSource": "KRX_OFFICIAL", "immutable": True, "codeNameBindings": {"042510": "라온시큐어", "300120": "라온피플"}},
+        }
+        contract = {"kiwoomCandidates": {
+            "symbols": ["042510", "300120"],
+            "stocks": [
+                {"itemCode": "042510", "itemName": "라온시큐어"},
+                {"itemCode": "300120", "itemName": "라온피플"},
+            ],
+            "sourceSha256": "a" * 64,
+            "selectionDate": "2026-10-28", "monitoringDate": "2026-10-29",
+            "sourceCandidateCount": 2,
+        }}
+        self.assertEqual(validate_kiwoom_candidate_binding(discovery, contract), [])
+        contract["kiwoomCandidates"]["stocks"][0]["itemName"] = "라온피플"
+        self.assertIn("KIWOOM_CODE_NAME_MISMATCH", validate_kiwoom_candidate_binding(discovery, contract))
+
+    def test_trading_date_evidence_is_required_for_verified_status(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261028", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID")
+        self.assertFalse(contract["rendering"]["htmlAllowed"])
+
+    def test_null_trading_date_disables_html(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": None, "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["status"], "PARTIAL")
+        self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_NULL")
+        self.assertFalse(contract["rendering"]["htmlAllowed"])
+
+    def test_industry_breadth_preserves_authoritative_155_of_169(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261028", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"},
+            industries={"generatedAt": "g", "industries": [{
+                "name": "반도체와반도체장비", "memberCount": 169, "advancers": 155,
+            }]},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        row = contract["industries"][0]
+        self.assertEqual((row["advancers"], row["memberCount"]), (155, 169))
+
+    def test_mixed_market_generations_are_not_available(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g1", "indices": []},
+            summary={"generatedAt": "g1", "fullMarket": {"tradingDate": "20261028", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g2", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g1"}, industries={"generatedAt": "g1", "industries": []},
+            themes={"generatedAt": "g1", "themes": []},
+            v2_latest={"generatedAt": "g1", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["status"], "PARTIAL")
+        self.assertFalse(contract["rendering"]["htmlAllowed"])
+
     def test_renderer_mismatch_catches_breakout_disagreement(self):
-        good = {"asOf": "2026-10-28", "observedAt": "t", "fullMarket": {"breadth": {"advancers": 1, "decliners": 2, "unchanged": 3}, "metrics": {"breakout20": {"count": 81}}, "marketTradingValue": {"KOSPI": {"value": 1}, "KOSDAQ": {"value": 2}}}, "v2": {"industries": [], "themes": []}, "candidates": []}
+        good = {"asOf": "2026-10-28", "observedAt": "t", "fullMarket": {"breadth": {"advancers": 1, "decliners": 2, "unchanged": 3}, "metrics": {"breakout20": {"count": 81}}, "marketTradingValue": {"KOSPI": {"value": 1}, "KOSDAQ": {"value": 2}}}, "v2": {"industries": [], "themes": []}, "candidates": [], "technicalCandidates": [], "kiwoomCandidates": {"symbols": [], "stocks": []}}
         bad = {**good, "fullMarket": {**good["fullMarket"], "metrics": {"breakout20": {"count": 80}}}}
         self.assertEqual(validate_rendered_models(good, bad), ["fullMarket.metrics.breakout20.count"])
 

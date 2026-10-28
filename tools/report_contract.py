@@ -23,7 +23,19 @@ REQUIRED_RENDER_FIELDS = (
     "v2.industries",
     "v2.themes",
     "candidates",
+    "technicalCandidates",
+    "kiwoomCandidates.symbols",
+    "kiwoomCandidates.stocks",
 )
+
+TRADING_DATE_EVIDENCE_REASONS = {
+    "VERIFIED_CANONICAL_SESSION",
+    "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+    "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
+    "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
+    "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+}
+
 
 
 def _path(value: Mapping[str, Any], path: str) -> Any:
@@ -44,6 +56,34 @@ def _same_generation(payloads: Mapping[str, Mapping[str, Any]]) -> tuple[str | N
     return (next(iter(values), None), len(values) <= 1)
 
 
+def _valid_trading_date_evidence(evidence: Any, trading_date: Any) -> bool:
+    """Require an explicit, matching evidence record before VERIFIED/HTML."""
+    if not isinstance(evidence, Mapping) or not trading_date:
+        return False
+    if evidence.get("status") != "VERIFIED":
+        return False
+    if str(evidence.get("tradingDate") or "") != str(trading_date):
+        return False
+    reason = evidence.get("reason")
+    if reason not in TRADING_DATE_EVIDENCE_REASONS:
+        return False
+    if reason == "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT":
+        return evidence.get("evidenceClass") == "INTRADAY_SESSION" and evidence.get("finalConfirmed") is False
+    return True
+
+
+def _valid_code_name_rows(stocks: list[Any], symbols: list[Any], bindings: Any) -> bool:
+    if not isinstance(bindings, Mapping):
+        return False
+    for row in stocks:
+        if not isinstance(row, Mapping) or row.get("itemCode") not in symbols or not row.get("itemName"):
+            return False
+        expected_name = bindings.get(str(row.get("itemCode")))
+        if not expected_name or row.get("itemName") != expected_name:
+            return False
+    return bool(stocks)
+
+
 def build_report_contract(
     *,
     indices: Mapping[str, Any],
@@ -56,6 +96,8 @@ def build_report_contract(
     v2_history: Mapping[str, Any],
     leaders: Mapping[str, Any],
     candidates: list[Mapping[str, Any]] | None = None,
+    technical_candidates: list[Mapping[str, Any]] | None = None,
+    kiwoom_candidates: Mapping[str, Any] | None = None,
     research: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
@@ -124,13 +166,61 @@ def build_report_contract(
     observations = v2_history.get("observations") or []
     unique_dates = sorted({str(row.get("tradingDate")) for row in observations if row.get("tradingDate")})
 
+    # ``candidates`` is retained as a compatibility alias for older callers.
+    # New callers must provide technical and Kiwoom candidates separately.
+    technical_candidates = (
+        technical_candidates if technical_candidates is not None else candidates or []
+    )
+    kiwoom_candidates = kiwoom_candidates if isinstance(kiwoom_candidates, Mapping) else {}
+    kiwoom_symbols = list(kiwoom_candidates.get("symbols") or [])
+    kiwoom_stocks = list(kiwoom_candidates.get("stocks") or [])
+    kiwoom_codes = [row.get("itemCode") for row in kiwoom_stocks if isinstance(row, Mapping)]
+    kiwoom_name_map = {
+        str(row.get("itemCode")): row.get("itemName")
+        for row in kiwoom_stocks
+        if isinstance(row, Mapping) and row.get("itemCode")
+    }
+    source_validation = kiwoom_candidates.get("validation")
+    name_evidence_valid = (
+        isinstance(source_validation, Mapping)
+        and source_validation.get("status") == "VALID"
+        and source_validation.get("calendarSource") == "KRX_OFFICIAL"
+        and source_validation.get("immutable") is True
+        and _valid_code_name_rows(kiwoom_stocks, kiwoom_symbols, source_validation.get("codeNameBindings"))
+    )
+    kiwoom_name_status = "VERIFIED" if name_evidence_valid else "PARTIAL" if kiwoom_stocks else "UNAVAILABLE"
+    trading_date_evidence_valid = _valid_trading_date_evidence(evidence, trading_date)
+    trading_date_status = (
+        "VERIFIED" if trading_date_evidence_valid
+        else "UNAVAILABLE_TRADING_DATE_NULL" if not trading_date
+        else "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID"
+    )
+    contract_status = (
+        "PARTIAL"
+        if baseline_status == "BASELINE_STALE" or not trading_date or not trading_date_evidence_valid
+        else "AVAILABLE" if aligned and full_market else "PARTIAL"
+    )
+
     contract: dict[str, Any] = {
         "schemaVersion": "market-report-contract-v1",
-        "status": "PARTIAL" if baseline_status == "BASELINE_STALE" else ("AVAILABLE" if aligned and full_market else "PARTIAL"),
+        "status": contract_status,
         "asOf": trading_date,
         "observedAt": generation,
+        "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
         "tradingDateEvidence": evidence,
+        "sourceGenerations": {
+            "market": generation,
+            "indices": indices.get("generatedAt"),
+            "v2": v2_latest.get("generatedAt"),
+            "kiwoom": kiwoom_candidates.get("syncedAt"),
+        },
+        "sourceBindings": {
+            "kiwoomCandidates": "data/trading-discovery/latest.json",
+            "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
+            "forbidCandidateMixing": True,
+            "historicalAndPreMarketMustRemainSeparate": True,
+        },
         "indices": indices.get("indices") or [],
         "fullMarket": {
             "totalCount": full_market.get("authoritativeCount"),
@@ -174,7 +264,35 @@ def build_report_contract(
                 "reason": "이 계약 입력에 동일 기준시각의 공시 원천이 없습니다.",
             },
         },
-        "candidates": candidates or [],
+        # Keep the legacy key as the technical-candidate alias.  Renderers
+        # must use the explicit keys below for source-sensitive sections.
+        "candidates": technical_candidates,
+        "technicalCandidates": technical_candidates,
+        "kiwoomCandidates": {
+            "source": "data/trading-discovery/latest.json",
+            "sourceType": "KIWOOM_CONDITION_SEARCH",
+            "selectionDate": kiwoom_candidates.get("selectionDate"),
+            "monitoringDate": kiwoom_candidates.get("monitoringDate"),
+            "sourceSha256": kiwoom_candidates.get("sourceSha256"),
+            "symbols": kiwoom_symbols,
+            "stocks": kiwoom_stocks,
+            "codeNameMap": kiwoom_name_map,
+            "codeNameStatus": kiwoom_name_status,
+            "sourceValidation": source_validation if isinstance(source_validation, Mapping) else None,
+            "sourceCandidateCount": kiwoom_candidates.get("candidateCount"),
+        },
+        "rendering": {
+            "htmlAllowed": bool(
+                contract_status == "AVAILABLE"
+                and trading_date
+                and trading_date_evidence_valid
+            ),
+            "reason": (
+                "CONTRACT_VERIFIED"
+                if contract_status == "AVAILABLE" and trading_date
+                else "CONTRACT_UNAVAILABLE_OR_TRADING_DATE_NULL"
+            ),
+        },
     }
     if baseline_status == "BASELINE_STALE":
         contract["baseline"] = {
@@ -186,6 +304,45 @@ def build_report_contract(
             "derivedMetricsReason": "BASELINE_STALE",
         }
     return contract
+
+
+def validate_kiwoom_candidate_binding(
+    discovery: Mapping[str, Any], contract: Mapping[str, Any]
+) -> list[str]:
+    """Reject candidate/source drift before a report can be rendered.
+
+    The immutable Kiwoom snapshot is the only authority for the Kiwoom section.
+    General technical candidates are intentionally not accepted here.
+    """
+    errors: list[str] = []
+    if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
+        return errors
+    expected = list(discovery.get("symbols") or [])
+    section = contract.get("kiwoomCandidates") if isinstance(contract, Mapping) else None
+    section = section if isinstance(section, Mapping) else {}
+    actual = list(section.get("symbols") or [])
+    stocks = list(section.get("stocks") or [])
+    codes = [row.get("itemCode") for row in stocks if isinstance(row, Mapping)]
+    if actual != expected:
+        errors.append("KIWOOM_SYMBOLS_MISMATCH")
+    if codes != expected:
+        errors.append("KIWOOM_STOCK_CODES_MISMATCH")
+    if section.get("sourceSha256") != discovery.get("sourceSha256"):
+        errors.append("KIWOOM_SOURCE_HASH_MISMATCH")
+    if section.get("selectionDate") != discovery.get("selectionDate"):
+        errors.append("KIWOOM_SELECTION_DATE_MISMATCH")
+    if section.get("monitoringDate") != discovery.get("monitoringDate"):
+        errors.append("KIWOOM_MONITORING_DATE_MISMATCH")
+    if section.get("sourceCandidateCount") != len(expected):
+        errors.append("KIWOOM_SOURCE_COUNT_MISMATCH")
+    for row in stocks:
+        if not isinstance(row, Mapping) or not row.get("itemCode"):
+            errors.append("KIWOOM_CODE_NAME_MAPPING_INVALID")
+        elif isinstance((discovery.get("validation") if isinstance(discovery, Mapping) else None), Mapping) and isinstance(discovery.get("validation", {}).get("codeNameBindings"), Mapping) and discovery["validation"]["codeNameBindings"].get(str(row.get("itemCode"))) != row.get("itemName"):
+            errors.append("KIWOOM_CODE_NAME_MISMATCH")
+    if len(set(codes)) != len(codes):
+        errors.append("KIWOOM_DUPLICATE_STOCK_CODE")
+    return errors
 
 
 def validate_rendered_models(markdown_model: Mapping[str, Any], html_model: Mapping[str, Any]) -> list[str]:
