@@ -62,10 +62,39 @@ def _base_state(row: Dict[str, Any]) -> str:
 def _evaluate(row: Dict[str, Any], kind: str) -> Dict[str, Any]:
     metrics = row.get("metrics") if kind == "theme" else row
     metrics = metrics if isinstance(metrics, dict) else {}
+    baseline_stale = (
+        row.get("baselineFreshnessStatus") == "BASELINE_STALE"
+        or metrics.get("baselineFreshnessStatus") == "BASELINE_STALE"
+    )
     trading = metrics.get("tradingValue") if isinstance(metrics.get("tradingValue"), dict) else {}
     persistence = metrics.get("persistence") if isinstance(metrics.get("persistence"), dict) else {}
     member_count = _num(row.get("memberCount"))
     coverage = _pct(row.get("coveragePct", row.get("featureValidMemberCount", 0) / member_count * 100 if member_count else None))
+    if baseline_stale:
+        unavailable = {name: None for name in WEIGHTS}
+        return {
+            "id": row.get("id"), "name": row.get("name"), "kind": kind,
+            "v1Status": _base_state(row), "v2Status": "WAIT",
+            "score": None, "rawScore": None, "weights": WEIGHTS,
+            "components": unavailable,
+            "priceRelativeStrengthBasis": "UNAVAILABLE",
+            "absoluteReturn1D": None, "relativeStrengthVsMarket": None,
+            "componentStatus": {name: "UNAVAILABLE" for name in WEIGHTS},
+            "missingComponents": ["baselineFreshness"],
+            "coreMissingComponents": ["baselineFreshness"],
+            "availableWeight": 0.0,
+            "absoluteStrength": None, "relativeDefense": None,
+            "memberCount": member_count, "coveragePct": coverage,
+            "smallGroupCorrection": 0.75 if member_count is not None and member_count <= 4 else 1.0,
+            "persistenceDays": 0,
+            "dataQuality": "BASELINE_STALE",
+            "baselineFreshnessStatus": "BASELINE_STALE",
+            "derivedMetricsStatus": "UNAVAILABLE",
+            "derivedMetricsReason": "BASELINE_STALE",
+            "trendEvidence": "BASELINE_STALE",
+            "watchEligible": False, "watchRank": None,
+            "watchReasons": ["baseline freshness is stale; derived selection deferred"],
+        }
     stocks = row.get("stocks") if isinstance(row.get("stocks"), list) else []
     valid_stocks = [stock for stock in stocks
                     if _usable_stock(stock)

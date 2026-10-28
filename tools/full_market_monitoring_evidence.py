@@ -18,9 +18,15 @@ import naver_full_market_current as current_collector
 import daily_monitoring_baseline as baseline_builder
 import trading_date_evidence
 try:
-    from tools.history_adjustment_guard import apply_to_feature, derived_metrics_usable, detect
+    from tools.history_adjustment_guard import (
+        DERIVED_METRIC_FIELDS, STATUS_UNVERIFIED, apply_to_feature,
+        derived_metrics_usable, detect,
+    )
 except ModuleNotFoundError:  # direct tools/ script invocation
-    from history_adjustment_guard import apply_to_feature, derived_metrics_usable, detect
+    from history_adjustment_guard import (
+        DERIVED_METRIC_FIELDS, STATUS_UNVERIFIED, apply_to_feature,
+        derived_metrics_usable, detect,
+    )
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +73,27 @@ def number(value):
 
 def pct(numerator, denominator):
     return round(numerator * 100 / denominator, 4) if denominator else None
+
+
+BASELINE_STALE = "BASELINE_STALE"
+
+
+def quarantine_stale_baseline_feature(feature, publication_context):
+    """Keep the independent quote while blocking stale-history derivatives."""
+    result = dict(feature)
+    if (publication_context or {}).get("baselineFreshnessStatus") != BASELINE_STALE:
+        return result
+    result.update({
+        "baselineFreshnessStatus": BASELINE_STALE,
+        "baselineAsOfDate": publication_context.get("baselineAsOfDate"),
+        "baselineExpectedPreviousTradingDate": publication_context.get("expectedPreviousTradingDate"),
+        "derivedMetricsUsable": False,
+        "derivedMetricsStatus": "UNAVAILABLE",
+        "derivedMetricsReason": BASELINE_STALE,
+    })
+    for key in DERIVED_METRIC_FIELDS:
+        result[key] = None
+    return result
 
 
 def mean(values):
@@ -240,6 +267,13 @@ def industry_quality(industries, previous_good=None):
 def aggregate_industries(features, industries, membership, previous_good=None):
     by_code = {row["code"]: row for row in features}
     quality = industry_quality(industries, previous_good)
+    baseline_stale = any(row.get("baselineFreshnessStatus") == BASELINE_STALE for row in features)
+    if baseline_stale:
+        quality.update({
+            "baselineFreshnessStatus": BASELINE_STALE,
+            "derivedMetricsStatus": "UNAVAILABLE",
+            "derivedMetricsReason": BASELINE_STALE,
+        })
     source = {str(row.get("id")): row for row in industries.get("industries", [])}
     result = []
     market_returns = [item["ret_1d"] for item in features
@@ -269,10 +303,15 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "id": group.get("id"), "name": group.get("name"), "memberCount": len(members),
             "featureValidMemberCount": len(feature_valid), "closeValidMemberCount": len(valid),
             "derivedFeatureValidMemberCount": len([item for item in derived_valid if item["traded_bar"]]),
-            "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(item) for item in valid),
+            "historyAdjustmentUnverifiedCount": sum(
+                item.get("historyAdjustmentStatus") == STATUS_UNVERIFIED for item in valid
+            ),
             "advancers": sum((item["changeRate"] or 0) > 0 for item in valid),
             "decliners": sum((item["changeRate"] or 0) < 0 for item in valid), "avgReturn1D": mean(returns),
-            "medianReturn1D": median(returns), "avgReturn5D": mean([item["ret_5d"] for item in valid if item["ret_5d"] is not None]),
+            "medianReturn1D": median(returns), "avgReturn5D": mean([
+                item["ret_5d"] for item in (derived_valid if baseline_stale else valid)
+                if item["ret_5d"] is not None
+            ]),
             "advancePct": pct(sum((item.get("changeRate") or 0) > 0 for item in valid), len(valid)),
             "breadthConcentration": ("BROAD" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) / len(valid) >= 0.6
                                       else "NARROW" if valid and sum((item.get("changeRate") or 0) > 0 for item in valid) > 0 else "WEAK"),
@@ -308,7 +347,7 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "tradingValue": {
                 "total": sum(turnover) if turnover else None,
                 "availableCount": len(turnover),
-                "coveragePct": pct(len(turnover), len(valid)),
+                "coveragePct": pct(len(turnover), len(derived_valid) if baseline_stale else len(valid)),
                 "top3ConcentrationPct": (sum(top_turnover) * 100 / sum(turnover)) if turnover and sum(turnover) else None,
                 "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
             },
@@ -316,6 +355,13 @@ def aggregate_industries(features, industries, membership, previous_good=None):
             "leaders": [{key: item.get(key) for key in ("code", "name", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "breakout_20_intraday")} for item in leaders],
             "industrySourcePresent": str(group.get("id")) in source,
         })
+        if baseline_stale:
+            result[-1].update({
+                "baselineFreshnessStatus": BASELINE_STALE,
+                "derivedMetricsStatus": "UNAVAILABLE",
+                "derivedMetricsReason": BASELINE_STALE,
+                "persistence": {"status": BASELINE_STALE, "availableTradingDays": 0},
+            })
     source_count = len(source)
     membership_count = len(membership.get("industries") or [])
     quality["aggregationUsableIndustryCount"] = len(result)
@@ -521,6 +567,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     else:
         features = [feature_row(row, read_history(row["code"], history_dir, today), today)
                     for row in current_snapshot["stocks"]]
+    # A fresh quote may still be published when yesterday's baseline is stale,
+    # but no history-derived feature may be presented as a valid observation.
+    features = [quarantine_stale_baseline_feature(row, publication_context)
+                for row in features]
     history_codes = {path.stem for path in Path(history_dir).glob("*.jsonl")}
     current_codes = {row["code"] for row in current_snapshot["stocks"]}
     theme_membership = theme_membership or {"status": "UNUSABLE", "themes": []}
@@ -722,8 +772,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "featureValidCount": sum(item["traded_bar"] for item in features),
                                 "derivedFeatureValidCount": sum(item["traded_bar"] and derived_metrics_usable(item)
                                                                 for item in features),
-                                "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(item)
-                                                                          for item in features),
+                                "historyAdjustmentUnverifiedCount": sum(
+                                    item.get("historyAdjustmentStatus") == STATUS_UNVERIFIED
+                                    for item in features
+                                ),
                                 "ohlcInvalidCount": sum(not item["ohlc_valid"] for item in features), "volumeInvalidCount": sum(not item["volume_valid"] for item in features),
                                 "currentSnapshotAttemptCount": current_snapshot["attemptCount"], "collectionQualityStatus": collection_quality,
                                 "publicationStatus": collection_quality,
@@ -733,6 +785,12 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         "latest-summary.json": summary,
     }
     evidence["latest-quality.json"].update(publication_context)
+    if publication_context.get("baselineFreshnessStatus") == BASELINE_STALE:
+        evidence["latest-quality.json"].update({
+            "expectedPreviousTradingDate": publication_context.get("expectedPreviousTradingDate"),
+            "derivedMetricsStatus": "UNAVAILABLE",
+            "derivedMetricsReason": BASELINE_STALE,
+        })
     return evidence, features
 
 
@@ -744,6 +802,7 @@ def build_theme_signals(generated_at, features, theme_membership):
         return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "UNAVAILABLE",
                 "sourceStatus": theme_membership.get("status", "UNUSABLE"), "themes": []}
     output = []
+    baseline_stale = any(row.get("baselineFreshnessStatus") == BASELINE_STALE for row in features)
     market_change_rates = [row.get("changeRate") for row in features
                            if row.get("close_valid") and row.get("changeRate") is not None]
     market_change_average = mean(market_change_rates)
@@ -765,7 +824,9 @@ def build_theme_signals(generated_at, features, theme_membership):
         theme_metrics = {
             "validQuoteCount": len(valid),
             "derivedValidQuoteCount": len(derived_valid),
-            "historyAdjustmentUnverifiedCount": sum(not derived_metrics_usable(row) for row in valid),
+            "historyAdjustmentUnverifiedCount": sum(
+                row.get("historyAdjustmentStatus") == STATUS_UNVERIFIED for row in valid
+            ),
             "advancers": sum((row.get("changeRate") or 0) > 0 for row in valid),
             "decliners": sum((row.get("changeRate") or 0) < 0 for row in valid),
             "unchanged": sum((row.get("changeRate") or 0) == 0 for row in valid),
@@ -799,12 +860,25 @@ def build_theme_signals(generated_at, features, theme_membership):
             },
             "persistence": {"status": "UNAVAILABLE_NO_GROUP_HISTORY", "availableTradingDays": 1},
         }
-        output.append({"id": str(theme.get("id")), "name": theme.get("name"),
-                       "membershipStatus": theme.get("status"), "memberCount": len(unique_codes),
-                       "featureCount": len(stocks), "coveragePct": round(len(stocks) * 100 / len(unique_codes), 4) if unique_codes else None,
-                       "missingCodes": [code for code in unique_codes if code not in rows_by_code],
-                       "metrics": theme_metrics,
-                       "stocks": stocks})
+        if baseline_stale:
+            theme_metrics.update({
+                "baselineFreshnessStatus": BASELINE_STALE,
+                "derivedMetricsStatus": "UNAVAILABLE",
+                "derivedMetricsReason": BASELINE_STALE,
+                "persistence": {"status": BASELINE_STALE, "availableTradingDays": 0},
+            })
+        theme_row = {"id": str(theme.get("id")), "name": theme.get("name"),
+                     "membershipStatus": theme.get("status"), "memberCount": len(unique_codes),
+                     "featureCount": len(stocks), "coveragePct": round(len(stocks) * 100 / len(unique_codes), 4) if unique_codes else None,
+                     "missingCodes": [code for code in unique_codes if code not in rows_by_code],
+                     "metrics": theme_metrics, "stocks": stocks}
+        if baseline_stale:
+            theme_row.update({
+                "baselineFreshnessStatus": BASELINE_STALE,
+                "derivedMetricsStatus": "UNAVAILABLE",
+                "derivedMetricsReason": BASELINE_STALE,
+            })
+        output.append(theme_row)
     return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "OK",
             "sourceStatus": theme_membership.get("status"), "themeCount": len(output), "themes": output}
 
