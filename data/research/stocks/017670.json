@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "017670",
   "itemName": "SK텔레콤",
-  "reportCount": 52,
-  "latestReportNid": "96710",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 53,
+  "latestReportNid": "97168",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "96710",
-    "writeDate": "2026-10-14",
-    "brokerName": "유안타증권",
-    "title": "이익 회복 위에 쌓이는 AIDC 가치",
-    "goalPrice": 118000,
+    "nid": "97168",
+    "writeDate": "2026-10-28",
+    "brokerName": "하나증권",
+    "title": "11월 전략 - 재료 많은데 가격 메리트도 커진 상황",
+    "goalPrice": 140000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 3,
         "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "원가": 1,
-        "자동차": 1
+        "가격": 3,
+        "AI": 1
       }
     }
   },
   "reportNids": [
+    "97168",
     "96710",
     "96666",
     "96656",

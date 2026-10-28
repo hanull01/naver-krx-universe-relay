@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "068270",
   "itemName": "셀트리온",
-  "reportCount": 27,
-  "latestReportNid": "97000",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 32,
+  "latestReportNid": "97153",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "97000",
-    "writeDate": "2026-10-23",
-    "brokerName": "SK증권",
-    "title": "옴리클로, 3대시장 First-mover의 완성",
-    "goalPrice": 280000,
+    "nid": "97153",
+    "writeDate": "2026-10-28",
+    "brokerName": "현대차증권",
+    "title": "3Q26 Review: 예상보다 더 잘되고 있다",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 6,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 2,
-        "환율": 2,
-        "미국": 1
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "97153",
+    "97149",
+    "97130",
+    "97124",
+    "97113",
     "97000",
     "96985",
     "96337",

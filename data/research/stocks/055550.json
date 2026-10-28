@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "055550",
   "itemName": "신한지주",
-  "reportCount": 25,
-  "latestReportNid": "97103",
+  "reportCount": 31,
+  "latestReportNid": "97181",
   "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "97103",
+    "nid": "97181",
     "writeDate": "2026-10-28",
-    "brokerName": "키움증권",
-    "title": "다소 아쉬운 분기실적, 연간 최대치는 기정사실화",
-    "goalPrice": 130000,
+    "brokerName": "한화투자증권",
+    "title": "잘 관리된 대손 및 연체 지표",
+    "goalPrice": 132000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 7
+        "positive": 4,
+        "negative": 3
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 6,
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97181",
+    "97175",
+    "97172",
+    "97160",
+    "97123",
+    "97117",
     "97103",
     "96717",
     "96691",

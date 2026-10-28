@@ -2,33 +2,41 @@
   "schemaVersion": 1,
   "itemCode": "042660",
   "itemName": "한화오션",
-  "reportCount": 33,
-  "latestReportNid": "97105",
+  "reportCount": 40,
+  "latestReportNid": "97178",
   "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "97105",
+    "nid": "97178",
     "writeDate": "2026-10-28",
-    "brokerName": "SK증권",
-    "title": "상선만으로는 부족하다",
-    "goalPrice": 90000,
+    "brokerName": "DS투자증권",
+    "title": "점차 회복할 실적. 해양과 특수선 수주가 관건",
+    "goalPrice": 100000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 7
+        "positive": 2,
+        "negative": 8
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 7,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "환율": 4,
+        "원가": 2,
         "수주": 1,
-        "자동차": 1,
-        "환율": 1
+        "조선": 1
       }
     }
   },
   "reportNids": [
+    "97178",
+    "97163",
+    "97142",
+    "97141",
+    "97137",
+    "97119",
+    "97118",
     "97105",
     "96809",
     "96719",

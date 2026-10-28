@@ -2,37 +2,43 @@
   "schemaVersion": 1,
   "itemCode": "011070",
   "itemName": "LG이노텍",
-  "reportCount": 46,
-  "latestReportNid": "96546",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 53,
+  "latestReportNid": "97165",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "96546",
-    "writeDate": "2026-10-08",
-    "brokerName": "유안타증권",
-    "title": "3Q26 Pre: 잠시 흐린 렌즈, 선명할 기판",
-    "goalPrice": 1200000,
+    "nid": "97165",
+    "writeDate": "2026-10-28",
+    "brokerName": "하나증권",
+    "title": "환율이 가려버린 성장",
+    "goalPrice": 530000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 3
+        "positive": 5,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 5,
-        "원가": 3,
-        "수요": 2,
-        "가격": 1,
-        "수주": 1,
-        "자동차": 1,
-        "재고": 1
+        "환율": 4,
+        "수요": 3,
+        "가격": 2,
+        "반도체": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97165",
+    "97151",
+    "97138",
+    "97132",
+    "97127",
+    "97112",
+    "97109",
     "96546",
     "96490",
     "96432",

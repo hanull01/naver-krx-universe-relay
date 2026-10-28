@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "170900",
   "itemName": "동아에스티",
-  "reportCount": 4,
-  "latestReportNid": "96807",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 6,
+  "latestReportNid": "97155",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "96807",
-    "writeDate": "2026-10-19",
-    "brokerName": "키움증권",
-    "title": "이어지는 비용 감소로 양호한 실적 전망",
-    "goalPrice": 50000,
+    "nid": "97155",
+    "writeDate": "2026-10-28",
+    "brokerName": "유안타증권",
+    "title": "비용 효율화로 챙긴 수익성",
+    "goalPrice": 51000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 3
+        "positive": 4,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3
+        "원가": 2,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "97155",
+    "97125",
     "96807",
     "94648",
     "92077",

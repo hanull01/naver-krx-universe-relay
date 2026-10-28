@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "218410",
   "itemName": "RFHIC",
-  "reportCount": 10,
-  "latestReportNid": "96176",
-  "latestWriteDate": "2026-09-16",
+  "reportCount": 12,
+  "latestReportNid": "97122",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "96176",
-    "writeDate": "2026-09-16",
-    "brokerName": "하나증권",
-    "title": "쇼티지 발생 유력, 높은 Multiple 형성될 것",
-    "goalPrice": 150000,
+    "nid": "97122",
+    "writeDate": "2026-10-28",
+    "brokerName": "유진투자증권",
+    "title": "반격 시작!",
+    "goalPrice": 72000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 17,
+        "negative": 5
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 12,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
+        "방산": 7,
+        "수주": 3,
+        "수요": 2,
+        "환율": 2,
         "미국": 1,
-        "방산": 1,
-        "수주": 1
+        "반도체": 1
       }
     }
   },
   "reportNids": [
+    "97122",
+    "97121",
     "96176",
     "95978",
     "94596",

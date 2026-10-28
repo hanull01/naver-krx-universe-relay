@@ -2,32 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "095340",
   "itemName": "ISC",
-  "reportCount": 10,
-  "latestReportNid": "96118",
-  "latestWriteDate": "2026-09-14",
+  "reportCount": 12,
+  "latestReportNid": "97164",
+  "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "96118",
-    "writeDate": "2026-09-14",
-    "brokerName": "iM증권",
-    "title": "ASP 상승하면서 향후 수익성 개선 가속화",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97164",
+    "writeDate": "2026-10-28",
+    "brokerName": "하나증권",
+    "title": "병목 해소와 판가인상이 실적 견인 전망",
+    "goalPrice": 250000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 7,
-        "AI": 1
+        "환율": 3,
+        "AI": 1,
+        "가격": 1,
+        "수주": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97164",
+    "97136",
     "96118",
     "95567",
     "95053",

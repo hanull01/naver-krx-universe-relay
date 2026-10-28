@@ -2,32 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "237690",
   "itemName": "에스티팜",
-  "reportCount": 16,
-  "latestReportNid": "97096",
+  "reportCount": 21,
+  "latestReportNid": "97156",
   "latestWriteDate": "2026-10-28",
   "latest": {
-    "nid": "97096",
+    "nid": "97156",
     "writeDate": "2026-10-28",
-    "brokerName": "미래에셋증권",
-    "title": "3Q26 Review: 환율 부담에도 성장세 지속",
-    "goalPrice": 150000,
+    "brokerName": "유안타증권",
+    "title": "3Q26Re: 아쉬운 수익성",
+    "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 5
+        "positive": 1,
+        "negative": 3
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "수주": 2
+        "환율": 2,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "97156",
+    "97148",
+    "97134",
+    "97120",
+    "97114",
     "97096",
     "96325",
     "96283",
