@@ -115,6 +115,7 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("Final daily update failed; restoring only its generated production paths", self.publish)
         self.assertIn("restore_generated_path()", self.publish)
         self.assertIn("git ls-files --error-unmatch", self.publish)
+        self.assertIn("git restore --source=HEAD --staged --worktree", self.publish)
         self.assertIn("rm -f --", self.publish)
         for path in (
             "data/dynamic-universe/latest.json",
@@ -129,6 +130,38 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         ):
             self.assertIn(path, self.publish)
         self.assertIn("git ls-files --others --exclude-standard", self.publish)
+
+    def test_report_contract_is_publishable_only_after_successful_generation(self):
+        self.assertIn('steps.report_contract.outputs.status }}" = "SUCCESS"', self.publish)
+        self.assertIn("data/monitoring/latest-report-contract.json", self.publish)
+        self.assertIn("contract_publish_eligible=false", self.publish)
+        self.assertIn('contract_publish_eligible=true', self.publish)
+
+    def test_contract_publish_eligibility_matches_market_add_gate(self):
+        start = self.publish.index("contract_publish_eligible=false")
+        end = self.publish.index("if [ \"$contract_publish_eligible\" != \"true\" ]", start)
+        eligibility = self.publish[start:end]
+        for condition in (
+            'steps.full_market.outputs.ready }}" = "true"',
+            'steps.full_market.outputs.exit_code }}" = "0"',
+            '"$final_daily_gate_required" = "false"',
+            'steps.report_contract.outputs.status }}" = "SUCCESS"',
+            "-f data/monitoring/latest-report-contract.json",
+        ):
+            self.assertIn(condition, eligibility)
+
+    def test_ineligible_report_contract_restores_or_removes_runner_file(self):
+        cleanup = self.publish[self.publish.index("restore_generated_path()"):
+                               self.publish.index("if git diff --cached --quiet")]
+        self.assertIn("data/monitoring/latest-report-contract.json", cleanup)
+        self.assertIn("if [ \"$contract_publish_eligible\" != \"true\" ]", cleanup)
+        self.assertLess(cleanup.index("contract_publish_eligible=false"),
+                        cleanup.index("restore_generated_path data/monitoring/latest-report-contract.json"))
+
+    def test_contract_cleanup_precedes_publish_cleanliness_gate(self):
+        cleanup_at = self.publish.index("restore_generated_path data/monitoring/latest-report-contract.json")
+        cleanliness_at = self.publish.index('git ls-files --others --exclude-standard')
+        self.assertLess(cleanup_at, cleanliness_at)
 
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
         self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
