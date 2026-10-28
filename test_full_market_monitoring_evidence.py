@@ -493,7 +493,48 @@ class EvidenceTests(unittest.TestCase):
         self.assertTrue(feature["close_valid"])
         self.assertFalse(feature["ohlc_valid"])
         self.assertFalse(feature["volume_valid"])
+
+    def test_stale_baseline_keeps_quote_and_quarantines_derived_metrics(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "2026-10-29T09:07:00+09:00",
+                    "expectedCount": 1, "coverageCount": 1, "attemptCount": 1,
+                    "duplicateCodes": [], "missingCodes": [],
+                    "stocks": [current("005930", localDate="20261029", currentPrice=130,
+                                        change=2, changeRate=1.56)]}
+        baseline = {"asOfDate": "20261027", "count": 1, "authoritativeCount": 1,
+                    "coveragePct": 100.0, "historyStatus": "OK",
+                    "stocks": [{"code": "005930", "lastClose": 128,
+                                "returnBases": {"1": 128, "5": 120, "20": 100},
+                                "rollingHighCounts": {}, "rollingHighs": {},
+                                "volumeState20": {}, "previousMa20": None,
+                                "previousMa60": None}]}
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "테스트"}]}
+        membership = {"status": "OK", "industries": [{"id": "1", "name": "테스트",
+                                                        "status": "OK", "members": [{"code": "005930"}]}]}
+        with tempfile.TemporaryDirectory() as directory:
+            built, features = evidence.build_evidence(
+                snapshot, Path(directory), baseline=baseline, industries=industries,
+                membership=membership, theme_membership={"status": "UNUSABLE", "themes": []},
+                publication_context={"baselineFreshnessStatus": "BASELINE_STALE",
+                                     "baselineAsOfDate": "20261027",
+                                     "expectedPreviousTradingDate": "20261028"},
+                today="20261029",
+            )
+        feature = features[0]
+        self.assertEqual(feature["currentPrice"], 130.0)
+        self.assertEqual(feature["changeRate"], 1.56)
+        self.assertEqual(feature["baselineFreshnessStatus"], "BASELINE_STALE")
+        self.assertFalse(feature["derivedMetricsUsable"])
+        self.assertIsNone(feature["ret_1d"])
+        self.assertIsNone(feature["ma20"])
         self.assertIsNone(feature["breakout_20_intraday"])
+        self.assertIsNone(feature["current_volume_ratio_20"])
+        quality = built["latest-quality.json"]
+        self.assertEqual(quality["baselineFreshnessStatus"], "BASELINE_STALE")
+        self.assertEqual(quality["derivedMetricsStatus"], "UNAVAILABLE")
+        industry = built["latest-industries.json"]["industries"][0]
+        self.assertIsNone(industry["avgReturn1D"])
+        self.assertEqual(industry["officialChangeRateRelativeStrength"], 0.0)
+        self.assertEqual(industry["derivedMetricsStatus"], "UNAVAILABLE")
 
     def test_breadth_has_market_splits(self):
         rows = []

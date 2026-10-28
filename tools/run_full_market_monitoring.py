@@ -459,11 +459,11 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         == str(source_observed_date).replace("-", "")
     )
     if source_observed_requested:
-        fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
+        fresh, freshness_status, expected_previous_date = baseline_freshness(baseline, now, market_day_check)
         source_observed_recovery = fresh and freshness_status == "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"
     else:
         source_observed_recovery = False
-        fresh, freshness_status, _ = baseline_freshness(baseline, now, market_day_check)
+        fresh, freshness_status, expected_previous_date = baseline_freshness(baseline, now, market_day_check)
     # A stale prior baseline is still a valid comparison input for a new
     # full-market snapshot.  Do not let the freshness warning create a
     # collection deadlock; the resulting evidence records the warning and
@@ -496,6 +496,8 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         "monitoredUniverse": monitored,
         "monitoredUniverseLeaders": monitored["monitoredUniverseLeaders"],
     }
+    if freshness_status == "BASELINE_STALE":
+        context["expectedPreviousTradingDate"] = expected_previous_date
     context["intradayTradingDateEvidence"] = intraday_trading_date_evidence(
         current, now, freshness_status, market_day_check
     )

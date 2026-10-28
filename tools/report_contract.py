@@ -83,6 +83,21 @@ def build_report_contract(
         or full_market.get("qualityStatus")
         or "UNAVAILABLE"
     )
+    baseline_status = (
+        quality.get("baselineFreshnessStatus")
+        or summary.get("baselineFreshnessStatus")
+        or full_market.get("baselineFreshnessStatus")
+    )
+    baseline_as_of = (
+        quality.get("baselineAsOfDate")
+        or summary.get("baselineAsOfDate")
+        or full_market.get("baselineAsOfDate")
+    )
+    expected_previous = (
+        quality.get("expectedPreviousTradingDate")
+        or summary.get("expectedPreviousTradingDate")
+        or full_market.get("expectedPreviousTradingDate")
+    )
 
     def metric(name: str, count: str, eligible: str, pct: str) -> dict[str, Any]:
         return {
@@ -111,7 +126,7 @@ def build_report_contract(
 
     contract: dict[str, Any] = {
         "schemaVersion": "market-report-contract-v1",
-        "status": "AVAILABLE" if aligned and full_market else "PARTIAL",
+        "status": "PARTIAL" if baseline_status == "BASELINE_STALE" else ("AVAILABLE" if aligned and full_market else "PARTIAL"),
         "asOf": trading_date,
         "observedAt": generation,
         "sourceQualityStatus": source_quality,
@@ -161,6 +176,15 @@ def build_report_contract(
         },
         "candidates": candidates or [],
     }
+    if baseline_status == "BASELINE_STALE":
+        contract["baseline"] = {
+            "asOfDate": baseline_as_of,
+            "expectedPreviousTradingDate": expected_previous,
+            "freshnessStatus": baseline_status,
+            "dateMismatch": True,
+            "derivedMetricsStatus": "UNAVAILABLE",
+            "derivedMetricsReason": "BASELINE_STALE",
+        }
     return contract
 
 
