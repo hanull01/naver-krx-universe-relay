@@ -288,7 +288,7 @@ def verified_final_baseline(discovery, baseline):
 
 
 def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
-            previous=None, final_baseline=None):
+            previous=None, final_baseline=None, name_lookup=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
     qidx, tidx, sidx = _index(quotes), _index(technicals), _index(states)
@@ -296,6 +296,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     baseline = verified_final_baseline(discovery, final_baseline)
     bidx = _index(baseline)
     previous_rows = _index(previous or {}, keys=("itemCode",))
+    name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     rows = []
     for code in discovery["symbols"]:
         quote, technical, state, signal = qidx.get(code), tidx.get(code), sidx.get(code), fidx.get(code)
@@ -314,7 +315,13 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "itemCode": code,
             "itemName": (market.get("stockName") or market.get("name")
                          or technical.get("stockName")
-                         or (identity_quote or {}).get("stockName")),
+                         or (identity_quote or {}).get("stockName")
+                         or name_lookup.get(code)),
+            "itemNameSource": (
+                "DISCOVERY_MARKET_DATA" if market.get("stockName") or market.get("name")
+                else "VERIFIED_NAME_LOOKUP" if name_lookup.get(code)
+                else None
+            ),
             "price": market.get("closePrice", market.get("currentPrice", market.get("lastClose"))),
             "changeRate": market.get("fluctuationsRatio", market.get("changeRate")),
             "volume": market.get("accumulatedTradingVolume"),

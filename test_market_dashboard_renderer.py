@@ -151,6 +151,40 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": mixed}})["indexSessionLabel"], "시장별 세션 상이")
         self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": unknown}})["indexSessionLabel"], "세션 확인 대기")
 
+    def test_preopen_report_keeps_prior_session_reference_in_both_outputs(self):
+        report = report_fixture()
+        report["reportContract"]["indices"] = [
+            {"name": "KOSPI", "close": 6000.0, "changePoints": 0.0, "changeRate": 0.0,
+             "marketStatus": "PREOPEN", "session": "UNKNOWN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+            {"name": "KOSDAQ", "close": 760.0, "changePoints": 0.0, "changeRate": 0.0,
+             "marketStatus": "PREOPEN", "session": "UNKNOWN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+        ]
+        report["reportContract"]["sessionContext"] = {
+            "mode": "PREOPEN", "status": "AVAILABLE",
+            "observation": {"tradingDate": "2026-10-30", "status": "AVAILABLE"},
+            "previousTradingDay": {
+                "status": "AVAILABLE", "tradingDate": "2026-10-29",
+                "verificationStatus": "VERIFIED_PRIOR_SESSION_SOURCE_OBSERVED",
+                "indices": [
+                    {"name": "KOSPI", "close": 5937.66, "changePoints": -74.78, "changeRate": -1.24,
+                     "sourceTime": "2026-10-29T20:15:00+09:00"},
+                    {"name": "KOSDAQ", "close": 753.23, "changePoints": -18.05, "changeRate": -2.34,
+                     "sourceTime": "2026-10-29T20:15:00+09:00"},
+                ],
+                "fullMarket": {"totalCount": 2767, "breadth": {"advancers": 717, "decliners": 1813, "unchanged": 237}},
+                "v1V2": {"tradingDate": "2026-10-29", "status": "PRIOR_SESSION_REFERENCE"},
+            },
+        }
+        model = build_dashboard_model(report)
+        self.assertEqual(model["indexSessionLabel"], "장전 관측")
+        markdown = render_dashboard_markdown(report)
+        rendered_html = render_dashboard_html(report)
+        html_text = html_lib.unescape(rendered_html)
+        for token in ("장전 관측", "직전 거래일 참고", "2026-10-29", "5937.66", "-1.24", "753.23", "당일 장전 자료와 혼합하지 않음"):
+            self.assertIn(token, markdown)
+            self.assertIn(token, html_text)
+        self.assertEqual(validate_rendered_outputs(markdown, rendered_html, model), [])
+
     def test_breadth_arithmetic_uses_contract_counts_for_other_sessions(self):
         report = report_fixture()
         report["reportContract"]["fullMarket"]["breadth"] = {
