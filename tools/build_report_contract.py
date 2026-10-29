@@ -38,23 +38,38 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
     trading_date = next(iter(dates))
 
     reasons = {e.get("reason") for e in candidates}
-    valid = reasons & (FINAL_EVIDENCE_REASONS | {INTRADAY_EVIDENCE_REASON})
-    if not valid or any(e.get("status") != "VERIFIED" for e in candidates):
+    accepted_reasons = FINAL_EVIDENCE_REASONS | {INTRADAY_EVIDENCE_REASON}
+    valid = reasons & accepted_reasons
+    if (not valid or not reasons.issubset(accepted_reasons)
+            or any(e.get("status") != "VERIFIED" for e in candidates)):
         raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
     # A current snapshot may support an intraday contract, but never a
     # finalized daily-bar claim. Preserve that distinction in the contract.
     if INTRADAY_EVIDENCE_REASON in valid:
-        intraday = next(e for e in candidates if e.get("reason") == INTRADAY_EVIDENCE_REASON)
-        if intraday.get("evidenceClass") not in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"} or intraday.get("finalConfirmed") is not False:
+        if reasons != {INTRADAY_EVIDENCE_REASON}:
+            raise SystemExit("TRADING_DATE_UNAVAILABLE")
+        intraday_candidates = [e for e in candidates if e.get("reason") == INTRADAY_EVIDENCE_REASON]
+        if any(
+            e.get("evidenceClass") != "INTRADAY_SESSION"
+            or e.get("finalConfirmed") is not False
+            for e in intraday_candidates
+        ):
             raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
     generated_at = quality.get("generatedAt")
     summary_generated_at = summary.get("generatedAt")
     if not generated_at or not summary_generated_at or generated_at != summary_generated_at:
         raise SystemExit("TRADING_DATE_EVIDENCE_STALE")
-    observed_at = {e.get("collectionGeneratedAt") for e in candidates if e.get("collectionGeneratedAt")}
-    if observed_at and observed_at != {generated_at}:
+    observed_at = {e.get("collectionGeneratedAt") for e in candidates}
+    if INTRADAY_EVIDENCE_REASON in valid and (
+        observed_at != {generated_at}
+        or any(not e.get("collectionGeneratedAt") for e in candidates)
+    ):
+        raise SystemExit("TRADING_DATE_EVIDENCE_STALE")
+    if INTRADAY_EVIDENCE_REASON not in valid and any(
+        value is not None and value != generated_at for value in observed_at
+    ):
         raise SystemExit("TRADING_DATE_EVIDENCE_STALE")
     if any(str(e.get("tradingDate")) != trading_date for e in candidates):
         raise SystemExit("TRADING_DATE_EVIDENCE_MISMATCH")

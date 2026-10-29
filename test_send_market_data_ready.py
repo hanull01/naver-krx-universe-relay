@@ -104,6 +104,86 @@ class ReadyMailTests(unittest.TestCase):
             with self.assertRaisesRegex(ready.ReadyValidationError, 'statuses differ'):
                 ready.validate_full_market_publication(summary, quality, current=self.current)
 
+    def _write_full_market_evidence(self, root, *, quality_evidence, summary_evidence=None,
+                                     trading_date='2026-09-29', generated_at='2026-09-29T10:39:00+09:00'):
+        summary = root / 'summary.json'; quality = root / 'quality.json'
+        summary.write_text(json.dumps({
+            'publicationStatus': 'SUCCESS', 'generatedAt': generated_at,
+            'fullMarket': {
+                'scope': 'AUTHORITATIVE_FULL_MARKET', 'tradingDate': trading_date,
+                'tradingDateEvidence': summary_evidence if summary_evidence is not None else quality_evidence,
+                'markets': {'TOTAL': {'stockCount': 2, 'validCount': 2}},
+            },
+        }), encoding='utf-8')
+        quality.write_text(json.dumps({
+            'publicationStatus': 'SUCCESS', 'generatedAt': generated_at,
+            'tradingDateEvidence': quality_evidence,
+        }), encoding='utf-8')
+        return summary, quality
+
+    def test_full_market_intraday_evidence_is_verified(self):
+        evidence = {
+            'tradingDate': '2026-09-29', 'status': 'VERIFIED',
+            'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            summary, quality = self._write_full_market_evidence(Path(directory), quality_evidence=evidence)
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertEqual(result['tradingDate'], '2026-09-29')
+        self.assertEqual(result['tradingDateStatus'], 'VERIFIED')
+        self.assertEqual(result['tradingDateEvidenceReason'], evidence['reason'])
+
+    def test_full_market_missing_intraday_evidence_stays_unavailable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary, quality = self._write_full_market_evidence(
+                root, quality_evidence={}, summary_evidence={})
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertIsNone(result['tradingDate'])
+        self.assertEqual(result['tradingDateStatus'], 'UNAVAILABLE')
+
+    def test_full_market_intraday_date_mismatch_stays_unavailable(self):
+        evidence = {
+            'tradingDate': '2026-09-28', 'status': 'VERIFIED',
+            'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            summary, quality = self._write_full_market_evidence(
+                Path(directory), quality_evidence=evidence, trading_date='2026-09-29')
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertIsNone(result['tradingDate'])
+        self.assertEqual(result['tradingDateEvidenceReason'], 'TRADING_DATE_EVIDENCE_MISMATCH')
+
+    def test_full_market_intraday_stale_collection_evidence_stays_unavailable(self):
+        evidence = {
+            'tradingDate': '2026-09-29', 'status': 'VERIFIED',
+            'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'collectionGeneratedAt': '2026-09-29T10:38:00+09:00',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            summary, quality = self._write_full_market_evidence(Path(directory), quality_evidence=evidence)
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertIsNone(result['tradingDate'])
+        self.assertEqual(result['tradingDateEvidenceReason'], 'TRADING_DATE_EVIDENCE_STALE')
+
+    def test_full_market_wrong_intraday_evidence_is_not_finalized(self):
+        evidence = {
+            'tradingDate': '2026-09-29', 'status': 'VERIFIED',
+            'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'evidenceClass': 'POST_MARKET_SNAPSHOT', 'finalConfirmed': False,
+            'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            summary, quality = self._write_full_market_evidence(Path(directory), quality_evidence=evidence)
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertIsNone(result['tradingDate'])
+        self.assertEqual(result['tradingDateEvidenceReason'], 'TRADING_DATE_EVIDENCE_INVALID')
+
     def test_same_commit_is_not_signaled_twice(self):
         FakeSMTP.messages=[]
         with tempfile.TemporaryDirectory() as directory:

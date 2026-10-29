@@ -18,9 +18,44 @@ VERIFIED_TRADING_DATE_REASONS = {
     'VERIFIED_CANONICAL_SESSION',
     'VERIFIED_MONITORING_DAILY_FINAL_SESSION',
 }
+INTRADAY_TRADING_DATE_REASON = 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT'
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""
+
+
+def _validated_full_market_trading_date(full_market, quality, generated_at):
+    """Return verified date metadata without turning an intraday snapshot into a final bar."""
+    trading_date = full_market.get('tradingDate')
+    summary_evidence = full_market.get('tradingDateEvidence')
+    quality_evidence = quality.get('tradingDateEvidence')
+    raw_candidates = [e for e in (quality_evidence, summary_evidence)
+                      if isinstance(e, dict)]
+    candidates = [e for e in raw_candidates if e.get('tradingDate')]
+    reason = next((e.get('reason') for e in raw_candidates if e.get('reason')),
+                  'TRADING_DATE_EVIDENCE_MISSING')
+    if not isinstance(trading_date, str) or not trading_date:
+        return None, 'UNAVAILABLE', reason
+    if not candidates or any(str(e.get('tradingDate')) != trading_date for e in candidates):
+        return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_MISMATCH'
+    if any(e.get('status') != 'VERIFIED' for e in candidates):
+        return None, 'UNAVAILABLE', reason
+    reasons = {e.get('reason') for e in candidates}
+    if INTRADAY_TRADING_DATE_REASON in reasons:
+        if reasons != {INTRADAY_TRADING_DATE_REASON}:
+            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
+        if quality.get('generatedAt') != generated_at:
+            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
+        for evidence in candidates:
+            if evidence.get('collectionGeneratedAt') != generated_at:
+                return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
+            if (evidence.get('evidenceClass') != 'INTRADAY_SESSION'
+                    or evidence.get('finalConfirmed') is not False):
+                return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
+        return trading_date, 'VERIFIED', INTRADAY_TRADING_DATE_REASON
+    if not reasons or not reasons.issubset(VERIFIED_TRADING_DATE_REASONS):
+        return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
+    return trading_date, 'VERIFIED', reason
 
 def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
                                      quality_path=FULL_MARKET_QUALITY_PATH,
@@ -62,11 +97,8 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
         raise ReadyValidationError('full-market publication is not from today')
     if collection_started_at and generated < parse_timestamp(collection_started_at, 'collectionStartedAt'):
         raise ReadyValidationError('full-market publication predates this collection run')
-    trading_evidence = full_market.get('tradingDateEvidence') or {}
-    trading_date = full_market.get('tradingDate')
-    trading_reason = trading_evidence.get('reason')
-    trading_verified = (isinstance(trading_date, str)
-                        and trading_reason in VERIFIED_TRADING_DATE_REASONS)
+    trading_date, trading_date_status, trading_reason = _validated_full_market_trading_date(
+        full_market, quality, summary.get('generatedAt'))
     return {'mode': 'FULL_MARKET', 'status': 'SUCCESS',
             'publicationStatus': publication_status,
             'scope': 'AUTHORITATIVE_FULL_MARKET',
@@ -79,9 +111,9 @@ def validate_full_market_publication(summary_path=FULL_MARKET_SUMMARY_PATH,
             'qualityWarnings': full_market.get('qualityWarnings', []),
             # A Gmail signal remains eligible for downstream diagnostics, but
             # its trading date must never be synthesized from generatedAt.
-            'tradingDate': trading_date if trading_verified else None,
-            'tradingDateStatus': 'VERIFIED' if trading_verified else 'UNAVAILABLE',
-            'tradingDateEvidenceReason': trading_reason or 'TRADING_DATE_EVIDENCE_MISSING',
+            'tradingDate': trading_date,
+            'tradingDateStatus': trading_date_status,
+            'tradingDateEvidenceReason': trading_reason,
             'marketSession': 'REGULAR_MARKET'}
 
 def parse_timestamp(value, field):
