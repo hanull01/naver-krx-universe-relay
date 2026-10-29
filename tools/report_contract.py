@@ -572,7 +572,7 @@ def build_report_contract(
             "reportContract": "data/monitoring/latest-report-contract.json",
             "markdownReport": "data/reports/latest.md",
             "htmlReport": "data/reports/latest.html",
-            "kiwoomCandidates": "data/trading-discovery/latest.json",
+            "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
             "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
             "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",
             "forbidCandidateMixing": True,
@@ -653,7 +653,15 @@ def build_report_contract(
             "reason": (
                 "CONTRACT_VERIFIED"
                 if contract_status == "AVAILABLE" and trading_date
-                else "CONTRACT_UNAVAILABLE_OR_TRADING_DATE_NULL"
+                else "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED"
+                if trading_date_status == "SOURCE_OBSERVED"
+                else "BASELINE_STALE_HTML_BLOCKED"
+                if baseline_status == "BASELINE_STALE"
+                else "TRADING_DATE_UNAVAILABLE_HTML_BLOCKED"
+                if not trading_date
+                else "TRADING_DATE_EVIDENCE_INVALID_HTML_BLOCKED"
+                if not trading_date_evidence_valid
+                else "CONTRACT_UNAVAILABLE_HTML_BLOCKED"
             ),
         },
     }
