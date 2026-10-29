@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "214450",
   "itemName": "파마리서치",
-  "reportCount": 20,
-  "latestReportNid": "97131",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 23,
+  "latestReportNid": "97250",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "97131",
-    "writeDate": "2026-10-28",
-    "brokerName": "키움증권",
-    "title": "달러를 가져가 환율 크리스크로스",
-    "goalPrice": 430000,
+    "nid": "97250",
+    "writeDate": "2026-10-29",
+    "brokerName": "교보증권",
+    "title": "3Q26 Preview: 3분기는 휴식기, 다만 많이 빠졌다",
+    "goalPrice": 530000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 7,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "수요": 1
+        "미국": 1,
+        "수요": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97250",
+    "97234",
+    "97209",
     "97131",
     "95700",
     "95388",

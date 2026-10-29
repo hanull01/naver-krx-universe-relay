@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "003160",
   "itemName": "디아이",
-  "reportCount": 5,
-  "latestReportNid": "96657",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 6,
+  "latestReportNid": "97208",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96657",
-    "writeDate": "2026-10-13",
-    "brokerName": "대신증권",
-    "title": "이제 시작",
-    "goalPrice": 60000,
+    "nid": "97208",
+    "writeDate": "2026-10-29",
+    "brokerName": "신한투자증권",
+    "title": "어디까지 올라가는거예요?",
+    "goalPrice": 56000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 3,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 1
+        "반도체": 2
       }
     }
   },
   "reportNids": [
+    "97208",
     "96657",
     "96018",
     "95316",

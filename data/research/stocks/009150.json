@@ -2,33 +2,45 @@
   "schemaVersion": 1,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "reportCount": 72,
-  "latestReportNid": "96939",
-  "latestWriteDate": "2026-10-22",
+  "reportCount": 80,
+  "latestReportNid": "97255",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96939",
-    "writeDate": "2026-10-22",
-    "brokerName": "iM증권",
-    "title": "Nvidia가 인정한 공식 기판 공급 파트너",
-    "goalPrice": 2100000,
+    "nid": "97255",
+    "writeDate": "2026-10-29",
+    "brokerName": "하나증권",
+    "title": "전방수요 지속 상향조정 중",
+    "goalPrice": 2000000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 9,
+        "negative": 4
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 3,
-        "수요": 2,
-        "환율": 1
+        "가격": 5,
+        "환율": 2,
+        "AI": 1,
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97255",
+    "97236",
+    "97226",
+    "97215",
+    "97206",
+    "97201",
+    "97198",
+    "97196",
     "96939",
     "96868",
     "96857",

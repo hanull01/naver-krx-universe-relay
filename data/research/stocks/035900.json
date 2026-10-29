@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "035900",
   "itemName": "JYP Ent.",
-  "reportCount": 29,
-  "latestReportNid": "96897",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 30,
+  "latestReportNid": "97223",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96897",
-    "writeDate": "2026-10-21",
-    "brokerName": "유진투자증권",
-    "title": "보릿고개",
-    "goalPrice": 50000,
+    "nid": "97223",
+    "writeDate": "2026-10-29",
+    "brokerName": "SK증권",
+    "title": "이겨내야 할 시간",
+    "goalPrice": 53000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 5
+        "positive": 0,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 3,
-        "원가": 3
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97223",
     "96897",
     "96785",
     "96648",

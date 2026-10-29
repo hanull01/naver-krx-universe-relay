@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "267250",
   "itemName": "HD현대",
-  "reportCount": 6,
-  "latestReportNid": "95090",
-  "latestWriteDate": "2026-08-06",
+  "reportCount": 8,
+  "latestReportNid": "97235",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "95090",
-    "writeDate": "2026-08-06",
-    "brokerName": "키움증권",
-    "title": "2Q26 Re: 브랜드 뉴 데이",
-    "goalPrice": 400000,
+    "nid": "97235",
+    "writeDate": "2026-10-29",
+    "brokerName": "대신증권",
+    "title": "정유 정상화를 조선·전력기기가 메운다",
+    "goalPrice": 210000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 0,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "재고": 1,
-        "조선": 1
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "97235",
+    "97227",
     "95090",
     "94982",
     "94798",

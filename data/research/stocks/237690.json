@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "237690",
   "itemName": "에스티팜",
-  "reportCount": 21,
-  "latestReportNid": "97156",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 22,
+  "latestReportNid": "97254",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "97156",
-    "writeDate": "2026-10-28",
-    "brokerName": "유안타증권",
-    "title": "3Q26Re: 아쉬운 수익성",
-    "goalPrice": 180000,
+    "nid": "97254",
+    "writeDate": "2026-10-29",
+    "brokerName": "하나증권",
+    "title": "환율 영향을 뒤집을 수주를 기다리며 (3Q26 Re)",
+    "goalPrice": 160000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 3
+        "positive": 2,
+        "negative": 4
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 2,
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 2,
-        "수주": 1
+        "환율": 3,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97254",
     "97156",
     "97148",
     "97134",

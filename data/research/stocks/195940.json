@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "195940",
   "itemName": "HK이노엔",
-  "reportCount": 16,
-  "latestReportNid": "96661",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 18,
+  "latestReportNid": "97189",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96661",
-    "writeDate": "2026-10-13",
-    "brokerName": "유안타증권",
-    "title": "몇달 남지 않은 27년",
-    "goalPrice": 68000,
+    "nid": "97189",
+    "writeDate": "2026-10-29",
+    "brokerName": "키움증권",
+    "title": "주가 상승은 해외 모멘텀에 달려있다",
+    "goalPrice": 48000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 8,
         "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "중국": 3,
-        "수요": 1
+        "수요": 2,
+        "재고": 2,
+        "중국": 2
       }
     }
   },
   "reportNids": [
+    "97189",
+    "97187",
     "96661",
     "96650",
     "96086",

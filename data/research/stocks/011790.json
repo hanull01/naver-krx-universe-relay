@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "011790",
   "itemName": "SKC",
-  "reportCount": 2,
-  "latestReportNid": "95060",
-  "latestWriteDate": "2026-08-05",
+  "reportCount": 3,
+  "latestReportNid": "97211",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "95060",
-    "writeDate": "2026-08-05",
+    "nid": "97211",
+    "writeDate": "2026-10-29",
     "brokerName": "SK증권",
-    "title": "동박, 가격(ASP)의 시간",
-    "goalPrice": 104000,
+    "title": "눈높이가 높아진 동박, 가격 인상률에 달렸다",
+    "goalPrice": 100000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 6
+        "positive": 3,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "반도체": 1,
+        "원가": 3,
         "배터리": 1,
         "수요": 1,
-        "원가": 1
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97211",
     "95060",
     "92073"
   ]

@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "105560",
   "itemName": "KB금융",
-  "reportCount": 25,
-  "latestReportNid": "96472",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 26,
+  "latestReportNid": "97247",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96472",
-    "writeDate": "2026-10-07",
-    "brokerName": "SK증권",
-    "title": "육각형의 정석",
-    "goalPrice": 213000,
+    "nid": "97247",
+    "writeDate": "2026-10-29",
+    "brokerName": "유안타증권",
+    "title": "2026년은 계획대로 가고 있다",
+    "goalPrice": 38000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 5,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 2,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "97247",
     "96472",
     "96421",
     "96136",

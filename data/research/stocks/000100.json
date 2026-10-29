@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "000100",
   "itemName": "유한양행",
-  "reportCount": 10,
-  "latestReportNid": "96784",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 12,
+  "latestReportNid": "97260",
+  "latestWriteDate": "2026-10-29",
   "latest": {
-    "nid": "96784",
-    "writeDate": "2026-10-16",
-    "brokerName": "IBK투자증권",
-    "title": "수확의 계절이 다가온다",
-    "goalPrice": 110000,
+    "nid": "97260",
+    "writeDate": "2026-10-29",
+    "brokerName": "미래에셋증권",
+    "title": "레이저티닙 로열티 성장 더디나, 기술이전 기대",
+    "goalPrice": 130000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 7,
+        "negative": 6
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "환율": 1
+        "환율": 3,
+        "자동차": 2
       }
     }
   },
   "reportNids": [
+    "97260",
+    "97190",
     "96784",
     "95751",
     "95039",
