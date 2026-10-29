@@ -383,6 +383,8 @@ def build_report_contract(
     kiwoom_candidates: Mapping[str, Any] | None = None,
     research: Mapping[str, Any] | None = None,
     v2_provenance: Mapping[str, Any] | None = None,
+    kiwoom_performance: Mapping[str, Any] | None = None,
+    v2_changes: list[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -507,6 +509,13 @@ def build_report_contract(
         v2_industries + v2_themes,
         v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
     )
+    compact_kiwoom_performance = dict(kiwoom_performance) if isinstance(kiwoom_performance, Mapping) else {
+        "status": "UNAVAILABLE", "reason": "KIWOOM_PERFORMANCE_NOT_SUPPLIED", "stocks": []
+    }
+    # Keep the report contract compact: detailed raw history remains in the
+    # dated source files and only the per-candidate horizon results cross the
+    # Work boundary.
+    compact_v2_changes = [dict(row) for row in (v2_changes or []) if isinstance(row, Mapping)]
 
     # ``candidates`` is retained as a compatibility alias for older callers.
     # New callers must provide technical and Kiwoom candidates separately.
@@ -608,7 +617,9 @@ def build_report_contract(
             "history": v2_history_summary,
             "industries": v2_industries,
             "themes": v2_themes,
+            "changes": compact_v2_changes,
         },
+        "v2Changes": compact_v2_changes,
         "independentAnalysis": {
             "research": {
                 "status": (research or {}).get("status") if isinstance(research, Mapping) else "UNAVAILABLE",
@@ -643,7 +654,9 @@ def build_report_contract(
             "codeNameStatus": kiwoom_name_status,
             "sourceValidation": source_validation if isinstance(source_validation, Mapping) else None,
             "sourceCandidateCount": kiwoom_candidates.get("candidateCount"),
+            "performanceStatus": compact_kiwoom_performance.get("status"),
         },
+        "kiwoomPerformance": compact_kiwoom_performance,
         "rendering": {
             "htmlAllowed": bool(
                 contract_status == "AVAILABLE"

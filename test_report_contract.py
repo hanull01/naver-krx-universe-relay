@@ -271,6 +271,22 @@ class ReportContractTests(unittest.TestCase):
         contract["kiwoomCandidates"]["stocks"][0]["itemName"] = "라온피플"
         self.assertIn("KIWOOM_CODE_NAME_MISMATCH", validate_kiwoom_candidate_binding(discovery, contract))
 
+    def test_batch2_performance_and_v2_changes_are_compact_and_backward_compatible(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261029", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            kiwoom_performance={"status": "PENDING", "source": "data/trading-discovery/2026-10-29.json", "stocks": [{"itemCode": "042510", "horizons": {"D+1": {"status": "PENDING"}}}]},
+            v2_changes=[{"kind": "industry", "id": "i1", "name": "업종", "officialChangeClass": "COMPARISON_UNAVAILABLE", "status": "UNVERIFIED_SOURCE"}],
+        )
+        self.assertEqual(contract["kiwoomPerformance"]["status"], "PENDING")
+        self.assertEqual(contract["v2Changes"][0]["officialChangeClass"], "COMPARISON_UNAVAILABLE")
+        self.assertEqual(contract["v2"]["changes"], contract["v2Changes"])
+
     def test_trading_date_evidence_is_required_for_verified_status(self):
         contract = build_report_contract(
             indices={"generatedAt": "g", "indices": []},

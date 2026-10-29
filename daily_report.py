@@ -14,6 +14,8 @@ from tools.market_dashboard_renderer import (
 )
 from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
 from tools.v2_source_provenance import build_source_provenance
+from tools.kiwoom_performance import build_kiwoom_performance, load_monitoring_daily_prices
+from tools.v2_change_analysis import compare_v2_changes
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -1433,6 +1435,21 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "publishedStatus": published_supplemental.get("status"),
         "publishedReason": published_supplemental.get("reason"),
     }
+    # Performance is read-only and date-bound.  Existing monitoring-daily
+    # files are used; SOURCE_OBSERVED rows remain pending rather than being
+    # promoted to confirmed closes.
+    if discovery.get("status") == "AVAILABLE" and discovery.get("symbols"):
+        kiwoom_prices, kiwoom_trading_dates = load_monitoring_daily_prices(
+            ROOT, discovery.get("symbols")
+        )
+        kiwoom_performance = build_kiwoom_performance(
+            discovery, kiwoom_prices, kiwoom_trading_dates, now_date=report_date
+        )
+    else:
+        # Preserve the existing report shape for missing/invalid/empty source
+        # snapshots; the immutable discovery status remains authoritative.
+        kiwoom_performance = None
+    v2_changes = compare_v2_changes(shadow_history)
     technical_candidate_section = next_session_candidates(rows, report_date)
     report_contract = build_report_contract(
         indices=indices,
@@ -1450,6 +1467,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         v2_provenance=build_source_provenance(
             ROOT, result=shadow_latest, include_outputs=True
         ),
+        kiwoom_performance=kiwoom_performance,
+        v2_changes=v2_changes,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract
