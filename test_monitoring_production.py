@@ -196,6 +196,11 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
         self.assertFalse(result["finalConfirmed"])
 
+    def test_session_boundaries_keep_observation_types_distinct(self):
+        self.assertEqual(runner.session_at(datetime(2026, 10, 28, 9, 9, tzinfo=KST)), "REGULAR")
+        self.assertEqual(runner.session_at(datetime(2026, 10, 28, 15, 30, tzinfo=KST)), "REGULAR_CLOSED")
+        self.assertEqual(runner.session_at(datetime(2026, 10, 28, 20, 40, tzinfo=KST)), "CLOSED")
+
     def test_post_market_snapshot_keeps_same_day_observation_non_final(self):
         now = datetime(2026, 10, 28, 20, 40, tzinfo=KST)
         snapshot = {

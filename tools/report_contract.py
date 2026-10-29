@@ -56,7 +56,9 @@ def _same_generation(payloads: Mapping[str, Mapping[str, Any]]) -> tuple[str | N
     return (next(iter(values), None), len(values) <= 1)
 
 
-def _valid_trading_date_evidence(evidence: Any, trading_date: Any) -> bool:
+def _valid_trading_date_evidence(
+    evidence: Any, trading_date: Any, observed_at: str | None = None
+) -> bool:
     """Require an explicit, matching evidence record before VERIFIED/HTML."""
     if not isinstance(evidence, Mapping) or not trading_date:
         return False
@@ -68,7 +70,12 @@ def _valid_trading_date_evidence(evidence: Any, trading_date: Any) -> bool:
     if reason not in TRADING_DATE_EVIDENCE_REASONS:
         return False
     if reason == "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT":
-        return evidence.get("evidenceClass") == "INTRADAY_SESSION" and evidence.get("finalConfirmed") is False
+        return (
+            evidence.get("evidenceClass") in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"}
+            and evidence.get("finalConfirmed") is False
+            and isinstance(observed_at, str)
+            and evidence.get("collectionGeneratedAt") == observed_at
+        )
     return True
 
 
@@ -189,7 +196,9 @@ def build_report_contract(
         and _valid_code_name_rows(kiwoom_stocks, kiwoom_symbols, source_validation.get("codeNameBindings"))
     )
     kiwoom_name_status = "VERIFIED" if name_evidence_valid else "PARTIAL" if kiwoom_stocks else "UNAVAILABLE"
-    trading_date_evidence_valid = _valid_trading_date_evidence(evidence, trading_date)
+    trading_date_evidence_valid = _valid_trading_date_evidence(
+        evidence, trading_date, generation
+    )
     trading_date_status = (
         "VERIFIED" if trading_date_evidence_valid
         else "UNAVAILABLE_TRADING_DATE_NULL" if not trading_date

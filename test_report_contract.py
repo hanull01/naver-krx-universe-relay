@@ -38,6 +38,31 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
+    def test_post_market_observation_is_available_but_not_final_daily_evidence(self):
+        generated = "2026-10-28T20:40:03+09:00"
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "POST_MARKET_SNAPSHOT",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        common = {"generatedAt": generated}
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {"tradingDate": "20261028", "tradingDateEvidence": evidence, "markets": {"TOTAL": {}}}},
+            breadth={**common, "fullMarket": {"marketTradingValue": {}}},
+            quality={**common, "tradingDateEvidence": evidence},
+            industries={**common, "industries": []}, themes={**common, "themes": []},
+            v2_latest={**common, "tradingDate": "20261028", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["status"], "AVAILABLE")
+        self.assertEqual(contract["tradingDateStatus"], "VERIFIED")
+        self.assertTrue(contract["rendering"]["htmlAllowed"])
+        self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
+
     def test_kiwoom_candidates_are_separate_from_technical_candidates(self):
         discovery = {
             "status": "AVAILABLE",

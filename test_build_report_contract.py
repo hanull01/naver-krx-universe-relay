@@ -85,6 +85,23 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(contract["asOf"], "20261028")
             self.assertEqual(contract["tradingDateEvidence"]["evidenceClass"], "POST_MARKET_SNAPSHOT")
 
+    def test_intraday_evidence_requires_matching_collection_timestamp(self):
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": "2026-10-28T10:08:00+00:00",
+        }
+        quality = {"generatedAt": "2026-10-28T10:09:00+00:00", "tradingDateEvidence": evidence}
+        summary = {"generatedAt": "2026-10-28T10:09:00+00:00", "fullMarket": {"tradingDateEvidence": evidence}}
+        with patch.object(builder, "load_json", side_effect=[quality, summary]), \
+             patch("sys.argv", ["build_report_contract.py"]):
+            with self.assertRaises(SystemExit) as error:
+                builder.main()
+        self.assertEqual(str(error.exception), "TRADING_DATE_EVIDENCE_STALE")
+
     def test_missing_date_does_not_replace_existing_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "latest-report-contract.json"
