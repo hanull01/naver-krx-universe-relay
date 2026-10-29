@@ -7,7 +7,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import trading_discovery
-from tools.report_contract import build_report_contract
+from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -1407,6 +1407,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "publishedStatus": published_supplemental.get("status"),
         "publishedReason": published_supplemental.get("reason"),
     }
+    technical_candidate_section = next_session_candidates(rows, report_date)
     report_contract = build_report_contract(
         indices=indices,
         summary=published_summary,
@@ -1417,9 +1418,18 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         v2_latest=shadow_latest,
         v2_history=shadow_history,
         leaders=published_leaders,
-        candidates=kiwoom_section.get("stocks") or [],
+        technical_candidates=technical_candidate_section.get("priority") or [],
+        kiwoom_candidates=kiwoom_section,
         research=research,
     )
+    kiwoom_contract_errors = validate_kiwoom_candidate_binding(
+        discovery, report_contract
+    )
+    if kiwoom_contract_errors:
+        raise ValueError(
+            "KIWOOM_CANDIDATE_CONTRACT_INVALID:"
+            + ",".join(kiwoom_contract_errors)
+        )
 
     missing_market = [
         {
@@ -1596,7 +1606,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "technicalEventsRegularSession": technical_events(
             rows, "regularSessionState"
         ),
-        "nextSessionCandidates": next_session_candidates(rows, report_date),
+        "nextSessionCandidates": technical_candidate_section,
         "researchSummary": research_overview,
         "marketResearchCross": market_research_cross(rows),
         "kiwoomPreviousCandidates": kiwoom_section,
