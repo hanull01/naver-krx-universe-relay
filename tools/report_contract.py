@@ -169,6 +169,203 @@ def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
     return compact
 
 
+def _leader_sort_key(row: Mapping[str, Any]) -> tuple[float, bool, float]:
+    rate = row.get("changeRate")
+    try:
+        rate_value = float(rate)
+    except (TypeError, ValueError):
+        rate_value = -9999.0
+    volume = row.get("current_volume_ratio_20")
+    try:
+        volume_value = float(volume)
+    except (TypeError, ValueError):
+        volume_value = -1.0
+    return rate_value, row.get("breakout_20_intraday") is True, volume_value
+
+
+def _compact_leader(row: Mapping[str, Any]) -> dict[str, Any]:
+    fields = (
+        "code", "name", "market", "currentPrice", "changeRate",
+        "accumulatedTradingValue", "dist_high_20", "current_volume_ratio_20",
+        "above_ma20", "above_ma60", "breakout_20_intraday",
+    )
+    return {key: row.get(key) for key in fields if key in row}
+
+
+def _leader_evidence(
+    source_row: Mapping[str, Any] | None,
+    *,
+    kind: str,
+    expected_generation: Any,
+    source_commit: Any,
+) -> dict[str, Any]:
+    if not isinstance(source_row, Mapping):
+        return {
+            "status": "UNAVAILABLE_MEMBERSHIP_SOURCE",
+            "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
+            if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+            "sourceGeneration": None,
+            "sourceCommit": source_commit,
+            "candidates": [],
+        }
+    source_generation = source_row.get("generatedAt")
+    if source_generation is None:
+        # The group files carry generation at the document root; callers mark
+        # this as unavailable when the root and row generations cannot align.
+        source_generation = expected_generation
+    if not expected_generation or source_generation != expected_generation:
+        return {
+            "status": "UNAVAILABLE_SOURCE_GENERATION_MISMATCH",
+            "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
+            if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+            "sourceGeneration": source_generation,
+            "sourceCommit": source_commit,
+            "candidates": [],
+        }
+    if kind == "industry":
+        candidates = list(source_row.get("leaders") or [])[:3]
+    else:
+        candidates = [
+            stock for stock in (source_row.get("stocks") or [])
+            if isinstance(stock, Mapping)
+            and stock.get("derivedMetricsUsable", True) is True
+        ]
+        candidates = sorted(candidates, key=_leader_sort_key, reverse=True)[:3]
+    compact = [_compact_leader(row) for row in candidates if isinstance(row, Mapping)]
+    if not compact:
+        status = "AVAILABLE_ZERO"
+    elif source_commit:
+        status = "AVAILABLE"
+    else:
+        status = "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"
+    return {
+        "status": status,
+        "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
+        if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+        "sourceGeneration": source_generation,
+        "sourceCommit": source_commit,
+        "candidates": compact,
+    }
+
+
+def _compact_v2_source_metrics(
+    source_row: Mapping[str, Any] | None,
+    *,
+    kind: str,
+    expected_generation: Any,
+    source_commit: Any,
+) -> tuple[str, dict[str, Any]]:
+    if not isinstance(source_row, Mapping):
+        return "UNAVAILABLE_MEMBERSHIP_SOURCE", {}
+    source_generation = source_row.get("generatedAt")
+    if not expected_generation or source_generation != expected_generation:
+        return "UNAVAILABLE_SOURCE_GENERATION_MISMATCH", {}
+    metrics = source_row.get("metrics") if kind == "theme" else source_row
+    metrics = metrics if isinstance(metrics, Mapping) else {}
+    trading = metrics.get("tradingValue") if isinstance(metrics.get("tradingValue"), Mapping) else {}
+    compact = {
+        "memberCount": source_row.get("memberCount"),
+        "advancers": metrics.get("advancers"),
+        "advancePct": metrics.get("advancePct", source_row.get("advancePct")),
+        "medianReturn1D": metrics.get("medianReturn1D"),
+        "relativeStrengthVsMarket": metrics.get("relativeStrengthVsMarket"),
+        "officialChangeRateRelativeStrength": metrics.get("officialChangeRateRelativeStrength"),
+        "tradingValue": {
+            key: trading.get(key)
+            for key in ("total", "availableCount", "coveragePct", "top3ConcentrationPct")
+            if key in trading
+        },
+        "coveragePct": source_row.get("coveragePct"),
+    }
+    compact = {key: value for key, value in compact.items() if value not in (None, {})}
+    return "AVAILABLE_UNVERIFIED_SOURCE_COMMIT" if not source_commit else "AVAILABLE", compact
+
+
+def _v2_history_summary(
+    history: Mapping[str, Any],
+    current_rows: list[Mapping[str, Any]],
+    current_trading_date: Any,
+) -> dict[str, Any]:
+    def date_key(value: Any) -> str:
+        return str(value or "").replace("-", "")
+
+    observations = [
+        item for item in (history.get("observations") or [])
+        if isinstance(item, Mapping)
+        and item.get("tradingDate")
+        and item.get("dateQuality", "VERIFIED") != "MISMATCH"
+    ]
+    dates = sorted({str(item.get("tradingDate")) for item in observations})
+    recent_dates = dates[-7:]
+    latest_by_key: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    for observation in sorted(observations, key=lambda item: (str(item.get("tradingDate")), str(item.get("observedAt")))):
+        date = str(observation.get("tradingDate"))
+        if date not in recent_dates:
+            continue
+        for kind, field in (("industry", "industries"), ("theme", "themes")):
+            for row in observation.get(field) or []:
+                if isinstance(row, Mapping) and row.get("id") is not None:
+                    latest_by_key[(kind, str(row.get("id")), date)] = row
+
+    tracked = []
+    for current in current_rows:
+        kind = str(current.get("kind") or "")
+        key = (kind, str(current.get("id")),)
+        snapshots = []
+        for date in recent_dates:
+            row = latest_by_key.get((*key, date))
+            if row is None:
+                continue
+            snapshots.append({
+                "tradingDate": date,
+                "v2Status": row.get("v2Status"),
+                "score": row.get("score"),
+                "persistenceDays": row.get("persistenceDays"),
+                "sourceSnapshotHash": next(
+                    (item.get("sourceSnapshotHash") for item in observations if str(item.get("tradingDate")) == date),
+                    None,
+                ),
+            })
+        previous = snapshots[-2] if len(snapshots) >= 2 else None
+        current_snapshot = snapshots[-1] if snapshots else None
+        score_delta = None
+        if previous and isinstance(previous.get("score"), (int, float)) and isinstance(current_snapshot and current_snapshot.get("score"), (int, float)):
+            score_delta = round(current_snapshot["score"] - previous["score"], 2)
+        if not previous:
+            change_class = "NEW_OR_NO_COMPARABLE_PRIOR"
+        elif previous.get("v2Status") != current_snapshot.get("v2Status"):
+            change_class = "STATUS_CHANGED"
+        elif score_delta is not None and score_delta > 0:
+            change_class = "STRENGTHENING"
+        elif score_delta is not None and score_delta < 0:
+            change_class = "WEAKENING"
+        else:
+            change_class = "PERSISTING"
+        current["historySummary"] = {
+            "status": "AVAILABLE" if len(snapshots) >= 2 else "PARTIAL" if snapshots else "UNAVAILABLE",
+            "currentObserved": bool(current_snapshot and date_key(current_snapshot.get("tradingDate")) == date_key(current_trading_date)),
+            "availableTradingDays": len(snapshots),
+            "recentTradingDates": recent_dates,
+            "sameDayDeduplicated": True,
+            "changeClass": change_class,
+            "scoreDelta": score_delta,
+            "snapshots": snapshots,
+        }
+        tracked.append({
+            "kind": kind, "id": current.get("id"), "name": current.get("name"),
+            **current["historySummary"],
+        })
+    return {
+        "recordCount": len(observations),
+        "uniqueTradingDates": dates,
+        "recentTradingDates": recent_dates,
+        "availableTradingDays": len(recent_dates),
+        "sameDayDeduplicated": True,
+        "status": "AVAILABLE" if len(recent_dates) >= 2 else "PARTIAL" if recent_dates else "UNAVAILABLE",
+        "trackedRows": tracked,
+    }
+
+
 def build_report_contract(
     *,
     indices: Mapping[str, Any],
@@ -233,23 +430,69 @@ def build_report_contract(
             "pct": total.get(pct),
         }
 
-    def selected(rows: Any) -> list[dict[str, Any]]:
+    source_by_kind = {
+        "industry": {
+            str(row.get("id")): row for row in (industries.get("industries") or [])
+            if isinstance(row, Mapping) and row.get("id") is not None
+        },
+        "theme": {
+            str(row.get("id")): row for row in (themes.get("themes") or [])
+            if isinstance(row, Mapping) and row.get("id") is not None
+        },
+    }
+    source_generations = {
+        "industry": industries.get("generatedAt"),
+        "theme": themes.get("generatedAt"),
+    }
+    v2_source_commit = (
+        v2_latest.get("inputEvidence", {}).get("sourceCommit")
+        if isinstance(v2_latest.get("inputEvidence"), Mapping) else None
+    )
+
+    def selected(rows: Any, kind: str) -> list[dict[str, Any]]:
         result = []
         for row in rows or []:
             if row.get("v2Status") not in {"ACTIVE", "WATCH"}:
                 continue
             item = dict(row)
-            item["leaders"] = row.get("leaders") or []
-            item["leaderEvidenceStatus"] = (
-                "AVAILABLE" if row.get("leaders") else "UNAVAILABLE_SAME_GENERATION_LEADER_DATA"
+            source_row = source_by_kind.get(kind, {}).get(str(row.get("id")))
+            if isinstance(source_row, Mapping):
+                source_row = dict(source_row)
+                source_row["generatedAt"] = source_generations.get(kind)
+            leader_evidence = _leader_evidence(
+                source_row,
+                kind=kind,
+                expected_generation=v2_latest.get("generatedAt"),
+                source_commit=v2_source_commit,
             )
+            item["leaderCandidates"] = leader_evidence["candidates"]
+            # Preserve the prior compact key for readers that already consume
+            # V2 rows; the explicit name is preferred by new renderers.
+            item["leaders"] = item["leaderCandidates"]
+            item["leaderEvidenceStatus"] = leader_evidence["status"]
+            item["leaderEvidence"] = {
+                key: value for key, value in leader_evidence.items() if key != "candidates"
+            }
+            source_metric_status, source_metrics = _compact_v2_source_metrics(
+                source_row,
+                kind=kind,
+                expected_generation=v2_latest.get("generatedAt"),
+                source_commit=v2_source_commit,
+            )
+            item["sourceMetricsStatus"] = source_metric_status
+            item["sourceMetrics"] = source_metrics
             result.append(item)
         return result
 
-    v2_industries = selected(v2_latest.get("industries"))
-    v2_themes = selected(v2_latest.get("themes"))
+    v2_industries = selected(v2_latest.get("industries"), "industry")
+    v2_themes = selected(v2_latest.get("themes"), "theme")
     observations = v2_history.get("observations") or []
     unique_dates = sorted({str(row.get("tradingDate")) for row in observations if row.get("tradingDate")})
+    v2_history_summary = _v2_history_summary(
+        v2_history,
+        v2_industries + v2_themes,
+        v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
+    )
 
     # ``candidates`` is retained as a compatibility alias for older callers.
     # New callers must provide technical and Kiwoom candidates separately.
@@ -337,7 +580,8 @@ def build_report_contract(
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
             "sourceQualityStatus": v2_latest.get("inputEvidence", {}).get("sourceQualityStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
             "sourceCommit": v2_latest.get("inputEvidence", {}).get("sourceCommit") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
-            "history": {"recordCount": len(observations), "uniqueTradingDates": unique_dates},
+            "sourceCommitStatus": v2_latest.get("inputEvidence", {}).get("sourceCommitStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else "UNAVAILABLE",
+            "history": v2_history_summary,
             "industries": v2_industries,
             "themes": v2_themes,
         },
