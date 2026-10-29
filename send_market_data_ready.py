@@ -19,6 +19,7 @@ VERIFIED_TRADING_DATE_REASONS = {
     'VERIFIED_MONITORING_DAILY_FINAL_SESSION',
 }
 INTRADAY_TRADING_DATE_REASON = 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT'
+SOURCE_OBSERVED_TRADING_DATE_REASON = 'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE'
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""
@@ -38,9 +39,18 @@ def _validated_full_market_trading_date(full_market, quality, generated_at):
         return None, 'UNAVAILABLE', reason
     if not candidates or any(str(e.get('tradingDate')) != trading_date for e in candidates):
         return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_MISMATCH'
+    reasons = {e.get('reason') for e in candidates}
+    statuses = {e.get('status') for e in candidates}
+    if reasons == {SOURCE_OBSERVED_TRADING_DATE_REASON}:
+        if statuses != {'SOURCE_OBSERVED'} or any(
+                e.get('evidenceClass') != 'SOURCE_OBSERVED' for e in candidates
+        ):
+            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
+        if quality.get('generatedAt') != generated_at:
+            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
+        return trading_date, 'SOURCE_OBSERVED', SOURCE_OBSERVED_TRADING_DATE_REASON
     if any(e.get('status') != 'VERIFIED' for e in candidates):
         return None, 'UNAVAILABLE', reason
-    reasons = {e.get('reason') for e in candidates}
     if INTRADAY_TRADING_DATE_REASON in reasons:
         if reasons != {INTRADAY_TRADING_DATE_REASON}:
             return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
