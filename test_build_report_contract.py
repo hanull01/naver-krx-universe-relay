@@ -1,6 +1,8 @@
 import json
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -28,10 +30,66 @@ class BuildReportContractTests(unittest.TestCase):
                 {"generatedAt": evidence["collectionGeneratedAt"], "tradingDateEvidence": evidence},
                 {"generatedAt": evidence["collectionGeneratedAt"], "fullMarket": {"tradingDateEvidence": evidence}},
             ]), \
-                 patch.object(builder, "build_report", return_value={"reportContract": {"status": "AVAILABLE", "asOf": "20261028"}}):
+                 patch.object(builder, "build_report", return_value={"reportContract": {"schemaVersion": "market-report-contract-v1", "status": "AVAILABLE", "asOf": "20261028"}}):
                 with patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
                     self.assertEqual(builder.main(), 0)
             self.assertEqual(json.loads(output.read_text())["status"], "AVAILABLE")
+
+    def test_main_writes_atomically_and_reports_size_and_sha(self):
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+            "finalConfirmed": True,
+            "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "latest-report-contract.json"
+            with patch.object(builder, "load_json", side_effect=[
+                {"generatedAt": evidence["collectionGeneratedAt"], "tradingDateEvidence": evidence},
+                {"generatedAt": evidence["collectionGeneratedAt"], "fullMarket": {"tradingDateEvidence": evidence}},
+            ]), patch.object(builder, "build_report", return_value={
+                "reportContract": {
+                    "schemaVersion": "market-report-contract-v1",
+                    "status": "AVAILABLE",
+                    "asOf": "20261028",
+                    "observedAt": evidence["collectionGeneratedAt"],
+                }
+            }), patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
+                captured = io.StringIO()
+                with redirect_stdout(captured):
+                    self.assertEqual(builder.main(), 0)
+            result = json.loads(captured.getvalue())
+            self.assertEqual(result["bytes"], output.stat().st_size)
+            self.assertEqual(len(result["sha256"]), 64)
+            self.assertEqual(json.loads(output.read_text())["asOf"], "20261028")
+
+    def test_oversized_contract_preserves_existing_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "latest-report-contract.json"
+            output.write_text('{"status":"AVAILABLE","asOf":"20261027"}\n', encoding="utf-8")
+            with patch.object(builder, "load_json", side_effect=[
+                {"generatedAt": "2026-10-28T10:00:00+00:00", "tradingDateEvidence": {
+                    "tradingDate": "20261028", "status": "VERIFIED",
+                    "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                }},
+                {"generatedAt": "2026-10-28T10:00:00+00:00", "fullMarket": {"tradingDateEvidence": {
+                    "tradingDate": "20261028", "status": "VERIFIED",
+                    "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                }}},
+            ]), patch.object(builder, "build_report", return_value={
+                "reportContract": {
+                    "schemaVersion": "market-report-contract-v1",
+                    "status": "AVAILABLE",
+                    "asOf": "20261028",
+                    "observedAt": "2026-10-28T10:00:00+00:00",
+                    "oversized": "x" * builder.MAX_WORK_CONTRACT_BYTES,
+                }
+            }), patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
+                with self.assertRaises(SystemExit) as error:
+                    builder.main()
+            self.assertEqual(str(error.exception), "REPORT_CONTRACT_TOO_LARGE")
+            self.assertEqual(json.loads(output.read_text())["asOf"], "20261027")
 
     def test_intraday_evidence_allows_contract_without_final_daily_bar(self):
         evidence = {
@@ -52,7 +110,7 @@ class BuildReportContractTests(unittest.TestCase):
             def load(path):
                 return quality if str(path).endswith("latest-quality.json") else summary
             with patch.object(builder, "load_json", side_effect=load), \
-                 patch.object(builder, "build_report", return_value={"reportContract": {"status": "AVAILABLE", "asOf": "20261028"}}), \
+                 patch.object(builder, "build_report", return_value={"reportContract": {"schemaVersion": "market-report-contract-v1", "status": "AVAILABLE", "asOf": "20261028"}}), \
                  patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
                 self.assertEqual(builder.main(), 0)
             contract = json.loads(output.read_text())
@@ -78,7 +136,7 @@ class BuildReportContractTests(unittest.TestCase):
             def load(path):
                 return quality if str(path).endswith("latest-quality.json") else summary
             with patch.object(builder, "load_json", side_effect=load), \
-                 patch.object(builder, "build_report", return_value={"reportContract": {"status": "AVAILABLE", "asOf": "20261028"}}), \
+                 patch.object(builder, "build_report", return_value={"reportContract": {"schemaVersion": "market-report-contract-v1", "status": "AVAILABLE", "asOf": "20261028"}}), \
                  patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
                 self.assertEqual(builder.main(), 0)
             contract = json.loads(output.read_text())

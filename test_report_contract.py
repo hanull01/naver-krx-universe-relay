@@ -2,6 +2,8 @@ import unittest
 
 from tools.report_contract import (
     build_report_contract,
+    classify_contract_transport_response,
+    validate_contract_payload,
     validate_kiwoom_candidate_binding,
     validate_rendered_models,
 )
@@ -15,6 +17,25 @@ class ReportContractTests(unittest.TestCase):
             "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
             "finalConfirmed": True,
         }
+
+    def test_contract_transport_empty_inline_content_is_not_called_empty_file(self):
+        result = classify_contract_transport_response({
+            "encoding": "none",
+            "content": "",
+            "size": 14673922,
+            "download_url": "https://raw.example.test/contract.json",
+        })
+        self.assertEqual(result["status"], "INLINE_CONTENT_UNAVAILABLE")
+        self.assertEqual(result["size"], 14673922)
+
+    def test_contract_payload_validation_covers_empty_invalid_missing_date_and_sha(self):
+        self.assertEqual(validate_contract_payload(b"")["status"], "EMPTY_FILE")
+        self.assertEqual(validate_contract_payload(b"not-json")["status"], "INVALID_JSON")
+        valid = b'{"schemaVersion":"market-report-contract-v1","asOf":"20261029","observedAt":"t"}'
+        self.assertEqual(validate_contract_payload(valid, expected_as_of="20261028")["status"], "TRADING_DATE_MISMATCH")
+        self.assertEqual(validate_contract_payload(valid, expected_sha256="0" * 64)["status"], "SHA_MISMATCH")
+        self.assertEqual(validate_contract_payload(b"{}", expected_as_of=None)["status"], "REQUIRED_FIELDS_MISSING")
+        self.assertEqual(validate_contract_payload(valid, expected_as_of="20261029", expected_observed_at="t")["status"], "VALID")
 
     def test_contract_uses_one_generation_and_keeps_v2_names_scores_and_history(self):
         common = {"generatedAt": "2026-10-28T10:09:19+00:00"}
@@ -218,3 +239,35 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertTrue(contract["baseline"]["dateMismatch"])
         self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
+
+    def test_theme_member_rows_are_compacted_for_github_contents_transport(self):
+        generated = "2026-10-29T04:09:16+00:00"
+        evidence = {
+            "tradingDate": "20261029",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261029", "tradingDateEvidence": evidence,
+                "authoritativeCount": 1, "markets": {"TOTAL": {}}
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": [{
+                "id": "1", "name": "테마", "metrics": {"score": 88.2},
+                "stocks": [{"code": "000001", "name": "A"}, {"code": "000002", "name": "B"}],
+            }]},
+            v2_latest={"generatedAt": generated, "tradingDate": "2026-10-29", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        row = contract["themes"][0]
+        self.assertNotIn("stocks", row)
+        self.assertEqual(row["stockDetailCount"], 2)
+        self.assertIn("latest-theme-signals.json", row["stockDetailSource"])
+        self.assertIn("themeStockDetails", contract["sourceBindings"])

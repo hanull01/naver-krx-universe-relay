@@ -7,6 +7,9 @@ guard for renderer output.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
+import json
 from collections.abc import Mapping
 from typing import Any
 
@@ -35,6 +38,64 @@ TRADING_DATE_EVIDENCE_REASONS = {
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
     "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
 }
+
+# GitHub Contents API does not return inline content for large blobs. Keep
+# the Work-facing contract below that transport limit while preserving the
+# verified group metrics and a pointer to the raw detail.
+MAX_WORK_CONTRACT_BYTES = 900_000
+
+
+def classify_contract_transport_response(response: Any) -> dict[str, Any]:
+    """Distinguish an API inline-content limitation from an empty file."""
+    if not isinstance(response, Mapping):
+        return {"status": "INVALID_RESPONSE"}
+    if response.get("encoding") == "none" and response.get("download_url"):
+        return {
+            "status": "INLINE_CONTENT_UNAVAILABLE",
+            "fallbackUrl": response.get("download_url"),
+            "size": response.get("size"),
+        }
+    content = response.get("content")
+    if not content:
+        return {"status": "EMPTY_CONTENT", "size": response.get("size")}
+    if response.get("encoding") != "base64":
+        return {"status": "UNSUPPORTED_ENCODING", "encoding": response.get("encoding")}
+    try:
+        payload = base64.b64decode(str(content), validate=False)
+    except Exception:
+        return {"status": "INVALID_BASE64"}
+    return {
+        "status": "CONTENT",
+        "payload": payload,
+        "size": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }
+
+
+def validate_contract_payload(
+    payload: bytes,
+    *,
+    expected_sha256: str | None = None,
+    expected_as_of: str | None = None,
+    expected_observed_at: str | None = None,
+) -> dict[str, Any]:
+    """Validate the bytes actually read from a published contract artifact."""
+    if not payload:
+        return {"status": "EMPTY_FILE"}
+    digest = hashlib.sha256(payload).hexdigest()
+    if expected_sha256 and digest != expected_sha256:
+        return {"status": "SHA_MISMATCH", "sha256": digest}
+    try:
+        contract = json.loads(payload)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return {"status": "INVALID_JSON", "sha256": digest}
+    if not isinstance(contract, Mapping) or not contract.get("schemaVersion"):
+        return {"status": "REQUIRED_FIELDS_MISSING", "sha256": digest}
+    if expected_as_of is not None and contract.get("asOf") != expected_as_of:
+        return {"status": "TRADING_DATE_MISMATCH", "sha256": digest}
+    if expected_observed_at is not None and contract.get("observedAt") != expected_observed_at:
+        return {"status": "OBSERVED_AT_MISMATCH", "sha256": digest}
+    return {"status": "VALID", "sha256": digest, "contract": contract}
 
 
 
@@ -89,6 +150,23 @@ def _valid_code_name_rows(stocks: list[Any], symbols: list[Any], bindings: Any) 
         if not expected_name or row.get("itemName") != expected_name:
             return False
     return bool(stocks)
+
+
+def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
+    """Keep theme metrics without duplicating every member quote row."""
+    compact: list[dict[str, Any]] = []
+    for row in rows or []:
+        if not isinstance(row, Mapping):
+            continue
+        item = dict(row)
+        stocks = item.pop("stocks", None)
+        if isinstance(stocks, list):
+            item["stockDetailCount"] = len(stocks)
+            item["stockDetailSource"] = (
+                "data/monitoring/latest-theme-signals.json#themes[].stocks"
+            )
+        compact.append(item)
+    return compact
 
 
 def build_report_contract(
@@ -227,6 +305,7 @@ def build_report_contract(
         "sourceBindings": {
             "kiwoomCandidates": "data/trading-discovery/latest.json",
             "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
+            "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",
             "forbidCandidateMixing": True,
             "historicalAndPreMarketMustRemainSeparate": True,
         },
@@ -249,7 +328,7 @@ def build_report_contract(
             "marketTradingValue": market_values,
         },
         "industries": industries.get("industries") or [],
-        "themes": themes.get("themes") or [],
+        "themes": _compact_theme_rows(themes.get("themes") or []),
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
         "v2": {
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
