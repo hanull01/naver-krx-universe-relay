@@ -31,9 +31,11 @@ class FinalDailyEvidenceTests(unittest.TestCase):
     def test_after_20_without_terminal_marker_is_official_candidate(self):
         result = validate_snapshot(self.snapshot([row()]),
                                    {"asOfDate": "20261019", "historyStatus": "OK"})
-        self.assertEqual(result["status"], "PASS_WITH_UNKNOWN_FINALITY")
+        self.assertEqual(result["status"], "PASS")
         self.assertTrue(result["finalEligible"])
         self.assertEqual(result["sessionStatus"], "KRX_AFTER_MARKET_CLOSE_20")
+        self.assertEqual(result["priceBasis"], "AFTER_MARKET_OBSERVED")
+        self.assertEqual(result["regularCloseStatus"], "NOT_PROVIDED_BY_SNAPSHOT")
         self.assertEqual(result["finalityPolicy"], "KRX_AFTER_MARKET_CLOSE_20_CANDIDATE")
         self.assertEqual(result["networkCalls"], 0)
 
@@ -96,6 +98,8 @@ class FinalDailyEvidenceTests(unittest.TestCase):
 
     def test_invalid_ohlcv_is_not_final(self):
         result = validate_snapshot(self.snapshot([row(highPrice=None, marketStatus="CLOSED")]))
+        self.assertEqual(result["status"], "UNUSABLE")
+        self.assertEqual(result["priceBasis"], "UNAVAILABLE")
         self.assertFalse(result["finalEligible"])
         self.assertIn("OHLCV_PRICE_INVALID:000001", result["errors"])
 
