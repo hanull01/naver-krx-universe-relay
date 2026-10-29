@@ -138,6 +138,8 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
             f"sourceCommit={_text(v2.get('sourceCommit'))};"
             f"sourceQualityStatus={_text(v2.get('sourceQualityStatus'))};"
             f"sourceCommitStatus={_text(v2.get('sourceCommitStatus'))};"
+            f"sourceProvenance={_text((v2.get('sourceProvenance') or {}).get('status'))};"
+            f"inputSnapshotSha256={_text((v2.get('sourceProvenance') or {}).get('inputSnapshotSha256'))};"
             f"tradingDate={_text(v2.get('tradingDate'))};"
             f"historyDates={','.join(v2.get('history', {}).get('uniqueTradingDates', [])) or '확인 불가'}"
         ),

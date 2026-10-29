@@ -141,6 +141,34 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(row["leaderEvidenceStatus"], "UNAVAILABLE_SOURCE_GENERATION_MISMATCH")
         self.assertEqual(row["leaderCandidates"], [])
 
+    def test_v2_source_provenance_is_explicit_and_never_promotes_missing_commit(self):
+        generated = "2026-10-29T05:08:56+00:00"
+        provenance = {
+            "schemaVersion": "v2-source-provenance-v1",
+            "status": "PARTIAL",
+            "sourceCommit": None,
+            "sourceCommitStatus": "UNAVAILABLE",
+            "inputSnapshotSha256": "a" * 64,
+            "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261029", "markets": {"TOTAL": {}}
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "tradingDate": "20261029",
+                        "inputEvidence": {"sourceCommit": None, "sourceCommitStatus": "UNAVAILABLE"},
+                        "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={}, v2_provenance=provenance,
+        )
+        self.assertEqual(contract["v2"]["sourceProvenance"]["status"], "PARTIAL")
+        self.assertIsNone(contract["v2"]["sourceProvenance"]["sourceCommit"])
+        self.assertNotEqual(contract["v2"]["sourceProvenance"]["status"], "VERIFIED")
+
     def test_post_market_observation_is_available_but_not_final_daily_evidence(self):
         generated = "2026-10-28T20:40:03+09:00"
         evidence = {

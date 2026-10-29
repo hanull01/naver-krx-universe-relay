@@ -18,26 +18,36 @@ def _sha256(payload: Any) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def _observation_id(result: Dict[str, Any], trading_date: str, observed_at: str) -> str:
+def _observation_id(result: Dict[str, Any], trading_date: str, observed_at: str,
+                    source_snapshot_hash: Optional[str] = None) -> str:
     # observedAt is intentionally excluded: rerunning the same published
     # snapshot on the same trading day must be idempotent.
     return _sha256({"tradingDate": trading_date, "source": result.get("source"),
-                    "generatedAt": result.get("generatedAt"), "schema": result.get("schemaVersion")})[:24]
+                    "generatedAt": result.get("generatedAt"), "schema": result.get("schemaVersion"),
+                    "sourceSnapshotHash": source_snapshot_hash})[:24]
 
 
-def make_observation(result: Dict[str, Any], trading_date: str, observed_at: Optional[str] = None) -> Dict[str, Any]:
+def make_observation(result: Dict[str, Any], trading_date: str, observed_at: Optional[str] = None,
+                     source_provenance: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     observed_at = observed_at or datetime.now(timezone.utc).isoformat()
+    source_provenance = source_provenance if isinstance(source_provenance, dict) else {}
+    source_snapshot_hash = source_provenance.get("inputSnapshotSha256")
+    if not source_snapshot_hash:
+        source_snapshot_hash = _sha256({"source": result.get("source"), "generatedAt": result.get("generatedAt")})
     observation = {
-        "observationId": _observation_id(result, trading_date, observed_at),
+        "observationId": _observation_id(result, trading_date, observed_at, source_snapshot_hash),
         "tradingDate": trading_date,
         "observedAt": observed_at,
         "schemaVersion": result.get("schemaVersion"),
         "source": result.get("source"),
-        "sourceSnapshotHash": _sha256({"source": result.get("source"), "generatedAt": result.get("generatedAt")}),
+        "sourceSnapshotHash": source_snapshot_hash,
         "generatedAt": result.get("generatedAt"),
         "industries": result.get("industries", []),
         "themes": result.get("themes", []),
     }
+    if source_provenance:
+        observation["sourceProvenance"] = source_provenance
+        observation["sourceSnapshotHashType"] = "INPUT_FILES_SHA256"
     generated = result.get("generatedAt")
     if isinstance(generated, str) and len(generated) >= 10 and generated[4] == "-" and generated[7] == "-":
         observation["sourceTradingDate"] = generated[:10]
@@ -93,11 +103,15 @@ def evaluate_horizons(history: Dict[str, Any]) -> List[Dict[str, Any]]:
     return output
 
 
-def record_current(root: Path, trading_date: str) -> Dict[str, Any]:
+def record_current(root: Path, trading_date: str, source_provenance: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     result = json.loads((root / "data/dynamic-universe/v2-shadow-latest.json").read_text())
     path = root / "data/dynamic-universe/v2-shadow-history.json"
     history = json.loads(path.read_text()) if path.exists() else {}
-    updated = append_observation(history, make_observation(result, trading_date))
+    if source_provenance is None:
+        evidence = result.get("inputEvidence") if isinstance(result.get("inputEvidence"), dict) else {}
+        source_provenance = evidence.get("sourceProvenance") if isinstance(evidence.get("sourceProvenance"), dict) else None
+    updated = append_observation(history, make_observation(result, trading_date,
+                                                           source_provenance=source_provenance))
     updated["horizonEvaluations"] = evaluate_horizons(updated)
     path.write_text(json.dumps(updated, ensure_ascii=False, indent=2) + "\n")
     return updated
