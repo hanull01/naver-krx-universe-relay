@@ -67,6 +67,15 @@
 - GitHub API 또는 네트워크 오류가 발생하면 원인을 구분하고 불필요하게 동일 요청을 반복하지 않는다.
 - 정상 동작 중인 로컬 Git 인증과 운영 환경을 임의 변경하지 않는다.
 
+## Work 클라우드 실행 규칙
+
+- 작업 시작 위치가 저장소인지 먼저 `git rev-parse --show-toplevel`과 `git rev-parse HEAD`로 확인한다. 저장소가 아니면 Git 작업을 시도하지 않는다.
+- 맥북의 로컬 경로, Homebrew, SSH 개인키, 로컬 Python 패키지를 Work 환경에 있다고 가정하지 않는다.
+- 최신 main에서 별도 작업 브랜치를 만들고, 기존 작업공간의 미커밋 변경은 보존한다.
+- QA 환경은 `python3 tools/work_qa_preflight.py --prepare --check`로 재구성한다. 이 명령은 `.qa-venv`에 `requirements-qa.txt`의 `certifi`와 `webauthn`만 설치한다.
+- GitHub API가 403을 반환하면 같은 API 쓰기 요청을 반복하지 않는다. 로그인된 GitHub 브라우저 또는 인증된 Git/CLI 경로로 전환하고, 실제 push·PR 결과로 쓰기 권한을 검증한다. 토큰, 비밀번호, SSH 개인키는 출력하거나 요청하지 않는다.
+- GitHub 쓰기 권한을 실제로 확인하기 전에는 PR 생성·push 성공으로 보고하지 않는다.
+
 ## Trading Console 경계
 
 KIS Trading Console 개발은 이 저장소의 범위가 아니다. Trading Console과의 연결은
