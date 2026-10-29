@@ -7,6 +7,11 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import trading_discovery
+from tools.market_dashboard_renderer import (
+    TemplateUnavailable,
+    render_dashboard_html,
+    render_dashboard_markdown,
+)
 from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
 
 KST = ZoneInfo("Asia/Seoul")
@@ -2212,6 +2217,16 @@ def write_markdown(report, path):
     )
 
 
+def write_work_markdown(report, path):
+    """Write the fixed three-part Work Markdown view from the report contract."""
+    Path(path).write_text(render_dashboard_markdown(report), encoding="utf-8")
+
+
+def write_work_html(report, path):
+    """Write the approved A v1.1 HTML view, or fail closed if unavailable."""
+    Path(path).write_text(render_dashboard_html(report), encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--as-of")
@@ -2245,6 +2260,17 @@ def main():
     dated_json.write_text(payload, encoding="utf-8")
     write_markdown(report, dated_md)
 
+    html_status = "TEMPLATE_UNAVAILABLE"
+    try:
+        dated_html = out_dir / f"{report['asOf']}.html"
+        latest_html = out_dir / "latest.html"
+        html = render_dashboard_html(report)
+        dated_html.write_text(html, encoding="utf-8")
+        latest_html.write_text(html, encoding="utf-8")
+        html_status = "AVAILABLE"
+    except TemplateUnavailable as exc:
+        print(f"HTML_REPORT={exc}")
+
     print(
         json.dumps(
             {
@@ -2258,6 +2284,7 @@ def main():
                     "researchSummary"
                 ]["rankingEligibleCount"],
                 "output": str(latest_path),
+                "htmlStatus": html_status,
             },
             ensure_ascii=False,
         )
