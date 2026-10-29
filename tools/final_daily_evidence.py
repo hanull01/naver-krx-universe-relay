@@ -36,9 +36,14 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
     # Only explicit session fields can establish the target date.  In
     # particular, snapshot.asOfDate is not a session-date source because it
     # may be inherited from the prior baseline.
-    target = _date(target_date or snapshot.get("tradingDate")
-                   or snapshot.get("tradeDate") or snapshot.get("marketDate")
-                   or snapshot.get("localDate"))
+    snapshot_target = _date(snapshot.get("tradingDate")
+                            or snapshot.get("tradeDate") or snapshot.get("marketDate")
+                            or snapshot.get("localDate"))
+    validated_target = _date(target_date)
+    # When the FINAL workflow supplies the optional argument, an empty or
+    # invalid value means that independent KRX date evidence was unavailable;
+    # do not silently fall back to a snapshot-local date from another path.
+    target = snapshot_target if target_date is None else validated_target
     generated = snapshot.get("generatedAt")
     errors, warnings = [], []
     if snapshot.get("source") != "NAVER_STOCKLIST_CURRENT":
@@ -52,6 +57,10 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
         errors.append("SOURCE_MARKET_EVIDENCE_UNVERIFIED")
     if not target:
         errors.append("TRADING_DATE_MISSING")
+    if target_date is not None and not validated_target:
+        errors.append("TRADING_DATE_EVIDENCE_INVALID")
+    elif validated_target and snapshot_target and validated_target != snapshot_target:
+        errors.append("TRADING_DATE_MISMATCH")
     if not generated:
         errors.append("SNAPSHOT_TIME_MISSING")
     else:
@@ -177,10 +186,15 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", required=True)
     parser.add_argument("--baseline", required=True)
+    parser.add_argument(
+        "--target-date",
+        default=None,
+        help="validated KRX trading date supplied by the FINAL evidence path",
+    )
     args = parser.parse_args(argv)
     snapshot = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
     baseline = json.loads(Path(args.baseline).read_text(encoding="utf-8"))
-    result = validate_snapshot(snapshot, baseline)
+    result = validate_snapshot(snapshot, baseline, target_date=args.target_date)
     print(json.dumps({key: result[key] for key in (
         "status", "tradingDate", "generatedAt", "rowCount", "expectedCount",
         "sessionStatus", "finalEligible", "finalityPolicy", "errors", "warnings", "networkCalls"

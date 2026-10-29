@@ -12,6 +12,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         cls.start = cls.text.index("      - name: Prepare final daily monitoring update")
         cls.end = cls.text.index("      - name: Run V2 shadow observation", cls.start)
         cls.final_step = cls.text[cls.start:cls.end]
+        cls.diagnostic_start = cls.text.index("      - name: Diagnose final daily-bar evidence")
+        cls.diagnostic_step = cls.text[cls.diagnostic_start:cls.start]
         cls.indices_start = cls.text.index("      - name: Collect market indices")
         cls.indices_step = cls.text[cls.indices_start:cls.start]
         cls.publish_start = cls.text.index("      - name: Commit refreshed production data")
@@ -52,12 +54,18 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertLess(rebuild, v1)
 
     def test_final_update_requires_explicit_snapshot_session_date(self):
-        self.assertIn("data/market/indices.json", self.final_step)
-        self.assertIn("validate_final_payload", self.final_step)
-        self.assertIn("from market_indices import validate_final_payload", self.final_step)
-        self.assertIn("collection_started_at", self.final_step)
-        self.assertIn("collection_finished_at", self.final_step)
+        self.assertIn("final-trading-date-evidence.json", self.indices_step)
+        self.assertIn("validate_final_payload", self.indices_step)
+        self.assertIn("from market_indices import validate_final_payload", self.indices_step)
+        self.assertIn("final-trading-date-evidence.json", self.final_step)
+        self.assertNotIn("data/market/indices.json", self.final_step)
+        self.assertNotIn("from market_indices import validate_final_payload", self.final_step)
         self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
+
+    def test_initial_diagnostic_reuses_validated_index_date(self):
+        self.assertIn('--target-date "${{ steps.indices.outputs.target_date }}"', self.diagnostic_step)
+        self.assertIn("final-trading-date-evidence.json", self.indices_step)
+        self.assertIn('echo "target_date=$target_date"', self.indices_step)
 
     def test_final_daily_evidence_is_a_publication_gate(self):
         self.assertIn("from tools.final_daily_evidence import validate_snapshot", self.final_step)
@@ -72,7 +80,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         self.assertIn("collection_finished_at", self.indices_step)
 
     def test_final_requires_closed_indices_before_local_date_collection(self):
-        self.assertIn("validate_final_payload", self.final_step)
+        self.assertIn("validate_final_payload", self.indices_step)
+        self.assertIn("final-trading-date-evidence.json", self.final_step)
         self.assertIn("--fetch-today", self.final_step)
         self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
         self.assertIn("steps.indices.outputs.exit_code == '0'", self.final_step)
