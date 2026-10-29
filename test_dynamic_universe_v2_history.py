@@ -65,15 +65,15 @@ class DynamicUniverseV2HistoryTests(unittest.TestCase):
     def test_v2_change_keys_include_kind_and_id_and_same_day_uses_latest_observation(self):
         history = {"observations": [
             {"tradingDate": "2026-10-28", "observedAt": "2026-10-28T01:00:00Z", "sourceSnapshotHash": "a",
-             "sourceProvenance": {"sourceCommit": "c"},
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "a", "status": "VERIFIED"}]},
              "industries": [{"id": "1", "name": "업종", "v2Status": "WATCH", "score": 70}],
              "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 60}]},
             {"tradingDate": "2026-10-28", "observedAt": "2026-10-28T02:00:00Z", "sourceSnapshotHash": "b",
-             "sourceProvenance": {"sourceCommit": "c"},
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "b", "status": "VERIFIED"}]},
              "industries": [{"id": "1", "name": "업종", "v2Status": "WATCH", "score": 72}],
              "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 60}]},
             {"tradingDate": "2026-10-29", "observedAt": "2026-10-29T01:00:00Z", "sourceSnapshotHash": "d",
-             "sourceProvenance": {"sourceCommit": "c"},
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-29", "files": [{"sha256": "d", "status": "VERIFIED"}]},
              "industries": [{"id": "1", "name": "업종", "v2Status": "ACTIVE", "score": 80}],
              "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 55}]},
         ]}
@@ -87,6 +87,24 @@ class DynamicUniverseV2HistoryTests(unittest.TestCase):
         history = {"observations": [
             {"tradingDate": "2026-10-28", "observedAt": "a", "industries": [{"id": "1", "v2Status": "WATCH", "score": 70}], "themes": []},
             {"tradingDate": "2026-10-29", "observedAt": "b", "industries": [{"id": "1", "v2Status": "ACTIVE", "score": 80}], "themes": []},
+        ]}
+        row = compare_v2_changes(history)[0]
+        self.assertEqual(row["status"], "UNVERIFIED_SOURCE")
+        self.assertEqual(row["officialChangeClass"], "COMPARISON_UNAVAILABLE")
+
+    def test_v2_missing_membership_is_not_reported_as_unchanged(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "a", "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+            {"tradingDate": "2026-10-29", "observedAt": "b", "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+        ]}
+        row = compare_v2_changes(history)[0]
+        self.assertIsNone(row["membershipChanged"])
+        self.assertEqual(row["membershipStatus"], "UNAVAILABLE")
+
+    def test_v2_provenance_status_and_date_are_required(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "a", "sourceProvenance": {"sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "status": "PARTIAL", "tradingDate": "2026-10-28", "files": [{"sha256": "a", "status": "VERIFIED"}]}, "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+            {"tradingDate": "2026-10-29", "observedAt": "b", "sourceProvenance": {"sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "status": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "b", "status": "VERIFIED"}]}, "industries": [{"id": "1", "v2Status": "ACTIVE"}], "themes": []},
         ]}
         row = compare_v2_changes(history)[0]
         self.assertEqual(row["status"], "UNVERIFIED_SOURCE")

@@ -14,8 +14,12 @@ def _rows(observation: Mapping[str, Any]) -> dict[tuple[str, str], Mapping[str, 
     return result
 
 
-def _members(row: Mapping[str, Any]) -> set[str]:
-    values = row.get("memberCodes") or row.get("members") or row.get("stocks") or []
+def _members(row: Mapping[str, Any]) -> set[str] | None:
+    keys = ("memberCodes", "members", "stocks")
+    present = next((key for key in keys if key in row), None)
+    if present is None:
+        return None
+    values = row.get(present) or []
     result = set()
     for value in values:
         if isinstance(value, Mapping):
@@ -42,6 +46,23 @@ def _value(row: Mapping[str, Any], names: tuple[str, ...]) -> Any:
     return None
 
 
+def _provenance_verified(observation: Mapping[str, Any], expected_date: str) -> bool:
+    provenance = observation.get("sourceProvenance")
+    if not isinstance(provenance, Mapping):
+        return False
+    if provenance.get("status") != "VERIFIED" or provenance.get("sourceCommitStatus") != "VERIFIED":
+        return False
+    if not provenance.get("sourceCommit"):
+        return False
+    if str(provenance.get("tradingDate") or "").replace("-", "") != str(expected_date).replace("-", ""):
+        return False
+    files = provenance.get("files")
+    if not isinstance(files, list) or not files:
+        return False
+    return all(isinstance(item, Mapping) and item.get("sha256") and item.get("status") in {"VERIFIED", "OBSERVED_HASH_ONLY"}
+               for item in files)
+
+
 def compare_v2_changes(history: Mapping[str, Any], *, current: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
     observations = [row for row in history.get("observations") or [] if isinstance(row, Mapping) and row.get("tradingDate") and row.get("dateQuality", "VERIFIED") != "MISMATCH"]
     by_date: dict[str, Mapping[str, Any]] = {}
@@ -65,7 +86,7 @@ def compare_v2_changes(history: Mapping[str, Any], *, current: Mapping[str, Any]
     for key in keys:
         now = current_rows.get(key)
         old = previous_rows.get(key)
-        source_verified = all(isinstance(row.get("sourceProvenance"), Mapping) and row["sourceProvenance"].get("sourceCommit") for row in (current_obs, previous or {}))
+        source_verified = bool(previous) and _provenance_verified(current_obs, current_date) and _provenance_verified(previous, str(previous.get("tradingDate")))
         if now is None:
             change = "EXITED"
         elif old is None:
@@ -79,6 +100,8 @@ def compare_v2_changes(history: Mapping[str, Any], *, current: Mapping[str, Any]
             official = "COMPARISON_UNAVAILABLE"
         else:
             official = change
+        current_members, previous_members = _members(now or {}), _members(old or {})
+        membership_comparable = current_members is not None and previous_members is not None
         output.append({"kind": key[0], "id": key[1], "name": (now or old).get("name"),
                        "changeClass": change, "officialChangeClass": official,
                        "status": "AVAILABLE" if source_verified else "UNVERIFIED_SOURCE",
@@ -87,7 +110,9 @@ def compare_v2_changes(history: Mapping[str, Any], *, current: Mapping[str, Any]
                        "relativeStrengthDelta": _delta(old, now, ("relativeStrengthVsMarket", "relativeStrength")),
                        "breadthDelta": _delta(old, now, ("advancePct", "breadthPct")),
                        "tradingValueConcentrationDelta": _delta(old, now, ("top3ConcentrationPct", "tradingValueConcentrationPct")),
-                       "persistenceDays": (now or old).get("persistenceDays"), "membershipChanged": _members(now or {}) != _members(old or {}),
+                       "persistenceDays": (now or old).get("persistenceDays"),
+                       "membershipChanged": (_members(now or {}) != _members(old or {})) if membership_comparable else None,
+                       "membershipStatus": "COMPARABLE" if membership_comparable else "UNAVAILABLE",
                        "leaderChanged": _leaders(now or {}) != _leaders(old or {}),
                        "sourceCommitStatus": "VERIFIED" if source_verified else "UNVERIFIED"})
     return output

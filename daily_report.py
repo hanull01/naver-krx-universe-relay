@@ -1443,7 +1443,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             ROOT, discovery.get("symbols")
         )
         kiwoom_performance = build_kiwoom_performance(
-            discovery, kiwoom_prices, kiwoom_trading_dates, now_date=report_date
+            discovery, kiwoom_prices, kiwoom_trading_dates,
+            official_trading_dates=None, now_date=report_date
         )
     else:
         # Preserve the existing report shape for missing/invalid/empty source

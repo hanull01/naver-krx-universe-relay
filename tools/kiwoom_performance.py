@@ -30,8 +30,16 @@ def _date(value: Any) -> str:
 
 
 def _row_quality(row: Mapping[str, Any], file_quality: str | None = None) -> str:
-    return str(row.get("qualityStatus") or row.get("sourceQualityStatus")
-               or file_quality or row.get("source_status") or "UNAVAILABLE")
+    """Use per-date evidence; never promote a row from a file header."""
+    explicit = row.get("qualityStatus") or row.get("sourceQualityStatus")
+    if explicit:
+        return str(explicit)
+    source_status = str(row.get("source_status") or "").upper()
+    if source_status in {"OBSERVED", "SOURCE_OBSERVED"}:
+        return "SOURCE_OBSERVED"
+    if source_status in {"VERIFIED", "VALIDATED", "FINAL", "VERIFIED_FINAL"}:
+        return source_status
+    return "UNAVAILABLE"
 
 
 def _corporate_action_status(row: Mapping[str, Any]) -> str | None:
@@ -48,7 +56,9 @@ def _eligible_close(row: Mapping[str, Any] | None, file_quality: str | None = No
     if close is None:
         return None, "CLOSE_INVALID"
     action = _corporate_action_status(row)
-    if action and action not in {"VERIFIED_NONE", "NONE", "NOT_APPLICABLE"}:
+    if action is None:
+        return None, "CORPORATE_ACTION_STATUS_UNVERIFIED"
+    if action not in {"VERIFIED_NONE", "NONE", "NOT_APPLICABLE", "VERIFIED_ADJUSTED", "COMPARABLE_ADJUSTED_PRICE"}:
         return None, "CORPORATE_ACTION_UNVERIFIED"
     quality = _row_quality(row, file_quality)
     if quality not in VERIFIED_QUALITY:
@@ -84,32 +94,36 @@ def load_monitoring_daily_prices(root: Path, codes: Iterable[str] | None = None)
                 dates.add(date)
                 row = dict(decoded_row)
                 row["date"] = date
-                row["sourceQualityStatus"] = file_quality
-                row["qualityStatus"] = file_quality
+                # Keep the file-level quality only as provenance metadata.
+                # _row_quality intentionally ignores it when the decoded row
+                # has no per-date verification evidence.
+                row["fileSourceQualityStatus"] = file_quality
                 rows[date] = row
     return result, sorted(dates)
 
 
-def _measurement(row: Mapping[str, Any], date: str, price_rows: Mapping[str, Mapping[str, Any]], file_quality: str | None = None) -> dict[str, Any]:
-    value, reason = _eligible_close(row, file_quality)
+def _measurement(row: Mapping[str, Any] | None, date: str) -> dict[str, Any]:
+    value, reason = _eligible_close(row)
     item = {"date": date, "close": value, "status": "AVAILABLE" if value is not None else "UNAVAILABLE",
             "reason": None if value is not None else reason, "priceSource": "MONITORING_DAILY"}
     return item
 
 
 def build_kiwoom_performance(discovery: Mapping[str, Any], price_rows: Mapping[str, Mapping[str, Mapping[str, Any]]],
-                             trading_dates: Iterable[str], *, now_date: str | None = None) -> dict[str, Any]:
+                             trading_dates: Iterable[str] | None = None, *, official_trading_dates: Iterable[str] | None = None,
+                             now_date: str | None = None) -> dict[str, Any]:
     """Return every candidate with explicit D+1/D+3/D+5 state."""
-    dates = sorted({_date(item) for item in trading_dates if _date(item)})
+    dates = sorted({_date(item) for item in (official_trading_dates if official_trading_dates is not None else []) if _date(item)})
     selection = _date(discovery.get("selectionDate"))
     monitoring = _date(discovery.get("monitoringDate"))
     symbols = [str(code) for code in discovery.get("symbols") or []]
     base_index = dates.index(selection) if selection in dates else None
+    calendar_available = official_trading_dates is not None and bool(dates)
     stocks = []
     for code in symbols:
         rows = price_rows.get(code) or {}
         base_row = rows.get(selection)
-        base_close, base_reason = _eligible_close(base_row)
+        base_close, base_reason = _eligible_close(base_row) if calendar_available else (None, "OFFICIAL_KRX_TRADING_DATES_UNAVAILABLE")
         stock = {"itemCode": code, "itemName": (discovery.get("validation", {}).get("codeNameBindings", {}) or {}).get(code),
                  "selectionDate": discovery.get("selectionDate"), "monitoringDate": discovery.get("monitoringDate"),
                  "selectionClose": base_close, "selectionCloseStatus": "AVAILABLE" if base_close is not None else "UNAVAILABLE",
@@ -118,11 +132,23 @@ def build_kiwoom_performance(discovery: Mapping[str, Any], price_rows: Mapping[s
         for horizon in HORIZONS:
             key = f"D+{horizon}"
             target_date = None if base_index is None else (dates[base_index + horizon] if base_index + horizon < len(dates) else None)
-            if target_date is None:
-                status, reason = "PENDING", "MEASUREMENT_TRADING_DATE_NOT_AVAILABLE" if base_index is not None else "SELECTION_DATE_NOT_IN_KRX_CALENDAR"
+            if not calendar_available:
+                status, reason = "PENDING", "OFFICIAL_KRX_TRADING_DATES_UNAVAILABLE"
                 stock["horizons"][key] = {"date": None, "close": None, "returnPct": None, "status": status, "reason": reason}
                 continue
-            measurement = _measurement(rows.get(target_date), target_date, rows)
+            if base_index is None:
+                status, reason = "UNAVAILABLE", "SELECTION_DATE_NOT_IN_KRX_TRADING_DATES"
+                stock["horizons"][key] = {"date": None, "close": None, "returnPct": None, "status": status, "reason": reason}
+                continue
+            if target_date is None:
+                status, reason = "PENDING", "MEASUREMENT_TRADING_DATE_NOT_AVAILABLE"
+                stock["horizons"][key] = {"date": None, "close": None, "returnPct": None, "status": status, "reason": reason}
+                continue
+            if now_date and target_date > _date(now_date):
+                stock["horizons"][key] = {"date": target_date, "close": None, "returnPct": None,
+                                           "status": "PENDING", "reason": "MEASUREMENT_DATE_IN_FUTURE"}
+                continue
+            measurement = _measurement(rows.get(target_date), target_date)
             if base_close is None:
                 measurement.update({"returnPct": None, "status": "UNAVAILABLE", "reason": "SELECTION_CLOSE_UNAVAILABLE"})
             elif measurement.get("close") is not None:
