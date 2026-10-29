@@ -248,6 +248,18 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
             composition_changed = bool(result["previousUniverseMissingCodes"] or
                                        result["previousUniverseNewCodes"])
             quality_warnings = ["UNIVERSE_COMPOSITION_CHANGED"] if composition_changed else []
+            universe_delta = None
+            if composition_changed:
+                # The NAVER set is complete, but the observed difference does
+                # not verify listing, delisting, or transfer semantics.
+                universe_delta = {
+                    "added": result["previousUniverseNewCodes"],
+                    "removed": result["previousUniverseMissingCodes"],
+                    "marketChanged": [],
+                    "nameChanged": [],
+                    "verificationStatus": "PENDING_EXTERNAL_VERIFICATION",
+                    "source": SOURCE,
+                }
             return {
                 "schemaVersion": SCHEMA_VERSION, "generatedAt": clock(), "source": SOURCE,
                 "sourceMarket": "KRX",
@@ -261,6 +273,7 @@ def collect_snapshot(universe_file=DEFAULT_UNIVERSE, fetcher=fetch_page, page_si
                 "expectedCount": result["expectedCount"], "count": result["count"],
                 "coverageCount": result["coverageCount"], "markets": result["markets"],
                 "attemptCount": attempt, "missingCodes": [], "extraCodes": [], "duplicateCodes": [],
+                "universeDelta": universe_delta,
                 "stocks": result["stocks"], "attemptDiagnostics": diagnostics,
                 "previousUniverseMissingCodes": result["previousUniverseMissingCodes"],
                 "previousUniverseNewCodes": result["previousUniverseNewCodes"],
