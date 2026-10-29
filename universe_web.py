@@ -159,6 +159,7 @@ class UniverseWebApp:
         try:
             with contextlib.redirect_stdout(output): mutate_operation(after,op)
             errors,warnings=manager.validation(after)
+            manager.validate_transition(before, after)
         except (ValueError,KeyError,TypeError) as exc: return {"ok":False,"errors":[str(exc)],"warnings":[],"summary":operation_summary(op)}
         a,b=manager.serialized(before),manager.serialized(after)
         return {"ok":not errors,"errors":errors,"warnings":warnings,"summary":preview_summary(before,after,op),"messages":output.getvalue().strip(),"diff":"".join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile="before/universe.json",tofile="after/universe.json")),"baselineHash":payload_hash(before),"changed":a!=b}

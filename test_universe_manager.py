@@ -93,6 +93,16 @@ class UniverseManagerTests(unittest.TestCase):
         self.assertEqual(json.loads(backups[0].read_text(encoding="utf-8")), fixture())
         self.assertIn("005930", universe_manager.stock_map(self.data()))
 
+    def test_empty_default_replacement_is_blocked(self):
+        empty = {
+            "stocks": [], "sectors": {}, "themes": {}, "watchlists": {},
+            "leaders": {"sector": {}, "theme": {}, "watchlist": {}},
+        }
+        with self.assertRaisesRegex(ValueError, "빈 기본값으로 교체할 수 없습니다"):
+            universe_manager.save(self.path, fixture(), empty)
+        self.assertEqual(self.data(), fixture())
+        self.assertFalse((self.path.parent / "history").exists())
+
     def test_malformed_config_handling(self):
         self.path.write_text("{not json", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "잘못된 JSON 구조"):

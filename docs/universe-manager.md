@@ -59,6 +59,10 @@ group references, leaders, enabled flags, and JSON structure. Duplicate stock na
 empty groups are reported as warnings so a newly created group can be populated in a
 later explicit command; invalid references and invalid leaders are errors.
 
+An existing non-empty Universe cannot be replaced by the empty default shape through
+the manager. This protects user settings from an accidental reset; restore or migrate
+the current settings first, then use an explicitly reviewed configuration change.
+
 For a real change, the manager saves the previous configuration to
 `config/history/universe-YYYYMMDD-HHMMSS.json`, then writes the validated replacement
 through a temporary file and atomic replace. No backup is made for dry-runs or no-op

@@ -99,6 +99,16 @@ class UniverseWebTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertIn("explicit confirmation", result["errors"][0])
 
+    def test_empty_default_reset_is_blocked_in_preview(self):
+        data = {"stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}],
+                "sectors": {}, "themes": {}, "watchlists": {},
+                "leaders": {"sector": {}, "theme": {}, "watchlist": {}}}
+        self.path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        preview = self.app.preview({"op": "stock_delete", "code": "005930"})
+        self.assertFalse(preview["ok"])
+        self.assertIn("빈 기본값으로 교체할 수 없습니다", preview["errors"][0])
+        self.assertEqual(self.app.current(), data)
+
     def test_config_path_safety(self):
         self.assertEqual(universe_web.safe_config_path(universe_web.DEFAULT_CONFIG), universe_web.DEFAULT_CONFIG)
         with self.assertRaises(Exception):
