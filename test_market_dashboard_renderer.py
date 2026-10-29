@@ -107,6 +107,10 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertRegex(html, rf'class="[^"]*\b{class_name}\b[^"]*"')
             self.assertIn(f".{class_name}", load_approved_template()["css"])
 
+    def test_dynamic_timestamp_has_mobile_wrap_guard(self):
+        html = render_dashboard_html(report_fixture())
+        self.assertIn(".kpi-value{overflow-wrap:anywhere;word-break:break-word}", html)
+
     def test_model_mismatch_is_detected_before_render_delivery(self):
         left = report_fixture()
         right = report_fixture()

@@ -22,6 +22,8 @@
 - 보조 통합 Cron은 월요일 KST 이른 슬롯을 포함하도록 UTC 일요일~금요일에 발생시키고, Worker가 KST 토·일을 필터링한다. 따라서 UTC 보정으로 인한 주말 실행은 dispatch하지 않는다.
 - Cloudflare Cron은 요일 표기가 `1=일요일`인 규칙을 사용하므로 `SUN-THU`, `MON-FRI`, `SUN-FRI` 명칭을 사용한다. GitHub Actions의 숫자 요일 표기와 혼동하지 않는다.
 - `production-publication-<runId>-<sha>-<changed>` artifact가 Run ID·게시 SHA·변경 여부를 연결한다. artifact가 없거나 SHA 검증이 실패하면 게시 성공으로 승격하지 않는다.
+- `daily-report.yml`은 하나의 보고서 모델에서 `data/reports/latest.json`, `data/reports/latest.md`, `data/reports/latest.html`을 함께 생성한다. Worker의 리포트 게시 검증은 세 파일이 같은 게시 커밋에 모두 포함될 때만 `PUBLISHED`로 기록한다.
+- 이 Worker는 GitHub 게시만 검증하며, 외부 Work의 실제 HTML 다운로드·첨부·사용은 확인하지 않는다. 해당 결과는 별도로 `UNVERIFIED`로 남긴다.
 
 ## 슬롯
 

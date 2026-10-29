@@ -2249,6 +2249,7 @@ def main():
     latest_path = out_dir / "latest.json"
     dated_json = out_dir / f"{report['asOf']}.json"
     dated_md = out_dir / f"{report['asOf']}.md"
+    latest_md = out_dir / "latest.md"
 
     payload = json.dumps(
         report,
@@ -2259,6 +2260,8 @@ def main():
     latest_path.write_text(payload, encoding="utf-8")
     dated_json.write_text(payload, encoding="utf-8")
     write_markdown(report, dated_md)
+    # Work Markdown and HTML must be sibling views of the same report model.
+    write_work_markdown(report, latest_md)
 
     html_status = "TEMPLATE_UNAVAILABLE"
     try:
