@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 
 from daily_report import build_report, load_json
+from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
 
 
 FINAL_EVIDENCE_REASONS = {
@@ -16,6 +20,36 @@ FINAL_EVIDENCE_REASONS = {
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
 }
 INTRADAY_EVIDENCE_REASON = "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT"
+
+
+def _serialize_contract(contract: dict) -> bytes:
+    payload = (json.dumps(contract, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    if not payload:
+        raise SystemExit("REPORT_CONTRACT_EMPTY")
+    if len(payload) > MAX_WORK_CONTRACT_BYTES:
+        raise SystemExit("REPORT_CONTRACT_TOO_LARGE")
+    try:
+        json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise SystemExit("REPORT_CONTRACT_INVALID_JSON") from exc
+    return payload
+
+
+def _write_atomic(path: Path, payload: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False
+        ) as temp:
+            temp.write(payload)
+            temp.flush()
+            os.fsync(temp.fileno())
+            temp_name = temp.name
+        os.replace(temp_name, path)
+    finally:
+        if temp_name and os.path.exists(temp_name):
+            os.unlink(temp_name)
 
 
 def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
@@ -90,9 +124,23 @@ def main() -> int:
         raise SystemExit("REPORT_CONTRACT_UNAVAILABLE")
     contract["tradingDateEvidence"] = evidence
     output = Path(args.output)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(output), "status": contract.get("status"), "asOf": contract.get("asOf"), "observedAt": contract.get("observedAt")}, ensure_ascii=False))
+    payload = _serialize_contract(contract)
+    validation = validate_contract_payload(
+        payload,
+        expected_as_of=contract.get("asOf"),
+        expected_observed_at=contract.get("observedAt"),
+    )
+    if validation.get("status") != "VALID":
+        raise SystemExit(f"REPORT_CONTRACT_{validation.get('status', 'INVALID')}")
+    _write_atomic(output, payload)
+    print(json.dumps({
+        "output": str(output),
+        "status": contract.get("status"),
+        "asOf": contract.get("asOf"),
+        "observedAt": contract.get("observedAt"),
+        "bytes": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }, ensure_ascii=False))
     return 0
 
 
