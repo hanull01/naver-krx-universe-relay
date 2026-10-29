@@ -118,6 +118,22 @@ def split_candidates_for_markdown(candidates, report_as_of):
         unverified.append((candidate, reason))
     return verified, unverified
 
+
+def discovery_source_path(report_date):
+    """Resolve the report-date snapshot without falling back to future latest data."""
+    configured = Path(TRADING_DISCOVERY_PATH)
+    if configured == Path(DEFAULT_TRADING_DISCOVERY_PATH):
+        return None
+    return configured
+
+
+def discovery_quotes_source_path(report_date):
+    """Resolve same-date supplemental quotes in the production path."""
+    configured = Path(TRADING_DISCOVERY_QUOTES_PATH)
+    if configured == Path(DEFAULT_TRADING_DISCOVERY_QUOTES_PATH):
+        return None
+    return configured
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 UNIVERSE_PATH = ROOT / "config" / "universe.json"
@@ -130,6 +146,8 @@ RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
+DEFAULT_TRADING_DISCOVERY_PATH = TRADING_DISCOVERY_PATH
+DEFAULT_TRADING_DISCOVERY_QUOTES_PATH = TRADING_DISCOVERY_QUOTES_PATH
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 MARKET_INDICES_PATH = DATA / "market" / "indices.json"
@@ -1330,7 +1348,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     report_date = as_of or datetime.now(KST).date().isoformat()
     full_market = full_market_evidence(report_date)
     alignment = date_alignment(report_date, indices, full_market)
-    discovery = trading_discovery.discovery_status(report_date, TRADING_DISCOVERY_PATH)
+    discovery = trading_discovery.discovery_status(
+        report_date, discovery_source_path(report_date)
+    )
     try:
         full_market_signals = load_json(FULL_MARKET_SIGNALS_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
@@ -1351,7 +1371,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     supplemental_quotes = {"datas": []}
     lookup = {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
     published_supplemental = trading_discovery.supplemental_quotes_status(
-        discovery, quotes.get("sourceTime"), TRADING_DISCOVERY_QUOTES_PATH)
+        discovery, quotes.get("sourceTime"), discovery_quotes_source_path(report_date))
     supplemental_quotes = {"datas": [
         {**row, "_discoveryAdditionalLookup": True}
         for row in published_supplemental.get("datas", [])

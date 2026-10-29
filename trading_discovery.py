@@ -204,33 +204,46 @@ def publish_snapshot(snapshot_path, output_dir=DISCOVERY_DIR, calendar_path=None
 
 
 def discovery_status(as_of, path=None):
-    path = Path(path or DISCOVERY_DIR / "latest.json")
+    # The report date is authoritative for production reads.  In particular,
+    # do not let a later ``latest.json`` (for the next monitoring session)
+    # replace the candidate set for an earlier report.  An explicit path is
+    # retained for isolated callers and test fixtures.
+    path = Path(path) if path is not None else DISCOVERY_DIR / f"{as_of}.json"
+    source_path = str(path)
+    try:
+        source_path = path.relative_to(ROOT).as_posix()
+    except ValueError:
+        pass
+
+    def with_source(value):
+        return {**value, "sourcePath": source_path}
+
     try:
         payload = load_json(path)
     except FileNotFoundError:
-        return {"status": "UNAVAILABLE", "reason": "SNAPSHOT_MISSING", "candidateCount": 0, "symbols": []}
+        return with_source({"status": "UNAVAILABLE", "reason": "SNAPSHOT_MISSING", "candidateCount": 0, "symbols": []})
     except (OSError, ValueError, json.JSONDecodeError):
-        return {"status": "INVALID", "reason": "SNAPSHOT_UNREADABLE", "candidateCount": 0, "symbols": []}
+        return with_source({"status": "INVALID", "reason": "SNAPSHOT_UNREADABLE", "candidateCount": 0, "symbols": []})
     if set(payload) != PUBLISHED_KEYS or payload.get("schemaVersion") != 1 or contains_sensitive_key(payload):
-        return {"status": "INVALID", "reason": "SNAPSHOT_SCHEMA_INVALID", "candidateCount": 0, "symbols": []}
+        return with_source({"status": "INVALID", "reason": "SNAPSHOT_SCHEMA_INVALID", "candidateCount": 0, "symbols": []})
     symbols = payload.get("symbols")
     if (not isinstance(symbols, list) or len(symbols) != len(set(symbols))
             or any(not isinstance(code, str) or not SYMBOL.fullmatch(code) for code in symbols)
             or payload.get("candidateCount") != len(symbols)):
-        return {"status": "INVALID", "reason": "SNAPSHOT_SYMBOLS_INVALID", "candidateCount": 0, "symbols": []}
+        return with_source({"status": "INVALID", "reason": "SNAPSHOT_SYMBOLS_INVALID", "candidateCount": 0, "symbols": []})
     if payload.get("monitoringDate") != as_of:
-        return {**payload, "status": "STALE", "reason": "MONITORING_DATE_MISMATCH"}
+        return with_source({**payload, "status": "STALE", "reason": "MONITORING_DATE_MISMATCH"})
     material = {
         "source": payload.get("source"), "source_group": payload.get("sourceGroup"),
         "group_id": payload.get("groupId"), "selection_date": payload.get("selectionDate"),
         "symbols": payload.get("symbols"),
     }
     if payload.get("sourceSha256") != source_hash(material):
-        return {**payload, "status": "INVALID", "reason": "SNAPSHOT_HASH_MISMATCH"}
+        return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_HASH_MISMATCH"})
     expected = "AVAILABLE" if symbols else "AVAILABLE_EMPTY"
     if payload.get("status") != expected or payload.get("validation", {}).get("status") != "VALID":
-        return {**payload, "status": "INVALID", "reason": "SNAPSHOT_VALIDATION_INVALID"}
-    return payload
+        return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_VALIDATION_INVALID"})
+    return with_source(payload)
 
 
 def _index(payload, keys=("itemCode", "code")):
@@ -508,7 +521,7 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
 
 
 def supplemental_quotes_status(discovery, market_source_time, path=None):
-    path = Path(path or DISCOVERY_QUOTES_DIR / "latest.json")
+    path = Path(path) if path is not None else DISCOVERY_QUOTES_DIR / f"{discovery.get('monitoringDate')}.json"
     try:
         return validate_supplemental_quotes(load_json(path), discovery, market_source_time)
     except FileNotFoundError:
