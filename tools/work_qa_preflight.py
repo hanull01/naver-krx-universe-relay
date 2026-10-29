@@ -13,6 +13,7 @@ import os
 import shutil
 import subprocess
 import sys
+from urllib.parse import urlsplit, urlunsplit
 from pathlib import Path
 
 
@@ -52,7 +53,34 @@ def find_repository(start: Path) -> tuple[Path, str, str, str]:
         raise PreflightError("UNEXPECTED_ORIGIN")
     head = run(["git", "rev-parse", "HEAD"], cwd=root).stdout.strip()
     branch = run(["git", "branch", "--show-current"], cwd=root).stdout.strip() or "DETACHED"
-    return root, head, branch, remote_url
+    return root, head, branch, redact_remote_url(remote_url)
+
+
+def redact_remote_url(remote_url: str) -> str:
+    """Return an origin suitable for logs without userinfo or tokens."""
+    value = str(remote_url or "").strip()
+    if not value:
+        return "<redacted-origin>"
+    if "://" not in value:
+        # SCP-style SSH remote, e.g. user@github.com:owner/repo.git.
+        if "@" in value and ":" in value:
+            host_path = value.rsplit("@", 1)[1]
+            host, path = host_path.split(":", 1)
+            return f"ssh://{host}/{path}"
+        return value if "@" not in value else value.split("@", 1)[-1]
+    try:
+        parsed = urlsplit(value)
+        host = parsed.hostname
+        if not parsed.scheme or not host:
+            return "<redacted-origin>"
+        netloc = host
+        if parsed.port:
+            netloc = f"{host}:{parsed.port}"
+        # Query strings and fragments may also contain embedded credentials;
+        # they are not needed to identify the repository origin.
+        return urlunsplit((parsed.scheme, netloc, parsed.path, "", ""))
+    except ValueError:
+        return "<redacted-origin>"
 
 
 def choose_python() -> str:
@@ -67,6 +95,19 @@ def choose_python() -> str:
 
 def venv_python(path: Path) -> Path:
     return path / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def require_qa_venv(env_path: Path) -> Path:
+    if not env_path.exists():
+        raise PreflightError(
+            f"QA_VENV_MISSING:{env_path}:run 'python3 tools/work_qa_preflight.py --prepare --check'"
+        )
+    python = venv_python(env_path)
+    if not python.is_file():
+        raise PreflightError(
+            f"QA_VENV_INCOMPLETE:{env_path}:run 'python3 tools/work_qa_preflight.py --prepare --repair --check'"
+        )
+    return python
 
 
 def imports_ok(python: Path) -> tuple[bool, str]:
@@ -84,7 +125,7 @@ def prepare(root: Path, env_path: Path) -> None:
         builder = choose_python()
         run([builder, "-m", "venv", str(env_path)], cwd=root)
         print(f"created_venv={env_path} using={builder}")
-    python = venv_python(env_path)
+    python = require_qa_venv(env_path)
     ok, _ = imports_ok(python)
     if not ok:
         run(
@@ -93,42 +134,61 @@ def prepare(root: Path, env_path: Path) -> None:
         )
     ok, detail = imports_ok(python)
     if not ok:
-        raise PreflightError(f"QA_IMPORT_FAILED:{detail}")
+        raise PreflightError(
+            f"QA_IMPORT_FAILED:{detail}:run 'python3 tools/work_qa_preflight.py --prepare --repair --check'"
+        )
     print(f"qa_imports=PASS python={python} certifi={detail}")
 
 
 def github_read_check(root: Path) -> str:
     gh = shutil.which("gh")
     if not gh:
-        return "gh_auth=UNAVAILABLE"
+        return "github_cli_auth=UNVERIFIED reason=GH_NOT_INSTALLED git_remote_read=UNVERIFIED github_write=UNVERIFIED"
     status = run([gh, "auth", "status", "--hostname", "github.com"], cwd=root, check=False)
     if status.returncode != 0:
-        return "gh_auth=UNVERIFIED"
+        remote = run(["git", "ls-remote", "origin", "HEAD"], cwd=root, check=False)
+        remote_status = "PASS" if remote.returncode == 0 else "UNVERIFIED"
+        return f"github_cli_auth=UNVERIFIED reason=GH_NOT_AUTHENTICATED git_remote_read={remote_status} github_write=UNVERIFIED"
     remote = run(["git", "ls-remote", "origin", "HEAD"], cwd=root, check=False)
-    return "gh_auth=PASS git_remote_read=PASS" if remote.returncode == 0 else "gh_auth=PASS git_remote_read=UNVERIFIED"
+    remote_status = "PASS" if remote.returncode == 0 else "UNVERIFIED"
+    return f"github_cli_auth=PASS git_remote_read={remote_status} github_write=UNVERIFIED"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--prepare", action="store_true", help="create/reuse .qa-venv and install missing QA imports")
     parser.add_argument("--check", action="store_true", help="validate repository, Python imports, and GitHub read authentication")
+    parser.add_argument("--repair", action="store_true", help="recreate only the repository-local .qa-venv when it is incomplete")
     parser.add_argument("--venv", type=Path, default=None)
     args = parser.parse_args()
     if not args.prepare and not args.check:
         parser.error("use --prepare and/or --check")
+    if args.repair and not args.prepare:
+        parser.error("--repair requires --prepare")
     try:
         root, head, branch, remote = find_repository(Path.cwd())
         print(f"repository=PASS root={root}")
         print(f"head={head} branch={branch}")
         print(f"origin={remote}")
         env_path = (args.venv or (root / ".qa-venv")).resolve()
+        if args.repair:
+            expected = (root / ".qa-venv").resolve()
+            if env_path != expected:
+                raise PreflightError(f"QA_REPAIR_SCOPE_REFUSED:{env_path}")
+            if env_path.exists():
+                if env_path.is_symlink() or not env_path.is_dir():
+                    raise PreflightError(f"QA_REPAIR_TARGET_NOT_DIRECTORY:{env_path}")
+                shutil.rmtree(env_path)
+                print(f"repaired_venv=REMOVED_ONLY_REPOSITORY_LOCAL:{env_path}")
         if args.prepare:
             prepare(root, env_path)
         if args.check:
-            python = venv_python(env_path) if env_path.exists() else Path(sys.executable)
+            python = require_qa_venv(env_path)
             ok, detail = imports_ok(python)
             if not ok:
-                raise PreflightError(f"QA_IMPORT_MISSING:{python}:{detail}")
+                raise PreflightError(
+                    f"QA_IMPORT_MISSING:{python}:{detail}:run 'python3 tools/work_qa_preflight.py --prepare --repair --check'"
+                )
             print(f"qa_imports=PASS python={python} certifi={detail}")
             print(github_read_check(root))
         return 0
