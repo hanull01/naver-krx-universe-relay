@@ -1,6 +1,7 @@
 import unittest
 
 from tools.dynamic_universe_v2_history import append_observation, evaluate_horizons, make_observation, unique_trading_dates
+from tools.v2_change_analysis import compare_v2_changes
 
 
 def result(generated, score=75, eligible=True):
@@ -60,6 +61,54 @@ class DynamicUniverseV2HistoryTests(unittest.TestCase):
         history = append_observation(history, second)
         self.assertEqual(len(history["observations"]), 2)
         self.assertEqual(unique_trading_dates(history), ["2026-10-15"])
+
+    def test_v2_change_keys_include_kind_and_id_and_same_day_uses_latest_observation(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "2026-10-28T01:00:00Z", "sourceSnapshotHash": "a",
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "a", "status": "VERIFIED"}]},
+             "industries": [{"id": "1", "name": "업종", "v2Status": "WATCH", "score": 70}],
+             "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 60}]},
+            {"tradingDate": "2026-10-28", "observedAt": "2026-10-28T02:00:00Z", "sourceSnapshotHash": "b",
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "b", "status": "VERIFIED"}]},
+             "industries": [{"id": "1", "name": "업종", "v2Status": "WATCH", "score": 72}],
+             "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 60}]},
+            {"tradingDate": "2026-10-29", "observedAt": "2026-10-29T01:00:00Z", "sourceSnapshotHash": "d",
+             "sourceProvenance": {"status": "VERIFIED", "sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "tradingDate": "2026-10-29", "files": [{"sha256": "d", "status": "VERIFIED"}]},
+             "industries": [{"id": "1", "name": "업종", "v2Status": "ACTIVE", "score": 80}],
+             "themes": [{"id": "1", "name": "테마", "v2Status": "WATCH", "score": 55}]},
+        ]}
+        changes = compare_v2_changes(history)
+        self.assertEqual({(row["kind"], row["id"]) for row in changes}, {("industry", "1"), ("theme", "1")})
+        industry = next(row for row in changes if row["kind"] == "industry")
+        self.assertEqual(industry["baseTradingDate"], "2026-10-28")
+        self.assertEqual(industry["officialChangeClass"], "STATUS_CHANGED")
+
+    def test_v2_missing_source_commit_blocks_official_transition(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "a", "industries": [{"id": "1", "v2Status": "WATCH", "score": 70}], "themes": []},
+            {"tradingDate": "2026-10-29", "observedAt": "b", "industries": [{"id": "1", "v2Status": "ACTIVE", "score": 80}], "themes": []},
+        ]}
+        row = compare_v2_changes(history)[0]
+        self.assertEqual(row["status"], "UNVERIFIED_SOURCE")
+        self.assertEqual(row["officialChangeClass"], "COMPARISON_UNAVAILABLE")
+
+    def test_v2_missing_membership_is_not_reported_as_unchanged(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "a", "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+            {"tradingDate": "2026-10-29", "observedAt": "b", "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+        ]}
+        row = compare_v2_changes(history)[0]
+        self.assertIsNone(row["membershipChanged"])
+        self.assertEqual(row["membershipStatus"], "UNAVAILABLE")
+
+    def test_v2_provenance_status_and_date_are_required(self):
+        history = {"observations": [
+            {"tradingDate": "2026-10-28", "observedAt": "a", "sourceProvenance": {"sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "status": "PARTIAL", "tradingDate": "2026-10-28", "files": [{"sha256": "a", "status": "VERIFIED"}]}, "industries": [{"id": "1", "v2Status": "WATCH"}], "themes": []},
+            {"tradingDate": "2026-10-29", "observedAt": "b", "sourceProvenance": {"sourceCommit": "c", "sourceCommitStatus": "VERIFIED", "status": "VERIFIED", "tradingDate": "2026-10-28", "files": [{"sha256": "b", "status": "VERIFIED"}]}, "industries": [{"id": "1", "v2Status": "ACTIVE"}], "themes": []},
+        ]}
+        row = compare_v2_changes(history)[0]
+        self.assertEqual(row["status"], "UNVERIFIED_SOURCE")
+        self.assertEqual(row["officialChangeClass"], "COMPARISON_UNAVAILABLE")
 
 
 if __name__ == "__main__":
