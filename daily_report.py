@@ -7,6 +7,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import trading_discovery
+import research_report_linkage
 from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     render_dashboard_html,
@@ -127,6 +128,8 @@ TECHNICALS_PATH = DATA / "technicals.json"
 STATES_PATH = DATA / "states.json"
 GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
+RESEARCH_REPORTS_PATH = DATA / "research" / "reports"
+RESEARCH_MANIFEST_PATH = DATA / "research" / "manifest.json"
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
@@ -1213,6 +1216,17 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     published_industries = optional_json(MONITORING_PATH / "latest-industries.json", {})
     published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
     published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
+    research_manifest = optional_json(RESEARCH_MANIFEST_PATH, {})
+    research_linkage = research_report_linkage.build_research_linkage(
+        universe=universe,
+        v2_latest=shadow_latest,
+        v2_history=shadow_history,
+        industries=published_industries,
+        themes=published_themes,
+        reports_dir=RESEARCH_REPORTS_PATH,
+        manifest=research_manifest,
+        as_of=as_of or datetime.now(KST).date().isoformat(),
+    )
 
     group_states = {}
     if GROUP_STATES_PATH.exists():
@@ -1427,6 +1441,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         technical_candidates=technical_candidate_section.get("priority") or [],
         kiwoom_candidates=kiwoom_section,
         research=research,
+        research_linkage=research_linkage,
         v2_provenance=build_source_provenance(
             ROOT, result=shadow_latest, include_outputs=True
         ),
