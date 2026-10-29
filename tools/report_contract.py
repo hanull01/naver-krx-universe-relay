@@ -381,6 +381,7 @@ def build_report_contract(
     technical_candidates: list[Mapping[str, Any]] | None = None,
     kiwoom_candidates: Mapping[str, Any] | None = None,
     research: Mapping[str, Any] | None = None,
+    v2_provenance: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -447,6 +448,18 @@ def build_report_contract(
     v2_source_commit = (
         v2_latest.get("inputEvidence", {}).get("sourceCommit")
         if isinstance(v2_latest.get("inputEvidence"), Mapping) else None
+    )
+    v2_provenance = dict(v2_provenance) if isinstance(v2_provenance, Mapping) else (
+        dict(v2_latest.get("inputEvidence", {}).get("sourceProvenance"))
+        if isinstance(v2_latest.get("inputEvidence"), Mapping)
+        and isinstance(v2_latest.get("inputEvidence", {}).get("sourceProvenance"), Mapping)
+        else {
+            "schemaVersion": "v2-source-provenance-v1",
+            "status": "UNVERIFIED",
+            "sourceCommit": None,
+            "sourceCommitStatus": "UNAVAILABLE",
+            "reason": "SOURCE_PROVENANCE_NOT_SUPPLIED",
+        }
     )
 
     def selected(rows: Any, kind: str) -> list[dict[str, Any]]:
@@ -581,6 +594,7 @@ def build_report_contract(
             "sourceQualityStatus": v2_latest.get("inputEvidence", {}).get("sourceQualityStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
             "sourceCommit": v2_latest.get("inputEvidence", {}).get("sourceCommit") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
             "sourceCommitStatus": v2_latest.get("inputEvidence", {}).get("sourceCommitStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else "UNAVAILABLE",
+            "sourceProvenance": v2_provenance,
             "history": v2_history_summary,
             "industries": v2_industries,
             "themes": v2_themes,

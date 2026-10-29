@@ -13,6 +13,7 @@ from tools.market_dashboard_renderer import (
     render_dashboard_markdown,
 )
 from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
+from tools.v2_source_provenance import build_source_provenance
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -1426,6 +1427,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         technical_candidates=technical_candidate_section.get("priority") or [],
         kiwoom_candidates=kiwoom_section,
         research=research,
+        v2_provenance=build_source_provenance(
+            ROOT, result=shadow_latest, include_outputs=True
+        ),
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract

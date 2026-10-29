@@ -16,10 +16,12 @@ from typing import Any, Dict
 try:
     from tools.dynamic_universe_v2_history import record_current
     from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
+    from tools.v2_source_provenance import build_source_provenance
 except ModuleNotFoundError:  # direct `python tools/...py` invocation
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from tools.dynamic_universe_v2_history import record_current
     from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
+    from tools.v2_source_provenance import build_source_provenance
 
 
 def _infer_trading_date(industry_payload: Dict[str, Any], theme_payload: Dict[str, Any]) -> str:
@@ -113,13 +115,15 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
             "sourceCommit": source_commit,
             "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
         }
+        result["inputEvidence"]["sourceProvenance"] = build_source_provenance(root, result=result)
         if baseline_status == "BASELINE_STALE":
             result["inputEvidence"]["baselineFreshnessStatus"] = baseline_status
         result["summary"] = summarize(result)
         (root / "data/dynamic-universe/v2-shadow-latest.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2) + "\n")
         # The history is written only after the complete V2 result exists.
-        history = record_current(root, trading_date)
+        history = record_current(root, trading_date,
+                                 result["inputEvidence"]["sourceProvenance"])
         outcome = {"status": "OK", "observedAt": observed_at or datetime.now(timezone.utc).isoformat(),
                    "tradingDate": trading_date, "summary": result["summary"],
                    "inputEvidence": result["inputEvidence"],

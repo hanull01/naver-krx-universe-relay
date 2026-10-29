@@ -45,6 +45,22 @@ class DynamicUniverseV2HistoryTests(unittest.TestCase):
         self.assertEqual(unique_trading_dates(history), ["2026-10-17"])
         self.assertEqual(evaluate_horizons(history), [])
 
+    def test_provenance_hash_becomes_history_snapshot_identity(self):
+        provenance = {"inputSnapshotSha256": "a" * 64, "status": "PARTIAL"}
+        observation = make_observation(result("2026-10-15T12:00:00+00:00"), "2026-10-15",
+                                       source_provenance=provenance)
+        self.assertEqual(observation["sourceSnapshotHash"], "a" * 64)
+        self.assertEqual(observation["sourceSnapshotHashType"], "INPUT_FILES_SHA256")
+        self.assertEqual(observation["sourceProvenance"]["status"], "PARTIAL")
+
+    def test_source_change_same_day_is_distinct_but_not_a_second_trading_day(self):
+        first = make_observation(result("same"), "2026-10-15", source_provenance={"inputSnapshotSha256": "a" * 64})
+        second = make_observation(result("same"), "2026-10-15", source_provenance={"inputSnapshotSha256": "b" * 64})
+        history = append_observation({}, first)
+        history = append_observation(history, second)
+        self.assertEqual(len(history["observations"]), 2)
+        self.assertEqual(unique_trading_dates(history), ["2026-10-15"])
+
 
 if __name__ == "__main__":
     unittest.main()
