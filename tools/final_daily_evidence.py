@@ -161,12 +161,21 @@ def validate_snapshot(snapshot, baseline=None, target_date=None, expected_codes=
         session_status = "UNKNOWN"
         warnings.append("SESSION_FINALITY_UNKNOWN")
 
-    status = "PASS_WITH_UNKNOWN_FINALITY" if not errors else "UNUSABLE"
+    # A complete post-20:00 KRX snapshot is a valid after-market observation
+    # for the existing FINAL candidate path.  It is not evidence of the
+    # 15:30 regular-session close, so keep that distinction explicit in the
+    # diagnostic instead of leaving a successful candidate in an ambiguous
+    # status.
+    status = "PASS" if official_candidate else "UNUSABLE"
+    price_basis = "AFTER_MARKET_OBSERVED" if official_candidate else "UNAVAILABLE"
+    regular_close_status = "NOT_PROVIDED_BY_SNAPSHOT" if official_candidate else "UNAVAILABLE"
     return {
         "status": status,
         "finalEligible": bool(official_candidate),
         "finalityPolicy": OFFICIAL_POLICY,
         "sessionStatus": session_status,
+        "priceBasis": price_basis,
+        "regularCloseStatus": regular_close_status,
         "tradingDate": target,
         "generatedAt": generated,
         "rowCount": len(rows),
@@ -197,7 +206,8 @@ def main(argv=None):
     result = validate_snapshot(snapshot, baseline, target_date=args.target_date)
     print(json.dumps({key: result[key] for key in (
         "status", "tradingDate", "generatedAt", "rowCount", "expectedCount",
-        "sessionStatus", "finalEligible", "finalityPolicy", "errors", "warnings", "networkCalls"
+        "sessionStatus", "priceBasis", "regularCloseStatus", "finalEligible",
+        "finalityPolicy", "errors", "warnings", "networkCalls"
     )}, ensure_ascii=False, sort_keys=True))
     return 0
 
