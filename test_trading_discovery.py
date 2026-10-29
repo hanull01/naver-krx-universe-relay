@@ -164,6 +164,18 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
+    def test_verified_name_lookup_does_not_supply_price_or_technical_values(self):
+        discovery = td.published_payload(snapshot(["000810"]))
+        result = td.analyze(
+            "2026-10-30", discovery, {}, {}, {},
+            name_lookup={"000810": "삼성화재"},
+        )
+        row = result["stocks"][0]
+        self.assertEqual(row["itemName"], "삼성화재")
+        self.assertEqual(row["itemNameSource"], "VERIFIED_NAME_LOOKUP")
+        self.assertIsNone(row["price"])
+        self.assertEqual(row["dataStatus"], "UNAVAILABLE")
+
     def test_final_baseline_replaces_stale_after_quote_and_leaves_etf_unavailable(self):
         discovery = td.published_payload(snapshot(["051910", "0197X0"]))
         stale_rows = [{

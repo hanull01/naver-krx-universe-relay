@@ -385,6 +385,7 @@ def build_report_contract(
     v2_provenance: Mapping[str, Any] | None = None,
     kiwoom_performance: Mapping[str, Any] | None = None,
     v2_changes: list[Mapping[str, Any]] | None = None,
+    session_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -516,6 +517,10 @@ def build_report_contract(
     # dated source files and only the per-candidate horizon results cross the
     # Work boundary.
     compact_v2_changes = [dict(row) for row in (v2_changes or []) if isinstance(row, Mapping)]
+    session_context = dict(session_context) if isinstance(session_context, Mapping) else {
+        "mode": "NOT_PREOPEN",
+        "status": "NOT_APPLICABLE",
+    }
 
     # ``candidates`` is retained as a compatibility alias for older callers.
     # New callers must provide technical and Kiwoom candidates separately.
@@ -571,6 +576,7 @@ def build_report_contract(
         "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
         "tradingDateEvidence": evidence,
+        "sessionContext": session_context,
         "sourceGenerations": {
             "market": generation,
             "indices": indices.get("generatedAt"),
