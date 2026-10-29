@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -64,6 +65,61 @@ def _first(mapping: Mapping[str, Any], *keys: str) -> Any:
         if mapping.get(key) not in (None, ""):
             return mapping[key]
     return None
+
+
+def _index_session_label(item: Mapping[str, Any]) -> str:
+    """Describe the observed session without promoting it to a final close."""
+    session = str(item.get("session") or "").upper()
+    status = str(item.get("marketStatus") or "").upper()
+    if "POST_MARKET" in session or status == "CLOSE":
+        return "장후 관측"
+    if session in {"REGULAR", "INTRADAY", "INTRADAY_SESSION"} or status == "OPEN":
+        return "장중 관측"
+    return "세션 확인 대기"
+
+
+def _index_session_summary(indices: list[Mapping[str, Any]]) -> str:
+    labels = [
+        _index_session_label(row)
+        for row in indices
+        if row.get("name") in {"KOSPI", "KOSDAQ"} or row.get("indexName") in {"KOSPI", "KOSDAQ"}
+    ]
+    if not labels:
+        return "세션 확인 대기"
+    unique = set(labels)
+    if unique == {"장후 관측"}:
+        return "장후 관측"
+    if unique == {"장중 관측"}:
+        return "장중 관측"
+    if "세션 확인 대기" in unique:
+        return "시장별 세션 상이·확인 대기" if len(unique) > 1 else "세션 확인 대기"
+    return "시장별 세션 상이"
+
+
+def _market_value_text(market_values: Mapping[str, Any]) -> str:
+    values = []
+    for market in ("KOSPI", "KOSDAQ"):
+        value = (market_values.get(market) or {}).get("value")
+        value_text = f"{value:,.0f}원" if isinstance(value, (int, float)) else "확인 불가"
+        values.append(f"{market} {value_text}")
+    return " · ".join(values)
+
+
+def _metric_line_value(metric: Mapping[str, Any]) -> str:
+    count = metric.get("count")
+    eligible = metric.get("eligibleCount")
+    pct = metric.get("pct")
+    if isinstance(count, (int, float)) and isinstance(eligible, (int, float)):
+        return f"{count:,} / {eligible:,} · {_plain_pct(pct)}"
+    return "확인 불가"
+
+
+def _industry_breadth_text(row: Mapping[str, Any]) -> str:
+    advancers = row.get("advancers")
+    members = row.get("memberCount")
+    if advancers is None or members is None:
+        return "확인 불가"
+    return f"{advancers} / {members}"
 
 
 def load_approved_template(template_dir: Path = TEMPLATE_DIR) -> dict[str, Any]:
@@ -122,6 +178,7 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
     v2 = contract.get("v2") or {}
     generations = contract.get("sourceGenerations") or {}
     evidence = contract.get("tradingDateEvidence") or {}
+    indices = list(contract.get("indices") or [])
     return {
         "asOf": contract.get("asOf") or report.get("asOf"),
         "writtenAt": report.get("writtenAt") or report.get("generatedAt") or contract.get("observedAt"),
@@ -145,7 +202,8 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "templateTrace": "filled-by-renderer",
         "evidence": evidence,
-        "indices": list(contract.get("indices") or []),
+        "indices": indices,
+        "indexSessionLabel": _index_session_summary(indices),
         "fullMarket": {
             "total": total,
             "advancers": advancers,
@@ -172,10 +230,8 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _metric_line(label: str, metric: Mapping[str, Any]) -> str:
-    count = metric.get("count")
-    eligible = metric.get("eligibleCount")
     pct = metric.get("pct")
-    value = f"{count:,} / {eligible:,} · {_plain_pct(pct)}" if isinstance(count, (int, float)) and isinstance(eligible, (int, float)) else "확인 불가"
+    value = _metric_line_value(metric)
     width = _num(pct) or 0
     return f'<div class="metric-row"><div>{_escape(label)}<div class="meter"><span style="width:{max(0, min(100, width))}%"></span></div></div><strong>{_escape(value)}</strong></div>'
 
@@ -188,11 +244,13 @@ def _index_cards(model: Mapping[str, Any]) -> str:
             continue
         rate = item.get("changeRate")
         points = item.get("changePoints")
+        source_time = item.get("sourceTime") or model.get("observedAt")
+        session_label = _index_session_label(item)
         cards.append(
             f'<article class="card index-card"><div class="index-name">{_escape(name)}</div>'
             f'<div class="index-value">{_escape(f"{item.get("close"):,.2f}" if isinstance(item.get("close"), (int, float)) else "확인 불가")}</div>'
             f'<div class="change {_change_class(rate)}">{_escape(f"{points:+,.2f}p" if isinstance(points, (int, float)) else "확인 불가")} ({_escape(_pct(rate))})</div>'
-            f'<div class="subvalue">{_escape(model.get("observedAt"))} 기준 · 정규장 장중 관측</div></article>'
+            f'<div class="subvalue">{_escape(source_time)} 기준 · {_escape(session_label)}</div></article>'
         )
     while len(cards) < 2:
         cards.append('<article class="card index-card"><div class="index-name">지수</div><div class="index-value">확인 불가</div><div class="change muted">원천 미확인</div><div class="subvalue">확인 불가</div></article>')
@@ -213,7 +271,7 @@ def _industry_cards(rows: list[Mapping[str, Any]]) -> str:
             '<div class="industry-item"><div class="industry-head">'
             f'<strong>{_escape(name)}</strong><span class="status-chip">{_escape(row.get("status") or row.get("persistence", {}).get("status") or "관찰")}</span></div>'
             '<div class="industry-numbers">'
-            f'<div>{_escape(f"{advancers} / {member_count}" if advancers is not None and member_count is not None else "확인 불가")}<small>상승 종목</small></div>'
+            f'<div>{_escape(_industry_breadth_text(row))}<small>상승 종목</small></div>'
             f'<div class="{_change_class(avg)}">{_escape(_pct(avg))}<small>1일 성과</small></div>'
             f'<div>{_escape(f"{total:,.0f}원" if isinstance(total, (int, float)) else "확인 불가")}<small>거래대금</small></div>'
             f'<div>{_escape(_plain_pct(advance))}<small>상승 비율</small></div></div></div>'
@@ -303,12 +361,21 @@ def render_dashboard_html(report: Mapping[str, Any], *, template_dir: Path = TEM
     market = model["fullMarket"]
     total = market["total"]
     ratio = market["declineRatio"]
+    market_value_text = _market_value_text(market["marketTradingValue"])
     metric_html = "".join(
         _metric_line(label, market["metrics"].get(key) or {})
         for label, key in (("20일 이동평균 상회", "aboveMA20"), ("60일 이동평균 상회", "aboveMA60"), ("120일 이동평균 상회", "aboveMA120"), ("20일 고점 돌파", "breakout20"), ("60일 고점 돌파", "breakout60"), ("20일 평균 거래량 상회", "volumeAbove20DayAverage"))
     )
     trace_style = ' style="min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere"'
-    return f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{assets["css"]}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">업종·종목</a><a href="#part3">대응</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● 장중 관찰</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 증거 {_escape(model["tradingDateStatus"])}</p><div class="chips" style="margin-top:14px"><span class="tag">A v1.1 · 균형형</span><span class="tag"{trace_style}>CONTRACT_TRACE {_escape(model["contractTrace"])}</span><span class="tag"{trace_style}>V2_DATA_TRACE {_escape(model["v2Trace"])}</span><span class="tag"{trace_style}>TEMPLATE_TRACE {_escape(model["templateTrace"])}</span></div><p class="intro">검증된 하나의 보고서 계약에서 시장·업종·테마·후보 데이터를 읽어 표시합니다. 확인되지 않은 값은 생성하지 않습니다.</p></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_index_cards(model)}</div><div style="height:12px"></div><div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{_escape(f"{market["advancers"]:,}")}</div><div class="kpi-sub">전체 { _escape(f"{total:,}") }종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{_escape(f"{market["decliners"]:,}")}</div><div class="kpi-sub">하락 비율 {_escape(_plain_pct(ratio))}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{_escape(f"{market["unchanged"]:,}")}</div><div class="kpi-sub">산술 검증 {'PASS' if market["advancers"] + market["decliners"] + market["unchanged"] == total else 'FAIL'}</div></article><article class="card"><div class="kpi-label">작성시각</div><div class="kpi-value" style="font-size:16px">{_escape(model["writtenAt"])}</div><div class="kpi-sub">원천 관측시각과 구분</div></article></div><div style="height:12px"></div><div class="grid two"><article class="card"><h3>전체시장 상승·하락 확산</h3><div class="big-number">{_escape(f"{total:,}")} <span class="muted tiny">종목</span></div><div aria-label="상승·하락·보합 비율" class="breadth" role="img"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span><i class="dot" style="background:var(--up)"></i>상승 <b>{_escape(f"{market["advancers"]:,}")}</b></span><span><i class="dot" style="background:var(--down)"></i>하락 <b>{_escape(f"{market["decliners"]:,}")} · {_escape(_plain_pct(ratio))}</b></span><span><i class="dot" style="background:var(--flat)"></i>보합 <b>{_escape(f"{market["unchanged"]:,}")}</b></span></div><p class="muted tiny">2,205/2,767 산술 검증: {'PASS' if total == 2767 and market["decliners"] == 2205 and ratio == 79.69 else '계약값 기준 검증'}</p></article><article class="card"><h3>추세·돌파 지표</h3>{metric_html}</article></div><div class="report-callout"><strong>계약 추적</strong><p style="overflow-wrap:anywhere">CONTRACT_TRACE {_escape(model["contractTrace"])}<br>V2_DATA_TRACE {_escape(model["v2Trace"])}<br>TEMPLATE_TRACE {_escape(model["templateTrace"])}<br>작성시각 {_escape(model["writtenAt"])}입니다.</p></div></section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 업종·테마·주도주·리서치</h2><span class="label">DEEP DIVE</span></div><article class="card"><div class="miniheading"><h3>업종 강세 실측 비교</h3><span class="tag">검증된 계약 자료</span></div><div class="industry-cards">{_industry_cards(model["industries"])}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V2 업종·테마 상태</h3><span class="tag">명칭·점수·근거·품질</span></div><div class="industry-cards">{_v2_cards(model["v2Industries"], "업종")}{_v2_cards(model["v2Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="statusline"><h3 style="margin:0">자동 주도주·독립 분석</h3><span class="status-chip">{_escape(model["research"].get("status") or "확인 불가")}</span></div><p class="muted">검증된 주도주 {len(model["leaders"])}종목: {_escape(_leader_text(model["leaders"]))}. 리서치 상태 {_escape(model["research"].get("status"))}, 수급·공시는 계약 원천이 없으면 확인 불가로 표시합니다.</p></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 키움 후보 추적·조건별 대응</h2><span class="label">WATCH POINTS</span></div><article class="card"><div class="section-head"><h3 style="margin:0">키움 전일후보군·종목별 상세 카드</h3><span class="tag">{_escape(model["observedAt"])}</span></div><div class="stock-list">{_stock_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>다음 회차 조건</h3><div class="decision-grid"><article class="decision"><b>거래일 증거</b><span class="pill wait">{_escape(model["tradingDateStatus"])}</span><p>확정 일봉과 장중 관측은 구분하여 표시합니다.</p></article><article class="decision"><b>하락 비율</b><span class="pill ok">검증</span><p>하락 {_escape(f"{market["decliners"]:,}")} / {_escape(f"{total:,}")} = {_escape(_plain_pct(ratio))}입니다.</p></article><article class="decision"><b>V2 주도성</b><span class="pill wait">관찰</span><p>V2 데이터의 실제 이름·점수·근거·자료 품질을 계약 그대로 표시합니다.</p></article><article class="decision"><b>후보 조건</b><span class="pill wait">확인 대기</span><p>원천에서 확인된 조건만 다음 회차에 재확인합니다.</p></article></div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])} · 승인 CSS와 카드 구조를 유지합니다.</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 작성시각 {_escape(model["writtenAt"])} · 시장 데이터 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    html_output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{assets["css"]}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">업종·종목</a><a href="#part3">대응</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 증거 {_escape(model["tradingDateStatus"])}</p><div class="chips" style="margin-top:14px"><span class="tag">A v1.1 · 균형형</span><span class="tag"{trace_style}>CONTRACT_TRACE {_escape(model["contractTrace"])}</span><span class="tag"{trace_style}>V2_DATA_TRACE {_escape(model["v2Trace"])}</span><span class="tag"{trace_style}>TEMPLATE_TRACE {_escape(model["templateTrace"])}</span></div><p class="intro">검증된 하나의 보고서 계약에서 시장·업종·테마·후보 데이터를 읽어 표시합니다. 확인되지 않은 값은 생성하지 않습니다.</p></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_index_cards(model)}</div><div style="height:12px"></div><div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{_escape(f"{market["advancers"]:,}")}</div><div class="kpi-sub">전체 { _escape(f"{total:,}") }종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{_escape(f"{market["decliners"]:,}")}</div><div class="kpi-sub">하락 비율 {_escape(_plain_pct(ratio))}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{_escape(f"{market["unchanged"]:,}")}</div><div class="kpi-sub">산술 검증 {'PASS' if market["advancers"] + market["decliners"] + market["unchanged"] == total else 'FAIL'}</div></article><article class="card"><div class="kpi-label">작성시각</div><div class="kpi-value" style="font-size:16px">{_escape(model["writtenAt"])}</div><div class="kpi-sub">원천 관측시각과 구분</div></article></div><div style="height:12px"></div><div class="grid two"><article class="card"><h3>전체시장 상승·하락 확산</h3><div class="big-number">{_escape(f"{total:,}")} <span class="muted tiny">종목</span></div><div aria-label="상승·하락·보합 비율" class="breadth" role="img"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span><i class="dot" style="background:var(--up)"></i>상승 <b>{_escape(f"{market["advancers"]:,}")}</b></span><span><i class="dot" style="background:var(--down)"></i>하락 <b>{_escape(f"{market["decliners"]:,}")} · {_escape(_plain_pct(ratio))}</b></span><span><i class="dot" style="background:var(--flat)"></i>보합 <b>{_escape(f"{market["unchanged"]:,}")}</b></span></div><p class="muted tiny">하락 { _escape(f"{market["decliners"]:,}") } / 전체 { _escape(f"{total:,}") } 산술 검증: {'PASS' if market["advancers"] + market["decliners"] + market["unchanged"] == total else 'FAIL'}</p><p class="muted tiny">시장 거래대금 · {_escape(market_value_text)}</p></article><article class="card"><h3>추세·돌파 지표</h3>{metric_html}</article></div><div class="report-callout"><strong>계약 추적</strong><p style="overflow-wrap:anywhere">CONTRACT_TRACE {_escape(model["contractTrace"])}<br>V2_DATA_TRACE {_escape(model["v2Trace"])}<br>TEMPLATE_TRACE {_escape(model["templateTrace"])}<br>작성시각 {_escape(model["writtenAt"])}입니다.</p></div></section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 업종·테마·주도주·리서치</h2><span class="label">DEEP DIVE</span></div><article class="card"><div class="miniheading"><h3>업종 강세 실측 비교</h3><span class="tag">검증된 계약 자료</span></div><div class="industry-cards">{_industry_cards(model["industries"])}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V2 업종·테마 상태</h3><span class="tag">명칭·점수·근거·품질</span></div><div class="industry-cards">{_v2_cards(model["v2Industries"], "업종")}{_v2_cards(model["v2Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="statusline"><h3 style="margin:0">자동 주도주·독립 분석</h3><span class="status-chip">{_escape(model["research"].get("status") or "확인 불가")}</span></div><p class="muted">검증된 주도주 {len(model["leaders"])}종목: {_escape(_leader_text(model["leaders"]))}. 리서치 상태 {_escape(model["research"].get("status"))}, 수급·공시는 계약 원천이 없으면 확인 불가로 표시합니다.</p></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 키움 후보 추적·조건별 대응</h2><span class="label">WATCH POINTS</span></div><article class="card"><div class="section-head"><h3 style="margin:0">키움 전일후보군·종목별 상세 카드</h3><span class="tag">{_escape(model["observedAt"])}</span></div><div class="stock-list">{_stock_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>다음 회차 조건</h3><div class="decision-grid"><article class="decision"><b>거래일 증거</b><span class="pill wait">{_escape(model["tradingDateStatus"])}</span><p>확정 일봉과 장중 관측은 구분하여 표시합니다.</p></article><article class="decision"><b>하락 비율</b><span class="pill ok">검증</span><p>하락 {_escape(f"{market["decliners"]:,}")} / {_escape(f"{total:,}")} = {_escape(_plain_pct(ratio))}입니다.</p></article><article class="decision"><b>V2 주도성</b><span class="pill wait">관찰</span><p>V2 데이터의 실제 이름·점수·근거·자료 품질을 계약 그대로 표시합니다.</p></article><article class="decision"><b>후보 조건</b><span class="pill wait">확인 대기</span><p>원천에서 확인된 조건만 다음 회차에 재확인합니다.</p></article></div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])} · 승인 CSS와 카드 구조를 유지합니다.</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 작성시각 {_escape(model["writtenAt"])} · 시장 데이터 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    issues = validate_rendered_outputs(
+        render_dashboard_markdown(report, template_dir=template_dir),
+        html_output,
+        model,
+    )
+    if issues:
+        raise TemplateUnavailable("TEMPLATE_UNAVAILABLE:RENDERED_OUTPUT_MISMATCH:" + ",".join(issues[:8]))
+    return html_output
 
 
 def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR) -> str:
@@ -327,9 +394,22 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
         "",
         "## 1. 시장 대시보드",
         "",
+        f"- 세션 요약: {model['indexSessionLabel']}",
+        f"- 계약 추적: CONTRACT_TRACE {model['contractTrace']} · V2_DATA_TRACE {model['v2Trace']} · TEMPLATE_TRACE {model['templateTrace']}",
         f"- 상승/하락/보합: {market['advancers']:,}/{market['decliners']:,}/{market['unchanged']:,}",
         f"- 하락 비율: {market['decliners']:,}/{market['total']:,} = {_plain_pct(market['declineRatio'])}",
         f"- 산술 검증: {'PASS' if market['advancers'] + market['decliners'] + market['unchanged'] == market['total'] else 'FAIL'}",
+        f"- 시장 거래대금: {_market_value_text(market['marketTradingValue'])}",
+        f"- 시장 세션: {model['indexSessionLabel']}",
+        *[
+            f"- {item.get('name') or item.get('indexName')}: {f'{item.get('close'):,.2f}' if isinstance(item.get('close'), (int, float)) else '확인 불가'} · {_pct(item.get('changeRate'))} · {_text(item.get('sourceTime') or model.get('observedAt'), '확인 불가')} · {_index_session_label(item)}"
+            for item in model['indices']
+            if item.get('name') in {'KOSPI', 'KOSDAQ'} or item.get('indexName') in {'KOSPI', 'KOSDAQ'}
+        ],
+        *[
+            f"- 지표 {label}: {_metric_line_value(market['metrics'].get(key) or {})}"
+            for label, key in (("20일 이동평균 상회", "aboveMA20"), ("60일 이동평균 상회", "aboveMA60"), ("120일 이동평균 상회", "aboveMA120"), ("20일 고점 돌파", "breakout20"), ("60일 고점 돌파", "breakout60"), ("20일 평균 거래량 상회", "volumeAbove20DayAverage"))
+        ],
         "",
         "## 2. 업종·테마·주도주·리서치",
         "",
@@ -342,6 +422,16 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
         "### V2 실명·주도 후보·최근 변화",
         "",
     ]
+    for row in model["industries"][:6]:
+        trading = row.get("tradingValue") or {}
+        total_value = trading.get("total")
+        industry_name = row.get("name") or row.get("id")
+        value_text = f"{total_value:,.0f}원" if isinstance(total_value, (int, float)) else "확인 불가"
+        lines.append(
+            f"- 업종 실측 {industry_name}: 상승 {_industry_breadth_text(row)}, "
+            f"1일 성과 {_pct(_first(row, 'avgReturn1D', 'medianReturn1D', 'changeRate'))}, "
+            f"거래대금 {value_text}"
+        )
     for label, rows in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
         lines.append(f"- V2 {label}: {len(rows)}개")
         for row in rows:
@@ -357,13 +447,17 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
             lines.append(
                 f"  - {row.get('name') or row.get('id') or '이름 미확인'}: "
                 f"V1 {row.get('v1Status') or '확인 불가'} · V2 {row.get('v2Status') or '확인 불가'}, "
-                f"점수 {score}, persistenceDays {row.get('persistenceDays') or 0}, "
+                f"점수 {f'{score:.2f}' if isinstance(score, (int, float)) else score}, persistenceDays {row.get('persistenceDays') or 0}, "
+                f"선정 근거 {row.get('selectionReason') or row.get('reason') or '확인 불가'}, "
+                f"자료 품질 {row.get('dataQuality') or row.get('qualityStatus') or '확인 불가'}, "
                 f"주도 후보 {leader_text}, 근거 {row.get('leaderEvidenceStatus') or '확인 불가'}, "
                 f"최근 변화 {history.get('changeClass') or '확인 불가'}, "
+                f"점수 변화 {history.get('scoreDelta') if history.get('scoreDelta') is not None else '확인 불가'}, "
                 f"상승 {source_metrics.get('advancers', '확인 불가')}개 / {_plain_pct(source_metrics.get('advancePct'))}, "
                 f"중앙 등락률 {_pct(source_metrics.get('medianReturn1D'))}, "
                 f"상대강도 {_pct(source_metrics.get('relativeStrengthVsMarket'))}, "
-                f"거래대금 {_price(trading_value.get('total')) if trading_value.get('total') is not None else '확인 불가'}"
+                f"거래대금 {_price(trading_value.get('total')) if trading_value.get('total') is not None else '확인 불가'}, "
+                f"자료 상태 {row.get('sourceMetricsStatus') or '확인 불가'}"
             )
     history = model.get("v2History") or {}
     lines.append(
@@ -384,6 +478,180 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
         )
     lines.extend(["", f"> NOTICE: {model['notice']}", ""])
     return "\n".join(lines)
+
+
+def validate_rendered_outputs(
+    markdown_text: str, html_text: str, model: Mapping[str, Any]
+) -> list[str]:
+    """Check the saved-format content, not only the pre-render model.
+
+    The same canonical tokens must survive both renderers.  This deliberately
+    reports field-level omissions so callers can fail closed before attaching
+    an incomplete HTML file.
+    """
+    html_plain = html.unescape(html_text)
+    issues: list[str] = []
+
+    required_sections = (
+        ("MARKDOWN_PART1", "## 1. 시장 대시보드", markdown_text),
+        ("MARKDOWN_PART2", "## 2. 업종·테마·주도주·리서치", markdown_text),
+        ("MARKDOWN_PART3", "## 3. 키움 후보 추적·조건별 대응", markdown_text),
+        ("HTML_PART1", 'id="part1"', html_plain),
+        ("HTML_PART2", 'id="part2"', html_plain),
+        ("HTML_PART3", 'id="part3"', html_plain),
+    )
+    for field, token, text in required_sections:
+        if token not in text:
+            issues.append(f"{field}_MISSING")
+
+    def markdown_section(heading: str) -> str:
+        match = re.search(
+            rf"^{re.escape(heading)}\s*$([\s\S]*?)(?=^##\s|\Z)",
+            markdown_text,
+            re.MULTILINE,
+        )
+        return match.group(1) if match else ""
+
+    def html_section(section_id: str) -> str:
+        match = re.search(
+            rf'<section[^>]*\bid="{re.escape(section_id)}"[^>]*>([\s\S]*?)</section>',
+            html_plain,
+            re.IGNORECASE,
+        )
+        return match.group(1) if match else ""
+
+    md_part1 = markdown_section("## 1. 시장 대시보드")
+    md_part2 = markdown_section("## 2. 업종·테마·주도주·리서치")
+    md_part3 = markdown_section("## 3. 키움 후보 추적·조건별 대응")
+    html_part1 = html_section("part1")
+    html_part2 = html_section("part2")
+    html_part3 = html_section("part3")
+
+    def require_in_section(field: str, value: Any, md_text: str, html_text_for_section: str) -> None:
+        if value in (None, ""):
+            return
+        token = str(value)
+        if token not in md_text:
+            issues.append(f"MARKDOWN_{field}_MISSING_IN_SECTION")
+        if token not in html_text_for_section:
+            issues.append(f"HTML_{field}_MISSING_IN_SECTION")
+
+    def require(field: str, value: Any) -> None:
+        if value in (None, ""):
+            return
+        token = str(value)
+        if token not in markdown_text:
+            issues.append(f"MARKDOWN_MISSING:{field}")
+        if token not in html_plain:
+            issues.append(f"HTML_MISSING:{field}")
+
+    require("asOf", model.get("asOf"))
+    require("writtenAt", model.get("writtenAt"))
+    require("observedAt", model.get("observedAt"))
+    require("tradingDateStatus", model.get("tradingDateStatus"))
+    require("indexSessionLabel", model.get("indexSessionLabel"))
+    for field in ("contractTrace", "v2Trace"):
+        require(field, model.get(field))
+    if model.get("templateTrace") not in (None, "", "filled-by-renderer"):
+        require("templateTrace", model.get("templateTrace"))
+    require("NOTICE", "NOTICE")
+
+    market = model["fullMarket"]
+    for field, value in (
+        ("advancers", f"{market['advancers']:,}"),
+        ("decliners", f"{market['decliners']:,}"),
+        ("unchanged", f"{market['unchanged']:,}"),
+        ("total", f"{market['total']:,}"),
+        ("declineRatio", _plain_pct(market["declineRatio"])),
+        ("marketTradingValue", _market_value_text(market["marketTradingValue"])),
+    ):
+        require(field, value)
+        require_in_section(field, value, md_part1, html_part1)
+    for key in ("aboveMA20", "aboveMA60", "aboveMA120", "breakout20", "breakout60", "volumeAbove20DayAverage"):
+        metric_value = _metric_line_value(market["metrics"].get(key) or {})
+        require(f"metric.{key}", metric_value)
+        require_in_section(f"metric.{key}", metric_value, md_part1, html_part1)
+
+    for item in model["indices"]:
+        name = item.get("name") or item.get("indexName")
+        if name not in {"KOSPI", "KOSDAQ"}:
+            continue
+        require(f"index.{name}.name", name)
+        require_in_section(f"index.{name}.name", name, md_part1, html_part1)
+        close = item.get("close")
+        close_value = f"{close:,.2f}" if isinstance(close, (int, float)) else "확인 불가"
+        rate_value = _pct(item.get("changeRate"))
+        source_time_value = _text(item.get("sourceTime") or model.get("observedAt"), "확인 불가")
+        session_value = _index_session_label(item)
+        for field, value in (("close", close_value), ("rate", rate_value), ("sourceTime", source_time_value), ("session", session_value)):
+            require(f"index.{name}.{field}", value)
+            require_in_section(f"index.{name}.{field}", value, md_part1, html_part1)
+
+    for row in model["industries"][:6]:
+        name = row.get("name") or row.get("id")
+        industry_values = (
+            ("industry.name", name),
+            ("industry.performance", _pct(_first(row, "avgReturn1D", "medianReturn1D", "changeRate"))),
+            ("industry.advancers", _industry_breadth_text(row)),
+        )
+        for field, value in industry_values:
+            require(field, value)
+            require_in_section(field, value, md_part2, html_part2)
+
+    for label, rows in (("v2Industry", model["v2Industries"]), ("v2Theme", model["v2Themes"])):
+        for row in rows:
+            row_values: list[tuple[str, Any]] = [
+                (f"{label}.name", row.get("name") or row.get("id")),
+                (f"{label}.status", row.get("v2Status") or row.get("status")),
+            ]
+            if isinstance(row.get("score"), (int, float)):
+                row_values.append((f"{label}.score", f"{row['score']:.2f}"))
+            persistence = row.get("persistenceDays") or (row.get("persistence") or {}).get("days") or (row.get("persistence") or {}).get("status")
+            row_values.extend([
+                (f"{label}.persistence", persistence),
+                (f"{label}.reason", row.get("selectionReason") or row.get("reason")),
+                (f"{label}.quality", row.get("dataQuality") or row.get("qualityStatus")),
+            ])
+            for field, value in row_values:
+                require(field, value)
+                require_in_section(field, value, md_part2, html_part2)
+            for leader in (row.get("leaderCandidates") or [])[:3]:
+                for field, value in ((f"{label}.leader.name", leader.get("name") or "이름 미확인"), (f"{label}.leader.code", leader.get("code") or "코드 미확인")):
+                    require(field, value)
+                    require_in_section(field, value, md_part2, html_part2)
+            history = row.get("historySummary") or {}
+            require(f"{label}.history", history.get("changeClass"))
+            require_in_section(f"{label}.history", history.get("changeClass"), md_part2, html_part2)
+
+    for row in model["leaders"][:10]:
+        for field, value in (("leader.name", row.get("name") or row.get("itemName")), ("leader.code", row.get("code") or row.get("itemCode"))):
+            require(field, value)
+            require_in_section(field, value, md_part2, html_part2)
+    for row in model["kiwoom"].get("stocks") or []:
+        stock_values = (
+            ("kiwoom.name", row.get("itemName")),
+            ("kiwoom.code", row.get("itemCode")),
+            ("kiwoom.price", _price(_first(row, "price", "currentPrice"))),
+            ("kiwoom.rate", _pct(_first(row, "changeRate", "change"))),
+            ("kiwoom.condition", row.get("conditionStatus") or row.get("state") or "확인 대기"),
+        )
+        for field, value in stock_values:
+            require(field, value)
+            require_in_section(field, value, md_part3, html_part3)
+    require_in_section("NOTICE.body", model.get("notice"), md_part3, html_part3)
+    return issues
+
+
+def validate_rendered_files(
+    markdown_path: Path, html_path: Path, model: Mapping[str, Any]
+) -> list[str]:
+    """Re-open the completed files and run the same fail-closed checks."""
+    try:
+        markdown_text = markdown_path.read_text(encoding="utf-8")
+        html_text = html_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"RENDERED_FILE_READ_FAILED:{type(exc).__name__}"]
+    return validate_rendered_outputs(markdown_text, html_text, model)
 
 
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:

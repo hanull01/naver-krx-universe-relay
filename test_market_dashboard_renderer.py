@@ -1,4 +1,5 @@
 import re
+import tempfile
 import unittest
 import html as html_lib
 from pathlib import Path
@@ -10,6 +11,8 @@ from tools.market_dashboard_renderer import (
     load_approved_template,
     render_dashboard_html,
     render_dashboard_markdown,
+    validate_rendered_files,
+    validate_rendered_outputs,
     validate_renderer_models,
 )
 
@@ -43,8 +46,8 @@ def report_fixture():
                 },
             },
             "indices": [
-                {"name": "KOSPI", "close": 3000.12, "changePoints": 12.3, "changeRate": 0.41},
-                {"name": "KOSDAQ", "close": 900.34, "changePoints": -3.2, "changeRate": -0.35},
+                {"name": "KOSPI", "close": 3000.12, "changePoints": 12.3, "changeRate": 0.41, "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT", "sourceTime": "2026-10-29T20:15:00+09:00"},
+                {"name": "KOSDAQ", "close": 900.34, "changePoints": -3.2, "changeRate": -0.35, "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT", "sourceTime": "2026-10-29T20:15:00+09:00"},
             ],
             "industries": [{"name": "반도체와반도체장비", "memberCount": 10, "advancers": 8, "avgReturn1D": 2.1, "advancePct": 80.0}],
             "themes": [],
@@ -100,6 +103,73 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("## 1. 시장 대시보드", markdown)
         self.assertIn("## 2. 업종·테마·주도주·리서치", markdown)
         self.assertIn("## 3. 키움 후보 추적·조건별 대응", markdown)
+        self.assertIn("장후 관측", html_text)
+        self.assertNotIn("정규장 장중 관측", html_text)
+        self.assertNotIn("2,205/2,767 산술 검증", html_text)
+        self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
+
+    def test_saved_output_validation_detects_missing_dynamic_information(self):
+        report = report_fixture()
+        markdown = render_dashboard_markdown(report)
+        rendered = render_dashboard_html(report)
+        broken = rendered.replace("SK하이닉스", "")
+        issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
+        self.assertTrue(any(issue == "HTML_MISSING:v2Industry.leader.name" for issue in issues), issues)
+
+    def test_saved_output_validation_requires_values_in_their_own_section(self):
+        report = report_fixture()
+        markdown = render_dashboard_markdown(report)
+        rendered = render_dashboard_html(report)
+        broken = re.sub(
+            r'(<section[^>]+id="part2"[^>]*>[\s\S]*?</section>)',
+            lambda match: match.group(1).replace("반도체와반도체장비", ""),
+            rendered,
+            count=1,
+        )
+        issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
+        self.assertIn("HTML_v2Industry.name_MISSING_IN_SECTION", issues)
+
+    def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
+        report = report_fixture()
+        model = build_dashboard_model(report)
+        html = render_dashboard_html(report)
+        markdown = render_dashboard_markdown(report)
+        with tempfile.TemporaryDirectory() as directory:
+            markdown_path = Path(directory) / "report.md"
+            html_path = Path(directory) / "report.html"
+            markdown_path.write_text(markdown, encoding="utf-8")
+            html_path.write_text(html, encoding="utf-8")
+            self.assertEqual(validate_rendered_files(markdown_path, html_path, model), [])
+
+    def test_session_summary_preserves_full_session_state(self):
+        post = [{"name": "KOSPI", "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT"}, {"name": "KOSDAQ", "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT"}]
+        intraday = [{"name": "KOSPI", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}, {"name": "KOSDAQ", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}]
+        mixed = [post[0], intraday[1]]
+        unknown = [{"name": "KOSPI"}, {"name": "KOSDAQ"}]
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": post}})["indexSessionLabel"], "장후 관측")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": intraday}})["indexSessionLabel"], "장중 관측")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": mixed}})["indexSessionLabel"], "시장별 세션 상이")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": unknown}})["indexSessionLabel"], "세션 확인 대기")
+
+    def test_breadth_arithmetic_uses_contract_counts_for_other_sessions(self):
+        report = report_fixture()
+        report["reportContract"]["fullMarket"]["breadth"] = {
+            "advancers": 705, "decliners": 1833, "unchanged": 229,
+        }
+        model = build_dashboard_model(report)
+        self.assertEqual(model["fullMarket"]["declineRatio"], 66.25)
+        html = render_dashboard_html(report)
+        self.assertIn("1,833 / 전체 2,767", html_lib.unescape(html))
+        self.assertNotIn("2,205/2,767", html_lib.unescape(html))
+
+    def test_bad_1813_sample_is_recomputed_and_not_reused_as_a_fixed_ratio(self):
+        report = report_fixture()
+        report["reportContract"]["fullMarket"]["breadth"] = {
+            "advancers": 717, "decliners": 1813, "unchanged": 237,
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        self.assertIn("65.52%", html)
+        self.assertNotIn("79.69%", html)
 
     def test_html_classes_are_from_approved_structure(self):
         html = render_dashboard_html(report_fixture())

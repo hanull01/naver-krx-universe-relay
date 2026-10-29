@@ -307,6 +307,7 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
         self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["rendering"]["reason"], "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED")
 
     def test_null_trading_date_disables_html(self):
         contract = build_report_contract(
@@ -373,6 +374,7 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertTrue(contract["baseline"]["dateMismatch"])
         self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
+        self.assertEqual(contract["rendering"]["reason"], "BASELINE_STALE_HTML_BLOCKED")
 
     def test_theme_member_rows_are_compacted_for_github_contents_transport(self):
         generated = "2026-10-29T04:09:16+00:00"
