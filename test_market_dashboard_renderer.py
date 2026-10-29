@@ -1,4 +1,5 @@
 import re
+import tempfile
 import unittest
 import html as html_lib
 from pathlib import Path
@@ -10,6 +11,7 @@ from tools.market_dashboard_renderer import (
     load_approved_template,
     render_dashboard_html,
     render_dashboard_markdown,
+    validate_rendered_files,
     validate_rendered_outputs,
     validate_renderer_models,
 )
@@ -113,6 +115,41 @@ class MarketDashboardRendererTests(unittest.TestCase):
         broken = rendered.replace("SK하이닉스", "")
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
         self.assertTrue(any(issue == "HTML_MISSING:v2Industry.leader.name" for issue in issues), issues)
+
+    def test_saved_output_validation_requires_values_in_their_own_section(self):
+        report = report_fixture()
+        markdown = render_dashboard_markdown(report)
+        rendered = render_dashboard_html(report)
+        broken = re.sub(
+            r'(<section[^>]+id="part2"[^>]*>[\s\S]*?</section>)',
+            lambda match: match.group(1).replace("반도체와반도체장비", ""),
+            rendered,
+            count=1,
+        )
+        issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
+        self.assertIn("HTML_v2Industry.name_MISSING_IN_SECTION", issues)
+
+    def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
+        report = report_fixture()
+        model = build_dashboard_model(report)
+        html = render_dashboard_html(report)
+        markdown = render_dashboard_markdown(report)
+        with tempfile.TemporaryDirectory() as directory:
+            markdown_path = Path(directory) / "report.md"
+            html_path = Path(directory) / "report.html"
+            markdown_path.write_text(markdown, encoding="utf-8")
+            html_path.write_text(html, encoding="utf-8")
+            self.assertEqual(validate_rendered_files(markdown_path, html_path, model), [])
+
+    def test_session_summary_preserves_full_session_state(self):
+        post = [{"name": "KOSPI", "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT"}, {"name": "KOSDAQ", "marketStatus": "CLOSE", "session": "POST_MARKET_SNAPSHOT"}]
+        intraday = [{"name": "KOSPI", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}, {"name": "KOSDAQ", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}]
+        mixed = [post[0], intraday[1]]
+        unknown = [{"name": "KOSPI"}, {"name": "KOSDAQ"}]
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": post}})["indexSessionLabel"], "장후 관측")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": intraday}})["indexSessionLabel"], "장중 관측")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": mixed}})["indexSessionLabel"], "시장별 세션 상이")
+        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": unknown}})["indexSessionLabel"], "세션 확인 대기")
 
     def test_breadth_arithmetic_uses_contract_counts_for_other_sessions(self):
         report = report_fixture()

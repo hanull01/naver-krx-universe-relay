@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -78,15 +79,21 @@ def _index_session_label(item: Mapping[str, Any]) -> str:
 
 
 def _index_session_summary(indices: list[Mapping[str, Any]]) -> str:
-    observed = [
-        f"{row.get('name') or row.get('indexName') or '시장'} {_index_session_label(row)}"
+    labels = [
+        _index_session_label(row)
         for row in indices
         if row.get("name") in {"KOSPI", "KOSDAQ"} or row.get("indexName") in {"KOSPI", "KOSDAQ"}
     ]
-    if not observed:
+    if not labels:
         return "세션 확인 대기"
-    labels = {value.rsplit(" ", 1)[-1] for value in observed}
-    return next(iter(labels)) if len(labels) == 1 else "시장별 세션 관측"
+    unique = set(labels)
+    if unique == {"장후 관측"}:
+        return "장후 관측"
+    if unique == {"장중 관측"}:
+        return "장중 관측"
+    if "세션 확인 대기" in unique:
+        return "시장별 세션 상이·확인 대기" if len(unique) > 1 else "세션 확인 대기"
+    return "시장별 세션 상이"
 
 
 def _market_value_text(market_values: Mapping[str, Any]) -> str:
@@ -387,6 +394,8 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
         "",
         "## 1. 시장 대시보드",
         "",
+        f"- 세션 요약: {model['indexSessionLabel']}",
+        f"- 계약 추적: CONTRACT_TRACE {model['contractTrace']} · V2_DATA_TRACE {model['v2Trace']} · TEMPLATE_TRACE {model['templateTrace']}",
         f"- 상승/하락/보합: {market['advancers']:,}/{market['decliners']:,}/{market['unchanged']:,}",
         f"- 하락 비율: {market['decliners']:,}/{market['total']:,} = {_plain_pct(market['declineRatio'])}",
         f"- 산술 검증: {'PASS' if market['advancers'] + market['decliners'] + market['unchanged'] == market['total'] else 'FAIL'}",
@@ -495,6 +504,38 @@ def validate_rendered_outputs(
         if token not in text:
             issues.append(f"{field}_MISSING")
 
+    def markdown_section(heading: str) -> str:
+        match = re.search(
+            rf"^{re.escape(heading)}\s*$([\s\S]*?)(?=^##\s|\Z)",
+            markdown_text,
+            re.MULTILINE,
+        )
+        return match.group(1) if match else ""
+
+    def html_section(section_id: str) -> str:
+        match = re.search(
+            rf'<section[^>]*\bid="{re.escape(section_id)}"[^>]*>([\s\S]*?)</section>',
+            html_plain,
+            re.IGNORECASE,
+        )
+        return match.group(1) if match else ""
+
+    md_part1 = markdown_section("## 1. 시장 대시보드")
+    md_part2 = markdown_section("## 2. 업종·테마·주도주·리서치")
+    md_part3 = markdown_section("## 3. 키움 후보 추적·조건별 대응")
+    html_part1 = html_section("part1")
+    html_part2 = html_section("part2")
+    html_part3 = html_section("part3")
+
+    def require_in_section(field: str, value: Any, md_text: str, html_text_for_section: str) -> None:
+        if value in (None, ""):
+            return
+        token = str(value)
+        if token not in md_text:
+            issues.append(f"MARKDOWN_{field}_MISSING_IN_SECTION")
+        if token not in html_text_for_section:
+            issues.append(f"HTML_{field}_MISSING_IN_SECTION")
+
     def require(field: str, value: Any) -> None:
         if value in (None, ""):
             return
@@ -525,52 +566,92 @@ def validate_rendered_outputs(
         ("marketTradingValue", _market_value_text(market["marketTradingValue"])),
     ):
         require(field, value)
+        require_in_section(field, value, md_part1, html_part1)
     for key in ("aboveMA20", "aboveMA60", "aboveMA120", "breakout20", "breakout60", "volumeAbove20DayAverage"):
-        require(f"metric.{key}", _metric_line_value(market["metrics"].get(key) or {}))
+        metric_value = _metric_line_value(market["metrics"].get(key) or {})
+        require(f"metric.{key}", metric_value)
+        require_in_section(f"metric.{key}", metric_value, md_part1, html_part1)
 
     for item in model["indices"]:
         name = item.get("name") or item.get("indexName")
         if name not in {"KOSPI", "KOSDAQ"}:
             continue
         require(f"index.{name}.name", name)
+        require_in_section(f"index.{name}.name", name, md_part1, html_part1)
         close = item.get("close")
-        require(f"index.{name}.close", f"{close:,.2f}" if isinstance(close, (int, float)) else "확인 불가")
-        require(f"index.{name}.rate", _pct(item.get("changeRate")))
-        require(f"index.{name}.sourceTime", _text(item.get("sourceTime") or model.get("observedAt"), "확인 불가"))
-        require(f"index.{name}.session", _index_session_label(item))
+        close_value = f"{close:,.2f}" if isinstance(close, (int, float)) else "확인 불가"
+        rate_value = _pct(item.get("changeRate"))
+        source_time_value = _text(item.get("sourceTime") or model.get("observedAt"), "확인 불가")
+        session_value = _index_session_label(item)
+        for field, value in (("close", close_value), ("rate", rate_value), ("sourceTime", source_time_value), ("session", session_value)):
+            require(f"index.{name}.{field}", value)
+            require_in_section(f"index.{name}.{field}", value, md_part1, html_part1)
 
     for row in model["industries"][:6]:
         name = row.get("name") or row.get("id")
-        require("industry.name", name)
-        require("industry.performance", _pct(_first(row, "avgReturn1D", "medianReturn1D", "changeRate")))
-        require("industry.advancers", _industry_breadth_text(row))
+        industry_values = (
+            ("industry.name", name),
+            ("industry.performance", _pct(_first(row, "avgReturn1D", "medianReturn1D", "changeRate"))),
+            ("industry.advancers", _industry_breadth_text(row)),
+        )
+        for field, value in industry_values:
+            require(field, value)
+            require_in_section(field, value, md_part2, html_part2)
 
     for label, rows in (("v2Industry", model["v2Industries"]), ("v2Theme", model["v2Themes"])):
         for row in rows:
-            require(f"{label}.name", row.get("name") or row.get("id"))
-            require(f"{label}.status", row.get("v2Status") or row.get("status"))
+            row_values: list[tuple[str, Any]] = [
+                (f"{label}.name", row.get("name") or row.get("id")),
+                (f"{label}.status", row.get("v2Status") or row.get("status")),
+            ]
             if isinstance(row.get("score"), (int, float)):
-                require(f"{label}.score", f"{row['score']:.2f}")
+                row_values.append((f"{label}.score", f"{row['score']:.2f}"))
             persistence = row.get("persistenceDays") or (row.get("persistence") or {}).get("days") or (row.get("persistence") or {}).get("status")
-            require(f"{label}.persistence", persistence)
-            require(f"{label}.reason", row.get("selectionReason") or row.get("reason"))
-            require(f"{label}.quality", row.get("dataQuality") or row.get("qualityStatus"))
+            row_values.extend([
+                (f"{label}.persistence", persistence),
+                (f"{label}.reason", row.get("selectionReason") or row.get("reason")),
+                (f"{label}.quality", row.get("dataQuality") or row.get("qualityStatus")),
+            ])
+            for field, value in row_values:
+                require(field, value)
+                require_in_section(field, value, md_part2, html_part2)
             for leader in (row.get("leaderCandidates") or [])[:3]:
-                require(f"{label}.leader.name", leader.get("name") or "이름 미확인")
-                require(f"{label}.leader.code", leader.get("code") or "코드 미확인")
+                for field, value in ((f"{label}.leader.name", leader.get("name") or "이름 미확인"), (f"{label}.leader.code", leader.get("code") or "코드 미확인")):
+                    require(field, value)
+                    require_in_section(field, value, md_part2, html_part2)
             history = row.get("historySummary") or {}
             require(f"{label}.history", history.get("changeClass"))
+            require_in_section(f"{label}.history", history.get("changeClass"), md_part2, html_part2)
 
     for row in model["leaders"][:10]:
-        require("leader.name", row.get("name") or row.get("itemName"))
-        require("leader.code", row.get("code") or row.get("itemCode"))
+        for field, value in (("leader.name", row.get("name") or row.get("itemName")), ("leader.code", row.get("code") or row.get("itemCode"))):
+            require(field, value)
+            require_in_section(field, value, md_part2, html_part2)
     for row in model["kiwoom"].get("stocks") or []:
-        require("kiwoom.name", row.get("itemName"))
-        require("kiwoom.code", row.get("itemCode"))
-        require("kiwoom.price", _price(_first(row, "price", "currentPrice")))
-        require("kiwoom.rate", _pct(_first(row, "changeRate", "change")))
-        require("kiwoom.condition", row.get("conditionStatus") or row.get("state") or "확인 대기")
+        stock_values = (
+            ("kiwoom.name", row.get("itemName")),
+            ("kiwoom.code", row.get("itemCode")),
+            ("kiwoom.price", _price(_first(row, "price", "currentPrice"))),
+            ("kiwoom.rate", _pct(_first(row, "changeRate", "change"))),
+            ("kiwoom.condition", row.get("conditionStatus") or row.get("state") or "확인 대기"),
+        )
+        for field, value in stock_values:
+            require(field, value)
+            require_in_section(field, value, md_part3, html_part3)
+    require_in_section("NOTICE.body", model.get("notice"), md_part3, html_part3)
     return issues
+
+
+def validate_rendered_files(
+    markdown_path: Path, html_path: Path, model: Mapping[str, Any]
+) -> list[str]:
+    """Re-open the completed files and run the same fail-closed checks."""
+    try:
+        markdown_text = markdown_path.read_text(encoding="utf-8")
+        html_text = html_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"RENDERED_FILE_READ_FAILED:{type(exc).__name__}"]
+    return validate_rendered_outputs(markdown_text, html_text, model)
 
 
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
