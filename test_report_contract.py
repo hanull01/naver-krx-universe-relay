@@ -284,6 +284,30 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID")
         self.assertFalse(contract["rendering"]["htmlAllowed"])
 
+    def test_source_observed_final_date_is_partial_and_html_blocked(self):
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "SOURCE_OBSERVED",
+            "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
+            "evidenceClass": "SOURCE_OBSERVED",
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {
+                "tradingDate": "20261028", "tradingDateEvidence": evidence,
+                "markets": {"TOTAL": {}},
+            }},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g", "tradingDateEvidence": evidence},
+            industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["status"], "PARTIAL")
+        self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
+        self.assertFalse(contract["rendering"]["htmlAllowed"])
+
     def test_null_trading_date_disables_html(self):
         contract = build_report_contract(
             indices={"generatedAt": "g", "indices": []},

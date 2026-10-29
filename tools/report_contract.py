@@ -38,6 +38,7 @@ TRADING_DATE_EVIDENCE_REASONS = {
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
     "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
 }
+SOURCE_OBSERVED_TRADING_DATE_REASON = "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
 
 # GitHub Contents API does not return inline content for large blobs. Keep
 # the Work-facing contract below that transport limit while preserving the
@@ -533,8 +534,16 @@ def build_report_contract(
     trading_date_evidence_valid = _valid_trading_date_evidence(
         evidence, trading_date, generation
     )
+    source_observed_date = (
+        isinstance(evidence, Mapping)
+        and evidence.get("status") == "SOURCE_OBSERVED"
+        and evidence.get("reason") == SOURCE_OBSERVED_TRADING_DATE_REASON
+        and evidence.get("evidenceClass") == "SOURCE_OBSERVED"
+        and str(evidence.get("tradingDate") or "") == str(trading_date or "")
+    )
     trading_date_status = (
         "VERIFIED" if trading_date_evidence_valid
+        else "SOURCE_OBSERVED" if source_observed_date
         else "UNAVAILABLE_TRADING_DATE_NULL" if not trading_date
         else "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID"
     )

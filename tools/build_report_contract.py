@@ -20,6 +20,7 @@ FINAL_EVIDENCE_REASONS = {
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
 }
 INTRADAY_EVIDENCE_REASON = "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT"
+SOURCE_OBSERVED_EVIDENCE_REASON = "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
 
 
 def _serialize_contract(contract: dict) -> bytes:
@@ -74,8 +75,14 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
     reasons = {e.get("reason") for e in candidates}
     accepted_reasons = FINAL_EVIDENCE_REASONS | {INTRADAY_EVIDENCE_REASON}
     valid = reasons & accepted_reasons
-    if (not valid or not reasons.issubset(accepted_reasons)
-            or any(e.get("status") != "VERIFIED" for e in candidates)):
+    statuses = {e.get("status") for e in candidates}
+    if reasons == {SOURCE_OBSERVED_EVIDENCE_REASON}:
+        if statuses != {"SOURCE_OBSERVED"} or any(
+                e.get("evidenceClass") != "SOURCE_OBSERVED" for e in candidates
+        ):
+            raise SystemExit("TRADING_DATE_UNAVAILABLE")
+    elif (not valid or not reasons.issubset(accepted_reasons)
+          or any(e.get("status") != "VERIFIED" for e in candidates)):
         raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
     # A current snapshot may support an intraday contract, but never a

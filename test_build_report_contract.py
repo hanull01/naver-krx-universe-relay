@@ -143,6 +143,38 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(contract["asOf"], "20261028")
             self.assertEqual(contract["tradingDateEvidence"]["evidenceClass"], "POST_MARKET_SNAPSHOT")
 
+    def test_source_observed_final_date_builds_partial_contract_without_html(self):
+        evidence = {
+            "tradingDate": "20261028",
+            "status": "SOURCE_OBSERVED",
+            "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
+            "evidenceClass": "SOURCE_OBSERVED",
+        }
+        quality = {"generatedAt": "2026-10-28T11:40:00+00:00", "tradingDateEvidence": evidence}
+        summary = {
+            "generatedAt": "2026-10-28T11:40:00+00:00",
+            "fullMarket": {"tradingDateEvidence": evidence},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "latest-report-contract.json"
+            def load(path):
+                return quality if str(path).endswith("latest-quality.json") else summary
+            with patch.object(builder, "load_json", side_effect=load), \
+                 patch.object(builder, "build_report", return_value={
+                     "reportContract": {
+                         "schemaVersion": "market-report-contract-v1",
+                         "status": "PARTIAL",
+                         "asOf": "20261028",
+                         "observedAt": "2026-10-28T11:40:00+00:00",
+                         "tradingDateStatus": "SOURCE_OBSERVED",
+                         "rendering": {"htmlAllowed": False},
+                     }
+                 }), \
+                 patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
+                self.assertEqual(builder.main(), 0)
+            contract = json.loads(output.read_text())
+            self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
+
     def test_intraday_evidence_requires_matching_collection_timestamp(self):
         evidence = {
             "tradingDate": "20261028",
