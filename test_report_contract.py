@@ -59,6 +59,88 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
+    def test_v2_real_names_leaders_and_recent_history_are_same_generation(self):
+        generated = "2026-10-29T05:08:56+00:00"
+        evidence = {
+            "tradingDate": "20261029", "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        industry_source = {
+            "id": "i1", "name": "인터넷과카탈로그소매", "leaders": [
+                {"code": "100001", "name": "상위업종주", "changeRate": 12.0},
+                {"code": "100002", "name": "두번째주", "changeRate": 8.0},
+                {"code": "100003", "name": "세번째주", "changeRate": 4.0},
+                {"code": "100004", "name": "제외주", "changeRate": 2.0},
+            ],
+        }
+        theme_source = {
+            "id": "t1", "name": "S7", "stocks": [
+                {"code": "200001", "name": "테마상위", "changeRate": 20.0, "derivedMetricsUsable": True, "currentPrice": 1000},
+                {"code": "200002", "name": "테마차상위", "changeRate": 10.0, "derivedMetricsUsable": True, "currentPrice": 2000},
+                {"code": "200003", "name": "테마하위", "changeRate": 1.0, "derivedMetricsUsable": True, "currentPrice": 3000},
+                {"code": "200004", "name": "격리", "changeRate": 99.0, "derivedMetricsUsable": False, "currentPrice": 4000},
+            ],
+        }
+        observations = []
+        for index, date in enumerate(("2026-10-22", "2026-10-23", "2026-10-24", "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29")):
+            observations.append({
+                "tradingDate": date, "observedAt": f"{date}T10:00:00+00:00",
+                "sourceSnapshotHash": f"hash-{date}",
+                "industries": [{"id": "i1", "kind": "industry", "v2Status": "WATCH", "score": 70 + index}],
+                "themes": [{"id": "t1", "kind": "theme", "v2Status": "WATCH", "score": 60 + index}],
+            })
+        observations.append({
+            "tradingDate": "2026-10-29", "observedAt": "2026-10-29T11:00:00+00:00",
+            "sourceSnapshotHash": "hash-2026-10-29-later",
+            "industries": [{"id": "i1", "kind": "industry", "v2Status": "ACTIVE", "score": 90}],
+            "themes": [{"id": "t1", "kind": "theme", "v2Status": "WATCH", "score": 66}],
+        })
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261029", "tradingDateEvidence": evidence,
+                "authoritativeCount": 1, "markets": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}},
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence},
+            industries={"generatedAt": generated, "industries": [industry_source]},
+            themes={"generatedAt": generated, "themes": [theme_source]},
+            v2_latest={"generatedAt": generated, "tradingDate": "20261029",
+                        "inputEvidence": {"sourceQualityStatus": "SOURCE_OBSERVED", "sourceCommit": None, "sourceCommitStatus": "UNAVAILABLE"},
+                        "industries": [{"id": "i1", "name": "인터넷과카탈로그소매", "kind": "industry", "v2Status": "ACTIVE", "score": 91.2, "persistenceDays": 7}],
+                        "themes": [{"id": "t1", "name": "S7", "kind": "theme", "v2Status": "WATCH", "score": 82.4, "persistenceDays": 3}]},
+            v2_history={"observations": observations}, leaders={},
+        )
+        industry = contract["v2"]["industries"][0]
+        theme = contract["v2"]["themes"][0]
+        self.assertEqual([row["name"] for row in industry["leaderCandidates"]], ["상위업종주", "두번째주", "세번째주"])
+        self.assertEqual(industry["leaders"], industry["leaderCandidates"])
+        self.assertEqual(industry["leaderEvidenceStatus"], "AVAILABLE_UNVERIFIED_SOURCE_COMMIT")
+        self.assertEqual([row["name"] for row in theme["leaderCandidates"]], ["테마상위", "테마차상위", "테마하위"])
+        self.assertEqual(contract["v2"]["history"]["availableTradingDays"], 7)
+        self.assertTrue(contract["v2"]["history"]["sameDayDeduplicated"])
+        self.assertEqual(industry["historySummary"]["changeClass"], "STATUS_CHANGED")
+        self.assertEqual(industry["historySummary"]["scoreDelta"], 15)
+        self.assertTrue(industry["historySummary"]["currentObserved"])
+
+    def test_v2_leaders_are_blocked_when_source_generation_does_not_match(self):
+        generated = "2026-10-29T05:08:56+00:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261029", "authoritativeCount": 1, "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": "old", "industries": [{"id": "i1", "leaders": [{"code": "1", "name": "오래된주"}]}]},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [{"id": "i1", "kind": "industry", "v2Status": "WATCH"}], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        row = contract["v2"]["industries"][0]
+        self.assertEqual(row["leaderEvidenceStatus"], "UNAVAILABLE_SOURCE_GENERATION_MISMATCH")
+        self.assertEqual(row["leaderCandidates"], [])
+
     def test_post_market_observation_is_available_but_not_final_daily_evidence(self):
         generated = "2026-10-28T20:40:03+09:00"
         evidence = {

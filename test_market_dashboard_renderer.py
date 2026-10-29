@@ -54,8 +54,9 @@ def report_fixture():
                 "sourceCommit": "abc123",
                 "sourceQualityStatus": "SOURCE_OBSERVED",
                 "history": {"uniqueTradingDates": ["2026-10-28", "2026-10-29"]},
-                "industries": [{"id": "i1", "name": "반도체와반도체장비", "v2Status": "ACTIVE", "score": 91.2, "selectionReason": "상대강도"}],
-                "themes": [{"id": "t1", "name": "S7", "v2Status": "WATCH", "score": 88.4, "selectionReason": "지속성"}],
+                "industries": [{"id": "i1", "name": "반도체와반도체장비", "v1Status": "WATCH", "v2Status": "ACTIVE", "score": 91.2, "selectionReason": "상대강도", "persistenceDays": 4, "leaderCandidates": [{"code": "000660", "name": "SK하이닉스", "changeRate": 3.77}], "leaderEvidenceStatus": "AVAILABLE", "sourceMetricsStatus": "AVAILABLE", "sourceMetrics": {"advancers": 8, "advancePct": 80.0, "medianReturn1D": 2.2, "relativeStrengthVsMarket": 4.5, "tradingValue": {"total": 1000000000}}, "historySummary": {"changeClass": "STRENGTHENING", "scoreDelta": 2.1, "availableTradingDays": 4}}],
+                "themes": [{"id": "t1", "name": "S7", "v1Status": "WATCH", "v2Status": "WATCH", "score": 88.4, "selectionReason": "지속성", "persistenceDays": 3, "leaderCandidates": [{"code": "005930", "name": "삼성전자", "changeRate": 1.2}], "leaderEvidenceStatus": "AVAILABLE_UNVERIFIED_SOURCE_COMMIT", "sourceMetricsStatus": "AVAILABLE_UNVERIFIED_SOURCE_COMMIT", "sourceMetrics": {"advancers": 5, "advancePct": 60.0, "medianReturn1D": 1.1, "relativeStrengthVsMarket": 2.2, "tradingValue": {"total": 2000000000}}, "historySummary": {"changeClass": "PERSISTING", "scoreDelta": 0, "availableTradingDays": 3}}],
+                "history": {"status": "AVAILABLE", "recentTradingDates": ["2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28"], "availableTradingDays": 4, "sameDayDeduplicated": True, "uniqueTradingDates": ["2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28"]},
             },
             "independentAnalysis": {"research": {"status": "AVAILABLE"}},
             "kiwoomCandidates": {
@@ -90,7 +91,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "2026-10-29T12:10:00+09:00", "79.69%", "SK하이닉스", "000660", "삼성E&A", "028050", "59,800원", "확인 대기"):
+        for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "2026-10-29T12:10:00+09:00", "79.69%", "SK하이닉스", "000660", "삼성전자", "005930", "STRENGTHENING", "persistenceDays", "중앙 등락률", "거래대금", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT", "삼성E&A", "028050", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_text)

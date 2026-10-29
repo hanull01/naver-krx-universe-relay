@@ -137,6 +137,7 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
         "v2Trace": (
             f"sourceCommit={_text(v2.get('sourceCommit'))};"
             f"sourceQualityStatus={_text(v2.get('sourceQualityStatus'))};"
+            f"sourceCommitStatus={_text(v2.get('sourceCommitStatus'))};"
             f"tradingDate={_text(v2.get('tradingDate'))};"
             f"historyDates={','.join(v2.get('history', {}).get('uniqueTradingDates', [])) or '확인 불가'}"
         ),
@@ -157,6 +158,7 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
         "leaders": list(contract.get("leaders") or []),
         "v2Industries": list(v2.get("industries") or []),
         "v2Themes": list(v2.get("themes") or []),
+        "v2History": v2.get("history") or {},
         "research": contract.get("independentAnalysis", {}).get("research", {}),
         "kiwoom": contract.get("kiwoomCandidates") or {},
         "technicalCandidates": list(contract.get("technicalCandidates") or []),
@@ -223,12 +225,35 @@ def _v2_cards(rows: list[Mapping[str, Any]], label: str) -> str:
         score = row.get("score")
         reason = row.get("selectionReason") or row.get("reason") or row.get("selectionReasons")
         persistence = row.get("persistence") or {}
+        history = row.get("historySummary") or {}
+        leaders = row.get("leaderCandidates") or []
+        source_metrics = row.get("sourceMetrics") or {}
+        trading_value = source_metrics.get("tradingValue") or {}
+        metrics_text = (
+            f"상승 {source_metrics.get('advancers', '확인 불가')}개 / "
+            f"{_plain_pct(source_metrics.get('advancePct'))} · "
+            f"중앙 등락률 {_pct(source_metrics.get('medianReturn1D'))} · "
+            f"상대강도 {_pct(source_metrics.get('relativeStrengthVsMarket'))} · "
+            f"거래대금 {_price(trading_value.get('total')) if trading_value.get('total') is not None else '확인 불가'}"
+        )
+        leader_text = ", ".join(
+            f"{leader.get('name') or '이름 미확인'}({leader.get('code') or '코드 미확인'})"
+            for leader in leaders[:3]
+        ) or "주도주 0개"
+        v1_v2 = f"V1 {row.get('v1Status') or '확인 불가'} · V2 {row.get('v2Status') or '확인 불가'}"
+        persistence_text = row.get("persistenceDays")
+        if persistence_text is None:
+            persistence_text = persistence.get("days") or persistence.get("status")
         cards.append(
             f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(row.get("v2Status") or row.get("status") or "확인 불가")}</span></div>'
             f'<div class="industry-numbers"><div>{_escape(f"{score:.2f}" if isinstance(score, (int, float)) else "확인 불가")}<small>{_escape(label)} 점수</small></div>'
-            f'<div>{_escape(persistence.get("status") or persistence.get("days") or "확인 불가")}<small>지속성</small></div>'
+            f'<div>{_escape(persistence_text or "확인 불가")}<small>persistenceDays · 지속성 ({_escape(v1_v2)})</small></div>'
             f'<div>{_escape(reason if isinstance(reason, str) else ", ".join(map(str, reason or [])) or "확인 불가")}<small>선정 근거</small></div>'
-            f'<div>{_escape(row.get("dataQuality") or row.get("qualityStatus") or "확인 불가")}<small>자료 품질</small></div></div></div>'
+            f'<div>{_escape(row.get("dataQuality") or row.get("qualityStatus") or "확인 불가")}<small>자료 품질</small></div>'
+            f'<div style="grid-column:1 / -1;overflow-wrap:anywhere">{_escape(metrics_text)}<small>구성종목·확산·중앙값·시장 대비·거래대금 · {_escape(row.get("sourceMetricsStatus") or "확인 불가")}</small></div>'
+            f'<div style="grid-column:1 / -1;overflow-wrap:anywhere">{_escape(leader_text)}<small>검증된 주도 후보 최대 3개 · {_escape(row.get("leaderEvidenceStatus") or "확인 불가")}</small></div>'
+            f'<div style="grid-column:1 / -1;overflow-wrap:anywhere">{_escape(history.get("changeClass") or "확인 불가")} · 점수 변화 {_escape(str(history.get("scoreDelta") if history.get("scoreDelta") is not None else "확인 불가"))}<small>최근 {history.get("availableTradingDays", 0)}거래일 · 동일 거래일 중복 제거</small></div>'
+            f'</div></div>'
         )
     return "".join(cards) or '<div class="industry-item"><strong>확인된 V2 결과가 없습니다.</strong></div>'
 
@@ -312,11 +337,45 @@ def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path =
         f"- 자동 주도주: {_leader_text(model['leaders'])}",
         f"- 리서치 상태: {model['research'].get('status') or '확인 불가'}",
         "",
+        "### V2 실명·주도 후보·최근 변화",
+        "",
+    ]
+    for label, rows in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
+        lines.append(f"- V2 {label}: {len(rows)}개")
+        for row in rows:
+            leaders = row.get("leaderCandidates") or []
+            leader_text = ", ".join(
+                f"{leader.get('name') or '이름 미확인'}({leader.get('code') or '코드 미확인'})"
+                for leader in leaders[:3]
+            ) or "주도주 0개"
+            history = row.get("historySummary") or {}
+            source_metrics = row.get("sourceMetrics") or {}
+            trading_value = source_metrics.get("tradingValue") or {}
+            score = row.get("score") if isinstance(row.get("score"), (int, float)) else "확인 불가"
+            lines.append(
+                f"  - {row.get('name') or row.get('id') or '이름 미확인'}: "
+                f"V1 {row.get('v1Status') or '확인 불가'} · V2 {row.get('v2Status') or '확인 불가'}, "
+                f"점수 {score}, persistenceDays {row.get('persistenceDays') or 0}, "
+                f"주도 후보 {leader_text}, 근거 {row.get('leaderEvidenceStatus') or '확인 불가'}, "
+                f"최근 변화 {history.get('changeClass') or '확인 불가'}, "
+                f"상승 {source_metrics.get('advancers', '확인 불가')}개 / {_plain_pct(source_metrics.get('advancePct'))}, "
+                f"중앙 등락률 {_pct(source_metrics.get('medianReturn1D'))}, "
+                f"상대강도 {_pct(source_metrics.get('relativeStrengthVsMarket'))}, "
+                f"거래대금 {_price(trading_value.get('total')) if trading_value.get('total') is not None else '확인 불가'}"
+            )
+    history = model.get("v2History") or {}
+    lines.append(
+        f"- V2 이력: {history.get('status', '확인 불가')}, "
+        f"최근 거래일 {', '.join(history.get('recentTradingDates') or []) or '확인 불가'}, "
+        f"실제 확보 {history.get('availableTradingDays', 0)}일, 동일 거래일 중복 제거 {history.get('sameDayDeduplicated', False)}"
+    )
+    lines.extend([
+        "",
         "## 3. 키움 후보 추적·조건별 대응",
         "",
         "| 종목명 | 종목코드 | 가격 | 등락률 | 조건 판정 |",
         "|---|---:|---:|---:|---|",
-    ]
+    ])
     for row in model["kiwoom"].get("stocks") or []:
         lines.append(
             f"| {_text(row.get('itemName'))} | {_text(row.get('itemCode'))} | {_price(_first(row, 'price', 'currentPrice'))} | {_pct(_first(row, 'changeRate', 'change'))} | {_text(row.get('conditionStatus') or row.get('state'), '확인 대기')} |"
@@ -330,7 +389,7 @@ def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Ma
     left = build_dashboard_model(markdown_report)
     right = build_dashboard_model(html_report)
     mismatches = []
-    for key in ("asOf", "writtenAt", "observedAt", "contractTrace", "v2Trace", "fullMarket", "industries", "v2Industries", "v2Themes", "leaders", "kiwoom"):
+    for key in ("asOf", "writtenAt", "observedAt", "contractTrace", "v2Trace", "fullMarket", "industries", "v2Industries", "v2Themes", "v2History", "leaders", "kiwoom"):
         if left.get(key) != right.get(key):
             mismatches.append(key)
     return mismatches
