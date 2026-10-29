@@ -126,6 +126,28 @@ class TradingDiscoveryTests(unittest.TestCase):
             path.write_text(json.dumps(td.published_payload(snapshot())), encoding="utf-8")
             self.assertEqual(td.discovery_status("2026-10-13", path)["status"], "STALE")
 
+    def test_default_reader_uses_report_date_and_never_falls_back_to_latest(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            dated = td.published_payload(snapshot(["042510", "064400", "253590"], monitoring="2026-10-29"))
+            future = td.published_payload(snapshot(["000810"], monitoring="2026-10-30"))
+            (root / "2026-10-29.json").write_text(json.dumps(dated), encoding="utf-8")
+            (root / "latest.json").write_text(json.dumps(future), encoding="utf-8")
+            original = td.DISCOVERY_DIR
+            td.DISCOVERY_DIR = root
+            try:
+                selected = td.discovery_status("2026-10-29")
+                self.assertEqual(selected["status"], "AVAILABLE")
+                self.assertEqual(selected["symbols"], ["042510", "064400", "253590"])
+                self.assertTrue(selected["sourcePath"].endswith("2026-10-29.json"))
+
+                (root / "2026-10-29.json").unlink()
+                missing = td.discovery_status("2026-10-29")
+                self.assertEqual(missing["status"], "UNAVAILABLE")
+                self.assertTrue(missing["sourcePath"].endswith("2026-10-29.json"))
+            finally:
+                td.DISCOVERY_DIR = original
+
     def test_analysis_reuses_core_then_full_market_and_isolates_missing(self):
         discovery = td.published_payload(snapshot(["005930", "035420", "999999"]))
         quotes = {"datas": [{"itemCode": "005930", "stockName": "삼성전자", "closePrice": 100,

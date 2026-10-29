@@ -119,6 +119,8 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(
                 [row["itemCode"] for row in contract["stocks"]], symbols
             )
+            self.assertTrue(contract["source"].endswith("latest.json"))
+            self.assertEqual(contract["sourceType"], "KIWOOM_WATCHLIST")
             self.assertNotIn("028050", contract["symbols"])
 
     def test_opt_in_lookup_requests_only_candidates_missing_from_both_sources(self):

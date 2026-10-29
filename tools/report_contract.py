@@ -523,6 +523,7 @@ def build_report_contract(
         if isinstance(row, Mapping) and row.get("itemCode")
     }
     source_validation = kiwoom_candidates.get("validation")
+    kiwoom_source_path = kiwoom_candidates.get("sourcePath")
     name_evidence_valid = (
         isinstance(source_validation, Mapping)
         and source_validation.get("status") == "VALID"
@@ -627,8 +628,12 @@ def build_report_contract(
         "candidates": technical_candidates,
         "technicalCandidates": technical_candidates,
         "kiwoomCandidates": {
-            "source": "data/trading-discovery/latest.json",
-            "sourceType": "KIWOOM_CONDITION_SEARCH",
+            # ``source`` is the immutable date-selected file actually read by
+            # the report.  Keep the semantic producer in sourceType so callers
+            # do not confuse it with the next session's latest.json.
+            "source": kiwoom_source_path,
+            "sourceType": kiwoom_candidates.get("source") or "KIWOOM_CONDITION_SEARCH",
+            "sourcePath": kiwoom_source_path,
             "selectionDate": kiwoom_candidates.get("selectionDate"),
             "monitoringDate": kiwoom_candidates.get("monitoringDate"),
             "sourceSha256": kiwoom_candidates.get("sourceSha256"),
