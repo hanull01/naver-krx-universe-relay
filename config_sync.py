@@ -22,9 +22,87 @@ def status(root, runner=subprocess.run):
     state = "LOCAL_CONFIG_CHANGES" if changed or cached else "SYNCED"
     return {"state": state, "dirty": bool(changed or cached), "stagedBlocked": blocked, "message": "저장하지 않은 설정 변경 있음" if state != "SYNCED" else "GitHub에 저장된 설정과 동일"}
 
+def _empty_config(data):
+    leaders = data.get("leaders") or {}
+    return (not data.get("stocks")
+            and not any(data.get(key) for key in ("sectors", "themes", "watchlists"))
+            and not any(leaders.values()))
+
+
+def _config_from_git(root, runner):
+    result = run(["show", "HEAD:config/universe.json"], root, runner)
+    if result.returncode:
+        raise ValueError("GitHub 기준 설정을 읽을 수 없습니다.")
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise ValueError("GitHub 기준 설정 JSON이 올바르지 않습니다.") from exc
+
+
+def _config_from_worktree(root):
+    try:
+        return json.loads((root / "config" / "universe.json").read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise ValueError("현재 Universe 설정 파일을 읽을 수 없습니다.") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError("현재 Universe 설정 JSON이 올바르지 않습니다.") from exc
+
+
+def comparison_summary(before, after):
+    """Return a data-backed, user-safe summary for the exact config diff."""
+    before_stocks = {str(row.get("itemCode")): row for row in before.get("stocks", [])}
+    after_stocks = {str(row.get("itemCode")): row for row in after.get("stocks", [])}
+    added_codes = sorted(set(after_stocks) - set(before_stocks))
+    removed_codes = sorted(set(before_stocks) - set(after_stocks))
+    changed = []
+    for code in sorted(set(before_stocks) & set(after_stocks)):
+        old, new = before_stocks[code], after_stocks[code]
+        fields = {}
+        for field in ("stockName", "enabled"):
+            if old.get(field) != new.get(field):
+                fields[field] = {"before": old.get(field), "after": new.get(field)}
+        if fields:
+            changed.append({"itemCode": code, "stockName": new.get("stockName") or old.get("stockName"), "fields": fields})
+
+    group_changes = []
+    for kind, key in (("sector", "sectors"), ("theme", "themes"), ("watchlist", "watchlists")):
+        old_groups = before.get(key) or {}
+        new_groups = after.get(key) or {}
+        for name in sorted(set(old_groups) | set(new_groups)):
+            if name not in old_groups:
+                group_changes.append({"kind": kind, "name": name, "change": "ADDED",
+                                      "added": sorted(str(code) for code in new_groups[name]), "removed": []})
+                continue
+            if name not in new_groups:
+                group_changes.append({"kind": kind, "name": name, "change": "REMOVED",
+                                      "added": [], "removed": sorted(str(code) for code in old_groups[name])})
+                continue
+            old_members = sorted(str(code) for code in old_groups.get(name, []))
+            new_members = sorted(str(code) for code in new_groups.get(name, []))
+            added_members = sorted(set(new_members) - set(old_members))
+            removed_members = sorted(set(old_members) - set(new_members))
+            if added_members or removed_members:
+                group_changes.append({"kind": kind, "name": name, "change": "CHANGED",
+                                      "added": added_members, "removed": removed_members})
+
+    state = "EMPTY_SOURCE" if _empty_config(after) else "NO_CHANGES" if before == after else "CHANGED"
+    return {
+        "state": state,
+        "stocks": {
+            "added": [after_stocks[code] for code in added_codes],
+            "removed": [before_stocks[code] for code in removed_codes],
+            "changed": changed,
+        },
+        "groups": group_changes,
+        "beforeStockCount": len(before_stocks),
+        "afterStockCount": len(after_stocks),
+    }
+
+
 def preview(root, runner=subprocess.run):
     result = status(root, runner)
     result["diff"] = run(["diff", "HEAD", "--", "config/universe.json"], root, runner).stdout
+    result["summary"] = comparison_summary(_config_from_git(root, runner), _config_from_worktree(root))
     return result
 
 def remote_config_changed(root, runner=subprocess.run):
