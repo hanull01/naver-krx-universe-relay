@@ -175,7 +175,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-29', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'POST_MARKET_SNAPSHOT', 'finalConfirmed': False,
+            'evidenceClass': 'UNKNOWN_SESSION', 'finalConfirmed': False,
             'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -183,6 +183,22 @@ class ReadyMailTests(unittest.TestCase):
             result = ready.validate_full_market_publication(summary, quality, current=self.current)
         self.assertIsNone(result['tradingDate'])
         self.assertEqual(result['tradingDateEvidenceReason'], 'TRADING_DATE_EVIDENCE_INVALID')
+
+    def test_full_market_post_market_evidence_is_verified_but_non_final(self):
+        evidence = {
+            'tradingDate': '2026-09-29', 'status': 'VERIFIED',
+            'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'evidenceClass': 'POST_MARKET_SNAPSHOT', 'finalConfirmed': False,
+            'collectionGeneratedAt': '2026-09-29T20:40:00+09:00',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            summary, quality = self._write_full_market_evidence(
+                Path(directory), quality_evidence=evidence,
+                generated_at='2026-09-29T20:40:00+09:00')
+            result = ready.validate_full_market_publication(summary, quality, current=self.current)
+        self.assertEqual(result['tradingDate'], '2026-09-29')
+        self.assertEqual(result['tradingDateStatus'], 'VERIFIED')
+        self.assertFalse(evidence['finalConfirmed'])
 
     def test_same_commit_is_not_signaled_twice(self):
         FakeSMTP.messages=[]

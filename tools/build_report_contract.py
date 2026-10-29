@@ -51,7 +51,7 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
             raise SystemExit("TRADING_DATE_UNAVAILABLE")
         intraday_candidates = [e for e in candidates if e.get("reason") == INTRADAY_EVIDENCE_REASON]
         if any(
-            e.get("evidenceClass") != "INTRADAY_SESSION"
+            e.get("evidenceClass") not in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"}
             or e.get("finalConfirmed") is not False
             for e in intraday_candidates
         ):

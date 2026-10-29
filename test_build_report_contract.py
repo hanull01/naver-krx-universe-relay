@@ -59,7 +59,7 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(contract["asOf"], "20261028")
             self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
-    def test_post_market_snapshot_evidence_is_not_intraday_contract_evidence(self):
+    def test_post_market_snapshot_evidence_allows_non_final_contract(self):
         evidence = {
             "tradingDate": "20261028",
             "status": "VERIFIED",
@@ -80,9 +80,10 @@ class BuildReportContractTests(unittest.TestCase):
             with patch.object(builder, "load_json", side_effect=load), \
                  patch.object(builder, "build_report", return_value={"reportContract": {"status": "AVAILABLE", "asOf": "20261028"}}), \
                  patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
-                with self.assertRaises(SystemExit) as error:
-                    builder.main()
-            self.assertEqual(str(error.exception), "TRADING_DATE_UNAVAILABLE")
+                self.assertEqual(builder.main(), 0)
+            contract = json.loads(output.read_text())
+            self.assertEqual(contract["asOf"], "20261028")
+            self.assertEqual(contract["tradingDateEvidence"]["evidenceClass"], "POST_MARKET_SNAPSHOT")
 
     def test_intraday_evidence_requires_matching_collection_timestamp(self):
         evidence = {

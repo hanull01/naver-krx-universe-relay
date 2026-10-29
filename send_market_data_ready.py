@@ -49,7 +49,7 @@ def _validated_full_market_trading_date(full_market, quality, generated_at):
         for evidence in candidates:
             if evidence.get('collectionGeneratedAt') != generated_at:
                 return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
-            if (evidence.get('evidenceClass') != 'INTRADAY_SESSION'
+            if (evidence.get('evidenceClass') not in {'INTRADAY_SESSION', 'POST_MARKET_SNAPSHOT'}
                     or evidence.get('finalConfirmed') is not False):
                 return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
         return trading_date, 'VERIFIED', INTRADAY_TRADING_DATE_REASON
