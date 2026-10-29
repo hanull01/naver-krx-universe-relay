@@ -381,6 +381,7 @@ def build_report_contract(
     technical_candidates: list[Mapping[str, Any]] | None = None,
     kiwoom_candidates: Mapping[str, Any] | None = None,
     research: Mapping[str, Any] | None = None,
+    research_linkage: Mapping[str, Any] | None = None,
     v2_provenance: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
@@ -603,6 +604,10 @@ def build_report_contract(
             "research": {
                 "status": (research or {}).get("status") if isinstance(research, Mapping) else "UNAVAILABLE",
                 "asOf": (research or {}).get("asOf") if isinstance(research, Mapping) else None,
+                "linkage": dict(research_linkage) if isinstance(research_linkage, Mapping) else {
+                    "status": "UNAVAILABLE",
+                    "reason": "RESEARCH_LINKAGE_NOT_SUPPLIED",
+                },
             },
             "investorFlow": {
                 "status": "UNAVAILABLE",
@@ -652,6 +657,20 @@ def build_report_contract(
             "derivedMetricsStatus": "UNAVAILABLE",
             "derivedMetricsReason": "BASELINE_STALE",
         }
+    # Research linkage is intentionally compact, but a configured watchlist or
+    # a large set of verified V2 members must not break the Work transport
+    # contract. Preserve the source and membership evidence while dropping
+    # per-broker detail if the complete contract reaches the established cap.
+    contract_size = len(json.dumps(contract, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+    if contract_size > MAX_WORK_CONTRACT_BYTES:
+        research_block = contract["independentAnalysis"]["research"]
+        linkage = research_block.get("linkage")
+        if isinstance(linkage, Mapping):
+            compact_linkage = dict(linkage)
+            compact_linkage["status"] = "PARTIAL"
+            compact_linkage["reason"] = "RESEARCH_LINKAGE_COMPACTED_TO_CONTRACT_LIMIT"
+            compact_linkage["stocks"] = []
+            research_block["linkage"] = compact_linkage
     return contract
 
 

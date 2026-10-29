@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from tools.report_contract import (
@@ -6,6 +7,7 @@ from tools.report_contract import (
     validate_contract_payload,
     validate_kiwoom_candidate_binding,
     validate_rendered_models,
+    MAX_WORK_CONTRACT_BYTES,
 )
 
 
@@ -58,6 +60,33 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["fullMarket"]["metrics"]["breakout20"]["count"], 81)
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
+
+    def test_research_linkage_is_compacted_at_work_contract_limit(self):
+        generated = "2026-10-29T05:08:56+00:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261029", "tradingDateEvidence": self.evidence("20261029"),
+                "authoritativeCount": 1, "markets": {"TOTAL": {}}
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "tradingDate": "2026-10-29", "industries": [], "themes": []},
+            v2_history={"observations": []},
+            leaders={},
+            research_linkage={
+                "status": "AVAILABLE",
+                "stocks": [{"itemCode": str(i), "detail": "x" * 2000} for i in range(1000)],
+            },
+        )
+        payload = json.dumps(contract, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        self.assertLessEqual(len(payload), MAX_WORK_CONTRACT_BYTES)
+        linkage = contract["independentAnalysis"]["research"]["linkage"]
+        self.assertEqual(linkage["status"], "PARTIAL")
+        self.assertEqual(linkage["reason"], "RESEARCH_LINKAGE_COMPACTED_TO_CONTRACT_LIMIT")
+        self.assertEqual(linkage["stocks"], [])
 
     def test_v2_real_names_leaders_and_recent_history_are_same_generation(self):
         generated = "2026-10-29T05:08:56+00:00"
