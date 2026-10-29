@@ -4,7 +4,9 @@
 This command is intentionally local-only: it never changes repository data,
 GitHub settings, Actions, or credentials.  It validates the repository first,
 then optionally creates a disposable QA virtual environment and installs only
-the dependencies used by the regression workflow.
+the dependencies used by the regression workflow. GitHub checks use only
+authenticated Git and, when available, the authenticated ``gh`` CLI; this
+preflight never calls a ChatGPT GitHub connector.
 """
 from __future__ import annotations
 
