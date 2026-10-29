@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install test dependencies
-        run: python -m pip install --disable-pip-version-check certifi webauthn
+        run: python -m pip install --disable-pip-version-check -r requirements-qa.txt
       - name: Compile Python files
         run: python -m compileall -q .
       - name: Run full unittest regression
