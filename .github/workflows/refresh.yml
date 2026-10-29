@@ -242,9 +242,67 @@ jobs:
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
           set +e
           python market_indices.py
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          index_exit_code=$?
+          echo "exit_code=$index_exit_code" >> "$GITHUB_OUTPUT"
           finished_at=$(python3 -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="microseconds"))')
           echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
+          if [ "$index_exit_code" -eq 0 ]; then
+            python3 - "data/market/indices.json" "$RUNNER_TEMP/final-trading-date-evidence.json" \
+              "$started_at" "$finished_at" <<'PY'
+          import json, sys
+          from pathlib import Path
+          from market_indices import validate_final_payload
+
+          indices_path, evidence_path, started_at, finished_at = sys.argv[1:]
+          try:
+              indices = json.loads(Path(indices_path).read_text(encoding="utf-8"))
+              evidence = validate_final_payload(indices, started_at, finished_at)
+              result = {
+                  "status": "VERIFIED",
+                  "evidenceClass": "POST_MARKET_INDEX_SNAPSHOT",
+                  "targetDate": evidence["targetDate"],
+                  "generatedAt": evidence["generatedAt"],
+                  "collectionStartedAt": started_at,
+                  "collectionFinishedAt": finished_at,
+                  "errors": [],
+              }
+          except (OSError, ValueError, json.JSONDecodeError) as exc:
+              result = {
+                  "status": "UNVERIFIED",
+                  "evidenceClass": "POST_MARKET_INDEX_SNAPSHOT",
+                  "targetDate": None,
+                  "generatedAt": None,
+                  "collectionStartedAt": started_at,
+                  "collectionFinishedAt": finished_at,
+                  "errors": [str(exc)],
+              }
+          Path(evidence_path).write_text(json.dumps(result, ensure_ascii=False) + "\n", encoding="utf-8")
+          print(json.dumps(result, ensure_ascii=False))
+          PY
+            evidence_status=$(python3 - "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          try:
+              print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")).get("status", "UNVERIFIED"))
+          except (OSError, ValueError, json.JSONDecodeError):
+              print("UNVERIFIED")
+          PY
+            )
+            target_date=$(python3 - "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          try:
+              print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")).get("targetDate") or "")
+          except (OSError, ValueError, json.JSONDecodeError):
+              print("")
+          PY
+            )
+            echo "final_date_evidence_status=$evidence_status" >> "$GITHUB_OUTPUT"
+            echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
+          else
+            echo "final_date_evidence_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "target_date=" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Diagnose final daily-bar evidence
         id: final_daily_evidence
@@ -255,7 +313,8 @@ jobs:
           # Reuse the validated runner-temporary snapshot; never refetch quotes.
           python tools/final_daily_evidence.py \
             --snapshot "$RUNNER_TEMP/full-market-current.json" \
-            --baseline data/monitoring-baseline/latest.json
+            --baseline data/monitoring-baseline/latest.json \
+            --target-date "${{ steps.indices.outputs.target_date }}"
 
       - name: Prepare final daily monitoring update (disabled by default)
         id: final_daily_history
@@ -266,14 +325,14 @@ jobs:
           set -euo pipefail
           python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-target.txt" \
             "${{ steps.indices.outputs.collection_started_at }}" \
-            "${{ steps.indices.outputs.collection_finished_at }}" <<'PY'
+            "${{ steps.indices.outputs.collection_finished_at }}" \
+            "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
           import json, sys
           from pathlib import Path
-          from market_indices import validate_final_payload
           from tools.final_daily_evidence import validate_snapshot
 
           snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          indices = json.loads(Path("data/market/indices.json").read_text(encoding="utf-8"))
+          date_evidence = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8"))
           observed_stocks = snapshot.get("stocks") or []
           if (snapshot.get("status") not in {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
                   or snapshot.get("collectionStatus", "SUCCESS") != "SUCCESS"):
@@ -284,12 +343,10 @@ jobs:
                                          for row in observed_stocks)):
               raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_UNIVERSE_INVALID")
 
-          try:
-              index_evidence = validate_final_payload(
-                  indices, sys.argv[3], sys.argv[4])
-          except ValueError as exc:
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + str(exc))
-          target_date = index_evidence["targetDate"]
+          if date_evidence.get("status") != "VERIFIED" or not date_evidence.get("targetDate"):
+              errors = ",".join(date_evidence.get("errors") or ["TRADING_DATE_EVIDENCE_UNVERIFIED"])
+              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + errors)
+          target_date = str(date_evidence["targetDate"])
 
           final_evidence = validate_snapshot(
               snapshot, json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8")),

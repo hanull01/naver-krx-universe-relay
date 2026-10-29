@@ -123,6 +123,65 @@ class FinalDailyEvidenceTests(unittest.TestCase):
                 ]), 0)
             self.assertEqual(json.loads(output.getvalue())["tradingDate"], "20261026")
 
+    def test_explicit_validated_target_date_fills_snapshot_without_date(self):
+        snapshot = self.snapshot([row()])
+        snapshot.pop("tradingDate")
+        result = validate_snapshot(
+            snapshot,
+            {"asOfDate": "20261018", "historyStatus": "OK"},
+            target_date="20261019",
+        )
+        self.assertTrue(result["finalEligible"])
+        self.assertEqual(result["tradingDate"], "20261019")
+        self.assertNotIn("TRADING_DATE_MISSING", result["errors"])
+
+    def test_validated_target_date_mismatch_blocks_mixed_generation(self):
+        result = validate_snapshot(
+            self.snapshot([row()]),
+            {"asOfDate": "20261018", "historyStatus": "OK"},
+            target_date="20261020",
+        )
+        self.assertFalse(result["finalEligible"])
+        self.assertIn("TRADING_DATE_MISMATCH", result["errors"])
+
+    def test_invalid_validated_target_date_does_not_fall_back_to_snapshot(self):
+        result = validate_snapshot(
+            self.snapshot([row()]),
+            {"asOfDate": "20261018", "historyStatus": "OK"},
+            target_date="not-a-date",
+        )
+        self.assertFalse(result["finalEligible"])
+        self.assertIn("TRADING_DATE_EVIDENCE_INVALID", result["errors"])
+
+    def test_missing_validated_target_date_does_not_fall_back_to_snapshot(self):
+        result = validate_snapshot(
+            self.snapshot([row()]),
+            {"asOfDate": "20261018", "historyStatus": "OK"},
+            target_date="",
+        )
+        self.assertFalse(result["finalEligible"])
+        self.assertIn("TRADING_DATE_MISSING", result["errors"])
+        self.assertIn("TRADING_DATE_EVIDENCE_INVALID", result["errors"])
+
+    def test_cli_accepts_validated_target_date_when_snapshot_has_no_date(self):
+        snapshot = self.snapshot([row()])
+        snapshot.pop("tradingDate")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot_path = root / "snapshot.json"
+            baseline_path = root / "baseline.json"
+            snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+            baseline_path.write_text(json.dumps({"asOfDate": "20261018", "historyStatus": "OK"}), encoding="utf-8")
+            output = StringIO()
+            with redirect_stdout(output):
+                self.assertEqual(final_daily_evidence.main([
+                    "--snapshot", str(snapshot_path), "--baseline", str(baseline_path),
+                    "--target-date", "20261019",
+                ]), 0)
+            payload = json.loads(output.getvalue())
+            self.assertEqual(payload["tradingDate"], "20261019")
+            self.assertNotIn("TRADING_DATE_MISSING", payload["errors"])
+
     def test_as_of_date_is_not_a_trading_date_source(self):
         result = validate_snapshot({"source": "NAVER_STOCKLIST_CURRENT", "sourceMarket": "KRX", "sourceMarketEvidence": self.evidence, "asOfDate": "20261016",
                                     "generatedAt": "2026-10-26T20:30:00+09:00",
