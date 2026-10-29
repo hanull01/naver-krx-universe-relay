@@ -203,8 +203,28 @@ def serialized(data):
     return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
 
 
+def is_empty_default(data):
+    """Return whether a config is the destructive empty-default shape."""
+    if data.get("stocks"):
+        return False
+    if any(data.get(key) for key in ("sectors", "themes", "watchlists")):
+        return False
+    leaders = data.get("leaders") or {}
+    return not any(leaders.values())
+
+
+def validate_transition(original, updated):
+    """Reject an accidental reset while preserving normal edits."""
+    if not is_empty_default(original) and is_empty_default(updated):
+        raise ValueError(
+            "기존 Universe를 빈 기본값으로 교체할 수 없습니다. "
+            "현재 설정을 보존한 뒤 명시적인 검토와 별도 복구 절차를 사용하세요."
+        )
+
+
 def save(path, original, updated, dry_run=False, now=None):
     warnings = validate_or_raise(updated)
+    validate_transition(original, updated)
     before, after = serialized(original), serialized(updated)
     diff = "".join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile=str(path), tofile=str(path)))
     for warning in warnings:
