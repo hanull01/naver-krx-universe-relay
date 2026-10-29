@@ -1,0 +1,51 @@
+{
+  "version": "A-1.1.0",
+  "approval": "USER_APPROVED_DESIGN_2026-10-28",
+  "source_file": "market-dashboard-A-v1.1.reference.html",
+  "source_sha256": "cba54525bbabe1f7a2b100d9696181bac1e49b76e772301007abfdcdb5fef0c3",
+  "css_sha256": "bbe55c39024cbf4705baece7d9ba135c9723dcce182bc2af6652b3275e8ea941",
+  "layout": {
+    "sections": [
+      {
+        "id": "part1",
+        "classes": [
+          "section",
+          "section-anchor"
+        ]
+      },
+      {
+        "id": "part2",
+        "classes": [
+          "section",
+          "section-anchor"
+        ]
+      },
+      {
+        "id": "part3",
+        "classes": [
+          "section",
+          "section-anchor"
+        ]
+      }
+    ],
+    "nav_anchors": [
+      "#part1",
+      "#part2",
+      "#part3"
+    ],
+    "index_cards": 2,
+    "responsive_widths_px": [
+      375,
+      390,
+      430,
+      1280
+    ]
+  },
+  "rules": [
+    "CSS and section ordering immutable without explicit user approval",
+    "Only replace market data and dynamic card content, never synthesize stale sample values",
+    "All user-facing prose in Markdown and HTML must use Korean polite style",
+    "Do not treat intraday session evidence as confirmed daily candles",
+    "On missing source, report TEMPLATE_UNAVAILABLE; do not generate an alternative design"
+  ]
+}
