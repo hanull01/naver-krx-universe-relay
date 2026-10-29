@@ -303,6 +303,9 @@ def build_report_contract(
             "kiwoom": kiwoom_candidates.get("syncedAt"),
         },
         "sourceBindings": {
+            "reportContract": "data/monitoring/latest-report-contract.json",
+            "markdownReport": "data/reports/latest.md",
+            "htmlReport": "data/reports/latest.html",
             "kiwoomCandidates": "data/trading-discovery/latest.json",
             "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
             "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",

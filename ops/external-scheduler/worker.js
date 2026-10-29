@@ -1,6 +1,10 @@
 const WORKFLOWS = {
   refresh: { workflow: "refresh.yml", publicationPaths: ["data/monitoring/latest-quality.json"], commitMessage: "Refresh NAVER market data" },
-  report: { workflow: "daily-report.yml", publicationPaths: ["data/reports/latest.json"], commitMessage: "Update daily market report" },
+  report: {
+    workflow: "daily-report.yml",
+    publicationPaths: ["data/reports/latest.json", "data/reports/latest.md", "data/reports/latest.html"],
+    commitMessage: "Update daily market report",
+  },
   research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"], commitMessage: "Update NAVER research intelligence" },
   snapshots: { workflow: "refresh-market-snapshots.yml", publicationPaths: ["data/market"], commitMessage: "Refresh NAVER market snapshots" },
   diagnostic: { workflow: "schedule-diagnostic.yml", publicationPaths: [] },
@@ -173,7 +177,7 @@ async function commitChangedPaths(api, repository, commits, publicationPaths, ru
     if (!Number.isFinite(committedAt) || committedAt < runStarted || committedAt > runFinished
         || !String(authorLogin).includes("github-actions") || message !== commitMessage) continue;
     const filenames = (detail.files || []).map((file) => file.filename || "");
-    if (publicationPaths.some((path) => filenames.some((name) =>
+    if (publicationPaths.every((path) => filenames.some((name) =>
       name === path || name.startsWith(`${path.replace(/\/$/, "")}/`)))) return commit.sha;
   }
   return null;

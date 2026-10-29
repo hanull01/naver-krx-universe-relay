@@ -266,6 +266,9 @@ def _leader_text(rows: list[Mapping[str, Any]]) -> str:
 
 def render_dashboard_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR) -> str:
     assets = load_approved_template(template_dir)
+    # Keep the approved A v1.1 stylesheet intact while allowing long dynamic
+    # timestamps to wrap inside the mobile KPI card.
+    assets["css"] += ".kpi-value{overflow-wrap:anywhere;word-break:break-word}"
     model = build_dashboard_model(report)
     if not model["htmlAllowed"]:
         raise TemplateUnavailable("TEMPLATE_UNAVAILABLE:CONTRACT_HTML_NOT_ALLOWED")
