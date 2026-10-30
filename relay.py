@@ -1577,7 +1577,10 @@ def run_quote_pipeline():
     failed = False
     result = timed_step('quotes', collect_quotes)
     _, _, legacy_codes, _ = universe_state()
-    failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
+    # ``legacy33`` is an optional compatibility output.  It must not gate the
+    # configured Universe or full-market publication when the user has moved
+    # to a different watchlist or left the legacy list unset.
+    failed |= result['count'] != result['expectedCount']
     if quote_snapshot_unusable(result):
         print('Quote collection failed; preserving last successful production snapshot.')
         return True

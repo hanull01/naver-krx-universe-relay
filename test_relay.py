@@ -569,6 +569,31 @@ class RelayTests(unittest.TestCase):
              patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
             self.assertFalse(relay.run_quote_pipeline())
 
+    def test_intraday_pipeline_does_not_require_legacy33_for_configured_universe(self):
+        for expected in (1, 3):
+            with self.subTest(expected=expected):
+                quotes = {'count': expected, 'expectedCount': expected,
+                          'coverageCount': expected, 'status': 'ok', 'datas': []}
+                technicals = {'count': expected, 'expectedCount': expected,
+                              'status': 'ok', 'missingCodes': [], 'datas': []}
+                states = {'count': expected, 'datas': []}
+                codes = [f'{index:06d}' for index in range(1, expected + 1)]
+                with patch.object(relay, 'collect_quotes', return_value=quotes), \
+                     patch.object(relay, 'build_technicals', return_value=technicals), \
+                     patch.object(relay, 'build_states', return_value=states), \
+                     patch.object(relay, 'build_group_states'), \
+                     patch.object(relay, 'universe_state', return_value=({}, codes, [], {})):
+                    self.assertFalse(relay.run_quote_pipeline())
+
+    def test_empty_universe_without_legacy33_remains_unusable(self):
+        quotes = {'count': 0, 'expectedCount': 0, 'coverageCount': 0,
+                  'status': 'error', 'datas': []}
+        with patch.object(relay, 'collect_quotes', return_value=quotes), \
+             patch.object(relay, 'build_technicals') as technicals, \
+             patch.object(relay, 'universe_state', return_value=({}, [], [], {})):
+            self.assertTrue(relay.run_quote_pipeline())
+        technicals.assert_not_called()
+
     def test_universe_legacy_and_validation(self):
         # Use an explicit legacy fixture; the production universe is intentionally
         # user-reset and must not be required by this regression test.
