@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "336260",
   "itemName": "두산퓨얼셀",
-  "reportCount": 12,
-  "latestReportNid": "97259",
-  "latestWriteDate": "2026-10-29",
+  "reportCount": 13,
+  "latestReportNid": "97263",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "97259",
-    "writeDate": "2026-10-29",
-    "brokerName": "하나증권",
-    "title": "미래 수주 대비 추가 증설도 검토 가능한 시점",
-    "goalPrice": 60000,
+    "nid": "97263",
+    "writeDate": "2026-10-30",
+    "brokerName": "미래에셋증권",
+    "title": "본격화된 해외 수주, 경쟁력 증명의 한해",
+    "goalPrice": 45000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 4
+        "positive": 8,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 1,
-        "원가": 1
+        "수주": 3,
+        "원전": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97263",
     "97259",
     "97244",
     "96942",

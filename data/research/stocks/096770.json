@@ -2,29 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "096770",
   "itemName": "SK이노베이션",
-  "reportCount": 21,
-  "latestReportNid": "96986",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 25,
+  "latestReportNid": "97369",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96986",
-    "writeDate": "2026-10-23",
-    "brokerName": "iM증권",
-    "title": "K엔무브 스페인 ILBOC 공장 투어 후기",
-    "goalPrice": 250000,
+    "nid": "97369",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "사상 최대 실적. 운임 상승은 OSP 인하로 상쇄된다",
+    "goalPrice": 220000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 5,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "가격": 1,
+        "배터리": 1,
+        "수요": 1,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "97369",
+    "97312",
+    "97309",
+    "97288",
     "96986",
     "96618",
     "96526",

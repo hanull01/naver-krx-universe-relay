@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "001440",
   "itemName": "대한전선",
-  "reportCount": 11,
-  "latestReportNid": "96703",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 13,
+  "latestReportNid": "97365",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96703",
-    "writeDate": "2026-10-14",
-    "brokerName": "SK증권",
-    "title": "환율하락에도 펀더멘털 개선은 지속",
-    "goalPrice": 33000,
+    "nid": "97365",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "원화 강세 영향으로 기대치 하회",
+    "goalPrice": 40000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 3,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "환율": 5,
-        "자동차": 1
+        "수주": 3,
+        "환율": 2,
+        "가격": 1
       }
     }
   },
   "reportNids": [
+    "97365",
+    "97359",
     "96703",
     "96498",
     "94904",

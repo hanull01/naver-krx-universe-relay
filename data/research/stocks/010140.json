@@ -2,33 +2,42 @@
   "schemaVersion": 1,
   "itemCode": "010140",
   "itemName": "삼성중공업",
-  "reportCount": 28,
-  "latestReportNid": "96811",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 37,
+  "latestReportNid": "97367",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96811",
-    "writeDate": "2026-10-19",
-    "brokerName": "키움증권",
-    "title": "비우호적인 환경에도 돋보이는 실적",
-    "goalPrice": 34000,
+    "nid": "97367",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "너무나도 안정적인 실적",
+    "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 2,
         "negative": 2
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수주": 1,
-        "원가": 1,
-        "조선": 1
+        "수주": 5,
+        "환율": 3,
+        "조선": 2
       }
     }
   },
   "reportNids": [
+    "97367",
+    "97355",
+    "97334",
+    "97325",
+    "97322",
+    "97318",
+    "97303",
+    "97281",
+    "97270",
     "96811",
     "96697",
     "96674",

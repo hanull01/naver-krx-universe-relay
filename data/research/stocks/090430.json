@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "090430",
   "itemName": "아모레퍼시픽",
-  "reportCount": 31,
-  "latestReportNid": "96534",
-  "latestWriteDate": "2026-10-08",
+  "reportCount": 38,
+  "latestReportNid": "97382",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96534",
-    "writeDate": "2026-10-08",
-    "brokerName": "SK증권",
-    "title": "영점조절 완료",
-    "goalPrice": 180000,
+    "nid": "97382",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "3Q26Re: 멀티 브랜드 기업의 힘",
+    "goalPrice": 170000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 4,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 1
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97382",
+    "97366",
+    "97346",
+    "97340",
+    "97296",
+    "97283",
+    "97277",
     "96534",
     "96350",
     "96142",

@@ -2,32 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "272450",
   "itemName": "진에어",
-  "reportCount": 3,
-  "latestReportNid": "94926",
-  "latestWriteDate": "2026-07-31",
+  "reportCount": 4,
+  "latestReportNid": "97306",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "94926",
-    "writeDate": "2026-07-31",
-    "brokerName": "미래에셋증권",
-    "title": "LCC의 유일한 선택지",
-    "goalPrice": 7000,
+    "nid": "97306",
+    "writeDate": "2026-10-30",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Preview - 봄날은 온다",
+    "goalPrice": 8000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 19,
+        "negative": 11
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원가": 3,
-        "자동차": 1
+        "환율": 6,
+        "수요": 3,
+        "가격": 2,
+        "원가": 2,
+        "자동차": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "97306",
     "94926",
     "93257",
     "92839"

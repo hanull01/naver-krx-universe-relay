@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "489790",
   "itemName": "한화비전",
-  "reportCount": 4,
-  "latestReportNid": "95102",
-  "latestWriteDate": "2026-08-06",
+  "reportCount": 5,
+  "latestReportNid": "97323",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "95102",
-    "writeDate": "2026-08-06",
-    "brokerName": "키움증권",
-    "title": "HBM 성장성에 다시 주목해야 할 시기",
-    "goalPrice": 100000,
+    "nid": "97323",
+    "writeDate": "2026-10-30",
+    "brokerName": "SK증권",
+    "title": "시큐리티, 세미텍 모두 좋았다",
+    "goalPrice": 80000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
+        "positive": 0,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "가격": 1,
-        "수주": 1
+        "수주": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97323",
     "95102",
     "94859",
     "93125",

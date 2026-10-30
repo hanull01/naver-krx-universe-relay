@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "034020",
   "itemName": "두산에너빌리티",
-  "reportCount": 23,
-  "latestReportNid": "96804",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 29,
+  "latestReportNid": "97364",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96804",
-    "writeDate": "2026-10-16",
+    "nid": "97364",
+    "writeDate": "2026-10-30",
     "brokerName": "하나증권",
-    "title": "연내 SMR 추가 수주 기대",
-    "goalPrice": 120000,
+    "title": "수주와 실적은 좋아지고 있다",
+    "goalPrice": 100000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 3
+        "positive": 6,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수주": 2
+        "수주": 3,
+        "원전": 1
       }
     }
   },
   "reportNids": [
+    "97364",
+    "97333",
+    "97320",
+    "97311",
+    "97300",
+    "97278",
     "96804",
     "96759",
     "94949",

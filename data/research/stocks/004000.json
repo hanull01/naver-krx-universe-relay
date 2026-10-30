@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "004000",
   "itemName": "롯데정밀화학",
-  "reportCount": 4,
-  "latestReportNid": "94813",
-  "latestWriteDate": "2026-07-31",
+  "reportCount": 6,
+  "latestReportNid": "97308",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "94813",
-    "writeDate": "2026-07-31",
+    "nid": "97308",
+    "writeDate": "2026-10-30",
     "brokerName": "iM증권",
-    "title": "글리세린 강세로 인한 ECH 반사수혜 지속 전망",
-    "goalPrice": 62000,
+    "title": "영업이익과 맞먹는 영업외손익 순현금구조",
+    "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 0
+        "positive": 3,
+        "negative": 5
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
         "수요": 3,
         "가격": 1,
-        "원가": 1,
-        "중국": 1
+        "재고": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97308",
+    "97289",
     "94813",
     "92107",
     "91873",
