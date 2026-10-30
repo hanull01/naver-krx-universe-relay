@@ -15,12 +15,16 @@ def sensitive(value):
     return False
 
 def status(root, runner=subprocess.run):
-    changed = run(["diff", "--", "config/universe.json"], root, runner).stdout
-    cached = run(["diff", "--cached", "--", "config/universe.json"], root, runner).stdout
     staged = [x for x in run(["diff", "--cached", "--name-only"], root, runner).stdout.splitlines() if x]
     blocked = [x for x in staged if x not in SYNC_ALLOWED_FILES]
-    state = "LOCAL_CONFIG_CHANGES" if changed or cached else "SYNCED"
-    return {"state": state, "dirty": bool(changed or cached), "stagedBlocked": blocked, "message": "저장하지 않은 설정 변경 있음" if state != "SYNCED" else "GitHub에 저장된 설정과 동일"}
+    try:
+        before = _config_from_git(root, runner)
+        after = _config_from_worktree(root)
+    except ValueError as exc:
+        return {"state": "ERROR", "dirty": False, "stagedBlocked": blocked, "message": str(exc)}
+    state = "SYNCED" if before == after else "LOCAL_CONFIG_CHANGES"
+    return {"state": state, "dirty": state != "SYNCED", "stagedBlocked": blocked,
+            "message": "GitHub에 저장된 설정과 동일" if state == "SYNCED" else "저장하지 않은 설정 변경 있음"}
 
 def _empty_config(data):
     leaders = data.get("leaders") or {}
@@ -30,7 +34,9 @@ def _empty_config(data):
 
 
 def _config_from_git(root, runner):
-    result = run(["show", "HEAD:config/universe.json"], root, runner)
+    result = run(["show", "origin/main:config/universe.json"], root, runner)
+    if result.returncode:
+        result = run(["show", "HEAD:config/universe.json"], root, runner)
     if result.returncode:
         raise ValueError("GitHub 기준 설정을 읽을 수 없습니다.")
     try:
@@ -101,7 +107,14 @@ def comparison_summary(before, after):
 
 def preview(root, runner=subprocess.run):
     result = status(root, runner)
-    result["diff"] = run(["diff", "HEAD", "--", "config/universe.json"], root, runner).stdout
+    if result["state"] == "ERROR":
+        result["diff"] = ""
+        result["summary"] = {"state": "ERROR"}
+        return result
+    diff = run(["diff", "origin/main", "--", "config/universe.json"], root, runner)
+    if diff.returncode:
+        diff = run(["diff", "HEAD", "--", "config/universe.json"], root, runner)
+    result["diff"] = diff.stdout
     result["summary"] = comparison_summary(_config_from_git(root, runner), _config_from_worktree(root))
     return result
 
@@ -126,6 +139,7 @@ def remote_config_changed(root, runner=subprocess.run):
 def push(root, runner=subprocess.run):
     current = status(root, runner)
     if current["stagedBlocked"]: raise ValueError("다른 개발 파일이 Git staging 상태입니다. 설정만 안전하게 저장하려면 먼저 staged 상태를 정리해야 합니다.")
+    if current["state"] == "ERROR": raise ValueError(current["message"])
     with open(root / "config" / "universe.json", encoding="utf-8") as f:
         if sensitive(json.load(f)): raise ValueError("설정에 민감정보로 보이는 필드가 있어 GitHub 저장을 차단했습니다.")
     if current["state"] == "SYNCED": return {"ok": True, "noop": True}

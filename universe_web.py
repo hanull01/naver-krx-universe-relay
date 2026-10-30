@@ -19,7 +19,27 @@ DEFAULT_CONFIG = ROOT / "config" / "universe.json"
 DEFAULT_DYNAMIC_RESULT = ROOT / "data" / "dynamic-universe" / "latest.json"
 DEFAULT_DYNAMIC_HISTORY = ROOT / "data" / "dynamic-universe" / "history.json"
 _sync_lock = threading.Lock()
+_JSON_CACHE = {}
+_JSON_CACHE_LOCK = threading.Lock()
 _AUTO_SYNC_INTERVAL_SECONDS = max(60, int(os.environ.get("UNIVERSE_AUTO_SYNC_INTERVAL_SECONDS", str(20 * 60))))
+
+
+def _cached_json(path, default=None):
+    """Cache published JSON by file version without freezing updated data."""
+    path = Path(path)
+    try:
+        stat = path.stat()
+        fingerprint = (stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        fingerprint = None
+    key = str(path)
+    with _JSON_CACHE_LOCK:
+        cached = _JSON_CACHE.get(key)
+        if cached and cached[0] == fingerprint:
+            return cached[1]
+        value = dynamic.load_json(path, default)
+        _JSON_CACHE[key] = (fingerprint, value)
+        return value
 def _saved_sync_state():
     try:
         value = json.loads((ROOT / "data" / "dynamic-universe" / ".sync-state.json").read_text(encoding="utf-8"))
@@ -98,9 +118,9 @@ class UniverseWebApp:
     def __init__(self,config_path=DEFAULT_CONFIG): self.config_path=Path(config_path)
     def current(self): return manager.load(self.config_path)
     def dynamic_payload(self):
-        payload = dynamic.load_json(DEFAULT_DYNAMIC_RESULT, {}) or {}
-        industries = dynamic.load_json(ROOT / "data" / "monitoring" / "latest-industries.json", {}) or {}
-        themes = dynamic.load_json(ROOT / "data" / "monitoring" / "latest-theme-signals.json", {}) or {}
+        payload = _cached_json(DEFAULT_DYNAMIC_RESULT, {}) or {}
+        industries = _cached_json(ROOT / "data" / "monitoring" / "latest-industries.json", {}) or {}
+        themes = _cached_json(ROOT / "data" / "monitoring" / "latest-theme-signals.json", {}) or {}
         industry_by_id = {str(v.get("id")): v for v in industries.get("industries", []) if isinstance(v, dict)}
         industry_by_name = {str(v.get("name")): v for v in industries.get("industries", []) if isinstance(v, dict)}
         theme_by_id = {str(v.get("id")): v for v in themes.get("themes", []) if isinstance(v, dict)}
@@ -128,7 +148,7 @@ class UniverseWebApp:
             selected_themes.append(merged)
         name_by_code = {}
         try:
-            assets = dynamic.load_json(ROOT / "data" / "market-universe" / "all-assets.json", {}).get("assets", [])
+            assets = _cached_json(ROOT / "data" / "market-universe" / "all-assets.json", {}).get("assets", [])
             name_by_code.update({str(v.get("code")): v.get("name") for v in assets if v.get("code") and v.get("name")})
         except (AttributeError, TypeError):
             pass
@@ -143,6 +163,51 @@ class UniverseWebApp:
                 "kiwoomDiscovery": kiwoom,
                 "analysisGeneratedAt": {"industries": industries.get("generatedAt"), "themes": themes.get("generatedAt")}}
     def dynamic_history(self): return dynamic.load_json(DEFAULT_DYNAMIC_HISTORY, {"events": []}) or {"events": []}
+    @staticmethod
+    def compact_market_item(item):
+        """Keep only fields consumed by the market dashboard."""
+        if not isinstance(item, dict):
+            return item
+        keys = ("id", "name", "code", "status", "source", "score", "groupType", "groupId",
+                "selectionBlockReason", "selectionBlocked", "selectionDeferred", "lastObservedTradingDate",
+                "evidenceGeneratedAt", "sourceTime", "reason", "criteria", "changeRate", "currentPrice",
+                "assetType")
+        result = {key: item[key] for key in keys if key in item}
+        metrics = item.get("metrics")
+        if isinstance(metrics, dict):
+            trading_value = metrics.get("tradingValue") or {}
+            result["metrics"] = {
+                "avgReturn": metrics.get("avgReturn", metrics.get("averageReturn1D")),
+                "medianReturn": metrics.get("medianReturn", metrics.get("medianReturn1D")),
+                "advancerPct": metrics.get("advancerPct"),
+                "pctAboveMA20": metrics.get("pctAboveMA20"),
+                "turnoverValue": metrics.get("turnoverValue", trading_value.get("total")),
+                "turnoverConcentrationPct": metrics.get("turnoverConcentrationPct", trading_value.get("top3ConcentrationPct")),
+            }
+        stocks = item.get("stocks")
+        if isinstance(stocks, list):
+            result["stockCount"] = len(stocks)
+            result["stocks"] = [{key: row[key] for key in ("code", "name") if key in row}
+                                 for row in stocks[:3] if isinstance(row, dict)]
+        elif isinstance(stocks, int):
+            result["stockCount"] = stocks
+        for key in ("leaders", "members"):
+            values = item.get(key)
+            if isinstance(values, list):
+                result[key] = [{field: row[field] for field in ("code", "name") if field in row}
+                               for row in values[:3] if isinstance(row, dict)]
+        return result
+    def automatic_view_payload(self):
+        payload = self.dynamic_payload()
+        return {
+            "generatedAt": payload.get("generatedAt"),
+            "commit": payload.get("commit"),
+            "analysisGeneratedAt": payload.get("analysisGeneratedAt"),
+            "sectors": [self.compact_market_item(item) for item in payload.get("sectors", [])],
+            "themes": [self.compact_market_item(item) for item in payload.get("themes", [])],
+            "leaders": [self.compact_market_item(item) for item in payload.get("leaders", [])],
+            "kiwoomDiscovery": [self.compact_market_item(item) for item in payload.get("kiwoomDiscovery", [])],
+        }
     def dashboard(self):
         data=self.current(); errors,warnings=manager.validation(data); stocks=data.get("stocks",[])
         return {"enabledCount":sum(x.get("enabled") is True for x in stocks),"disabledCount":sum(x.get("enabled") is False for x in stocks),"sectorCount":len(data.get("sectors",{})),"themeCount":len(data.get("themes",{})),"watchlistCount":len(data.get("watchlists",{})),"validation":{"status":"ERROR" if errors else "WARNING" if warnings else "OK","errors":errors,"warnings":warnings},"configPath":str(self.config_path),"modifiedAt":self.config_path.stat().st_mtime}
@@ -177,7 +242,7 @@ class UniverseWebApp:
             if method=="GET" and route=="/healthz": return HTTPStatus.OK,{"status":"ok"}
             if method=="GET" and route=="/api/dashboard": return HTTPStatus.OK,self.dashboard()
             if method=="GET" and route=="/api/automatic":
-                p=self.dynamic_payload(); sync=dict(_sync_state); return HTTPStatus.OK,{"generatedAt":p.get("generatedAt"),"commit":sync.get("lastAppliedCommit") or p.get("commit"),"sectors":p.get("sectors",[]),"themes":p.get("themes",[]),"leaders":p.get("leaders",[]),"initialObservationCandidates":p.get("initialObservationCandidates",[]),"kiwoomDiscovery":p.get("kiwoomDiscovery",[]),"pending":p.get("pending",[]),"industryEvidence":p.get("industryEvidence"),"sync":sync}
+                p=self.automatic_view_payload(); sync=dict(_sync_state); p["commit"]=sync.get("lastAppliedCommit") or p.get("commit"); p["sync"]=sync; return HTTPStatus.OK,p
             if method=="GET" and route=="/api/history": return HTTPStatus.OK,self.dynamic_history()
             if method=="GET" and route=="/api/settings": return HTTPStatus.OK,dynamic.load_json(ROOT/"config"/"dynamic_universe_policy.json",{}) or {}
             if method=="GET" and route=="/api/dynamic-sync/status": return HTTPStatus.OK,dict(_sync_state)
@@ -402,13 +467,14 @@ function kst(v){if(!v)return '기준시각 확인 불가';try{return new Date(v)
 function label(s){return ({ACTIVE:'주목 중',WATCH:'관찰 중',DISCOVERED:'선정 검토 중',REENTERED:'다시 주목',REMOVED:'관찰 종료',PENDING:'확인 대기'}[s]||s||'확인 대기')}
 function value(v){return v===null||v===undefined||v===''?'확인 불가':esc(v)}
 function metrics(v){let m=v&&v.metrics||{},keys=[['avgReturn','평균 등락률','%'],['medianReturn','중앙값 등락률','%'],['advancerPct','상승 종목 비율','%'],['pctAboveMA20','20일선 상회율','%'],['turnoverValue','거래대금',''],['turnoverConcentrationPct','상위 3종목 거래대금 비중','%']];return '<div class="muted">'+keys.map(k=>'<span class="chip">'+k[1]+': '+value(m[k[0]])+(m[k[0]]==null?'':k[2])+'</span>').join('')+'</div>'}
-function row(v){let name=v.name||v.code||'이름 확인 불가',reason=v.reason||v.criteria||'선정 근거 자료 미제공',stocks=v.stocks||v.leaders||v.members||[],details='<div class="market-detail"><p class="muted">선정 이유: '+esc(reason)+'</p>'+metrics(v)+'<p class="muted">데이터 기준시각: '+kst(v.sourceTime||v.evidenceGeneratedAt)+'</p>'+((stocks||[]).slice(0,3).map(s=>'<p><b>'+esc(s.name||s.code||'종목명 확인 불가')+'</b> <span class="badge">'+esc(s.code||'코드 확인 불가')+'</span></p>').join('')||'<p class="muted">연결된 주목 종목 없음</p>')+'</div>';return '<article class="card"><button class="market-toggle" aria-expanded="false"><b>'+esc(name)+'</b> <span class="badge">'+esc(label(v.status))+'</span></button>'+details+'</article>'}
-function section(title,items){return '<h2>'+title+'</h2>'+((items||[]).filter(v=>v.status!=='REMOVED').map(row).join('')||'<p class="muted">현재 선정 없음</p>')}
-function renderMarket(x){let sectors=x?.sectors||[],themes=x?.themes||[],leaders=x?.leaders||[],kiwoom=x?.kiwoomDiscovery||[],active=sectors.filter(v=>['ACTIVE','WATCH','DISCOVERED','REENTERED'].includes(v.status)).length,observed=new Set([...leaders,...kiwoom].map(v=>v.code).filter(Boolean)),host=$('dynamicUniverseContent');if(!host){$('dash').innerHTML='<div id="dynamicUniverseContent"></div>';host=$('dynamicUniverseContent')}host.innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">선정 자료: '+kst(x.generatedAt)+' · 동기화: '+esc(({APPLIED:'갱신 완료',NOOP:'최신 상태',FAILED:'갱신 실패',RUNNING:'확인 중'}[x.sync?.status]||'확인 대기'))+'</p><div class="dynamic-summary"><article class="card metric"><span class="muted">주목 업종</span><b>'+active+'</b></article><article class="card metric"><span class="muted">주목 테마</span><b>'+themes.filter(v=>v.status!=='REMOVED').length+'</b></article><article class="card metric"><span class="muted">관찰 종목</span><b>'+observed.size+'</b></article><article class="card metric"><span class="muted">키움 후보</span><b>'+kiwoom.length+'</b></article></div>'+section('주목 업종',sectors)+section('주목 테마',themes)+section('주도주·대표 관찰 종목',leaders)+section('키움 발굴 후보',kiwoom)+'</article>'}
+function marketDetail(v){let reason=v.reason||v.criteria||'선정 근거 자료 미제공',stocks=v.stocks||v.leaders||v.members||[];return '<p class="muted">선정 이유: '+esc(reason)+'</p>'+metrics(v)+'<p class="muted">데이터 기준시각: '+kst(v.sourceTime||v.evidenceGeneratedAt)+'</p>'+((stocks||[]).slice(0,3).map(s=>'<p><b>'+esc(s.name||s.code||'종목명 확인 불가')+'</b> <span class="badge">'+esc(s.code||'코드 확인 불가')+'</span></p>').join('')||'<p class="muted">연결된 주목 종목 없음</p>')}
+function row(v,key){let name=v.name||v.code||'이름 확인 불가';marketCards.set(key,v);return '<article class="card"><button class="market-toggle" data-market-key="'+esc(key)+'" aria-expanded="false"><b>'+esc(name)+'</b> <span class="badge">'+esc(label(v.status))+'</span></button><div class="market-detail"></div></article>'}
+function section(title,items,prefix){return '<h2>'+title+'</h2>'+((items||[]).filter(v=>v.status!=='REMOVED').map((v,i)=>row(v,prefix+'-'+i)).join('')||'<p class="muted">현재 선정 없음</p>')}
+function renderMarket(x){marketCards=new Map();let sectors=x?.sectors||[],themes=x?.themes||[],leaders=x?.leaders||[],kiwoom=x?.kiwoomDiscovery||[],active=sectors.filter(v=>['ACTIVE','WATCH','DISCOVERED','REENTERED'].includes(v.status)).length,observed=new Set([...leaders,...kiwoom].map(v=>v.code).filter(Boolean)),host=$('dynamicUniverseContent');if(!host){$('dash').innerHTML='<div id="dynamicUniverseContent"></div>';host=$('dynamicUniverseContent')}host.innerHTML='<article class="card"><h1>시장 현황</h1><p class="muted">선정 자료: '+kst(x.generatedAt)+' · 동기화: '+esc(({APPLIED:'갱신 완료',NOOP:'최신 상태',FAILED:'갱신 실패',RUNNING:'확인 중'}[x.sync?.status]||'확인 대기'))+'</p><div class="dynamic-summary"><article class="card metric"><span class="muted">주목 업종</span><b>'+active+'</b></article><article class="card metric"><span class="muted">주목 테마</span><b>'+themes.filter(v=>v.status!=='REMOVED').length+'</b></article><article class="card metric"><span class="muted">관찰 종목</span><b>'+observed.size+'</b></article><article class="card metric"><span class="muted">키움 후보</span><b>'+kiwoom.length+'</b></article></div>'+section('주목 업종',sectors,'sector')+section('주목 테마',themes,'theme')+section('주도주·대표 관찰 종목',leaders,'leader')+section('키움 발굴 후보',kiwoom,'kiwoom')+'</article>'}
 function renderMine(){let host=$('myStocks');if(!host){$('groups').insertAdjacentHTML('beforeend','<div id="myStocks"><h3>등록 종목</h3><input id="filterMine" placeholder="종목명 · 종목코드 검색"><div id="stockListMine"></div></div>');host=$('myStocks')}if($('filterMine'))$('filterMine').oninput=function(){let q=this.value.toLowerCase();$('stockListMine').innerHTML=stocks.filter(s=>(s.itemCode+' '+s.stockName).toLowerCase().includes(q)).map(s=>'<p><b>'+esc(s.stockName)+'</b> <span class="badge">'+esc(s.itemCode)+'</span> '+badge(s.enabled?'활성':'비활성')+'</p>').join('')||'<p class="muted">등록 종목이 없습니다.</p>'};$('filterMine').oninput()}
 function select(id){let bs=[...document.querySelectorAll('.tabs [data-v]')];document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));bs.forEach(b=>b.classList.toggle('tab-selected',b.dataset.v===id));let b=bs.find(x=>x.dataset.v===id);if(b)b.scrollIntoView({block:'nearest',inline:'center'})}
-document.querySelectorAll('.tabs [data-v]').forEach(b=>b.onclick=()=>select(b.dataset.v));document.addEventListener('click',e=>{let b=e.target.closest('.market-toggle');if(!b)return;let d=b.nextElementSibling,open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));d.classList.toggle('open',!open)});select('dash');
-let initialized=false,serial=0,syncPollTimer=null,syncPollStopped=false,syncPollCount=0,lastSyncView=null;
+document.querySelectorAll('.tabs [data-v]').forEach(b=>b.onclick=()=>select(b.dataset.v));document.addEventListener('click',e=>{let b=e.target.closest('.market-toggle');if(!b)return;let d=b.nextElementSibling,open=b.getAttribute('aria-expanded')==='true';if(!open&&!d.dataset.rendered){d.innerHTML=marketDetail(marketCards.get(b.dataset.marketKey)||{});d.dataset.rendered='1'}b.setAttribute('aria-expanded',String(!open));d.classList.toggle('open',!open)});select('dash');
+let initialized=false,serial=0,syncPollTimer=null,syncPollStopped=false,syncPollCount=0,lastSyncView=null,marketCards=new Map();
 function stopSyncPolling(){syncPollStopped=true;if(syncPollTimer){clearTimeout(syncPollTimer);syncPollTimer=null}}
 function terminalSyncStatus(status){return ['APPLIED','NOOP','FAILED','SUCCESS','COMPLETED'].includes(status)}
 async function refreshAutomaticView(){let next=await api('/api/automatic');let before=lastSyncView||{};let changed=next.commit!==before.commit||next.generatedAt!==before.generatedAt;if(changed){lastSyncView=next;renderMarket(next)}return next}
@@ -430,7 +496,7 @@ function startSyncPolling(view){
   if(view?.sync?.status==='RUNNING')syncPollTimer=setTimeout(pollSyncStatus,250);
 }
 window.addEventListener('pagehide',stopSyncPolling,{once:true});
-async function initialize(note){if(initialized)return;initialized=true;let n=++serial;try{let r=await Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups),api('/api/automatic')]);if(n!==serial)return;[dash,stocks,groups]=r;render();renderMine();renderMarket(r[3]);startSyncPolling(r[3]);if(note)toast('설정 검증: '+dash.validation.status)}catch(e){initialized=false;stopSyncPolling();toast('시장 자료를 불러오지 못했습니다. 마지막 정상 화면을 유지합니다.')}}
+async function initialize(note){if(initialized)return;initialized=true;let n=++serial;let basePromise=Promise.all([api('/api/dashboard'),api('/api/stocks').then(x=>x.stocks),api('/api/groups').then(x=>x.groups)]);let marketPromise=api('/api/automatic').then(x=>({value:x})).catch(error=>({error}));try{let r=await basePromise;if(n!==serial)return;[dash,stocks,groups]=r;render();renderMine();if(note)toast('설정 검증: '+dash.validation.status);let market=await marketPromise;if(n!==serial)return;if(market.error){toast('시장 자료를 불러오지 못했습니다. 기본 화면을 표시합니다.');return}renderMarket(market.value);startSyncPolling(market.value)}catch(e){initialized=false;stopSyncPolling();toast('기본 화면을 불러오지 못했습니다. 마지막 정상 화면을 유지합니다.')}}
 window.loadUser=initialize;select('dash');initialize();
 })();
 </script>'''

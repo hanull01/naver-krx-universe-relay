@@ -1,4 +1,8 @@
+import json
+import subprocess
+import tempfile
 import unittest
+from pathlib import Path
 
 import config_sync
 
@@ -12,6 +16,24 @@ def config(stocks=None, watchlists=None):
 
 
 class ConfigSyncTests(unittest.TestCase):
+    def test_status_uses_json_baseline_not_worktree_diff(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            data = config([{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}])
+            (root / "config" / "universe.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+            def runner(args, **_):
+                if args[1:] == ["diff", "--cached", "--name-only"]:
+                    return subprocess.CompletedProcess(args, 0, "", "")
+                if args[1:] == ["show", "origin/main:config/universe.json"]:
+                    return subprocess.CompletedProcess(args, 0, json.dumps(data, ensure_ascii=False), "")
+                return subprocess.CompletedProcess(args, 0, "", "")
+
+            result = config_sync.status(root, runner)
+            self.assertEqual(result["state"], "SYNCED")
+            self.assertFalse(result["dirty"])
+
     def test_summary_uses_actual_stock_and_group_changes(self):
         before = config(
             [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}],
