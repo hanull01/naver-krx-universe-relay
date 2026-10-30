@@ -170,6 +170,74 @@ def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
     return compact
 
 
+_TRADING_DATE_EVIDENCE_SCALARS = (
+    "tradingDate",
+    "status",
+    "reason",
+    "evidenceClass",
+    "finalConfirmed",
+    "collectionGeneratedAt",
+    "sourceTime",
+    "diagnosticStatus",
+)
+_TRADING_DATE_EVIDENCE_DETAIL_FIELDS = (
+    "missingCanonicalCodes",
+    "invalidCanonicalCodes",
+    "missingFinalCodes",
+    "unexpectedFinalCodes",
+    "invalidFinalCodes",
+)
+
+
+def _compact_trading_date_evidence(evidence: Any) -> dict[str, Any]:
+    """Keep the date decision while referencing bulky per-code diagnostics.
+
+    The quality and summary artifacts remain the authoritative place for the
+    full diagnostic lists.  They are not needed by Work to render a report,
+    and copying them into the contract can exceed the GitHub Contents
+    transport limit for a full-market snapshot.
+    """
+    if not isinstance(evidence, Mapping):
+        return {}
+    compact = {
+        key: evidence[key]
+        for key in _TRADING_DATE_EVIDENCE_SCALARS
+        if key in evidence
+    }
+    detail_counts = {}
+    for key in _TRADING_DATE_EVIDENCE_DETAIL_FIELDS:
+        value = evidence.get(key)
+        if isinstance(value, (list, Mapping)):
+            detail_counts[key] = len(value)
+    for key in ("observedDateCounts", "explicitSessionDates"):
+        value = evidence.get(key)
+        if value not in (None, {}, []):
+            compact[key] = value
+    for key in ("secondaryEvidence", "sourceObservedEvidence", "localDateDiagnostic"):
+        nested = evidence.get(key)
+        if isinstance(nested, Mapping):
+            nested_counts = {
+                field: len(nested[field])
+                for field in _TRADING_DATE_EVIDENCE_DETAIL_FIELDS
+                if isinstance(nested.get(field), (list, Mapping))
+            }
+            nested_summary = {
+                field: nested[field]
+                for field in _TRADING_DATE_EVIDENCE_SCALARS
+                if field in nested
+            }
+            if nested_counts:
+                nested_summary["detailCounts"] = nested_counts
+            compact[key] = nested_summary
+    if detail_counts:
+        compact["detailCounts"] = detail_counts
+        compact["detailSource"] = (
+            "data/monitoring/latest-quality.json#tradingDateEvidence;"
+            "data/monitoring/latest-summary.json#fullMarket.tradingDateEvidence"
+        )
+    return compact
+
+
 def _leader_sort_key(row: Mapping[str, Any]) -> tuple[float, bool, float]:
     rate = row.get("changeRate")
     try:
@@ -575,7 +643,7 @@ def build_report_contract(
         "observedAt": generation,
         "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
-        "tradingDateEvidence": evidence,
+        "tradingDateEvidence": _compact_trading_date_evidence(evidence),
         "sessionContext": session_context,
         "sourceGenerations": {
             "market": generation,
@@ -623,7 +691,10 @@ def build_report_contract(
             "history": v2_history_summary,
             "industries": v2_industries,
             "themes": v2_themes,
-            "changes": compact_v2_changes,
+            # The canonical list lives at the top level.  Keep a source
+            # pointer here instead of serializing the same 343-row list a
+            # second time.
+            "changesSource": "reportContract.v2Changes",
         },
         "v2Changes": compact_v2_changes,
         "independentAnalysis": {

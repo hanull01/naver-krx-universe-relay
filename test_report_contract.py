@@ -285,7 +285,45 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["kiwoomPerformance"]["status"], "PENDING")
         self.assertEqual(contract["v2Changes"][0]["officialChangeClass"], "COMPARISON_UNAVAILABLE")
-        self.assertEqual(contract["v2"]["changes"], contract["v2Changes"])
+        self.assertEqual(contract["v2"]["changesSource"], "reportContract.v2Changes")
+
+    def test_full_market_date_diagnostics_are_compacted_with_reference_counts(self):
+        generated = "2026-10-30T00:09:00+09:00"
+        evidence = {
+            "tradingDate": "20261030",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+            "missingCanonicalCodes": [f"{index:06d}" for index in range(2769)],
+            "invalidCanonicalCodes": {f"{index:06d}": "NORMAL_EMPTY_DAILY" for index in range(116)},
+            "secondaryEvidence": {
+                "reason": "CANONICAL_COVERAGE_INCOMPLETE",
+                "missingCanonicalCodes": [f"{index:06d}" for index in range(2769)],
+            },
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261030", "tradingDateEvidence": evidence,
+                "authoritativeCount": 2769, "markets": {"TOTAL": {
+                    "advancers": 1, "decliners": 2767, "unchanged": 1,
+                }},
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "tradingDate": "20261030", "industries": [], "themes": []},
+            v2_history={"observations": []},
+            leaders={},
+        )
+        evidence_out = contract["tradingDateEvidence"]
+        self.assertNotIn("missingCanonicalCodes", evidence_out)
+        self.assertEqual(evidence_out["detailCounts"]["missingCanonicalCodes"], 2769)
+        self.assertEqual(evidence_out["detailCounts"]["invalidCanonicalCodes"], 116)
+        self.assertEqual(evidence_out["secondaryEvidence"]["detailCounts"]["missingCanonicalCodes"], 2769)
 
     def test_trading_date_evidence_is_required_for_verified_status(self):
         contract = build_report_contract(
