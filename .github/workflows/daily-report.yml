@@ -93,7 +93,9 @@ jobs:
             echo "Resolved published trading date ${as_of} does not match KRX scheduled target ${expected}." >&2
             exit 1
           fi
-          python3 daily_report.py --as-of "$as_of" --output-dir data/reports
+          # The 23:00 job preserves the JSON history/validation artifact only.
+          # Work owns the user-facing Markdown/HTML report views.
+          python3 daily_report.py --as-of "$as_of" --output-dir data/reports --json-only
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}
           EXPECTED_KRX_TRADING_DATE: ${{ steps.market_day.outputs.expected_date }}
@@ -160,7 +162,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/reports
+          git add data/reports/*.json
 
           if git diff --cached --quiet; then
             echo "No daily report changes to commit."
