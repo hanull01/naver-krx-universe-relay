@@ -1,45 +1,14 @@
 {
   "schemaVersion": 1,
-  "status": "AVAILABLE",
-  "monitoringDate": "2026-10-28",
-  "candidateSourceSha256": "ee9ba698bd9cef473bdc705b2546bda396d9a09bcbeb3d65464f73e449995cb3",
-  "marketSourceTime": "2026-10-15T10:27:21.119354+09:00",
-  "generatedAt": "2026-10-28T01:32:44.427879+09:00",
+  "status": "AVAILABLE_EMPTY",
+  "monitoringDate": "2026-10-30",
+  "candidateSourceSha256": "39d5e12a61477cf5db87498781dc438969667ad6a5d0933318d7b84e2b95038b",
+  "marketSourceTime": "2026-10-30T14:56:04.671635+09:00",
+  "generatedAt": "2026-10-30T14:56:36.609867+09:00",
   "source": "NAVER_KRX",
-  "requestedCount": 2,
-  "quoteCount": 2,
+  "requestedCount": 0,
+  "quoteCount": 0,
   "missingSymbols": [],
   "errors": [],
-  "datas": [
-    {
-      "itemCode": "028050",
-      "stockName": "삼성E&A",
-      "closePrice": 62800,
-      "fluctuationsRatio": 5.02,
-      "accumulatedTradingVolume": 4801737,
-      "accumulatedTradingValue": 299097000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-10-27T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "session": "PRE",
-      "priceBasis": "PREVIOUS_KRX_CLOSE",
-      "fresh": true,
-      "status": "ok"
-    },
-    {
-      "itemCode": "064400",
-      "stockName": "LG씨엔에스",
-      "closePrice": 75500,
-      "fluctuationsRatio": 2.72,
-      "accumulatedTradingVolume": 812203,
-      "accumulatedTradingValue": 61062000000,
-      "source": "NAVER_KRX",
-      "sourceTime": "2026-10-27T20:00:00+09:00",
-      "marketStatus": "CLOSE",
-      "session": "PRE",
-      "priceBasis": "PREVIOUS_KRX_CLOSE",
-      "fresh": true,
-      "status": "ok"
-    }
-  ]
+  "datas": []
 }
