@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from tools.report_contract import (
@@ -325,6 +326,111 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(evidence_out["detailCounts"]["invalidCanonicalCodes"], 116)
         self.assertEqual(evidence_out["secondaryEvidence"]["detailCounts"]["missingCanonicalCodes"], 2769)
 
+    def test_relative_strength_top5_is_separate_from_v1_v2_status_and_deterministic(self):
+        common = {"generatedAt": "2026-10-30T10:00:00+09:00"}
+        industries = {
+            **common,
+            "industries": [
+                {"id": "2", "name": "B", "memberCount": 10, "featureValidMemberCount": 10,
+                 "relativeStrengthVsMarket": 3.0, "avgReturn1D": 2.0, "advancePct": 70,
+                 "leaders": [{"code": "000002", "name": "B주도"}]},
+                {"id": "1", "name": "A", "memberCount": 10, "featureValidMemberCount": 10,
+                 "relativeStrengthVsMarket": 3.0, "avgReturn1D": 2.0, "advancePct": 70,
+                 "leaders": [{"code": "000001", "name": "A주도"}]},
+            ],
+        }
+        themes = {**common, "themes": [{
+            "id": "T1", "name": "테마A", "memberCount": 4, "coveragePct": 100,
+            "membershipStatus": "OK", "metrics": {
+                "officialChangeRateRelativeStrength": 5.0, "averageReturn1D": 4.0,
+                "advancerPct": 75, "derivedValidQuoteCount": 4,
+            }, "stocks": [{"code": "000003", "name": "테마주"}],
+        }]}
+        v2_latest = {**common, "inputEvidence": {"sourceCommit": None}, "industries": [
+            {"id": "2", "kind": "industry", "v1Status": "ACTIVE", "v2Status": "WATCH", "score": 71.0, "dataQuality": "OK"},
+            {"id": "1", "kind": "industry", "v1Status": "WAIT", "v2Status": "ACTIVE", "score": 80.0, "dataQuality": "OK"},
+        ], "themes": [{"id": "T1", "kind": "theme", "v1Status": "ACTIVE", "v2Status": "WEAK", "score": 40.0, "dataQuality": "OK"}]}
+        history = {"observations": [{
+            "tradingDate": "2026-10-29", "observedAt": "2026-10-29T10:00:00+09:00",
+            "dateQuality": "VERIFIED", "industries": [
+                {"id": "1", "kind": "industry", "relativeStrengthVsMarket": 1.0, "averageReturn1D": 1.0, "memberCount": 10},
+                {"id": "2", "kind": "industry", "relativeStrengthVsMarket": 4.0, "averageReturn1D": 1.0, "memberCount": 10},
+            ], "themes": [],
+        }]}
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {"tradingDate": "20261030", "tradingDateEvidence": self.evidence("20261030"), "markets": {"TOTAL": {}}}},
+            breadth={**common, "fullMarket": {"marketTradingValue": {}}}, quality={**common},
+            industries=industries, themes=themes, v2_latest=v2_latest, v2_history=history, leaders={},
+        )
+        tracking = contract["relativeStrengthTop5"]
+        self.assertEqual([row["id"] for row in tracking["industries"]["top5"]], ["1", "2"])
+        self.assertEqual(tracking["industries"]["top5"][0]["changeClass"], "RANK_UP")
+        self.assertEqual(tracking["industries"]["active"][0]["id"], "1")
+        self.assertEqual(tracking["sourceCommitStatus"], "UNVERIFIED")
+        self.assertNotIn("stocks", contract["themes"][0])
+        self.assertNotIn("missingCodes", contract["themes"][0])
+
+    def test_relative_strength_zero_is_eligible_not_missing(self):
+        common = {"generatedAt": "g"}
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {"tradingDate": "20261030", "markets": {"TOTAL": {}}}},
+            breadth={**common, "fullMarket": {"marketTradingValue": {}}}, quality={**common},
+            industries={**common, "industries": [{"id": "1", "name": "중립업종", "memberCount": 5, "featureValidMemberCount": 5, "relativeStrengthVsMarket": 0.0}]},
+            themes={**common, "themes": []}, v2_latest={**common, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        row = contract["relativeStrengthTop5"]["industries"]["top5"][0]
+        self.assertEqual(row["relativeStrength"], 0.0)
+        self.assertEqual(row["eligibility"], "ELIGIBLE")
+
+    def test_2769_scale_group_contract_stays_below_target_without_member_duplication(self):
+        common = {"generatedAt": "2026-10-30T10:00:00+09:00"}
+        industries = []
+        for index in range(79):
+            industries.append({
+                "id": f"I{index:03d}", "name": f"업종{index:03d}",
+                "memberCount": 35, "featureValidMemberCount": 35,
+                "relativeStrengthVsMarket": float(index) / 10,
+                "avgReturn1D": float(index) / 20, "advancePct": 55.0,
+                "leaders": [{"code": f"{index:03d}001", "name": "주도주", "changeRate": 3.0}],
+            })
+        themes = []
+        for index in range(264):
+            themes.append({
+                "id": f"T{index:03d}", "name": f"테마{index:03d}",
+                "memberCount": 10, "coveragePct": 100.0,
+                "membershipStatus": "OK", "metrics": {
+                    "officialChangeRateRelativeStrength": float(index) / 10,
+                    "averageReturn1D": float(index) / 20, "advancerPct": 50.0,
+                    "derivedValidQuoteCount": 10,
+                },
+                "stocks": [{"code": f"{index:03d}{stock:03d}", "name": "구성종목", "changeRate": 1.0}
+                           for stock in range(10)],
+            })
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {
+                "tradingDate": "20261030", "tradingDateEvidence": self.evidence("20261030"),
+                "authoritativeCount": 2769, "markets": {"TOTAL": {
+                    "advancers": 1200, "decliners": 1300, "unchanged": 269,
+                }},
+            }},
+            breadth={**common, "fullMarket": {"marketTradingValue": {}}},
+            quality={**common, "tradingDateEvidence": self.evidence("20261030")},
+            industries={**common, "industries": industries},
+            themes={**common, "themes": themes},
+            v2_latest={**common, "tradingDate": "20261030", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        payload = json.dumps(contract, ensure_ascii=False).encode("utf-8")
+        self.assertEqual(len(contract["industries"]), 79)
+        self.assertEqual(len(contract["themes"]), 264)
+        self.assertLess(len(payload), 600_000)
+        self.assertNotIn("stocks", contract["themes"][0])
+        self.assertEqual(contract["themes"][0]["stockDetailCount"], 10)
+
     def test_trading_date_evidence_is_required_for_verified_status(self):
         contract = build_report_contract(
             indices={"generatedAt": "g", "indices": []},
@@ -376,6 +482,8 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_NULL")
         self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["relativeStrengthTop5"]["status"], "PARTIAL")
+        self.assertEqual(contract["relativeStrengthTop5"]["reason"], "TRADING_DATE_UNAVAILABLE")
 
     def test_industry_breadth_preserves_authoritative_155_of_169(self):
         contract = build_report_contract(

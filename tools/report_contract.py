@@ -170,6 +170,321 @@ def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
     return compact
 
 
+_GROUP_SUMMARY_FIELDS = (
+    "id", "name", "kind", "status", "v1Status", "v2Status",
+    "membershipStatus", "memberCount", "featureCount", "coveragePct",
+    "advancers", "decliners", "unchanged", "advancePct", "avgReturn1D",
+    "averageReturn1D", "medianReturn1D", "relativeStrengthVsMarket",
+    "officialChangeRateRelativeStrength", "pctAboveMA5", "pctAboveMA20",
+    "pctAboveMA60", "pctBreakout20", "pctNear52WeekHigh",
+    "pctVolumeAbove20DayAverage", "volumeIncreasePct", "dataQuality",
+    "qualityStatus", "industrySourcePresent", "featureValidMemberCount",
+    "derivedFeatureValidMemberCount", "closeValidMemberCount",
+    "historyAdjustmentUnverifiedCount", "missingCodeCount",
+)
+
+
+def _compact_group_leaders(rows: Any) -> list[dict[str, Any]]:
+    compact = []
+    for row in rows or []:
+        if not isinstance(row, Mapping):
+            continue
+        item = _compact_leader(row)
+        if row.get("itemCode") is not None and item.get("code") is None:
+            item["code"] = row.get("itemCode")
+        if row.get("itemName") is not None and item.get("name") is None:
+            item["name"] = row.get("itemName")
+        compact.append(item)
+    return compact[:3]
+
+
+def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
+    """Keep report-facing group facts without copying source diagnostics."""
+    if not isinstance(row, Mapping):
+        return {}
+    metrics = row.get("metrics") if kind == "theme" else row
+    metrics = metrics if isinstance(metrics, Mapping) else {}
+    item: dict[str, Any] = {}
+    for field in _GROUP_SUMMARY_FIELDS:
+        value = row.get(field)
+        if value is None:
+            value = metrics.get(field)
+        if value is not None:
+            item[field] = value
+    if "averageReturn1D" in item and "avgReturn1D" not in item:
+        item["avgReturn1D"] = item["averageReturn1D"]
+    trading = metrics.get("tradingValue")
+    if isinstance(trading, Mapping):
+        item["tradingValue"] = {
+            key: trading.get(key)
+            for key in ("total", "availableCount", "coveragePct", "top3ConcentrationPct", "comparisonStatus")
+            if trading.get(key) is not None
+        }
+    persistence = metrics.get("persistence")
+    if isinstance(persistence, Mapping):
+        item["persistence"] = {
+            key: persistence.get(key)
+            for key in ("status", "availableTradingDays")
+            if persistence.get(key) is not None
+        }
+    missing_codes = row.get("missingCodes")
+    if isinstance(missing_codes, list):
+        item["missingCodeCount"] = len(missing_codes)
+    if kind == "theme" and isinstance(row.get("stocks"), list):
+        item["stockDetailCount"] = len(row["stocks"])
+        item["stockDetailSource"] = "data/monitoring/latest-theme-signals.json#themes[].stocks"
+    leaders = row.get("leaders")
+    if leaders:
+        item["leaders"] = _compact_group_leaders(leaders)
+    item["detailSource"] = (
+        "data/monitoring/latest-industries.json#industries[]"
+        if kind == "industry" else
+        "data/monitoring/latest-theme-signals.json#themes[]"
+    )
+    return item
+
+
+def _compact_group_rows(rows: Any, kind: str) -> list[dict[str, Any]]:
+    return [item for item in (_compact_group_row(row, kind) for row in rows or []) if item]
+
+
+def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
+    metrics = row.get("metrics") if kind == "theme" else row
+    metrics = metrics if isinstance(metrics, Mapping) else {}
+    # Published theme source rows nest metrics; V2 history rows expose the
+    # comparable fields at the row root.  Do not mistake V2 component scores
+    # for the source metrics.
+    if kind == "theme" and not any(
+        key in metrics for key in ("averageReturn1D", "relativeStrengthVsMarket", "officialChangeRateRelativeStrength")
+    ):
+        metrics = row
+    relative = next(
+        (metrics.get(field) for field in (
+            "officialChangeRateRelativeStrength",
+            "relativeStrengthVsMarket",
+            "relativeStrengthVsMarketMedian",
+        ) if isinstance(metrics.get(field), (int, float)) and not isinstance(metrics.get(field), bool)),
+        None,
+    )
+    absolute = next(
+        (metrics.get(field) for field in ("avgReturn1D", "averageReturn1D", "medianReturn1D")
+         if isinstance(metrics.get(field), (int, float)) and not isinstance(metrics.get(field), bool)),
+        None,
+    )
+    breadth = next(
+        (metrics.get(field) for field in ("advancePct", "advancerPct")
+         if isinstance(metrics.get(field), (int, float)) and not isinstance(metrics.get(field), bool)),
+        None,
+    )
+    member_count = row.get("memberCount") or metrics.get("memberCount")
+    coverage = row.get("coveragePct")
+    if coverage is None:
+        coverage = metrics.get("coveragePct")
+    missing_codes = row.get("missingCodes")
+    quality = row.get("dataQuality") or row.get("qualityStatus") or metrics.get("dataQuality")
+    explicit_invalid = quality in {"UNAVAILABLE", "BASELINE_STALE", "MISMATCH", "ERROR"}
+    if kind == "industry":
+        derived = row.get("derivedFeatureValidMemberCount")
+        if derived is None:
+            derived = row.get("featureValidMemberCount")
+        feature_invalid = derived == 0 if derived is not None else False
+    else:
+        derived = metrics.get("derivedValidQuoteCount")
+        feature_invalid = derived == 0 if derived is not None else False
+    eligible = (
+        relative is not None
+        and not explicit_invalid
+        and not feature_invalid
+        and (member_count is None or float(member_count) > 0)
+        and (coverage is None or float(coverage) > 0)
+        and not (isinstance(missing_codes, list) and missing_codes)
+    )
+    reason = None
+    if relative is None:
+        reason = "RELATIVE_STRENGTH_UNAVAILABLE"
+    elif explicit_invalid:
+        reason = f"QUALITY_{quality}"
+    elif feature_invalid:
+        reason = "DERIVED_FEATURES_UNAVAILABLE"
+    elif isinstance(missing_codes, list) and missing_codes:
+        reason = "GROUP_MEMBERSHIP_INCOMPLETE"
+    return {
+        "relativeStrength": relative,
+        "absoluteReturn1D": absolute,
+        "breadthPct": breadth,
+        "memberCount": member_count,
+        "coveragePct": coverage,
+        "eligible": eligible,
+        "eligibilityReason": reason,
+    }
+
+
+def _history_rankings(history: Mapping[str, Any], kind: str) -> tuple[list[str], dict[str, dict[str, int]], dict[str, dict[str, Mapping[str, Any]]]]:
+    by_date: dict[str, list[Mapping[str, Any]]] = {}
+    for observation in history.get("observations") or []:
+        if not isinstance(observation, Mapping) or not observation.get("tradingDate"):
+            continue
+        if observation.get("dateQuality", "VERIFIED") == "MISMATCH":
+            continue
+        date = str(observation.get("tradingDate"))
+        by_date.setdefault(date, []).append(observation)
+    dates = sorted(by_date)[-7:]
+    ranks: dict[str, dict[str, int]] = {}
+    rows_by_date: dict[str, dict[str, Mapping[str, Any]]] = {}
+    for date in dates:
+        latest = sorted(by_date[date], key=lambda item: str(item.get("observedAt") or ""))[-1]
+        rows = [row for row in latest.get("industries" if kind == "industry" else "themes", []) if isinstance(row, Mapping)]
+        eligible = [row for row in rows if _group_metrics(row, kind)["eligible"]]
+        eligible.sort(key=lambda row: (
+            -float(_group_metrics(row, kind)["relativeStrength"]),
+            -float(_group_metrics(row, kind)["absoluteReturn1D"] or -1e9),
+            -float(_group_metrics(row, kind)["breadthPct"] or -1e9),
+            -float(_group_metrics(row, kind)["memberCount"] or -1),
+            str(row.get("id") or ""),
+        ))
+        ranks[date] = {str(row.get("id")): index for index, row in enumerate(eligible, 1) if row.get("id") is not None}
+        rows_by_date[date] = {str(row.get("id")): row for row in rows if row.get("id") is not None}
+    return dates, ranks, rows_by_date
+
+
+def build_relative_strength_tracking(
+    *,
+    industries: Mapping[str, Any],
+    themes: Mapping[str, Any],
+    v2_latest: Mapping[str, Any],
+    v2_history: Mapping[str, Any],
+    trading_date: Any,
+    source_commit: Any,
+) -> dict[str, Any]:
+    """Create an independent TOP-5 observation layer; V1/V2 states stay intact."""
+    result: dict[str, Any] = {
+        "schemaVersion": "relative-strength-top5-v1",
+        "status": "AVAILABLE",
+        "tradingDate": trading_date,
+        "sourceCommit": source_commit,
+        "sourceCommitStatus": "VERIFIED" if source_commit else "UNVERIFIED",
+        "sourcePaths": {
+            "industries": "data/monitoring/latest-industries.json#industries[]",
+            "themes": "data/monitoring/latest-theme-signals.json#themes[]",
+            "history": "data/dynamic-universe/v2-shadow-history.json#observations[]",
+        },
+        "observedTradingDates": [],
+        "industries": {"top5": [], "active": [], "exited": []},
+        "themes": {"top5": [], "active": [], "exited": []},
+    }
+    if not trading_date:
+        result["status"] = "PARTIAL"
+        result["reason"] = "TRADING_DATE_UNAVAILABLE"
+        return result
+    v2_by_key = {
+        (str(row.get("kind")), str(row.get("id"))): row
+        for row in (list(v2_latest.get("industries") or []) + list(v2_latest.get("themes") or []))
+        if isinstance(row, Mapping) and row.get("id") is not None
+    }
+    for kind, source in (("industry", industries), ("theme", themes)):
+        rows = [row for row in source.get("industries" if kind == "industry" else "themes", []) if isinstance(row, Mapping)]
+        eligible = []
+        for row in rows:
+            metrics = _group_metrics(row, kind)
+            v2 = v2_by_key.get((kind, str(row.get("id"))), {})
+            if metrics["eligible"]:
+                eligible.append((row, metrics, v2))
+        eligible.sort(key=lambda item: (
+            -float(item[1]["relativeStrength"]),
+            -float(item[1]["absoluteReturn1D"] or -1e9),
+            -float(item[1]["breadthPct"] or -1e9),
+            -float(item[1]["memberCount"] or -1),
+            str(item[0].get("id") or ""),
+        ))
+        dates, prior_ranks, prior_rows = _history_rankings(v2_history, kind)
+        result["observedTradingDates"] = sorted(set(result["observedTradingDates"]) | set(dates) | ({str(trading_date)} if trading_date else set()))
+        current_ranks = {str(row.get("id")): index for index, (row, _, _) in enumerate(eligible, 1)}
+        current_date = str(trading_date) if trading_date else None
+        previous_date = (
+            dates[-2] if current_date and dates and dates[-1] == current_date and len(dates) >= 2
+            else dates[-1] if dates and dates[-1] != current_date
+            else None
+        )
+        previous_rank_map = prior_ranks.get(previous_date, {}) if previous_date else {}
+        first_dates = {}
+        for date in dates:
+            for group_id, rank in prior_ranks.get(date, {}).items():
+                if rank <= 5 and group_id not in first_dates:
+                    first_dates[group_id] = date
+        top5 = []
+        for rank, (row, metrics, v2) in enumerate(eligible[:5], 1):
+            group_id = str(row.get("id"))
+            prior_rank = previous_rank_map.get(group_id)
+            if prior_rank is None:
+                change_class = "NEW_ENTRY" if previous_date else "FIRST_OBSERVATION"
+            elif prior_rank > 5:
+                change_class = "NEW_ENTRY"
+            elif rank < prior_rank:
+                change_class = "RANK_UP"
+            elif rank > prior_rank:
+                change_class = "RANK_DOWN"
+            else:
+                change_class = "MAINTAINED"
+            consecutive = 1
+            prior_dates = [date for date in dates if date != current_date]
+            for date in reversed(prior_dates):
+                if prior_ranks.get(date, {}).get(group_id, 999) <= 5:
+                    consecutive += 1
+                else:
+                    break
+            source_leaders = row.get("leaders")
+            if kind == "theme" and not source_leaders:
+                source_leaders = sorted(
+                    [stock for stock in (row.get("stocks") or []) if isinstance(stock, Mapping)],
+                    key=lambda stock: (
+                        -float(stock.get("changeRate") or -1e9),
+                        -float(stock.get("accumulatedTradingValue") or 0),
+                        str(stock.get("code") or ""),
+                    ),
+                )[:3]
+            top5.append({
+                "rank": rank,
+                "id": row.get("id"),
+                "name": row.get("name"),
+                "kind": kind,
+                "relativeStrength": metrics["relativeStrength"],
+                "absoluteReturn1D": metrics["absoluteReturn1D"],
+                "breadthPct": metrics["breadthPct"],
+                "memberCount": metrics["memberCount"],
+                "coveragePct": metrics["coveragePct"],
+                "eligibility": "ELIGIBLE",
+                "v1Status": v2.get("v1Status") or row.get("status"),
+                "v2Status": v2.get("v2Status"),
+                "dataQuality": v2.get("dataQuality") or row.get("qualityStatus") or row.get("dataQuality") or "AVAILABLE",
+                "score": v2.get("score"),
+                "persistenceDays": v2.get("persistenceDays"),
+                "leaderCandidates": _compact_group_leaders(source_leaders),
+                "rankBefore": prior_rank,
+                "rankChange": (prior_rank - rank) if prior_rank is not None else None,
+                "changeClass": change_class,
+                "firstTop5Date": first_dates.get(group_id),
+                "consecutiveTop5TradingDays": consecutive,
+                "sourceGeneration": source.get("generatedAt"),
+                "sourceCommit": source_commit,
+            })
+        active = []
+        for row in (list(v2_latest.get("industries" if kind == "industry" else "themes") or [])):
+            if not isinstance(row, Mapping) or row.get("v2Status") != "ACTIVE":
+                continue
+            active.append({"id": row.get("id"), "name": row.get("name"), "v2Status": row.get("v2Status"), "score": row.get("score"), "rank": current_ranks.get(str(row.get("id"))), "inTop5": str(row.get("id")) in current_ranks and current_ranks[str(row.get("id"))] <= 5})
+        exited = []
+        if previous_date:
+            for group_id, prior_rank in previous_rank_map.items():
+                if prior_rank <= 5 and current_ranks.get(group_id, 999) > 5:
+                    prior = prior_rows.get(previous_date, {}).get(group_id, {})
+                    exited.append({"id": group_id, "name": prior.get("name"), "rankBefore": prior_rank, "changeClass": "EXITED", "reason": "OUTSIDE_CURRENT_TOP5", "tradingDate": previous_date})
+        result["industries" if kind == "industry" else "themes"] = {
+            "top5": top5, "active": active, "exited": exited[:5]
+        }
+    result["observedTradingDates"] = sorted(result["observedTradingDates"])[-7:]
+    return result
+
+
 _TRADING_DATE_EVIDENCE_SCALARS = (
     "tradingDate",
     "status",
@@ -571,6 +886,14 @@ def build_report_contract(
 
     v2_industries = selected(v2_latest.get("industries"), "industry")
     v2_themes = selected(v2_latest.get("themes"), "theme")
+    relative_strength_tracking = build_relative_strength_tracking(
+        industries=industries,
+        themes=themes,
+        v2_latest=v2_latest,
+        v2_history=v2_history,
+        trading_date=trading_date,
+        source_commit=v2_source_commit,
+    )
     observations = v2_history.get("observations") or []
     unique_dates = sorted({str(row.get("tradingDate")) for row in observations if row.get("tradingDate")})
     v2_history_summary = _v2_history_summary(
@@ -658,6 +981,9 @@ def build_report_contract(
             "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
             "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
             "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",
+            "industryDetails": "data/monitoring/latest-industries.json#industries[]",
+            "v2HistoryDetails": "data/dynamic-universe/v2-shadow-history.json#observations[]",
+            "relativeStrengthTop5": "reportContract.relativeStrengthTop5",
             "forbidCandidateMixing": True,
             "historicalAndPreMarketMustRemainSeparate": True,
         },
@@ -679,8 +1005,11 @@ def build_report_contract(
             },
             "marketTradingValue": market_values,
         },
-        "industries": industries.get("industries") or [],
-        "themes": _compact_theme_rows(themes.get("themes") or []),
+        # Full member-level source rows stay in their published artifacts;
+        # the contract carries only the stable group summary needed by Work.
+        "industries": _compact_group_rows(industries.get("industries") or [], "industry"),
+        "themes": _compact_group_rows(themes.get("themes") or [], "theme"),
+        "relativeStrengthTop5": relative_strength_tracking,
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
         "v2": {
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
