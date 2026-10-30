@@ -2418,6 +2418,11 @@ def main():
         "--output-dir",
         default="data/reports",
     )
+    parser.add_argument(
+        "--json-only",
+        action="store_true",
+        help="write only the dated/latest JSON report; do not create document views",
+    )
     args = parser.parse_args()
 
     report = build_report(args.as_of, fetch_discovery_missing=args.fetch_discovery_missing)
@@ -2438,20 +2443,22 @@ def main():
 
     latest_path.write_text(payload, encoding="utf-8")
     dated_json.write_text(payload, encoding="utf-8")
-    write_markdown(report, dated_md)
-    # Work Markdown and HTML must be sibling views of the same report model.
-    write_work_markdown(report, latest_md)
+    html_status = "NOT_REQUESTED"
+    if not args.json_only:
+        write_markdown(report, dated_md)
+        # Work Markdown and HTML must be sibling views of the same report model.
+        write_work_markdown(report, latest_md)
 
-    html_status = "TEMPLATE_UNAVAILABLE"
-    try:
-        dated_html = out_dir / f"{report['asOf']}.html"
-        latest_html = out_dir / "latest.html"
-        html = render_dashboard_html(report)
-        dated_html.write_text(html, encoding="utf-8")
-        latest_html.write_text(html, encoding="utf-8")
-        html_status = "AVAILABLE"
-    except TemplateUnavailable as exc:
-        print(f"HTML_REPORT={exc}")
+        html_status = "TEMPLATE_UNAVAILABLE"
+        try:
+            dated_html = out_dir / f"{report['asOf']}.html"
+            latest_html = out_dir / "latest.html"
+            html = render_dashboard_html(report)
+            dated_html.write_text(html, encoding="utf-8")
+            latest_html.write_text(html, encoding="utf-8")
+            html_status = "AVAILABLE"
+        except TemplateUnavailable as exc:
+            print(f"HTML_REPORT={exc}")
 
     print(
         json.dumps(
