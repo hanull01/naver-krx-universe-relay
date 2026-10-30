@@ -4,6 +4,7 @@ import tempfile
 import time
 import threading
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -170,6 +171,55 @@ class UniverseWebTests(unittest.TestCase):
         result = stock_search.search_stocks("없는검색어", universe_path=self.path, fetch_json=lambda _: (_ for _ in ()).throw(OSError("offline")))
         self.assertEqual(result["results"], [])
         self.assertIn("종목 검색 서비스를", result["message"])
+
+    def test_local_stock_index_cache_invalidates_and_is_thread_safe(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            universe = root / "universe.json"
+            rankings = root / "rankings.json"
+            research = root / "research"
+            research.mkdir()
+            universe.write_text(json.dumps({"stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}]}), encoding="utf-8")
+            rankings.write_text(json.dumps({"rankings": []}), encoding="utf-8")
+            research_file = research / "one.json"
+            research_file.write_text(json.dumps({"itemCode": "000001", "itemName": "테스트"}), encoding="utf-8")
+            with patch.object(stock_search, "RANKINGS_PATH", rankings), patch.object(stock_search, "RESEARCH_DIR", research):
+                stock_search._INDEX_CACHE.clear()
+                first = stock_search.local_stocks(universe)
+                with patch.object(stock_search, "_build_local_stocks", wraps=stock_search._build_local_stocks) as build:
+                    self.assertEqual(stock_search.local_stocks(universe), first)
+                    build.assert_not_called()
+                    parallel = list(ThreadPoolExecutor(max_workers=4).map(lambda _: stock_search.local_stocks(universe), range(8)))
+                    self.assertTrue(all(rows == first for rows in parallel))
+                universe.write_text(json.dumps({"stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}, {"itemCode": "000660", "stockName": "SK하이닉스", "enabled": True}]}), encoding="utf-8")
+                self.assertIn("000660", {row["code"] for row in stock_search.local_stocks(universe)})
+                research_file.unlink()
+                self.assertNotIn("000001", {row["code"] for row in stock_search.local_stocks(universe)})
+
+    def test_automatic_view_payload_compacts_details_without_losing_counts(self):
+        status, payload = self.request("GET", "/api/automatic")
+        self.assertEqual(status, 200)
+        self.assertNotIn("pending", payload)
+        self.assertNotIn("initialObservationCandidates", payload)
+        self.assertTrue(all(len(item.get("stocks", [])) <= 3 for item in payload["themes"] if isinstance(item.get("stocks"), list)))
+
+    def test_sync_failure_records_failed_and_allows_retry(self):
+        previous = dict(universe_web._sync_state)
+        universe_web._sync_state = {"status": "NOT_STARTED", "lastAppliedCommit": "old", "lastAppliedGeneratedAt": "old", "lastAppliedSha256": "sha", "lastCheckedAt": None, "lastSuccessAt": None}
+        try:
+            with patch.object(universe_web.background_sync, "run_result", side_effect=[RuntimeError("offline"), {"status": "NOOP", "commit": "new"}]):
+                universe_web._start_sync("test")
+                deadline = time.time() + 3
+                while time.time() < deadline and universe_web._sync_state.get("status") == "RUNNING":
+                    time.sleep(0.01)
+                self.assertEqual(universe_web._sync_state["status"], "FAILED")
+                universe_web._start_sync("retry")
+                deadline = time.time() + 3
+                while time.time() < deadline and universe_web._sync_state.get("status") == "RUNNING":
+                    time.sleep(0.01)
+                self.assertEqual(universe_web._sync_state["status"], "NOOP")
+        finally:
+            universe_web._sync_state = previous
 
     def test_preview_hash_mismatch_blocks_apply(self):
         operation = {"op": "stock_enable", "code": "005930"}
