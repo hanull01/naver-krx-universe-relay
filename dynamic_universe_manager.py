@@ -375,7 +375,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
         discovery_rows = [{"code": code, "source": discovery.get("source"), "sourceGroup": discovery.get("source_group") or discovery.get("sourceGroup"), "status": "DISCOVERED"}
                           for item in discovery.get("symbols", []) if (code := _code(item))]
     watchlists = (universe or {}).get("watchlists") or {}
-    user_watchlists = {name: list(codes) for name, codes in watchlists.items() if name != "legacy33"}
+    user_watchlists = {name: list(codes) for name, codes in watchlists.items()}
     memberships = {}
     def member(code, source, reason):
         row = memberships.setdefault(code, {"code": code, "sources": [], "reasons": []})

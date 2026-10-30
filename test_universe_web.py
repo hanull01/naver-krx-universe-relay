@@ -53,14 +53,14 @@ class UniverseWebTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(payload["groups"]["sector"][0]["name"], "기존")
 
-    def test_legacy33_and_manual_leaders_are_hidden_from_web_data(self):
+    def test_configured_watchlists_and_manual_leaders_are_visible_in_web_data(self):
         data = self.app.current()
-        data["watchlists"]["legacy33"] = ["000001"]
+        data["watchlists"]["보관목록"] = ["000001"]
         self.path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
         _, groups = self.request("GET", "/api/groups")
         _, stocks = self.request("GET", "/api/stocks")
-        self.assertNotIn("legacy33", [group["name"] for group in groups["groups"]["watchlist"]])
-        self.assertNotIn("legacy33", stocks["stocks"][0]["watchlist"])
+        self.assertIn("보관목록", [group["name"] for group in groups["groups"]["watchlist"]])
+        self.assertIn("보관목록", stocks["stocks"][0]["watchlist"])
         self.assertNotIn("leaders", stocks["stocks"][0])
 
     def test_dry_run_preview_never_writes(self):
