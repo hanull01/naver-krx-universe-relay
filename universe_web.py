@@ -75,8 +75,6 @@ def memberships(data):
     result={s["itemCode"]:{k:[] for k in manager.GROUP_KEYS} for s in data["stocks"]}
     for kind,key in manager.GROUP_KEYS.items():
         for name,codes in data.get(key,{}).items():
-            if kind == "watchlist" and name == "legacy33":
-                continue
             for code in codes:
                 if code in result: result[code][kind].append(name)
     return result
@@ -216,7 +214,7 @@ class UniverseWebApp:
         return [{**s,"market":markets.get(s["itemCode"]),**ms.get(s["itemCode"],{"leaders":[]})} for s in data.get("stocks",[])]
     def groups(self):
         data=self.current(); names={s["itemCode"]:s["stockName"] for s in data.get("stocks",[])}; out={}
-        for kind,key in manager.GROUP_KEYS.items(): out[kind]=[{"name":n,"members":[{"code":c,"name":names.get(c)} for c in codes],"leaders":[]} for n,codes in data.get(key,{}).items() if not (kind == "watchlist" and n == "legacy33")]
+        for kind,key in manager.GROUP_KEYS.items(): out[kind]=[{"name":n,"members":[{"code":c,"name":names.get(c)} for c in codes],"leaders":[]} for n,codes in data.get(key,{}).items()]
         return out
     def search(self,q): return stock_search.search_stocks(q,universe_path=self.config_path)
     def preview(self,op):

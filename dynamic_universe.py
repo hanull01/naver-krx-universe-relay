@@ -5,9 +5,6 @@ context.  It does not change the production Universe or perform requests.
 """
 
 
-USER_WATCHLIST_NAMES = {'legacy33'}
-
-
 def _code(row):
     if isinstance(row, dict):
         value = row.get('code') or row.get('itemCode') or row.get('symbol')
@@ -38,7 +35,6 @@ def _user_codes(universe):
     return {
         _code(code): name
         for name, codes in watchlists.items()
-        if name not in USER_WATCHLIST_NAMES
         for code in codes
         if _code(code)
     }

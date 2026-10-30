@@ -75,12 +75,11 @@ def universe_codes(universe, enabled_only=True):
 def universe_state():
     universe = load_universe()
     codes = universe_codes(universe)
-    legacy = [c for c in universe['watchlists'].get('legacy33', []) if c in set(codes)]
     sector = {}
     for name, members in universe['sectors'].items():
         for code in members:
             sector.setdefault(code, name)
-    return universe, codes, legacy, sector
+    return universe, codes, sector
 
 
 def now():
@@ -574,7 +573,7 @@ def build_preclose_quote(code, stock_name, business_day, close, current, sector=
     return result
 
 
-def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
+def collect_preclose_quotes(universe, codes, sectors, current):
     rows, errors = {}, []
     try:
         business_day = previous_krx_business_day(current.date())
@@ -604,15 +603,12 @@ def collect_preclose_quotes(universe, codes, legacy_codes, sectors, current):
         if code not in rows:
             errors.append({'code': code, 'error': 'no_valid_quote'})
     payload = quote_payload(rows, codes, len(codes), errors, current)
-    legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)
     if quote_snapshot_unusable(payload):
         save('data/status/quotes-error.json', quote_error_diagnostic(payload, current))
         print('Collector failed; preserving last successful production snapshot.')
     else:
         save('data/quotes.json', payload)
         save('data/quotes-lite.json', lite_payload(payload), compact=True)
-        save('data/core33.json', legacy)
-        save('data/core33-lite.json', lite_payload(legacy), compact=True)
         write_group_files(universe, rows)
     print(json.dumps({k: payload[k] for k in ('count', 'freshCount', 'status', 'sourceTime')}))
     return payload
@@ -724,10 +720,10 @@ def quote_regular_reference(code, quote):
 
 
 def collect_quotes():
-    universe, codes, legacy_codes, sectors = universe_state()
+    universe, codes, sectors = universe_state()
     current = now()
     if detect_market_session(current) == 'PRE':
-        return collect_preclose_quotes(universe, codes, legacy_codes, sectors, current)
+        return collect_preclose_quotes(universe, codes, sectors, current)
     rows, errors = {}, []
 
     def batch(codes, stage):
@@ -766,16 +762,12 @@ def collect_quotes():
     for code in missing:
         errors.append({'code': code, 'error': 'no_valid_quote'})
     payload = quote_payload(rows, codes, len(codes), errors, current)
-    # Legacy 33-stock compatibility output; data/quotes*.json is the Universe-wide source.
-    legacy = quote_payload(rows, legacy_codes, len(legacy_codes), errors, current)
     if quote_snapshot_unusable(payload):
         save('data/status/quotes-error.json', quote_error_diagnostic(payload, current))
         print('Collector failed; preserving last successful production snapshot.')
     else:
         save('data/quotes.json', payload)
         save('data/quotes-lite.json', lite_payload(payload), compact=True)
-        save('data/core33.json', legacy)
-        save('data/core33-lite.json', lite_payload(legacy), compact=True)
         write_group_files(universe, rows)
     print(json.dumps({k: payload[k] for k in ('count', 'freshCount', 'status', 'sourceTime')}))
     return payload
@@ -1033,7 +1025,7 @@ def collect_regular_daily(code, current=None):
 
 
 def collect_all_daily():
-    _, codes, _, _ = universe_state()
+    _, codes, _ = universe_state()
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(collect_daily, codes))
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -1274,7 +1266,7 @@ def calculate_technicals(code, stock_name, daily, quote):
 
 
 def build_technicals(quote_payload=None):
-    universe, codes, _, _ = universe_state()
+    universe, codes, _ = universe_state()
     if quote_payload is None:
         try:
             quote_payload = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
@@ -1430,7 +1422,7 @@ def regular_close_confirmed(quote):
 
 
 def build_states(quote_payload=None, technical_payload=None):
-    universe, codes, _, _ = universe_state(); config = load_analysis_config()
+    universe, codes, _ = universe_state(); config = load_analysis_config()
     if quote_payload is None: quote_payload = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
     if technical_payload is None: technical_payload = json.loads((ROOT / 'data/technicals.json').read_text(encoding='utf-8'))
     quotes = {row['itemCode']: row for row in quote_payload.get('datas', [])}; technicals = {row['itemCode']: row for row in technical_payload.get('datas', [])}
@@ -1558,7 +1550,7 @@ def calculate_group_state(kind, name, members, leaders, enabled, quotes, technic
 
 
 def build_group_states(quote_payload, technical_payload, state_payload):
-    universe,codes,_,_=universe_state(); config=load_analysis_config(); enabled=set(codes); q={x['itemCode']:x for x in quote_payload['datas']}; t={x['itemCode']:x for x in technical_payload['datas']}; s={x['itemCode']:x for x in state_payload['datas']}; groups=[]
+    universe,codes,_=universe_state(); config=load_analysis_config(); enabled=set(codes); q={x['itemCode']:x for x in quote_payload['datas']}; t={x['itemCode']:x for x in technical_payload['datas']}; s={x['itemCode']:x for x in state_payload['datas']}; groups=[]
     for plural,kind in (('sectors','sector'),('themes','theme'),('watchlists','watchlist')):
         for name,members in universe[plural].items(): groups.append(calculate_group_state(kind,name,members,universe.get('leaders',{}).get(kind,{}).get(name,[]),enabled,q,t,s,config))
     payload={'generatedAt':now().isoformat(),'groupCount':len(groups),'status':'ok','groups':groups}; save('data/group-states.json',payload); fields=('groupType','groupName','enabledMembers','upRatio','aboveMA20CountRatio','aboveMA60CountRatio','breakout20AttemptCount','breakout20ConfirmedCount','volumeSurgeCount','leaderUpCount','averageChangePct','diffusionState','status','current','regularSession'); save('data/group-states-lite.json',{**{k:payload[k] for k in ('generatedAt','groupCount','status')},'groups':[{k:g[k] for k in fields} for g in groups]},compact=True); return payload
@@ -1576,8 +1568,7 @@ def run_quote_pipeline():
     """Refresh quotes and derive intraday outputs from the local daily cache."""
     failed = False
     result = timed_step('quotes', collect_quotes)
-    _, _, legacy_codes, _ = universe_state()
-    failed |= result['count'] != result['expectedCount'] or len(legacy_codes) != 33
+    failed |= result['count'] != result['expectedCount']
     if quote_snapshot_unusable(result):
         print('Quote collection failed; preserving last successful production snapshot.')
         return True

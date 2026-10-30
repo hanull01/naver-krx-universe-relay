@@ -518,7 +518,6 @@ jobs:
           # not own data/market, data/research, or data/reports.
           git add \
             data/quotes.json data/quotes-lite.json \
-            data/core33.json data/core33-lite.json \
             data/groups \
             data/technicals.json data/technicals-lite.json \
             data/states.json data/states-lite.json \
