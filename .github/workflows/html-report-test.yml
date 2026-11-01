@@ -196,8 +196,12 @@ jobs:
             'html.url='+m['htmlUrl'],'html.sha256='+m['htmlSha256'],'html.bytes='+str(m['htmlBytes']),
             'markdown.url='+m['markdownUrl'],'markdown.sha256='+m['markdownSha256'],
             'manifest.url='+m['manifestUrl'],
+            'html.attachment=2026-10-30.html','markdown.attachment=2026-10-30.md',
             'markdown.bytes='+str(m['markdownBytes']),'artifact='+m['workflow']+'-'+m['runId'],
             'This is a test message; do not treat it as MARKET_DATA_READY.'])+'\n')
+          output_root=Path(os.environ['RUNNER_TEMP'])/'html-report-test'/'output'
+          for filename, maintype, subtype in (('2026-10-30.html','text','html'),('2026-10-30.md','text','markdown')):
+              e.add_attachment((output_root/filename).read_bytes(), maintype=maintype, subtype=subtype, filename=filename)
           with smtplib.SMTP_SSL('smtp.gmail.com',465,timeout=20) as s:
               s.login(os.environ['MARKET_GMAIL_USERNAME'],os.environ['MARKET_GMAIL_APP_PASSWORD']); s.send_message(e)
           print('HTML_REPORT_TEST SMTP send succeeded')
