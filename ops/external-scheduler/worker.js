@@ -1,5 +1,6 @@
 const WORKFLOWS = {
   refresh: { workflow: "refresh.yml", publicationPaths: ["data/monitoring/latest-quality.json"], commitMessage: "Refresh NAVER market data" },
+  backfill: { workflow: "backfill-derived.yml", publicationPaths: ["data/monitoring-derived"], commitMessagePrefix: "Publish full-market derived data " },
   report: {
     workflow: "daily-report.yml",
     publicationPaths: ["data/reports/latest.json", "data/reports/latest.md", "data/reports/latest.html"],
@@ -13,12 +14,17 @@ const WORKFLOWS = {
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
 export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * SUN-FRI";
+export const DAILY_COMPOSITE_CRON = "0 22,23 * * SUN-THU";
 export const GITHUB_USER_AGENT = "naver-krx-external-scheduler";
 const LEGACY_CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
+const LEGACY_DAILY_COMPOSITE_CRON = "0 22,23 * * 0-4";
 
 export function planForCron(cron) {
   if (cron === "30 11 * * MON-FRI" || cron === "30 11 * * 1-5") {
     return { slot: "20:30", key: "refresh-final", ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } };
+  }
+  if (cron === "0 22 * * SUN-THU" || cron === "0 22 * * 0-4") {
+    return { slot: "07:00", key: "backfill-derived", ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } };
   }
   if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "7 0-10 * * MON-FRI" || cron === "7 0-10 * * 1-5") {
     return { slot: cron.startsWith("0 23") ? "08:00" : "09:07-19:07", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
@@ -37,6 +43,7 @@ export function planForCron(cron) {
 export function planForKey(key) {
   const plans = {
     "refresh-final": { slot: "20:30", key, ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } },
+    "backfill-derived": { slot: "07:00", key, ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } },
     "refresh-intraday": { slot: "08:00-19:07", key, ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } },
     "daily-report": { slot: "23:00", key, ...WORKFLOWS.report, inputs: {} },
     "schedule-diagnostic": { slot: "09:17", key, ...WORKFLOWS.diagnostic, inputs: {} },
@@ -60,11 +67,20 @@ export function slotKeyFor(plan, cron, scheduledTime) {
 }
 
 export function resolveScheduledPlan(cron, scheduledTime) {
+  const kst = kstParts(scheduledTime);
+  if (cron === DAILY_COMPOSITE_CRON || cron === LEGACY_DAILY_COMPOSITE_CRON) {
+    if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
+    const hour = Number(kst.hour);
+    const minute = Number(kst.minute);
+    if (hour === 7 && minute === 0) return { plan: planForKey("backfill-derived"), slotCron: "0 22 * * 0-4" };
+    if (hour === 8 && minute === 0) return { plan: planForKey("refresh-intraday"), slotCron: "0 23 * * 0-4" };
+    return null;
+  }
   if (cron !== CONSOLIDATED_CRON && cron !== LEGACY_CONSOLIDATED_CRON) {
+    if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const plan = planForCron(cron);
     return plan ? { plan, slotCron: cron } : null;
   }
-  const kst = kstParts(scheduledTime);
   if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
   const hour = Number(kst.hour);
   const minute = Number(kst.minute);
@@ -166,7 +182,7 @@ export async function waitForDispatchedRun(api, repository, plan, dispatchedAt, 
   return { status: "RUN_UNVERIFIED", run: null };
 }
 
-async function commitChangedPaths(api, repository, commits, publicationPaths, run, commitMessage) {
+async function commitChangedPaths(api, repository, commits, publicationPaths, run, commitMessage, commitMessagePrefix) {
   for (const commit of commits || []) {
     const detail = await api(`/repos/${repository}/commits/${commit.sha}`);
     const committedAt = Date.parse(detail.commit?.committer?.date || "");
@@ -174,8 +190,9 @@ async function commitChangedPaths(api, repository, commits, publicationPaths, ru
     const runFinished = Date.parse(run.updated_at || run.created_at || "");
     const authorLogin = detail.author?.login || detail.commit?.author?.name || "";
     const message = (detail.commit?.message || "").split("\n", 1)[0];
+    const messageMatches = commitMessagePrefix ? message.startsWith(commitMessagePrefix) : message === commitMessage;
     if (!Number.isFinite(committedAt) || committedAt < runStarted || committedAt > runFinished
-        || !String(authorLogin).includes("github-actions") || message !== commitMessage) continue;
+        || !String(authorLogin).includes("github-actions") || !messageMatches) continue;
     const filenames = (detail.files || []).map((file) => file.filename || "");
     if (publicationPaths.every((path) => filenames.some((name) =>
       name === path || name.startsWith(`${path.replace(/\/$/, "")}/`)))) return commit.sha;
@@ -208,7 +225,7 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
     result.deliveryStatus = "UNVERIFIED";
     return result;
   }
-  result.publicationSha = await commitChangedPaths(api, repository, [{ sha: publicationSha }], plan.publicationPaths, current, plan.commitMessage);
+  result.publicationSha = await commitChangedPaths(api, repository, [{ sha: publicationSha }], plan.publicationPaths, current, plan.commitMessage, plan.commitMessagePrefix);
   result.publicationChanged = directSha ? current.publication_changed !== false : artifactPublication.changed;
   result.publicationStatus = result.publicationSha ? (result.publicationChanged ? "PUBLISHED" : "UNCHANGED") : "PUBLISH_UNVERIFIED";
   if (!result.publicationChanged) {

@@ -29,6 +29,7 @@
 
 | KST | 대상 | 입력 |
 |---|---|---|
+| 07:00 | Backfill full-market derived data | `dry_run=false`, `publish=true` |
 | 08:00 | Refresh market data | `run_mode=intraday` |
 | 09:07~19:07 | Refresh market data | `run_mode=intraday` |
 | 20:30 | Refresh market data | `run_mode=final_recovery` |
