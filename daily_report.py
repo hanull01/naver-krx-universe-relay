@@ -16,6 +16,7 @@ from tools.report_contract import build_report_contract, validate_kiwoom_candida
 from tools.v2_source_provenance import build_source_provenance
 from tools.kiwoom_performance import build_kiwoom_performance, load_monitoring_daily_prices
 from tools.v2_change_analysis import compare_v2_changes
+from tools.full_market_technical_adapter import build_report_input as build_staged_technical_input
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -419,6 +420,113 @@ def build_preopen_session_context(report_date, indices, baseline, reports_root=N
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _project_staged_payload(payload, rows, *, missing_codes, target_date):
+    """Keep the legacy payload shape for registered-Universe consumers."""
+    projected = dict(payload)
+    projected["datas"] = list(rows)
+    projected["targetDate"] = target_date
+    projected["scope"] = "REGISTERED_UNIVERSE_PROJECTION"
+    projected["missingCodes"] = list(missing_codes)
+    projected["fallbackUsed"] = False
+    return projected
+
+
+def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
+    """Load default inputs or opt-in staged full-market technical inputs.
+
+    The default path remains the production files. Staging mode is strict:
+    the adapter must supply the full-market rows, and registered-Universe
+    rows are projected from that same generation without legacy fallback.
+    """
+    if staging_input_dir is None:
+        return {
+            "mode": "DEFAULT",
+            "technicals": load_json(TECHNICALS_PATH),
+            "states": load_json(STATES_PATH),
+            "groupStates": load_json(GROUP_STATES_PATH) if GROUP_STATES_PATH.exists() else {},
+            "analysisTechnicals": None,
+            "analysisStates": None,
+            "metadata": {"mode": "DEFAULT", "fallbackUsed": False},
+        }
+
+    root = Path(staging_input_dir)
+    staged = build_staged_technical_input(
+        root / "technicals.json",
+        root / "states.json",
+        root / "group-states.json",
+        UNIVERSE_PATH,
+        current_snapshot=current_snapshot,
+    )
+    full_market = staged["fullMarket"]
+    registered = staged["registeredUniverse"]
+    technical_rows = [item["technicals"] for item in registered["items"]]
+    state_rows = [item["state"] for item in registered["items"]]
+    registered_technicals = _project_staged_payload(
+        full_market["technicalsPayload"],
+        technical_rows,
+        missing_codes=registered["missingCodes"],
+        target_date=staged["targetDate"],
+    )
+    registered_states = _project_staged_payload(
+        full_market["statesPayload"],
+        state_rows,
+        missing_codes=registered["missingCodes"],
+        target_date=staged["targetDate"],
+    )
+    metadata = {
+        "mode": "STAGING",
+        "adapter": staged["source"],
+        "targetDate": staged["targetDate"],
+        "sourceStaging": staged["sourceStaging"],
+        "fullMarketTechnicalCount": len(full_market["technicals"]),
+        "fullMarketStateCount": len(full_market["states"]),
+        "registeredCount": registered["registeredCount"],
+        "registeredObservedCount": len(registered["items"]),
+        "missingCodes": list(registered["missingCodes"]),
+        "historicalGroupsStatus": staged["historicalGroups"].get("availabilityStatus"),
+        "currentSnapshot": dict(staged["currentSnapshot"]),
+        "currentSnapshotSeparated": True,
+        "fallbackUsed": False,
+    }
+    return {
+        "mode": "STAGING",
+        "technicals": registered_technicals,
+        "states": registered_states,
+        "groupStates": staged["historicalGroups"],
+        "analysisTechnicals": full_market["technicalsPayload"],
+        "analysisStates": full_market["statesPayload"],
+        "metadata": metadata,
+    }
+
+
+def restrict_staging_current_quotes(quotes, target_date):
+    """Do not mix a different-generation current snapshot into staged rows."""
+    target = compact_date(target_date)
+    dates = set()
+    top_date = source_date(quotes.get("sourceTime")) if isinstance(quotes, dict) else None
+    if top_date:
+        dates.add(top_date)
+    for row in (quotes.get("datas") or []) if isinstance(quotes, dict) else []:
+        if not isinstance(row, dict):
+            continue
+        row_date = source_date(row.get("sourceTime") or row.get("collectedAt"))
+        if row_date:
+            dates.add(row_date)
+    if target and dates == {target}:
+        return quotes
+    stale = dict(quotes) if isinstance(quotes, dict) else {}
+    stale.update({
+        "status": "STALE",
+        "fresh": False,
+        "datas": [],
+        "reason": "CURRENT_SNAPSHOT_DATE_MISMATCH",
+        "targetDate": target,
+        "observedSourceDates": sorted(dates),
+        "currentSnapshotSeparated": True,
+    })
+    return stale
 
 
 def full_market_evidence(as_of=None, root=MONITORING_PATH):
@@ -1322,11 +1430,23 @@ def market_research_cross(rows):
 
 def build_report(as_of=None, fetch_discovery_missing=False,
                  discovery_quote_fetcher=None, discovery_quote_normalizer=None,
-                 discovery_clock=None):
+                 discovery_clock=None, staging_input_dir=None):
     universe = load_json(UNIVERSE_PATH)
     quotes = load_json(QUOTES_PATH)
-    technicals = load_json(TECHNICALS_PATH)
-    states = load_json(STATES_PATH)
+    current_snapshot = {
+        "status": "AVAILABLE" if MARKET_INDICES_PATH.exists() else "UNAVAILABLE",
+        "source": "CURRENT_SNAPSHOT_INPUT",
+        "path": str(MARKET_INDICES_PATH),
+    }
+    technical_inputs = load_report_technical_inputs(staging_input_dir, current_snapshot)
+    technicals = technical_inputs["technicals"]
+    states = technical_inputs["states"]
+    analysis_technicals = technical_inputs["analysisTechnicals"] or technicals
+    analysis_states = technical_inputs["analysisStates"] or states
+    if staging_input_dir:
+        quotes = restrict_staging_current_quotes(
+            quotes, technical_inputs["metadata"]["targetDate"]
+        )
     research = load_json(RESEARCH_PATH)
     try:
         indices = load_json(MARKET_INDICES_PATH)
@@ -1351,9 +1471,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
     published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
 
-    group_states = {}
-    if GROUP_STATES_PATH.exists():
-        group_states = load_json(GROUP_STATES_PATH)
+    group_states = technical_inputs["groupStates"]
 
     quote_idx = index_rows(quotes)
     tech_idx = index_rows(technicals)
@@ -1535,7 +1653,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "datas": list(quotes.get("datas") or []) + supplemental_quotes["datas"],
     }
     kiwoom_section = trading_discovery.analyze(
-        report_date, discovery, discovery_quotes, technicals, states,
+        report_date, discovery, discovery_quotes,
+        analysis_technicals, analysis_states,
         full_market_signals, previous_discovery, monitoring_baseline,
         discovery_name_lookup,
     )
@@ -1710,14 +1829,18 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "fresh": quotes.get("fresh"),
             },
             "technicals": {
-                "path": "data/technicals.json",
+                "path": (str(Path(staging_input_dir) / "technicals.json")
+                         if staging_input_dir else "data/technicals.json"),
                 "generatedAt": technicals.get("generatedAt"),
                 "status": technicals.get("status"),
+                "scope": "REGISTERED_UNIVERSE_PROJECTION" if staging_input_dir else "DEFAULT",
             },
             "states": {
-                "path": "data/states.json",
+                "path": (str(Path(staging_input_dir) / "states.json")
+                         if staging_input_dir else "data/states.json"),
                 "generatedAt": states.get("generatedAt"),
                 "status": states.get("status"),
+                "scope": "REGISTERED_UNIVERSE_PROJECTION" if staging_input_dir else "DEFAULT",
             },
             "researchIntelligence": {
                 "path": "data/research/intelligence/latest.json",
@@ -1754,6 +1877,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "missingMarketCount": len(missing_market),
             "missingMarketStocks": missing_market,
         },
+        "technicalInput": technical_inputs["metadata"],
         "marketSummary": {
             "fullMarket": full_market_summary_data,
             "monitoredUniverse": monitored_summary,
@@ -2423,9 +2547,20 @@ def main():
         action="store_true",
         help="write only the dated/latest JSON history; do not create Markdown or HTML",
     )
+    parser.add_argument(
+        "--staging-input-dir",
+        help=(
+            "opt in to strict staged full-market technicals/states input; "
+            "default production paths are not used for technical fallback"
+        ),
+    )
     args = parser.parse_args()
 
-    report = build_report(args.as_of, fetch_discovery_missing=args.fetch_discovery_missing)
+    report = build_report(
+        args.as_of,
+        fetch_discovery_missing=args.fetch_discovery_missing,
+        staging_input_dir=args.staging_input_dir,
+    )
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
