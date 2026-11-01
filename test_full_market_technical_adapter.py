@@ -41,6 +41,10 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         self.groups.write_text(json.dumps({
             "targetDate": "20261029", "availabilityStatus": "UNAVAILABLE", "groups": []
         }), encoding="utf-8")
+        (self.root / "report-contract-projection.json").write_text(json.dumps({
+            "asOf": "20261029", "status": "PARTIAL", "observedAt": "2026-11-01T07:00:00+09:00",
+            "fullMarket": {"breadth": {}, "leaders": [], "quality": {}},
+        }), encoding="utf-8")
         self.universe.write_text(json.dumps({
             "stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True}],
             "watchlists": {"관심종목": ["005930"]},
@@ -166,6 +170,20 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         self.assertEqual(restricted["status"], "STALE")
         self.assertEqual(restricted["datas"], [])
         self.assertEqual(restricted["observedSourceDates"], ["20261030"])
+
+    def test_derived_projection_is_reported_as_partial_not_final(self):
+        projection = {
+            "asOf": "20261029", "status": "AVAILABLE",
+            "observedAt": "2026-11-01T07:00:00+09:00",
+            "fullMarket": {"breadth": {"advancers": 1}, "leaders": [], "quality": {}},
+        }
+        result = daily_report.full_market_from_derived_projection(projection, "2026-10-29")
+        summary = daily_report.full_market_summary(
+            result, {"status": "OK", "mismatches": [], "missingEvidence": []}
+        )
+        self.assertEqual(summary["status"], "PARTIAL")
+        self.assertEqual(summary["snapshotDateStatus"], "DERIVED_TARGET_DATE")
+        self.assertEqual(summary["breadth"]["advancers"], 1)
 
 
 if __name__ == "__main__":

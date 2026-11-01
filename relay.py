@@ -2,6 +2,7 @@
 import argparse
 import json
 import math
+import os
 import re
 import time
 import statistics
@@ -682,7 +683,8 @@ def confirmed_regular_bar(daily, quote):
     for bar in reversed(daily.get('datas', [])):
         bar_date = ''.join(ch for ch in str(bar.get('date') or '') if ch.isdigit())
         if (bar_date == target and bar.get('complete') is True
-                and bar.get('session') != 'FINAL_DAILY'
+                and bar.get('session') not in ('AFTER_MARKET', 'POST_MARKET', 'ROLLING_HISTORY')
+                and bar.get('barType') not in ('AFTER_MARKET_DAILY', 'DERIVED_ROLLING_HISTORY')
                 and not bar.get('noTrading')):
             return bar
     return None
@@ -1070,7 +1072,10 @@ def normalize_raw_daily_for_technical(daily, current=None):
     return normalized
 
 
-def load_daily_for_technical(code, verified_bar=None):
+def load_daily_for_technical(code, verified_bar=None, daily_adapter=None):
+    """Load technical history, optionally through an explicit read-only adapter."""
+    if daily_adapter is not None:
+        return daily_adapter(code)
     try:
         daily = json.loads((ROOT / f'data/daily/{code}.json').read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
@@ -1265,7 +1270,14 @@ def calculate_technicals(code, stock_name, daily, quote):
     }
 
 
-def build_technicals(quote_payload=None):
+def _daily_for_build(code, verified_bar, daily_loader):
+    """Use an explicit test/adapter loader without changing production defaults."""
+    if daily_loader is None:
+        return load_daily_for_technical(code, verified_bar)
+    return load_daily_for_technical(code, daily_adapter=daily_loader)
+
+
+def build_technicals(quote_payload=None, daily_loader=None):
     universe, codes, _ = universe_state()
     if quote_payload is None:
         try:
@@ -1285,14 +1297,14 @@ def build_technicals(quote_payload=None):
         except (CalendarUnavailable, OSError, ValueError) as exc:
             print(f'MONITORING_DAILY_TECHNICALS unavailable=previous_business_day:{exc}')
     monitoring_rows = {}
-    if len(business_days) == 1:
+    if daily_loader is None and len(business_days) == 1:
         try:
             monitoring_rows = load_monitoring_daily_final(
                 codes, datetime.fromisoformat(next(iter(business_days))).date())
         except Exception as exc:
             print(f'MONITORING_DAILY_TECHNICALS unavailable={exc}')
     datas = [calculate_technicals(code, names[code],
-                                  load_daily_for_technical(code, monitoring_rows.get(code)),
+                                  _daily_for_build(code, monitoring_rows.get(code), daily_loader),
                                   quotes.get(code))
              for code in codes]
     missing = [row['itemCode'] for row in datas if row['status'] == 'error']
@@ -1421,7 +1433,7 @@ def regular_close_confirmed(quote):
     return source_time.date() == now().astimezone(KST).date() and source_time.time() >= dtime(15, 30)
 
 
-def build_states(quote_payload=None, technical_payload=None):
+def build_states(quote_payload=None, technical_payload=None, daily_loader=None):
     universe, codes, _ = universe_state(); config = load_analysis_config()
     if quote_payload is None: quote_payload = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
     if technical_payload is None: technical_payload = json.loads((ROOT / 'data/technicals.json').read_text(encoding='utf-8'))
@@ -1430,14 +1442,14 @@ def build_states(quote_payload=None, technical_payload=None):
     business_days = {row.get('previousBusinessDay') for row in quotes.values()
                      if row.get('previousBusinessDay')}
     monitoring_rows = {}
-    if len(business_days) == 1:
+    if daily_loader is None and len(business_days) == 1:
         try:
             monitoring_rows = load_monitoring_daily_final(
                 codes, datetime.fromisoformat(next(iter(business_days))).date())
         except Exception as exc:
             print(f'MONITORING_DAILY_STATES unavailable={exc}')
     datas = [calculate_state(code, names[code], technicals.get(code, {}),
-                             load_daily_for_technical(code, monitoring_rows.get(code)),
+                             _daily_for_build(code, monitoring_rows.get(code), daily_loader),
                              quotes.get(code), config) for code in codes]
     missing = [row['itemCode'] for row in datas if row['status'] != 'ok']
     payload = {'generatedAt': now().isoformat(), 'expectedCount': len(codes), 'count': len(datas), 'missingCodes': missing, 'status': 'ok' if not missing else 'partial', 'datas': datas}
@@ -1565,14 +1577,43 @@ def timed_step(name, fn, *args):
 
 
 def run_quote_pipeline():
-    """Refresh quotes and derive intraday outputs from the local daily cache."""
+    """Refresh quotes and derive intraday outputs from the selected history."""
     failed = False
     result = timed_step('quotes', collect_quotes)
     failed |= result['count'] != result['expectedCount']
     if quote_snapshot_unusable(result):
         print('Quote collection failed; preserving last successful production snapshot.')
         return True
-    technicals = timed_step('technicals', build_technicals, result)
+    daily_loader = None
+    derived_run = os.environ.get('DERIVED_RUN_DIR')
+    if derived_run:
+        try:
+            from tools.derived_input_resolver import (
+                RollingHistoryDailyLoader,
+                validate_derived_run,
+            )
+            target = os.environ.get('DERIVED_TARGET_DATE')
+            if not target:
+                target = next(
+                    (str(row.get('previousBusinessDay')) for row in result.get('datas', [])
+                     if row.get('previousBusinessDay')),
+                    '',
+                )
+            resolved = validate_derived_run(derived_run, target)
+            daily_loader = RollingHistoryDailyLoader(resolved).load
+            print(
+                f"DERIVED_INPUT=AVAILABLE targetDate={resolved['targetDate']} "
+                f"runId={resolved['runId']} fallbackUsed=false"
+            )
+        except Exception as exc:
+            print(f'DERIVED_INPUT=UNAVAILABLE reason={exc}')
+            return True
+    if daily_loader is None:
+        technicals = timed_step('technicals', build_technicals, result)
+    else:
+        technicals = timed_step(
+            'technicals', build_technicals, result, daily_loader=daily_loader
+        )
     failed |= technicals['count'] != result['expectedCount']
     # A complete-looking row count is not healthy if every daily-derived row
     # carries an error (for example, a stale completed-candle cache).
@@ -1581,7 +1622,12 @@ def run_quote_pipeline():
         print('Derived intraday validation failed; preserving last successful production snapshot.')
     if technicals.get('status') == 'partial':
         print(f"WARNING technicals partial missingCodes={len(technicals.get('missingCodes', []))}")
-    states = timed_step('states', build_states, result, technicals)
+    if daily_loader is None:
+        states = timed_step('states', build_states, result, technicals)
+    else:
+        states = timed_step(
+            'states', build_states, result, technicals, daily_loader=daily_loader
+        )
     timed_step('group-states', build_group_states, result, technicals, states)
     return failed
 

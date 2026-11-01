@@ -1,0 +1,38 @@
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+
+
+class DerivedWorkflowIntegrationTests(unittest.TestCase):
+    def test_daily_report_passes_the_resolved_generation_to_staging_mode(self):
+        text = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
+        self.assertIn("Resolve report and derived generation", text)
+        self.assertIn("resolve_derived_input", text)
+        self.assertIn("--staging-input-dir", text)
+        self.assertIn("steps.inputs.outputs.derived_dir", text)
+        self.assertIn("--json-only", text)
+
+    def test_refresh_requires_derived_generation_before_intraday_collection(self):
+        text = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("Resolve derived generation for refresh", text)
+        self.assertIn("DERIVED_RUN_DIR", text)
+        self.assertIn("DERIVED_TARGET_DATE", text)
+        self.assertIn("Intraday collection or derived technical validation failed", text)
+        self.assertNotIn("data/daily/", text[text.index("- name: Collect NAVER data"):text.index("- name: Collect full-market monitoring evidence")])
+
+    def test_legacy_fallback_is_not_enabled_by_staging_adapter(self):
+        text = (ROOT / "daily_report.py").read_text(encoding="utf-8")
+        start = text.index("def load_report_technical_inputs")
+        end = text.index("def restrict_staging_current_quotes", start)
+        block = text[start:end]
+        self.assertIn("derivedProjection", block)
+        self.assertIn("build_staged_technical_input", block)
+        staging_block = block.split("    root = Path(staging_input_dir)", 1)[1]
+        self.assertNotIn("TECHNICALS_PATH", staging_block)
+        self.assertNotIn("STATES_PATH", staging_block)
+
+
+if __name__ == "__main__":
+    unittest.main()
