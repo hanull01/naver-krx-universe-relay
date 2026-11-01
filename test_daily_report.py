@@ -1177,6 +1177,28 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["MARKET_QUIET_RESEARCH_LIMITED"]["count"], 1)
         self.assertEqual(got["INSUFFICIENT_DATA"]["count"], 1)
 
+    def test_json_only_writes_no_markdown_or_html(self):
+        report = {
+            "asOf": "2026-10-16",
+            "status": "OK",
+            "coverageStatus": "OK",
+            "coverage": {"enabledStockCount": 0},
+            "researchSummary": {"rankingEligibleCount": 0},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(daily_report, "build_report", return_value=report), patch(
+                "sys.argv",
+                ["daily_report.py", "--as-of", "2026-10-16", "--output-dir", directory, "--json-only"],
+            ):
+                daily_report.main()
+            output = Path(directory)
+            self.assertTrue((output / "latest.json").exists())
+            self.assertTrue((output / "2026-10-16.json").exists())
+            self.assertFalse((output / "latest.md").exists())
+            self.assertFalse((output / "2026-10-16.md").exists())
+            self.assertFalse((output / "latest.html").exists())
+            self.assertFalse((output / "2026-10-16.html").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

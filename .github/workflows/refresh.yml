@@ -481,6 +481,33 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Build current observation Markdown and HTML
+        id: observation_report
+        if: steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.report_contract.outputs.status == 'SUCCESS'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          output_dir="data/reports/current-observation/${GITHUB_RUN_ID}"
+          python tools/render_current_observation.py \
+            --contract data/monitoring/latest-report-contract.json \
+            --output-dir "$output_dir" \
+            --run-id "$GITHUB_RUN_ID" \
+            --head-sha "$GITHUB_SHA" \
+            > "$RUNNER_TEMP/current-observation-result.json"
+          code=$?
+          cat "$RUNNER_TEMP/current-observation-result.json"
+          if [ "$code" -eq 0 ]; then
+            echo "status=SUCCESS" >> "$GITHUB_OUTPUT"
+            echo "manifest_path=$output_dir/manifest.json" >> "$GITHUB_OUTPUT"
+            echo "markdown_path=$output_dir/report.md" >> "$GITHUB_OUTPUT"
+            echo "html_path=$output_dir/report.html" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=FAILED" >> "$GITHUB_OUTPUT"
+            echo "reason=CURRENT_OBSERVATION_RENDER_FAILED" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true'
@@ -523,6 +550,18 @@ jobs:
             data/technicals.json data/technicals-lite.json \
             data/states.json data/states-lite.json \
             data/group-states.json data/group-states-lite.json
+
+          # Current-observation Markdown/HTML and their manifest are produced
+          # from the just-built report contract.  They are independent of the
+          # FINAL/Baseline gate and are therefore retained for intraday runs.
+          if [ "${{ steps.observation_report.outputs.status }}" = "SUCCESS" ]; then
+            git add \
+              "${{ steps.observation_report.outputs.markdown_path }}" \
+              "${{ steps.observation_report.outputs.html_path }}" \
+              "${{ steps.observation_report.outputs.manifest_path }}"
+          else
+            echo "Current observation report is unavailable; market data and report delivery will be reported separately."
+          fi
 
           if [ "${{ steps.indices.outputs.exit_code }}" = "0" ]; then
             git add data/market/indices.json
@@ -727,6 +766,7 @@ jobs:
           FULL_MARKET_FAILURE_REASON: ${{ steps.full_market.outputs.failure_reason }}
           FULL_MARKET_LAST_PUBLISHED_AT: ${{ steps.full_market.outputs.last_published_at }}
           FULL_MARKET_REQUIRED: 'true'
+          CURRENT_OBSERVATION_MANIFEST_PATH: ${{ steps.observation_report.outputs.manifest_path }}
         run: python send_market_data_ready.py
 
       - name: Warn when MARKET_DATA_READY signal fails
