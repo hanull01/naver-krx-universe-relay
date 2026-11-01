@@ -2,31 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "010060",
   "itemName": "OCI홀딩스",
-  "reportCount": 17,
-  "latestReportNid": "96721",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 21,
+  "latestReportNid": "97381",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96721",
-    "writeDate": "2026-10-15",
-    "brokerName": "키움증권",
-    "title": "고개를 돌려 우주를 바라볼 때",
-    "goalPrice": 370000,
+    "nid": "97381",
+    "writeDate": "2026-10-30",
+    "brokerName": "교보증권",
+    "title": "3Q26 Review: 나 홀로 생존",
+    "goalPrice": 430000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 5,
+        "negative": 7
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "수요": 2,
+        "가격": 1,
+        "미국": 1,
+        "원가": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97381",
+    "97368",
+    "97315",
+    "97271",
     "96721",
     "94707",
     "94473",

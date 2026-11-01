@@ -45,6 +45,70 @@ def verified_full_market():
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_preopen_context_separates_current_observation_from_prior_session(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            previous = root / "2026-10-29.json"
+            previous.write_text(json.dumps({
+                "asOf": "2026-10-29",
+                "generatedAt": "2026-10-29T23:01:34+09:00",
+                "dateAlignment": {"status": "OK"},
+                "marketSummary": {"indices": {"indices": [
+                    {"name": "KOSPI", "close": 5937.66, "changePoints": -74.78,
+                     "changeRate": -1.24, "marketStatus": "CLOSE",
+                     "sourceTime": "2026-10-29T20:15:00+09:00"},
+                    {"name": "KOSDAQ", "close": 753.23, "changePoints": -18.05,
+                     "changeRate": -2.34, "marketStatus": "CLOSE",
+                     "sourceTime": "2026-10-29T20:15:00+09:00"}
+                ]}},
+                "reportContract": {
+                    "fullMarket": {"totalCount": 2767,
+                                   "breadth": {"advancers": 717, "decliners": 1813, "unchanged": 237},
+                                   "metrics": {"aboveMA20": {"count": 10}}},
+                    "v2": {"tradingDate": "2026-10-29", "sourceQualityStatus": "SOURCE_OBSERVED",
+                           "sourceCommitStatus": "UNAVAILABLE"}
+                }
+            }), encoding="utf-8")
+            context = daily_report.build_preopen_session_context(
+                "2026-10-30",
+                {"generatedAt": "2026-10-30T08:01:46+09:00", "source": "NAVER_MOBILE_INDEX_BASIC",
+                 "indices": [
+                     {"name": "KOSPI", "close": 5937.66, "changePoints": 0.0,
+                      "changeRate": 0.0, "marketStatus": "PREOPEN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+                     {"name": "KOSDAQ", "close": 753.23, "changePoints": 0.0,
+                      "changeRate": 0.0, "marketStatus": "PREOPEN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+                 ]},
+                {"asOfDate": "20261029"}, root
+            )
+            self.assertEqual(context["mode"], "PREOPEN")
+            self.assertEqual(context["status"], "AVAILABLE")
+            self.assertEqual(context["observation"]["tradingDate"], "20261030")
+            self.assertEqual(context["previousTradingDay"]["tradingDate"], "20261029")
+            self.assertEqual(context["previousTradingDay"]["indices"][0]["changeRate"], -1.24)
+            self.assertEqual(context["previousTradingDay"]["fullMarket"]["breadth"]["decliners"], 1813)
+
+    def test_preopen_context_rejects_stale_generation_without_losing_prior_reference(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "2026-10-29.json").write_text(json.dumps({
+                "asOf": "2026-10-29", "dateAlignment": {"status": "OK"},
+                "marketSummary": {"indices": {"indices": [
+                    {"name": "KOSPI", "marketStatus": "CLOSE", "sourceTime": "2026-10-29T20:15:00+09:00"},
+                    {"name": "KOSDAQ", "marketStatus": "CLOSE", "sourceTime": "2026-10-29T20:15:00+09:00"},
+                ]}}
+            }), encoding="utf-8")
+            context = daily_report.build_preopen_session_context(
+                "2026-10-30",
+                {"generatedAt": "2026-10-29T23:01:46+09:00", "indices": [
+                    {"name": "KOSPI", "marketStatus": "PREOPEN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+                    {"name": "KOSDAQ", "marketStatus": "PREOPEN", "sourceTime": "2026-10-30T08:01:46+09:00"},
+                ]},
+                {"asOfDate": "20261029"}, root
+            )
+            self.assertEqual(context["status"], "PARTIAL")
+            self.assertEqual(context["observation"]["reason"], "PREOPEN_GENERATION_DATE_MISMATCH")
+            self.assertEqual(context["previousTradingDay"]["status"], "AVAILABLE")
+
     def test_resolve_report_trading_date_rejects_intraday_session_evidence(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); monitoring = root / "monitoring"; monitoring.mkdir()

@@ -29,6 +29,25 @@ class ReadyMailTests(unittest.TestCase):
         metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('MARKET_DATA_READY ')); self.assertNotIn('[MARKET_DATA_READY]', message['Subject'])
         for line in ('run_id=123','generatedAt=','sourceTime=','count=2','expectedCount=2','freshCount=2','missingCodes=[]','delayTime=0','status=ok'): self.assertIn(line,message.get_content())
         for line in ('fullMarketStatus=UNAVAILABLE','fullMarketFailureReason=CURRENT_SNAPSHOT_INCOMPLETE','fullMarketLastPublishedAt=2026-10-12T08:00:00+09:00','fullMarketDataWarning=Do not use prior full-market data as today data'): self.assertIn(line,message.get_content())
+
+    def test_html_publication_metadata_is_explicit_in_ready_signal(self):
+        metadata = {
+            'mode': 'FULL_MARKET', 'publicationStatus': 'SUCCESS',
+            'generatedAt': '2026-09-29T10:39:00+09:00', 'tradingDate': '2026-09-29',
+            'tradingDateStatus': 'VERIFIED',
+            'tradingDateEvidenceReason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+            'marketSession': 'REGULAR_MARKET', 'count': 2, 'expectedCount': 2,
+            'coverageCount': 2, 'qualityStatus': 'SUCCESS', 'missingCodes': [],
+            'unconfirmedMissingCodes': [], 'newCodes': [], 'qualityWarnings': [],
+        }
+        env = dict(self.env(), MARKET_HTML_PUBLISHED='true', MARKET_HTML_STATUS='SUCCESS',
+                   MARKET_HTML_SHA256='a' * 64, MARKET_HTML_BYTES='105246',
+                   MARKET_HTML_PATH='data/reports/2026-09-29.html')
+        content = ready.ready_message(metadata, env).get_content()
+        for line in ('html.published=true', 'html.status=SUCCESS',
+                     f'html.sha256={"a" * 64}', 'html.bytes=105246',
+                     'html.path=data/reports/2026-09-29.html'):
+            self.assertIn(line, content)
     def test_invalid_coverage_status_delay_and_times_are_blocked(self):
         for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None}):
             payload=self.payload(); payload.update(changes)

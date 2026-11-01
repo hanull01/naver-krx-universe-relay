@@ -172,6 +172,45 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         cleanliness_at = self.publish.index('git ls-files --others --exclude-standard')
         self.assertLess(cleanup_at, cleanliness_at)
 
+    def test_contract_ready_builds_validated_html_before_publication(self):
+        html_start = self.text.index("      - name: Build and validate GitHub HTML report")
+        publish_at = self.text.index("      - name: Commit refreshed production data")
+        html_step = self.text[html_start:publish_at]
+        self.assertIn("id: html_report", html_step)
+        self.assertIn("tools/render_report_from_contract.py", html_step)
+        self.assertIn("data/monitoring/latest-report-contract.json", html_step)
+        self.assertIn("continue-on-error: true", html_step)
+        self.assertIn("status=SUCCESS", html_step)
+        self.assertIn("sha256=", html_step)
+        self.assertLess(html_start, publish_at)
+
+    def test_html_is_staged_only_with_the_same_contract_publication_gate(self):
+        start = self.publish.index("html_publish_eligible=false")
+        end = self.publish.index("if git diff --cached --quiet", start)
+        html_publish = self.publish[start:end]
+        for condition in (
+            '"$contract_publish_eligible" = "true"',
+            'steps.html_report.outputs.status }}" = "SUCCESS"',
+            'report-html/${{ steps.html_report.outputs.as_of }}.html',
+            'git add --',
+            'data/reports/latest.html',
+        ):
+            self.assertIn(condition, html_publish)
+
+    def test_ready_email_carries_html_publication_provenance(self):
+        mail_start = self.text.index("      - name: Send MARKET_DATA_READY signal")
+        mail = self.text[mail_start:]
+        for value in (
+            "MARKET_HTML_PUBLISHED",
+            "MARKET_HTML_STATUS",
+            "MARKET_HTML_SHA256",
+            "MARKET_HTML_BYTES",
+            "MARKET_HTML_PATH",
+        ):
+            self.assertIn(value, mail)
+        self.assertIn("htmlPublished", self.text)
+        self.assertIn("htmlSha256", self.text)
+
     def test_final_update_writes_and_validates_local_date_diagnostic(self):
         self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
         self.assertIn("OBSERVED_STOCK_UNIVERSE_INVALID", self.final_step)

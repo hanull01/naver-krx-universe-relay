@@ -66,7 +66,7 @@ class RelayTests(unittest.TestCase):
         universe = self.expanded_universe()
         codes = relay.universe_codes(universe)
         quotes = {'datas': [{'itemCode': code, 'accumulatedTradingVolume': 1000} for code in codes]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'load_daily_for_technical', return_value=self.daily_fixture(20)) as daily, \
              patch.object(relay, 'save') as save:
             result = relay.build_technicals(quotes)
@@ -148,7 +148,7 @@ class RelayTests(unittest.TestCase):
         universe = self.expanded_universe(); codes = relay.universe_codes(universe)
         tech = {'datas': [{'itemCode': code, 'ma20': 10, 'ma60': 9, 'volumeRatio20': 1.0, 'status': 'ok'} for code in codes]}
         quotes = {'datas': [{'itemCode': code, 'closePrice': 10, 'highPrice': 10, 'marketStatus': 'OPEN'} for code in codes]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), patch.object(relay, 'load_analysis_config', return_value={'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}), patch.object(relay, 'load_daily_for_technical', return_value=self.daily_fixture(21)), patch.object(relay, 'save') as save:
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), patch.object(relay, 'load_analysis_config', return_value={'nearPct': 2, 'volumeElevated': 1.2, 'volumeSurge': 1.5}), patch.object(relay, 'load_daily_for_technical', return_value=self.daily_fixture(21)), patch.object(relay, 'save') as save:
             result = relay.build_states(quotes, tech)
         self.assertEqual(result['count'], 3)
         self.assertTrue(all('current' in row and 'regularSession' in row for row in result['datas']))
@@ -175,7 +175,7 @@ class RelayTests(unittest.TestCase):
             ],
             'sectors': {'대형섹터': ['000001', '000002', '000003']},
             'themes': {'테마A': ['000001', '000002'], '테마B': ['000001']},
-            'watchlists': {'관심': ['000001', '000003'], 'legacy33': ['000001', '000002', '000003']},
+            'watchlists': {'관심': ['000001', '000003']},
             'leaders': {'sector': {'대형섹터': ['000001', '000002']},
                         'theme': {'테마A': ['000001', '000002', '000003', '000001', '000002']},
                         'watchlist': {'관심': ['000001', '000002', '000003', '000001', '000002']}},
@@ -183,8 +183,7 @@ class RelayTests(unittest.TestCase):
 
     def test_expanded_universe_groups_and_quotes_are_deduplicated(self):
         universe = self.expanded_universe()
-        _, codes, legacy, sectors = (universe, relay.universe_codes(universe),
-                                     universe['watchlists']['legacy33'],
+        _, codes, sectors = (universe, relay.universe_codes(universe),
                                      {'000001': '대형섹터', '000002': '대형섹터', '000003': '대형섹터'})
         calls = []
         def fetch(url):
@@ -197,7 +196,7 @@ class RelayTests(unittest.TestCase):
                     'accumulatedTradingVolume': 1, 'marketStatus': 'OPEN', 'delayTime': 0,
                     'status': 'ok'}
         current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, legacy, sectors)), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, sectors)), \
              patch.object(relay, 'now', return_value=current), \
              patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), \
              patch.object(relay, 'save') as save:
@@ -225,7 +224,7 @@ class RelayTests(unittest.TestCase):
                     'accumulatedTradingVolume': 1, 'marketStatus': 'OPEN', 'delayTime': 0,
                     'status': 'ok'}
         current = datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST)
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, [], {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'now', return_value=current), patch.object(relay, 'fetch', fetch), \
              patch.object(relay, 'normalize_quote', normalize), patch.object(relay, 'save'):
             result = relay.collect_quotes()
@@ -235,7 +234,7 @@ class RelayTests(unittest.TestCase):
     def test_expanded_universe_daily_is_deduplicated(self):
         universe = self.expanded_universe()
         codes = relay.universe_codes(universe)
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'collect_daily', side_effect=lambda code: {'itemCode': code, 'status': 'ok', 'completedCount': 1}) as daily, \
              patch.object(relay, 'collect_regular_daily', side_effect=lambda code: {'itemCode': code, 'regularDailyStatus': 'ok'}) as regular, \
              patch.object(relay, 'save'):
@@ -261,7 +260,7 @@ class RelayTests(unittest.TestCase):
             {'date': '2026-09-28', 'complete': True, 'close': 70000},
             {'date': '2026-09-29', 'complete': False, 'close': 99999},
         ]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'now', return_value=current), \
              patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()), \
              patch.object(relay, 'load_daily_for_technical', return_value=daily), \
@@ -285,7 +284,7 @@ class RelayTests(unittest.TestCase):
         universe = self.expanded_universe(); codes = relay.universe_codes(universe)
         current = datetime(2026, 9, 29, 8, 40, tzinfo=relay.KST)
         daily = {'datas': [{'date': '2026-09-25', 'complete': True, 'close': 70000}]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'now', return_value=current), \
              patch.object(relay, 'previous_krx_business_day', return_value=datetime(2026, 9, 28).date()), \
              patch.object(relay, 'load_daily_for_technical', return_value=daily), \
@@ -306,7 +305,7 @@ class RelayTests(unittest.TestCase):
                                'openPriceRaw': '', 'highPriceRaw': '100', 'lowPriceRaw': '100',
                                'accumulatedTradingVolumeRaw': '1', 'accumulatedTradingValueRaw': '1',
                                'stockExchangeType': {'delayTime': 0}} for code in requested]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'now', return_value=current), patch.object(relay, 'fetch', broken_quote), \
              patch.object(relay, 'save') as save:
             result = relay.collect_quotes()
@@ -316,7 +315,7 @@ class RelayTests(unittest.TestCase):
         unusable = {'count': 0, 'expectedCount': 3, 'freshCount': 0, 'status': 'error', 'datas': []}
         with patch.object(relay, 'collect_quotes', return_value=unusable), \
              patch.object(relay, 'build_technicals') as technicals, \
-             patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})):
+             patch.object(relay, 'universe_state', return_value=(universe, codes, {})):
             self.assertTrue(relay.run_quote_pipeline())
         technicals.assert_not_called()
 
@@ -324,13 +323,12 @@ class RelayTests(unittest.TestCase):
         quotes = {'count': 3, 'expectedCount': 3, 'datas': []}
         technicals = {'count': 3, 'datas': []}
         states = {'count': 3, 'datas': []}
-        legacy = [f'{index:06d}' for index in range(33)]
         with patch.object(relay, 'collect_all_daily') as daily, \
              patch.object(relay, 'collect_quotes', return_value=quotes) as collect_quotes, \
              patch.object(relay, 'build_technicals', return_value=technicals) as build_technicals, \
              patch.object(relay, 'build_states', return_value=states) as build_states, \
              patch.object(relay, 'build_group_states') as build_group_states, \
-             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+             patch.object(relay, 'universe_state', return_value=({}, [], {})):
             self.assertEqual(relay.main(['intraday']), 0)
         daily.assert_not_called()
         collect_quotes.assert_called_once_with()
@@ -343,13 +341,12 @@ class RelayTests(unittest.TestCase):
         quotes = {'count': 1, 'expectedCount': 1, 'datas': []}
         technicals = {'count': 1, 'datas': []}
         states = {'count': 1, 'datas': []}
-        legacy = [f'{index:06d}' for index in range(33)]
         with patch.object(relay, 'collect_all_daily', return_value=daily_rows) as daily, \
              patch.object(relay, 'collect_quotes', return_value=quotes) as collect_quotes, \
              patch.object(relay, 'build_technicals', return_value=technicals), \
              patch.object(relay, 'build_states', return_value=states), \
              patch.object(relay, 'build_group_states'), \
-             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+             patch.object(relay, 'universe_state', return_value=({}, [], {})):
             self.assertEqual(relay.main(['daily']), 0)
             collect_quotes.assert_not_called()
             self.assertEqual(relay.main(['all']), 0)
@@ -360,7 +357,7 @@ class RelayTests(unittest.TestCase):
         universe = self.expanded_universe()
         codes = relay.universe_codes(universe)
         quotes = {'datas': [{'itemCode': code, 'accumulatedTradingVolume': 1000} for code in codes]}
-        with patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+        with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
              patch.object(relay, 'load_daily_for_technical', return_value=None), \
              patch.object(relay, 'save'):
             payload = relay.build_technicals(quotes)
@@ -548,42 +545,64 @@ class RelayTests(unittest.TestCase):
         technicals = {'count': 3, 'expectedCount': 3, 'status': 'error',
                       'missingCodes': ['000001', '000002', '000003'], 'datas': []}
         states = {'count': 3, 'datas': []}
-        legacy = [f'{index:06d}' for index in range(33)]
         with patch.object(relay, 'collect_quotes', return_value=quotes), \
              patch.object(relay, 'build_technicals', return_value=technicals), \
              patch.object(relay, 'build_states', return_value=states), \
              patch.object(relay, 'build_group_states'), \
-             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+             patch.object(relay, 'universe_state', return_value=({}, [], {})):
             self.assertTrue(relay.run_quote_pipeline())
 
-    def test_intraday_pipeline_succeeds_when_legacy_cache_normalizes_to_previous_completed_day(self):
+    def test_intraday_pipeline_succeeds_with_previous_completed_day_cache(self):
         quotes = {'count': 3, 'expectedCount': 3, 'coverageCount': 3,
                   'status': 'ok', 'datas': []}
         technicals = {'count': 3, 'expectedCount': 3, 'status': 'ok',
                       'missingCodes': [], 'datas': []}
-        states = {'count': 3, 'datas': []}; legacy = [f'{index:06d}' for index in range(33)]
+        states = {'count': 3, 'datas': []}
         with patch.object(relay, 'collect_quotes', return_value=quotes), \
              patch.object(relay, 'build_technicals', return_value=technicals), \
              patch.object(relay, 'build_states', return_value=states), \
              patch.object(relay, 'build_group_states'), \
-             patch.object(relay, 'universe_state', return_value=({}, [], legacy, {})):
+             patch.object(relay, 'universe_state', return_value=({}, [], {})):
             self.assertFalse(relay.run_quote_pipeline())
 
-    def test_universe_legacy_and_validation(self):
-        # Use an explicit legacy fixture; the production universe is intentionally
-        # user-reset and must not be required by this regression test.
+    def test_intraday_pipeline_accepts_configured_universe_sizes(self):
+        for expected in (1, 3):
+            with self.subTest(expected=expected):
+                quotes = {'count': expected, 'expectedCount': expected,
+                          'coverageCount': expected, 'status': 'ok', 'datas': []}
+                technicals = {'count': expected, 'expectedCount': expected,
+                              'status': 'ok', 'missingCodes': [], 'datas': []}
+                states = {'count': expected, 'datas': []}
+                codes = [f'{index:06d}' for index in range(1, expected + 1)]
+                with patch.object(relay, 'collect_quotes', return_value=quotes), \
+                     patch.object(relay, 'build_technicals', return_value=technicals), \
+                     patch.object(relay, 'build_states', return_value=states), \
+                     patch.object(relay, 'build_group_states'), \
+             patch.object(relay, 'universe_state', return_value=({}, codes, {})):
+                    self.assertFalse(relay.run_quote_pipeline())
+
+    def test_empty_universe_remains_unusable(self):
+        quotes = {'count': 0, 'expectedCount': 0, 'coverageCount': 0,
+                  'status': 'error', 'datas': []}
+        with patch.object(relay, 'collect_quotes', return_value=quotes), \
+             patch.object(relay, 'build_technicals') as technicals, \
+             patch.object(relay, 'universe_state', return_value=({}, [], {})):
+            self.assertTrue(relay.run_quote_pipeline())
+        technicals.assert_not_called()
+
+    def test_universe_validation_is_independent_of_watchlist_size(self):
         codes = [f"{index:06d}" for index in range(1, 34)]
         universe = {
             'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True} for code in codes],
             'sectors': {}, 'themes': {},
-            'watchlists': {'legacy33': codes},
+            'watchlists': {'관심종목': codes},
             'leaders': {'sector': {}, 'theme': {}, 'watchlist': {}},
         }
         with patch.object(relay, 'load_universe', return_value=universe):
             loaded = relay.load_universe()
-        self.assertEqual(len(loaded['watchlists']['legacy33']), 33)
+        self.assertEqual(len(loaded['watchlists']['관심종목']), 33)
         self.assertGreaterEqual(len(relay.universe_codes(loaded)), 33)
-        self.assertEqual(loaded['watchlists']['legacy33'][-1], '000033')
+        self.assertEqual(loaded['watchlists']['관심종목'][-1], '000033')
         broken = json.loads(json.dumps(loaded))
         broken['leaders']['sector']['원전·발전설비'] = ['999999']
         with self.assertRaises(ValueError):
@@ -605,7 +624,7 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(result['sourceTimeLatest'], 'now')
         self.assertNotIn('unwanted', result['datas'][0])
 
-    def test_legacy_fresh_count_uses_legacy_codes_only(self):
+    def test_fresh_count_uses_requested_codes_only(self):
         rows = {'000001': {'fresh': True, 'sourceTime': 'a'},
                 '000002': {'fresh': True, 'sourceTime': 'b'}}
         result = relay.quote_payload(rows, ['000001'], 1, [], datetime.now(relay.KST))
@@ -1072,13 +1091,13 @@ class RelayTests(unittest.TestCase):
                 json.dumps(state('KOSDAQ', codes[2:])), encoding='utf-8')
             universe = {'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True}
                                    for code in codes], 'sectors': {}, 'themes': {},
-                        'watchlists': {'legacy33': codes}, 'leaders': {}}
+                        'watchlists': {'관심종목': codes}, 'leaders': {}}
             with patch.object(relay, 'ROOT', root), patch.object(relay, 'now', return_value=current), \
                  patch.object(relay, 'previous_krx_business_day', return_value=business_day), \
-                 patch.object(relay, 'universe_state', return_value=(universe, codes, codes, {})), \
+                 patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
                  patch.object(relay, 'load_analysis_config', return_value=analysis), \
                  patch.object(relay, 'save') as save:
-                result = relay.collect_preclose_quotes(universe, codes, codes, {}, current)
+                result = relay.collect_preclose_quotes(universe, codes, {}, current)
                 technicals = relay.build_technicals(result)
                 states = relay.build_states(result, technicals)
         self.assertEqual(result['status'], 'ok')
@@ -1242,12 +1261,12 @@ class RelayTests(unittest.TestCase):
         fixture = {
             'stocks': [{'itemCode': code, 'stockName': code, 'enabled': True} for code in codes],
             'sectors': {'원전·발전설비': codes}, 'themes': {},
-            'watchlists': {'legacy33': codes},
+            'watchlists': {'관심종목': codes},
             'leaders': {'sector': {'원전·발전설비': codes[:2]}, 'theme': {}, 'watchlist': {}},
         }
         sector = {code: '원전·발전설비' for code in codes}
         with patch.object(relay, 'now', return_value=current), \
-             patch.object(relay, 'universe_state', return_value=(fixture, codes, codes, sector)), \
+             patch.object(relay, 'universe_state', return_value=(fixture, codes, sector)), \
              patch.object(relay, 'fetch', fetch), patch.object(relay, 'normalize_quote', normalize), \
              patch.object(relay, 'save') as save:
             result = relay.collect_quotes()
@@ -1255,9 +1274,6 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(len(set(r['itemCode'] for r in result['datas'])), result['expectedCount'])
         self.assertEqual(len(calls[0]), result['expectedCount'])
         written = {call.args[0]: call.args[1] for call in save.call_args_list}
-        self.assertEqual(written['data/core33-lite.json']['count'], 33)
-        self.assertEqual(written['data/core33-lite.json']['datas'][-1]['itemCode'], '000033')
-        self.assertEqual(set(written['data/core33-lite.json']['datas'][0]), set(relay.LITE_FIELDS))
         self.assertIn('data/quotes.json', written)
         self.assertIn('data/quotes-lite.json', written)
         self.assertIn('data/groups/원전·발전설비.json', written)

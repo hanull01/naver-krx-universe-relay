@@ -153,6 +153,7 @@ DEFAULT_TRADING_DISCOVERY_QUOTES_PATH = TRADING_DISCOVERY_QUOTES_PATH
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 MARKET_INDICES_PATH = DATA / "market" / "indices.json"
+MARKET_UNIVERSE_PATH = DATA / "market-universe" / "all-assets.json"
 DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
 V2_SHADOW_HISTORY_PATH = DATA / "dynamic-universe" / "v2-shadow-history.json"
@@ -298,6 +299,122 @@ def date_alignment(report_date, indices, full_market):
     if result["missingEvidence"] or result["mismatches"]:
         result["status"] = "PARTIAL"
     return result
+
+
+def build_preopen_session_context(report_date, indices, baseline, reports_root=None):
+    """Keep a pre-open observation separate from the prior confirmed session.
+
+    The current index snapshot is useful as an observation, but it is not a
+    trading-day close.  The prior session is loaded only from the explicit
+    baseline date and its dated report; no calendar-day or ``latest.json``
+    fallback is allowed.
+    """
+    rows = [row for row in (indices.get("indices") or []) if isinstance(row, dict)]
+    current_date = compact_date(report_date)
+    preopen_rows = [
+        row for row in rows
+        if str(row.get("marketStatus") or "").upper() in {"PREOPEN", "PRE_OPEN", "BEFORE_OPEN"}
+        or str(row.get("session") or "").upper() in {"PREOPEN", "PRE_OPEN"}
+    ]
+    if not preopen_rows:
+        return {"mode": "NOT_PREOPEN", "status": "NOT_APPLICABLE"}
+
+    observation = {
+        "status": "AVAILABLE",
+        "tradingDate": current_date,
+        "generatedAt": indices.get("generatedAt"),
+        "source": indices.get("source"),
+        "indices": preopen_rows,
+    }
+    generated_date = source_date(indices.get("generatedAt"))
+    if current_date and generated_date and generated_date != current_date:
+        observation["status"] = "UNAVAILABLE"
+        observation["reason"] = "PREOPEN_GENERATION_DATE_MISMATCH"
+    if any(source_date(row.get("sourceTime")) != current_date for row in preopen_rows):
+        observation["status"] = "UNAVAILABLE"
+        observation["reason"] = "PREOPEN_SOURCE_DATE_MISMATCH"
+
+    previous_date = compact_date((baseline or {}).get("asOfDate"))
+    context = {
+        "mode": "PREOPEN",
+        "status": "PARTIAL",
+        "observation": observation,
+        "previousTradingDay": {
+            "status": "UNAVAILABLE",
+            "tradingDate": previous_date,
+            "indices": [],
+            "source": None,
+            "verificationStatus": "UNAVAILABLE",
+        },
+    }
+    if not previous_date or previous_date == current_date:
+        context["previousTradingDay"]["reason"] = "PREVIOUS_TRADING_DATE_UNAVAILABLE"
+        return context
+
+    reports_root = Path(reports_root or DATA / "reports")
+    previous_path = reports_root / f"{previous_date[:4]}-{previous_date[4:6]}-{previous_date[6:]}.json"
+    try:
+        previous_report = load_json(previous_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        context["previousTradingDay"]["reason"] = "PREVIOUS_DATED_REPORT_UNAVAILABLE"
+        return context
+
+    if compact_date(previous_report.get("asOf")) != previous_date:
+        context["previousTradingDay"]["reason"] = "PREVIOUS_REPORT_DATE_MISMATCH"
+        return context
+    previous_market = previous_report.get("marketSummary") or {}
+    previous_indices = ((previous_market.get("indices") or {}).get("indices")
+                        or (previous_report.get("reportContract") or {}).get("indices")
+                        or [])
+    def index_key(row):
+        return row.get("code") or {
+            "코스피": "KOSPI", "코스닥": "KOSDAQ",
+            "KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ",
+        }.get(row.get("name"))
+
+    valid_previous = (
+        len(previous_indices) == 2
+        and {index_key(row) for row in previous_indices} == {"KOSPI", "KOSDAQ"}
+        and all(
+            str(row.get("marketStatus") or "").upper() in {"CLOSE", "CLOSED", "AFTER_MARKET"}
+            and source_date(row.get("sourceTime")) == previous_date
+            for row in previous_indices
+        )
+        and (previous_report.get("dateAlignment") or {}).get("status") == "OK"
+    )
+    if not valid_previous:
+        context["previousTradingDay"]["reason"] = "PREVIOUS_SESSION_EVIDENCE_INVALID"
+        return context
+
+    previous_contract = previous_report.get("reportContract") or {}
+    previous_full_market = previous_contract.get("fullMarket") or previous_market.get("fullMarket") or {}
+    previous_v2 = previous_contract.get("v2") or {}
+    try:
+        source_path = str(previous_path.relative_to(ROOT))
+    except ValueError:
+        source_path = str(previous_path)
+    context["previousTradingDay"] = {
+        "status": "AVAILABLE",
+        "tradingDate": previous_date,
+        "source": source_path,
+        "generatedAt": previous_report.get("generatedAt"),
+        "verificationStatus": "VERIFIED_PRIOR_SESSION_SOURCE_OBSERVED",
+        "indices": previous_indices,
+        "fullMarket": {
+            "totalCount": previous_full_market.get("totalCount"),
+            "breadth": previous_full_market.get("breadth") or {},
+            "metrics": previous_full_market.get("metrics") or {},
+            "marketTradingValue": previous_full_market.get("marketTradingValue") or {},
+        },
+        "v1V2": {
+            "tradingDate": previous_v2.get("tradingDate") or previous_date,
+            "status": "PRIOR_SESSION_REFERENCE",
+            "sourceQualityStatus": previous_v2.get("sourceQualityStatus"),
+            "sourceCommitStatus": previous_v2.get("sourceCommitStatus"),
+        },
+    }
+    context["status"] = "AVAILABLE" if observation["status"] == "AVAILABLE" else "PARTIAL"
+    return context
 
 
 def load_json(path):
@@ -1353,6 +1470,18 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     discovery = trading_discovery.discovery_status(
         report_date, discovery_source_path(report_date)
     )
+    discovery_name_lookup = {}
+    if discovery.get("status") in {"AVAILABLE", "AVAILABLE_EMPTY"}:
+        try:
+            name_source = load_json(MARKET_UNIVERSE_PATH)
+            discovery_name_lookup = {
+                str(row.get("code")): row.get("name")
+                for row in (name_source.get("assets") or [])
+                if isinstance(row, dict) and row.get("code") in discovery.get("symbols", [])
+                and row.get("name")
+            }
+        except (OSError, ValueError, json.JSONDecodeError):
+            discovery_name_lookup = {}
     try:
         full_market_signals = load_json(FULL_MARKET_SIGNALS_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
@@ -1365,6 +1494,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         monitoring_baseline = load_json(MONITORING_BASELINE_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
         monitoring_baseline = {}
+    session_context = build_preopen_session_context(
+        report_date, indices, monitoring_baseline
+    )
     try:
         previous_report = load_json(PREVIOUS_REPORT_PATH)
         previous_discovery = previous_report.get("kiwoomPreviousCandidates", {})
@@ -1405,6 +1537,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes, technicals, states,
         full_market_signals, previous_discovery, monitoring_baseline,
+        discovery_name_lookup,
     )
     leader_by_code = {
         str(row.get("code")): row for row in full_market.get("leaders", [])
@@ -1470,6 +1603,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         ),
         kiwoom_performance=kiwoom_performance,
         v2_changes=v2_changes,
+        session_context=session_context,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract
@@ -1649,6 +1783,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             dynamic_universe, shadow_latest, shadow_history, shadow_status
         ),
         "reportContract": report_contract,
+        "sessionContext": session_context,
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),
         "technicalEventsCurrent": technical_events(rows, "currentState"),

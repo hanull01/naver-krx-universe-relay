@@ -268,6 +268,13 @@ def ready_message(metadata, env):
             'legacyQuotes.mode=SUPPLEMENTAL_ONLY',
             'legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY',
         ])
+        lines.extend([
+            f'html.published={env.get("MARKET_HTML_PUBLISHED", "false")}',
+            f'html.status={env.get("MARKET_HTML_STATUS", "UNAVAILABLE")}',
+            f'html.sha256={env.get("MARKET_HTML_SHA256", "UNAVAILABLE")}',
+            f'html.bytes={env.get("MARKET_HTML_BYTES", "UNAVAILABLE")}',
+            f'html.path={env.get("MARKET_HTML_PATH", "UNAVAILABLE")}',
+        ])
     else:
         lines.extend([
             f'generatedAt={metadata["generatedAt"]}', f'sourceTime={metadata["sourceTime"]}',

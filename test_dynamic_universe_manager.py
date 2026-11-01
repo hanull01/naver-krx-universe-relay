@@ -34,7 +34,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         return {"stocks": [{"itemCode": "005930", "stockName": "삼성전자", "enabled": True},
                            {"itemCode": "000660", "stockName": "SK하이닉스", "enabled": True}],
                 "sectors": {}, "themes": {},
-                "watchlists": {"legacy33": ["005930"], "관심종목": ["005930", "000660"]},
+                "watchlists": {"관심종목": ["005930", "000660"]},
                 "leaders": {"sector": {}, "theme": {}, "watchlist": {}}}
 
     def test_sector_requires_persistence_then_activates(self):
@@ -80,14 +80,14 @@ class DynamicUniverseManagerTests(unittest.TestCase):
         manager.build_management_result(self._dated_context([sector()], "20261023"), universe, policy=POLICY)
         self.assertEqual(universe["watchlists"], before)
 
-    def test_manual_watchlist_add_remove_and_legacy_guard(self):
+    def test_manual_watchlist_add_remove(self):
         universe = self.universe()
         universe_manager.mutate_user_watchlist(universe, "add", "관심종목", "123456", "테스트")
         self.assertIn("123456", universe["watchlists"]["관심종목"])
         universe_manager.mutate_user_watchlist(universe, "remove", "관심종목", "123456")
         self.assertNotIn("123456", universe["watchlists"]["관심종목"])
-        with self.assertRaises(ValueError):
-            universe_manager.mutate_user_watchlist(universe, "remove", "legacy33", "005930")
+        universe_manager.mutate_user_watchlist(universe, "remove", "관심종목", "005930")
+        self.assertNotIn("005930", universe["watchlists"]["관심종목"])
 
     def test_atomic_publish_and_restore_source_state(self):
         result = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)

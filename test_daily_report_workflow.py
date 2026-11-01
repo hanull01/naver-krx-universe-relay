@@ -27,6 +27,10 @@ class DailyReportWorkflowContractTests(unittest.TestCase):
         self.assertIn("REPORT_AS_OF: ${{ inputs.as_of || '' }}", self.build)
         self.assertIn('[ "${{ github.event_name }}" = "workflow_dispatch" ]', self.market_day)
 
+    def test_23h_publishes_json_history_without_duplicate_document_views(self):
+        self.assertIn("daily_report.py --as-of \"$as_of\" --output-dir data/reports --json-only", self.build)
+        self.assertIn("git add data/reports/*.json", self.text)
+
 
 if __name__ == "__main__":
     unittest.main()

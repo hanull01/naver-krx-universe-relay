@@ -2,29 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "073240",
   "itemName": "금호타이어",
-  "reportCount": 10,
-  "latestReportNid": "96851",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 13,
+  "latestReportNid": "97379",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96851",
-    "writeDate": "2026-10-20",
-    "brokerName": "신한투자증권",
-    "title": "단기 감익의 골을 지나",
-    "goalPrice": 8000,
+    "nid": "97379",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "관세는 남았지만, 불이익은 줄고 대응은 구체화된다",
+    "goalPrice": 7700,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 6,
+        "negative": 7
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 4,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "가격": 3,
+        "원가": 3,
+        "중국": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "97379",
+    "97348",
+    "97328",
     "96851",
     "96830",
     "94927",

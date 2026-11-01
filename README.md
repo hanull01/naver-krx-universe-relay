@@ -1,6 +1,6 @@
 # NAVER KRX Universe Relay
 
-Public KRX quote snapshots and daily OHLCV for the dynamic `config/universe.json` monitoring Universe. All `enabled: true` stocks are collected; sectors, themes, and watchlists are supported. The original 33-stock set remains available only through legacy compatibility outputs.
+Public KRX quote snapshots and daily OHLCV for the dynamic `config/universe.json` monitoring Universe. All `enabled: true` stocks are collected; sectors, themes, and watchlists are supported.
 No accounts, order information, KIS keys, personal data, or custom secrets are used.
 
 ## Public data
@@ -8,8 +8,6 @@ No accounts, order information, KIS keys, personal data, or custom secrets are u
 - [Universe quotes](https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/quotes.json)
 - [Samsung daily OHLCV](https://raw.githubusercontent.com/hanull01/naver-krx-universe-relay/main/data/daily/005930.json)
 - Replace `005930` with another enabled Universe code for other daily files.
-
-`data/core33.json` and `data/core33-lite.json` are legacy compatibility files for the original 33-stock set. New Universe stocks are published through `data/quotes*.json`, `data/technicals*.json`, and `data/states*.json`, not core33.
 
 `relay.py` uses Python 3.12+ standard libraries. Run `python relay.py all`.
 It collects daily data first and quotes last to minimize quote age at publication.

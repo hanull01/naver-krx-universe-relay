@@ -14,7 +14,7 @@ class DynamicUniverseTests(unittest.TestCase):
 
     def universe(self):
         return {'generatedAt': 't', 'watchlists': {
-            'legacy33': ['000002'], '관심종목': ['000010', '000001'],
+            '관심종목': ['000002', '000010', '000001'],
         }}
 
     def test_deduplicates_sources_and_preserves_baseline(self):

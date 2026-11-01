@@ -1,0 +1,1281 @@
+{
+  "status": "OK",
+  "rankingEligible": true,
+  "itemCode": "005930",
+  "itemName": "삼성전자",
+  "asOf": "2026-10-30",
+  "dateRange": {
+    "from": "2026-03-30",
+    "to": "2026-10-30"
+  },
+  "reportCount": 94,
+  "brokerCount": 14,
+  "recentVsPrevious": {
+    "recent": {
+      "from": "2026-09-30",
+      "to": "2026-10-30",
+      "reportCount": 22,
+      "brokerCount": 12,
+      "targetPrice": {
+        "count": 20,
+        "min": 350000,
+        "max": 690000,
+        "mean": 499500,
+        "median": 490000,
+        "stdev": 76907,
+        "range": 340000
+      },
+      "earningsDirection": {
+        "MIXED": 4,
+        "UNKNOWN": 8,
+        "UP": 10
+      },
+      "textSignal": {
+        "positive": 103,
+        "negative": 58,
+        "net": 45,
+        "netPerReport": 2.045
+      },
+      "topics": {
+        "수요": {
+          "count": 14,
+          "perReport": 0.636
+        },
+        "환율": {
+          "count": 10,
+          "perReport": 0.455
+        },
+        "HBM": {
+          "count": 6,
+          "perReport": 0.273
+        },
+        "원가": {
+          "count": 6,
+          "perReport": 0.273
+        },
+        "AI": {
+          "count": 4,
+          "perReport": 0.182
+        },
+        "메모리": {
+          "count": 4,
+          "perReport": 0.182
+        },
+        "DRAM": {
+          "count": 2,
+          "perReport": 0.091
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.045
+        },
+        "메모리 가격": {
+          "count": 1,
+          "perReport": 0.045
+        },
+        "주주환원": {
+          "count": 1,
+          "perReport": 0.045
+        }
+      }
+    },
+    "previous": {
+      "from": "2026-08-31",
+      "to": "2026-09-29",
+      "reportCount": 5,
+      "brokerCount": 5,
+      "targetPrice": {
+        "count": 5,
+        "min": 350000,
+        "max": 630000,
+        "mean": 500000,
+        "median": 560000,
+        "stdev": 106395,
+        "range": 280000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 3,
+        "UP": 2
+      },
+      "textSignal": {
+        "positive": 32,
+        "negative": 21,
+        "net": 11,
+        "netPerReport": 2.2
+      },
+      "topics": {
+        "환율": {
+          "count": 4,
+          "perReport": 0.8
+        },
+        "HBM": {
+          "count": 2,
+          "perReport": 0.4
+        },
+        "수요": {
+          "count": 2,
+          "perReport": 0.4
+        },
+        "사이클": {
+          "count": 2,
+          "perReport": 0.4
+        },
+        "파운드리": {
+          "count": 1,
+          "perReport": 0.2
+        },
+        "메모리": {
+          "count": 1,
+          "perReport": 0.2
+        },
+        "메모리 가격": {
+          "count": 1,
+          "perReport": 0.2
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.2
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.2
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.2
+        }
+      }
+    },
+    "topicAcceleration": [
+      {
+        "topic": "수요",
+        "currentCount": 14,
+        "currentPerReport": 0.636,
+        "previousCount": 2,
+        "previousPerReport": 0.4,
+        "perReportDelta": 0.236,
+        "ratio": 1.59
+      },
+      {
+        "topic": "DRAM",
+        "currentCount": 2,
+        "currentPerReport": 0.091,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.091,
+        "ratio": null
+      },
+      {
+        "topic": "원가",
+        "currentCount": 6,
+        "currentPerReport": 0.273,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": 0.073,
+        "ratio": 1.36
+      },
+      {
+        "topic": "주주환원",
+        "currentCount": 1,
+        "currentPerReport": 0.045,
+        "previousCount": 0,
+        "previousPerReport": 0,
+        "perReportDelta": 0.045,
+        "ratio": null
+      },
+      {
+        "topic": "AI",
+        "currentCount": 4,
+        "currentPerReport": 0.182,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.018,
+        "ratio": 0.91
+      },
+      {
+        "topic": "메모리",
+        "currentCount": 4,
+        "currentPerReport": 0.182,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.018,
+        "ratio": 0.91
+      },
+      {
+        "topic": "HBM",
+        "currentCount": 6,
+        "currentPerReport": 0.273,
+        "previousCount": 2,
+        "previousPerReport": 0.4,
+        "perReportDelta": -0.127,
+        "ratio": 0.68
+      },
+      {
+        "topic": "메모리 가격",
+        "currentCount": 1,
+        "currentPerReport": 0.045,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.155,
+        "ratio": 0.22
+      },
+      {
+        "topic": "재고",
+        "currentCount": 1,
+        "currentPerReport": 0.045,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.155,
+        "ratio": 0.22
+      },
+      {
+        "topic": "파운드리",
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 1,
+        "previousPerReport": 0.2,
+        "perReportDelta": -0.2,
+        "ratio": 0.0
+      },
+      {
+        "topic": "환율",
+        "currentCount": 10,
+        "currentPerReport": 0.455,
+        "previousCount": 4,
+        "previousPerReport": 0.8,
+        "perReportDelta": -0.345,
+        "ratio": 0.57
+      },
+      {
+        "topic": "사이클",
+        "currentCount": 0,
+        "currentPerReport": 0,
+        "previousCount": 2,
+        "previousPerReport": 0.4,
+        "perReportDelta": -0.4,
+        "ratio": 0.0
+      }
+    ]
+  },
+  "comparison": {
+    "reportCountChange": 17,
+    "targetMeanChangePct": -0.1,
+    "targetMedianChangePct": -12.5,
+    "targetDispersionChangePct": -27.72
+  },
+  "goalPriceRevisions": {
+    "total": 30,
+    "up": 24,
+    "down": 6,
+    "flat": 0
+  },
+  "monthly": {
+    "2026-03": {
+      "reportCount": 1,
+      "brokerCount": 1,
+      "targetPrice": {
+        "count": 1,
+        "min": 260000,
+        "max": 260000,
+        "mean": 260000,
+        "median": 260000,
+        "stdev": 0,
+        "range": 0
+      },
+      "earningsDirection": {
+        "DOWN": 1
+      },
+      "textSignal": {
+        "positive": 0,
+        "negative": 4,
+        "net": -4,
+        "netPerReport": -4.0
+      },
+      "topics": {
+        "원가": {
+          "count": 1,
+          "perReport": 1.0
+        }
+      }
+    },
+    "2026-04": {
+      "reportCount": 15,
+      "brokerCount": 11,
+      "targetPrice": {
+        "count": 14,
+        "min": 260000,
+        "max": 400000,
+        "mean": 302143,
+        "median": 300000,
+        "stdev": 34054,
+        "range": 140000
+      },
+      "earningsDirection": {
+        "MIXED": 3,
+        "UP": 6,
+        "UNKNOWN": 5,
+        "DOWN": 1
+      },
+      "textSignal": {
+        "positive": 50,
+        "negative": 24,
+        "net": 26,
+        "netPerReport": 1.733
+      },
+      "topics": {
+        "수요": {
+          "count": 5,
+          "perReport": 0.333
+        },
+        "환율": {
+          "count": 3,
+          "perReport": 0.2
+        },
+        "원가": {
+          "count": 3,
+          "perReport": 0.2
+        },
+        "AI": {
+          "count": 2,
+          "perReport": 0.133
+        },
+        "재고": {
+          "count": 2,
+          "perReport": 0.133
+        }
+      }
+    },
+    "2026-05": {
+      "reportCount": 18,
+      "brokerCount": 12,
+      "targetPrice": {
+        "count": 17,
+        "min": 300000,
+        "max": 550000,
+        "mean": 370588,
+        "median": 330000,
+        "stdev": 78701,
+        "range": 250000
+      },
+      "earningsDirection": {
+        "MIXED": 1,
+        "UNKNOWN": 8,
+        "UP": 9
+      },
+      "textSignal": {
+        "positive": 92,
+        "negative": 32,
+        "net": 60,
+        "netPerReport": 3.333
+      },
+      "topics": {
+        "수요": {
+          "count": 9,
+          "perReport": 0.5
+        },
+        "AI": {
+          "count": 5,
+          "perReport": 0.278
+        },
+        "메모리": {
+          "count": 2,
+          "perReport": 0.111
+        },
+        "원가": {
+          "count": 2,
+          "perReport": 0.111
+        },
+        "파운드리": {
+          "count": 1,
+          "perReport": 0.056
+        }
+      }
+    },
+    "2026-06": {
+      "reportCount": 10,
+      "brokerCount": 7,
+      "targetPrice": {
+        "count": 10,
+        "min": 430000,
+        "max": 590000,
+        "mean": 518000,
+        "median": 550000,
+        "stdev": 52688,
+        "range": 160000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 6,
+        "UP": 2,
+        "DOWN": 1,
+        "MIXED": 1
+      },
+      "textSignal": {
+        "positive": 23,
+        "negative": 12,
+        "net": 11,
+        "netPerReport": 1.1
+      },
+      "topics": {
+        "원가": {
+          "count": 3,
+          "perReport": 0.3
+        },
+        "AI": {
+          "count": 2,
+          "perReport": 0.2
+        },
+        "수요": {
+          "count": 2,
+          "perReport": 0.2
+        },
+        "주주환원": {
+          "count": 1,
+          "perReport": 0.1
+        },
+        "CAPEX/생산능력": {
+          "count": 1,
+          "perReport": 0.1
+        }
+      }
+    },
+    "2026-07": {
+      "reportCount": 19,
+      "brokerCount": 10,
+      "targetPrice": {
+        "count": 19,
+        "min": 370000,
+        "max": 580000,
+        "mean": 501053,
+        "median": 500000,
+        "stdev": 65606,
+        "range": 210000
+      },
+      "earningsDirection": {
+        "UP": 10,
+        "UNKNOWN": 6,
+        "DOWN": 3
+      },
+      "textSignal": {
+        "positive": 99,
+        "negative": 53,
+        "net": 46,
+        "netPerReport": 2.421
+      },
+      "topics": {
+        "수요": {
+          "count": 11,
+          "perReport": 0.579
+        },
+        "원가": {
+          "count": 8,
+          "perReport": 0.421
+        },
+        "메모리": {
+          "count": 4,
+          "perReport": 0.211
+        },
+        "AI": {
+          "count": 4,
+          "perReport": 0.211
+        },
+        "주주환원": {
+          "count": 3,
+          "perReport": 0.158
+        },
+        "환율": {
+          "count": 2,
+          "perReport": 0.105
+        },
+        "재고": {
+          "count": 2,
+          "perReport": 0.105
+        },
+        "중국": {
+          "count": 2,
+          "perReport": 0.105
+        },
+        "HBM": {
+          "count": 1,
+          "perReport": 0.053
+        },
+        "파운드리": {
+          "count": 1,
+          "perReport": 0.053
+        }
+      }
+    },
+    "2026-08": {
+      "reportCount": 4,
+      "brokerCount": 2,
+      "targetPrice": {
+        "count": 4,
+        "min": 370000,
+        "max": 440000,
+        "mean": 387500,
+        "median": 370000,
+        "stdev": 30311,
+        "range": 70000
+      },
+      "earningsDirection": {
+        "UP": 2,
+        "MIXED": 1,
+        "UNKNOWN": 1
+      },
+      "textSignal": {
+        "positive": 15,
+        "negative": 6,
+        "net": 9,
+        "netPerReport": 2.25
+      },
+      "topics": {
+        "수요": {
+          "count": 3,
+          "perReport": 0.75
+        },
+        "AI": {
+          "count": 3,
+          "perReport": 0.75
+        },
+        "HBM": {
+          "count": 1,
+          "perReport": 0.25
+        },
+        "중국": {
+          "count": 1,
+          "perReport": 0.25
+        }
+      }
+    },
+    "2026-09": {
+      "reportCount": 6,
+      "brokerCount": 6,
+      "targetPrice": {
+        "count": 6,
+        "min": 350000,
+        "max": 630000,
+        "mean": 491667,
+        "median": 505000,
+        "stdev": 98897,
+        "range": 280000
+      },
+      "earningsDirection": {
+        "UNKNOWN": 3,
+        "UP": 2,
+        "MIXED": 1
+      },
+      "textSignal": {
+        "positive": 35,
+        "negative": 22,
+        "net": 13,
+        "netPerReport": 2.167
+      },
+      "topics": {
+        "환율": {
+          "count": 4,
+          "perReport": 0.667
+        },
+        "HBM": {
+          "count": 3,
+          "perReport": 0.5
+        },
+        "수요": {
+          "count": 2,
+          "perReport": 0.333
+        },
+        "사이클": {
+          "count": 2,
+          "perReport": 0.333
+        },
+        "파운드리": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "메모리": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "메모리 가격": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "AI": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.167
+        },
+        "원가": {
+          "count": 1,
+          "perReport": 0.167
+        }
+      }
+    },
+    "2026-10": {
+      "reportCount": 21,
+      "brokerCount": 12,
+      "targetPrice": {
+        "count": 19,
+        "min": 350000,
+        "max": 690000,
+        "mean": 502105,
+        "median": 500000,
+        "stdev": 78040,
+        "range": 340000
+      },
+      "earningsDirection": {
+        "MIXED": 3,
+        "UNKNOWN": 8,
+        "UP": 10
+      },
+      "textSignal": {
+        "positive": 100,
+        "negative": 57,
+        "net": 43,
+        "netPerReport": 2.048
+      },
+      "topics": {
+        "수요": {
+          "count": 14,
+          "perReport": 0.667
+        },
+        "환율": {
+          "count": 10,
+          "perReport": 0.476
+        },
+        "원가": {
+          "count": 6,
+          "perReport": 0.286
+        },
+        "HBM": {
+          "count": 5,
+          "perReport": 0.238
+        },
+        "AI": {
+          "count": 4,
+          "perReport": 0.19
+        },
+        "메모리": {
+          "count": 4,
+          "perReport": 0.19
+        },
+        "DRAM": {
+          "count": 2,
+          "perReport": 0.095
+        },
+        "재고": {
+          "count": 1,
+          "perReport": 0.048
+        },
+        "메모리 가격": {
+          "count": 1,
+          "perReport": 0.048
+        },
+        "주주환원": {
+          "count": 1,
+          "perReport": 0.048
+        }
+      }
+    }
+  },
+  "brokerTrajectory": {
+    "DS투자증권": {
+      "reportCount": 5,
+      "targetPricePointCount": 5,
+      "firstGoalPrice": 300000,
+      "latestGoalPrice": 530000,
+      "changeAmount": 230000,
+      "changePct": 76.67,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 300000,
+          "title": "진짜 놀랐습니다.."
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 300000,
+          "title": "1Q26 Re: 메모리와 파운드리 모두 순항 중"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 530000,
+          "title": "2Q26 Re: 폼은 일시적이지만 클래스는 영원하다"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 530000,
+          "title": "사상 최초 DRAM 분기 매출 100조원 상회"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 530000,
+          "title": "3Q26 Re: 추정치 추가 상향"
+        }
+      ]
+    },
+    "IBK투자증권": {
+      "reportCount": 7,
+      "targetPricePointCount": 7,
+      "firstGoalPrice": 350000,
+      "latestGoalPrice": 350000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 350000,
+          "title": "판도가 바뀌었다!"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 350000,
+          "title": "메모리 천하의 주인공"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 460000,
+          "title": "외풍을 극복하고도 남을 실적"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 460000,
+          "title": "무시할 실적이 아니다"
+        },
+        {
+          "date": "2026-10-02",
+          "goalPrice": 460000,
+          "title": "분기 영업이익 100조 시대가 열렸다"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 460000,
+          "title": "환율도 메모리 호황을 막진 못했다"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 350000,
+          "title": "실적은 좋지만, 주주환원은 아쉽다"
+        }
+      ]
+    },
+    "SK증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 400000,
+      "latestGoalPrice": 610000,
+      "changeAmount": 210000,
+      "changePct": 52.5,
+      "trajectory": [
+        {
+          "date": "2026-04-30",
+          "goalPrice": 400000,
+          "title": "1Q26 Conference call"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 610000,
+          "title": "현저한 저평가"
+        }
+      ]
+    },
+    "iM증권": {
+      "reportCount": 4,
+      "targetPricePointCount": 4,
+      "firstGoalPrice": 280000,
+      "latestGoalPrice": 480000,
+      "changeAmount": 200000,
+      "changePct": 71.43,
+      "trajectory": [
+        {
+          "date": "2026-04-01",
+          "goalPrice": 280000,
+          "title": "스태그플레이션 우려 Vs 살아있는 업황"
+        },
+        {
+          "date": "2026-04-08",
+          "goalPrice": 300000,
+          "title": "주당가치 급증. 단 이란 전쟁은 여전히 중요"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 300000,
+          "title": "경쟁력 회복이 일조한 1Q26 Memory 실적"
+        },
+        {
+          "date": "2026-06-22",
+          "goalPrice": 480000,
+          "title": "중기 주가 상승세 유지 예상"
+        }
+      ]
+    },
+    "교보증권": {
+      "reportCount": 6,
+      "targetPricePointCount": 5,
+      "firstGoalPrice": 330000,
+      "latestGoalPrice": 500000,
+      "changeAmount": 170000,
+      "changePct": 51.52,
+      "trajectory": [
+        {
+          "date": "2026-05-06",
+          "goalPrice": 330000,
+          "title": "호황의 강도와 지속성 모두 확인"
+        },
+        {
+          "date": "2026-07-01",
+          "goalPrice": 500000,
+          "title": "2Q26 Preview 그럼에도 불구하고 믿음의 실적"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 500000,
+          "title": "2Q26 Review 변하지 않은 메모리 호황"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 500000,
+          "title": "3Q26 Preview HBM이 만들고, 메모리가 이어간다"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 500000,
+          "title": "3Q26 Review 사상 최대 실적, 메모리가 이끌었다"
+        }
+      ]
+    },
+    "대신증권": {
+      "reportCount": 7,
+      "targetPricePointCount": 7,
+      "firstGoalPrice": 270000,
+      "latestGoalPrice": 500000,
+      "changeAmount": 230000,
+      "changePct": 85.19,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 270000,
+          "title": "Memory Giant"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 330000,
+          "title": "바겐세일"
+        },
+        {
+          "date": "2026-06-26",
+          "goalPrice": 560000,
+          "title": "두렵지 않다"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 560000,
+          "title": "체급의 위력"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 560000,
+          "title": "동의할 수 없는 주가"
+        },
+        {
+          "date": "2026-09-22",
+          "goalPrice": 560000,
+          "title": "Beyond the cycle"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 500000,
+          "title": "결국 제자리를 찾아갈 것"
+        }
+      ]
+    },
+    "미래에셋증권": {
+      "reportCount": 20,
+      "targetPricePointCount": 20,
+      "firstGoalPrice": 300000,
+      "latestGoalPrice": 400000,
+      "changeAmount": 100000,
+      "changePct": 33.33,
+      "trajectory": [
+        {
+          "date": "2026-04-02",
+          "goalPrice": 300000,
+          "title": "구조적 변화의 서막"
+        },
+        {
+          "date": "2026-04-06",
+          "goalPrice": 300000,
+          "title": "뉴 노멀 증명 구간"
+        },
+        {
+          "date": "2026-04-07",
+          "goalPrice": 300000,
+          "title": "놀라운 실적의 시작"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 320000,
+          "title": "수익성 약화 우려는 일시적"
+        },
+        {
+          "date": "2026-05-07",
+          "goalPrice": 400000,
+          "title": "밸류에이션 할인 종식을 고함"
+        },
+        {
+          "date": "2026-05-11",
+          "goalPrice": 400000,
+          "title": "중장기 사업 가시성 확보"
+        },
+        {
+          "date": "2026-05-21",
+          "goalPrice": 480000,
+          "title": "내부는 태풍, 외부는 폭풍"
+        },
+        {
+          "date": "2026-05-27",
+          "goalPrice": 550000,
+          "title": "밸류에이션 집중 추격 구간"
+        },
+        {
+          "date": "2026-06-01",
+          "goalPrice": 550000,
+          "title": "플러스 알파: 대규모 주주환원"
+        },
+        {
+          "date": "2026-06-09",
+          "goalPrice": 550000,
+          "title": "어두울땐 실적을 켜자"
+        },
+        {
+          "date": "2026-06-15",
+          "goalPrice": 550000,
+          "title": "풀스텍 내재화의 우위"
+        },
+        {
+          "date": "2026-06-25",
+          "goalPrice": 550000,
+          "title": "27년에 더욱 부각될 생산능력"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 550000,
+          "title": "과격한 주가 반응에 뇌동하지 말자"
+        },
+        {
+          "date": "2026-07-29",
+          "goalPrice": 370000,
+          "title": "배당 매력도 급등 구간"
+        },
+        {
+          "date": "2026-08-11",
+          "goalPrice": 370000,
+          "title": "비중확대의 적기"
+        },
+        {
+          "date": "2026-08-14",
+          "goalPrice": 370000,
+          "title": "사방에서 울리는 낭보들"
+        },
+        {
+          "date": "2026-08-26",
+          "goalPrice": 370000,
+          "title": "공포가 클수록 중심을 잡자"
+        },
+        {
+          "date": "2026-09-07",
+          "goalPrice": 400000,
+          "title": "HBM으로 매크로 우려 극복"
+        },
+        {
+          "date": "2026-10-06",
+          "goalPrice": 400000,
+          "title": "반도체 사상 첫 매출 천억불 달성"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 400000,
+          "title": "초우량 고성장 파격 세일 중"
+        }
+      ]
+    },
+    "신한투자증권": {
+      "reportCount": 8,
+      "targetPricePointCount": 8,
+      "firstGoalPrice": 270000,
+      "latestGoalPrice": 450000,
+      "changeAmount": 180000,
+      "changePct": 66.67,
+      "trajectory": [
+        {
+          "date": "2026-04-06",
+          "goalPrice": 270000,
+          "title": "현 시점은 Peak 구간의 초입"
+        },
+        {
+          "date": "2026-04-21",
+          "goalPrice": 300000,
+          "title": "실적 눈높이 재차 상향"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 300000,
+          "title": "의심할 여지 없는 초호황"
+        },
+        {
+          "date": "2026-05-21",
+          "goalPrice": 550000,
+          "title": "초호황 속 조정 구간 = 매수 타이밍"
+        },
+        {
+          "date": "2026-06-30",
+          "goalPrice": 590000,
+          "title": "충당금 반영 후에도 높아질 눈높이"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 450000,
+          "title": "명확한 주주환원 의지"
+        },
+        {
+          "date": "2026-09-30",
+          "goalPrice": 450000,
+          "title": "HBM 시장 침투 준비 완료"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 450000,
+          "title": "전인미답의 길"
+        }
+      ]
+    },
+    "유안타증권": {
+      "reportCount": 3,
+      "targetPricePointCount": 3,
+      "firstGoalPrice": 340000,
+      "latestGoalPrice": 690000,
+      "changeAmount": 350000,
+      "changePct": 102.94,
+      "trajectory": [
+        {
+          "date": "2026-05-04",
+          "goalPrice": 340000,
+          "title": "2Q26 예상 영업이익 86.8조원, 가격 모멘텀 극대화 구간"
+        },
+        {
+          "date": "2026-09-23",
+          "goalPrice": 630000,
+          "title": "메모리 가격 상승폭 둔화보다 사이클 장기화!"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 690000,
+          "title": "4Q26 예상 영업이익 137.3조원"
+        }
+      ]
+    },
+    "유진투자증권": {
+      "reportCount": 6,
+      "targetPricePointCount": 6,
+      "firstGoalPrice": 360000,
+      "latestGoalPrice": 560000,
+      "changeAmount": 200000,
+      "changePct": 55.56,
+      "trajectory": [
+        {
+          "date": "2026-05-04",
+          "goalPrice": 360000,
+          "title": "단기 부담을 이겨 낼 구조적 변화"
+        },
+        {
+          "date": "2026-07-06",
+          "goalPrice": 560000,
+          "title": "조정은 매수의 기회"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 560000,
+          "title": "걱정의 벽을 타고"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 560000,
+          "title": "품격을 보여줬다"
+        },
+        {
+          "date": "2026-09-29",
+          "goalPrice": 560000,
+          "title": "긴 호흡으로"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 560000,
+          "title": "눈높이를 높이는 구간"
+        }
+      ]
+    },
+    "키움증권": {
+      "reportCount": 10,
+      "targetPricePointCount": 7,
+      "firstGoalPrice": 260000,
+      "latestGoalPrice": 350000,
+      "changeAmount": 90000,
+      "changePct": 34.62,
+      "trajectory": [
+        {
+          "date": "2026-03-30",
+          "goalPrice": 260000,
+          "title": "1Q26 영업이익 43조원, 서프라이즈 예상"
+        },
+        {
+          "date": "2026-04-08",
+          "goalPrice": 260000,
+          "title": "너무 좋아도 걱정"
+        },
+        {
+          "date": "2026-05-11",
+          "goalPrice": 330000,
+          "title": "2Q26 영업이익 100조원 예상"
+        },
+        {
+          "date": "2026-06-29",
+          "goalPrice": 430000,
+          "title": "2Q26 영업이익 89조원"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 390000,
+          "title": "하반기, EPS 성장률 둔화 예상"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 390000,
+          "title": "3Q26 실적 전망치 상향"
+        },
+        {
+          "date": "2026-09-23",
+          "goalPrice": 350000,
+          "title": "HBM, 파운드리 중장기 성장성에 주목"
+        }
+      ]
+    },
+    "하나증권": {
+      "reportCount": 8,
+      "targetPricePointCount": 8,
+      "firstGoalPrice": 300000,
+      "latestGoalPrice": 480000,
+      "changeAmount": 180000,
+      "changePct": 60.0,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 300000,
+          "title": "2026년 영업이익 355조원으로 상향"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 330000,
+          "title": "갈 길이 멀다"
+        },
+        {
+          "date": "2026-06-18",
+          "goalPrice": 480000,
+          "title": "성과급 반영해도 실적 전망치 상향"
+        },
+        {
+          "date": "2026-07-08",
+          "goalPrice": 480000,
+          "title": "메모리 이익 체력 확인. 실적 상향 여력 충분"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 480000,
+          "title": "메모리 산업의 구조적 변화에 주목"
+        },
+        {
+          "date": "2026-10-01",
+          "goalPrice": 480000,
+          "title": "견조한 실적에 HBM이 가세"
+        },
+        {
+          "date": "2026-10-12",
+          "goalPrice": 480000,
+          "title": "강한 DRAM 가격. LPDDR 공급 부족 심화"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 480000,
+          "title": "2027년 영업이익 전망치 상향으로 방향 전환"
+        }
+      ]
+    },
+    "한화투자증권": {
+      "reportCount": 6,
+      "targetPricePointCount": 6,
+      "firstGoalPrice": 300000,
+      "latestGoalPrice": 580000,
+      "changeAmount": 280000,
+      "changePct": 93.33,
+      "trajectory": [
+        {
+          "date": "2026-04-08",
+          "goalPrice": 300000,
+          "title": "심각한 숏티지, 더 강력해지는 이익 체력"
+        },
+        {
+          "date": "2026-05-04",
+          "goalPrice": 330000,
+          "title": "1Q26 Review: 2027년은 더 심한 숏티지 구간"
+        },
+        {
+          "date": "2026-07-07",
+          "goalPrice": 580000,
+          "title": "2Q26 Review: 범용 메모리 서프, 파운드리 흑전, 글로벌 최고가 HBM4 생산"
+        },
+        {
+          "date": "2026-07-31",
+          "goalPrice": 580000,
+          "title": "강력한 LTA와 주주환원으로 합당한 기업가치 회복 가능"
+        },
+        {
+          "date": "2026-10-07",
+          "goalPrice": 580000,
+          "title": "주인공은 HBM으로 바뀐다"
+        },
+        {
+          "date": "2026-10-30",
+          "goalPrice": 580000,
+          "title": "HBM4 경쟁력 회복과 높아지는 이익의 눈높이"
+        }
+      ]
+    },
+    "현대차증권": {
+      "reportCount": 2,
+      "targetPricePointCount": 2,
+      "firstGoalPrice": 440000,
+      "latestGoalPrice": 440000,
+      "changeAmount": 0,
+      "changePct": 0.0,
+      "trajectory": [
+        {
+          "date": "2026-06-30",
+          "goalPrice": 440000,
+          "title": "난기류 지대에 진입했다고 목적지가 변경되는 것은 아니다"
+        },
+        {
+          "date": "2026-08-05",
+          "goalPrice": 440000,
+          "title": "공급과 수요 모두 변화 / HBM 시장 점유율 확대 예상"
+        }
+      ]
+    }
+  },
+  "methodology": {
+    "rawContentStored": false,
+    "topicSource": "report title + stored rule-based topic keys only",
+    "topicCountsAreFullTextCounts": false,
+    "buySellUsedAsRecommendationScore": false,
+    "minimumRecentReportsForRanking": 3
+  }
+}

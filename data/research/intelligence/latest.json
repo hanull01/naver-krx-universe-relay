@@ -3,14 +3,180 @@
   "version": "research-intelligence-batch-v1",
   "asOf": "2026-10-30",
   "universeSource": "config/universe.json",
-  "enabledStockCount": 0,
-  "statusCounts": {},
-  "rankingEligibleCount": 0,
-  "stocks": [],
+  "enabledStockCount": 1,
+  "statusCounts": {
+    "OK": 1
+  },
+  "rankingEligibleCount": 1,
+  "stocks": [
+    {
+      "itemCode": "005930",
+      "itemName": "삼성전자",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 94,
+      "brokerCount": 14,
+      "recentReportCount": 22,
+      "previousReportCount": 5,
+      "recentTargetMean": 499500,
+      "previousTargetMean": 500000,
+      "recentTargetMedian": 490000,
+      "recentTargetStdev": 76907,
+      "targetMeanChangePct": -0.1,
+      "targetDispersionChangePct": -27.72,
+      "revisionUp": 24,
+      "revisionDown": 6,
+      "risingTopics": [
+        {
+          "topic": "수요",
+          "delta": 0.236,
+          "ratio": 1.59
+        },
+        {
+          "topic": "DRAM",
+          "delta": 0.091,
+          "ratio": null
+        },
+        {
+          "topic": "원가",
+          "delta": 0.073,
+          "ratio": 1.36
+        },
+        {
+          "topic": "주주환원",
+          "delta": 0.045,
+          "ratio": null
+        }
+      ]
+    }
+  ],
   "rankings": {
-    "researchAttentionIncrease": [],
-    "targetMeanChange": [],
-    "targetDispersionIncrease": []
+    "researchAttentionIncrease": [
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 94,
+        "brokerCount": 14,
+        "recentReportCount": 22,
+        "previousReportCount": 5,
+        "recentTargetMean": 499500,
+        "previousTargetMean": 500000,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 76907,
+        "targetMeanChangePct": -0.1,
+        "targetDispersionChangePct": -27.72,
+        "revisionUp": 24,
+        "revisionDown": 6,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.236,
+            "ratio": 1.59
+          },
+          {
+            "topic": "DRAM",
+            "delta": 0.091,
+            "ratio": null
+          },
+          {
+            "topic": "원가",
+            "delta": 0.073,
+            "ratio": 1.36
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.045,
+            "ratio": null
+          }
+        ]
+      }
+    ],
+    "targetMeanChange": [
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 94,
+        "brokerCount": 14,
+        "recentReportCount": 22,
+        "previousReportCount": 5,
+        "recentTargetMean": 499500,
+        "previousTargetMean": 500000,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 76907,
+        "targetMeanChangePct": -0.1,
+        "targetDispersionChangePct": -27.72,
+        "revisionUp": 24,
+        "revisionDown": 6,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.236,
+            "ratio": 1.59
+          },
+          {
+            "topic": "DRAM",
+            "delta": 0.091,
+            "ratio": null
+          },
+          {
+            "topic": "원가",
+            "delta": 0.073,
+            "ratio": 1.36
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.045,
+            "ratio": null
+          }
+        ]
+      }
+    ],
+    "targetDispersionIncrease": [
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 94,
+        "brokerCount": 14,
+        "recentReportCount": 22,
+        "previousReportCount": 5,
+        "recentTargetMean": 499500,
+        "previousTargetMean": 500000,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 76907,
+        "targetMeanChangePct": -0.1,
+        "targetDispersionChangePct": -27.72,
+        "revisionUp": 24,
+        "revisionDown": 6,
+        "risingTopics": [
+          {
+            "topic": "수요",
+            "delta": 0.236,
+            "ratio": 1.59
+          },
+          {
+            "topic": "DRAM",
+            "delta": 0.091,
+            "ratio": null
+          },
+          {
+            "topic": "원가",
+            "delta": 0.073,
+            "ratio": 1.36
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.045,
+            "ratio": null
+          }
+        ]
+      }
+    ]
   },
   "methodology": {
     "automaticUniversePromotion": false,

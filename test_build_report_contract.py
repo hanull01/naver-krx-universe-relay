@@ -64,6 +64,45 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(len(result["sha256"]), 64)
             self.assertEqual(json.loads(output.read_text())["asOf"], "20261028")
 
+    def test_large_2769_stock_diagnostics_are_not_copied_into_contract(self):
+        generated = "2026-10-30T00:09:00+09:00"
+        evidence = {
+            "tradingDate": "20261030",
+            "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+            "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+            "missingCanonicalCodes": [f"{index:06d}" for index in range(2769)],
+            "invalidCanonicalCodes": {f"{index:06d}": "INVALID" for index in range(116)},
+        }
+        quality = {"generatedAt": generated, "tradingDateEvidence": evidence}
+        summary = {"generatedAt": generated, "fullMarket": {"tradingDateEvidence": evidence}}
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "latest-report-contract.json"
+            with patch.object(builder, "load_json", side_effect=[quality, summary]), patch.object(
+                builder,
+                "build_report",
+                return_value={"reportContract": {
+                    "schemaVersion": "market-report-contract-v1",
+                    "status": "PARTIAL",
+                    "asOf": "2026-10-30",
+                    "observedAt": generated,
+                    "tradingDateStatus": "VERIFIED",
+                }},
+            ), patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
+                captured = io.StringIO()
+                with redirect_stdout(captured):
+                    self.assertEqual(builder.main(), 0)
+            result = json.loads(captured.getvalue())
+            self.assertLess(result["bytes"], builder.MAX_WORK_CONTRACT_BYTES)
+            written = json.loads(output.read_text(encoding="utf-8"))
+            self.assertNotIn("missingCanonicalCodes", written["tradingDateEvidence"])
+            self.assertEqual(
+                written["tradingDateEvidence"]["detailCounts"]["missingCanonicalCodes"],
+                2769,
+            )
+
     def test_oversized_contract_preserves_existing_file(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "latest-report-contract.json"

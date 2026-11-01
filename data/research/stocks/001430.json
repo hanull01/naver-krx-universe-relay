@@ -2,31 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "001430",
   "itemName": "세아베스틸지주",
-  "reportCount": 16,
-  "latestReportNid": "96894",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 20,
+  "latestReportNid": "97376",
+  "latestWriteDate": "2026-10-30",
   "latest": {
-    "nid": "96894",
-    "writeDate": "2026-10-21",
-    "brokerName": "신한투자증권",
-    "title": "롤마진 축소의 파고를 넘어",
-    "goalPrice": 55000,
+    "nid": "97376",
+    "writeDate": "2026-10-30",
+    "brokerName": "하나증권",
+    "title": "3분기는 부진했지만 장기 성장 기대감 유효!",
+    "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 5,
+        "negative": 9
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 1
+        "가격": 3,
+        "원가": 3,
+        "방산": 2,
+        "재고": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97376",
+    "97350",
+    "97307",
+    "97287",
     "96894",
     "96718",
     "96714",

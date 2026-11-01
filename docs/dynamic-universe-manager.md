@@ -12,7 +12,7 @@ and never sends orders.
 | `AUTO_THEME` | verified theme evidence only | `themes`, or an explicit `PENDING` reason |
 | `AUTO_LEADER` | qualified sector/theme members | `leaders` |
 | `KIWOOM_DISCOVERY` | validated discovery snapshot | `kiwoomDiscovery` |
-| `USER_WATCHLIST` | user actions only | non-`legacy33` groups in `config/universe.json` |
+| `USER_WATCHLIST` | user actions only | configured groups in `config/universe.json` |
 
 One code may have several memberships. `collectionCodes` is deduplicated by
 code while `memberships.sources` and `memberships.reasons` retain provenance.

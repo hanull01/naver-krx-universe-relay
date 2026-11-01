@@ -35,6 +35,19 @@ def minute(stamp, open_price, close, high=None, low=None):
 
 
 class TradeCandidatePerformanceTests(unittest.TestCase):
+    def test_canonical_report_contract_is_preferred_for_technical_candidates(self):
+        contract = {
+            "status": "AVAILABLE", "asOf": "2026-10-30", "observedAt": "t",
+            "technicalCandidates": [candidate("005930")],
+        }
+        snapshot_result = subject.build_candidate_snapshot({"reportContract": contract})
+        self.assertEqual(snapshot_result["asOf"], "2026-10-30")
+        self.assertEqual(snapshot_result["candidates"][0]["itemCode"], "005930")
+        self.assertEqual(
+            snapshot_result["methodology"]["source"],
+            "data/monitoring/latest-report-contract.json#technicalCandidates",
+        )
+
     def test_candidate_snapshot_is_immutable_and_idempotent(self):
         report = {"generatedAt": "t", "nextSessionCandidates": {
             "status": "AVAILABLE", "asOf": "2026-10-06", "candidateCount": 1,

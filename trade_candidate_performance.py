@@ -19,6 +19,7 @@ from krx_market_day import CalendarUnavailable, krx_holidays
 KST = ZoneInfo("Asia/Seoul")
 ROOT = Path(__file__).resolve().parent
 REPORT_PATH = ROOT / "data" / "reports" / "latest.json"
+REPORT_CONTRACT_PATH = ROOT / "data" / "monitoring" / "latest-report-contract.json"
 CANDIDATE_ROOT = ROOT / "data" / "trade-candidates"
 PERFORMANCE_ROOT = ROOT / "data" / "trade-candidate-performance"
 TARGET_MINUTES = {
@@ -55,8 +56,32 @@ def next_krx_trading_day(candidate_date, holiday_loader=krx_holidays):
 
 
 def build_candidate_snapshot(report):
-    source = report.get("nextSessionCandidates")
-    if not isinstance(source, dict) or source.get("status") not in ("AVAILABLE", "PARTIAL"):
+    contract = report.get("reportContract") if isinstance(report, dict) else None
+    if isinstance(contract, dict):
+        source = contract.get("technicalCandidates")
+        source_status = contract.get("status")
+        source_path = "data/monitoring/latest-report-contract.json#technicalCandidates"
+        report_as_of = contract.get("asOf")
+    else:
+        source = report.get("nextSessionCandidates") if isinstance(report, dict) else None
+        source_status = source.get("status") if isinstance(source, dict) else None
+        source_path = "data/reports/latest.json#nextSessionCandidates"
+        report_as_of = report.get("asOf") if isinstance(report, dict) else None
+
+    if isinstance(source, list):
+        priority = source
+        candidate_count = len(source)
+        source_available = source_status in ("AVAILABLE", "PARTIAL")
+    elif isinstance(source, dict):
+        priority = source.get("priority", [])
+        candidate_count = source.get("candidateCount")
+        source_available = source.get("status") in ("AVAILABLE", "PARTIAL")
+    else:
+        priority = []
+        candidate_count = None
+        source_available = False
+
+    if not source_available:
         raise ValueError("next-session candidates are unavailable")
     candidates = []
     fields = (
@@ -64,21 +89,24 @@ def build_candidate_snapshot(report):
         "breakoutStrength", "regularSession", "current", "afterSession",
         "volume", "tags", "metadata",
     )
-    for row in source.get("priority", []):
+    for row in priority:
         if not isinstance(row, dict):
             raise ValueError("candidate row is invalid")
         candidates.append({key: deepcopy(row.get(key)) for key in fields if key in row})
-    if len(candidates) != source.get("candidateCount"):
+    if candidate_count is not None and len(candidates) != candidate_count:
         raise ValueError("candidate count mismatch")
     return {
         "schemaVersion": 1,
-        "asOf": source.get("asOf") or report.get("asOf"),
-        "generatedAt": report.get("generatedAt"),
+        "asOf": (source.get("asOf") if isinstance(source, dict) else None) or report_as_of,
+        "generatedAt": (
+            contract.get("observedAt") if isinstance(contract, dict)
+            else report.get("generatedAt")
+        ),
         "candidateCount": len(candidates),
         "candidates": candidates,
         "methodology": {
             "immutableCandidateDateSnapshot": True,
-            "source": "data/reports/latest.json#nextSessionCandidates",
+            "source": source_path,
             "technicalBasis": "REGULAR_SESSION",
             "volumeBasis": "CURRENT_DAILY_TECHNICAL",
             "afterBasis": "CLOSED_REFERENCE",
@@ -321,13 +349,25 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate-date")
     parser.add_argument("--snapshot-report", type=Path)
+    parser.add_argument(
+        "--snapshot-contract",
+        type=Path,
+        default=None,
+        help="canonical report contract used for technical candidate snapshots",
+    )
     parser.add_argument("--snapshot-only", action="store_true")
     parser.add_argument("--candidate-root", type=Path, default=CANDIDATE_ROOT)
     parser.add_argument("--performance-root", type=Path, default=PERFORMANCE_ROOT)
     args = parser.parse_args(argv)
 
     if args.snapshot_report:
-        snapshot = persist_candidate_snapshot(load_json(args.snapshot_report), args.candidate_root)
+        source = load_json(args.snapshot_report)
+        contract_path = args.snapshot_contract
+        if contract_path is None and args.snapshot_report.resolve() == REPORT_PATH.resolve():
+            contract_path = REPORT_CONTRACT_PATH
+        if contract_path is not None and contract_path.exists():
+            source = {"reportContract": load_json(contract_path)}
+        snapshot = persist_candidate_snapshot(source, args.candidate_root)
     else:
         candidate_date = args.candidate_date
         if not candidate_date:

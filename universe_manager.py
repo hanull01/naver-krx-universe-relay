@@ -19,7 +19,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DEFAULT_PATH = ROOT / "config" / "universe.json"
 GROUP_KEYS = {"sector": "sectors", "theme": "themes", "watchlist": "watchlists"}
-LEGACY_WATCHLISTS = {"legacy33"}
 
 
 def code(value):
@@ -140,13 +139,8 @@ def references(data, item_code):
 
 
 def user_watchlists(data):
-    """Return only explicitly user-managed groups.
-
-    ``legacy33`` is a compatibility baseline, not proof of user intent.  It is
-    therefore excluded from editable USER_WATCHLIST data during migration.
-    """
-    return {name: list(members) for name, members in data.get("watchlists", {}).items()
-            if name not in LEGACY_WATCHLISTS}
+    """Return all configured user-managed watchlist groups."""
+    return {name: list(members) for name, members in data.get("watchlists", {}).items()}
 
 
 def mutate_user_watchlist(data, action, group_name, item_code=None, stock_name=None):
@@ -154,8 +148,6 @@ def mutate_user_watchlist(data, action, group_name, item_code=None, stock_name=N
     if not isinstance(group_name, str) or not group_name.strip():
         raise ValueError("관심 그룹명이 필요합니다")
     group_name = group_name.strip()
-    if group_name in LEGACY_WATCHLISTS:
-        raise ValueError("legacy 호환 목록은 사용자 관심종목으로 편집할 수 없습니다")
     watchlists = data.setdefault("watchlists", {})
     if action == "group_create":
         if group_name in watchlists: raise ValueError("이미 존재하는 관심 그룹입니다")

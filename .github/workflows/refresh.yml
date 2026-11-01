@@ -508,6 +508,57 @@ jobs:
           fi
           exit 0
 
+      - name: Build and validate GitHub HTML report
+        id: html_report
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.report_contract.outputs.status == 'SUCCESS' && hashFiles('data/monitoring/latest-report-contract.json') != ''
+        continue-on-error: true
+        shell: bash
+        env:
+          HTML_OUTPUT_DIR: ${{ runner.temp }}/report-html
+        run: |
+          set +e
+          mkdir -p "$HTML_OUTPUT_DIR"
+          python3 tools/render_report_from_contract.py \
+            --input data/monitoring/latest-report-contract.json \
+            --output-dir "$HTML_OUTPUT_DIR" \
+            > "$RUNNER_TEMP/html-report-result.json"
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "status=FAILED" >> "$GITHUB_OUTPUT"
+            echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+            echo "::warning::Contract was published-ready, but the validated HTML view was not generated. Market data publication remains independent."
+            exit 0
+          fi
+          html_path=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'html-report-result.json').read_text(encoding='utf-8'))
+          print(result.get('datedHtml') or '')
+          PY
+          )
+          html_as_of=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'html-report-result.json').read_text(encoding='utf-8'))
+          print(result.get('asOf') or '')
+          PY
+          )
+          if [ -z "$html_as_of" ] || [ ! -f "$html_path" ] || [ ! -f "$HTML_OUTPUT_DIR/latest.html" ]; then
+            echo "status=FAILED" >> "$GITHUB_OUTPUT"
+            echo "exit_code=2" >> "$GITHUB_OUTPUT"
+            echo "::warning::Validated HTML output path is missing. Market data publication remains independent."
+            exit 0
+          fi
+          html_sha256=$(sha256sum "$html_path" | awk '{print $1}')
+          html_bytes=$(wc -c < "$html_path" | tr -d ' ')
+          echo "status=SUCCESS" >> "$GITHUB_OUTPUT"
+          echo "exit_code=0" >> "$GITHUB_OUTPUT"
+          echo "as_of=$html_as_of" >> "$GITHUB_OUTPUT"
+          echo "sha256=$html_sha256" >> "$GITHUB_OUTPUT"
+          echo "bytes=$html_bytes" >> "$GITHUB_OUTPUT"
+          echo "path=data/reports/$html_as_of.html" >> "$GITHUB_OUTPUT"
+          echo "HTML validation succeeded: path=data/reports/$html_as_of.html sha256=$html_sha256 bytes=$html_bytes"
+
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
         if: steps.market_day.outputs.run == 'true'
@@ -545,7 +596,6 @@ jobs:
           # not own data/market, data/research, or data/reports.
           git add \
             data/quotes.json data/quotes-lite.json \
-            data/core33.json data/core33-lite.json \
             data/groups \
             data/technicals.json data/technicals-lite.json \
             data/states.json data/states-lite.json \
@@ -662,6 +712,27 @@ jobs:
             restore_generated_path data/monitoring/latest-report-contract.json
           fi
 
+          html_publish_eligible=false
+          if [ "$contract_publish_eligible" = "true" ] \
+            && [ "${{ steps.html_report.outputs.status }}" = "SUCCESS" ] \
+            && [ -f "${RUNNER_TEMP}/report-html/${{ steps.html_report.outputs.as_of }}.html" ] \
+            && [ -f "$RUNNER_TEMP/report-html/latest.html" ]; then
+            mkdir -p data/reports
+            cp -- "$RUNNER_TEMP/report-html/${{ steps.html_report.outputs.as_of }}.html" \
+              "data/reports/${{ steps.html_report.outputs.as_of }}.html"
+            cp -- "$RUNNER_TEMP/report-html/latest.html" data/reports/latest.html
+            git add -- \
+              "data/reports/${{ steps.html_report.outputs.as_of }}.html" \
+              data/reports/latest.html
+            html_publish_eligible=true
+          else
+            echo "Validated HTML is unavailable or the contract is not publishable; no HTML view will be added."
+          fi
+          echo "html_published=$html_publish_eligible" >> "$GITHUB_OUTPUT"
+          echo "html_sha256=${{ steps.html_report.outputs.sha256 }}" >> "$GITHUB_OUTPUT"
+          echo "html_bytes=${{ steps.html_report.outputs.bytes }}" >> "$GITHUB_OUTPUT"
+          echo "html_path=${{ steps.html_report.outputs.path }}" >> "$GITHUB_OUTPUT"
+
           if git diff --cached --quiet; then
             echo "No data changes to commit"
             echo "published=false" >> "$GITHUB_OUTPUT"
@@ -728,6 +799,10 @@ jobs:
         env:
           PRODUCTION_COMMIT_SHA: ${{ steps.publish.outputs.production_commit_sha }}
           PUBLICATION_CHANGED: ${{ steps.publish.outputs.publication_changed }}
+          HTML_PUBLISHED: ${{ steps.publish.outputs.html_published }}
+          HTML_SHA256: ${{ steps.publish.outputs.html_sha256 }}
+          HTML_BYTES: ${{ steps.publish.outputs.html_bytes }}
+          HTML_PATH: ${{ steps.publish.outputs.html_path }}
         run: |
           python3 - <<'PY'
           import json
@@ -738,6 +813,10 @@ jobs:
               "headSha": os.environ["GITHUB_SHA"],
               "productionCommitSha": os.environ["PRODUCTION_COMMIT_SHA"],
               "publicationChanged": os.environ["PUBLICATION_CHANGED"] == "true",
+              "htmlPublished": os.environ.get("HTML_PUBLISHED") == "true",
+              "htmlSha256": os.environ.get("HTML_SHA256") or None,
+              "htmlBytes": int(os.environ["HTML_BYTES"]) if os.environ.get("HTML_BYTES", "").isdigit() else None,
+              "htmlPath": os.environ.get("HTML_PATH") or None,
           }, ensure_ascii=False, sort_keys=True), encoding="utf-8")
           PY
 
@@ -767,6 +846,11 @@ jobs:
           FULL_MARKET_LAST_PUBLISHED_AT: ${{ steps.full_market.outputs.last_published_at }}
           FULL_MARKET_REQUIRED: 'true'
           CURRENT_OBSERVATION_MANIFEST_PATH: ${{ steps.observation_report.outputs.manifest_path }}
+          MARKET_HTML_PUBLISHED: ${{ steps.publish.outputs.html_published }}
+          MARKET_HTML_STATUS: ${{ steps.html_report.outputs.status || 'UNAVAILABLE' }}
+          MARKET_HTML_SHA256: ${{ steps.publish.outputs.html_sha256 }}
+          MARKET_HTML_BYTES: ${{ steps.publish.outputs.html_bytes }}
+          MARKET_HTML_PATH: ${{ steps.publish.outputs.html_path }}
         run: python send_market_data_ready.py
 
       - name: Warn when MARKET_DATA_READY signal fails

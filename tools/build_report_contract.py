@@ -10,7 +10,11 @@ import tempfile
 from pathlib import Path
 
 from daily_report import build_report, load_json
-from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
+from tools.report_contract import (
+    MAX_WORK_CONTRACT_BYTES,
+    _compact_trading_date_evidence,
+    validate_contract_payload,
+)
 
 
 FINAL_EVIDENCE_REASONS = {
@@ -129,7 +133,7 @@ def main() -> int:
     contract = report.get("reportContract")
     if not isinstance(contract, dict):
         raise SystemExit("REPORT_CONTRACT_UNAVAILABLE")
-    contract["tradingDateEvidence"] = evidence
+    contract["tradingDateEvidence"] = _compact_trading_date_evidence(evidence)
     output = Path(args.output)
     payload = _serialize_contract(contract)
     validation = validate_contract_payload(

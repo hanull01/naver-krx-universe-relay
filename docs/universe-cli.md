@@ -5,7 +5,7 @@ For normal local Universe management, use [Universe Manager](universe-manager.md
 `apply`, `rename-stock`, and isolated-worktree `--publish` flows. No production
 workflow or collector currently invokes it directly.
 
-`config/universe.json` is the operating source of truth. The `legacy33` watchlist preserves the original 33 stocks; `data/core33*.json` remains compatibility-only, and new stocks use Universe-wide `data/quotes*.json` and related outputs.
+`config/universe.json` is the operating source of truth. Enabled stocks use the Universe-wide quote, technical, state, and group outputs.
 
 ```bash
 # A. 단순 종목 추가 (기본 enabled=true)

@@ -5,6 +5,8 @@ NAVER autocomplete request is only attempted when local data has no match.
 """
 
 import json
+import os
+import threading
 from pathlib import Path
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -14,6 +16,8 @@ ROOT = Path(__file__).resolve().parent
 UNIVERSE_PATH = ROOT / "config" / "universe.json"
 RANKINGS_PATH = ROOT / "data" / "market" / "rankings.json"
 RESEARCH_DIR = ROOT / "data" / "research" / "stocks"
+_INDEX_CACHE = {}
+_INDEX_CACHE_LOCK = threading.RLock()
 
 
 def _load(path, default):
@@ -27,8 +31,30 @@ def _market(value):
     return {"0": "KOSPI", "1": "KOSDAQ", "2": "KONEX"}.get(str(value))
 
 
-def local_stocks(universe_path=UNIVERSE_PATH):
-    """Build a deduplicated local index from existing project data only."""
+def _source_fingerprint(universe_path):
+    def file_fingerprint(path):
+        try:
+            stat = Path(path).stat()
+            return (str(path), stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            return (str(path), None, None)
+
+    research = []
+    try:
+        with os.scandir(RESEARCH_DIR) as entries:
+            for entry in entries:
+                if entry.name.endswith(".json") and entry.is_file():
+                    try:
+                        stat = entry.stat()
+                        research.append((entry.name, stat.st_mtime_ns, stat.st_size))
+                    except OSError:
+                        research.append((entry.name, None, None))
+    except OSError:
+        pass
+    return (file_fingerprint(universe_path), file_fingerprint(RANKINGS_PATH), tuple(sorted(research)))
+
+
+def _build_local_stocks(universe_path):
     rows = {}
     universe = _load(universe_path, {})
     for item in universe.get("stocks", []):
@@ -50,7 +76,21 @@ def local_stocks(universe_path=UNIVERSE_PATH):
             code, name = str(item.get("itemCode", "")), item.get("itemName")
             if code and name:
                 rows.setdefault(code, {"code": code, "name": name, "market": None, "inUniverse": False, "enabled": None, "source": "research"})
-    return list(rows.values())
+    return tuple(rows.values())
+
+
+def local_stocks(universe_path=UNIVERSE_PATH):
+    """Build a deduplicated local index from existing project data only."""
+    path = Path(universe_path)
+    fingerprint = _source_fingerprint(path)
+    key = str(path.resolve())
+    with _INDEX_CACHE_LOCK:
+        cached = _INDEX_CACHE.get(key)
+        if cached and cached[0] == fingerprint:
+            return [dict(row) for row in cached[1]]
+        rows = _build_local_stocks(path)
+        _INDEX_CACHE[key] = (fingerprint, rows)
+        return [dict(row) for row in rows]
 
 
 def _matches(row, query):
