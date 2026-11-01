@@ -212,7 +212,9 @@ def load_approved_template(template_dir: Path = TEMPLATE_DIR) -> dict[str, Any]:
     }
 
 
-def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
+def build_dashboard_model(
+    report: Mapping[str, Any], *, allow_current_observation: bool = False
+) -> dict[str, Any]:
     """Normalize one report contract for both Markdown and HTML renderers."""
     contract = report.get("reportContract") if isinstance(report.get("reportContract"), Mapping) else report
     if not isinstance(contract, Mapping):
@@ -245,7 +247,14 @@ def build_dashboard_model(report: Mapping[str, Any]) -> dict[str, Any]:
         "observedAt": contract.get("observedAt") or report.get("generatedAt"),
         "tradingDateStatus": contract.get("tradingDateStatus"),
         "sourceQualityStatus": contract.get("sourceQualityStatus"),
-        "htmlAllowed": bool((contract.get("rendering") or {}).get("htmlAllowed")),
+        # The normal HTML gate remains authoritative for finalized reports.
+        # Current observations have a separate, explicit rendering path: they
+        # may be rendered before FINAL/Baseline is available, but only after
+        # the observation artifact builder has validated the contract.
+        "htmlAllowed": bool(
+            (contract.get("rendering") or {}).get("htmlAllowed")
+            or allow_current_observation
+        ),
         "contractTrace": (
             f"schema={_text(contract.get('schemaVersion'))};status={_text(contract.get('status'))};"
             f"asOf={_text(contract.get('asOf'))};observedAt={_text(contract.get('observedAt'))};"
@@ -458,12 +467,17 @@ def _top5_cards(section: Mapping[str, Any], label: str) -> str:
     return "".join(cards) or f'<div class="industry-item"><strong>{_escape(label)} 상대강도 TOP 5 자료가 없습니다.</strong></div>'
 
 
-def render_dashboard_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR) -> str:
+def render_dashboard_html(
+    report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR,
+    allow_current_observation: bool = False,
+) -> str:
     assets = load_approved_template(template_dir)
     # Keep the approved A v1.1 stylesheet intact while allowing long dynamic
     # timestamps to wrap inside the mobile KPI card.
     assets["css"] += ".kpi-value{overflow-wrap:anywhere;word-break:break-word}"
-    model = build_dashboard_model(report)
+    model = build_dashboard_model(
+        report, allow_current_observation=allow_current_observation
+    )
     if not model["htmlAllowed"]:
         raise TemplateUnavailable("TEMPLATE_UNAVAILABLE:CONTRACT_HTML_NOT_ALLOWED")
     model["templateTrace"] = assets["templateTrace"]
@@ -513,7 +527,10 @@ def render_dashboard_html(report: Mapping[str, Any], *, template_dir: Path = TEM
         f'<article class="card"><h3>키움 후보 D+1/D+3/D+5 추적</h3><p class="muted">상태 {_escape(model["kiwoomPerformance"].get("status") or "확인 불가")} · 전략 판정은 기준 미확인 시 산출하지 않습니다.</p>{performance_html}</article><div class="notice"><b>NOTICE</b>'
     )
     issues = validate_rendered_outputs(
-        render_dashboard_markdown(report, template_dir=template_dir),
+        render_dashboard_markdown(
+            report, template_dir=template_dir,
+            allow_current_observation=allow_current_observation,
+        ),
         html_output,
         model,
     )
@@ -522,9 +539,14 @@ def render_dashboard_html(report: Mapping[str, Any], *, template_dir: Path = TEM
     return html_output
 
 
-def render_dashboard_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR) -> str:
+def render_dashboard_markdown(
+    report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR,
+    allow_current_observation: bool = False,
+) -> str:
     assets = load_approved_template(template_dir)
-    model = build_dashboard_model(report)
+    model = build_dashboard_model(
+        report, allow_current_observation=allow_current_observation
+    )
     model["templateTrace"] = assets["templateTrace"]
     market = model["fullMarket"]
     lines = [

@@ -93,8 +93,9 @@ jobs:
             echo "Resolved published trading date ${as_of} does not match KRX scheduled target ${expected}." >&2
             exit 1
           fi
-          # The 23:00 job preserves the JSON history/validation artifact only.
-          # Work owns the user-facing Markdown/HTML report views.
+          # The 23:00 job is JSON history only.  Current-observation
+          # Markdown/HTML is produced by Refresh market data from the same
+          # report contract and is never duplicated here.
           python3 daily_report.py --as-of "$as_of" --output-dir data/reports --json-only
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}

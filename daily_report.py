@@ -2421,7 +2421,7 @@ def main():
     parser.add_argument(
         "--json-only",
         action="store_true",
-        help="write only the dated/latest JSON report; do not create document views",
+        help="write only the dated/latest JSON history; do not create Markdown or HTML",
     )
     args = parser.parse_args()
 
@@ -2443,13 +2443,11 @@ def main():
 
     latest_path.write_text(payload, encoding="utf-8")
     dated_json.write_text(payload, encoding="utf-8")
-    html_status = "NOT_REQUESTED"
+    html_status = "NOT_REQUESTED" if args.json_only else "TEMPLATE_UNAVAILABLE"
     if not args.json_only:
         write_markdown(report, dated_md)
         # Work Markdown and HTML must be sibling views of the same report model.
         write_work_markdown(report, latest_md)
-
-        html_status = "TEMPLATE_UNAVAILABLE"
         try:
             dated_html = out_dir / f"{report['asOf']}.html"
             latest_html = out_dir / "latest.html"

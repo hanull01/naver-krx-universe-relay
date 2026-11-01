@@ -1,5 +1,6 @@
 """Send a guarded Gmail signal after production market data reaches GitHub."""
 import json
+import hashlib
 import os
 import socket
 import smtplib
@@ -143,6 +144,44 @@ def quote_rows(payload):
             return rows
     raise ReadyValidationError('quotes rows are incomplete')
 
+
+def validate_current_observation_manifest(manifest_path, expected_commit_sha=None):
+    """Validate the same-generation Markdown/HTML files without gating market data."""
+    path = Path(manifest_path)
+    try:
+        manifest = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ReadyValidationError('current observation manifest is unavailable') from exc
+    required = (
+        'reportType', 'session', 'reportContractGeneratedAt',
+        'workflowRunId', 'executionHead', 'markdownPath', 'htmlPath',
+        'reportContractPath', 'reportContractSha256',
+        'markdownSha256', 'htmlSha256', 'reportStatus',
+    )
+    if manifest.get('reportType') != 'current_observation' or any(
+            not manifest.get(key) for key in required):
+        raise ReadyValidationError('current observation manifest is incomplete')
+    if manifest.get('currentObservationAllowed') is not True:
+        raise ReadyValidationError('current observation is not allowed')
+    for field, digest_field in (('reportContractPath', 'reportContractSha256'),
+                                ('markdownPath', 'markdownSha256'),
+                                ('htmlPath', 'htmlSha256')):
+        relative = Path(str(manifest[field]))
+        if relative.is_absolute() or '..' in relative.parts:
+            raise ReadyValidationError('current observation path is unsafe')
+        artifact = ROOT / relative
+        if not artifact.exists():
+            artifact = path.parent / relative
+        try:
+            digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise ReadyValidationError(f'current observation {field} is unavailable') from exc
+        if digest != manifest[digest_field]:
+            raise ReadyValidationError(f'current observation {field} hash mismatch')
+    if expected_commit_sha and manifest.get('executionHead') in (None, ''):
+        raise ReadyValidationError('current observation execution head is missing')
+    return manifest
+
 def representative_source_time(payload, rows):
     """Prefer producer metadata; strictly validate legacy row-only payloads."""
     top_level = payload.get('sourceTime')
@@ -243,6 +282,25 @@ def ready_message(metadata, env):
             f'freshCount={metadata["freshCount"]}', f'coverageCount={metadata["coverageCount"]}',
             'missingCodes=[]', 'delayTime=0', 'status=ok',
             f'session={metadata["session"]}', f'priceBasis={metadata["priceBasis"]}'])
+    observation = metadata.get('currentObservation') or {}
+    lines.extend([
+        f'currentObservation.status={observation.get("status", "UNAVAILABLE")}',
+        f'currentObservation.session={observation.get("session", "UNAVAILABLE")}',
+        f'currentObservation.manifestPath={observation.get("manifestPath", "UNAVAILABLE")}',
+        f'currentObservation.markdownPath={observation.get("markdownPath", "UNAVAILABLE")}',
+        f'currentObservation.htmlPath={observation.get("htmlPath", "UNAVAILABLE")}',
+        f'currentObservation.reportContractGeneratedAt={observation.get("reportContractGeneratedAt", "UNAVAILABLE")}',
+        f'currentObservation.sourceTime={observation.get("sourceTime", "UNAVAILABLE")}',
+        f'currentObservation.workflowRunId={observation.get("workflowRunId", "UNAVAILABLE")}',
+        f'currentObservation.executionHead={observation.get("executionHead", "UNAVAILABLE")}',
+        f'currentObservation.markdownSha256={observation.get("markdownSha256", "UNAVAILABLE")}',
+        f'currentObservation.htmlSha256={observation.get("htmlSha256", "UNAVAILABLE")}',
+        f'currentObservation.reportStatus={observation.get("reportStatus", "UNAVAILABLE")}',
+        f'currentObservation.tradingDateStatus={observation.get("tradingDateStatus", "UNAVAILABLE")}',
+        f'currentObservation.finalPending={observation.get("finalPending", "UNAVAILABLE")}',
+        f'currentObservation.baselineStale={observation.get("baselineStale", "UNAVAILABLE")}',
+        f'currentObservation.reason={observation.get("reason", "none")}',
+    ])
     for key in ('liveCount', 'noAfterTradeCount'):
         if metadata.get(key) is not None:
             lines.append(f'{key}={metadata[key]}')
@@ -294,6 +352,22 @@ def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, 
         else:
             payload = json.loads(Path(quotes_path).read_text(encoding='utf-8'))
             metadata = validate_quotes(payload, current=current, collection_started_at=env.get('MARKET_DATA_COLLECTION_STARTED_AT'))
+        manifest_path = env.get('CURRENT_OBSERVATION_MANIFEST_PATH')
+        if manifest_path:
+            try:
+                observation = validate_current_observation_manifest(
+                    manifest_path, env.get('MARKET_DATA_COMMIT_SHA'))
+            except ReadyValidationError as exc:
+                observation = {
+                    'status': 'UNAVAILABLE',
+                    'reason': str(exc),
+                }
+        else:
+            observation = {
+                'status': 'UNAVAILABLE',
+                'reason': 'CURRENT_OBSERVATION_MANIFEST_MISSING',
+            }
+        metadata['currentObservation'] = observation
         send_ready_email(ready_message(metadata, env), env, smtp_factory=smtp_factory)
     except (OSError, json.JSONDecodeError, ReadyValidationError, RuntimeError) as exc:
         print(f'MARKET_DATA_READY not sent: {exc}'); return 1

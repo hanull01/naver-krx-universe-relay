@@ -1,4 +1,5 @@
 import json
+import hashlib
 import socket
 import smtplib
 import tempfile
@@ -469,5 +470,32 @@ class ReadyMailTests(unittest.TestCase):
                 ready.ReadyValidationError, "statuses differ"
             ):
                 ready.validate_full_market_publication(summary, quality)
+
+    def test_current_observation_manifest_validates_both_artifact_hashes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            markdown = root / "report.md"
+            html = root / "report.html"
+            markdown.write_text("# observation\n", encoding="utf-8")
+            html.write_text("<!doctype html><p>observation</p>", encoding="utf-8")
+            contract = root / "contract.json"
+            contract.write_text('{"asOf":"2026-10-29"}\n', encoding="utf-8")
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps({
+                "reportType": "current_observation", "session": "INTRADAY",
+                "reportContractGeneratedAt": "2026-10-29T10:00:00+09:00",
+                "workflowRunId": "123", "executionHead": "a" * 40,
+                "reportContractPath": "contract.json",
+                "reportContractSha256": hashlib.sha256(contract.read_bytes()).hexdigest(),
+                "markdownPath": "report.md", "htmlPath": "report.html",
+                "markdownSha256": hashlib.sha256(markdown.read_bytes()).hexdigest(),
+                "htmlSha256": hashlib.sha256(html.read_bytes()).hexdigest(),
+                "reportStatus": "PARTIAL", "currentObservationAllowed": True,
+            }), encoding="utf-8")
+            got = ready.validate_current_observation_manifest(manifest, "commit")
+            self.assertEqual(got["session"], "INTRADAY")
+            html.write_text("tampered", encoding="utf-8")
+            with self.assertRaisesRegex(ready.ReadyValidationError, "hash mismatch"):
+                ready.validate_current_observation_manifest(manifest, "commit")
 
 if __name__ == '__main__': unittest.main()
