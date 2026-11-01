@@ -8,6 +8,11 @@ on:
         required: false
         default: false
         type: boolean
+      publish:
+        description: Publish validated derived data to main (main branch only)
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -21,11 +26,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout main
+      - name: Checkout workflow ref
         uses: actions/checkout@v4
         with:
-          ref: main
           fetch-depth: 0
+
+      - name: Validate publication ref
+        if: inputs.publish == true && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::publish=true is allowed only on refs/heads/main (current: $GITHUB_REF)"
+          exit 1
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -270,9 +280,18 @@ jobs:
           print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection.stat().st_size}")
           PY
 
+      - name: Upload non-publishing derived artifact
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true && inputs.publish != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-market-derived-${{ github.run_id }}
+          path: ${{ runner.temp }}/full-market-derived
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Publish derived artifacts atomically
         id: publish
-        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true && inputs.publish == true && github.ref == 'refs/heads/main'
         shell: bash
         env:
           DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
