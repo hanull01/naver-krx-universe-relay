@@ -45,8 +45,11 @@ def _read_json(path: str | Path) -> dict[str, Any]:
     return payload
 
 
-def _validate_provenance(row: Mapping[str, Any], expected_source: str | None) -> None:
-    provenance = row.get("provenance")
+def _validate_provenance(
+    row: Mapping[str, Any], expected_source: str | None,
+    provenance: Mapping[str, Any] | None = None,
+) -> None:
+    provenance = provenance or row.get("provenance")
     if not isinstance(provenance, Mapping):
         raise FullMarketTechnicalAdapterError(f"{row.get('itemCode')}: provenance missing")
     source_path = str(provenance.get("sourceCanonicalPath") or "")
@@ -63,7 +66,11 @@ def _validate_provenance(row: Mapping[str, Any], expected_source: str | None) ->
         raise FullMarketTechnicalAdapterError(f"{row.get('itemCode')}: incomplete provenance")
 
 
-def _load_rows(path: str | Path, expected_source: str | None = None) -> dict[str, Any]:
+def _load_rows(
+    path: str | Path,
+    expected_source: str | None = None,
+    provenance_by_code: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     payload = _read_json(path)
     target = _date(payload.get("targetDate"), "targetDate")
     if target == "20261030":
@@ -80,11 +87,26 @@ def _load_rows(path: str | Path, expected_source: str | None = None) -> dict[str
             raise FullMarketTechnicalAdapterError(f"invalid itemCode: {code!r}")
         if code in by_code:
             raise FullMarketTechnicalAdapterError(f"duplicate itemCode: {code}")
-        as_of = _date(row.get("asOfDate") or row.get("asOf"), f"{code}.asOfDate")
+        raw_as_of = row.get("asOfDate") or row.get("asOf")
+        if raw_as_of in (None, ""):
+            if str(row.get("availabilityStatus") or row.get("status")) not in {
+                "PARTIAL", "UNAVAILABLE", "NO_DAILY_BAR"
+            }:
+                raise FullMarketTechnicalAdapterError(f"invalid {code}.asOfDate: {raw_as_of!r}")
+            as_of = None
+        else:
+            as_of = _date(raw_as_of, f"{code}.asOfDate")
         if as_of == "20261030":
             raise FullMarketTechnicalAdapterError(f"{code}: 20261030 row is not allowed")
-        _validate_provenance(row, expected_source)
-        by_code[code] = row
+        provenance = row.get("provenance")
+        if not isinstance(provenance, Mapping) and isinstance(provenance_by_code, Mapping):
+            candidate = provenance_by_code.get(code)
+            provenance = candidate if isinstance(candidate, Mapping) else None
+        _validate_provenance(row, expected_source, provenance)
+        copied = dict(row)
+        if "provenance" not in copied and provenance is not None:
+            copied["provenance"] = dict(provenance)
+        by_code[code] = copied
     return {"payload": payload, "targetDate": target, "rows": by_code}
 
 
@@ -94,9 +116,12 @@ def load_full_market_staging(
     group_states_path: str | Path,
 ) -> dict[str, Any]:
     """Load full-market technical/state staging without any production fallback."""
-    technicals = _load_rows(technicals_path)
+    provenance_path = Path(technicals_path).with_name("provenance.json")
+    provenance_payload = _read_json(provenance_path) if provenance_path.exists() else {}
+    provenance_by_code = provenance_payload.get("byCode") if isinstance(provenance_payload, Mapping) else None
+    technicals = _load_rows(technicals_path, provenance_by_code=provenance_by_code)
     source = str(next(iter(technicals["rows"].values()))["provenance"]["sourceStaging"])
-    states = _load_rows(states_path, expected_source=source)
+    states = _load_rows(states_path, expected_source=source, provenance_by_code=provenance_by_code)
     groups = _read_json(group_states_path)
     target = technicals["targetDate"]
     if states["targetDate"] != target or _date(groups.get("targetDate"), "group targetDate") != target:

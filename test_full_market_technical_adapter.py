@@ -79,6 +79,23 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         with self.assertRaises(FullMarketTechnicalAdapterError):
             build_report_input(self.technicals, self.states, self.groups, self.universe)
 
+    def test_external_provenance_file_is_accepted(self):
+        technicals = json.loads(self.technicals.read_text())
+        states = json.loads(self.states.read_text())
+        provenance = technicals["datas"][0].pop("provenance")
+        states["datas"][0].pop("provenance")
+        self.technicals.write_text(json.dumps(technicals), encoding="utf-8")
+        self.states.write_text(json.dumps(states), encoding="utf-8")
+        (self.root / "provenance.json").write_text(json.dumps({
+            "schemaVersion": 1,
+            "sourceStaging": self.source,
+            "targetDate": "20261029",
+            "byCode": {"005930": provenance},
+        }), encoding="utf-8")
+        result = build_report_input(self.technicals, self.states, self.groups, self.universe)
+        self.assertEqual(result["sourceStaging"], self.source)
+        self.assertEqual(result["fullMarket"]["technicals"]["005930"]["provenance"], provenance)
+
     def test_missing_registered_symbol_is_not_filled_from_legacy_data(self):
         universe = json.loads(self.universe.read_text())
         universe["stocks"].append({
