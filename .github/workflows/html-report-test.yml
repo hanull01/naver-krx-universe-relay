@@ -1,0 +1,110 @@
+name: HTML_REPORT_TEST
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SOURCE_COMMIT: 6795f3499321f31704a18c51182b8207ee898327
+      SOURCE_CONTRACT: data/monitoring/latest-report-contract.json
+      SOURCE_TRADING_DATE: 2026-10-30
+    steps:
+      - name: Checkout renderer
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch fixed source contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin "$SOURCE_COMMIT"
+          git cat-file -e "$SOURCE_COMMIT^{commit}"
+          git cat-file -e "$SOURCE_COMMIT:$SOURCE_CONTRACT"
+          mkdir -p "$RUNNER_TEMP/html-report-test"
+          git show "$SOURCE_COMMIT:$SOURCE_CONTRACT" > "$RUNNER_TEMP/html-report-test/contract.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'html-report-test'/'contract.json'
+          d=json.loads(p.read_text(encoding='utf-8'))
+          asof=str(d.get('asOf') or d.get('tradingDate') or '')
+          if asof.replace('-','') != os.environ['SOURCE_TRADING_DATE'].replace('-',''):
+              raise SystemExit('source trading date mismatch: '+asof)
+          if not d.get('rendering',{}).get('htmlAllowed',False):
+              raise SystemExit('source contract htmlAllowed is false')
+          print('source contract verified', p.stat().st_size)
+          PY
+      - name: Render and validate Markdown plus HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/html-report-test"
+          out="$root/output"
+          python tools/render_report_from_contract.py --input "$root/contract.json" --output-dir "$out" > "$root/render.json"
+          test -s "$out/2026-10-30.md"
+          test -s "$out/2026-10-30.html"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'html-report-test'
+          md=root/'output'/'2026-10-30.md'; html=root/'output'/'2026-10-30.html'
+          mt=md.read_text(encoding='utf-8'); ht=html.read_text(encoding='utf-8')
+          required=['CONTRACT_TRACE','V2_DATA_TRACE','TEMPLATE_TRACE']
+          if any(x not in mt or x not in ht for x in required): raise SystemExit('trace missing')
+          if '<pre>' in ht or '2,205/2,767' in ht: raise SystemExit('stale HTML detected')
+          manifest={
+            'testMode':'HTML_REPORT_TEST','repository':os.environ['GITHUB_REPOSITORY'],
+            'workflow':os.environ['GITHUB_WORKFLOW'],'runId':os.environ['GITHUB_RUN_ID'],
+            'runUrl':os.environ['GITHUB_SERVER_URL']+'/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],
+            'sourceTradingDate':os.environ['SOURCE_TRADING_DATE'],'sourceCommit':os.environ['SOURCE_COMMIT'],
+            'sourceContract':os.environ['SOURCE_CONTRACT'],'htmlSha256':hashlib.sha256(html.read_bytes()).hexdigest(),
+            'htmlBytes':html.stat().st_size,'markdownSha256':hashlib.sha256(md.read_bytes()).hexdigest(),
+            'markdownBytes':md.stat().st_size,'htmlFile':'2026-10-30.html','markdownFile':'2026-10-30.md'}
+          (root/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(manifest,ensure_ascii=False))
+          PY
+      - name: Upload verified test files
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.workflow }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/html-report-test/output/2026-10-30.md
+            ${{ runner.temp }}/html-report-test/output/2026-10-30.html
+            ${{ runner.temp }}/html-report-test/manifest.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Send one HTML_REPORT_TEST email
+        env:
+          MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
+          MARKET_GMAIL_APP_PASSWORD: ${{ secrets.MARKET_GMAIL_APP_PASSWORD }}
+          MARKET_GMAIL_TO: ${{ secrets.MARKET_GMAIL_TO }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, smtplib
+          from email.message import EmailMessage
+          from pathlib import Path
+          m=json.loads((Path(os.environ['RUNNER_TEMP'])/'html-report-test'/'manifest.json').read_text(encoding='utf-8'))
+          e=EmailMessage(); e['Subject']='HTML_REPORT_TEST'; e['From']=os.environ['MARKET_GMAIL_USERNAME']; e['To']=os.environ['MARKET_GMAIL_TO']
+          e.set_content('\n'.join([
+            'TEST ONLY — HTML_REPORT_TEST','testMode='+m['testMode'],'repository='+m['repository'],
+            'workflow='+m['workflow'],'run_id='+m['runId'],'run_url='+m['runUrl'],
+            'sourceTradingDate='+m['sourceTradingDate'],'sourceCommit='+m['sourceCommit'],
+            'sourceContract='+m['sourceContract'],'html.path=artifact://'+m['runId']+'/'+m['htmlFile'],
+            'html.sha256='+m['htmlSha256'],'html.bytes='+str(m['htmlBytes']),
+            'markdown.path=artifact://'+m['runId']+'/'+m['markdownFile'],'markdown.sha256='+m['markdownSha256'],
+            'markdown.bytes='+str(m['markdownBytes']),'artifact='+m['workflow']+'-'+m['runId'],
+            'This is a test message; do not treat it as MARKET_DATA_READY.'])+'\n')
+          with smtplib.SMTP_SSL('smtp.gmail.com',465,timeout=20) as s:
+              s.login(os.environ['MARKET_GMAIL_USERNAME'],os.environ['MARKET_GMAIL_APP_PASSWORD']); s.send_message(e)
+          print('HTML_REPORT_TEST SMTP send succeeded')
+          PY
