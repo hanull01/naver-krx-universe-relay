@@ -226,14 +226,14 @@ def build_report_contract_projection(
     artifact_names = (
         "technicals.json", "states.json", "registered-universe-technicals.json",
         "registered-universe-states.json", "group-states.json", "provenance.json",
-        "quality.json", "manifest.json",
+        "quality.json", "manifest.json", "rolling-history-manifest.json",
     )
     artifacts = {name: _artifact(root, name) for name in artifact_names}
     quality_summary = {
         key: quality.get(key)
         for key in (
             "status", "totalAssets", "byAssetType", "statusCounts", "missingCodes",
-            "noDailyBar", "date20261030Rows", "historicalGroups",
+            "noDailyBar", "date20261030Rows", "historicalGroups", "rollingHistory",
         )
     }
     contract = {
@@ -251,6 +251,7 @@ def build_report_contract_projection(
             "fullMarketProvenance": "provenance.json",
             "registeredUniverse": "registered-universe-technicals.json,registered-universe-states.json",
             "groupStates": "group-states.json",
+            "rollingHistory": "rolling-history-manifest.json",
             "currentSnapshot": "SEPARATE_NOT_INCLUDED",
         },
         "fullMarket": {

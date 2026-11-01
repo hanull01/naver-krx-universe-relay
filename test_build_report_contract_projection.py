@@ -49,6 +49,7 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         self.assertEqual(contract["registeredUniverse"]["items"][0]["metrics"]["ma20"], 114.5)
         self.assertEqual(contract["provenance"]["fullMarketRows"], 1)
         self.assertIn("technicals.json", contract["fullMarket"]["artifacts"])
+        self.assertIn("rolling-history-manifest.json", contract["fullMarket"]["artifacts"])
         self.assertNotIn('"asOfDate":"20261030"', output.read_text(encoding="utf-8"))
 
     def test_projection_rejects_mixed_full_market_coverage(self):

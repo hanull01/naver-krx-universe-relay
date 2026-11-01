@@ -1,0 +1,44 @@
+import unittest
+from pathlib import Path
+
+
+class BackfillDerivedWorkflowTests(unittest.TestCase):
+    WORKFLOW = Path(__file__).parent / ".github" / "workflows" / "backfill-derived.yml"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = cls.WORKFLOW.read_text(encoding="utf-8")
+
+    def test_workflow_is_manual_and_checks_out_selected_ref(self):
+        self.assertIn("workflow_dispatch:", self.text)
+        self.assertNotIn("\n  schedule:", self.text)
+        self.assertNotIn("\n  push:", self.text)
+        self.assertNotIn("ref: main", self.text)
+        self.assertIn("fetch-depth: 0", self.text)
+
+    def test_publish_modes_and_rolling_history_are_explicit(self):
+        self.assertIn("      publish:", self.text)
+        self.assertIn("default: false", self.text)
+        self.assertIn("Restore latest rolling history", self.text)
+        self.assertIn("Resolve rolling collection window", self.text)
+        self.assertIn('--history-dir "$HISTORY_DIR"', self.text)
+        self.assertIn('"rolling-history-manifest.json"', self.text)
+        self.assertIn("Upload non-publishing derived artifact", self.text)
+        self.assertIn("inputs.publish == true && github.ref != 'refs/heads/main'", self.text)
+        self.assertIn("inputs.publish == true && github.ref == 'refs/heads/main'", self.text)
+
+    def test_safety_gates_and_no_report_generation(self):
+        self.assertIn("FULL_MARKET_COLLECTION_ZERO_ROWS", self.text)
+        self.assertIn("REPORT_CONTRACT_TOO_LARGE", self.text)
+        self.assertIn("DERIVED_FALLBACK_USED", self.text)
+        self.assertIn("20261030_DATA_MIXED_IN", self.text)
+        self.assertIn("20261030_ROLLING_HISTORY_MIXED_IN", self.text)
+        self.assertIn("RAW_OR_REPORT_RENDER_OUTPUT_PRESENT", self.text)
+        publish_start = self.text.index("- name: Publish derived artifacts atomically")
+        publish_body = self.text[publish_start:]
+        self.assertIn("inputs.publish == true", publish_body)
+        self.assertIn("git push origin HEAD:main", publish_body)
+
+
+if __name__ == "__main__":
+    unittest.main()

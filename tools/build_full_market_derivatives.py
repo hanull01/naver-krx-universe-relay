@@ -14,17 +14,77 @@ import json
 import math
 import statistics
 from collections import deque
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
 
 FORBIDDEN_DATE = "20261030"
+ROLLING_WINDOW = 120
 REQUIRED_OHLCV = ("open", "high", "low", "close", "volume")
 
 
 class FullMarketDerivativeError(ValueError):
     """Raised when a staging derivative cannot be built safely."""
+
+
+def resolve_rolling_window(
+    history_dir: str | Path,
+    target_date: str,
+    is_trading_day,
+    window: int = ROLLING_WINDOW,
+) -> dict[str, Any]:
+    """Choose bootstrap, gap-fill, or incremental collection without network I/O."""
+    target = date.fromisoformat(target_date)
+    history_root = Path(history_dir)
+    manifest_path = history_root / "rolling-history-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
+    entries = manifest.get("byCode") or {}
+    counts = [int(row.get("rowCount") or 0) for row in entries.values() if isinstance(row, dict)]
+    latest_dates = [
+        _date(row.get("latest"))
+        for row in entries.values()
+        if isinstance(row, dict) and _date(row.get("latest"))
+    ]
+    latest = max(latest_dates, default=None)
+
+    def is_open(day: date) -> bool:
+        result = is_trading_day(day)
+        return bool(result[0] if isinstance(result, tuple) else result)
+
+    if not entries or not counts or min(counts) < window:
+        dates = []
+        cursor = target
+        while len(dates) < window:
+            if is_open(cursor):
+                dates.append(cursor)
+            cursor -= timedelta(days=1)
+        return {
+            "mode": "BOOTSTRAP",
+            "startDate": min(dates).isoformat(),
+            "endDate": target.isoformat(),
+            "historyLatest": latest,
+            "historyCountMin": min(counts) if counts else 0,
+        }
+
+    target_compact = target.strftime("%Y%m%d")
+    if latest and latest < target_compact:
+        start = date.fromisoformat(f"{latest[:4]}-{latest[4:6]}-{latest[6:]}") + timedelta(days=1)
+        while start < target and not is_open(start):
+            start += timedelta(days=1)
+        if start > target:
+            start = target
+        mode = "GAP_FILL" if start < target else "INCREMENTAL"
+    else:
+        start = target
+        mode = "INCREMENTAL"
+    return {
+        "mode": mode,
+        "startDate": start.isoformat(),
+        "endDate": target.isoformat(),
+        "historyLatest": latest,
+        "historyCountMin": min(counts),
+    }
 
 
 def _date(value: Any) -> str | None:
@@ -123,10 +183,8 @@ def _load_coverage(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _load_assets(canonical_dir: Path) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], int]:
-    files = sorted(canonical_dir.glob("*.jsonl"))
-    if not files:
-        raise FullMarketDerivativeError(f"no canonical files: {canonical_dir}")
+def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], int]:
+    files = sorted(directory.rglob("*.jsonl")) if directory.exists() else []
     assets: dict[str, list[dict[str, Any]]] = {}
     file_meta: dict[str, dict[str, Any]] = {}
     date_20261030_rows = 0
@@ -180,11 +238,48 @@ def _load_assets(canonical_dir: Path) -> tuple[dict[str, list[dict[str, Any]]], 
                 "earliest": _date(first_row.get("date")) if isinstance(first_row, dict) else None,
                 "latest": rows[-1]["date"] if rows else None,
             },
-            "assetType": str(first_row.get("assetType") or "STOCK") if isinstance(first_row, dict) else "UNKNOWN",
+            "assetType": str(
+                first_row.get("assetType") if isinstance(first_row, dict) else None
+                or (path.parent.name if path.parent.name.upper() in {"STOCK", "ETF"} else "STOCK")
+            ).upper(),
+            "sourceKind": source_kind,
         }
+    return assets, file_meta, date_20261030_rows
+
+
+def _load_assets(
+    canonical_dir: Path,
+    history_dir: Path | None = None,
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], int]:
+    current_assets, current_meta, current_forbidden = _load_asset_files(
+        canonical_dir, source_kind="CURRENT_COLLECTION"
+    )
+    history_assets, history_meta, history_forbidden = _load_asset_files(
+        history_dir, source_kind="RESTORED_ROLLING_HISTORY"
+    ) if history_dir is not None else ({}, {}, 0)
+    if not current_assets and not history_assets:
+        raise FullMarketDerivativeError(f"no canonical files: {canonical_dir}")
+
+    assets: dict[str, list[dict[str, Any]]] = {}
+    file_meta: dict[str, dict[str, Any]] = {}
+    for code in sorted(set(current_assets) | set(history_assets)):
+        by_date = {row["date"]: row for row in history_assets.get(code, [])}
+        by_date.update({row["date"]: row for row in current_assets.get(code, [])})
+        rows = sorted(by_date.values(), key=lambda value: value["date"])[-ROLLING_WINDOW:]
+        assets[code] = rows
+        current = current_meta.get(code)
+        history = history_meta.get(code)
+        meta = dict(current or history or {})
+        meta["historyCount"] = len(rows)
+        meta["rollingHistoryWindow"] = ROLLING_WINDOW
+        if current and history:
+            meta["restoredHistoryPath"] = history.get("sourceCanonicalPath")
+            meta["restoredHistorySha256"] = history.get("sourceCanonicalSha256")
+        meta["sourceKind"] = "MERGED_CURRENT_AND_ROLLING_HISTORY" if current and history else meta.get("sourceKind")
+        file_meta[code] = meta
     if not any(assets.values()):
         raise FullMarketDerivativeError("canonical rows are empty")
-    return assets, file_meta, date_20261030_rows
+    return assets, file_meta, current_forbidden + history_forbidden
 
 
 def _provenance(root: Path, code: str, meta: Mapping[str, Any], rows: list[dict[str, Any]], target: str) -> dict[str, Any]:
@@ -343,12 +438,64 @@ def _group_states(states: Mapping[str, Mapping[str, Any]], universe: Mapping[str
     }
 
 
-def build_derivatives(canonical_dir: str | Path, universe_path: str | Path, output_dir: str | Path) -> dict[str, Any]:
+def _write_rolling_history(
+    output: Path,
+    assets: Mapping[str, list[dict[str, Any]]],
+    file_meta: Mapping[str, Mapping[str, Any]],
+    target: str,
+    generated_at: str,
+) -> dict[str, Any]:
+    history_root = output / "rolling-history"
+    entries: dict[str, Any] = {}
+    total_rows = 0
+    for code, rows in sorted(assets.items()):
+        asset_type = str(file_meta.get(code, {}).get("assetType") or "STOCK").upper()
+        path = history_root / asset_type / f"{code}.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="utf-8") as handle:
+            for row in rows[-ROLLING_WINDOW:]:
+                handle.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
+        total_rows += len(rows)
+        entries[code] = {
+            "assetType": asset_type,
+            "path": str(path.relative_to(output)),
+            "bytes": path.stat().st_size,
+            "sha256": _sha256(path),
+            "rowCount": len(rows),
+            "earliest": rows[0]["date"] if rows else None,
+            "latest": rows[-1]["date"] if rows else None,
+            "sourceKind": file_meta.get(code, {}).get("sourceKind"),
+            "sourceCanonicalPath": file_meta.get(code, {}).get("sourceCanonicalPath"),
+            "sourceCanonicalSha256": file_meta.get(code, {}).get("sourceCanonicalSha256"),
+            "restoredHistoryPath": file_meta.get(code, {}).get("restoredHistoryPath"),
+            "restoredHistorySha256": file_meta.get(code, {}).get("restoredHistorySha256"),
+        }
+    manifest = {
+        "schemaVersion": 1,
+        "generatedAt": generated_at,
+        "targetDate": target,
+        "window": ROLLING_WINDOW,
+        "fallbackUsed": False,
+        "count": len(entries),
+        "totalRows": total_rows,
+        "byCode": entries,
+    }
+    _write_json(output / "rolling-history-manifest.json", manifest)
+    return manifest
+
+
+def build_derivatives(
+    canonical_dir: str | Path,
+    universe_path: str | Path,
+    output_dir: str | Path,
+    history_dir: str | Path | None = None,
+) -> dict[str, Any]:
     canonical = Path(canonical_dir)
     root = canonical.parent.parent if canonical.parent.name == "canonical" else canonical.parent
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
-    assets, file_meta, date_20261030_rows = _load_assets(canonical)
+    restored_history = Path(history_dir) if history_dir is not None else None
+    assets, file_meta, date_20261030_rows = _load_assets(canonical, restored_history)
     latest_dates = [rows[-1]["date"] for rows in assets.values() if rows]
     if not latest_dates:
         raise FullMarketDerivativeError("no usable canonical rows")
@@ -391,6 +538,8 @@ def build_derivatives(canonical_dir: str | Path, universe_path: str | Path, outp
     registered_states = {**state_payload, "scope": "REGISTERED_UNIVERSE_PROJECTION", "expectedCount": len(registered_codes), "count": len(registered_codes) - len(registered_missing), "missingCodes": registered_missing, "datas": [public_state_by_code[code] for code in registered_codes if code in public_state_by_code]}
     group_payload = _group_states(public_state_by_code, universe, target, root)
     provenance = {"schemaVersion": 1, "sourceStaging": str(root), "targetDate": target, "byCode": {code: {key: value for key, value in row["provenance"].items() if key != "targetDate"} for code, row in technical_by_code.items()}}
+    generated_at = technical_payload["generatedAt"]
+    rolling_history = _write_rolling_history(output, assets, file_meta, target, generated_at)
     quality = {
         "schemaVersion": 1, "generatedAt": technical_payload["generatedAt"], "status": technical_payload["status"],
         "targetDate": target, "sourceStaging": str(root), "fallbackUsed": False,
@@ -401,6 +550,13 @@ def build_derivatives(canonical_dir: str | Path, universe_path: str | Path, outp
         "missingCodes": missing_codes, "noDailyBar": no_daily_bar, "date20261030Rows": 0,
         "historicalGroups": "UNAVAILABLE" if not group_payload["groups"] else "WATCHLIST_ONLY",
         "currentSnapshot": {"status": "SEPARATE_NOT_INCLUDED", "reason": "CURRENT_SNAPSHOT_IS_NOT_BACKFILL_DERIVATIVE"},
+        "rollingHistory": {
+            "status": "AVAILABLE" if rolling_history["count"] else "UNAVAILABLE",
+            "window": ROLLING_WINDOW,
+            "count": rolling_history["count"],
+            "totalRows": rolling_history["totalRows"],
+            "manifest": "rolling-history-manifest.json",
+        },
     }
     file_info = {}
     for name, payload in (
@@ -415,6 +571,12 @@ def build_derivatives(canonical_dir: str | Path, universe_path: str | Path, outp
         "source": source, "quality": {key: value for key, value in quality.items() if key not in ("generatedAt",)},
         "registeredUniverse": {"count": len(registered_codes) - len(registered_missing), "expectedCount": len(registered_codes), "missingCodes": registered_missing},
         "files": file_info,
+        "rollingHistory": {
+            "manifest": "rolling-history-manifest.json",
+            "window": ROLLING_WINDOW,
+            "count": rolling_history["count"],
+            "totalRows": rolling_history["totalRows"],
+        },
     }
     file_info["manifest.json"] = _write_json(output / "manifest.json", manifest)
     return {"outputDir": str(output), "targetDate": target, "files": file_info, "quality": quality}
@@ -425,8 +587,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--canonical-dir", required=True)
     parser.add_argument("--universe", required=True)
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--history-dir")
     args = parser.parse_args(argv)
-    result = build_derivatives(args.canonical_dir, args.universe, args.output_dir)
+    result = build_derivatives(
+        args.canonical_dir,
+        args.universe,
+        args.output_dir,
+        history_dir=args.history_dir,
+    )
     print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
     return 0
 

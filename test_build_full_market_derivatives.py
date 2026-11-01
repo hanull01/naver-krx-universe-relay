@@ -2,11 +2,13 @@ import hashlib
 import json
 import tempfile
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 
 from tools.build_full_market_derivatives import (
     FullMarketDerivativeError,
     build_derivatives,
+    resolve_rolling_window,
 )
 
 
@@ -47,6 +49,27 @@ class BuildFullMarketDerivativesTests(unittest.TestCase):
         path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
         return path
 
+    def _write_history_rows(self, end="20261028", count=120, code="005930"):
+        cursor = date.fromisoformat(f"{end[:4]}-{end[4:6]}-{end[6:]}")
+        dates = []
+        while len(dates) < count:
+            if cursor.weekday() < 5:
+                dates.append(cursor.strftime("%Y%m%d"))
+            cursor -= timedelta(days=1)
+        dates.reverse()
+        history = self.root / "restored-history" / "STOCK" / f"{code}.jsonl"
+        history.parent.mkdir(parents=True, exist_ok=True)
+        rows = []
+        for index, day in enumerate(dates):
+            close = 100.0 + index
+            rows.append({
+                "code": code, "date": day, "open": close - 1, "high": close + 2,
+                "low": close - 2, "close": close, "volume": 1000 + index,
+                "assetType": "STOCK", "feature_valid": True, "source_valid": True,
+            })
+        history.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        return history
+
     def test_builds_compact_derivatives_and_registered_projection(self):
         source = self._write_rows()
         (self.root / "provenance").mkdir()
@@ -85,6 +108,9 @@ class BuildFullMarketDerivativesTests(unittest.TestCase):
             (self.output / "technicals.json").stat().st_size,
             source.stat().st_size * 3,
         )
+        rolling = json.loads((self.output / "rolling-history-manifest.json").read_text())
+        self.assertEqual(rolling["window"], 120)
+        self.assertEqual(rolling["byCode"]["005930"]["rowCount"], 25)
 
     def test_empty_canonical_is_unavailable_without_fallback(self):
         self._write_rows()
@@ -107,6 +133,59 @@ class BuildFullMarketDerivativesTests(unittest.TestCase):
         path.write_text(json.dumps(row) + "\n", encoding="utf-8")
         with self.assertRaises(FullMarketDerivativeError):
             build_derivatives(self.canonical, self.universe, self.output)
+
+    def test_restored_history_and_new_bar_keep_rolling_window_and_enable_ma60(self):
+        history = self._write_history_rows()
+        current = self._write_rows(count=1, start=500.0)
+        row = json.loads(current.read_text().splitlines()[0])
+        row["date"] = "20261029"
+        current.write_text(json.dumps(row) + "\n", encoding="utf-8")
+
+        build_derivatives(
+            self.canonical,
+            self.universe,
+            self.output,
+            history_dir=history.parent.parent,
+        )
+        technicals = json.loads((self.output / "technicals.json").read_text())
+        technical = technicals["datas"][0]
+        rolling = json.loads((self.output / "rolling-history-manifest.json").read_text())
+        rolling_file = self.output / rolling["byCode"]["005930"]["path"]
+        rolling_rows = [json.loads(line) for line in rolling_file.read_text().splitlines()]
+
+        self.assertEqual(technical["asOfDate"], "20261029")
+        self.assertEqual(technical["historyCount"], 120)
+        self.assertIsNotNone(technical["ma20"])
+        self.assertIsNotNone(technical["ma60"])
+        self.assertEqual(rolling["byCode"]["005930"]["rowCount"], 120)
+        self.assertEqual(rolling_rows[-1]["date"], "20261029")
+        self.assertNotEqual(rolling_rows[0]["date"], "20260101")
+        self.assertEqual(rolling["byCode"]["005930"]["sourceKind"], "MERGED_CURRENT_AND_ROLLING_HISTORY")
+        self.assertEqual(rolling["byCode"]["005930"]["restoredHistorySha256"], hashlib.sha256(history.read_bytes()).hexdigest())
+
+    def test_rolling_window_bootstrap_incremental_and_gap_fill(self):
+        history_dir = self.root / "window-history"
+        history_dir.mkdir()
+        is_weekday = lambda day: day.weekday() < 5
+
+        bootstrap = resolve_rolling_window(history_dir, "20261029", is_weekday)
+        self.assertEqual(bootstrap["mode"], "BOOTSTRAP")
+        self.assertEqual(bootstrap["endDate"], "2026-10-29")
+        self.assertEqual(bootstrap["historyCountMin"], 0)
+
+        (history_dir / "rolling-history-manifest.json").write_text(json.dumps({
+            "byCode": {"005930": {"rowCount": 120, "latest": "20261028"}}
+        }), encoding="utf-8")
+        incremental = resolve_rolling_window(history_dir, "20261029", is_weekday)
+        self.assertEqual(incremental["mode"], "INCREMENTAL")
+        self.assertEqual(incremental["startDate"], "2026-10-29")
+
+        (history_dir / "rolling-history-manifest.json").write_text(json.dumps({
+            "byCode": {"005930": {"rowCount": 120, "latest": "20261008"}}
+        }), encoding="utf-8")
+        gap = resolve_rolling_window(history_dir, "20261012", is_weekday)
+        self.assertEqual(gap["mode"], "GAP_FILL")
+        self.assertEqual(gap["startDate"], "2026-10-09")
 
 
 if __name__ == "__main__":

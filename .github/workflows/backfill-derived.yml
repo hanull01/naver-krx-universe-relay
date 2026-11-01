@@ -102,6 +102,81 @@ jobs:
           echo "target_date=$target" >> "$GITHUB_OUTPUT"
           echo "Previous KRX trading day: $target"
 
+      - name: Restore latest rolling history
+        id: history
+        if: steps.market_day.outputs.run == 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          HISTORY_OUTPUT: ${{ runner.temp }}/restored-rolling-history
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          from pathlib import Path
+
+          repository_root = Path("data/monitoring-derived")
+          output = Path(os.environ["HISTORY_OUTPUT"])
+          output.mkdir(parents=True, exist_ok=True)
+          candidates = []
+          for pointer in sorted(repository_root.glob("*/latest.json")) if repository_root.exists() else []:
+              try:
+                  payload = json.loads(pointer.read_text(encoding="utf-8"))
+                  manifest_path = pointer.parent / str(payload["path"])
+                  run_dir = manifest_path.parent
+                  history_manifest = run_dir / "rolling-history-manifest.json"
+                  history_dir = run_dir / "rolling-history"
+                  if history_manifest.is_file() and history_dir.is_dir():
+                      manifest = json.loads(history_manifest.read_text(encoding="utf-8"))
+                      candidates.append((str(manifest.get("targetDate") or ""), str(manifest.get("generatedAt") or ""), history_dir, history_manifest))
+              except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+                  continue
+          if candidates:
+              _, _, source_dir, source_manifest = sorted(candidates, reverse=True, key=lambda item: (item[0], item[1]))[0]
+              shutil.copytree(source_dir, output, dirs_exist_ok=True)
+              shutil.copy2(source_manifest, output / "rolling-history-manifest.json")
+              print(f"restored rolling history from {source_dir}")
+              found = "true"
+          else:
+              print("no rolling history pointer found; bootstrap required")
+              found = "false"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"found={found}\n")
+              handle.write(f"path={output}\n")
+          PY
+
+      - name: Resolve rolling collection window
+        id: collection_window
+        if: steps.market_day.outputs.run == 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          HISTORY_DIR: ${{ runner.temp }}/restored-rolling-history
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          import krx_market_day
+          from tools.build_full_market_derivatives import resolve_rolling_window
+
+          result = resolve_rolling_window(
+              Path(os.environ["HISTORY_DIR"]),
+              os.environ["TARGET_DATE"],
+              krx_market_day.market_day,
+          )
+          print(
+              f"rollingMode={result['mode']} start={result['startDate']} "
+              f"end={result['endDate']} historyLatest={result['historyLatest']}"
+          )
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"mode={result['mode']}\n")
+              handle.write(f"start_date={result['startDate']}\n")
+              handle.write(f"end_date={result['endDate']}\n")
+          PY
+
       - name: Build STOCK+ETF target universe
         id: targets
         if: steps.market_day.outputs.run == 'true'
@@ -144,12 +219,13 @@ jobs:
             echo "No STOCK or ETF targets; safe NOOP without publishing."
           fi
 
-      - name: Collect previous-day NAVER daily bars
+      - name: Collect required NAVER daily bars
         id: collect
         if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
         shell: bash
         env:
-          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+          START_DATE: ${{ steps.collection_window.outputs.start_date }}
+          END_DATE: ${{ steps.collection_window.outputs.end_date }}
           UNIVERSE_FILE: ${{ runner.temp }}/stock-etf-universe.json
           BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
         run: |
@@ -157,8 +233,8 @@ jobs:
           python tools/naver_daily_backfill.py \
             --universe-file "$UNIVERSE_FILE" \
             --asset-type all \
-            --start-date "$TARGET_DATE" \
-            --end-date "$TARGET_DATE" \
+            --start-date "$START_DATE" \
+            --end-date "$END_DATE" \
             --output-root "$BACKFILL_ROOT" \
             --max-workers 8 \
             --sleep 0.05
@@ -210,6 +286,7 @@ jobs:
         env:
           BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
           DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
+          HISTORY_DIR: ${{ runner.temp }}/restored-rolling-history
         run: |
           set -euo pipefail
           canonical="$BACKFILL_ROOT/canonical/daily"
@@ -234,7 +311,8 @@ jobs:
           python tools/build_full_market_derivatives.py \
             --canonical-dir "$canonical" \
             --universe config/universe.json \
-            --output-dir "$DERIVED_ROOT"
+            --output-dir "$DERIVED_ROOT" \
+            --history-dir "$HISTORY_DIR"
           python -m tools.build_report_contract_projection \
             --derived-dir "$DERIVED_ROOT" \
             --universe config/universe.json \
@@ -258,7 +336,7 @@ jobs:
               "technicals.json", "states.json", "registered-universe-technicals.json",
               "registered-universe-states.json", "group-states.json", "provenance.json",
               "quality.json", "manifest.json", "report-contract-projection.json",
-              "report-contract-manifest.json",
+              "report-contract-manifest.json", "rolling-history-manifest.json",
           }
           actual = {path.name for path in root.iterdir() if path.is_file()}
           if not required.issubset(actual):
@@ -277,6 +355,14 @@ jobs:
               raise SystemExit("20261030_DATA_MIXED_IN")
           if len(technicals.get("datas", [])) != len(states.get("datas", [])):
               raise SystemExit("TECHNICAL_STATE_COVERAGE_MISMATCH")
+          rolling_manifest = json.loads((root / "rolling-history-manifest.json").read_text(encoding="utf-8"))
+          if rolling_manifest.get("fallbackUsed"):
+              raise SystemExit("ROLLING_HISTORY_FALLBACK_USED")
+          if int(rolling_manifest.get("window") or 0) != 120:
+              raise SystemExit("ROLLING_HISTORY_WINDOW_INVALID")
+          for path in (root / "rolling-history").rglob("*.jsonl"):
+              if "20261030" in path.read_text(encoding="utf-8"):
+                  raise SystemExit("20261030_ROLLING_HISTORY_MIXED_IN")
           print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection.stat().st_size}")
           PY
 
