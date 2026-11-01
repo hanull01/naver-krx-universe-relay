@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { CONSOLIDATED_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
@@ -33,6 +33,69 @@ test("09:07 and 10:07 are independent slots", () => {
   const nine = slotKeyFor(plan, "7 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 7));
   const ten = slotKeyFor(plan, "7 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 7));
   assert.notEqual(nine, ten);
+});
+
+test("the composite daily cron dispatches backfill at 07:00 KST and refresh at 08:00 KST", () => {
+  const mondayBackfill = Date.UTC(2026, 9, 25, 22, 0);
+  const mondayRefresh = Date.UTC(2026, 9, 25, 23, 0);
+  assert.equal(planForCron("0 22 * * SUN-THU").key, "backfill-derived");
+  const backfill = resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayBackfill);
+  const refresh = resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayRefresh);
+
+  assert.equal(backfill.plan.workflow, "backfill-derived.yml");
+  assert.deepEqual(backfill.plan.inputs, { dry_run: "false", publish: "true" });
+  assert.equal(backfill.plan.slot, "07:00");
+  assert.equal(refresh.plan.workflow, "refresh.yml");
+  assert.deepEqual(refresh.plan.inputs, { run_mode: "intraday" });
+  assert.equal(refresh.plan.slot, "08:00-19:07");
+  assert.notEqual(slotKeyFor(backfill.plan, backfill.slotCron, mondayBackfill), slotKeyFor(refresh.plan, refresh.slotCron, mondayRefresh));
+});
+
+test("the composite daily cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects weekends", () => {
+  const mondayKst = Date.UTC(2026, 9, 25, 22, 0);
+  const sundayKst = Date.UTC(2026, 9, 24, 22, 0);
+  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayKst).plan.key, "backfill-derived");
+  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, sundayKst), null);
+});
+
+test("existing intraday, final, report, and auxiliary cron branches remain intact", () => {
+  assert.equal(planForCron("7 0-10 * * MON-FRI").key, "refresh-intraday");
+  assert.equal(planForCron("30 11 * * MON-FRI").key, "refresh-final");
+  assert.equal(planForCron("0 14 * * MON-FRI").key, "daily-report");
+  assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
+  assert.equal(planForCron("10,30,50 0-10 * * MON-FRI").key, "snapshots");
+});
+
+test("backfill publication verification accepts the workflow's dated commit message", async () => {
+  const now = new Date();
+  const run = {
+    id: 114,
+    event: "workflow_dispatch",
+    created_at: new Date(now.getTime() - 1000).toISOString(),
+    updated_at: now.toISOString(),
+    status: "completed",
+    conclusion: "success",
+    head_sha: "backfill-run",
+    production_commit_sha: "backfill-pub",
+  };
+  const plan = planForCron("0 22 * * SUN-THU");
+  const api = async (path) => {
+    if (path.includes("/runs?event=schedule")) return { workflow_runs: [] };
+    if (path.includes("/runs?event=workflow_dispatch")) return { workflow_runs: [run] };
+    if (path === `/repos/${repo}/actions/runs/114`) return run;
+    if (path === `/repos/${repo}/commits/backfill-pub`) return {
+      files: [{ filename: "data/monitoring-derived/20261030/114/manifest.json" }],
+      commit: {
+        message: "Publish full-market derived data 2026-10-30",
+        committer: { date: now.toISOString() },
+      },
+      author: { login: "github-actions[bot]" },
+    };
+    throw new Error(`unexpected path ${path}`);
+  };
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, plan, "backfill-derived:slot", now.getTime(), { github: api, sleep: async () => {} });
+  assert.equal(result.status, "PUBLISHED");
+  assert.equal(result.publicationSha, "backfill-pub");
 });
 
 test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => {
