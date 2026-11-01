@@ -80,8 +80,6 @@ test("backfill publication verification accepts the workflow's dated commit mess
   };
   const plan = planForCron("0 22 * * SUN-THU");
   const api = async (path) => {
-    if (path.includes("/runs?event=schedule")) return { workflow_runs: [] };
-    if (path.includes("/runs?event=workflow_dispatch")) return { workflow_runs: [run] };
     if (path === `/repos/${repo}/actions/runs/114`) return run;
     if (path === `/repos/${repo}/commits/backfill-pub`) return {
       files: [{ filename: "data/monitoring-derived/20261030/114/manifest.json" }],
@@ -93,9 +91,10 @@ test("backfill publication verification accepts the workflow's dated commit mess
     };
     throw new Error(`unexpected path ${path}`);
   };
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, plan, "backfill-derived:slot", now.getTime(), { github: api, sleep: async () => {} });
-  assert.equal(result.status, "PUBLISHED");
+  const result = await verifyRunCompletion(api, repo, plan, run);
+  assert.equal(result.status, "RUN_VERIFIED");
   assert.equal(result.publicationSha, "backfill-pub");
+  assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
 test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => {
