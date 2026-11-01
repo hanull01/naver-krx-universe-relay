@@ -1,0 +1,463 @@
+name: Backfill full-market derived data
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate KRX date, target universe, and collector command without collecting or publishing
+        required: false
+        default: false
+        type: boolean
+      publish:
+        description: Publish validated derived data to main (main branch only)
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generated-data-write
+  cancel-in-progress: false
+
+jobs:
+  backfill-derived:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout workflow ref
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate publication ref
+        if: inputs.publish == true && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::publish=true is allowed only on refs/heads/main (current: $GITHUB_REF)"
+          exit 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate derived-data code
+        run: |
+          python -m py_compile \
+            krx_market_day.py \
+            tools/naver_daily_backfill.py \
+            tools/build_full_market_derivatives.py \
+            tools/build_report_contract_projection.py \
+            tools/full_market_technical_adapter.py
+          python -m unittest \
+            test_build_full_market_derivatives.py \
+            test_build_report_contract_projection.py \
+            test_full_market_technical_adapter.py -v
+
+      - name: Check KRX trading day
+        id: market_day
+        shell: bash
+        run: |
+          set +e
+          today=$(TZ=Asia/Seoul date +%F)
+          python krx_market_day.py --date "$today"
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "today=$today" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$code" -eq 1 ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "noop=true" >> "$GITHUB_OUTPUT"
+            echo "KRX is closed on $today; this manual run is a safe NOOP."
+            exit 0
+          fi
+          echo "::error::KRX calendar could not be verified; refusing collection."
+          exit "$code"
+
+      - name: Resolve previous KRX trading day
+        id: previous_day
+        if: steps.market_day.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          target=$(python - <<'PY'
+          from datetime import date, timedelta
+          import krx_market_day
+
+          today = date.fromisoformat("${{ steps.market_day.outputs.today }}")
+          candidate = today - timedelta(days=1)
+          for _ in range(370):
+              is_open, reason = krx_market_day.market_day(candidate)
+              if is_open:
+                  print(candidate.isoformat())
+                  break
+              candidate -= timedelta(days=1)
+          else:
+              raise SystemExit("previous KRX trading day was not found")
+          PY
+          )
+          echo "target_date=$target" >> "$GITHUB_OUTPUT"
+          echo "Previous KRX trading day: $target"
+
+      - name: Restore latest rolling history
+        id: history
+        if: steps.market_day.outputs.run == 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          HISTORY_OUTPUT: ${{ runner.temp }}/restored-rolling-history
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          from pathlib import Path
+
+          repository_root = Path("data/monitoring-derived")
+          output = Path(os.environ["HISTORY_OUTPUT"])
+          output.mkdir(parents=True, exist_ok=True)
+          candidates = []
+          for pointer in sorted(repository_root.glob("*/latest.json")) if repository_root.exists() else []:
+              try:
+                  payload = json.loads(pointer.read_text(encoding="utf-8"))
+                  manifest_path = pointer.parent / str(payload["path"])
+                  run_dir = manifest_path.parent
+                  history_manifest = run_dir / "rolling-history-manifest.json"
+                  history_dir = run_dir / "rolling-history"
+                  if history_manifest.is_file() and history_dir.is_dir():
+                      manifest = json.loads(history_manifest.read_text(encoding="utf-8"))
+                      candidates.append((str(manifest.get("targetDate") or ""), str(manifest.get("generatedAt") or ""), history_dir, history_manifest))
+              except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+                  continue
+          if candidates:
+              _, _, source_dir, source_manifest = sorted(candidates, reverse=True, key=lambda item: (item[0], item[1]))[0]
+              shutil.copytree(source_dir, output, dirs_exist_ok=True)
+              shutil.copy2(source_manifest, output / "rolling-history-manifest.json")
+              print(f"restored rolling history from {source_dir}")
+              found = "true"
+          else:
+              print("no rolling history pointer found; bootstrap required")
+              found = "false"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"found={found}\n")
+              handle.write(f"path={output}\n")
+          PY
+
+      - name: Resolve rolling collection window
+        id: collection_window
+        if: steps.market_day.outputs.run == 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          HISTORY_DIR: ${{ runner.temp }}/restored-rolling-history
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          import krx_market_day
+          from tools.build_full_market_derivatives import resolve_rolling_window
+
+          result = resolve_rolling_window(
+              Path(os.environ["HISTORY_DIR"]),
+              os.environ["TARGET_DATE"],
+              krx_market_day.market_day,
+          )
+          print(
+              f"rollingMode={result['mode']} start={result['startDate']} "
+              f"end={result['endDate']} historyLatest={result['historyLatest']}"
+          )
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"mode={result['mode']}\n")
+              handle.write(f"start_date={result['startDate']}\n")
+              handle.write(f"end_date={result['endDate']}\n")
+          PY
+
+      - name: Build STOCK+ETF target universe
+        id: targets
+        if: steps.market_day.outputs.run == 'true'
+        shell: bash
+        env:
+          UNIVERSE_SOURCE: data/market-universe/all-assets.json
+          UNIVERSE_OUTPUT: ${{ runner.temp }}/stock-etf-universe.json
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          source = Path(os.environ["UNIVERSE_SOURCE"])
+          output = Path(os.environ["UNIVERSE_OUTPUT"])
+          payload = json.loads(source.read_text(encoding="utf-8"))
+          rows = payload.get("assets")
+          if not isinstance(rows, list):
+              rows = []
+              for key, kind in (("stocks", "STOCK"), ("etfs", "ETF")):
+                  for row in payload.get(key, []) or []:
+                      if isinstance(row, dict):
+                          copied = dict(row)
+                          copied.setdefault("assetType", kind)
+                          rows.append(copied)
+          filtered = [
+              row for row in rows
+              if isinstance(row, dict) and str(row.get("assetType", "STOCK")).upper() in {"STOCK", "ETF"}
+              and row.get("code")
+          ]
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text(json.dumps({"assets": filtered}, ensure_ascii=False), encoding="utf-8")
+          print(f"STOCK+ETF targets={len(filtered)}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"count={len(filtered)}\n")
+              handle.write(f"noop={'true' if not filtered else 'false'}\n")
+          PY
+          if [ "${{ steps.targets.outputs.noop }}" = "true" ]; then
+            echo "No STOCK or ETF targets; safe NOOP without publishing."
+          fi
+
+      - name: Collect required NAVER daily bars
+        id: collect
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          START_DATE: ${{ steps.collection_window.outputs.start_date }}
+          END_DATE: ${{ steps.collection_window.outputs.end_date }}
+          UNIVERSE_FILE: ${{ runner.temp }}/stock-etf-universe.json
+          BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
+        run: |
+          set -euo pipefail
+          python tools/naver_daily_backfill.py \
+            --universe-file "$UNIVERSE_FILE" \
+            --asset-type all \
+            --start-date "$START_DATE" \
+            --end-date "$END_DATE" \
+            --output-root "$BACKFILL_ROOT" \
+            --max-workers 8 \
+            --sleep 0.05
+
+      - name: Validate collection coverage and create temporary coverage records
+        id: coverage
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["BACKFILL_ROOT"])
+          manifest = root / "metadata" / "manifest.jsonl"
+          rows = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines() if line.strip()]
+          successful = [row for row in rows if row.get("collection_status") == "SUCCESS"]
+          total_rows = sum(int(row.get("row_count") or 0) for row in successful)
+          if not successful or total_rows == 0:
+              raise SystemExit("FULL_MARKET_COLLECTION_ZERO_ROWS")
+
+          coverage = root / "provenance" / "coverage.jsonl"
+          coverage.parent.mkdir(parents=True, exist_ok=True)
+          with coverage.open("w", encoding="utf-8") as handle:
+              for row in rows:
+                  handle.write(json.dumps({
+                      "assetType": row.get("assetType"),
+                      "code": row.get("code"),
+                      "missingReason": row.get("missing_reason"),
+                      "rowCount": row.get("row_count", 0),
+                      "sourceCanonicalPath": row.get("canonical_path"),
+                      "sourceStaging": str(root),
+                      "status": row.get("source_status") or row.get("collection_status"),
+                  }, ensure_ascii=False) + "\n")
+
+          no_daily = [row.get("code") for row in successful if row.get("missing_reason") == "NO_DAILY_BAR"]
+          print(f"successful={len(successful)} totalRows={total_rows} noDailyBar={len(no_daily)}")
+          PY
+
+      - name: Build full-market derived artifacts
+        id: derived
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
+          DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
+          HISTORY_DIR: ${{ runner.temp }}/restored-rolling-history
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          canonical="$BACKFILL_ROOT/canonical/daily"
+          mkdir -p "$canonical"
+          # Preserve successful empty responses as explicit unavailable inputs.
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["BACKFILL_ROOT"])
+          manifest = root / "metadata" / "manifest.jsonl"
+          for line in manifest.read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              row = json.loads(line)
+              if row.get("collection_status") == "SUCCESS" and not row.get("canonical_written"):
+                  if row.get("missing_reason") == "NO_DAILY_BAR":
+                      (root / "canonical" / "daily" / f"{row['code']}.jsonl").touch()
+          PY
+          rm -rf "$DERIVED_ROOT"
+          python tools/build_full_market_derivatives.py \
+            --canonical-dir "$canonical" \
+            --universe config/universe.json \
+            --output-dir "$DERIVED_ROOT" \
+            --history-dir "$HISTORY_DIR" \
+            --target-date "$TARGET_DATE"
+          python -m tools.build_report_contract_projection \
+            --derived-dir "$DERIVED_ROOT" \
+            --universe config/universe.json \
+            --output "$DERIVED_ROOT/report-contract-projection.json" \
+            --target-date "$TARGET_DATE"
+
+      - name: Validate derived output before publication
+        id: validate
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true
+        shell: bash
+        env:
+          DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["DERIVED_ROOT"])
+          target = os.environ["TARGET_DATE"].replace("-", "")
+          if len(target) != 8 or not target.isdigit():
+              raise SystemExit("INVALID_TARGET_DATE")
+          required = {
+              "technicals.json", "states.json", "registered-universe-technicals.json",
+              "registered-universe-states.json", "group-states.json", "provenance.json",
+              "quality.json", "manifest.json", "report-contract-projection.json",
+              "report-contract-manifest.json", "rolling-history-manifest.json",
+          }
+          actual = {path.name for path in root.iterdir() if path.is_file()}
+          if not required.issubset(actual):
+              raise SystemExit(f"DERIVED_OUTPUT_MISSING:{sorted(required - actual)}")
+          if any(path.name.endswith((".html", ".md")) or path.name == "raw" for path in root.rglob("*") if path.is_file()):
+              raise SystemExit("RAW_OR_REPORT_RENDER_OUTPUT_PRESENT")
+          projection = root / "report-contract-projection.json"
+          if projection.stat().st_size > 900_000:
+              raise SystemExit("REPORT_CONTRACT_TOO_LARGE")
+          technicals = json.loads((root / "technicals.json").read_text(encoding="utf-8"))
+          states = json.loads((root / "states.json").read_text(encoding="utf-8"))
+          quality = json.loads((root / "quality.json").read_text(encoding="utf-8"))
+          groups = json.loads((root / "group-states.json").read_text(encoding="utf-8"))
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          projection = json.loads((root / "report-contract-projection.json").read_text(encoding="utf-8"))
+          for name, payload in (("technicals", technicals), ("states", states), ("quality", quality), ("groups", groups)):
+              if payload.get("targetDate") != target:
+                  raise SystemExit(f"{name.upper()}_TARGET_DATE_MISMATCH")
+          if (manifest.get("source") or {}).get("targetDate") != target:
+              raise SystemExit("MANIFEST_TARGET_DATE_MISMATCH")
+          if projection.get("asOf") != target:
+              raise SystemExit("PROJECTION_TARGET_DATE_MISMATCH")
+          if technicals.get("fallbackUsed") or states.get("fallbackUsed") or quality.get("fallbackUsed"):
+              raise SystemExit("DERIVED_FALLBACK_USED")
+          for name, payload in (("technicals", technicals), ("states", states)):
+              for row in payload.get("datas", []):
+                  as_of = str(row.get("asOfDate") or "").replace("-", "")
+                  if as_of and as_of > target:
+                      raise SystemExit(f"{name.upper()}_FUTURE_DATA:{as_of}>{target}")
+          if len(technicals.get("datas", [])) != len(states.get("datas", [])):
+              raise SystemExit("TECHNICAL_STATE_COVERAGE_MISMATCH")
+          rolling_manifest = json.loads((root / "rolling-history-manifest.json").read_text(encoding="utf-8"))
+          if rolling_manifest.get("targetDate") != target:
+              raise SystemExit("ROLLING_HISTORY_TARGET_DATE_MISMATCH")
+          if rolling_manifest.get("fallbackUsed"):
+              raise SystemExit("ROLLING_HISTORY_FALLBACK_USED")
+          if int(rolling_manifest.get("window") or 0) != 120:
+              raise SystemExit("ROLLING_HISTORY_WINDOW_INVALID")
+          for path in (root / "rolling-history").rglob("*.jsonl"):
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  observed = str(row.get("date") or "").replace("-", "")
+                  if observed and observed > target:
+                      raise SystemExit(f"ROLLING_HISTORY_FUTURE_DATA:{observed}>{target}")
+          print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection.stat().st_size}")
+          PY
+
+      - name: Upload non-publishing derived artifact
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true && inputs.publish != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-market-derived-${{ github.run_id }}
+          path: ${{ runner.temp }}/full-market-derived
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish derived artifacts atomically
+        id: publish
+        if: steps.market_day.outputs.run == 'true' && steps.targets.outputs.noop != 'true' && inputs.dry_run != true && inputs.publish == true && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
+        run: |
+          set -euo pipefail
+          publish_parent="data/monitoring-derived/$TARGET_DATE"
+          publish_dir="$publish_parent/${GITHUB_RUN_ID}"
+          staging_dir="$publish_parent/.staging-${GITHUB_RUN_ID}"
+          latest_pointer="$publish_parent/latest.json"
+          if [ -e "$publish_dir" ] || [ -e "$staging_dir" ]; then
+            echo "::error::Publication destination already exists; refusing overwrite."
+            exit 1
+          fi
+          mkdir -p "$publish_parent"
+          cp -a "$DERIVED_ROOT/." "$staging_dir/"
+          mv "$staging_dir" "$publish_dir"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          parent = Path(f"data/monitoring-derived/{os.environ['TARGET_DATE']}")
+          pointer = {
+              "schemaVersion": 1,
+              "targetDate": os.environ["TARGET_DATE"],
+              "runId": os.environ["GITHUB_RUN_ID"],
+              "path": f"{os.environ['GITHUB_RUN_ID']}/report-contract-manifest.json",
+          }
+          tmp = parent / f".latest.{os.environ['GITHUB_RUN_ID']}.tmp"
+          tmp.write_text(json.dumps(pointer, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+          os.replace(tmp, parent / "latest.json")
+          PY
+          git add -- "$publish_dir" "$latest_pointer"
+          actual=$(git diff --cached --name-only)
+          if [ -z "$actual" ]; then
+            echo "::error::No derived artifacts staged."
+            exit 1
+          fi
+          while IFS= read -r path; do
+            case "$path" in
+              data/monitoring-derived/*) ;;
+              *) echo "::error::Unexpected staged path: $path"; exit 1 ;;
+            esac
+          done <<< "$actual"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publish full-market derived data $TARGET_DATE"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report safe NOOP
+        if: steps.market_day.outputs.noop == 'true' || steps.targets.outputs.noop == 'true' || inputs.dry_run == true
+        run: echo "No publication was performed."
