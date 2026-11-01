@@ -72,22 +72,39 @@ jobs:
           python3 -m py_compile daily_report.py test_daily_report.py
           python3 -m unittest test_daily_report.py -v
 
+      - name: Resolve report and derived generation
+        id: inputs
+        if: steps.market_day.outputs.run == 'true'
+        env:
+          REPORT_AS_OF: ${{ inputs.as_of || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from daily_report import resolve_report_trading_date
+          from tools.derived_input_resolver import resolve_derived_input
+
+          result = resolve_report_trading_date(
+              requested_date=os.environ.get("REPORT_AS_OF") or None
+          )
+          if result.get("status") != "READY":
+              raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
+          as_of = result["tradingDate"]
+          derived = resolve_derived_input("data/monitoring-derived", as_of)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"as_of={as_of}\n")
+              output.write(f"derived_dir={derived['runDir']}\n")
+              output.write(f"derived_run_id={derived['runId']}\n")
+          print(f"Resolved report trading date: {as_of}")
+          print(f"Resolved derived run: {derived['runId']}")
+          PY
+
       - name: Build daily report
         if: steps.market_day.outputs.run == 'true'
         run: |
-          report_date=$(python3 - <<'PY'
-          import json, os, sys
-          from daily_report import resolve_report_trading_date
-          requested = os.environ.get("REPORT_AS_OF") or None
-          result = resolve_report_trading_date(requested_date=requested)
-          print(json.dumps(result, ensure_ascii=False))
-          if result.get("status") != "READY":
-              raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
-          print(result["tradingDate"])
-          PY
-          )
-          as_of=$(printf '%s\n' "$report_date" | tail -n 1)
-          echo "Resolved report trading date: ${as_of}"
+          as_of='${{ steps.inputs.outputs.as_of }}'
+          derived_dir='${{ steps.inputs.outputs.derived_dir }}'
           expected=${EXPECTED_KRX_TRADING_DATE:-}
           if [ -n "$expected" ] && [ "$as_of" != "$expected" ]; then
             echo "Resolved published trading date ${as_of} does not match KRX scheduled target ${expected}." >&2
@@ -96,7 +113,8 @@ jobs:
           # The 23:00 job is JSON history only.  Current-observation
           # Markdown/HTML is produced by Refresh market data from the same
           # report contract and is never duplicated here.
-          python3 daily_report.py --as-of "$as_of" --output-dir data/reports --json-only
+          python3 daily_report.py --as-of "$as_of" --output-dir data/reports --json-only \
+            --staging-input-dir "$derived_dir"
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}
           EXPECTED_KRX_TRADING_DATE: ${{ steps.market_day.outputs.expected_date }}

@@ -448,10 +448,16 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
             "groupStates": load_json(GROUP_STATES_PATH) if GROUP_STATES_PATH.exists() else {},
             "analysisTechnicals": None,
             "analysisStates": None,
+            "derivedProjection": None,
             "metadata": {"mode": "DEFAULT", "fallbackUsed": False},
         }
 
     root = Path(staging_input_dir)
+    projection_path = root / "report-contract-projection.json"
+    try:
+        derived_projection = load_json(projection_path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise ValueError(f"DERIVED_REPORT_PROJECTION_UNAVAILABLE:{projection_path}") from exc
     staged = build_staged_technical_input(
         root / "technicals.json",
         root / "states.json",
@@ -497,6 +503,7 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "groupStates": staged["historicalGroups"],
         "analysisTechnicals": full_market["technicalsPayload"],
         "analysisStates": full_market["statesPayload"],
+        "derivedProjection": derived_projection,
         "metadata": metadata,
     }
 
@@ -605,6 +612,34 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "changes": payloads["latest-changes.json"],
         "monitoredUniverse": summary.get("monitoredUniverse", {}),
         "marketTradingValue": payloads["latest-breadth.json"].get("fullMarket", {}).get("marketTradingValue", {}),
+    }
+
+
+def full_market_from_derived_projection(projection, target_date):
+    """Expose derived market summaries without promoting them to FINAL."""
+    if not isinstance(projection, dict):
+        return {"status": "UNAVAILABLE", "reason": "DERIVED_PROJECTION_MISSING"}
+    target = str(target_date or "").replace("-", "")
+    if projection.get("asOf") != target:
+        return {"status": "UNAVAILABLE", "reason": "DERIVED_PROJECTION_DATE_MISMATCH"}
+    summary = projection.get("fullMarket") or {}
+    quality = summary.get("quality") or {}
+    return {
+        "status": "AVAILABLE" if projection.get("status") in {"AVAILABLE", "PARTIAL"} else "UNAVAILABLE",
+        "asOfDate": target,
+        "snapshotDate": target,
+        "snapshotDateStatus": "DERIVED_TARGET_DATE",
+        "sourceQualityStatus": projection.get("sourceQualityStatus", "PARTIAL"),
+        "qualityStatus": projection.get("status", "PARTIAL"),
+        "quality": quality,
+        "breadth": summary.get("breadth") or {},
+        "leaders": summary.get("leaders") or [],
+        "industries": [],
+        "marketTradingValue": {},
+        "generatedAt": projection.get("observedAt"),
+        "sourceTime": None,
+        "reason": "DERIVED_SOURCE_OBSERVED_NOT_FINAL",
+        "derivedProjection": projection,
     }
 
 
@@ -1082,8 +1117,9 @@ def full_market_summary(full_market, alignment):
         status = "UNAVAILABLE"
         reason = full_market.get("reason") or "FULL_MARKET_EVIDENCE_UNAVAILABLE"
 
-    quality = full_market.get("quality") if verified else {}
-    industries = full_market.get("industries", []) if verified else []
+    derived_summary = snapshot_status == "DERIVED_TARGET_DATE"
+    quality = full_market.get("quality") if (verified or derived_summary) else {}
+    industries = full_market.get("industries", []) if (verified or derived_summary) else []
     industries = [row for row in industries if isinstance(row, dict)]
     industries.sort(
         key=lambda row: (
@@ -1100,16 +1136,16 @@ def full_market_summary(full_market, alignment):
         "tradingDate": full_market.get("snapshotDate"),
         "baselineDate": full_market.get("asOfDate"),
         "snapshotDateStatus": snapshot_status,
-        "sourceTime": full_market.get("sourceTime") if verified else None,
-        "generatedAt": full_market.get("generatedAt") if verified else None,
-        "qualityStatus": full_market.get("qualityStatus") if verified else None,
-        "sourceQualityStatus": full_market.get("sourceQualityStatus") if verified else None,
+        "sourceTime": full_market.get("sourceTime") if (verified or derived_summary) else None,
+        "generatedAt": full_market.get("generatedAt") if (verified or derived_summary) else None,
+        "qualityStatus": full_market.get("qualityStatus") if (verified or derived_summary) else None,
+        "sourceQualityStatus": full_market.get("sourceQualityStatus") if (verified or derived_summary) else None,
         "quality": quality,
-        "breadth": full_market.get("breadth") if verified else None,
-        "marketTradingValue": full_market.get("marketTradingValue", {}) if verified else {},
+        "breadth": full_market.get("breadth") if (verified or derived_summary) else None,
+        "marketTradingValue": full_market.get("marketTradingValue", {}) if (verified or derived_summary) else {},
         "industries": industries,
         "industrySortBasis": "AVG_RETURN_1D_DESC_NULLS_LAST",
-        "leaders": full_market.get("leaders", []) if verified else [],
+        "leaders": full_market.get("leaders", []) if (verified or derived_summary) else [],
         "mismatches": alignment.get("mismatches", []),
         "missingEvidence": alignment.get("missingEvidence", []),
     }
@@ -1583,7 +1619,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     )
 
     report_date = as_of or datetime.now(KST).date().isoformat()
-    full_market = full_market_evidence(report_date)
+    if staging_input_dir:
+        full_market = full_market_from_derived_projection(
+            technical_inputs.get("derivedProjection"), report_date
+        )
+    else:
+        full_market = full_market_evidence(report_date)
     alignment = date_alignment(report_date, indices, full_market)
     discovery = trading_discovery.discovery_status(
         report_date, discovery_source_path(report_date)
