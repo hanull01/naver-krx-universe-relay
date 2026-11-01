@@ -335,7 +335,12 @@ jobs:
           import os
           from pathlib import Path
 
-          root = Path(os.environ["DERIVED_ROOT"])
+          def require_path(value, name):
+              if not isinstance(value, Path):
+                  raise TypeError(f"{name}_MUST_BE_PATH:{type(value).__name__}")
+              return value
+
+          root = require_path(Path(os.environ["DERIVED_ROOT"]), "DERIVED_ROOT")
           target = os.environ["TARGET_DATE"].replace("-", "")
           if len(target) != 8 or not target.isdigit():
               raise SystemExit("INVALID_TARGET_DATE")
@@ -345,26 +350,33 @@ jobs:
               "quality.json", "manifest.json", "report-contract-projection.json",
               "report-contract-manifest.json", "rolling-history-manifest.json",
           }
-          actual = {path.name for path in root.iterdir() if path.is_file()}
+          actual = {path.name for path in require_path(root, "DERIVED_ROOT").iterdir() if path.is_file()}
           if not required.issubset(actual):
               raise SystemExit(f"DERIVED_OUTPUT_MISSING:{sorted(required - actual)}")
-          if any(path.name.endswith((".html", ".md")) or path.name == "raw" for path in root.rglob("*") if path.is_file()):
+          if any(path.name.endswith((".html", ".md")) or path.name == "raw" for path in require_path(root, "DERIVED_ROOT").rglob("*") if path.is_file()):
               raise SystemExit("RAW_OR_REPORT_RENDER_OUTPUT_PRESENT")
-          projection = root / "report-contract-projection.json"
-          if projection.stat().st_size > 900_000:
+          projection_path = require_path(root / "report-contract-projection.json", "REPORT_CONTRACT_PROJECTION")
+          if projection_path.stat().st_size > 900_000:
               raise SystemExit("REPORT_CONTRACT_TOO_LARGE")
-          technicals = json.loads((root / "technicals.json").read_text(encoding="utf-8"))
-          states = json.loads((root / "states.json").read_text(encoding="utf-8"))
-          quality = json.loads((root / "quality.json").read_text(encoding="utf-8"))
-          groups = json.loads((root / "group-states.json").read_text(encoding="utf-8"))
-          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-          projection = json.loads((root / "report-contract-projection.json").read_text(encoding="utf-8"))
+          technicals_path = require_path(root / "technicals.json", "TECHNICALS")
+          states_path = require_path(root / "states.json", "STATES")
+          quality_path = require_path(root / "quality.json", "QUALITY")
+          groups_path = require_path(root / "group-states.json", "GROUP_STATES")
+          manifest_path = require_path(root / "manifest.json", "MANIFEST")
+          rolling_manifest_path = require_path(root / "rolling-history-manifest.json", "ROLLING_HISTORY_MANIFEST")
+          rolling_history_root = require_path(root / "rolling-history", "ROLLING_HISTORY")
+          technicals = json.loads(technicals_path.read_text(encoding="utf-8"))
+          states = json.loads(states_path.read_text(encoding="utf-8"))
+          quality = json.loads(quality_path.read_text(encoding="utf-8"))
+          groups = json.loads(groups_path.read_text(encoding="utf-8"))
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          projection_payload = json.loads(projection_path.read_text(encoding="utf-8"))
           for name, payload in (("technicals", technicals), ("states", states), ("quality", quality), ("groups", groups)):
               if payload.get("targetDate") != target:
                   raise SystemExit(f"{name.upper()}_TARGET_DATE_MISMATCH")
           if (manifest.get("source") or {}).get("targetDate") != target:
               raise SystemExit("MANIFEST_TARGET_DATE_MISMATCH")
-          if projection.get("asOf") != target:
+          if projection_payload.get("asOf") != target:
               raise SystemExit("PROJECTION_TARGET_DATE_MISMATCH")
           if technicals.get("fallbackUsed") or states.get("fallbackUsed") or quality.get("fallbackUsed"):
               raise SystemExit("DERIVED_FALLBACK_USED")
@@ -375,14 +387,14 @@ jobs:
                       raise SystemExit(f"{name.upper()}_FUTURE_DATA:{as_of}>{target}")
           if len(technicals.get("datas", [])) != len(states.get("datas", [])):
               raise SystemExit("TECHNICAL_STATE_COVERAGE_MISMATCH")
-          rolling_manifest = json.loads((root / "rolling-history-manifest.json").read_text(encoding="utf-8"))
+          rolling_manifest = json.loads(rolling_manifest_path.read_text(encoding="utf-8"))
           if rolling_manifest.get("targetDate") != target:
               raise SystemExit("ROLLING_HISTORY_TARGET_DATE_MISMATCH")
           if rolling_manifest.get("fallbackUsed"):
               raise SystemExit("ROLLING_HISTORY_FALLBACK_USED")
           if int(rolling_manifest.get("window") or 0) != 120:
               raise SystemExit("ROLLING_HISTORY_WINDOW_INVALID")
-          for path in (root / "rolling-history").rglob("*.jsonl"):
+          for path in rolling_history_root.rglob("*.jsonl"):
               for line in path.read_text(encoding="utf-8").splitlines():
                   if not line.strip():
                       continue
@@ -390,7 +402,7 @@ jobs:
                   observed = str(row.get("date") or "").replace("-", "")
                   if observed and observed > target:
                       raise SystemExit(f"ROLLING_HISTORY_FUTURE_DATA:{observed}>{target}")
-          print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection.stat().st_size}")
+          print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection_path.stat().st_size}")
           PY
 
       - name: Upload non-publishing derived artifact

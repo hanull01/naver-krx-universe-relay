@@ -42,6 +42,16 @@ class BackfillDerivedWorkflowTests(unittest.TestCase):
         self.assertIn("inputs.publish == true", publish_body)
         self.assertIn("git push origin HEAD:main", publish_body)
 
+    def test_validation_keeps_paths_separate_from_loaded_payloads(self):
+        self.assertIn('projection_path = require_path(root / "report-contract-projection.json"', self.text)
+        self.assertIn('projection_payload = json.loads(projection_path.read_text', self.text)
+        self.assertIn('projection_path.stat().st_size', self.text)
+        self.assertNotIn('projection = json.loads((root / "report-contract-projection.json")', self.text)
+        self.assertIn('rolling_manifest_path = require_path(root / "rolling-history-manifest.json"', self.text)
+        self.assertIn('rolling_history_root = require_path(root / "rolling-history"', self.text)
+        self.assertIn('for path in rolling_history_root.rglob("*.jsonl")', self.text)
+        self.assertIn('def require_path(value, name):', self.text)
+
 
 if __name__ == "__main__":
     unittest.main()
