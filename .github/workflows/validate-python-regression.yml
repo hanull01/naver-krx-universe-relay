@@ -25,6 +25,12 @@ jobs:
         run: python -m unittest discover -s . -p 'test_*.py'
       - name: Run theme regression summary
         run: python -m unittest -v test_theme_research test_theme_membership_snapshot
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run external scheduler JavaScript tests
+        run: node --test ops/external-scheduler/worker.test.mjs
       - name: Verify changed-file policy
         run: |
           git diff --check
