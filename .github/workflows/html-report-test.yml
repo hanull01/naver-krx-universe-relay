@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   report-test:
@@ -88,6 +88,79 @@ jobs:
           (root/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(manifest,ensure_ascii=False))
           PY
+      - name: Publish verified files to public test branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/html-report-test"
+          branch="html-report-test/$GITHUB_RUN_ID"
+          public_dir="test-artifacts/html-report-test-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags origin main
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'html-report-test'
+          manifest_path=root/'manifest.json'
+          manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+          branch=f"html-report-test/{os.environ['GITHUB_RUN_ID']}"
+          public_dir=f"test-artifacts/html-report-test-{os.environ['GITHUB_RUN_ID']}"
+          base=f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/{branch}/{public_dir}"
+          manifest.update({
+              'publicBranch': branch,
+              'publicDir': public_dir,
+              'htmlUrl': f"{base}/2026-10-30.html",
+              'markdownUrl': f"{base}/2026-10-30.md",
+              'manifestUrl': f"{base}/manifest.json",
+          })
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+          print(json.dumps({'publicBranch':branch,'publicDir':public_dir,'htmlUrl':manifest['htmlUrl'],'markdownUrl':manifest['markdownUrl'],'manifestUrl':manifest['manifestUrl']},ensure_ascii=False))
+          PY
+          git switch --create "$branch" origin/main
+          mkdir -p "$public_dir"
+          cp "$root/output/2026-10-30.html" "$public_dir/2026-10-30.html"
+          cp "$root/output/2026-10-30.md" "$public_dir/2026-10-30.md"
+          cp "$root/manifest.json" "$public_dir/manifest.json"
+          git add "$public_dir"
+          git commit -m "Publish HTML_REPORT_TEST $GITHUB_RUN_ID"
+          git push origin "HEAD:$branch"
+          html_url="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/$public_dir/2026-10-30.html"
+          markdown_url="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/$public_dir/2026-10-30.md"
+          manifest_url="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/$public_dir/manifest.json"
+          curl -fsSL --retry 12 --retry-delay 2 "$html_url" -o "$root/downloaded.html"
+          curl -fsSL --retry 12 --retry-delay 2 "$markdown_url" -o "$root/downloaded.md"
+          curl -fsSL --retry 12 --retry-delay 2 "$manifest_url" -o "$root/downloaded-manifest.json"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'html-report-test'
+          manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          html=(root/'downloaded.html').read_bytes()
+          markdown=(root/'downloaded.md').read_bytes()
+          expected_html=(root/'output'/'2026-10-30.html').read_bytes()
+          expected_markdown=(root/'output'/'2026-10-30.md').read_bytes()
+          if html != expected_html or markdown != expected_markdown:
+              raise SystemExit('public download does not match generated output')
+          if hashlib.sha256(html).hexdigest() != manifest['htmlSha256']:
+              raise SystemExit('public HTML SHA mismatch')
+          if hashlib.sha256(markdown).hexdigest() != manifest['markdownSha256']:
+              raise SystemExit('public Markdown SHA mismatch')
+          public_manifest=json.loads((root/'downloaded-manifest.json').read_text(encoding='utf-8'))
+          for key in ('htmlUrl','markdownUrl','manifestUrl','publicBranch','publicDir'):
+              if public_manifest.get(key) != manifest.get(key):
+                  raise SystemExit(f'public manifest mismatch: {key}')
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as env:
+              env.write(f"PUBLIC_HTML_URL={manifest['htmlUrl']}\n")
+              env.write(f"PUBLIC_MARKDOWN_URL={manifest['markdownUrl']}\n")
+              env.write(f"PUBLIC_MANIFEST_URL={manifest['manifestUrl']}\n")
+              env.write(f"PUBLIC_TEST_BRANCH={manifest['publicBranch']}\n")
+          print(json.dumps({'publicHtmlUrl':manifest['htmlUrl'],'publicMarkdownUrl':manifest['markdownUrl'],'publicManifestUrl':manifest['manifestUrl'],'htmlSha256':manifest['htmlSha256'],'markdownSha256':manifest['markdownSha256']},ensure_ascii=False))
+          PY
+
       - name: Upload verified test files
         uses: actions/upload-artifact@v4
         with:
@@ -119,9 +192,10 @@ jobs:
             'workflow='+m['workflow'],'run_id='+m['runId'],'run_url='+m['runUrl'],
             'sourceTradingDate='+m['sourceTradingDate'],'sourceCommit='+m['sourceCommit'],
             'sourceHtmlAllowed='+str(m['sourceHtmlAllowed']).lower(),'testOnlyHtmlOverride='+str(m['testOnlyHtmlOverride']).lower(),
-            'sourceContract='+m['sourceContract'],'html.path=artifact://'+m['runId']+'/'+m['htmlFile'],
-            'html.sha256='+m['htmlSha256'],'html.bytes='+str(m['htmlBytes']),
-            'markdown.path=artifact://'+m['runId']+'/'+m['markdownFile'],'markdown.sha256='+m['markdownSha256'],
+            'sourceContract='+m['sourceContract'],'publicBranch='+m['publicBranch'],'publicDir='+m['publicDir'],
+            'html.url='+m['htmlUrl'],'html.sha256='+m['htmlSha256'],'html.bytes='+str(m['htmlBytes']),
+            'markdown.url='+m['markdownUrl'],'markdown.sha256='+m['markdownSha256'],
+            'manifest.url='+m['manifestUrl'],
             'markdown.bytes='+str(m['markdownBytes']),'artifact='+m['workflow']+'-'+m['runId'],
             'This is a test message; do not treat it as MARKET_DATA_READY.'])+'\n')
           with smtplib.SMTP_SSL('smtp.gmail.com',465,timeout=20) as s:
