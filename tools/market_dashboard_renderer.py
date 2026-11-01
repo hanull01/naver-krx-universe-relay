@@ -10,6 +10,7 @@ import hashlib
 import html
 import json
 import re
+import tempfile
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,14 @@ CSS_PATH = TEMPLATE_DIR / "market-dashboard-A-v1.1.css"
 
 class TemplateUnavailable(RuntimeError):
     """The approved template or the renderable contract is unavailable."""
+
+
+def _date_stem(value: Any) -> str:
+    """Return a stable dated-output stem without inferring a date."""
+    text = str(value or "").strip().replace("-", "")
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return "latest"
 
 
 def _text(value: Any, fallback: str = "확인 불가") -> str:
@@ -858,6 +867,95 @@ def validate_rendered_files(
     except (OSError, UnicodeError) as exc:
         return [f"RENDERED_FILE_READ_FAILED:{type(exc).__name__}"]
     return validate_rendered_outputs(markdown_text, html_text, model)
+
+
+def render_contract_views(
+    contract: Mapping[str, Any],
+    output_dir: Path,
+    *,
+    template_dir: Path = TEMPLATE_DIR,
+) -> dict[str, Any]:
+    """Render and validate both views from one published report contract.
+
+    This is the GitHub-facing, contract-only path.  It renders both strings
+    before writing anything, validates the strings, writes the files once,
+    then reopens the completed files for a second validation pass.  HTML is
+    never written when the contract disallows it or either view is incomplete.
+    """
+    if not isinstance(contract, Mapping):
+        raise TemplateUnavailable("CONTRACT_UNAVAILABLE:JSON_OBJECT_REQUIRED")
+
+    model = build_dashboard_model(contract)
+    markdown_text = render_dashboard_markdown(contract, template_dir=template_dir)
+    html_text = render_dashboard_html(contract, template_dir=template_dir)
+    issues = validate_rendered_outputs(markdown_text, html_text, model)
+    if issues:
+        raise TemplateUnavailable(
+            "TEMPLATE_UNAVAILABLE:RENDERED_OUTPUT_MISMATCH:" + ",".join(issues[:8])
+        )
+
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    stem = _date_stem(model.get("asOf"))
+    dated_markdown = destination / f"{stem}.md"
+    latest_markdown = destination / "latest.md"
+    dated_html = destination / f"{stem}.html"
+    latest_html = destination / "latest.html"
+
+    staged: list[tuple[Path, Path]] = []
+    try:
+        for path, text in (
+            (dated_markdown, markdown_text),
+            (latest_markdown, markdown_text),
+            (dated_html, html_text),
+            (latest_html, html_text),
+        ):
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=destination,
+                prefix=f".{path.name}.",
+                suffix=".tmp",
+                delete=False,
+            ) as handle:
+                handle.write(text)
+                staged.append((Path(handle.name), path))
+
+        staged_markdown, _ = staged[0]
+        staged_html, _ = staged[2]
+        reopened_issues = validate_rendered_files(staged_markdown, staged_html, model)
+        if reopened_issues:
+            raise TemplateUnavailable(
+                "TEMPLATE_UNAVAILABLE:REOPENED_OUTPUT_MISMATCH:"
+                + ",".join(reopened_issues[:8])
+            )
+        for temporary, target in staged:
+            temporary.replace(target)
+    except Exception:
+        for temporary, _ in staged:
+            try:
+                temporary.unlink()
+            except OSError:
+                pass
+        raise
+
+    final_issues = validate_rendered_files(dated_markdown, dated_html, model)
+    if final_issues:
+        raise TemplateUnavailable(
+            "TEMPLATE_UNAVAILABLE:FINAL_OUTPUT_MISMATCH:" + ",".join(final_issues[:8])
+        )
+
+    return {
+        "asOf": model.get("asOf"),
+        "htmlStatus": "AVAILABLE",
+        "markdown": str(latest_markdown),
+        "html": str(latest_html),
+        "datedMarkdown": str(dated_markdown),
+        "datedHtml": str(dated_html),
+        "templateTrace": load_approved_template(template_dir)["templateTrace"],
+        "htmlSha256": hashlib.sha256(html_text.encode("utf-8")).hexdigest(),
+        "htmlBytes": len(html_text.encode("utf-8")),
+    }
 
 
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
