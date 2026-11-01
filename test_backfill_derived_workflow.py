@@ -31,8 +31,11 @@ class BackfillDerivedWorkflowTests(unittest.TestCase):
         self.assertIn("FULL_MARKET_COLLECTION_ZERO_ROWS", self.text)
         self.assertIn("REPORT_CONTRACT_TOO_LARGE", self.text)
         self.assertIn("DERIVED_FALLBACK_USED", self.text)
-        self.assertIn("20261030_DATA_MIXED_IN", self.text)
-        self.assertIn("20261030_ROLLING_HISTORY_MIXED_IN", self.text)
+        self.assertIn('TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}', self.text)
+        self.assertIn("FUTURE_DATA", self.text)
+        self.assertIn("ROLLING_HISTORY_TARGET_DATE_MISMATCH", self.text)
+        self.assertNotIn("20261030_DATA_MIXED_IN", self.text)
+        self.assertNotIn("20261030_ROLLING_HISTORY_MIXED_IN", self.text)
         self.assertIn("RAW_OR_REPORT_RENDER_OUTPUT_PRESENT", self.text)
         publish_start = self.text.index("- name: Publish derived artifacts atomically")
         publish_body = self.text[publish_start:]

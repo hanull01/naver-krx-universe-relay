@@ -107,12 +107,39 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         self.assertEqual(result["registeredUniverse"]["missingCodes"], ["000660"])
         self.assertFalse(result["fallbackUsed"])
 
-    def test_20261030_is_rejected(self):
+    def test_future_row_after_target_is_rejected(self):
         payload = json.loads(self.technicals.read_text())
-        payload["targetDate"] = "20261030"
+        payload["datas"][0]["asOfDate"] = "20261030"
         self.technicals.write_text(json.dumps(payload), encoding="utf-8")
         with self.assertRaises(FullMarketTechnicalAdapterError):
-            build_report_input(self.technicals, self.states, self.groups, self.universe)
+            build_report_input(
+                self.technicals,
+                self.states,
+                self.groups,
+                self.universe,
+                expected_target_date="20261029",
+            )
+
+    def test_target_20261030_is_allowed(self):
+        technicals = json.loads(self.technicals.read_text())
+        states = json.loads(self.states.read_text())
+        groups = json.loads(self.groups.read_text())
+        technicals["targetDate"] = "20261030"
+        states["targetDate"] = "20261030"
+        groups["targetDate"] = "20261030"
+        technicals["datas"][0]["asOfDate"] = "20261030"
+        states["datas"][0]["asOfDate"] = "20261030"
+        self.technicals.write_text(json.dumps(technicals), encoding="utf-8")
+        self.states.write_text(json.dumps(states), encoding="utf-8")
+        self.groups.write_text(json.dumps(groups), encoding="utf-8")
+        result = build_report_input(
+            self.technicals,
+            self.states,
+            self.groups,
+            self.universe,
+            expected_target_date="20261030",
+        )
+        self.assertEqual(result["targetDate"], "20261030")
 
     def test_daily_report_loader_keeps_full_market_and_registered_inputs_separate(self):
         current = {"status": "AVAILABLE", "tradingDate": "20261029"}

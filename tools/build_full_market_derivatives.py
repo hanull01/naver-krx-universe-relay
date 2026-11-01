@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Any, Mapping
 
 
-FORBIDDEN_DATE = "20261030"
 ROLLING_WINDOW = 120
 REQUIRED_OHLCV = ("open", "high", "low", "close", "volume")
 
@@ -183,23 +182,21 @@ def _load_coverage(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], int]:
+def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]]]:
     files = sorted(directory.rglob("*.jsonl")) if directory.exists() else []
     assets: dict[str, list[dict[str, Any]]] = {}
     file_meta: dict[str, dict[str, Any]] = {}
-    date_20261030_rows = 0
     for path in files:
         code = path.stem
         tail_lines = deque(maxlen=121)
         line_count = 0
         first_row = None
+        max_observed_date = None
         with path.open(encoding="utf-8") as handle:
             for line_number, line in enumerate(handle, 1):
                 if not line.strip():
                     continue
                 line_count += 1
-                if FORBIDDEN_DATE in line:
-                    date_20261030_rows += 1
                 if first_row is None:
                     try:
                         first_row = json.loads(line)
@@ -207,6 +204,13 @@ def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, l
                         raise FullMarketDerivativeError(f"invalid canonical JSONL {path}:{line_number}: {exc}") from exc
                     if not isinstance(first_row, dict) or str(first_row.get("code")) != code:
                         raise FullMarketDerivativeError(f"canonical code mismatch: {path}:{line_number}")
+                try:
+                    observed = json.loads(line)
+                except json.JSONDecodeError:
+                    observed = None
+                observed_date = _date(observed.get("date")) if isinstance(observed, dict) else None
+                if observed_date and (max_observed_date is None or observed_date > max_observed_date):
+                    max_observed_date = observed_date
                 tail_lines.append(line)
         rows = []
         seen = set()
@@ -218,7 +222,7 @@ def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, l
             if not isinstance(row, dict) or str(row.get("code")) != code:
                 raise FullMarketDerivativeError(f"canonical code mismatch: {path}:{line_number}")
             date = _date(row.get("date"))
-            if not date or date in seen or date == FORBIDDEN_DATE:
+            if not date or date in seen:
                 raise FullMarketDerivativeError(f"invalid or duplicate date: {path}:{line_number}")
             seen.add(date)
             if not all(_numeric(row, key) is not None for key in REQUIRED_OHLCV):
@@ -238,25 +242,26 @@ def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, l
                 "earliest": _date(first_row.get("date")) if isinstance(first_row, dict) else None,
                 "latest": rows[-1]["date"] if rows else None,
             },
+            "maxObservedDate": max_observed_date,
             "assetType": str(
                 first_row.get("assetType") if isinstance(first_row, dict) else None
                 or (path.parent.name if path.parent.name.upper() in {"STOCK", "ETF"} else "STOCK")
             ).upper(),
             "sourceKind": source_kind,
         }
-    return assets, file_meta, date_20261030_rows
+    return assets, file_meta
 
 
 def _load_assets(
     canonical_dir: Path,
     history_dir: Path | None = None,
-) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], int]:
-    current_assets, current_meta, current_forbidden = _load_asset_files(
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]]]:
+    current_assets, current_meta = _load_asset_files(
         canonical_dir, source_kind="CURRENT_COLLECTION"
     )
-    history_assets, history_meta, history_forbidden = _load_asset_files(
+    history_assets, history_meta = _load_asset_files(
         history_dir, source_kind="RESTORED_ROLLING_HISTORY"
-    ) if history_dir is not None else ({}, {}, 0)
+    ) if history_dir is not None else ({}, {})
     if not current_assets and not history_assets:
         raise FullMarketDerivativeError(f"no canonical files: {canonical_dir}")
 
@@ -270,6 +275,13 @@ def _load_assets(
         current = current_meta.get(code)
         history = history_meta.get(code)
         meta = dict(current or history or {})
+        observed_dates = [
+            str(value.get("maxObservedDate"))
+            for value in (current, history)
+            if isinstance(value, Mapping) and value.get("maxObservedDate")
+        ]
+        if observed_dates:
+            meta["maxObservedDate"] = max(observed_dates)
         meta["historyCount"] = len(rows)
         meta["rollingHistoryWindow"] = ROLLING_WINDOW
         if current and history:
@@ -279,7 +291,7 @@ def _load_assets(
         file_meta[code] = meta
     if not any(assets.values()):
         raise FullMarketDerivativeError("canonical rows are empty")
-    return assets, file_meta, current_forbidden + history_forbidden
+    return assets, file_meta
 
 
 def _provenance(root: Path, code: str, meta: Mapping[str, Any], rows: list[dict[str, Any]], target: str) -> dict[str, Any]:
@@ -489,19 +501,29 @@ def build_derivatives(
     universe_path: str | Path,
     output_dir: str | Path,
     history_dir: str | Path | None = None,
+    target_date: str | None = None,
 ) -> dict[str, Any]:
     canonical = Path(canonical_dir)
     root = canonical.parent.parent if canonical.parent.name == "canonical" else canonical.parent
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     restored_history = Path(history_dir) if history_dir is not None else None
-    assets, file_meta, date_20261030_rows = _load_assets(canonical, restored_history)
+    assets, file_meta = _load_assets(canonical, restored_history)
     latest_dates = [rows[-1]["date"] for rows in assets.values() if rows]
     if not latest_dates:
         raise FullMarketDerivativeError("no usable canonical rows")
-    target = max(latest_dates)
-    if target == FORBIDDEN_DATE or date_20261030_rows:
-        raise FullMarketDerivativeError("20261030 data is not allowed in derivative staging")
+    target = _date(target_date) if target_date is not None else max(latest_dates)
+    if not target:
+        raise FullMarketDerivativeError(f"invalid target date: {target_date!r}")
+    future_files = [
+        (code, str(meta.get("maxObservedDate")))
+        for code, meta in file_meta.items()
+        if meta.get("maxObservedDate") and str(meta["maxObservedDate"]) > target
+    ]
+    if future_files:
+        raise FullMarketDerivativeError(
+            f"future data beyond targetDate {target}: {future_files[:5]}"
+        )
     universe = _load_universe(Path(universe_path))
     technical_rows = [_technical_row(code, file_meta[code], rows, target, root) for code, rows in sorted(assets.items())]
     state_rows = [_state_row(row, assets[row["itemCode"]]) for row in technical_rows]
@@ -516,7 +538,8 @@ def build_derivatives(
     no_daily_bar = sorted({str(row.get("code")) for row in coverage if row.get("missingReason") == "NO_DAILY_BAR"})
     source = {
         "sourceStaging": str(root), "sourceCanonicalDir": str(canonical), "targetDate": target,
-        "date20261030Rows": 0, "fallbackUsed": False,
+        "date20261030Rows": sum(row.get("date") == "20261030" for rows in assets.values() for row in rows),
+        "fallbackUsed": False,
     }
     technical_payload = {
         "schemaVersion": 1, "generatedAt": datetime.now().astimezone().isoformat(),
@@ -547,7 +570,8 @@ def build_derivatives(
             kind: sum(row["assetType"] == kind for row in technical_rows) for kind in ("STOCK", "ETF")
         },
         "statusCounts": {status: sum(row["availabilityStatus"] == status for row in technical_rows) for status in ("AVAILABLE", "PARTIAL", "UNAVAILABLE")},
-        "missingCodes": missing_codes, "noDailyBar": no_daily_bar, "date20261030Rows": 0,
+        "missingCodes": missing_codes, "noDailyBar": no_daily_bar,
+        "date20261030Rows": source["date20261030Rows"],
         "historicalGroups": "UNAVAILABLE" if not group_payload["groups"] else "WATCHLIST_ONLY",
         "currentSnapshot": {"status": "SEPARATE_NOT_INCLUDED", "reason": "CURRENT_SNAPSHOT_IS_NOT_BACKFILL_DERIVATIVE"},
         "rollingHistory": {
@@ -588,12 +612,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--universe", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--history-dir")
+    parser.add_argument("--target-date")
     args = parser.parse_args(argv)
     result = build_derivatives(
         args.canonical_dir,
         args.universe,
         args.output_dir,
         history_dir=args.history_dir,
+        target_date=args.target_date,
     )
     print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
     return 0

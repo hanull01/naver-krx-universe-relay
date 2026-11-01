@@ -60,6 +60,20 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_report_contract_projection(self.derived, self.universe)
 
+    def test_projection_accepts_dynamic_target_20261030(self):
+        build_derivatives(
+            self.canonical,
+            self.universe,
+            self.derived,
+            target_date="20261030",
+        )
+        result = build_report_contract_projection(
+            self.derived,
+            self.universe,
+            expected_target_date="20261030",
+        )
+        self.assertEqual(result["contract"]["asOf"], "20261030")
+
 
 if __name__ == "__main__":
     unittest.main()

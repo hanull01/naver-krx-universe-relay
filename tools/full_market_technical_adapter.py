@@ -70,11 +70,16 @@ def _load_rows(
     path: str | Path,
     expected_source: str | None = None,
     provenance_by_code: Mapping[str, Any] | None = None,
+    expected_target_date: str | None = None,
 ) -> dict[str, Any]:
     payload = _read_json(path)
     target = _date(payload.get("targetDate"), "targetDate")
-    if target == "20261030":
-        raise FullMarketTechnicalAdapterError("20261030 is not allowed in staged report input")
+    if expected_target_date is not None:
+        expected = _date(expected_target_date, "expected targetDate")
+        if target != expected:
+            raise FullMarketTechnicalAdapterError(
+                f"staged targetDate mismatch: {target} != {expected}"
+            )
     rows = payload.get("datas")
     if not isinstance(rows, list):
         raise FullMarketTechnicalAdapterError(f"datas must be a list: {path}")
@@ -96,8 +101,10 @@ def _load_rows(
             as_of = None
         else:
             as_of = _date(raw_as_of, f"{code}.asOfDate")
-        if as_of == "20261030":
-            raise FullMarketTechnicalAdapterError(f"{code}: 20261030 row is not allowed")
+        if as_of is not None and as_of > target:
+            raise FullMarketTechnicalAdapterError(
+                f"{code}: asOfDate {as_of} is after targetDate {target}"
+            )
         provenance = row.get("provenance")
         if not isinstance(provenance, Mapping) and isinstance(provenance_by_code, Mapping):
             candidate = provenance_by_code.get(code)
@@ -114,14 +121,24 @@ def load_full_market_staging(
     technicals_path: str | Path,
     states_path: str | Path,
     group_states_path: str | Path,
+    expected_target_date: str | None = None,
 ) -> dict[str, Any]:
     """Load full-market technical/state staging without any production fallback."""
     provenance_path = Path(technicals_path).with_name("provenance.json")
     provenance_payload = _read_json(provenance_path) if provenance_path.exists() else {}
     provenance_by_code = provenance_payload.get("byCode") if isinstance(provenance_payload, Mapping) else None
-    technicals = _load_rows(technicals_path, provenance_by_code=provenance_by_code)
+    technicals = _load_rows(
+        technicals_path,
+        provenance_by_code=provenance_by_code,
+        expected_target_date=expected_target_date,
+    )
     source = str(next(iter(technicals["rows"].values()))["provenance"]["sourceStaging"])
-    states = _load_rows(states_path, expected_source=source, provenance_by_code=provenance_by_code)
+    states = _load_rows(
+        states_path,
+        expected_source=source,
+        provenance_by_code=provenance_by_code,
+        expected_target_date=technicals["targetDate"],
+    )
     groups = _read_json(group_states_path)
     target = technicals["targetDate"]
     if states["targetDate"] != target or _date(groups.get("targetDate"), "group targetDate") != target:
@@ -203,9 +220,15 @@ def build_report_input(
     group_states_path: str | Path,
     universe_path: str | Path,
     current_snapshot: Mapping[str, Any] | None = None,
+    expected_target_date: str | None = None,
 ) -> dict[str, Any]:
     """Build separated report inputs; current snapshot remains an independent source."""
-    full_market = load_full_market_staging(technicals_path, states_path, group_states_path)
+    full_market = load_full_market_staging(
+        technicals_path,
+        states_path,
+        group_states_path,
+        expected_target_date=expected_target_date,
+    )
     registered = project_registered_universe(full_market, universe_path)
     current = dict(current_snapshot) if current_snapshot is not None else {
         "status": "UNAVAILABLE",

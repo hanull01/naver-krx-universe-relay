@@ -18,9 +18,6 @@ from typing import Any, Mapping
 from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
 
 
-FORBIDDEN_DATE = "20261030"
-
-
 class ReportContractProjectionError(ValueError):
     """Raised when the staged artifacts cannot form a safe projection."""
 
@@ -56,6 +53,25 @@ def _artifact(root: Path, name: str) -> dict[str, Any]:
 
 def _percent(count: int, eligible: int) -> float | None:
     return round(count * 100 / eligible, 6) if eligible else None
+
+
+def _normalize_date(value: Any, field: str) -> str:
+    text = str(value or "").replace("-", "")
+    if len(text) != 8 or not text.isdigit():
+        raise ReportContractProjectionError(f"invalid {field}: {value!r}")
+    return text
+
+
+def _validate_rows_not_after(rows: list[Mapping[str, Any]], target: str, label: str) -> None:
+    for row in rows:
+        raw = row.get("asOfDate") or row.get("asOf")
+        if raw in (None, ""):
+            continue
+        as_of = _normalize_date(raw, f"{label}.asOfDate")
+        if as_of > target:
+            raise ReportContractProjectionError(
+                f"{label} contains future data: {as_of} > targetDate {target}"
+            )
 
 
 def _metric_summary(rows: list[Mapping[str, Any]], value: str) -> dict[str, Any]:
@@ -197,6 +213,7 @@ def build_report_contract_projection(
     derived_dir: str | Path,
     universe_path: str | Path,
     output_path: str | Path | None = None,
+    expected_target_date: str | None = None,
 ) -> dict[str, Any]:
     root = Path(derived_dir)
     technicals = _read(root / "technicals.json")
@@ -205,19 +222,31 @@ def build_report_contract_projection(
     groups = _read(root / "group-states.json")
     manifest = _read(root / "manifest.json")
     universe = _read(Path(universe_path))
-    target = str(technicals.get("targetDate") or "")
-    if not target or target == FORBIDDEN_DATE or states.get("targetDate") != target:
+    target = _normalize_date(technicals.get("targetDate"), "technicals.targetDate")
+    if expected_target_date is not None:
+        expected = _normalize_date(expected_target_date, "expected_target_date")
+        if target != expected:
+            raise ReportContractProjectionError(
+                f"staged targetDate {target} does not match expected targetDate {expected}"
+            )
+    if states.get("targetDate") != target:
         raise ReportContractProjectionError("staged target dates are invalid or mixed")
     if quality.get("targetDate") != target or groups.get("targetDate") != target:
         raise ReportContractProjectionError("staged quality/group dates do not match")
+    source_target = (manifest.get("source") or {}).get("targetDate")
+    if source_target is not None and source_target != target:
+        raise ReportContractProjectionError("staged manifest targetDate does not match")
     if technicals.get("fallbackUsed") or states.get("fallbackUsed") or quality.get("fallbackUsed"):
         raise ReportContractProjectionError("fallback data is forbidden")
     technical_rows = technicals.get("datas") or []
     state_rows = states.get("datas") or []
     if len(technical_rows) != len(state_rows) or len(technical_rows) != int(quality.get("totalAssets") or 0):
         raise ReportContractProjectionError("full-market row coverage mismatch")
-    if any(row.get("asOfDate") == FORBIDDEN_DATE for row in technical_rows + state_rows):
-        raise ReportContractProjectionError("20261030 is present in staged rows")
+    _validate_rows_not_after(technical_rows, target, "technicals")
+    _validate_rows_not_after(state_rows, target, "states")
+    rolling_manifest = _read(root / "rolling-history-manifest.json")
+    if rolling_manifest.get("targetDate") != target:
+        raise ReportContractProjectionError("rolling history targetDate does not match")
     provenance = _read(root / "provenance.json")
     if len(provenance.get("byCode") or {}) != len(technical_rows):
         raise ReportContractProjectionError("provenance coverage mismatch")
@@ -304,8 +333,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--derived-dir", required=True)
     parser.add_argument("--universe", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--target-date")
     args = parser.parse_args(argv)
-    result = build_report_contract_projection(args.derived_dir, args.universe, args.output)
+    result = build_report_contract_projection(
+        args.derived_dir,
+        args.universe,
+        args.output,
+        expected_target_date=args.target_date,
+    )
     manifest_path = Path(args.output).with_name("report-contract-manifest.json")
     manifest = {
         "schemaVersion": 1,

@@ -287,6 +287,7 @@ jobs:
           BACKFILL_ROOT: ${{ runner.temp }}/backfill-derived
           DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
           HISTORY_DIR: ${{ runner.temp }}/restored-rolling-history
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
         run: |
           set -euo pipefail
           canonical="$BACKFILL_ROOT/canonical/daily"
@@ -312,11 +313,13 @@ jobs:
             --canonical-dir "$canonical" \
             --universe config/universe.json \
             --output-dir "$DERIVED_ROOT" \
-            --history-dir "$HISTORY_DIR"
+            --history-dir "$HISTORY_DIR" \
+            --target-date "$TARGET_DATE"
           python -m tools.build_report_contract_projection \
             --derived-dir "$DERIVED_ROOT" \
             --universe config/universe.json \
-            --output "$DERIVED_ROOT/report-contract-projection.json"
+            --output "$DERIVED_ROOT/report-contract-projection.json" \
+            --target-date "$TARGET_DATE"
 
       - name: Validate derived output before publication
         id: validate
@@ -324,6 +327,7 @@ jobs:
         shell: bash
         env:
           DERIVED_ROOT: ${{ runner.temp }}/full-market-derived
+          TARGET_DATE: ${{ steps.previous_day.outputs.target_date }}
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -332,6 +336,9 @@ jobs:
           from pathlib import Path
 
           root = Path(os.environ["DERIVED_ROOT"])
+          target = os.environ["TARGET_DATE"].replace("-", "")
+          if len(target) != 8 or not target.isdigit():
+              raise SystemExit("INVALID_TARGET_DATE")
           required = {
               "technicals.json", "states.json", "registered-universe-technicals.json",
               "registered-universe-states.json", "group-states.json", "provenance.json",
@@ -349,20 +356,40 @@ jobs:
           technicals = json.loads((root / "technicals.json").read_text(encoding="utf-8"))
           states = json.loads((root / "states.json").read_text(encoding="utf-8"))
           quality = json.loads((root / "quality.json").read_text(encoding="utf-8"))
+          groups = json.loads((root / "group-states.json").read_text(encoding="utf-8"))
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          projection = json.loads((root / "report-contract-projection.json").read_text(encoding="utf-8"))
+          for name, payload in (("technicals", technicals), ("states", states), ("quality", quality), ("groups", groups)):
+              if payload.get("targetDate") != target:
+                  raise SystemExit(f"{name.upper()}_TARGET_DATE_MISMATCH")
+          if (manifest.get("source") or {}).get("targetDate") != target:
+              raise SystemExit("MANIFEST_TARGET_DATE_MISMATCH")
+          if projection.get("asOf") != target:
+              raise SystemExit("PROJECTION_TARGET_DATE_MISMATCH")
           if technicals.get("fallbackUsed") or states.get("fallbackUsed") or quality.get("fallbackUsed"):
               raise SystemExit("DERIVED_FALLBACK_USED")
-          if any(row.get("asOfDate") == "20261030" for row in technicals.get("datas", []) + states.get("datas", [])):
-              raise SystemExit("20261030_DATA_MIXED_IN")
+          for name, payload in (("technicals", technicals), ("states", states)):
+              for row in payload.get("datas", []):
+                  as_of = str(row.get("asOfDate") or "").replace("-", "")
+                  if as_of and as_of > target:
+                      raise SystemExit(f"{name.upper()}_FUTURE_DATA:{as_of}>{target}")
           if len(technicals.get("datas", [])) != len(states.get("datas", [])):
               raise SystemExit("TECHNICAL_STATE_COVERAGE_MISMATCH")
           rolling_manifest = json.loads((root / "rolling-history-manifest.json").read_text(encoding="utf-8"))
+          if rolling_manifest.get("targetDate") != target:
+              raise SystemExit("ROLLING_HISTORY_TARGET_DATE_MISMATCH")
           if rolling_manifest.get("fallbackUsed"):
               raise SystemExit("ROLLING_HISTORY_FALLBACK_USED")
           if int(rolling_manifest.get("window") or 0) != 120:
               raise SystemExit("ROLLING_HISTORY_WINDOW_INVALID")
           for path in (root / "rolling-history").rglob("*.jsonl"):
-              if "20261030" in path.read_text(encoding="utf-8"):
-                  raise SystemExit("20261030_ROLLING_HISTORY_MIXED_IN")
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  observed = str(row.get("date") or "").replace("-", "")
+                  if observed and observed > target:
+                      raise SystemExit(f"ROLLING_HISTORY_FUTURE_DATA:{observed}>{target}")
           print(f"validated rows={len(technicals.get('datas', []))} projectionBytes={projection.stat().st_size}")
           PY
 

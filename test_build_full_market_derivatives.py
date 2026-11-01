@@ -126,13 +126,41 @@ class BuildFullMarketDerivativesTests(unittest.TestCase):
         with self.assertRaises(FullMarketDerivativeError):
             build_derivatives(self.canonical, self.universe, self.output)
 
-    def test_forbidden_20261030_row_fails(self):
+    def test_row_after_dynamic_target_fails(self):
         path = self._write_rows(count=1)
         row = json.loads(path.read_text().splitlines()[0])
         row["date"] = "20261030"
         path.write_text(json.dumps(row) + "\n", encoding="utf-8")
         with self.assertRaises(FullMarketDerivativeError):
-            build_derivatives(self.canonical, self.universe, self.output)
+            build_derivatives(self.canonical, self.universe, self.output, target_date="20261029")
+
+    def test_dynamic_target_20261030_is_allowed(self):
+        path = self._write_rows(count=1)
+        row = json.loads(path.read_text().splitlines()[0])
+        row["date"] = "20261030"
+        path.write_text(json.dumps(row) + "\n", encoding="utf-8")
+        result = build_derivatives(
+            self.canonical, self.universe, self.output, target_date="20261030"
+        )
+        technicals = json.loads((self.output / "technicals.json").read_text())
+        self.assertEqual(result["targetDate"], "20261030")
+        self.assertEqual(technicals["targetDate"], "20261030")
+        self.assertEqual(technicals["datas"][0]["asOfDate"], "20261030")
+        self.assertEqual(technicals["date20261030Rows"], 1)
+
+    def test_restored_history_after_target_fails(self):
+        history = self._write_history_rows(count=1)
+        row = json.loads(history.read_text().splitlines()[0])
+        row["date"] = "20261030"
+        history.write_text(json.dumps(row) + "\n", encoding="utf-8")
+        with self.assertRaises(FullMarketDerivativeError):
+            build_derivatives(
+                self.canonical,
+                self.universe,
+                self.output,
+                history_dir=history.parent.parent,
+                target_date="20261029",
+            )
 
     def test_restored_history_and_new_bar_keep_rolling_window_and_enable_ma60(self):
         history = self._write_history_rows()
