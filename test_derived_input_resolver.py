@@ -47,7 +47,7 @@ class DerivedInputResolverTests(unittest.TestCase):
             }},
         }
         manifest = {
-            "targetDate": "20261030", "generatedAt": generated,
+            "generatedAt": generated,
             "source": {"targetDate": "20261030"},
         }
         projection = {"asOf": "20261030", "observedAt": generated, "provenance": {"fallbackUsed": False}}
@@ -98,6 +98,30 @@ class DerivedInputResolverTests(unittest.TestCase):
             "path": "41355451393/manifest.json",
         }), encoding="utf-8")
         with self.assertRaisesRegex(DerivedInputError, "DERIVED_POINTER_RUN_DIRECTORY_MISMATCH"):
+            resolve_derived_input(self.root, "20261030")
+
+    def test_manifest_source_date_is_required(self):
+        manifest = self.run / "manifest.json"
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+        payload["source"].pop("targetDate")
+        manifest.write_text(json.dumps(payload), encoding="utf-8")
+        with self.assertRaisesRegex(DerivedInputError, "DERIVED_MANIFEST_SOURCE_DATE_MISSING"):
+            resolve_derived_input(self.root, "20261030")
+
+    def test_manifest_source_date_mismatch_is_rejected(self):
+        manifest = self.run / "manifest.json"
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+        payload["source"]["targetDate"] = "20261029"
+        manifest.write_text(json.dumps(payload), encoding="utf-8")
+        with self.assertRaisesRegex(DerivedInputError, "DERIVED_TARGET_DATE_MISMATCH:manifest.json"):
+            resolve_derived_input(self.root, "20261030")
+
+    def test_manifest_run_id_mismatch_is_rejected(self):
+        manifest = self.run / "manifest.json"
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+        payload["runId"] = "different-run"
+        manifest.write_text(json.dumps(payload), encoding="utf-8")
+        with self.assertRaisesRegex(DerivedInputError, "DERIVED_MANIFEST_RUN_ID_MISMATCH"):
             resolve_derived_input(self.root, "20261030")
 
     def test_missing_artifact_and_fallback_are_rejected(self):

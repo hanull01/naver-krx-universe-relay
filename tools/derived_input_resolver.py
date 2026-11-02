@@ -63,7 +63,15 @@ def _has_fallback(value: Any) -> bool:
 
 
 def _target(payload: Mapping[str, Any], name: str) -> str | None:
-    value = payload.get("asOf") if name == "report-contract-projection.json" else payload.get("targetDate")
+    if name == "report-contract-projection.json":
+        value = payload.get("asOf")
+    elif name == "manifest.json":
+        source = payload.get("source")
+        if not isinstance(source, Mapping) or source.get("targetDate") in (None, ""):
+            raise DerivedInputError("DERIVED_MANIFEST_SOURCE_DATE_MISSING")
+        value = source.get("targetDate")
+    else:
+        value = payload.get("targetDate")
     return compact_date(value, f"{name}.targetDate") if value not in (None, "") else None
 
 
@@ -94,6 +102,9 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
     source = manifest.get("source")
     if not isinstance(source, Mapping) or compact_date(source.get("targetDate"), "manifest.source.targetDate") != target:
         raise DerivedInputError("DERIVED_MANIFEST_SOURCE_DATE_MISMATCH")
+    manifest_run_id = manifest.get("runId")
+    if manifest_run_id not in (None, "") and str(manifest_run_id) != run_id:
+        raise DerivedInputError(f"DERIVED_MANIFEST_RUN_ID_MISMATCH:{manifest_run_id}!={run_id}")
 
     generated_values = {
         str(payload.get("generatedAt"))
