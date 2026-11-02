@@ -89,20 +89,24 @@ class MarketDashboardRendererTests(unittest.TestCase):
         market = model["fullMarket"]
         self.assertEqual(market["advancers"] + market["decliners"] + market["unchanged"], market["total"])
 
-    def test_html_and_markdown_share_traces_values_and_three_parts(self):
+    def test_html_and_markdown_share_compact_user_values_and_three_parts(self):
         report = report_fixture()
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "2026-10-29T12:10:00+09:00", "79.69%", "SK하이닉스", "000660", "삼성전자", "005930", "STRENGTHENING", "persistenceDays", "중앙 등락률", "거래대금", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT", "삼성E&A", "028050", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29", "2026-10-29 12:10 KST", "79.69%", "SK하이닉스", "000660", "삼성전자", "005930", "삼성E&A", "028050", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
-        self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_text)
+        for internal in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
+            self.assertNotIn(internal, html_text)
+            self.assertNotIn(internal, markdown)
+        self.assertNotIn("2026-10-29T12:10:00+09:00", html_text)
         self.assertNotIn("과거 예시 데이터", html_text)
+        self.assertLess(html_text.count('class="status-chip"'), 30)
         self.assertEqual(["part1", "part2", "part3"], re.findall(r'<section[^>]+id="(part\d)"', html))
         self.assertIn("## 1. 시장 대시보드", markdown)
-        self.assertIn("## 2. 업종·테마·주도주·리서치", markdown)
-        self.assertIn("## 3. 키움 후보 추적·조건별 대응", markdown)
+        self.assertIn("## 2. 주도 업종·테마", markdown)
+        self.assertIn("## 3. 관심종목·키움 후보", markdown)
         self.assertIn("장후 관측", html_text)
         self.assertNotIn("정규장 장중 관측", html_text)
         self.assertNotIn("2,205/2,767 산술 검증", html_text)
@@ -112,22 +116,28 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         markdown = render_dashboard_markdown(report)
         rendered = render_dashboard_html(report)
-        broken = rendered.replace("SK하이닉스", "")
+        broken = rendered.replace("005930", "")
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
-        self.assertTrue(any(issue == "HTML_MISSING:v2Industry.leader.name" for issue in issues), issues)
+        self.assertTrue(any(issue.startswith("PART3_INTEREST_MISSING:005930") for issue in issues), issues)
 
     def test_saved_output_validation_requires_values_in_their_own_section(self):
         report = report_fixture()
+        report["reportContract"]["relativeStrengthTop5"] = {
+            "status": "AVAILABLE",
+            "tradingDate": "20261029",
+            "industries": {"top5": [{"rank": 1, "name": "반도체 TOP", "relativeStrength": 4.2, "breadthPct": 80.0, "memberCount": 3}]},
+            "themes": {"top5": []},
+        }
         markdown = render_dashboard_markdown(report)
         rendered = render_dashboard_html(report)
         broken = re.sub(
             r'(<section[^>]+id="part2"[^>]*>[\s\S]*?</section>)',
-            lambda match: match.group(1).replace("반도체와반도체장비", ""),
+            lambda match: match.group(1).replace("반도체 TOP", ""),
             rendered,
             count=1,
         )
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
-        self.assertIn("HTML_v2Industry.name_MISSING_IN_SECTION", issues)
+        self.assertTrue(any(issue.startswith("PART2_TOP5_MISSING:반도체 TOP") for issue in issues), issues)
 
     def test_v2_rows_beyond_visible_card_limit_do_not_block_html(self):
         report = report_fixture()
@@ -147,7 +157,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         self.assertNotIn("표시범위 밖 테마 5", html_lib.unescape(html))
-        self.assertIn("표시범위 밖 테마 5", markdown)
+        self.assertNotIn("표시범위 밖 테마 5", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_unavailable_v2_theme_is_rendered_without_blocking_html(self):
@@ -155,8 +165,9 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["v2"]["themes"] = []
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
-        self.assertIn("확인된 V2 결과가 없습니다.", html_lib.unescape(html))
-        self.assertIn("V2 테마: 0개", markdown)
+        self.assertIn("V2", html_lib.unescape(html))
+        self.assertNotIn("S7", html_lib.unescape(html))
+        self.assertNotIn("S7", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
@@ -223,7 +234,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         model = build_dashboard_model(report)
         self.assertEqual(model["fullMarket"]["declineRatio"], 66.25)
         html = render_dashboard_html(report)
-        self.assertIn("1,833 / 전체 2,767", html_lib.unescape(html))
+        self.assertIn("1,833", html_lib.unescape(html))
         self.assertNotIn("2,205/2,767", html_lib.unescape(html))
 
     def test_bad_1813_sample_is_recomputed_and_not_reused_as_a_fixed_ratio(self):
@@ -237,7 +248,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
 
     def test_html_classes_are_from_approved_structure(self):
         html = render_dashboard_html(report_fixture())
-        required = ("wrap", "topbar", "nav", "hero", "section", "card", "index-card", "kpis", "breadth", "industry-cards", "stock-list", "decision-grid")
+        required = ("wrap", "topbar", "nav", "hero", "section", "card", "index-card", "kpis", "breadth", "industry-cards", "stock-list", "status-chip")
         for class_name in required:
             self.assertRegex(html, rf'class="[^"]*\b{class_name}\b[^"]*"')
             self.assertIn(f".{class_name}", load_approved_template()["css"])
@@ -257,6 +268,28 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["rendering"]["htmlAllowed"] = False
         with self.assertRaisesRegex(TemplateUnavailable, "CONTRACT_HTML_NOT_ALLOWED"):
             render_dashboard_html(report)
+
+    def test_unverified_v2_suppresses_official_score_and_leader(self):
+        report = report_fixture()
+        report["reportContract"]["v2"]["sourceCommit"] = None
+        report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("V2 판정 보류 — 원천 검증 대기", html)
+        self.assertIn("V2 판정 보류 — 원천 검증 대기", markdown)
+        self.assertNotIn("91.20", html)
+        self.assertNotIn("SK하이닉스(000660)", html)
+        self.assertNotIn("sourceCommitStatus", html)
+
+    def test_unavailable_index_does_not_render_numeric_values(self):
+        report = report_fixture()
+        report["reportContract"]["indices"][0]["status"] = "UNAVAILABLE"
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("KOSPI", html)
+        self.assertIn("확인 불가", html)
+        self.assertNotIn("3,000.12", html)
+        self.assertNotIn("3,000.12", markdown)
 
 
 if __name__ == "__main__":
