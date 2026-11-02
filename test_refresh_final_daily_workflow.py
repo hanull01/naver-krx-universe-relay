@@ -191,11 +191,23 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         for condition in (
             '"$contract_publish_eligible" = "true"',
             'steps.html_report.outputs.status }}" = "SUCCESS"',
-            'report-html/${{ steps.html_report.outputs.as_of }}.html',
+            'html_source="${{ steps.html_report.outputs.source_path }}"',
+            'html_target="$GITHUB_WORKSPACE/data/reports/${{ steps.html_report.outputs.as_of }}.html"',
+            'published_html_sha256=$(sha256sum "$html_target"',
+            '"$published_html_sha256" = "${{ steps.html_report.outputs.sha256 }}"',
             'git add --',
             'data/reports/latest.html',
         ):
             self.assertIn(condition, html_publish)
+
+    def test_html_generation_and_publication_share_resolved_paths_and_hash(self):
+        html_start = self.text.index("      - name: Build and validate GitHub HTML report")
+        publish_start = self.text.index("      - name: Commit refreshed production data")
+        html_step = self.text[html_start:publish_start]
+        self.assertIn('html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"', html_step)
+        self.assertIn('echo "source_path=$html_path" >> "$GITHUB_OUTPUT"', html_step)
+        self.assertIn('echo "latest_source_path=$latest_html_path" >> "$GITHUB_OUTPUT"', html_step)
+        self.assertNotIn("result.get('datedHtml')", html_step)
 
     def test_ready_email_carries_html_publication_provenance(self):
         mail_start = self.text.index("      - name: Send MARKET_DATA_READY signal")
