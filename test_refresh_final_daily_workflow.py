@@ -178,6 +178,7 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         html_step = self.text[html_start:publish_at]
         self.assertIn("id: html_report", html_step)
         self.assertIn("tools/render_report_from_contract.py", html_step)
+        self.assertIn("--current-observation", html_step)
         self.assertIn("data/monitoring/latest-report-contract.json", html_step)
         self.assertIn("continue-on-error: true", html_step)
         self.assertIn("status=SUCCESS", html_step)

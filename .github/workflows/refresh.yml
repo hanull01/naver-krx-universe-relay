@@ -562,6 +562,7 @@ jobs:
           python3 tools/render_report_from_contract.py \
             --input data/monitoring/latest-report-contract.json \
             --output-dir "$HTML_OUTPUT_DIR" \
+            --current-observation \
             > "$RUNNER_TEMP/html-report-result.json"
           code=$?
           if [ "$code" -ne 0 ]; then

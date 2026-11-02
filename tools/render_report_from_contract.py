@@ -28,6 +28,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--output-dir", default="data/reports")
     parser.add_argument("--template-dir", default=str(TEMPLATE_DIR))
+    parser.add_argument(
+        "--current-observation",
+        action="store_true",
+        help="allow a validated PARTIAL current-observation contract to render",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -36,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
             payload,
             Path(args.output_dir),
             template_dir=Path(args.template_dir),
+            allow_current_observation=args.current_observation,
         )
     except (OSError, UnicodeError, json.JSONDecodeError, TemplateUnavailable) as exc:
         print(json.dumps({"htmlStatus": "TEMPLATE_UNAVAILABLE", "error": str(exc)}, ensure_ascii=False))
