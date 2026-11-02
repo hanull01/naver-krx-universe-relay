@@ -48,6 +48,20 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
                 render_contract_views(contract, Path(directory))
             self.assertEqual(list(Path(directory).iterdir()), [])
 
+    def test_current_observation_mode_allows_validated_partial_contract(self):
+        contract = report_fixture()["reportContract"]
+        contract["status"] = "PARTIAL"
+        contract["rendering"] = {
+            "htmlAllowed": False,
+            "reason": "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            result = render_contract_views(
+                contract, Path(directory), allow_current_observation=True
+            )
+            self.assertEqual(result["htmlStatus"], "AVAILABLE")
+            self.assertTrue(Path(result["datedHtml"]).exists())
+
 
 if __name__ == "__main__":
     unittest.main()

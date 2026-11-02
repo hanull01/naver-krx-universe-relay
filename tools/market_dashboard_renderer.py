@@ -900,6 +900,7 @@ def render_contract_views(
     output_dir: Path,
     *,
     template_dir: Path = TEMPLATE_DIR,
+    allow_current_observation: bool = False,
 ) -> dict[str, Any]:
     """Render and validate both views from one published report contract.
 
@@ -911,9 +912,19 @@ def render_contract_views(
     if not isinstance(contract, Mapping):
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:JSON_OBJECT_REQUIRED")
 
-    model = build_dashboard_model(contract)
-    markdown_text = render_dashboard_markdown(contract, template_dir=template_dir)
-    html_text = render_dashboard_html(contract, template_dir=template_dir)
+    model = build_dashboard_model(
+        contract, allow_current_observation=allow_current_observation
+    )
+    markdown_text = render_dashboard_markdown(
+        contract,
+        template_dir=template_dir,
+        allow_current_observation=allow_current_observation,
+    )
+    html_text = render_dashboard_html(
+        contract,
+        template_dir=template_dir,
+        allow_current_observation=allow_current_observation,
+    )
     issues = validate_rendered_outputs(markdown_text, html_text, model)
     if issues:
         raise TemplateUnavailable(
