@@ -6,6 +6,7 @@ from pathlib import Path
 from tools.derived_input_resolver import (
     DerivedInputError,
     RollingHistoryDailyLoader,
+    filesystem_date,
     resolve_derived_input,
 )
 
@@ -14,7 +15,8 @@ class DerivedInputResolverTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name) / "data" / "monitoring-derived"
-        self.run = self.root / "20261030" / "41355451393"
+        self.date_dir = self.root / "2026-10-30"
+        self.run = self.date_dir / "41355451393"
         (self.run / "rolling-history" / "STOCK").mkdir(parents=True)
         generated = "2026-11-02T07:01:00+09:00"
         provenance = {
@@ -61,7 +63,7 @@ class DerivedInputResolverTests(unittest.TestCase):
                         "high": 71000, "open": 69000, "low": 68000, "volume": 1000}) + "\n",
             encoding="utf-8",
         )
-        (self.root / "20261030" / "latest.json").write_text(json.dumps({
+        (self.date_dir / "latest.json").write_text(json.dumps({
             "targetDate": "20261030", "runId": "41355451393",
             "path": "41355451393/manifest.json",
         }), encoding="utf-8")
@@ -74,6 +76,29 @@ class DerivedInputResolverTests(unittest.TestCase):
         self.assertEqual(result["runId"], "41355451393")
         self.assertEqual(result["targetDate"], "20261030")
         self.assertEqual(result["runDir"], self.run.resolve())
+
+    def test_compact_and_dashed_target_dates_select_same_pointer(self):
+        self.assertEqual(filesystem_date("20261030"), "2026-10-30")
+        self.assertEqual(filesystem_date("2026-10-30"), "2026-10-30")
+        compact = resolve_derived_input(self.root, "20261030")
+        dashed = resolve_derived_input(self.root, "2026-10-30")
+        self.assertEqual(compact["pointerPath"], dashed["pointerPath"])
+        self.assertEqual(compact["runId"], dashed["runId"])
+
+    def test_invalid_date_and_missing_pointer_fail(self):
+        with self.assertRaisesRegex(DerivedInputError, "INVALID_TARGETDATE"):
+            resolve_derived_input(self.root, "2026/10/30")
+        with self.assertRaisesRegex(DerivedInputError, "DERIVED_JSON_READ_FAILED"):
+            resolve_derived_input(self.root, "20261029")
+
+    def test_pointer_run_id_mismatch_is_rejected(self):
+        pointer = self.date_dir / "latest.json"
+        pointer.write_text(json.dumps({
+            "targetDate": "20261030", "runId": "wrong-run",
+            "path": "41355451393/manifest.json",
+        }), encoding="utf-8")
+        with self.assertRaisesRegex(DerivedInputError, "DERIVED_POINTER_RUN_DIRECTORY_MISMATCH"):
+            resolve_derived_input(self.root, "20261030")
 
     def test_missing_artifact_and_fallback_are_rejected(self):
         (self.run / "states.json").unlink()

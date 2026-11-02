@@ -36,6 +36,12 @@ def compact_date(value: Any, field: str = "targetDate") -> str:
     return text
 
 
+def filesystem_date(value: Any, field: str = "targetDate") -> str:
+    """Return the canonical dashed date used by derived filesystem paths."""
+    text = compact_date(value, field)
+    return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -122,7 +128,7 @@ def resolve_derived_input(root: str | Path, target_date: str) -> dict[str, Any]:
     """Resolve and validate ``data/monitoring-derived/<date>/latest.json``."""
     base = Path(root)
     target = compact_date(target_date)
-    pointer_path = base / target / "latest.json"
+    pointer_path = base / filesystem_date(target) / "latest.json"
     pointer = _read_json(pointer_path)
     if compact_date(pointer.get("targetDate"), "pointer.targetDate") != target:
         raise DerivedInputError("DERIVED_POINTER_TARGET_DATE_MISMATCH")
