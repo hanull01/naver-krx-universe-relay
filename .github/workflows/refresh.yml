@@ -870,9 +870,36 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Fail when current observation report is unavailable
+        if: >-
+          steps.market_day.outputs.run == 'true' &&
+          steps.full_market.outputs.exit_code == '0' &&
+          steps.full_market.outputs.ready == 'true' &&
+          steps.publish.outputs.publication_changed == 'true' &&
+          (
+            steps.report_contract.outputs.status != 'SUCCESS' ||
+            steps.observation_report.outputs.status != 'SUCCESS' ||
+            steps.html_report.outputs.status != 'SUCCESS' ||
+            steps.publish.outputs.html_published != 'true'
+          )
+        run: |
+          echo "::error::Current observation Markdown/HTML was not generated and validated; MARKET_DATA_READY is blocked."
+          exit 1
+
       - name: Send MARKET_DATA_READY signal
         id: ready_email
-        if: github.ref == 'refs/heads/main' && steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.publish.outputs.publication_changed == 'true' && (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
+        if: >-
+          github.ref == 'refs/heads/main' &&
+          steps.market_day.outputs.run == 'true' &&
+          steps.collect.outputs.exit_code == '0' &&
+          steps.full_market.outputs.exit_code == '0' &&
+          steps.full_market.outputs.ready == 'true' &&
+          steps.report_contract.outputs.status == 'SUCCESS' &&
+          steps.observation_report.outputs.status == 'SUCCESS' &&
+          steps.html_report.outputs.status == 'SUCCESS' &&
+          steps.publish.outputs.publication_changed == 'true' &&
+          steps.publish.outputs.html_published == 'true' &&
+          (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
         continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}

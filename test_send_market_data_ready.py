@@ -110,7 +110,7 @@ class ReadyMailTests(unittest.TestCase):
     def test_smtp_timeout_is_safe(self):
         self.assert_smtp_failure(socket.timeout('secret'), 'Gmail SMTP timeout')
     def test_workflow_sends_only_after_successful_publish(self):
-        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+900]); self.assertIn("steps.full_market.outputs.exit_code == '0'", workflow[mail:mail+900]); self.assertIn("FULL_MARKET_REQUIRED: 'true'", workflow[mail:mail+1400])
+        workflow=(Path(__file__).parent/'.github/workflows/refresh.yml').read_text(encoding='utf-8'); publish=workflow.index('id: publish'); mail=workflow.index('id: ready_email'); self.assertLess(publish,mail); self.assertIn("steps.publish.outputs.published == 'true'",workflow[mail:mail+900]); self.assertIn("steps.full_market.outputs.exit_code == '0'", workflow[mail:mail+900]); self.assertIn("FULL_MARKET_REQUIRED: 'true'", workflow[mail:])
 
     def test_full_market_publication_requires_success_and_authoritative_coverage(self):
         with tempfile.TemporaryDirectory() as directory:
