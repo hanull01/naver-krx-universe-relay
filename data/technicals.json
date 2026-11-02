@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T20:32:06.652264+09:00",
+  "generatedAt": "2026-11-03T08:01:50.435808+09:00",
   "expectedCount": 1,
   "count": 1,
   "missingCodes": [],
@@ -8,32 +8,20 @@
     {
       "itemCode": "005930",
       "stockName": "삼성전자",
-      "asOf": "2026-10-30",
+      "asOf": "2026-11-02",
       "historyCount": 120,
-      "ma5": 226900.0,
-      "ma20": 235900.0,
-      "ma60": 251266.67,
+      "ma5": 230200.0,
+      "ma20": 233675.0,
+      "ma60": 251108.33,
       "high20": 279500.0,
       "high60": 288000.0,
       "high52w": 374500.0,
       "high52wComplete": false,
-      "avgVolume20": 18077962.4,
-      "volumeRatio20": 0.8,
+      "avgVolume20": 18120747.1,
+      "volumeRatio20": null,
       "status": "ok",
       "confirmedStatus": "ok",
-      "provisional": {
-        "status": "provisional",
-        "basis": "VERIFIED_HISTORY_PLUS_NAVER_CURRENT_PRICE",
-        "sourceTime": "2026-11-02T20:00:00+09:00",
-        "session": "CLOSED",
-        "asOf": "2026-11-02T20:00:00+09:00",
-        "ma5": 230200.0,
-        "ma20": 233675.0,
-        "ma60": 251108.33,
-        "price": 230000,
-        "confirmed": false,
-        "note": "current price is not a completed regular-session OHLCV bar"
-      }
+      "provisional": null
     }
   ]
 }
