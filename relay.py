@@ -1568,10 +1568,10 @@ def build_group_states(quote_payload, technical_payload, state_payload):
     payload={'generatedAt':now().isoformat(),'groupCount':len(groups),'status':'ok','groups':groups}; save('data/group-states.json',payload); fields=('groupType','groupName','enabledMembers','upRatio','aboveMA20CountRatio','aboveMA60CountRatio','breakout20AttemptCount','breakout20ConfirmedCount','volumeSurgeCount','leaderUpCount','averageChangePct','diffusionState','status','current','regularSession'); save('data/group-states-lite.json',{**{k:payload[k] for k in ('generatedAt','groupCount','status')},'groups':[{k:g[k] for k in fields} for g in groups]},compact=True); return payload
 
 
-def timed_step(name, fn, *args):
+def timed_step(name, fn, *args, **kwargs):
     """Emit small operational timing logs without changing output schemas."""
     started = time.perf_counter()
-    result = fn(*args)
+    result = fn(*args, **kwargs)
     print(f'{name} elapsedSeconds={time.perf_counter() - started:.2f}')
     return result
 
