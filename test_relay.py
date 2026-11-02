@@ -3,7 +3,7 @@ import json
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import relay
 import universe_cli
 
@@ -335,6 +335,14 @@ class RelayTests(unittest.TestCase):
         build_technicals.assert_called_once_with(quotes)
         build_states.assert_called_once_with(quotes, technicals)
         build_group_states.assert_called_once_with(quotes, technicals, states)
+
+    def test_timed_step_forwards_keyword_arguments_to_pipeline_step(self):
+        step = Mock(return_value={'status': 'ok'})
+
+        result = relay.timed_step('technical-input', step, 'quotes', daily_loader='loader')
+
+        self.assertEqual(result, {'status': 'ok'})
+        step.assert_called_once_with('quotes', daily_loader='loader')
 
     def test_daily_and_all_modes_keep_their_existing_pipeline_contracts(self):
         daily_rows = [{'itemCode': '000001', 'status': 'ok', 'completedCount': 60}]
