@@ -570,13 +570,6 @@ jobs:
             echo "::warning::Contract was published-ready, but the validated HTML view was not generated. Market data publication remains independent."
             exit 0
           fi
-          html_path=$(python3 - <<'PY'
-          import json
-          from pathlib import Path
-          result=json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'html-report-result.json').read_text(encoding='utf-8'))
-          print(result.get('datedHtml') or '')
-          PY
-          )
           html_as_of=$(python3 - <<'PY'
           import json
           from pathlib import Path
@@ -584,7 +577,9 @@ jobs:
           print(result.get('asOf') or '')
           PY
           )
-          if [ -z "$html_as_of" ] || [ ! -f "$html_path" ] || [ ! -f "$HTML_OUTPUT_DIR/latest.html" ]; then
+          html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"
+          latest_html_path="$HTML_OUTPUT_DIR/latest.html"
+          if [ -z "$html_as_of" ] || [ ! -f "$html_path" ] || [ ! -f "$latest_html_path" ]; then
             echo "status=FAILED" >> "$GITHUB_OUTPUT"
             echo "exit_code=2" >> "$GITHUB_OUTPUT"
             echo "::warning::Validated HTML output path is missing. Market data publication remains independent."
@@ -597,6 +592,8 @@ jobs:
           echo "as_of=$html_as_of" >> "$GITHUB_OUTPUT"
           echo "sha256=$html_sha256" >> "$GITHUB_OUTPUT"
           echo "bytes=$html_bytes" >> "$GITHUB_OUTPUT"
+          echo "source_path=$html_path" >> "$GITHUB_OUTPUT"
+          echo "latest_source_path=$latest_html_path" >> "$GITHUB_OUTPUT"
           echo "path=data/reports/$html_as_of.html" >> "$GITHUB_OUTPUT"
           echo "HTML validation succeeded: path=data/reports/$html_as_of.html sha256=$html_sha256 bytes=$html_bytes"
 
@@ -754,23 +751,36 @@ jobs:
           fi
 
           html_publish_eligible=false
+          published_html_sha256=""
+          html_source="${{ steps.html_report.outputs.source_path }}"
+          latest_html_source="${{ steps.html_report.outputs.latest_source_path }}"
+          html_target="$GITHUB_WORKSPACE/data/reports/${{ steps.html_report.outputs.as_of }}.html"
+          latest_html_target="$GITHUB_WORKSPACE/data/reports/latest.html"
           if [ "$contract_publish_eligible" = "true" ] \
             && [ "${{ steps.html_report.outputs.status }}" = "SUCCESS" ] \
-            && [ -f "${RUNNER_TEMP}/report-html/${{ steps.html_report.outputs.as_of }}.html" ] \
-            && [ -f "$RUNNER_TEMP/report-html/latest.html" ]; then
+            && [ -f "$html_source" ] \
+            && [ -f "$latest_html_source" ]; then
             mkdir -p data/reports
-            cp -- "$RUNNER_TEMP/report-html/${{ steps.html_report.outputs.as_of }}.html" \
-              "data/reports/${{ steps.html_report.outputs.as_of }}.html"
-            cp -- "$RUNNER_TEMP/report-html/latest.html" data/reports/latest.html
-            git add -- \
-              "data/reports/${{ steps.html_report.outputs.as_of }}.html" \
-              data/reports/latest.html
-            html_publish_eligible=true
+            cp -- "$html_source" "$html_target"
+            cp -- "$latest_html_source" "$latest_html_target"
+            published_html_sha256=$(sha256sum "$html_target" | awk '{print $1}')
+            latest_html_sha256=$(sha256sum "$latest_html_target" | awk '{print $1}')
+            if [ -s "$html_target" ] \
+              && [ -s "$latest_html_target" ] \
+              && [ "$published_html_sha256" = "${{ steps.html_report.outputs.sha256 }}" ] \
+              && [ "$latest_html_sha256" = "$published_html_sha256" ]; then
+              git add -- \
+                "data/reports/${{ steps.html_report.outputs.as_of }}.html" \
+                data/reports/latest.html
+              html_publish_eligible=true
+            else
+              echo "::error::Published HTML path or SHA-256 does not match the generated HTML."
+            fi
           else
             echo "Validated HTML is unavailable or the contract is not publishable; no HTML view will be added."
           fi
           echo "html_published=$html_publish_eligible" >> "$GITHUB_OUTPUT"
-          echo "html_sha256=${{ steps.html_report.outputs.sha256 }}" >> "$GITHUB_OUTPUT"
+          echo "html_sha256=$published_html_sha256" >> "$GITHUB_OUTPUT"
           echo "html_bytes=${{ steps.html_report.outputs.bytes }}" >> "$GITHUB_OUTPUT"
           echo "html_path=${{ steps.html_report.outputs.path }}" >> "$GITHUB_OUTPUT"
 
