@@ -85,13 +85,19 @@ jobs:
           from daily_report import resolve_report_trading_date
           from tools.derived_input_resolver import resolve_derived_input
 
-          result = resolve_report_trading_date(
-              requested_date=os.environ.get("REPORT_AS_OF") or None
-          )
-          if result.get("status") != "READY":
-              raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
-          as_of = result["tradingDate"]
-          derived = resolve_derived_input("data/monitoring-derived", as_of)
+          requested = os.environ.get("REPORT_AS_OF") or None
+          if requested:
+              from daily_report import compact_date
+              as_of = compact_date(requested)
+              derived = resolve_derived_input("data/monitoring-derived", as_of)
+              print(f"Resolved explicit derived report date: {as_of}")
+          else:
+              result = resolve_report_trading_date()
+              if result.get("status") != "READY":
+                  raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
+              as_of = result["tradingDate"]
+              derived = resolve_derived_input("data/monitoring-derived", as_of)
+              print(f"Resolved evidence report date: {as_of}")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"as_of={as_of}\n")
               output.write(f"derived_dir={derived['runDir']}\n")
