@@ -222,6 +222,26 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         mail = self.text[self.text.index("id: ready_email"):]
         self.assertIn("steps.publish.outputs.publication_changed == 'true'", mail[:1200])
 
+    def test_ready_signal_requires_same_generation_markdown_and_html(self):
+        mail = self.text[self.text.index("id: ready_email"):]
+        for condition in (
+            "steps.report_contract.outputs.status == 'SUCCESS'",
+            "steps.observation_report.outputs.status == 'SUCCESS'",
+            "steps.html_report.outputs.status == 'SUCCESS'",
+            "steps.publish.outputs.html_published == 'true'",
+        ):
+            self.assertIn(condition, mail[:1800])
+
+    def test_report_delivery_failure_blocks_ready_signal_and_fails_workflow(self):
+        start = self.text.index("      - name: Fail when current observation report is unavailable")
+        end = self.text.index("      - name: Send MARKET_DATA_READY signal", start)
+        gate = self.text[start:end]
+        self.assertIn("steps.observation_report.outputs.status != 'SUCCESS'", gate)
+        self.assertIn("steps.html_report.outputs.status != 'SUCCESS'", gate)
+        self.assertIn("steps.publish.outputs.html_published != 'true'", gate)
+        self.assertIn("MARKET_DATA_READY is blocked", gate)
+        self.assertIn("exit 1", gate)
+
     def test_full_market_entrypoint_opts_into_source_observed_only_with_explicit_date(self):
         calls = self.text.count("--allow-source-observed-final")
         self.assertEqual(calls, 2)

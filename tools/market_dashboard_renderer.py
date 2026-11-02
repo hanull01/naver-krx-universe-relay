@@ -824,8 +824,12 @@ def validate_rendered_outputs(
                     require(field, value)
                     require_in_section(field, value, md_part2, html_part2)
 
+    # The approved A v1.1 card layout intentionally renders at most six V2
+    # rows per category.  Validate the fields that are actually present in
+    # the saved HTML section; requiring hidden rows made valid reports fail
+    # with TEMPLATE_UNAVAILABLE when a seventh theme had a score/leader.
     for label, rows in (("v2Industry", model["v2Industries"]), ("v2Theme", model["v2Themes"])):
-        for row in rows:
+        for row in rows[:6]:
             row_values: list[tuple[str, Any]] = [
                 (f"{label}.name", row.get("name") or row.get("id")),
                 (f"{label}.status", row.get("v2Status") or row.get("status")),

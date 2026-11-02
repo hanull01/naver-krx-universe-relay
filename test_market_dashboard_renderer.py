@@ -129,6 +129,36 @@ class MarketDashboardRendererTests(unittest.TestCase):
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
         self.assertIn("HTML_v2Industry.name_MISSING_IN_SECTION", issues)
 
+    def test_v2_rows_beyond_visible_card_limit_do_not_block_html(self):
+        report = report_fixture()
+        hidden = {
+            "id": "hidden-theme",
+            "name": "표시범위 밖 테마",
+            "v1Status": "WATCH",
+            "v2Status": "WATCH",
+            "score": 77.7,
+            "leaderCandidates": [{"code": "999999", "name": "표시범위 밖 주도주"}],
+            "persistenceDays": 2,
+            "historySummary": {"changeClass": "PERSISTING"},
+        }
+        report["reportContract"]["v2"]["themes"] = [
+            report["reportContract"]["v2"]["themes"][0]
+        ] + [dict(hidden, id=f"hidden-theme-{index}", name=f"표시범위 밖 테마 {index}") for index in range(6)]
+        html = render_dashboard_html(report)
+        markdown = render_dashboard_markdown(report)
+        self.assertNotIn("표시범위 밖 테마 5", html_lib.unescape(html))
+        self.assertIn("표시범위 밖 테마 5", markdown)
+        self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
+
+    def test_unavailable_v2_theme_is_rendered_without_blocking_html(self):
+        report = report_fixture()
+        report["reportContract"]["v2"]["themes"] = []
+        html = render_dashboard_html(report)
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("확인된 V2 결과가 없습니다.", html_lib.unescape(html))
+        self.assertIn("V2 테마: 0개", markdown)
+        self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
+
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
         report = report_fixture()
         model = build_dashboard_model(report)

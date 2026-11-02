@@ -128,7 +128,7 @@ class SafePublisherTests(unittest.TestCase):
         self.assertIn("steps.collect.outputs.exit_code == '0'", mail[:600])
         self.assertIn("steps.full_market.outputs.exit_code == '0'", mail[:800])
         self.assertIn("FULL_MARKET_STATUS", mail)
-        self.assertIn("steps.publish.outputs.published == 'true'", mail[:600])
+        self.assertIn("steps.publish.outputs.published == 'true'", mail)
         self.assertNotIn("steps.discovery_quotes", mail[:600])
 
 
