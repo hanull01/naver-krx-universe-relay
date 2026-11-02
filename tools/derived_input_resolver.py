@@ -9,6 +9,7 @@ snapshots.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 from pathlib import Path
 from typing import Any, Mapping
@@ -22,7 +23,20 @@ REQUIRED_ARTIFACTS = (
     "report-contract-projection.json",
     "manifest.json",
     "rolling-history-manifest.json",
+    "report-contract-manifest.json",
 )
+REPORT_CONTRACT_SOURCE_ARTIFACTS = (
+    "technicals.json",
+    "states.json",
+    "registered-universe-technicals.json",
+    "registered-universe-states.json",
+    "group-states.json",
+    "provenance.json",
+    "quality.json",
+    "manifest.json",
+    "rolling-history-manifest.json",
+)
+REPORT_CONTRACT_MANIFEST = "report-contract-manifest.json"
 
 
 class DerivedInputError(ValueError):
@@ -50,6 +64,60 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise DerivedInputError(f"DERIVED_JSON_OBJECT_REQUIRED:{path}")
     return payload
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _verify_artifact_record(
+    root: Path,
+    name: str,
+    record: Mapping[str, Any],
+    run_id: str,
+) -> Path:
+    """Verify a manifest record against the immutable file in this run."""
+    if not isinstance(record, Mapping):
+        raise DerivedInputError(f"DERIVED_ARTIFACT_METADATA_MISSING:{name}")
+    declared_path = record.get("path")
+    if not isinstance(declared_path, str) or Path(declared_path).name != name:
+        raise DerivedInputError(f"DERIVED_ARTIFACT_PATH_MISMATCH:{name}")
+    declared_run_id = record.get("runId")
+    if declared_run_id not in (None, "") and str(declared_run_id) != run_id:
+        raise DerivedInputError(
+            f"DERIVED_ARTIFACT_RUN_ID_MISMATCH:{name}:{declared_run_id}!={run_id}"
+        )
+    expected_sha = str(record.get("sha256") or "")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha):
+        raise DerivedInputError(f"DERIVED_ARTIFACT_SHA256_MISSING:{name}")
+    path = root / name
+    if not path.is_file():
+        raise DerivedInputError(f"DERIVED_ARTIFACT_MISSING:{name}")
+    actual_sha = _sha256(path)
+    if actual_sha.lower() != expected_sha.lower():
+        raise DerivedInputError(f"DERIVED_ARTIFACT_SHA256_MISMATCH:{name}")
+    declared_bytes = record.get("bytes")
+    if declared_bytes not in (None, "") and int(declared_bytes) != path.stat().st_size:
+        raise DerivedInputError(f"DERIVED_ARTIFACT_BYTES_MISMATCH:{name}")
+    return path
+
+
+def _verify_artifact_metadata_consistency(
+    name: str,
+    left: Mapping[str, Any] | None,
+    right: Mapping[str, Any] | None,
+) -> None:
+    if not left or not right:
+        return
+    if str(left.get("sha256") or "").lower() != str(right.get("sha256") or "").lower():
+        raise DerivedInputError(f"DERIVED_ARTIFACT_METADATA_SHA_MISMATCH:{name}")
+    if left.get("bytes") not in (None, "") and right.get("bytes") not in (None, ""):
+        if int(left["bytes"]) != int(right["bytes"]):
+            raise DerivedInputError(f"DERIVED_ARTIFACT_METADATA_BYTES_MISMATCH:{name}")
 
 
 def _has_fallback(value: Any) -> bool:
@@ -106,21 +174,66 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
     if manifest_run_id not in (None, "") and str(manifest_run_id) != run_id:
         raise DerivedInputError(f"DERIVED_MANIFEST_RUN_ID_MISMATCH:{manifest_run_id}!={run_id}")
 
-    generated_values = {
-        str(payload.get("generatedAt"))
+    report_manifest = artifacts[REPORT_CONTRACT_MANIFEST]
+    report_manifest_run_id = report_manifest.get("runId")
+    if report_manifest_run_id not in (None, "") and str(report_manifest_run_id) != run_id:
+        raise DerivedInputError(
+            f"DERIVED_REPORT_MANIFEST_RUN_ID_MISMATCH:{report_manifest_run_id}!={run_id}"
+        )
+    contract = report_manifest.get("contract")
+    if not isinstance(contract, Mapping) or Path(str(contract.get("path") or "")).name != "report-contract-projection.json":
+        raise DerivedInputError("DERIVED_REPORT_CONTRACT_PATH_MISMATCH")
+    _verify_artifact_record(
+        root,
+        "report-contract-projection.json",
+        contract,
+        run_id,
+    )
+
+    source_artifacts = report_manifest.get("sourceArtifacts")
+    if not isinstance(source_artifacts, Mapping):
+        raise DerivedInputError("DERIVED_REPORT_SOURCE_ARTIFACTS_MISSING")
+    manifest_files = manifest.get("files")
+    if not isinstance(manifest_files, Mapping):
+        manifest_files = {}
+    source_payloads: dict[str, dict[str, Any]] = {}
+    for name in REPORT_CONTRACT_SOURCE_ARTIFACTS:
+        source_record = source_artifacts.get(name)
+        _verify_artifact_record(root, name, source_record, run_id)
+        _verify_artifact_metadata_consistency(
+            name,
+            manifest_files.get(name),
+            source_record,
+        )
+        source_payloads[name] = _read_json(root / name)
+        if _has_fallback(source_payloads[name]):
+            raise DerivedInputError(f"DERIVED_FALLBACK_USED:{name}")
+
+    rolling_manifest = source_payloads["rolling-history-manifest.json"]
+    for code, entry in (rolling_manifest.get("byCode") or {}).items():
+        if not isinstance(entry, Mapping):
+            continue
+        latest = entry.get("latest")
+        if latest not in (None, "") and compact_date(latest, f"{code}.latest") > target:
+            raise DerivedInputError(f"ROLLING_HISTORY_FUTURE_DATA:{code}:{latest}")
+
+    generated_at_by_artifact = {
+        name: str(payload.get("generatedAt"))
         for name, payload in artifacts.items()
-        if name != "report-contract-projection.json" and payload.get("generatedAt")
+        if payload.get("generatedAt")
     }
     projection_observed = artifacts["report-contract-projection.json"].get("observedAt")
     if projection_observed:
-        generated_values.add(str(projection_observed))
-    if len(generated_values) > 1:
-        raise DerivedInputError("DERIVED_GENERATION_MISMATCH")
+        generated_at_by_artifact["report-contract-projection.json"] = str(projection_observed)
+    generated_values = set(generated_at_by_artifact.values())
+    generation_diagnostic = {
+        "generatedAtByArtifact": generated_at_by_artifact,
+        "generatedAtMismatch": len(generated_values) > 1,
+    }
 
     rolling_dir = root / "rolling-history"
     if not rolling_dir.is_dir():
         raise DerivedInputError(f"ROLLING_HISTORY_NOT_FOUND:{rolling_dir}")
-    rolling_manifest = artifacts["rolling-history-manifest.json"]
     if int(rolling_manifest.get("window") or 0) != 120:
         raise DerivedInputError("ROLLING_HISTORY_WINDOW_INVALID")
 
@@ -130,7 +243,8 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
         "runDir": root,
         "files": paths,
         "artifacts": artifacts,
-        "generatedAt": next(iter(generated_values), None),
+        "generatedAt": manifest.get("generatedAt") or next(iter(generated_values), None),
+        "generationDiagnostic": generation_diagnostic,
         "rollingHistoryDir": rolling_dir,
     }
 
@@ -186,6 +300,11 @@ class RollingHistoryDailyLoader:
         path = (self.run_dir / relative).resolve()
         if self.history_dir.resolve() not in path.parents:
             raise DerivedInputError(f"ROLLING_HISTORY_PATH_INVALID:{code}")
+        expected_sha = str(entry.get("sha256") or "")
+        if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha):
+            raise DerivedInputError(f"ROLLING_HISTORY_SHA256_MISSING:{code}")
+        if _sha256(path).lower() != expected_sha.lower():
+            raise DerivedInputError(f"ROLLING_HISTORY_SHA256_MISMATCH:{code}")
         rows = []
         for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             if not line.strip():
