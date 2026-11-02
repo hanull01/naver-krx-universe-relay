@@ -22,6 +22,16 @@ class DerivedWorkflowIntegrationTests(unittest.TestCase):
         self.assertIn("Intraday collection or derived technical validation failed", text)
         self.assertNotIn("data/daily/", text[text.index("- name: Collect NAVER data"):text.index("- name: Collect full-market monitoring evidence")])
 
+    def test_refresh_and_daily_report_select_the_same_resolved_generation(self):
+        refresh = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
+        daily = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
+        for text in (refresh, daily):
+            self.assertIn("resolve_derived_input", text)
+            self.assertRegex(text, r"(?:derived|result)\[['\"]runId['\"]\]")
+            self.assertRegex(text, r"(?:derived|result)\[['\"]runDir['\"]\]")
+        self.assertIn('resolve_derived_input("data/monitoring-derived", sys.argv[1])', refresh)
+        self.assertIn('resolve_derived_input("data/monitoring-derived", as_of)', daily)
+
     def test_legacy_fallback_is_not_enabled_by_staging_adapter(self):
         text = (ROOT / "daily_report.py").read_text(encoding="utf-8")
         start = text.index("def load_report_technical_inputs")
