@@ -58,6 +58,11 @@ def _price(value: Any) -> str:
     return f"{number:,.0f}원" if number is not None else "확인 불가"
 
 
+def _index_close(value: Any) -> str:
+    number = _num(value)
+    return f"{number:,.2f}" if number is not None else "확인 불가"
+
+
 def _escape(value: Any) -> str:
     return html.escape(_text(value), quote=True)
 
@@ -89,11 +94,29 @@ def _index_session_label(item: Mapping[str, Any]) -> str:
     return "세션 확인 대기"
 
 
+def _index_code(item: Mapping[str, Any]) -> str | None:
+    """Return the canonical index code, preferring code over display names."""
+    aliases = {
+        "KOSPI": "KOSPI",
+        "코스피": "KOSPI",
+        "KOSDAQ": "KOSDAQ",
+        "코스닥": "KOSDAQ",
+    }
+    for key in ("code", "name", "indexName"):
+        value = str(item.get(key) or "").strip()
+        if value in aliases:
+            return aliases[value]
+        upper = value.upper()
+        if upper in aliases:
+            return aliases[upper]
+    return None
+
+
 def _index_session_summary(indices: list[Mapping[str, Any]]) -> str:
     labels = [
         _index_session_label(row)
         for row in indices
-        if row.get("name") in {"KOSPI", "KOSDAQ"} or row.get("indexName") in {"KOSPI", "KOSDAQ"}
+        if _index_code(row) in {"KOSPI", "KOSDAQ"}
     ]
     if not labels:
         return "세션 확인 대기"
@@ -316,8 +339,8 @@ def _metric_line(label: str, metric: Mapping[str, Any]) -> str:
 def _index_cards(model: Mapping[str, Any]) -> str:
     cards = []
     for item in model["indices"]:
-        name = item.get("name") or item.get("indexName")
-        if name not in {"KOSPI", "KOSDAQ"}:
+        name = _index_code(item)
+        if name is None:
             continue
         rate = item.get("changeRate")
         points = item.get("changePoints")
@@ -570,7 +593,7 @@ def render_dashboard_markdown(
         *[
             f"- {item.get('name') or item.get('indexName')}: {f'{item.get('close'):,.2f}' if isinstance(item.get('close'), (int, float)) else '확인 불가'} · {_pct(item.get('changeRate'))} · {_text(item.get('sourceTime') or model.get('observedAt'), '확인 불가')} · {_index_session_label(item)}"
             for item in model['indices']
-            if item.get('name') in {'KOSPI', 'KOSDAQ'} or item.get('indexName') in {'KOSPI', 'KOSDAQ'}
+            if _index_code(item) in {'KOSPI', 'KOSDAQ'}
         ],
         *[
             f"- 지표 {label}: {_metric_line_value(market['metrics'].get(key) or {})}"
@@ -782,8 +805,8 @@ def validate_rendered_outputs(
         require_in_section(f"metric.{key}", metric_value, md_part1, html_part1)
 
     for item in model["indices"]:
-        name = item.get("name") or item.get("indexName")
-        if name not in {"KOSPI", "KOSDAQ"}:
+        name = _index_code(item)
+        if name is None:
             continue
         require(f"index.{name}.name", name)
         require_in_section(f"index.{name}.name", name, md_part1, html_part1)
@@ -1210,9 +1233,9 @@ def _compact_index_available(row: Mapping[str, Any], expected_date: Any = None) 
 def _compact_index_cards(model: Mapping[str, Any]) -> str:
     cards = []
     rows_by_name = {
-        row.get("name") or row.get("indexName"): row
+        _index_code(row): row
         for row in model["indices"]
-        if (row.get("name") or row.get("indexName")) in {"KOSPI", "KOSDAQ"}
+        if _index_code(row) in {"KOSPI", "KOSDAQ"}
     }
     for name in ("KOSPI", "KOSDAQ"):
         row = rows_by_name.get(name)
@@ -1365,10 +1388,12 @@ def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLAT
         for row in previous.get("indices") or []:
             lines.append(f"- 직전 {row.get('name') or row.get('code')}: {row.get('close') if row.get('close') is not None else '확인 불가'} · {row.get('changeRate') if row.get('changeRate') is not None else '확인 불가'}% · 당일 장전 자료와 혼합하지 않음")
     for row in model["indices"]:
-        name = row.get("name") or row.get("indexName")
+        name = _index_code(row)
         if name in {"KOSPI", "KOSDAQ"}:
             available = _compact_index_available(row, model.get("asOfRaw"))
-            lines.append(f"- {name}: {_price(row.get('close')) if available else '확인 불가'} · {_pct(row.get('changeRate')) if available else '확인 불가'} · {_compact_kst(row.get('sourceTime')) if available else '원천 확인 대기'}")
+            points = row.get("changePoints")
+            points_text = f"{points:+,.2f}p" if isinstance(points, (int, float)) else "확인 불가"
+            lines.append(f"- {name}: {_index_close(row.get('close')) if available else '확인 불가'} · {points_text if available else '확인 불가'} ({_pct(row.get('changeRate')) if available else '확인 불가'}) · {_compact_kst(row.get('sourceTime')) if available else '원천 확인 대기'}")
     lines += [f"- 상승/하락/보합: {market['advancers']:,}/{market['decliners']:,}/{market['unchanged']:,}", f"- 하락 비율: {_plain_pct(market['declineRatio'])}", f"- 시장 거래대금: {_market_value_text(market['marketTradingValue'])}"]
     for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")):
         lines.append(f"- {label}: {_metric_line_value(market['metrics'].get(key) or {})}")
