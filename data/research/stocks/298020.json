@@ -2,35 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "298020",
   "itemName": "효성티앤씨",
-  "reportCount": 9,
-  "latestReportNid": "95000",
-  "latestWriteDate": "2026-08-03",
+  "reportCount": 12,
+  "latestReportNid": "97480",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "95000",
-    "writeDate": "2026-08-03",
+    "nid": "97480",
+    "writeDate": "2026-11-02",
     "brokerName": "하나증권",
-    "title": "컨센 36% 상회. 절대 저평가 국면",
-    "goalPrice": 590000,
+    "title": "유가와 관련이 적고, 사이클도 돌아섰다",
+    "goalPrice": 400000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 10,
-        "negative": 2
+        "positive": 0,
+        "negative": 12
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 5,
-        "수요": 3,
-        "재고": 2,
+        "수요": 5,
+        "가격": 3,
+        "원가": 2,
         "중국": 2,
-        "원가": 1
+        "미국": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97480",
+    "97437",
+    "97428",
     "95000",
     "94951",
     "94935",

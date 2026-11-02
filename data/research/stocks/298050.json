@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "298050",
   "itemName": "HS효성첨단소재",
-  "reportCount": 3,
-  "latestReportNid": "95029",
-  "latestWriteDate": "2026-08-04",
+  "reportCount": 6,
+  "latestReportNid": "97481",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "95029",
-    "writeDate": "2026-08-04",
-    "brokerName": "신한투자증권",
-    "title": "본업은 강하고, 탄소섬유는 살아난다",
-    "goalPrice": 260000,
+    "nid": "97481",
+    "writeDate": "2026-11-02",
+    "brokerName": "하나증권",
+    "title": "2027년 상반기 탄소섬유 흑자전환 가이던스 제시",
+    "goalPrice": 220000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 6,
-        "negative": 3
+        "negative": 8
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1
+        "가격": 3,
+        "원가": 3
       }
     }
   },
   "reportNids": [
+    "97481",
+    "97438",
+    "97425",
     "95029",
     "94812",
     "92039"

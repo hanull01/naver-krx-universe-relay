@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "067160",
   "itemName": "SOOP",
-  "reportCount": 3,
-  "latestReportNid": "94135",
-  "latestWriteDate": "2026-07-14",
+  "reportCount": 4,
+  "latestReportNid": "97441",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "94135",
-    "writeDate": "2026-07-14",
-    "brokerName": "신한투자증권",
-    "title": "후원 매출 반등, 신규 콘텐츠 발굴이 숙제",
-    "goalPrice": 70000,
+    "nid": "97441",
+    "writeDate": "2026-11-02",
+    "brokerName": "유진투자증권",
+    "title": "증명이 필요한 시기",
+    "goalPrice": 45000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 19,
+        "negative": 9
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsPositiveSignalCount": 15,
+      "earningsNegativeSignalCount": 6,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "수주": 1,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "97441",
     "94135",
     "92504",
     "92350"

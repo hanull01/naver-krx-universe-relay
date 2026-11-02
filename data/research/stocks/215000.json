@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "215000",
   "itemName": "골프존",
-  "reportCount": 4,
-  "latestReportNid": "96982",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 5,
+  "latestReportNid": "97445",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96982",
-    "writeDate": "2026-10-23",
-    "brokerName": "신한투자증권",
-    "title": "낮아진 기대치, 높아진 배당 매력",
-    "goalPrice": 55500,
+    "nid": "97445",
+    "writeDate": "2026-11-02",
+    "brokerName": "유진투자증권",
+    "title": "3Q26P Review: 11분기만에 매출 증가세로 전환",
+    "goalPrice": 50000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 1
+        "positive": 28,
+        "negative": 10
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsPositiveSignalCount": 13,
+      "earningsNegativeSignalCount": 6,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "원가": 3,
+        "미국": 2,
+        "자동차": 2,
+        "중국": 2
+      }
     }
   },
   "reportNids": [
+    "97445",
     "96982",
     "95245",
     "92465",

@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "128940",
   "itemName": "한미약품",
-  "reportCount": 40,
-  "latestReportNid": "97173",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 43,
+  "latestReportNid": "97447",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "97173",
-    "writeDate": "2026-10-28",
-    "brokerName": "교보증권",
-    "title": "3Q26 Review: 북경한미 회복이 필요",
-    "goalPrice": 600000,
+    "nid": "97447",
+    "writeDate": "2026-11-02",
+    "brokerName": "미래에셋증권",
+    "title": "올해만 세번째 증명, 이제 머크의 시간",
+    "goalPrice": 720000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 5,
+        "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UP",
+      "topics": {
+        "미국": 1,
+        "수요": 1,
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "97447",
+    "97430",
+    "97395",
     "97173",
     "97143",
     "97126",

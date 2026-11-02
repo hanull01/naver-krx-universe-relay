@@ -2,34 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "213500",
   "itemName": "한솔제지",
-  "reportCount": 2,
-  "latestReportNid": "94964",
-  "latestWriteDate": "2026-08-03",
+  "reportCount": 3,
+  "latestReportNid": "97446",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "94964",
-    "writeDate": "2026-08-03",
+    "nid": "97446",
+    "writeDate": "2026-11-02",
     "brokerName": "유진투자증권",
-    "title": "2Q26P Review: 16분기만에 8%대 OPM 회복",
+    "title": "3Q26P Review: 단가인상 효과로 수익성 개선 기대",
     "goalPrice": 11000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 25,
-        "negative": 3
+        "positive": 23,
+        "negative": 16
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 14,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 10,
+      "earningsNegativeSignalCount": 11,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "가격": 6,
-        "미국": 4,
+        "가격": 7,
+        "환율": 3,
+        "미국": 2,
+        "수요": 2,
         "자동차": 2,
-        "중국": 1
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97446",
     "94964",
     "93021"
   ]

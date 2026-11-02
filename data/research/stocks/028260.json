@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "028260",
   "itemName": "삼성물산",
-  "reportCount": 34,
-  "latestReportNid": "97360",
-  "latestWriteDate": "2026-10-30",
+  "reportCount": 35,
+  "latestReportNid": "97410",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "97360",
-    "writeDate": "2026-10-30",
-    "brokerName": "DS투자증권",
-    "title": "체급이 달라지기 시작",
-    "goalPrice": 620000,
+    "nid": "97410",
+    "writeDate": "2026-11-02",
+    "brokerName": "iM증권",
+    "title": "반도체 낙수효과로 배당확대 및 원전밸류 상승 본격화",
+    "goalPrice": 470000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 8,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 8,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 1,
+        "반도체": 1,
+        "수주": 1
+      }
     }
   },
   "reportNids": [
+    "97410",
     "97360",
     "97358",
     "97261",

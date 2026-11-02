@@ -2,29 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "054950",
   "itemName": "제이브이엠",
-  "reportCount": 7,
-  "latestReportNid": "96996",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 8,
+  "latestReportNid": "97464",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96996",
-    "writeDate": "2026-10-23",
-    "brokerName": "신한투자증권",
-    "title": "비수기에도 돋보이는 수익성",
-    "goalPrice": 34000,
-    "normalizedOpinion": "BUY",
+    "nid": "97464",
+    "writeDate": "2026-11-02",
+    "brokerName": "유안타증권",
+    "title": "3Q26 Review",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 8,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 2,
+        "환율": 2,
+        "로봇": 1,
+        "수요": 1,
+        "자동차": 1,
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "97464",
     "96996",
     "95958",
     "94881",

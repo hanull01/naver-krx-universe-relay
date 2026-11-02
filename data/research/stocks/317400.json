@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "317400",
   "itemName": "자이에스앤디",
-  "reportCount": 4,
-  "latestReportNid": "96116",
-  "latestWriteDate": "2026-09-14",
+  "reportCount": 5,
+  "latestReportNid": "97434",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96116",
-    "writeDate": "2026-09-14",
-    "brokerName": "iM증권",
-    "title": "데이터센터 수주확대 가시화로 성장성 가속화",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97434",
+    "writeDate": "2026-11-02",
+    "brokerName": "신한투자증권",
+    "title": "DC 기반 고성장은 시작",
+    "goalPrice": 11000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 6,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "배터리": 1
+        "AI": 3,
+        "수주": 1
       }
     }
   },
   "reportNids": [
+    "97434",
     "96116",
     "95181",
     "93746",

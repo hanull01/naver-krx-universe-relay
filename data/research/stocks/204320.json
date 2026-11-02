@@ -2,36 +2,42 @@
   "schemaVersion": 1,
   "itemCode": "204320",
   "itemName": "HL만도",
-  "reportCount": 26,
-  "latestReportNid": "96748",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 31,
+  "latestReportNid": "97486",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96748",
-    "writeDate": "2026-10-15",
+    "nid": "97486",
+    "writeDate": "2026-11-02",
     "brokerName": "하나증권",
-    "title": "3Q26 프리뷰: 원가는 지나가고, 로봇은 다가온다",
-    "goalPrice": 61000,
+    "title": "비용이 먼저 왔고, 로드맵은 지켜졌다",
+    "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 2
+        "positive": 4,
+        "negative": 3
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 2,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수주": 2,
-        "로봇": 1,
-        "수요": 1,
-        "원가": 1,
-        "자동차": 1,
-        "환율": 1
+        "수주": 3,
+        "원가": 3,
+        "가격": 2,
+        "로봇": 2,
+        "미국": 1,
+        "반도체": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97486",
+    "97427",
+    "97407",
+    "97399",
+    "97396",
     "96748",
     "96739",
     "96725",

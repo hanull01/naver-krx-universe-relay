@@ -2,33 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "091700",
   "itemName": "파트론",
-  "reportCount": 1,
-  "latestReportNid": "92471",
-  "latestWriteDate": "2026-05-06",
+  "reportCount": 2,
+  "latestReportNid": "97458",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "92471",
-    "writeDate": "2026-05-06",
+    "nid": "97458",
+    "writeDate": "2026-11-02",
     "brokerName": "대신증권",
-    "title": "1Q, 매출 상회/수익성 하회",
-    "goalPrice": 9000,
-    "normalizedOpinion": "BUY",
+    "title": "3Q 수익성 부진 지속",
+    "goalPrice": 5300,
+    "normalizedOpinion": "MARKETPERFORM",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 5
+        "positive": 0,
+        "negative": 8
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
         "가격": 2,
-        "수요": 2,
-        "원가": 2
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97458",
     "92471"
   ]
 }

@@ -2,35 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "004020",
   "itemName": "현대제철",
-  "reportCount": 22,
-  "latestReportNid": "96609",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 27,
+  "latestReportNid": "97496",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96609",
-    "writeDate": "2026-10-12",
-    "brokerName": "미래에셋증권",
-    "title": "3Q26 Preview : 아쉬운 성적표, 남아있는 뒷심",
-    "goalPrice": 40000,
+    "nid": "97496",
+    "writeDate": "2026-11-02",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Review: 본업은 물량 부진, 4분기 증익은 지속",
+    "goalPrice": 43000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 2
+        "positive": 1,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 2,
-        "가격": 1,
-        "수요": 1,
-        "조선": 1,
-        "파업": 1
+        "자동차": 4,
+        "가격": 2,
+        "수요": 2,
+        "미국": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97496",
+    "97476",
+    "97456",
+    "97401",
+    "97398",
     "96609",
     "96586",
     "96462",

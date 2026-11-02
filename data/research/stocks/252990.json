@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "252990",
   "itemName": "샘씨엔에스",
-  "reportCount": 3,
-  "latestReportNid": "92802",
-  "latestWriteDate": "2026-05-13",
+  "reportCount": 4,
+  "latestReportNid": "97450",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "92802",
-    "writeDate": "2026-05-13",
-    "brokerName": "한국IR협의회",
-    "title": "DRAM과 함께 고마진으로 복귀",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97450",
+    "writeDate": "2026-11-02",
+    "brokerName": "대신증권",
+    "title": "내년에도 계속되는 성장",
+    "goalPrice": 25000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
+        "positive": 11,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "UP",
       "topics": {
-        "반도체": 4
+        "반도체": 8,
+        "중국": 2,
+        "가격": 1
       }
     }
   },
   "reportNids": [
+    "97450",
     "92802",
     "92455",
     "91394"

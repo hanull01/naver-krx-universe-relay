@@ -2,33 +2,42 @@
   "schemaVersion": 1,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "reportCount": 35,
-  "latestReportNid": "96819",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 42,
+  "latestReportNid": "97504",
+  "latestWriteDate": "2026-11-02",
   "latest": {
-    "nid": "96819",
-    "writeDate": "2026-10-19",
-    "brokerName": "SK증권",
-    "title": "펀더멘털은 여전히 견고",
-    "goalPrice": 2500000,
+    "nid": "97504",
+    "writeDate": "2026-11-02",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Review: 일시적 부진, 수주 모멘텀은 지속",
+    "goalPrice": 3500000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 1,
         "negative": 3
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "원가": 2,
-        "환율": 2,
-        "자동차": 1
+        "미국": 1,
+        "원전": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97504",
+    "97489",
+    "97467",
+    "97462",
+    "97455",
+    "97442",
+    "97403",
     "96819",
     "96746",
     "96678",
