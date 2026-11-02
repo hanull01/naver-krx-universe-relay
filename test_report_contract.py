@@ -41,7 +41,10 @@ class ReportContractTests(unittest.TestCase):
     def test_contract_uses_one_generation_and_keeps_v2_names_scores_and_history(self):
         common = {"generatedAt": "2026-10-28T10:09:19+00:00"}
         contract = build_report_contract(
-            indices={**common, "indices": [{"name": "KOSPI", "close": 6012.44}]},
+            indices={**common, "indices": [
+                {"name": "KOSPI", "close": 6012.44, "sourceTime": "2026-10-28T10:09:19+00:00"},
+                {"name": "KOSDAQ", "close": 900.12, "sourceTime": "2026-10-28T10:09:19+00:00"},
+            ]},
             summary={**common, "fullMarket": {"tradingDate": "20261028", "tradingDateEvidence": self.evidence(), "authoritativeCount": 2766,
                 "markets": {"TOTAL": {"advancers": 1850, "decliners": 713, "unchanged": 203,
                     "breakout20Count": 81, "breakout20EligibleCount": 2642, "pctBreakout20": 3.0659}}}},
@@ -190,9 +193,9 @@ class ReportContractTests(unittest.TestCase):
             v2_latest={**common, "tradingDate": "20261028", "industries": [], "themes": []},
             v2_history={"observations": []}, leaders={},
         )
-        self.assertEqual(contract["status"], "AVAILABLE")
+        self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "VERIFIED")
-        self.assertTrue(contract["rendering"]["htmlAllowed"])
+        self.assertFalse(contract["rendering"]["htmlAllowed"])
         self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
     def test_kiwoom_candidates_are_separate_from_technical_candidates(self):

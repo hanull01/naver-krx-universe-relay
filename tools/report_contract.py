@@ -811,6 +811,22 @@ def build_report_contract(
         or full_market.get("expectedPreviousTradingDate")
     )
 
+    def indices_are_complete() -> bool:
+        """Require both current index observations before marking a contract available."""
+        rows = [row for row in (indices.get("indices") or []) if isinstance(row, Mapping)]
+        by_name = {str(row.get("name") or row.get("indexName")): row for row in rows}
+        expected = str(trading_date or "").replace("-", "")
+        if not expected or not {"KOSPI", "KOSDAQ"}.issubset(by_name):
+            return False
+        for name in ("KOSPI", "KOSDAQ"):
+            row = by_name[name]
+            if not isinstance(row.get("close"), (int, float)) or not row.get("sourceTime"):
+                return False
+            source_date = str(row["sourceTime"])[:10].replace("-", "")
+            if source_date != expected:
+                return False
+        return True
+
     def metric(name: str, count: str, eligible: str, pct: str) -> dict[str, Any]:
         return {
             "count": total.get(count),
@@ -956,6 +972,7 @@ def build_report_contract(
     contract_status = (
         "PARTIAL"
         if baseline_status == "BASELINE_STALE" or not trading_date or not trading_date_evidence_valid
+        or not indices_are_complete()
         else "AVAILABLE" if aligned and full_market else "PARTIAL"
     )
 
