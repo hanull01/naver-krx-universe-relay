@@ -1,0 +1,425 @@
+# 국내증시 시장 모니터링 - 20261102
+
+- 작성시각: 2026-11-02T04:21:32.018646+00:00
+- 시장 데이터 기준시각: 2026-11-02T04:21:32.018646+00:00
+- CONTRACT_TRACE: schema=market-report-contract-v1;status=AVAILABLE;asOf=20261102;observedAt=2026-11-02T04:21:32.018646+00:00;tradingDateStatus=VERIFIED
+- V2_DATA_TRACE: sourceCommit=확인 불가;sourceQualityStatus=COMPLETE_RECONCILIATION_PENDING;sourceCommitStatus=UNAVAILABLE;sourceProvenance=PARTIAL;inputSnapshotSha256=be38fcae4f347de097d18a7507e820f87bec452c15d9f7670af97d243e7203b7;tradingDate=20261102;historyDates=2026-10-15,2026-10-16,2026-10-19,2026-10-23,2026-10-26,2026-10-27,2026-10-28,2026-10-29,2026-10-30,2026-11-02
+- TEMPLATE_TRACE: version=A-1.1.0;sourceSha256=cba54525bbabe1f7a2b100d9696181bac1e49b76e772301007abfdcdb5fef0c3;cssSha256=bbe55c39024cbf4705baece7d9ba135c9723dcce182bc2af6652b3275e8ea941
+
+## 1. 시장 대시보드
+
+- 세션 요약: 세션 확인 대기
+- 계약 추적: CONTRACT_TRACE schema=market-report-contract-v1;status=AVAILABLE;asOf=20261102;observedAt=2026-11-02T04:21:32.018646+00:00;tradingDateStatus=VERIFIED · V2_DATA_TRACE sourceCommit=확인 불가;sourceQualityStatus=COMPLETE_RECONCILIATION_PENDING;sourceCommitStatus=UNAVAILABLE;sourceProvenance=PARTIAL;inputSnapshotSha256=be38fcae4f347de097d18a7507e820f87bec452c15d9f7670af97d243e7203b7;tradingDate=20261102;historyDates=2026-10-15,2026-10-16,2026-10-19,2026-10-23,2026-10-26,2026-10-27,2026-10-28,2026-10-29,2026-10-30,2026-11-02 · TEMPLATE_TRACE version=A-1.1.0;sourceSha256=cba54525bbabe1f7a2b100d9696181bac1e49b76e772301007abfdcdb5fef0c3;cssSha256=bbe55c39024cbf4705baece7d9ba135c9723dcce182bc2af6652b3275e8ea941
+- 상승/하락/보합: 1,759/789/221
+- 하락 비율: 789/2,769 = 28.49%
+- 산술 검증: PASS
+- 시장 거래대금: KOSPI 9,804,678,000,000원 · KOSDAQ 3,487,437,229,000원
+- 시장 세션: 세션 확인 대기
+- 지표 20일 이동평균 상회: 391 / 2,642 · 14.80%
+- 지표 60일 이동평균 상회: 496 / 2,624 · 18.90%
+- 지표 120일 이동평균 상회: 488 / 2,608 · 18.71%
+- 지표 20일 고점 돌파: 38 / 2,638 · 1.44%
+- 지표 60일 고점 돌파: 25 / 2,621 · 0.95%
+- 지표 20일 평균 거래량 상회: 315 / 2,637 · 11.95%
+
+## 2. 업종·테마·주도주·리서치
+
+- 업종: 79개, 테마: 8개, 주도주: 30종목
+- 업종명: 조선, 전기장비, 항공사, 전기유틸리티, 백화점과일반상점, 에너지장비및서비스, 복합기업, 우주항공과국방, 건설, 철강, 기계, 무역회사와판매업체, 항공화물운송과물류, 반도체와반도체장비, 건축자재, 전기제품, 무선통신서비스, 건강관리기술, 통신장비, 호텔,레스토랑,레저, 자동차, 전자장비와기기, 화장품, 해운사, 식품, 석유와가스, 건강관리장비와용품, 화학, 종이와목재, 자동차부품, 생명보험, 기타, 생명과학도구및서비스, 복합유틸리티, IT서비스, 방송과엔터테인먼트, 인터넷과카탈로그소매, 비철금속, 디스플레이장비및부품, 상업서비스와공급품, 핸드셋, 증권, 전자제품, 기타금융, 가정용품, 제약, 창업투자, 판매업체, 생물공학, 가정용기기와용품, 도로와철도운송, 다각화된소비자서비스, 게임엔터테인먼트, 가스유틸리티, 건축제품, 양방향미디어와서비스, 컴퓨터와주변기기, 디스플레이패널, 레저용장비와제품, 포장재, 다각화된통신서비스, 교육서비스, 소프트웨어, 전문소매, 섬유,의류,신발,호화품, 식품과기본식료품소매, 운송인프라, 은행, 가구, 음료, 카드, 손해보험, 사무용전자제품, 문구류, 출판, 건강관리업체및서비스, 담배, 광고, 부동산
+- V2 업종·테마: 생명보험, 자전거, 편의점, 홈쇼핑, 영화, 기업인수목적회사(SPAC), 콩/대두, 생명보험, S7(삼성전자/SK하이닉스 등)
+- 자동 주도주: 영광(359410), 깨끗한나라우(004545), 샘표(007540), 피앤에스로보틱스(460940), 샘표식품(248170), 동양2우B(001527), 에어레인(163280), HLB바이오스텝(278650), 엑시온그룹(069920), 한국철강(104700)
+- 리서치 상태: OK
+
+### V2 실명·주도 후보·최근 변화
+
+- 업종 실측 조선: 상승 28 / 31, 1일 성과 +7.18%, 거래대금 1,237,993,896,000원
+- 업종 실측 전기장비: 상승 28 / 32, 1일 성과 +4.97%, 거래대금 392,533,936,000원
+- 업종 실측 항공사: 상승 9 / 9, 1일 성과 +4.13%, 거래대금 67,127,000,000원
+- 업종 실측 전기유틸리티: 상승 5 / 5, 1일 성과 +4.12%, 거래대금 28,519,354,000원
+- 업종 실측 백화점과일반상점: 상승 12 / 14, 1일 성과 +3.75%, 거래대금 35,806,188,000원
+- 업종 실측 에너지장비및서비스: 상승 26 / 32, 1일 성과 +3.60%, 거래대금 118,716,686,000원
+
+### 상대강도 TOP 5 추적
+
+- 상대강도 업종 TOP 5: 5개
+  - 1. 조선: 상대강도 +7.05% · V1 REMOVED · V2 WEAK · 변화 MAINTAINED · 연속 TOP 5 2일 · 주도주 영광(359410), HD현대마린엔진(071970), 현대힘스(460930)
+  - 2. 항공사: 상대강도 +2.92% · V1 REMOVED · V2 WEAK · 변화 RANK_UP · 연속 TOP 5 2일 · 주도주 제주항공(089590), 한진칼(180640), 아시아나항공(020560)
+  - 3. 전기장비: 상대강도 +2.40% · V1 REMOVED · V2 WEAK · 변화 RANK_DOWN · 연속 TOP 5 2일 · 주도주 효성중공업(298040), 일진전기(103590), LS ELECTRIC(010120)
+  - 4. 전기유틸리티: 상대강도 +1.98% · V1 REMOVED · V2 WEAK · 변화 MAINTAINED · 연속 TOP 5 2일 · 주도주 그리드위즈(453450), 한전기술(052690), 한국전력(015760)
+  - 5. 백화점과일반상점: 상대강도 +1.89% · V1 REMOVED · V2 WEAK · 변화 MAINTAINED · 연속 TOP 5 2일 · 주도주 롯데쇼핑(023530), 이마트(139480), 신세계(004170)
+- 상대강도 테마 TOP 5: 5개
+  - 1. 콩/대두: 상대강도 +12.96% · V1 REMOVED · V2 ACTIVE · 변화 NEW_ENTRY · 연속 TOP 5 1일 · 주도주 샘표(007540), 샘표식품(248170), 풀무원(017810)
+  - 2. 조선: 상대강도 +5.87% · V1 REMOVED · V2 WEAK · 변화 NEW_ENTRY · 연속 TOP 5 1일 · 주도주 한화오션(042660), HD한국조선해양(009540), 삼성중공업(010140)
+  - 3. 피팅(관이음쇠)/밸브: 상대강도 +5.26% · V1 REMOVED · V2 WEAK · 변화 NEW_ENTRY · 연속 TOP 5 1일 · 주도주 성광벤드(014620), 태광(023160), 케이에스피(073010)
+  - 4. 철강 주요종목: 상대강도 +5.17% · V1 REMOVED · V2 WEAK · 변화 NEW_ENTRY · 연속 TOP 5 1일 · 주도주 한국철강(104700), 현대제철(004020), 세아베스틸지주(001430)
+  - 5. 건설 대표주: 상대강도 +5.00% · V1 WATCH · V2 WEAK · 변화 NEW_ENTRY · 연속 TOP 5 1일 · 주도주 GS건설(006360), 현대건설(000720), 대우건설(047040)
+- TOP 5와 V1/V2 ACTIVE는 독립 계층입니다 · 원천 커밋 상태 UNVERIFIED · 관측 거래일 2026-10-26, 2026-10-27, 2026-10-28, 2026-10-29, 2026-10-30, 2026-11-02, 20261102
+- V2 업종: 1개
+  - 생명보험: V1 REMOVED · V2 WATCH, 점수 57.19, persistenceDays 10, 선정 근거 확인 불가, 자료 품질 LOW_CONFIDENCE_SMALL_GROUP, 주도 후보 삼성생명(032830), 한화생명(088350), 미래에셋생명(085620), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 12.2, 상승 2개 / 66.67%, 중앙 등락률 +1.23%, 상대강도 -0.27%, 거래대금 37,681,000,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+- V2 테마: 8개
+  - 자전거: V1 ACTIVE · V2 WATCH, 점수 47.87, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 빅텍(065450), 삼천리자전거(024950), 알톤(123750), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 0.4, 상승 2개 / 확인 불가, 중앙 등락률 +0.11%, 상대강도 확인 불가, 거래대금 11,981,289,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 편의점: V1 ACTIVE · V2 ACTIVE, 점수 84.57, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 이마트(139480), 유성티엔에스(024800), BGF리테일(282330), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 27.82, 상승 5개 / 확인 불가, 중앙 등락률 +5.15%, 상대강도 확인 불가, 거래대금 15,680,464,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 홈쇼핑: V1 ACTIVE · V2 WATCH, 점수 62.45, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 롯데쇼핑(023530), 태광산업(003240), GS리테일(007070), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STRENGTHENING, 점수 변화 8.87, 상승 4개 / 확인 불가, 중앙 등락률 +2.71%, 상대강도 확인 불가, 거래대금 10,006,743,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 영화: V1 ACTIVE · V2 WATCH, 점수 69.88, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 롯데쇼핑(023530), 덱스터(206560), CJ CGV(079160), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 13.3, 상승 7개 / 확인 불가, 중앙 등락률 +0.49%, 상대강도 확인 불가, 거래대금 7,680,441,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 기업인수목적회사(SPAC): V1 WATCH · V2 WATCH, 점수 65.26, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 한화플러스제5호스팩(498390), 키움히어로제1호스팩(466690), 키움히어로제2호스팩(0131D0), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 8.38, 상승 36개 / 확인 불가, 중앙 등락률 +0.15%, 상대강도 확인 불가, 거래대금 2,329,553,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 콩/대두: V1 REMOVED · V2 ACTIVE, 점수 92.00, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 샘표(007540), 샘표식품(248170), 풀무원(017810), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 46.0, 상승 5개 / 확인 불가, 중앙 등락률 +6.55%, 상대강도 확인 불가, 거래대금 7,588,660,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - 생명보험: V1 ACTIVE · V2 WATCH, 점수 45.36, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 삼성생명(032830), 한화생명(088350), 미래에셋생명(085620), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 19.99, 상승 2개 / 확인 불가, 중앙 등락률 +0.95%, 상대강도 확인 불가, 거래대금 38,092,000,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+  - S7(삼성전자/SK하이닉스 등): V1 ACTIVE · V2 ACTIVE, 점수 83.97, persistenceDays 1, 선정 근거 확인 불가, 자료 품질 PARTIAL, 주도 후보 SK스퀘어(402340), SK하이닉스(000660), 삼성전자(005930), 근거 AVAILABLE_UNVERIFIED_SOURCE_COMMIT, 최근 변화 STATUS_CHANGED, 점수 변화 56.7, 상승 7개 / 확인 불가, 중앙 등락률 +4.07%, 상대강도 확인 불가, 거래대금 5,460,878,000,000원, 자료 상태 AVAILABLE_UNVERIFIED_SOURCE_COMMIT
+- V2 이력: AVAILABLE, 최근 거래일 2026-10-23, 2026-10-26, 2026-10-27, 2026-10-28, 2026-10-29, 2026-10-30, 2026-11-02, 실제 확보 7일, 동일 거래일 중복 제거 True
+- V2 업종·테마 변화 추적:
+  - 기타: COMPARISON_UNAVAILABLE · 점수 변화 -0.83 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 제약: COMPARISON_UNAVAILABLE · 점수 변화 7.0 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 생명과학도구및서비스: COMPARISON_UNAVAILABLE · 점수 변화 1.94 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 게임엔터테인먼트: COMPARISON_UNAVAILABLE · 점수 변화 -1.49 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 백화점과일반상점: COMPARISON_UNAVAILABLE · 점수 변화 15.83 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 판매업체: COMPARISON_UNAVAILABLE · 점수 변화 -0.96 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화장품: COMPARISON_UNAVAILABLE · 점수 변화 8.72 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - IT서비스: COMPARISON_UNAVAILABLE · 점수 변화 12.31 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 식품: COMPARISON_UNAVAILABLE · 점수 변화 9.98 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 디스플레이장비및부품: COMPARISON_UNAVAILABLE · 점수 변화 13.56 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자동차부품: COMPARISON_UNAVAILABLE · 점수 변화 11.14 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 레저용장비와제품: COMPARISON_UNAVAILABLE · 점수 변화 -4.48 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화학: COMPARISON_UNAVAILABLE · 점수 변화 8.63 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자동차: COMPARISON_UNAVAILABLE · 점수 변화 16.05 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 섬유,의류,신발,호화품: COMPARISON_UNAVAILABLE · 점수 변화 -1.15 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 담배: COMPARISON_UNAVAILABLE · 점수 변화 -26.44 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 복합기업: COMPARISON_UNAVAILABLE · 점수 변화 25.58 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 창업투자: COMPARISON_UNAVAILABLE · 점수 변화 5.76 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 반도체와반도체장비: COMPARISON_UNAVAILABLE · 점수 변화 27.13 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건설: COMPARISON_UNAVAILABLE · 점수 변화 17.36 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 부동산: COMPARISON_UNAVAILABLE · 점수 변화 -4.78 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건강관리장비와용품: COMPARISON_UNAVAILABLE · 점수 변화 6.53 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전자장비와기기: COMPARISON_UNAVAILABLE · 점수 변화 16.17 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기제품: COMPARISON_UNAVAILABLE · 점수 변화 22.12 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 우주항공과국방: COMPARISON_UNAVAILABLE · 점수 변화 23.4 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 방송과엔터테인먼트: COMPARISON_UNAVAILABLE · 점수 변화 -1.44 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 생물공학: COMPARISON_UNAVAILABLE · 점수 변화 12.3 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 소프트웨어: COMPARISON_UNAVAILABLE · 점수 변화 -1.68 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건강관리기술: COMPARISON_UNAVAILABLE · 점수 변화 16.38 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건축자재: COMPARISON_UNAVAILABLE · 점수 변화 14.2 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 교육서비스: COMPARISON_UNAVAILABLE · 점수 변화 3.39 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 조선: COMPARISON_UNAVAILABLE · 점수 변화 31.13 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 핸드셋: COMPARISON_UNAVAILABLE · 점수 변화 11.92 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 컴퓨터와주변기기: COMPARISON_UNAVAILABLE · 점수 변화 -2.46 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 통신장비: COMPARISON_UNAVAILABLE · 점수 변화 19.15 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 에너지장비및서비스: COMPARISON_UNAVAILABLE · 점수 변화 24.1 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 운송인프라: COMPARISON_UNAVAILABLE · 점수 변화 1.23 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가정용품: COMPARISON_UNAVAILABLE · 점수 변화 11.0 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가정용기기와용품: COMPARISON_UNAVAILABLE · 점수 변화 7.16 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 기계: COMPARISON_UNAVAILABLE · 점수 변화 20.69 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 양방향미디어와서비스: COMPARISON_UNAVAILABLE · 점수 변화 2.26 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 은행: COMPARISON_UNAVAILABLE · 점수 변화 -10.14 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 식품과기본식료품소매: COMPARISON_UNAVAILABLE · 점수 변화 -1.94 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가구: COMPARISON_UNAVAILABLE · 점수 변화 -1.93 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 철강: COMPARISON_UNAVAILABLE · 점수 변화 14.64 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 항공사: COMPARISON_UNAVAILABLE · 점수 변화 25.3 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기장비: COMPARISON_UNAVAILABLE · 점수 변화 31.41 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전자제품: COMPARISON_UNAVAILABLE · 점수 변화 8.04 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 인터넷과카탈로그소매: COMPARISON_UNAVAILABLE · 점수 변화 11.12 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 음료: COMPARISON_UNAVAILABLE · 점수 변화 -2.66 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 광고: COMPARISON_UNAVAILABLE · 점수 변화 -6.82 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 포장재: COMPARISON_UNAVAILABLE · 점수 변화 3.34 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가스유틸리티: COMPARISON_UNAVAILABLE · 점수 변화 -0.24 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 석유와가스: COMPARISON_UNAVAILABLE · 점수 변화 7.08 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 출판: COMPARISON_UNAVAILABLE · 점수 변화 2.47 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 손해보험: COMPARISON_UNAVAILABLE · 점수 변화 -10.36 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건강관리업체및서비스: COMPARISON_UNAVAILABLE · 점수 변화 4.9 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 호텔,레스토랑,레저: COMPARISON_UNAVAILABLE · 점수 변화 11.02 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 종이와목재: COMPARISON_UNAVAILABLE · 점수 변화 1.23 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 기타금융: COMPARISON_UNAVAILABLE · 점수 변화 6.42 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건축제품: COMPARISON_UNAVAILABLE · 점수 변화 2.7 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 증권: COMPARISON_UNAVAILABLE · 점수 변화 14.58 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 비철금속: COMPARISON_UNAVAILABLE · 점수 변화 11.04 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 해운사: COMPARISON_UNAVAILABLE · 점수 변화 -1.99 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 상업서비스와공급품: COMPARISON_UNAVAILABLE · 점수 변화 1.46 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기유틸리티: COMPARISON_UNAVAILABLE · 점수 변화 30.87 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 항공화물운송과물류: COMPARISON_UNAVAILABLE · 점수 변화 16.45 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 디스플레이패널: COMPARISON_UNAVAILABLE · 점수 변화 -1.04 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전문소매: COMPARISON_UNAVAILABLE · 점수 변화 5.11 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 도로와철도운송: COMPARISON_UNAVAILABLE · 점수 변화 6.53 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 생명보험: COMPARISON_UNAVAILABLE · 점수 변화 12.2 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 복합유틸리티: COMPARISON_UNAVAILABLE · 점수 변화 17.41 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 문구류: COMPARISON_UNAVAILABLE · 점수 변화 -2.25 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 무선통신서비스: COMPARISON_UNAVAILABLE · 점수 변화 16.66 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 무역회사와판매업체: COMPARISON_UNAVAILABLE · 점수 변화 16.89 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 다각화된통신서비스: COMPARISON_UNAVAILABLE · 점수 변화 -17.24 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 카드: COMPARISON_UNAVAILABLE · 점수 변화 -26.52 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 사무용전자제품: COMPARISON_UNAVAILABLE · 점수 변화 -3.01 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 다각화된소비자서비스: COMPARISON_UNAVAILABLE · 점수 변화 -2.18 · 지속 10일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스마트홈(홈네트워크): COMPARISON_UNAVAILABLE · 점수 변화 26.07 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 사료: COMPARISON_UNAVAILABLE · 점수 변화 18.9 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 바이오인식(생체인식): COMPARISON_UNAVAILABLE · 점수 변화 15.12 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 백신/진단시약/방역(신종플루, AI 등): COMPARISON_UNAVAILABLE · 점수 변화 10.44 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화장품: COMPARISON_UNAVAILABLE · 점수 변화 16.6 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 지주사: COMPARISON_UNAVAILABLE · 점수 변화 18.89 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 공기청정기: COMPARISON_UNAVAILABLE · 점수 변화 25.89 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 음식료업종: COMPARISON_UNAVAILABLE · 점수 변화 10.77 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 창투사: COMPARISON_UNAVAILABLE · 점수 변화 22.77 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 반도체 장비: COMPARISON_UNAVAILABLE · 점수 변화 34.35 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 남북경협: COMPARISON_UNAVAILABLE · 점수 변화 18.05 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전력설비: COMPARISON_UNAVAILABLE · 점수 변화 52.48 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 제대혈: COMPARISON_UNAVAILABLE · 점수 변화 32.24 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 통신: COMPARISON_UNAVAILABLE · 점수 변화 13.46 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 영상콘텐츠: COMPARISON_UNAVAILABLE · 점수 변화 12.2 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 엔터테인먼트: COMPARISON_UNAVAILABLE · 점수 변화 -2.31 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 리모델링/인테리어: COMPARISON_UNAVAILABLE · 점수 변화 16.06 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 소매유통: COMPARISON_UNAVAILABLE · 점수 변화 25.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 출산장려정책: COMPARISON_UNAVAILABLE · 점수 변화 13.89 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 반도체 재료/부품: COMPARISON_UNAVAILABLE · 점수 변화 37.34 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 종합 물류: COMPARISON_UNAVAILABLE · 점수 변화 22.8 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 방위산업/전쟁 및 테러: COMPARISON_UNAVAILABLE · 점수 변화 29.62 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 여행: COMPARISON_UNAVAILABLE · 점수 변화 41.89 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 원격진료/비대면진료(U-Healthcare): COMPARISON_UNAVAILABLE · 점수 변화 23.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 증권: COMPARISON_UNAVAILABLE · 점수 변화 38.39 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 온실가스(탄소배출권)/탄소 포집·활용·저장(CCUS): COMPARISON_UNAVAILABLE · 점수 변화 45.48 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건설 대표주: COMPARISON_UNAVAILABLE · 점수 변화 63.72 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 반도체 대표주(생산): COMPARISON_UNAVAILABLE · 점수 변화 43.62 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자동차 대표주: COMPARISON_UNAVAILABLE · 점수 변화 42.49 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 구제역/광우병 수혜: COMPARISON_UNAVAILABLE · 점수 변화 13.91 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 손해보험: COMPARISON_UNAVAILABLE · 점수 변화 -16.82 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 은행: COMPARISON_UNAVAILABLE · 점수 변화 -9.13 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 항공/저가 항공사(LCC): COMPARISON_UNAVAILABLE · 점수 변화 23.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 타이어: COMPARISON_UNAVAILABLE · 점수 변화 18.94 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - SI(시스템통합): COMPARISON_UNAVAILABLE · 점수 변화 20.73 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 골판지 제조: COMPARISON_UNAVAILABLE · 점수 변화 17.54 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 비철금속: COMPARISON_UNAVAILABLE · 점수 변화 35.65 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 제약업체: COMPARISON_UNAVAILABLE · 점수 변화 14.31 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - IT 대표주: COMPARISON_UNAVAILABLE · 점수 변화 47.33 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 치아 치료(임플란트 등): COMPARISON_UNAVAILABLE · 점수 변화 10.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 의료기기: COMPARISON_UNAVAILABLE · 점수 변화 17.36 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 도시가스: COMPARISON_UNAVAILABLE · 점수 변화 1.53 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - LPG(액화석유가스): COMPARISON_UNAVAILABLE · 점수 변화 3.23 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전선: COMPARISON_UNAVAILABLE · 점수 변화 58.92 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전자파: COMPARISON_UNAVAILABLE · 점수 변화 35.33 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 석유화학: COMPARISON_UNAVAILABLE · 점수 변화 33.59 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 테마파크: COMPARISON_UNAVAILABLE · 점수 변화 10.73 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 수자원(양적/질적 개선): COMPARISON_UNAVAILABLE · 점수 변화 28.95 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 정유: COMPARISON_UNAVAILABLE · 점수 변화 1.35 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 핵융합에너지: COMPARISON_UNAVAILABLE · 점수 변화 54.62 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 풍력에너지: COMPARISON_UNAVAILABLE · 점수 변화 40.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 황사/미세먼지: COMPARISON_UNAVAILABLE · 점수 변화 14.68 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 태양광에너지: COMPARISON_UNAVAILABLE · 점수 변화 31.94 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 폐기물처리: COMPARISON_UNAVAILABLE · 점수 변화 21.34 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 우주항공산업(누리호/인공위성 등): COMPARISON_UNAVAILABLE · 점수 변화 54.16 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 비료: COMPARISON_UNAVAILABLE · 점수 변화 33.12 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 원자력발전: COMPARISON_UNAVAILABLE · 점수 변화 41.5 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 농업: COMPARISON_UNAVAILABLE · 점수 변화 19.22 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자전거: COMPARISON_UNAVAILABLE · 점수 변화 0.4 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 해저터널(지하화/지하도로 등): COMPARISON_UNAVAILABLE · 점수 변화 33.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 강관업체(Steel pipe): COMPARISON_UNAVAILABLE · 점수 변화 44.49 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기차: COMPARISON_UNAVAILABLE · 점수 변화 27.88 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 국내 상장 중국기업: COMPARISON_UNAVAILABLE · 점수 변화 7.72 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스마트그리드(지능형전력망): COMPARISON_UNAVAILABLE · 점수 변화 50.42 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 미디어(방송/신문): COMPARISON_UNAVAILABLE · 점수 변화 11.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 보안주(물리): COMPARISON_UNAVAILABLE · 점수 변화 17.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - GTX(수도권 광역급행철도): COMPARISON_UNAVAILABLE · 점수 변화 39.2 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 바이오시밀러(복제 바이오의약품): COMPARISON_UNAVAILABLE · 점수 변화 16.15 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 탄소나노튜브(CNT): COMPARISON_UNAVAILABLE · 점수 변화 11.84 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 철도: COMPARISON_UNAVAILABLE · 점수 변화 29.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 모바일게임(스마트폰): COMPARISON_UNAVAILABLE · 점수 변화 6.66 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 겨울: COMPARISON_UNAVAILABLE · 점수 변화 20.71 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - LED장비: COMPARISON_UNAVAILABLE · 점수 변화 50.87 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자동차부품: COMPARISON_UNAVAILABLE · 점수 변화 18.25 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 모바일콘텐츠(스마트폰/태블릿PC): COMPARISON_UNAVAILABLE · 점수 변화 2.19 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전자결제(전자화폐): COMPARISON_UNAVAILABLE · 점수 변화 34.42 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 클라우드 컴퓨팅: COMPARISON_UNAVAILABLE · 점수 변화 10.37 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스마트폰: COMPARISON_UNAVAILABLE · 점수 변화 18.33 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - CCTV＆DVR: COMPARISON_UNAVAILABLE · 점수 변화 23.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 생명보험: COMPARISON_UNAVAILABLE · 점수 변화 19.99 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 기업인수목적회사(SPAC): COMPARISON_UNAVAILABLE · 점수 변화 8.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마스크: COMPARISON_UNAVAILABLE · 점수 변화 4.78 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - PCB(FPCB 등): COMPARISON_UNAVAILABLE · 점수 변화 42.9 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 모바일솔루션(스마트폰): COMPARISON_UNAVAILABLE · 점수 변화 13.84 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 증강현실(AR): COMPARISON_UNAVAILABLE · 점수 변화 19.06 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스포츠행사 수혜(올림픽, 월드컵 등): COMPARISON_UNAVAILABLE · 점수 변화 7.07 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 공작기계: COMPARISON_UNAVAILABLE · 점수 변화 10.83 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 희귀금속(희토류 등): COMPARISON_UNAVAILABLE · 점수 변화 36.47 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 조선: COMPARISON_UNAVAILABLE · 점수 변화 46.09 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 음성인식: COMPARISON_UNAVAILABLE · 점수 변화 36.62 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 시스템반도체: COMPARISON_UNAVAILABLE · 점수 변화 31.16 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 환율하락 수혜: COMPARISON_UNAVAILABLE · 점수 변화 18.01 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 리츠(REITs): COMPARISON_UNAVAILABLE · 점수 변화 -2.97 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 고령화 사회(노인복지): COMPARISON_UNAVAILABLE · 점수 변화 20.18 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 남-북-러 가스관사업: COMPARISON_UNAVAILABLE · 점수 변화 40.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 엔젤산업: COMPARISON_UNAVAILABLE · 점수 변화 15.6 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - SNS(소셜네트워크서비스): COMPARISON_UNAVAILABLE · 점수 변화 24.28 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 백화점: COMPARISON_UNAVAILABLE · 점수 변화 48.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화학섬유: COMPARISON_UNAVAILABLE · 점수 변화 18.9 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 패션/의류: COMPARISON_UNAVAILABLE · 점수 변화 8.64 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 무선충전기술: COMPARISON_UNAVAILABLE · 점수 변화 46.99 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건설 중소형: COMPARISON_UNAVAILABLE · 점수 변화 22.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 셰일가스(Shale Gas): COMPARISON_UNAVAILABLE · 점수 변화 31.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 일자리(취업): COMPARISON_UNAVAILABLE · 점수 변화 3.29 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 종합상사: COMPARISON_UNAVAILABLE · 점수 변화 32.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 3D 프린터: COMPARISON_UNAVAILABLE · 점수 변화 36.59 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 제습기: COMPARISON_UNAVAILABLE · 점수 변화 33.16 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전력저장장치(ESS): COMPARISON_UNAVAILABLE · 점수 변화 42.81 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - LED: COMPARISON_UNAVAILABLE · 점수 변화 24.04 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 페인트: COMPARISON_UNAVAILABLE · 점수 변화 12.2 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가상화폐(비트코인 등): COMPARISON_UNAVAILABLE · 점수 변화 28.39 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스마트카(SMART CAR): COMPARISON_UNAVAILABLE · 점수 변화 46.29 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 재난/안전(지진/화재 등): COMPARISON_UNAVAILABLE · 점수 변화 20.54 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 핀테크(FinTech): COMPARISON_UNAVAILABLE · 점수 변화 16.76 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 인터넷은행: COMPARISON_UNAVAILABLE · 점수 변화 6.45 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 삼성페이: COMPARISON_UNAVAILABLE · 점수 변화 16.53 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 드론(Drone): COMPARISON_UNAVAILABLE · 점수 변화 26.11 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 가상현실(VR): COMPARISON_UNAVAILABLE · 점수 변화 26.16 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 해운: COMPARISON_UNAVAILABLE · 점수 변화 0.59 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자율주행차: COMPARISON_UNAVAILABLE · 점수 변화 27.76 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 5G(5세대 이동통신): COMPARISON_UNAVAILABLE · 점수 변화 25.52 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 유전자 치료제/분석: COMPARISON_UNAVAILABLE · 점수 변화 11.91 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 치매: COMPARISON_UNAVAILABLE · 점수 변화 17.92 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건설기계: COMPARISON_UNAVAILABLE · 점수 변화 29.88 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 항공기부품: COMPARISON_UNAVAILABLE · 점수 변화 33.64 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 홈쇼핑: COMPARISON_UNAVAILABLE · 점수 변화 8.87 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 면세점: COMPARISON_UNAVAILABLE · 점수 변화 35.68 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - LNG(액화천연가스): COMPARISON_UNAVAILABLE · 점수 변화 30.52 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 플렉서블 디스플레이: COMPARISON_UNAVAILABLE · 점수 변화 37.4 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 편의점: COMPARISON_UNAVAILABLE · 점수 변화 27.82 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 키오스크(KIOSK): COMPARISON_UNAVAILABLE · 점수 변화 20.89 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 수소에너지(수소차/연료전지 등): COMPARISON_UNAVAILABLE · 점수 변화 27.08 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 블록체인: COMPARISON_UNAVAILABLE · 점수 변화 10.81 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 아이폰: COMPARISON_UNAVAILABLE · 점수 변화 33.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 면역항암제: COMPARISON_UNAVAILABLE · 점수 변화 20.79 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마이크로 LED: COMPARISON_UNAVAILABLE · 점수 변화 16.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스마트팩토리(스마트공장): COMPARISON_UNAVAILABLE · 점수 변화 33.94 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 갤럭시 부품주: COMPARISON_UNAVAILABLE · 점수 변화 25.04 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 보톡스(보툴리눔톡신): COMPARISON_UNAVAILABLE · 점수 변화 31.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - DMZ 평화공원: COMPARISON_UNAVAILABLE · 점수 변화 3.44 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 조림사업: COMPARISON_UNAVAILABLE · 점수 변화 31.79 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 원자력발전소 해체: COMPARISON_UNAVAILABLE · 점수 변화 53.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 아스콘(아스팔트 콘크리트): COMPARISON_UNAVAILABLE · 점수 변화 11.68 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 폴더블폰: COMPARISON_UNAVAILABLE · 점수 변화 34.98 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - MLCC(적층세라믹콘덴서): COMPARISON_UNAVAILABLE · 점수 변화 55.05 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 호텔/리조트: COMPARISON_UNAVAILABLE · 점수 변화 33.25 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 카메라모듈/부품: COMPARISON_UNAVAILABLE · 점수 변화 33.09 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 그래핀: COMPARISON_UNAVAILABLE · 점수 변화 28.53 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 아프리카 돼지열병(ASF): COMPARISON_UNAVAILABLE · 점수 변화 14.76 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 게임: COMPARISON_UNAVAILABLE · 점수 변화 5.87 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 日제품 불매운동(수혜): COMPARISON_UNAVAILABLE · 점수 변화 -0.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 日 수출 규제(국산화 등): COMPARISON_UNAVAILABLE · 점수 변화 44.97 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 양자암호/양자컴퓨팅: COMPARISON_UNAVAILABLE · 점수 변화 8.18 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 재택근무/스마트워크: COMPARISON_UNAVAILABLE · 점수 변화 9.22 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 코로나19(진단/치료제/백신 개발 등): COMPARISON_UNAVAILABLE · 점수 변화 13.62 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 시멘트/레미콘: COMPARISON_UNAVAILABLE · 점수 변화 24.98 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(장비): COMPARISON_UNAVAILABLE · 점수 변화 25.47 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(소재/부품): COMPARISON_UNAVAILABLE · 점수 변화 29.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 코로나19(진단키트): COMPARISON_UNAVAILABLE · 점수 변화 10.11 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 코로나19(치료제/백신 개발 등): COMPARISON_UNAVAILABLE · 점수 변화 26.86 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(생산): COMPARISON_UNAVAILABLE · 점수 변화 1.57 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 캐릭터상품: COMPARISON_UNAVAILABLE · 점수 변화 23.01 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 코로나19(음압병실/음압구급차): COMPARISON_UNAVAILABLE · 점수 변화 35.93 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - UAM(도심항공모빌리티): COMPARISON_UNAVAILABLE · 점수 변화 28.56 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 콜드체인(저온 유통): COMPARISON_UNAVAILABLE · 점수 변화 12.34 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 모더나(MODERNA): COMPARISON_UNAVAILABLE · 점수 변화 17.11 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화이자(PFIZER): COMPARISON_UNAVAILABLE · 점수 변화 40.29 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 카지노: COMPARISON_UNAVAILABLE · 점수 변화 34.79 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마이크로바이옴: COMPARISON_UNAVAILABLE · 점수 변화 10.96 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(전고체): COMPARISON_UNAVAILABLE · 점수 변화 35.25 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 쿠팡(coupang): COMPARISON_UNAVAILABLE · 점수 변화 19.35 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 영화: COMPARISON_UNAVAILABLE · 점수 변화 13.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 메타버스(Metaverse): COMPARISON_UNAVAILABLE · 점수 변화 21.55 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마켓컬리(kurly): COMPARISON_UNAVAILABLE · 점수 변화 34.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 두나무(Dunamu): COMPARISON_UNAVAILABLE · 점수 변화 41.55 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 야놀자(Yanolja): COMPARISON_UNAVAILABLE · 점수 변화 50.31 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 건강기능식품: COMPARISON_UNAVAILABLE · 점수 변화 8.71 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 웹툰: COMPARISON_UNAVAILABLE · 점수 변화 18.64 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 카카오뱅크(kakao BANK): COMPARISON_UNAVAILABLE · 점수 변화 4.43 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 인터넷 대표주: COMPARISON_UNAVAILABLE · 점수 변화 30.75 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - NFT(대체불가토큰): COMPARISON_UNAVAILABLE · 점수 변화 13.49 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - mRNA(메신저 리보핵산): COMPARISON_UNAVAILABLE · 점수 변화 28.48 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 골프: COMPARISON_UNAVAILABLE · 점수 변화 6.43 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 토스(toss): COMPARISON_UNAVAILABLE · 점수 변화 18.85 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 폐배터리: COMPARISON_UNAVAILABLE · 점수 변화 40.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 리비안(RIVIAN): COMPARISON_UNAVAILABLE · 점수 변화 29.84 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(LFP/리튬인산철): COMPARISON_UNAVAILABLE · 점수 변화 34.42 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 요소수: COMPARISON_UNAVAILABLE · 점수 변화 34.64 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 로봇(산업용/협동로봇 등): COMPARISON_UNAVAILABLE · 점수 변화 31.01 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 탈모 치료: COMPARISON_UNAVAILABLE · 점수 변화 29.11 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마이데이터: COMPARISON_UNAVAILABLE · 점수 변화 0.91 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 니켈: COMPARISON_UNAVAILABLE · 점수 변화 41.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 미용기기: COMPARISON_UNAVAILABLE · 점수 변화 27.66 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기차(충전소/충전기): COMPARISON_UNAVAILABLE · 점수 변화 37.08 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전후 재건(우크라/중동 전쟁 등): COMPARISON_UNAVAILABLE · 점수 변화 29.23 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 교육/온라인 교육: COMPARISON_UNAVAILABLE · 점수 변화 8.98 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 피팅(관이음쇠)/밸브: COMPARISON_UNAVAILABLE · 점수 변화 48.87 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 애플페이: COMPARISON_UNAVAILABLE · 점수 변화 33.9 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 리튬: COMPARISON_UNAVAILABLE · 점수 변화 27.48 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 모듈러주택: COMPARISON_UNAVAILABLE · 점수 변화 34.08 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 렌터카: COMPARISON_UNAVAILABLE · 점수 변화 10.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 윤활유: COMPARISON_UNAVAILABLE · 점수 변화 0.4 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - AI 챗봇(챗GPT 등): COMPARISON_UNAVAILABLE · 점수 변화 25.49 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - STO(토큰증권 발행): COMPARISON_UNAVAILABLE · 점수 변화 16.69 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전력반도체: COMPARISON_UNAVAILABLE · 점수 변화 50.13 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 페라이트: COMPARISON_UNAVAILABLE · 점수 변화 42.34 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - HBM(고대역폭메모리): COMPARISON_UNAVAILABLE · 점수 변화 46.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 초전도체: COMPARISON_UNAVAILABLE · 점수 변화 40.77 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 비만치료제: COMPARISON_UNAVAILABLE · 점수 변화 17.66 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 의료AI: COMPARISON_UNAVAILABLE · 점수 변화 21.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 온디바이스 AI: COMPARISON_UNAVAILABLE · 점수 변화 55.01 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 마이코플라스마 폐렴: COMPARISON_UNAVAILABLE · 점수 변화 14.67 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - CXL(컴퓨트익스프레스링크): COMPARISON_UNAVAILABLE · 점수 변화 38.94 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 보안주(정보): COMPARISON_UNAVAILABLE · 점수 변화 0.49 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 뉴로모픽 반도체: COMPARISON_UNAVAILABLE · 점수 변화 39.05 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 유리 기판: COMPARISON_UNAVAILABLE · 점수 변화 42.19 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 고체산화물 연료전지(SOFC): COMPARISON_UNAVAILABLE · 점수 변화 52.95 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - NI(네트워크통합): COMPARISON_UNAVAILABLE · 점수 변화 28.51 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 냉각시스템(액침냉각 등): COMPARISON_UNAVAILABLE · 점수 변화 36.0 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 전기차 화재 방지(배터리 열폭주 등): COMPARISON_UNAVAILABLE · 점수 변화 43.52 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 딥페이크(deepfake): COMPARISON_UNAVAILABLE · 점수 변화 -0.99 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 밸류업(24년 기업가치 제고계획 발표): COMPARISON_UNAVAILABLE · 점수 변화 20.95 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 코리아 밸류업 지수(Korea Value-up Index): COMPARISON_UNAVAILABLE · 점수 변화 17.01 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 밸류업(25년 기업가치 제고계획 발표): COMPARISON_UNAVAILABLE · 점수 변화 15.85 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 지역화폐: COMPARISON_UNAVAILABLE · 점수 변화 40.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 퓨리오사AI: COMPARISON_UNAVAILABLE · 점수 변화 35.74 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지(나트륨이온): COMPARISON_UNAVAILABLE · 점수 변화 42.84 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 유심(USIM): COMPARISON_UNAVAILABLE · 점수 변화 24.5 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 탈 플라스틱(친환경/생분해성 등): COMPARISON_UNAVAILABLE · 점수 변화 22.2 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스테이블코인: COMPARISON_UNAVAILABLE · 점수 변화 15.74 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 스페이스X(SpaceX): COMPARISON_UNAVAILABLE · 점수 변화 42.35 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 김밥(냉동김밥 등): COMPARISON_UNAVAILABLE · 점수 변화 16.25 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 광통신(광케이블/광섬유 등): COMPARISON_UNAVAILABLE · 점수 변화 44.03 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 피지컬 AI/휴머노이드 로봇: COMPARISON_UNAVAILABLE · 점수 변화 44.51 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 광고: COMPARISON_UNAVAILABLE · 점수 변화 2.27 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2026 상반기 신규상장: COMPARISON_UNAVAILABLE · 점수 변화 20.71 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 서울고속버스터미널 재개발 수혜: COMPARISON_UNAVAILABLE · 점수 변화 20.82 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 부동산 보유 자산주: COMPARISON_UNAVAILABLE · 점수 변화 22.0 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 귀금속(금/은): COMPARISON_UNAVAILABLE · 점수 변화 9.24 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 우주태양광(페로브스카이트 등): COMPARISON_UNAVAILABLE · 점수 변화 32.52 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 오가노이드: COMPARISON_UNAVAILABLE · 점수 변화 24.15 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 콩/대두: COMPARISON_UNAVAILABLE · 점수 변화 46.0 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 소캠(SOCAMM): COMPARISON_UNAVAILABLE · 점수 변화 48.41 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 육계: COMPARISON_UNAVAILABLE · 점수 변화 22.26 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 주유소: COMPARISON_UNAVAILABLE · 점수 변화 8.33 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 반도체 기판(FC-BGA/PCB/MLB 등): COMPARISON_UNAVAILABLE · 점수 변화 51.57 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - S7(삼성전자/SK하이닉스 등): COMPARISON_UNAVAILABLE · 점수 변화 56.7 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2026 하반기 신규상장: COMPARISON_UNAVAILABLE · 점수 변화 43.61 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 철강 주요종목: COMPARISON_UNAVAILABLE · 점수 변화 39.86 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 제지: COMPARISON_UNAVAILABLE · 점수 변화 7.75 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 2차전지: COMPARISON_UNAVAILABLE · 점수 변화 27.11 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 줄기세포: COMPARISON_UNAVAILABLE · 점수 변화 32.55 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 철강 중소형: COMPARISON_UNAVAILABLE · 점수 변화 23.04 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 여름: COMPARISON_UNAVAILABLE · 점수 변화 16.19 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 자원개발: COMPARISON_UNAVAILABLE · 점수 변화 20.4 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 화폐/금융자동화기기(디지털화폐 등): COMPARISON_UNAVAILABLE · 점수 변화 22.32 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 태풍 및 장마: COMPARISON_UNAVAILABLE · 점수 변화 13.4 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 주류업(주정, 에탄올 등): COMPARISON_UNAVAILABLE · 점수 변화 4.38 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - OLED(유기 발광 다이오드): COMPARISON_UNAVAILABLE · 점수 변화 27.19 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 수산: COMPARISON_UNAVAILABLE · 점수 변화 5.93 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 통신장비: COMPARISON_UNAVAILABLE · 점수 변화 28.3 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 조선기자재: COMPARISON_UNAVAILABLE · 점수 변화 47.0 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 음원/음반: COMPARISON_UNAVAILABLE · 점수 변화 -1.86 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+  - 지능형로봇/인공지능(AI): COMPARISON_UNAVAILABLE · 점수 변화 23.67 · 지속 1일 · 구성 변경 없음 · 원천 UNVERIFIED
+
+## 3. 키움 후보 추적·조건별 대응
+
+| 종목명 | 종목코드 | 가격 | 등락률 | 조건 판정 |
+|---|---:|---:|---:|---|
+| 라온시큐어 | 042510 | 18,050원 | -7.20% | 확인 대기 |
+| 삼성바이오로직스 | 207940 | 1,440,000원 | -3.16% | 확인 대기 |
+
+- 키움 후보 성과 추적: PENDING · 원본 data/trading-discovery/2026-11-02.json
+  - 이름 미확인(042510): 선정일 종가 확인 불가 · D+1 대기 / PENDING, D+3 대기 / PENDING, D+5 대기 / PENDING · 전략 판정 UNVERIFIED
+  - 이름 미확인(207940): 선정일 종가 확인 불가 · D+1 대기 / PENDING, D+3 대기 / PENDING, D+5 대기 / PENDING · 전략 판정 UNVERIFIED
+
+> NOTICE: CONTRACT_VERIFIED
