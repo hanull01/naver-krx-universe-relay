@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: generated-data-write
@@ -469,6 +470,17 @@ jobs:
           git rebase origin/main
           git push origin HEAD:main
           echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch daily report after successful backfill
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run daily-report.yml --ref main \
+            -f as_of="${{ steps.previous_day.outputs.target_date }}"
+          echo "Dispatched daily-report for ${{ steps.previous_day.outputs.target_date }}."
 
       - name: Report safe NOOP
         if: steps.market_day.outputs.noop == 'true' || steps.targets.outputs.noop == 'true' || inputs.dry_run == true
