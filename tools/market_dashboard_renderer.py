@@ -993,3 +993,490 @@ def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Ma
         if left.get(key) != right.get(key):
             mismatches.append(key)
     return mismatches
+
+
+# ---------------------------------------------------------------------------
+# User-facing projection
+# ---------------------------------------------------------------------------
+# The functions below intentionally supersede the older verbose projection
+# above.  Keeping the approved template loader and the A v1.1 section/classes
+# preserves template lineage while preventing internal lineage metadata and
+# every raw group row from leaking into the user view.
+
+def _compact_date(value: Any) -> str:
+    text = str(value or "").strip().replace("-", "")
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return _text(value)
+
+
+def _compact_kst(value: Any) -> str:
+    if value in (None, ""):
+        return "확인 불가"
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo:
+            parsed = parsed.astimezone(ZoneInfo("Asia/Seoul"))
+        return parsed.strftime("%Y-%m-%d %H:%M KST")
+    except (TypeError, ValueError):
+        return _compact_date(value)
+
+
+def _compact_normalized_date(value: Any) -> str | None:
+    text = str(value or "").replace("-", "").strip()
+    return text if len(text) == 8 and text.isdigit() else None
+
+
+def _compact_row_available(row: Mapping[str, Any]) -> bool:
+    values = (
+        row.get("status"), row.get("dataStatus"), row.get("qualityStatus"),
+        row.get("dataQuality"), row.get("membershipStatus"),
+        row.get("sourceCommitStatus"), row.get("sourceProvenanceStatus"),
+        row.get("eligibility"),
+    )
+    blocked = {"UNAVAILABLE", "PARTIAL", "UNVERIFIED", "STALE", "INVALID", "INELIGIBLE"}
+    return not any(
+        any(token in str(value).upper() for token in blocked)
+        for value in values if value not in (None, "")
+    )
+
+
+def _compact_v2_verified(contract: Mapping[str, Any], v2: Mapping[str, Any]) -> bool:
+    source_commit = v2.get("sourceCommit")
+    commit_status = str(v2.get("sourceCommitStatus") or "").upper()
+    if not source_commit or commit_status not in {"VERIFIED", "AVAILABLE", "OK"}:
+        return False
+    expected = _compact_normalized_date((contract.get("tradingDateEvidence") or {}).get("tradingDate") or contract.get("asOf"))
+    observed = _compact_normalized_date(v2.get("tradingDate"))
+    if not expected or expected != observed:
+        return False
+    return str(v2.get("sourceQualityStatus") or "").upper() not in {"UNAVAILABLE", "PARTIAL", "STALE", "INVALID"}
+
+
+def _compact_relative_top5(contract: Mapping[str, Any], key: str) -> list[Mapping[str, Any]]:
+    relative = contract.get("relativeStrengthTop5") or {}
+    section = relative.get(key) or {}
+    if str(relative.get("status") or "").upper() in {"UNAVAILABLE", "FAILED", "INVALID"}:
+        return []
+    if _compact_normalized_date(relative.get("tradingDate")) != _compact_normalized_date(contract.get("asOf")):
+        return []
+    return [
+        row for row in (section.get("top5") or [])
+        if isinstance(row, Mapping) and _compact_row_available(row) and row.get("eligibility", "ELIGIBLE") == "ELIGIBLE"
+    ][:5]
+
+
+def _compact_interest_rows(contract: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    for key in ("registeredUniverse", "monitoredUniverse", "userWatchlist", "interestStocks"):
+        value = contract.get(key)
+        items = value.get("items") or value.get("stocks") or [] if isinstance(value, Mapping) else value or []
+        if items:
+            return [row for row in items if isinstance(row, Mapping)][:1]
+    # The configured user universe is Samsung Electronics.  No market values
+    # are invented when the current contract does not carry its projection.
+    return [{"itemCode": "005930", "itemName": "삼성전자", "status": "UNAVAILABLE"}]
+
+
+def _compact_interest(row: Mapping[str, Any]) -> dict[str, str]:
+    metrics = row.get("metrics") or row.get("technicals") or row
+    state = row.get("state") or row
+    def pick(*sources: Mapping[str, Any], keys: tuple[str, ...]) -> Any:
+        for source in sources:
+            for key in keys:
+                if source.get(key) not in (None, ""):
+                    return source[key]
+        return None
+    return {
+        "name": _text(row.get("itemName") or row.get("name"), "삼성전자"),
+        "code": _text(row.get("itemCode") or row.get("code"), "005930"),
+        "price": _price(pick(row, metrics, keys=("price", "currentPrice", "close"))),
+        "ma20": _price(pick(row, metrics, keys=("ma20", "MA20"))),
+        "ma60": _price(pick(row, metrics, keys=("ma60", "MA60"))),
+        "trend": _text(pick(row, state, keys=("trend", "trendStatus")), "확인 대기"),
+        "status": _text(row.get("status") or row.get("dataStatus") or row.get("qualityStatus"), "확인 대기"),
+    }
+
+
+def _compact_leaders(row: Mapping[str, Any]) -> str:
+    leaders = row.get("leaderCandidates") or row.get("leaders") or []
+    values = [
+        f"{_text(item.get('name'), '이름 확인 대기')}({_text(item.get('code'), '코드 확인 대기')})"
+        for item in leaders[:3] if isinstance(item, Mapping)
+    ]
+    return ", ".join(values) if values else "주도주 자료 없음"
+
+
+def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool = False) -> dict[str, Any]:
+    contract = report.get("reportContract") if isinstance(report.get("reportContract"), Mapping) else report
+    if not isinstance(contract, Mapping):
+        raise TemplateUnavailable("CONTRACT_UNAVAILABLE")
+    full_market = contract.get("fullMarket") or {}
+    breadth = full_market.get("breadth") or {}
+    total = _num(full_market.get("totalCount"))
+    advancers = _num(breadth.get("advancers"))
+    decliners = _num(breadth.get("decliners"))
+    unchanged = _num(breadth.get("unchanged"))
+    if None in (total, advancers, decliners, unchanged) or advancers + decliners + unchanged != total:
+        raise TemplateUnavailable("CONTRACT_UNAVAILABLE:BREADTH_ARITHMETIC_MISMATCH")
+    v2 = contract.get("v2") or {}
+    rendering = contract.get("rendering") or {}
+    status = _text(contract.get("status"), "PARTIAL")
+    quality = _text(contract.get("sourceQualityStatus"), "확인 대기")
+    reason = _text(rendering.get("reason"), quality if status != "AVAILABLE" else "확인된 계약 자료")
+    relative_industries = _compact_relative_top5(contract, "industries")
+    relative_themes = _compact_relative_top5(contract, "themes")
+    v2_verified = _compact_v2_verified(contract, v2)
+    return {
+        "contract": contract,
+        "asOf": _compact_date(contract.get("asOf") or report.get("asOf")),
+        "asOfRaw": contract.get("asOf") or report.get("asOf"),
+        "writtenAt": _compact_kst(report.get("writtenAt") or report.get("generatedAt") or contract.get("observedAt")),
+        "observedAt": _compact_kst(contract.get("observedAt") or report.get("generatedAt")),
+        "tradingDateStatus": _text(contract.get("tradingDateStatus")),
+        "status": status,
+        "quality": quality,
+        "reason": reason,
+        "htmlAllowed": bool(rendering.get("htmlAllowed") or allow_current_observation),
+        "indices": list(contract.get("indices") or []),
+        "indexSessionLabel": _index_session_summary(list(contract.get("indices") or [])),
+        "sessionContext": contract.get("sessionContext") or {"mode": "NOT_PREOPEN"},
+        "fullMarket": {
+            "total": total,
+            "advancers": advancers,
+            "decliners": decliners,
+            "unchanged": unchanged,
+            "declineRatio": round(decliners / total * 100, 2) if total else None,
+            "marketTradingValue": full_market.get("marketTradingValue") or {},
+            "metrics": full_market.get("metrics") or {},
+        },
+        "relativeIndustries": relative_industries,
+        "relativeThemes": relative_themes,
+        "v1Industries": [row for row in relative_industries if row.get("v1Status") not in (None, "")],
+        "v2Verified": v2_verified,
+        "v2Industries": list(v2.get("industries") or [])[:5] if v2_verified else [],
+        "v2Themes": list(v2.get("themes") or [])[:5] if v2_verified else [],
+        "v2HoldReason": "V2 판정 보류 — 원천 검증 대기",
+        "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
+        "kiwoom": contract.get("kiwoomCandidates") or {},
+        "notice": reason,
+    }
+
+
+def _compact_index_reason(row: Mapping[str, Any] | None, name: str, expected_date: Any) -> str:
+    if not row:
+        return f"{name} 원천이 계약에 없음"
+    for key in ("reason", "error", "valueStatus", "dataStatus", "qualityStatus"):
+        value = row.get(key)
+        if value not in (None, "") and str(value).upper() not in {"AVAILABLE", "OK"}:
+            return str(value)
+    if row.get("close") is None:
+        return f"{name} close 누락"
+    source_time = row.get("sourceTime")
+    if not source_time:
+        return f"{name} sourceTime 누락"
+    source_date = _compact_normalized_date(str(source_time)[:10])
+    if source_date and source_date != _compact_normalized_date(expected_date):
+        return f"{name} 기준일 불일치"
+    return f"{name} 지수 원천 검증 대기"
+
+
+def _compact_index_available(row: Mapping[str, Any], expected_date: Any = None) -> bool:
+    statuses = (row.get("status"), row.get("dataStatus"), row.get("qualityStatus"), row.get("valueStatus"))
+    if any(any(token in str(value).upper() for token in ("UNAVAILABLE", "PARTIAL", "UNVERIFIED", "STALE", "INVALID")) for value in statuses if value not in (None, "")):
+        return False
+    if not isinstance(row.get("close"), (int, float)) or not row.get("sourceTime"):
+        return False
+    if expected_date is not None:
+        source_date = _compact_normalized_date(str(row.get("sourceTime"))[:10])
+        if source_date and source_date != _compact_normalized_date(expected_date):
+            return False
+    return True
+
+
+def _compact_index_cards(model: Mapping[str, Any]) -> str:
+    cards = []
+    rows_by_name = {
+        row.get("name") or row.get("indexName"): row
+        for row in model["indices"]
+        if (row.get("name") or row.get("indexName")) in {"KOSPI", "KOSDAQ"}
+    }
+    for name in ("KOSPI", "KOSDAQ"):
+        row = rows_by_name.get(name)
+        available = _compact_index_available(row or {}, model.get("asOfRaw"))
+        close = row.get("close") if available else None
+        points = row.get("changePoints") if available else None
+        rate = row.get("changeRate") if available else None
+        source_time = _compact_kst(row.get("sourceTime")) if available else "원천 확인 대기"
+        cards.append(
+            f'<article class="card index-card"><div class="index-name">{_escape(name)}</div>'
+            f'<div class="index-value">{_escape(f"{close:,.2f}" if isinstance(close, (int, float)) else "확인 불가")}</div>'
+            f'<div class="change {_change_class(rate)}">{_escape(f"{points:+,.2f}p" if isinstance(points, (int, float)) else "확인 불가")} ({_escape(_pct(rate))})</div>'
+            f'<div class="subvalue">{_escape(source_time)} · {_escape(_index_session_label(row or {}))}</div>'
+            f'{"<p class=\"muted tiny\">" + _escape(_compact_index_reason(row, name, model.get("asOfRaw"))) + "</p>" if not available else ""}</article>'
+        )
+    return "".join(cards)
+
+
+def _compact_rank_cards(rows: list[Mapping[str, Any]], label: str) -> str:
+    cards = []
+    for row in rows[:5]:
+        if not _compact_row_available(row):
+            continue
+        strength = row.get("relativeStrength")
+        breadth = row.get("breadthPct")
+        cards.append(
+            '<div class="industry-item"><div class="industry-head">'
+            f'<strong>{_escape(row.get("rank") or "")}. {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(row.get("changeClass") or "관측")}</span></div>'
+            '<div class="industry-numbers">'
+            f'<div class="{_change_class(strength)}">{_escape(_pct(strength))}<small>상대강도</small></div>'
+            f'<div>{_escape(_plain_pct(breadth))}<small>상승 비율</small></div>'
+            f'<div>{_escape(str(row.get("memberCount") or "확인 불가"))}<small>구성 종목</small></div>'
+            f'<div style="grid-column:1 / -1;overflow-wrap:anywhere">{_escape(_compact_leaders(row))}<small>대표 주도주 최대 3개</small></div>'
+            '</div></div>'
+        )
+    return "".join(cards) or f'<div class="industry-item"><strong>{_escape(label)} 자료 없음</strong><p>검증된 현재 거래일 자료를 확인 대기 중입니다.</p></div>'
+
+
+def _compact_v1_cards(model: Mapping[str, Any]) -> str:
+    if not model["v1Industries"]:
+        return '<div class="industry-item"><strong>V1 운영 선정 자료 없음</strong><p>현재 거래일의 검증된 V1 상태가 없습니다.</p></div>'
+    return "".join(
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(row.get("v1Status"))}</span></div><p>V1 운영 상태 · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>'
+        for row in model["v1Industries"][:5]
+    )
+
+
+def _compact_v2_cards(model: Mapping[str, Any]) -> str:
+    if not model["v2Verified"]:
+        return '<div class="industry-item"><strong>V2 판정 보류 — 원천 검증 대기</strong><p>점수·ACTIVE·주도주는 표시하지 않습니다.</p></div>'
+    rows = []
+    for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
+        for row in group:
+            if _compact_row_available(row):
+                score = f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 대기"
+                rows.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(row.get("v2Status") or "확인 대기")}</span></div><p>점수 {_escape(score)} · 주도주 {_escape(_compact_leaders(row))}</p></div>')
+    return "".join(rows) or '<div class="industry-item"><strong>V2 자료 없음</strong></div>'
+
+
+def _compact_interest_cards(model: Mapping[str, Any]) -> str:
+    return "".join(
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">관심종목</span><span class="status-chip">{_escape(row["status"])}</span></div><div class="stock-header"><h4>{_escape(row["name"])} <small>({_escape(row["code"])})</small></h4></div><div class="stock-stats"><div class="stock-stat"><small>현재 관측</small><strong>{_escape(row["price"])}</strong></div><div class="stock-stat"><small>MA20</small><strong>{_escape(row["ma20"])}</strong></div><div class="stock-stat"><small>MA60</small><strong>{_escape(row["ma60"])}</strong></div><div class="stock-stat"><small>추세</small><strong>{_escape(row["trend"])}</strong></div></div></article>'
+        for row in model["interests"]
+    )
+
+
+def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
+    rows = model["kiwoom"].get("stocks") or []
+    if not rows:
+        return '<article class="stock"><h4>키움 후보 자료 없음</h4><p>확인된 후보가 없습니다.</p></article>'
+    return "".join(
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(row.get("status") or "관측")}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName"))} <small>({_escape(row.get("itemCode"))})</small></h4></div><div class="stock-stats"><div class="stock-stat"><small>현재 관측</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>조건 판정</small><strong>{_escape(row.get("conditionStatus") or row.get("state") or "확인 대기")}</strong></div></div></article>'
+        for row in rows
+    )
+
+
+def _compact_conclusions(model: Mapping[str, Any]) -> list[str]:
+    market = model["fullMarket"]
+    result = []
+    if model["status"].upper() != "AVAILABLE" or model["quality"].upper() not in {"AVAILABLE", "VERIFIED"}:
+        result.append(f"리포트 상태 {model['status']} — {model['reason']}")
+    if model["relativeIndustries"]:
+        row = model["relativeIndustries"][0]
+        result.append(f"업종 상대강도 1위: {row.get('name') or row.get('id')} ({_pct(row.get('relativeStrength'))})")
+    if model["relativeThemes"]:
+        row = model["relativeThemes"][0]
+        result.append(f"테마 상대강도 1위: {row.get('name') or row.get('id')} ({_pct(row.get('relativeStrength'))})")
+    result.append(f"시장 확산: 상승 {market['advancers']:,} · 하락 {market['decliners']:,} · 보합 {market['unchanged']:,}")
+    if not model["v2Verified"]:
+        result.append("V2 판정 보류 — 원천 검증 대기")
+    return result[:5]
+
+
+def _compact_market_html(model: Mapping[str, Any]) -> str:
+    market = model["fullMarket"]
+    total = market["total"]
+    metrics = market["metrics"]
+    metric_html = "".join(_metric_line(label, metrics.get(key) or {}) for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")))
+    return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article><article class="card"><div class="kpi-label">시장 거래대금</div><div class="kpi-value" style="font-size:16px">{_escape(_market_value_text(market["marketTradingValue"]))}</div><div class="kpi-sub">동일 기준일</div></article></div><div class="grid two"><article class="card"><h3>시장 확산</h3><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율</h3>{metric_html}</article></div>'
+
+
+def _compact_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR, allow_current_observation: bool = False) -> str:
+    assets = load_approved_template(template_dir)
+    model = _compact_model(report, allow_current_observation=allow_current_observation)
+    if not model["htmlAllowed"]:
+        raise TemplateUnavailable("TEMPLATE_UNAVAILABLE:CONTRACT_HTML_NOT_ALLOWED")
+    css = assets["css"] + (
+        ".kpi-value{overflow-wrap:anywhere;word-break:break-word}"
+        ".industry-item,.stock{overflow-wrap:anywhere}"
+        "@media(max-width:520px){"
+        ".wrap{width:100%;min-width:0;overflow-x:hidden}"
+        ".topbar{flex-wrap:wrap;min-width:0}"
+        ".brand,.nav{min-width:0}"
+        ".nav{flex:1 1 100%;justify-content:flex-start;max-width:100%;overflow:visible}"
+        ".section-head{flex-wrap:wrap}"
+        ".section-head .label{margin-left:0;flex-basis:100%}"
+        ".index-grid{grid-template-columns:1fr!important}"
+        ".index-grid .index-card,.card{min-width:0;max-width:100%;width:100%}"
+        ".grid,.kpis,.industry-cards,.stock-list{min-width:0;max-width:100%}"
+        ".kpis{grid-template-columns:1fr}"
+        ".kpi-value{overflow-wrap:anywhere;word-break:break-word}"
+        ".card ul,.card li{min-width:0;overflow-wrap:anywhere;word-break:break-word}"
+        "}"
+    )
+    status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>PARTIAL</b> · {_escape(model["reason"])}</div>'
+    conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>현재 거래일 업종 상대강도 TOP 5</h3><span class="tag">실측</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>현재 거래일 테마 상대강도 TOP 5</h3><span class="tag">상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V1 운영 상태</h3><span class="tag">V2와 분리</span></div><div class="industry-cards">{_compact_v1_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V2 시험 관찰</h3><span class="tag">공식 승격 금지</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    return output
+
+
+def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR, allow_current_observation: bool = False) -> str:
+    load_approved_template(template_dir)
+    model = _compact_model(report, allow_current_observation=allow_current_observation)
+    if not model["htmlAllowed"]:
+        raise TemplateUnavailable("TEMPLATE_UNAVAILABLE:CONTRACT_HTML_NOT_ALLOWED")
+    market = model["fullMarket"]
+    lines = [f"# 국내증시 시장 모니터링 - {model['asOf']}", "", f"- 기준시각: {model['observedAt']}", f"- 거래일 상태: {model['tradingDateStatus']}"]
+    if model["status"].upper() != "AVAILABLE":
+        lines += [f"- 리포트 상태: {model['status']}", f"- 보류 사유: {model['reason']}"]
+    lines += ["", "## 1. 시장 대시보드", "", f"- 세션: {model['indexSessionLabel']}"]
+    if (model.get("sessionContext") or {}).get("mode") == "PREOPEN":
+        observation = model["sessionContext"].get("observation") or {}
+        previous = model["sessionContext"].get("previousTradingDay") or {}
+        lines += [
+            "",
+            "### 장전 관측과 직전 거래일 참고자료",
+            f"- 당일 장전 관측: {_compact_date(observation.get('tradingDate'))} · 상태 {observation.get('status') or '확인 불가'}",
+            f"- 직전 거래일 참고: {_compact_date(previous.get('tradingDate'))} · 상태 {previous.get('status') or '확인 불가'}",
+        ]
+        for row in previous.get("indices") or []:
+            lines.append(f"- 직전 {row.get('name') or row.get('code')}: {row.get('close') if row.get('close') is not None else '확인 불가'} · {row.get('changeRate') if row.get('changeRate') is not None else '확인 불가'}% · 당일 장전 자료와 혼합하지 않음")
+    for row in model["indices"]:
+        name = row.get("name") or row.get("indexName")
+        if name in {"KOSPI", "KOSDAQ"}:
+            available = _compact_index_available(row, model.get("asOfRaw"))
+            lines.append(f"- {name}: {_price(row.get('close')) if available else '확인 불가'} · {_pct(row.get('changeRate')) if available else '확인 불가'} · {_compact_kst(row.get('sourceTime')) if available else '원천 확인 대기'}")
+    lines += [f"- 상승/하락/보합: {market['advancers']:,}/{market['decliners']:,}/{market['unchanged']:,}", f"- 하락 비율: {_plain_pct(market['declineRatio'])}", f"- 시장 거래대금: {_market_value_text(market['marketTradingValue'])}"]
+    for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")):
+        lines.append(f"- {label}: {_metric_line_value(market['metrics'].get(key) or {})}")
+    lines += ["", "### 핵심 결론", ""] + [f"- {item}" for item in _compact_conclusions(model)]
+    lines += ["", "## 2. 주도 업종·테마", "", "### 업종 상대강도 TOP 5"]
+    lines += [f"- {row.get('rank')}. {row.get('name') or row.get('id')} · 상대강도 {_pct(row.get('relativeStrength'))} · 상승 비율 {_plain_pct(row.get('breadthPct'))} · 주도주 {_compact_leaders(row)}" for row in model["relativeIndustries"]] or ["- 자료 없음"]
+    lines += ["", "### 테마 상대강도 TOP 5"]
+    lines += [f"- {row.get('rank')}. {row.get('name') or row.get('id')} · 상대강도 {_pct(row.get('relativeStrength'))} · 상승 비율 {_plain_pct(row.get('breadthPct'))} · 주도주 {_compact_leaders(row)}" for row in model["relativeThemes"]] or ["- 자료 없음"]
+    lines += ["", "### V1 운영 상태"]
+    lines += [f"- {row.get('name') or row.get('id')} · V1 {row.get('v1Status')} · 주도주 {_compact_leaders(row)}" for row in model["v1Industries"]] or ["- 자료 없음"]
+    lines += ["", "### V2 시험 관찰", f"- {'검증된 V2 자료' if model['v2Verified'] else 'V2 판정 보류 — 원천 검증 대기'}"]
+    if model["v2Verified"]:
+        lines += [f"- {row.get('name') or row.get('id')} · V2 {row.get('v2Status') or '확인 대기'} · 점수 {row.get('score') if row.get('score') is not None else '확인 대기'} · 주도주 {_compact_leaders(row)}" for row in (model["v2Industries"] + model["v2Themes"])[:5]]
+    lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
+    lines += [f"- {row['name']}({row['code']}) · 현재 관측 {row['price']} · MA20 {row['ma20']} · MA60 {row['ma60']} · 추세 {row['trend']} · 상태 {row['status']}" for row in model["interests"]]
+    lines += ["", "### 키움 전일 발굴 후보"]
+    lines += [f"- {_text(row.get('itemName'))}({row.get('itemCode')}) · 현재 관측 {_price(_first(row, 'price', 'currentPrice'))} · 조건 판정 {row.get('conditionStatus') or row.get('state') or '확인 대기'}" for row in model["kiwoom"].get("stocks") or []] or ["- 자료 없음"]
+    lines += ["", f"> NOTICE: {model['notice']}", ""]
+    return "\n".join(lines)
+
+
+def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, Any]) -> list[str]:
+    plain = html.unescape(html_text)
+    issues: list[str] = []
+    for field, token, text in (("MARKDOWN_PART1", "## 1. 시장 대시보드", markdown_text), ("MARKDOWN_PART2", "## 2. 주도 업종·테마", markdown_text), ("MARKDOWN_PART3", "## 3. 관심종목·키움 후보", markdown_text), ("HTML_PART1", 'id="part1"', plain), ("HTML_PART2", 'id="part2"', plain), ("HTML_PART3", 'id="part3"', plain)):
+        if token not in text:
+            issues.append(f"{field}_MISSING")
+    for forbidden in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256", "sourceSha256"):
+        if forbidden in markdown_text or forbidden in plain:
+            issues.append(f"INTERNAL_TRACE_EXPOSED:{forbidden}")
+    if "<pre" in plain.lower():
+        issues.append("HTML_MARKDOWN_PRE_EXPOSED")
+    if "+00:00" in markdown_text or "+00:00" in plain:
+        issues.append("RAW_UTC_EXPOSED")
+    def markdown_section(heading: str) -> str:
+        match = re.search(rf"^{re.escape(heading)}\s*$([\s\S]*?)(?=^##\s|\Z)", markdown_text, re.MULTILINE)
+        return match.group(1) if match else ""
+
+    def html_section(section_id: str) -> str:
+        match = re.search(rf'<section[^>]*\bid="{re.escape(section_id)}"[^>]*>([\s\S]*?)</section>', plain, re.IGNORECASE)
+        return match.group(1) if match else ""
+
+    part1_md, part1_html = markdown_section("## 1. 시장 대시보드"), html_section("part1")
+    part2_md, part2_html = markdown_section("## 2. 주도 업종·테마"), html_section("part2")
+    part3_md, part3_html = markdown_section("## 3. 관심종목·키움 후보"), html_section("part3")
+
+    required = [model["asOf"], model["tradingDateStatus"], model["indexSessionLabel"], f"{model['fullMarket']['advancers']:,}", f"{model['fullMarket']['decliners']:,}", f"{model['fullMarket']['unchanged']:,}", _market_value_text(model["fullMarket"]["marketTradingValue"])]
+    required += [_metric_line_value(model["fullMarket"]["metrics"].get(key) or {}) for key in ("aboveMA20", "aboveMA60", "aboveMA120")]
+    for value in required:
+        if value and (str(value) not in markdown_text or str(value) not in plain):
+            issues.append(f"CORE_VALUE_MISSING:{value}")
+    for value in required[3:]:
+        if value and (str(value) not in part1_md or str(value) not in part1_html):
+            issues.append(f"PART1_VALUE_MISSING:{value}")
+    for row in model["interests"]:
+        for value in (row["name"], row["code"]):
+            if value and (str(value) not in part3_md or str(value) not in part3_html):
+                issues.append(f"PART3_INTEREST_MISSING:{value}")
+    for _compact_row in model["relativeIndustries"] + model["relativeThemes"]:
+        value = _compact_row.get("name") or _compact_row.get("id")
+        if value and (str(value) not in part2_md or str(value) not in part2_html):
+            issues.append(f"PART2_TOP5_MISSING:{value}")
+    if model["v2Verified"]:
+        for row in model["v2Industries"] + model["v2Themes"]:
+            name = row.get("name") or row.get("id")
+            if name and (str(name) not in part2_md or str(name) not in part2_html):
+                issues.append(f"PART2_V2_MISSING:{name}")
+            for leader in (row.get("leaderCandidates") or row.get("leaders") or [])[:3]:
+                for value in (leader.get("name"), leader.get("code")):
+                    if value and (str(value) not in part2_md or str(value) not in part2_html):
+                        issues.append(f"PART2_V2_LEADER_MISSING:{value}")
+    if model["v2Verified"] is False and "V2 판정 보류 — 원천 검증 대기" not in markdown_text and "V2 판정 보류 — 원천 검증 대기" not in plain:
+        issues.append("V2_HOLD_MISSING")
+    return issues
+
+
+# Override the public rendering/validation functions after the legacy
+# implementation so every caller (daily_report and GitHub workflows included)
+# receives the compact projection without changing the approved template.
+build_dashboard_model = _compact_model
+render_dashboard_html = _compact_html
+render_dashboard_markdown = _compact_markdown
+validate_rendered_outputs = _compact_validate
+
+
+def validate_rendered_files(markdown_path: Path, html_path: Path, model: Mapping[str, Any]) -> list[str]:
+    try:
+        markdown_text = markdown_path.read_text(encoding="utf-8")
+        html_text = html_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return [f"RENDERED_FILE_READ_FAILED:{type(exc).__name__}"]
+    return _compact_validate(markdown_text, html_text, model)
+
+
+def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
+    left = _compact_model(markdown_report)
+    right = _compact_model(html_report)
+    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "status", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v2Industries", "v2Themes", "interests", "kiwoom") if left.get(key) != right.get(key)]
+
+
+def _compact_session_context_html(model: Mapping[str, Any]) -> str:
+    context = model.get("sessionContext") or {}
+    if context.get("mode") != "PREOPEN":
+        return ""
+    observation = context.get("observation") or {}
+    previous = context.get("previousTradingDay") or {}
+    rows = [
+        f"당일 장전 관측: {_compact_date(observation.get('tradingDate'))} · 상태 {observation.get('status') or '확인 불가'}",
+        f"직전 거래일 참고: {_compact_date(previous.get('tradingDate'))} · 상태 {previous.get('status') or '확인 불가'}",
+    ]
+    if previous.get("status") == "AVAILABLE":
+        for row in previous.get("indices") or []:
+            rows.append(
+                f"직전 {row.get('name') or row.get('code')}: "
+                f"{row.get('close') if row.get('close') is not None else '확인 불가'} · "
+                f"{row.get('changeRate') if row.get('changeRate') is not None else '확인 불가'}% · "
+                "당일 장전 자료와 혼합하지 않음"
+            )
+    return '<article class="card session-context"><h3>장전 관측과 직전 거래일 참고자료</h3>' + "".join(f"<p>{_escape(row)}</p>" for row in rows) + "</article>"
+
+
+_session_context_html = _compact_session_context_html

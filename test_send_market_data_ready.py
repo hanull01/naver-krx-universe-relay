@@ -25,6 +25,40 @@ class ReadyMailTests(unittest.TestCase):
         return {'status':'ok','count':2,'expectedCount':2,'coverageCount':2,'freshCount':2,'missingCodes':[], 'generatedAt':timestamp,'sourceTime':timestamp,'collectionStartedAt':'2026-09-29T10:32:00+09:00','datas':[{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'},{'delayTime':0,'sourceTime':timestamp,'session':'REGULAR','priceBasis':'KRX_REGULAR'}]}
     def env(self):
         return {'MARKET_GMAIL_USERNAME':'sender@example.com','MARKET_GMAIL_APP_PASSWORD':'secret','MARKET_GMAIL_TO':'trigger@example.com','GITHUB_RUN_ID':'123','GITHUB_REPOSITORY':'hanull01/naver-krx-universe-relay','GITHUB_SERVER_URL':'https://github.com','MARKET_DATA_COMMIT_SHA':'abc123','MARKET_DATA_COLLECTION_STARTED_AT':'2026-09-29T10:32:00+09:00','FULL_MARKET_STATUS':'UNAVAILABLE','FULL_MARKET_FAILURE_REASON':'CURRENT_SNAPSHOT_INCOMPLETE','FULL_MARKET_LAST_PUBLISHED_AT':'2026-10-12T08:00:00+09:00'}
+
+    def _write_current_observation(self, root, *, run_id='123', execution_head='a' * 40):
+        report_contract = root / 'report-contract.json'
+        markdown = root / 'report.md'
+        html = root / 'report.html'
+        manifest = root / 'manifest.json'
+        report_contract.write_text(json.dumps({
+            'schemaVersion': 'market-report-contract-v1',
+            'asOf': '2026-09-29',
+            'observedAt': '2026-09-29T10:39:00+09:00',
+        }), encoding='utf-8')
+        markdown.write_text('# current observation\n', encoding='utf-8')
+        html.write_text('<!doctype html><html><body>current observation</body></html>', encoding='utf-8')
+        digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+        manifest.write_text(json.dumps({
+            'reportType': 'current_observation',
+            'session': 'INTRADAY',
+            'tradingDate': '2026-09-29',
+            'sourceTime': '2026-09-29T10:39:00+09:00',
+            'reportContractGeneratedAt': '2026-09-29T10:39:00+09:00',
+            'workflowRunId': run_id,
+            'executionHead': execution_head,
+            'markdownPath': 'report.md',
+            'htmlPath': 'report.html',
+            'reportContractPath': 'report-contract.json',
+            'reportContractSha256': digest(report_contract),
+            'markdownSha256': digest(markdown),
+            'htmlSha256': digest(html),
+            'reportStatus': 'AVAILABLE',
+            'currentObservationAllowed': True,
+            'finalPending': True,
+            'baselineStale': False,
+        }), encoding='utf-8')
+        return manifest
     def test_valid_payload_builds_exact_prefix_and_required_lines(self):
         metadata=ready.validate_quotes(self.payload(),current=self.current,collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']); message=ready.ready_message(metadata,self.env()); self.assertTrue(message['Subject'].startswith('MARKET_DATA_READY ')); self.assertNotIn('[MARKET_DATA_READY]', message['Subject'])
         for line in ('run_id=123','generatedAt=','sourceTime=','count=2','expectedCount=2','freshCount=2','missingCodes=[]','delayTime=0','status=ok'): self.assertIn(line,message.get_content())
@@ -285,13 +319,78 @@ class ReadyMailTests(unittest.TestCase):
             summary.write_text(json.dumps({'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
                 'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET', 'markets': {'TOTAL': {'stockCount': 2764, 'validCount': 2764}}}}), encoding='utf-8')
             quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
-            env = dict(self.env(), FULL_MARKET_REQUIRED='true')
+            manifest = self._write_current_observation(root)
+            env = dict(self.env(), FULL_MARKET_REQUIRED='true',
+                       CURRENT_OBSERVATION_MANIFEST_PATH=str(manifest))
             missing_quotes = root / 'missing-quotes.json'
             self.assertEqual(ready.main(env, missing_quotes, FakeSMTP, current=self.current,
                                         summary_path=summary, quality_path=quality), 0)
-            content = FakeSMTP.messages[-1].get_content()
+            content = FakeSMTP.messages[-1].get_body(preferencelist=('plain',)).get_content()
             self.assertIn('fullMarket.count=2764', content)
             self.assertIn('legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY', content)
+
+    def test_current_observation_manifest_adds_same_generation_attachments(self):
+        FakeSMTP.messages = []
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = self._write_current_observation(root)
+            env = dict(self.env(), FULL_MARKET_REQUIRED='true',
+                       CURRENT_OBSERVATION_MANIFEST_PATH=str(manifest))
+            summary = root / 'summary.json'
+            quality = root / 'quality.json'
+            evidence = {
+                'tradingDate': '2026-09-29', 'status': 'VERIFIED',
+                'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
+                'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+                'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
+            }
+            payload = {
+                'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {
+                    'scope': 'AUTHORITATIVE_FULL_MARKET', 'tradingDate': '2026-09-29',
+                    'tradingDateEvidence': evidence,
+                    'markets': {'TOTAL': {'stockCount': 2, 'validCount': 2}},
+                },
+            }
+            summary.write_text(json.dumps(payload), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS',
+                                           'generatedAt': '2026-09-29T10:39:00+09:00',
+                                           'tradingDateEvidence': evidence}), encoding='utf-8')
+            self.assertEqual(ready.main(env, root / 'missing-quotes.json', FakeSMTP,
+                                        current=self.current, summary_path=summary,
+                                        quality_path=quality), 0)
+            message = FakeSMTP.messages[-1]
+            content = message.get_body(preferencelist=('plain',)).get_content()
+            self.assertIn('currentObservation.manifestPath=', content)
+            self.assertIn('currentObservation.targetDate=2026-09-29', content)
+            self.assertIn('currentObservation.attachmentCount=2', content)
+            self.assertIn('currentObservation.attachmentSha256=report.md:', content)
+            self.assertIn('report.html:', content)
+            self.assertIn('--- current observation Markdown ---', content)
+            self.assertIn('# current observation', content)
+            self.assertEqual(
+                sorted(part.get_filename() for part in message.iter_attachments()),
+                ['report.html', 'report.md'],
+            )
+
+    def test_full_market_manifest_failure_does_not_send(self):
+        FakeSMTP.messages = []
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            summary = root / 'summary.json'
+            quality = root / 'quality.json'
+            summary.write_text(json.dumps({
+                'publicationStatus': 'SUCCESS', 'generatedAt': '2026-09-29T10:39:00+09:00',
+                'fullMarket': {'scope': 'AUTHORITATIVE_FULL_MARKET',
+                               'markets': {'TOTAL': {'stockCount': 2, 'validCount': 2}}},
+            }), encoding='utf-8')
+            quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
+            env = dict(self.env(), FULL_MARKET_REQUIRED='true',
+                       CURRENT_OBSERVATION_MANIFEST_PATH=str(root / 'missing-manifest.json'))
+            self.assertEqual(ready.main(env, root / 'missing-quotes.json', FakeSMTP,
+                                        current=self.current, summary_path=summary,
+                                        quality_path=quality), 1)
+            self.assertEqual(FakeSMTP.messages, [])
 
     def test_full_market_signal_does_not_infer_trading_date_from_generated_at(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -479,10 +578,15 @@ class ReadyMailTests(unittest.TestCase):
             markdown.write_text("# observation\n", encoding="utf-8")
             html.write_text("<!doctype html><p>observation</p>", encoding="utf-8")
             contract = root / "contract.json"
-            contract.write_text('{"asOf":"2026-10-29"}\n', encoding="utf-8")
+            contract.write_text(json.dumps({
+                "asOf": "2026-10-29",
+                "observedAt": "2026-10-29T10:00:00+09:00",
+            }) + "\n", encoding="utf-8")
             manifest = root / "manifest.json"
             manifest.write_text(json.dumps({
                 "reportType": "current_observation", "session": "INTRADAY",
+                "tradingDate": "2026-10-29",
+                "sourceTime": "2026-10-29T10:00:00+09:00",
                 "reportContractGeneratedAt": "2026-10-29T10:00:00+09:00",
                 "workflowRunId": "123", "executionHead": "a" * 40,
                 "reportContractPath": "contract.json",

@@ -29,12 +29,15 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
             self.assertNotIn("<pre", html_text.lower())
             self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_lib.unescape(html_text))
             self.assertNotIn("2,205/2,767", html_lib.unescape(html_text))
-            for token in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "SK하이닉스", "삼성전자", "키움 후보"):
-                self.assertIn(token, html_text)
+            for token in ("삼성전자", "005930", "키움 후보"):
+                self.assertIn(token, html_lib.unescape(html_text))
                 self.assertIn(token, markdown_text)
+            for token in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256"):
+                self.assertNotIn(token, html_text)
+                self.assertNotIn(token, markdown_text)
             for section_id in ("part1", "part2", "part3"):
                 self.assertIn(f'id="{section_id}"', html_text)
-            for heading in ("## 1. 시장 대시보드", "## 2. 업종·테마·주도주·리서치", "## 3. 키움 후보 추적·조건별 대응"):
+            for heading in ("## 1. 시장 대시보드", "## 2. 주도 업종·테마", "## 3. 관심종목·키움 후보"):
                 self.assertIn(heading, markdown_text)
 
     def test_html_is_not_written_when_contract_disallows_it(self):

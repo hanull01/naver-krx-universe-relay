@@ -145,8 +145,26 @@ def quote_rows(payload):
     raise ReadyValidationError('quotes rows are incomplete')
 
 
-def validate_current_observation_manifest(manifest_path, expected_commit_sha=None):
-    """Validate the same-generation Markdown/HTML files without gating market data."""
+def _resolve_manifest_artifact(manifest_path, relative):
+    path = Path(manifest_path)
+    candidate = Path(str(relative))
+    if candidate.is_absolute() or '..' in candidate.parts:
+        raise ReadyValidationError('current observation path is unsafe')
+    candidates = [ROOT / candidate, path.parent / candidate]
+    # Older manifests recorded the contract basename only.  Resolve that
+    # declared basename to the current published contract, then verify its
+    # manifest SHA below; never select a prior report artifact by filename.
+    if candidate.name == 'latest-report-contract.json':
+        candidates.append(ROOT / 'data' / 'monitoring' / 'latest-report-contract.json')
+    for artifact in candidates:
+        if artifact.is_file():
+            return artifact
+    raise ReadyValidationError('current observation artifact is unavailable')
+
+
+def validate_current_observation_manifest(manifest_path, expected_commit_sha=None,
+                                          expected_run_id=None):
+    """Validate and resolve the same-generation Markdown/HTML files."""
     path = Path(manifest_path)
     try:
         manifest = json.loads(path.read_text(encoding='utf-8'))
@@ -154,7 +172,7 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
         raise ReadyValidationError('current observation manifest is unavailable') from exc
     required = (
         'reportType', 'session', 'reportContractGeneratedAt',
-        'workflowRunId', 'executionHead', 'markdownPath', 'htmlPath',
+        'tradingDate', 'sourceTime', 'workflowRunId', 'executionHead', 'markdownPath', 'htmlPath',
         'reportContractPath', 'reportContractSha256',
         'markdownSha256', 'htmlSha256', 'reportStatus',
     )
@@ -163,24 +181,81 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
         raise ReadyValidationError('current observation manifest is incomplete')
     if manifest.get('currentObservationAllowed') is not True:
         raise ReadyValidationError('current observation is not allowed')
+    resolved = {}
     for field, digest_field in (('reportContractPath', 'reportContractSha256'),
                                 ('markdownPath', 'markdownSha256'),
                                 ('htmlPath', 'htmlSha256')):
-        relative = Path(str(manifest[field]))
-        if relative.is_absolute() or '..' in relative.parts:
-            raise ReadyValidationError('current observation path is unsafe')
-        artifact = ROOT / relative
-        if not artifact.exists():
-            artifact = path.parent / relative
+        artifact = _resolve_manifest_artifact(path, manifest[field])
         try:
             digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
         except OSError as exc:
             raise ReadyValidationError(f'current observation {field} is unavailable') from exc
         if digest != manifest[digest_field]:
             raise ReadyValidationError(f'current observation {field} hash mismatch')
+        resolved[field] = artifact
+    try:
+        contract_payload = json.loads(resolved['reportContractPath'].read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ReadyValidationError('current observation report contract is unavailable') from exc
+    contract = contract_payload.get('reportContract') if isinstance(contract_payload, dict) else None
+    contract = contract if isinstance(contract, dict) else contract_payload
+    contract_date = str(contract.get('asOf') or contract.get('tradingDate') or '').replace('-', '')
+    manifest_date = str(manifest.get('tradingDate') or '').replace('-', '')
+    if not manifest_date or contract_date != manifest_date:
+        raise ReadyValidationError('current observation report contract trading date mismatch')
+    contract_generated = contract.get('observedAt') or contract.get('generatedAt')
+    if contract_generated and str(contract_generated) != str(manifest.get('reportContractGeneratedAt')):
+        raise ReadyValidationError('current observation report contract generation mismatch')
     if expected_commit_sha and manifest.get('executionHead') in (None, ''):
         raise ReadyValidationError('current observation execution head is missing')
+    if expected_run_id and str(manifest.get('workflowRunId')) != str(expected_run_id):
+        raise ReadyValidationError('current observation workflow run mismatch')
+    if not manifest.get('manifestPath'):
+        try:
+            manifest['manifestPath'] = path.relative_to(ROOT).as_posix()
+        except ValueError:
+            manifest['manifestPath'] = path.name
+    manifest['_resolvedPaths'] = resolved
     return manifest
+
+
+def attach_current_observation(message, manifest):
+    """Attach exactly the two validated artifacts described by the manifest."""
+    resolved = manifest.get('_resolvedPaths') or {}
+    attachments = []
+    for field, digest_field, filename, maintype, subtype in (
+        ('markdownPath', 'markdownSha256', 'report.md', 'text', 'markdown'),
+        ('htmlPath', 'htmlSha256', 'report.html', 'text', 'html'),
+    ):
+        path = resolved.get(field)
+        if not isinstance(path, Path) or not path.is_file():
+            raise ReadyValidationError(f'current observation {field} is unavailable')
+        content = path.read_bytes()
+        digest = hashlib.sha256(content).hexdigest()
+        if digest != manifest[digest_field] or not content:
+            raise ReadyValidationError(f'current observation {field} attachment hash mismatch')
+        message.add_attachment(content, maintype=maintype, subtype=subtype, filename=filename)
+        attachments.append({'filename': filename, 'sha256': digest, 'bytes': len(content)})
+    return attachments
+
+
+def current_observation_attachment_metadata(manifest):
+    """Recheck the two files and return MIME metadata before sending."""
+    resolved = manifest.get('_resolvedPaths') or {}
+    attachments = []
+    for field, digest_field, filename in (
+        ('markdownPath', 'markdownSha256', 'report.md'),
+        ('htmlPath', 'htmlSha256', 'report.html'),
+    ):
+        path = resolved.get(field)
+        if not isinstance(path, Path) or not path.is_file():
+            raise ReadyValidationError(f'current observation {field} is unavailable')
+        content = path.read_bytes()
+        digest = hashlib.sha256(content).hexdigest()
+        if digest != manifest[digest_field] or not content:
+            raise ReadyValidationError(f'current observation {field} attachment hash mismatch')
+        attachments.append({'filename': filename, 'sha256': digest, 'bytes': len(content)})
+    return attachments
 
 def representative_source_time(payload, rows):
     """Prefer producer metadata; strictly validate legacy row-only payloads."""
@@ -286,6 +361,7 @@ def ready_message(metadata, env):
     lines.extend([
         f'currentObservation.status={observation.get("status", "UNAVAILABLE")}',
         f'currentObservation.session={observation.get("session", "UNAVAILABLE")}',
+        f'currentObservation.targetDate={observation.get("tradingDate", observation.get("targetDate", "UNAVAILABLE"))}',
         f'currentObservation.manifestPath={observation.get("manifestPath", "UNAVAILABLE")}',
         f'currentObservation.markdownPath={observation.get("markdownPath", "UNAVAILABLE")}',
         f'currentObservation.htmlPath={observation.get("htmlPath", "UNAVAILABLE")}',
@@ -300,7 +376,12 @@ def ready_message(metadata, env):
         f'currentObservation.finalPending={observation.get("finalPending", "UNAVAILABLE")}',
         f'currentObservation.baselineStale={observation.get("baselineStale", "UNAVAILABLE")}',
         f'currentObservation.reason={observation.get("reason", "none")}',
+        f'currentObservation.attachmentCount={observation.get("attachmentCount", 0)}',
+        f'currentObservation.attachmentSha256={";".join(item.get("filename", "") + ":" + item.get("sha256", "") for item in observation.get("attachments", [])) or "UNAVAILABLE"}',
     ])
+    markdown_body = observation.get("markdownBody")
+    if isinstance(markdown_body, str) and markdown_body:
+        lines.extend(["", "--- current observation Markdown ---", markdown_body.rstrip()])
     for key in ('liveCount', 'noAfterTradeCount'):
         if metadata.get(key) is not None:
             lines.append(f'{key}={metadata[key]}')
@@ -353,22 +434,26 @@ def main(env=None, quotes_path=QUOTES_LITE_PATH, smtp_factory=smtplib.SMTP_SSL, 
             payload = json.loads(Path(quotes_path).read_text(encoding='utf-8'))
             metadata = validate_quotes(payload, current=current, collection_started_at=env.get('MARKET_DATA_COLLECTION_STARTED_AT'))
         manifest_path = env.get('CURRENT_OBSERVATION_MANIFEST_PATH')
-        if manifest_path:
-            try:
-                observation = validate_current_observation_manifest(
-                    manifest_path, env.get('MARKET_DATA_COMMIT_SHA'))
-            except ReadyValidationError as exc:
-                observation = {
-                    'status': 'UNAVAILABLE',
-                    'reason': str(exc),
-                }
+        if not manifest_path:
+            if env.get('FULL_MARKET_REQUIRED') == 'true':
+                raise ReadyValidationError('CURRENT_OBSERVATION_MANIFEST_MISSING')
+            observation = {'status': 'UNAVAILABLE', 'reason': 'CURRENT_OBSERVATION_MANIFEST_MISSING', 'attachments': []}
         else:
-            observation = {
-                'status': 'UNAVAILABLE',
-                'reason': 'CURRENT_OBSERVATION_MANIFEST_MISSING',
-            }
+            observation = validate_current_observation_manifest(
+                manifest_path,
+                env.get('MARKET_DATA_COMMIT_SHA'),
+                env.get('GITHUB_RUN_ID'),
+            )
+            observation['status'] = observation.get('reportStatus', 'AVAILABLE')
+            observation['attachments'] = current_observation_attachment_metadata(observation)
+            markdown_path = observation['_resolvedPaths']['markdownPath']
+            observation['markdownBody'] = markdown_path.read_text(encoding='utf-8')
+        observation['attachmentCount'] = len(observation.get('attachments') or [])
         metadata['currentObservation'] = observation
-        send_ready_email(ready_message(metadata, env), env, smtp_factory=smtp_factory)
+        message = ready_message(metadata, env)
+        if observation.get('attachments'):
+            attach_current_observation(message, observation)
+        send_ready_email(message, env, smtp_factory=smtp_factory)
     except (OSError, json.JSONDecodeError, ReadyValidationError, RuntimeError) as exc:
         print(f'MARKET_DATA_READY not sent: {exc}'); return 1
     print('MARKET_DATA_READY email sent.'); return 0

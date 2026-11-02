@@ -924,7 +924,6 @@ jobs:
           steps.publish.outputs.publication_changed == 'true' &&
           steps.publish.outputs.html_published == 'true' &&
           (steps.publish.outputs.publication_usable == 'true' || steps.publish.outputs.published == 'true')
-        continue-on-error: true
         env:
           MARKET_GMAIL_USERNAME: ${{ secrets.MARKET_GMAIL_USERNAME }}
           MARKET_GMAIL_APP_PASSWORD: ${{ secrets.MARKET_GMAIL_APP_PASSWORD }}
