@@ -270,6 +270,42 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("KOSPI sourceTime 누락", html)
         self.assertIn("KOSDAQ 원천이 계약에 없음", html)
 
+    def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):
+        report = report_fixture()
+        report["reportContract"]["indices"] = [
+            {"code": "KOSPI", "name": "코스피", "close": 3000.12, "changePoints": 12.3, "changeRate": 0.41,
+             "marketStatus": "OPEN", "session": "REGULAR", "sourceTime": "2026-10-29T14:00:00+09:00"},
+            {"code": "KOSDAQ", "name": "코스닥", "close": 900.34, "changePoints": -3.2, "changeRate": -0.35,
+             "marketStatus": "OPEN", "session": "REGULAR", "sourceTime": "2026-10-29T14:00:00+09:00"},
+        ]
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertEqual(build_dashboard_model(report)["indexSessionLabel"], "장중 관측")
+        for output in (html, markdown):
+            self.assertIn("KOSPI", output)
+            self.assertIn("3,000.12", output)
+            self.assertIn("+12.30p", output)
+            self.assertIn("+0.41%", output)
+            self.assertIn("KOSDAQ", output)
+            self.assertIn("900.34", output)
+            self.assertIn("-3.20p", output)
+            self.assertIn("-0.35%", output)
+
+    def test_index_korean_names_without_code_are_normalized(self):
+        report = report_fixture()
+        report["reportContract"]["indices"] = [
+            {"name": "코스피", "close": 3000.12, "changePoints": 12.3, "changeRate": 0.41,
+             "marketStatus": "OPEN", "session": "REGULAR", "sourceTime": "2026-10-29T14:00:00+09:00"},
+            {"indexName": "코스닥", "close": 900.34, "changePoints": -3.2, "changeRate": -0.35,
+             "marketStatus": "OPEN", "session": "REGULAR", "sourceTime": "2026-10-29T14:00:00+09:00"},
+        ]
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("3,000.12", html)
+        self.assertIn("3,000.12", markdown)
+        self.assertIn("900.34", html)
+        self.assertIn("900.34", markdown)
+
     def test_unverified_v2_source_never_renders_score_or_leader(self):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
