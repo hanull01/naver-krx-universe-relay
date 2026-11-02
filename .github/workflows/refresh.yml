@@ -577,8 +577,20 @@ jobs:
           print(result.get('asOf') or '')
           PY
           )
-          html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"
-          latest_html_path="$HTML_OUTPUT_DIR/latest.html"
+          html_path=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'html-report-result.json').read_text(encoding='utf-8'))
+          print(result.get('datedHtml') or '')
+          PY
+          )
+          latest_html_path=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'html-report-result.json').read_text(encoding='utf-8'))
+          print(result.get('html') or '')
+          PY
+          )
           if [ -z "$html_as_of" ] || [ ! -f "$html_path" ] || [ ! -f "$latest_html_path" ]; then
             echo "status=FAILED" >> "$GITHUB_OUTPUT"
             echo "exit_code=2" >> "$GITHUB_OUTPUT"
@@ -594,8 +606,9 @@ jobs:
           echo "bytes=$html_bytes" >> "$GITHUB_OUTPUT"
           echo "source_path=$html_path" >> "$GITHUB_OUTPUT"
           echo "latest_source_path=$latest_html_path" >> "$GITHUB_OUTPUT"
-          echo "path=data/reports/$html_as_of.html" >> "$GITHUB_OUTPUT"
-          echo "HTML validation succeeded: path=data/reports/$html_as_of.html sha256=$html_sha256 bytes=$html_bytes"
+          html_filename=$(basename -- "$html_path")
+          echo "path=data/reports/$html_filename" >> "$GITHUB_OUTPUT"
+          echo "HTML validation succeeded: path=data/reports/$html_filename sha256=$html_sha256 bytes=$html_bytes"
 
       - name: Collect optional Kiwoom discovery quotes
         id: discovery_quotes
@@ -754,7 +767,8 @@ jobs:
           published_html_sha256=""
           html_source="${{ steps.html_report.outputs.source_path }}"
           latest_html_source="${{ steps.html_report.outputs.latest_source_path }}"
-          html_target="$GITHUB_WORKSPACE/data/reports/${{ steps.html_report.outputs.as_of }}.html"
+          html_filename=$(basename -- "$html_source")
+          html_target="$GITHUB_WORKSPACE/data/reports/$html_filename"
           latest_html_target="$GITHUB_WORKSPACE/data/reports/latest.html"
           if [ "$contract_publish_eligible" = "true" ] \
             && [ "${{ steps.html_report.outputs.status }}" = "SUCCESS" ] \
@@ -770,7 +784,7 @@ jobs:
               && [ "$published_html_sha256" = "${{ steps.html_report.outputs.sha256 }}" ] \
               && [ "$latest_html_sha256" = "$published_html_sha256" ]; then
               git add -- \
-                "data/reports/${{ steps.html_report.outputs.as_of }}.html" \
+                "data/reports/$html_filename" \
                 data/reports/latest.html
               html_publish_eligible=true
             else
@@ -782,7 +796,7 @@ jobs:
           echo "html_published=$html_publish_eligible" >> "$GITHUB_OUTPUT"
           echo "html_sha256=$published_html_sha256" >> "$GITHUB_OUTPUT"
           echo "html_bytes=${{ steps.html_report.outputs.bytes }}" >> "$GITHUB_OUTPUT"
-          echo "html_path=${{ steps.html_report.outputs.path }}" >> "$GITHUB_OUTPUT"
+          echo "html_path=data/reports/$html_filename" >> "$GITHUB_OUTPUT"
 
           if git diff --cached --quiet; then
             echo "No data changes to commit"

@@ -192,7 +192,8 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
             '"$contract_publish_eligible" = "true"',
             'steps.html_report.outputs.status }}" = "SUCCESS"',
             'html_source="${{ steps.html_report.outputs.source_path }}"',
-            'html_target="$GITHUB_WORKSPACE/data/reports/${{ steps.html_report.outputs.as_of }}.html"',
+            'html_filename=$(basename -- "$html_source")',
+            'html_target="$GITHUB_WORKSPACE/data/reports/$html_filename"',
             'published_html_sha256=$(sha256sum "$html_target"',
             '"$published_html_sha256" = "${{ steps.html_report.outputs.sha256 }}"',
             'git add --',
@@ -204,10 +205,11 @@ class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
         html_start = self.text.index("      - name: Build and validate GitHub HTML report")
         publish_start = self.text.index("      - name: Commit refreshed production data")
         html_step = self.text[html_start:publish_start]
-        self.assertIn('html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"', html_step)
+        self.assertIn("result.get('datedHtml')", html_step)
+        self.assertIn("result.get('html')", html_step)
+        self.assertNotIn('html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"', html_step)
         self.assertIn('echo "source_path=$html_path" >> "$GITHUB_OUTPUT"', html_step)
         self.assertIn('echo "latest_source_path=$latest_html_path" >> "$GITHUB_OUTPUT"', html_step)
-        self.assertNotIn("result.get('datedHtml')", html_step)
 
     def test_ready_email_carries_html_publication_provenance(self):
         mail_start = self.text.index("      - name: Send MARKET_DATA_READY signal")
