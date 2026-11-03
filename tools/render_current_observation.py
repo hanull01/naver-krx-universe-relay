@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     build_dashboard_model,
+    load_approved_template,
     render_dashboard_html,
     render_dashboard_markdown,
     validate_rendered_files,
@@ -94,8 +95,19 @@ def render_current_observation(
         "writtenAt": observed_at,
     }
     model = build_dashboard_model(report, allow_current_observation=True)
-    markdown = render_dashboard_markdown(report, allow_current_observation=True)
-    html = render_dashboard_html(report, allow_current_observation=True)
+    assets = load_approved_template()
+    markdown = render_dashboard_markdown(
+        report,
+        allow_current_observation=True,
+        _model=model,
+        _template_assets=assets,
+    )
+    html = render_dashboard_html(
+        report,
+        allow_current_observation=True,
+        _model=model,
+        _assets=assets,
+    )
 
     run_id = str(run_id or os.environ.get("GITHUB_RUN_ID") or "local")
     head_sha = str(head_sha or os.environ.get("GITHUB_SHA") or "UNAVAILABLE")
