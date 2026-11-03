@@ -206,7 +206,7 @@ class BuildReportContractTests(unittest.TestCase):
                          "asOf": "20261028",
                          "observedAt": "2026-10-28T11:40:00+00:00",
                          "tradingDateStatus": "SOURCE_OBSERVED",
-                         "rendering": {"htmlAllowed": False},
+                         "rendering": {"status": "RENDERABLE", "reason": "PARTIAL_DATA_RETAINED"},
                      }
                  }), \
                  patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):

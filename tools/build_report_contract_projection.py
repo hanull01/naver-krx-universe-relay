@@ -273,7 +273,6 @@ def build_report_contract_projection(
         "tradingDateStatus": "SOURCE_OBSERVED",
         "sourceQualityStatus": quality.get("status", "PARTIAL"),
         "finalityStatus": "SOURCE_OBSERVED",
-        "htmlAllowed": False,
         "sourceBindings": {
             "fullMarketManifest": "manifest.json",
             "fullMarketDetails": "technicals.json,states.json",

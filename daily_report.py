@@ -509,7 +509,12 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
 
 
 def restrict_staging_current_quotes(quotes, target_date):
-    """Do not mix a different-generation current snapshot into staged rows."""
+    """Keep current observations even when their date differs from history.
+
+    The current quote snapshot and staged historical technicals are separate
+    generations by design.  A date difference is diagnostic metadata, not a
+    reason to erase the current observation or relabel it as stale.
+    """
     target = compact_date(target_date)
     dates = set()
     top_date = source_date(quotes.get("sourceTime")) if isinstance(quotes, dict) else None
@@ -521,19 +526,61 @@ def restrict_staging_current_quotes(quotes, target_date):
         row_date = source_date(row.get("sourceTime") or row.get("collectedAt"))
         if row_date:
             dates.add(row_date)
-    if target and dates == {target}:
-        return quotes
-    stale = dict(quotes) if isinstance(quotes, dict) else {}
-    stale.update({
-        "status": "STALE",
-        "fresh": False,
-        "datas": [],
-        "reason": "CURRENT_SNAPSHOT_DATE_MISMATCH",
+    current = dict(quotes) if isinstance(quotes, dict) else {}
+    current.update({
         "targetDate": target,
+        "historicalTechnicalDate": target,
         "observedSourceDates": sorted(dates),
         "currentSnapshotSeparated": True,
+        "currentSnapshotDateStatus": (
+            "MATCH" if target and dates == {target}
+            else "CURRENT_OBSERVATION_SEPARATE"
+        ),
     })
-    return stale
+    return current
+
+
+def registered_universe_projection(enabled, rows):
+    """Project configured items without mixing current and historical data."""
+    by_code = {str(row.get("itemCode")): row for row in rows if row.get("itemCode")}
+    items = []
+    for item in enabled:
+        code = str(item["itemCode"])
+        row = by_code.get(code, {})
+        market = row.get("market") or {}
+        technical = row.get("technical") or {}
+        current_state = row.get("currentState") or {}
+        state = row.get("state") or {}
+        items.append({
+            "itemCode": code,
+            "itemName": item.get("stockName") or row.get("itemName"),
+            "current": {
+                "price": market.get("price"),
+                "changeRate": market.get("changeRate"),
+                "sourceTime": market.get("sourceTime"),
+                "status": "AVAILABLE" if row.get("marketObserved") else "UNAVAILABLE",
+            },
+            "technicals": {
+                "ma20": technical.get("ma20"),
+                "ma60": technical.get("ma60"),
+                "sourceDate": technical.get("sourceDate"),
+                "status": technical.get("confirmedStatus") or technical.get("status"),
+            },
+            "state": {
+                "status": current_state.get("status") or state.get("status") or "UNAVAILABLE",
+                "trend": current_state.get("trend") or current_state.get("trendStatus") or state.get("trend") or state.get("trendStatus"),
+                "priceVsMA20": current_state.get("priceVsMA20") or state.get("priceVsMA20"),
+                "priceVsMA60": current_state.get("priceVsMA60") or state.get("priceVsMA60"),
+            },
+            "status": "AVAILABLE" if row else "UNAVAILABLE",
+        })
+    return {
+        "status": "AVAILABLE" if items else "AVAILABLE_EMPTY",
+        "scope": "REGISTERED_UNIVERSE",
+        "count": len(items),
+        "fallbackUsed": False,
+        "items": items,
+    }
 
 
 def full_market_evidence(as_of=None, root=MONITORING_PATH):
@@ -1527,6 +1574,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     rows = []
     state_fields = [
         "status", "source", "sourceDate", "sourceTime", "price", "close",
+        "trend", "trendStatus",
         "priceVsMA20", "priceVsMA60", "maAlignment", "distanceMA20Pct",
         "distanceMA60Pct", "priorHigh20", "priorHigh60",
         "distancePriorHigh20Pct", "distancePriorHigh60Pct", "breakout20",
@@ -1561,6 +1609,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                         "ma5",
                         "ma20",
                         "ma60",
+                        "sourceDate",
+                        "sourceTime",
                         "high20",
                         "high52w",
                         "high60",
@@ -1728,6 +1778,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "publishedStatus": published_supplemental.get("status"),
         "publishedReason": published_supplemental.get("reason"),
     }
+    registered_projection = registered_universe_projection(enabled, rows)
     # Performance is read-only and date-bound.  Existing monitoring-daily
     # files are used; SOURCE_OBSERVED rows remain pending rather than being
     # promoted to confirmed closes.
@@ -1764,6 +1815,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         kiwoom_performance=kiwoom_performance,
         v2_changes=v2_changes,
         session_context=session_context,
+        registered_universe=registered_projection,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract
@@ -1868,6 +1920,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "sourceTime": quotes.get("sourceTime"),
                 "status": quotes.get("status"),
                 "fresh": quotes.get("fresh"),
+                "currentSnapshotSeparated": quotes.get("currentSnapshotSeparated", False),
+                "historicalTechnicalDate": quotes.get("historicalTechnicalDate"),
+                "observedSourceDates": quotes.get("observedSourceDates", []),
+                "currentSnapshotDateStatus": quotes.get("currentSnapshotDateStatus"),
             },
             "technicals": {
                 "path": (str(Path(staging_input_dir) / "technicals.json")

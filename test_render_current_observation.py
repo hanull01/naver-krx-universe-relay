@@ -21,8 +21,8 @@ class CurrentObservationReportTests(unittest.TestCase):
             "finalConfirmed": False,
         }
         contract["rendering"] = {
-            "htmlAllowed": False,
-            "reason": "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED",
+            "status": "RENDERABLE",
+            "reason": "PARTIAL_DATA_RETAINED",
         }
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -44,7 +44,7 @@ class CurrentObservationReportTests(unittest.TestCase):
             self.assertEqual(output["status"], "SUCCESS")
             self.assertEqual(manifest["session"], "POST_MARKET")
             self.assertTrue(manifest["finalPending"])
-            self.assertFalse(manifest["contractHtmlAllowed"])
+            self.assertNotIn("contractHtmlAllowed", manifest)
             for field, filename in (("markdownSha256", "report.md"), ("htmlSha256", "report.html")):
                 self.assertEqual(
                     manifest[field],

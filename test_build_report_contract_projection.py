@@ -43,7 +43,7 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         self.assertLessEqual(result["bytes"], 900_000)
         self.assertEqual(contract["asOf"], "20261029")
         self.assertEqual(contract["status"], "AVAILABLE")
-        self.assertFalse(contract["htmlAllowed"])
+        self.assertNotIn("htmlAllowed", contract)
         self.assertEqual(contract["fullMarket"]["totalCount"], 1)
         self.assertEqual(contract["registeredUniverse"]["items"][0]["itemCode"], "005930")
         self.assertEqual(contract["registeredUniverse"]["items"][0]["metrics"]["ma20"], 114.5)

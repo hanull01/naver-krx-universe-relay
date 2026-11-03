@@ -195,7 +195,7 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "VERIFIED")
-        self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
         self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
     def test_kiwoom_candidates_are_separate_from_technical_candidates(self):
@@ -445,9 +445,9 @@ class ReportContractTests(unittest.TestCase):
             v2_history={"observations": []}, leaders={},
         )
         self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID")
-        self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
 
-    def test_source_observed_final_date_is_partial_and_html_blocked(self):
+    def test_source_observed_final_date_is_partial_and_renderable(self):
         evidence = {
             "tradingDate": "20261028",
             "status": "SOURCE_OBSERVED",
@@ -469,8 +469,8 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
-        self.assertFalse(contract["rendering"]["htmlAllowed"])
-        self.assertEqual(contract["rendering"]["reason"], "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED")
+        self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
+        self.assertEqual(contract["rendering"]["reason"], "PARTIAL_DATA_RETAINED")
 
     def test_null_trading_date_disables_html(self):
         contract = build_report_contract(
@@ -484,7 +484,7 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_NULL")
-        self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["rendering"]["status"], "UNAVAILABLE")
         self.assertEqual(contract["relativeStrengthTop5"]["status"], "PARTIAL")
         self.assertEqual(contract["relativeStrengthTop5"]["reason"], "TRADING_DATE_UNAVAILABLE")
 
@@ -515,7 +515,7 @@ class ReportContractTests(unittest.TestCase):
             v2_history={"observations": []}, leaders={},
         )
         self.assertEqual(contract["status"], "PARTIAL")
-        self.assertFalse(contract["rendering"]["htmlAllowed"])
+        self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
 
     def test_renderer_mismatch_catches_breakout_disagreement(self):
         good = {"asOf": "2026-10-28", "observedAt": "t", "fullMarket": {"breadth": {"advancers": 1, "decliners": 2, "unchanged": 3}, "metrics": {"breakout20": {"count": 81}}, "marketTradingValue": {"KOSPI": {"value": 1}, "KOSDAQ": {"value": 2}}}, "v2": {"industries": [], "themes": []}, "candidates": [], "technicalCandidates": [], "kiwoomCandidates": {"symbols": [], "stocks": []}}
@@ -539,7 +539,7 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertTrue(contract["baseline"]["dateMismatch"])
         self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
-        self.assertEqual(contract["rendering"]["reason"], "BASELINE_STALE_HTML_BLOCKED")
+        self.assertEqual(contract["rendering"]["reason"], "PARTIAL_DATA_RETAINED")
 
     def test_theme_member_rows_are_compacted_for_github_contents_transport(self):
         generated = "2026-10-29T04:09:16+00:00"
