@@ -60,10 +60,20 @@ and public publication remain separate deployment gates.
 `stage_m10_report_inputs` materializes a local-only adapter directory for the
 existing `full_market_technical_adapter` contract. It emits
 `technicals.json`, `states.json`, `group-states.json`, `provenance.json`, and a
-`PARTIAL` report projection. For the inspected generation, all 4,082 entities
+`conflict-audit.json` plus a `PARTIAL` report projection. For the inspected generation, all 4,082 entities
 are validated, 3,950 stock/ETF rows are staged for the existing instrument
 adapter, and 132 index rows remain in the separate index metadata section.
 Per-indicator null counts are reported; nulls are not synthesized.
+
+When the staging source is `KRX_M10_GENERATION`, KRX is the primary and only
+historical indicator source. The adapter records
+`KRX_PRIMARY_NO_MERGE` and
+`MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK`; a missing KRX row remains
+missing or lagged instead of being filled from NAVER history. NAVER current
+and after-hours observations remain a separate current-snapshot input. The
+report renderer prints unavailable breadth values as `확인 불가` when the M10
+generation does not provide a verified aggregate, rather than fabricating
+zeros or failing the report.
 
 `derived_input_resolver.py` is intentionally not changed: its
 `monitoring-derived` pointer is the existing NAVER/derived generation

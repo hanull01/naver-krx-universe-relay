@@ -95,6 +95,17 @@ class KrxSyncReceiptTests(unittest.TestCase):
         output = self.root / "report-stage"
         result = stage_m10_report_inputs(self.root, output)
         self.assertEqual(result["status"], "STAGED_NOT_CONNECTED")
+        technicals_payload = json.loads((output / "technicals.json").read_text())
+        self.assertEqual(technicals_payload["historicalPriority"], "PRIMARY")
+        self.assertFalse(technicals_payload["historicalFallbackAllowed"])
+        self.assertEqual(technicals_payload["conflictPolicy"], "KRX_PRIMARY_NO_MERGE")
+        self.assertEqual(
+            technicals_payload["missingDataPolicy"],
+            "MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK",
+        )
+        conflict_audit = json.loads((output / "conflict-audit.json").read_text())
+        self.assertEqual(conflict_audit["policy"], "KRX_PRIMARY_NO_MERGE")
+        self.assertEqual(conflict_audit["entries"], [])
         loaded = load_full_market_staging(
             output / "technicals.json", output / "states.json", output / "group-states.json",
             expected_target_date="20261102")

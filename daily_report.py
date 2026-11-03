@@ -458,12 +458,19 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         derived_projection = load_json(projection_path)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         raise ValueError(f"DERIVED_REPORT_PROJECTION_UNAVAILABLE:{projection_path}") from exc
+    technicals_payload = load_json(root / "technicals.json")
+    expected_source_staging = (
+        "KRX_M10_GENERATION"
+        if technicals_payload.get("source") == "KRX_M10_GENERATION"
+        else None
+    )
     staged = build_staged_technical_input(
         root / "technicals.json",
         root / "states.json",
         root / "group-states.json",
         UNIVERSE_PATH,
         current_snapshot=current_snapshot,
+        expected_source_staging=expected_source_staging,
     )
     full_market = staged["fullMarket"]
     registered = staged["registeredUniverse"]
@@ -494,6 +501,20 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "historicalGroupsStatus": staged["historicalGroups"].get("availabilityStatus"),
         "currentSnapshot": dict(staged["currentSnapshot"]),
         "currentSnapshotSeparated": True,
+        "historicalIndicatorSource": staged["historicalIndicatorSource"],
+        "historicalPriority": staged["historicalPriority"],
+        "historicalFallbackAllowed": staged["historicalFallbackAllowed"],
+        "currentObservationPolicy": staged["currentObservationPolicy"],
+        "conflictPolicy": (
+            "KRX_PRIMARY_NO_MERGE"
+            if staged["historicalIndicatorSource"] == "KRX"
+            else "EXTERNAL_STAGING_POLICY"
+        ),
+        "missingDataPolicy": (
+            "MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK"
+            if staged["historicalIndicatorSource"] == "KRX"
+            else "STAGING_SOURCE_DEFINED"
+        ),
         "fallbackUsed": False,
     }
     return {
@@ -2461,18 +2482,31 @@ def write_markdown(report, path):
         lines.append(f"- 상태: UNAVAILABLE ({full_market.get('reason', 'UNKNOWN')})")
     else:
         lines.append(f"- 수집 품질: {full_market.get('qualityStatus', 'UNKNOWN')}")
-        fb = full_market["breadth"]
+        # KRX-only staging deliberately does not synthesize breadth/leader
+        # aggregates that were not supplied by the verified generation.
+        # Render unavailable values instead of failing the whole report.
+        fb = full_market.get("breadth") or {}
+
+        def full_market_metric(name):
+            metric = fb.get(name)
+            if not isinstance(metric, dict):
+                return "확인 불가"
+            count = metric.get("count", "확인 불가")
+            pct = metric.get("pct", "확인 불가")
+            return f"{count} ({pct}%)"
+
         lines.extend([
             f"- 기준일: {full_market['asOfDate']}",
             f"- 분석 대상/기준 Universe: {full_market.get('quality', {}).get('currentCount', 'UNKNOWN')}/"
             f"{full_market.get('quality', {}).get('authoritativeCount', 'UNKNOWN')}종목",
-            f"- 상승/하락/보합: {fb['advancers']}/{fb['decliners']}/{fb['unchanged']}",
-            f"- MA20 위: {fb['aboveMA20']['count']} ({fb['aboveMA20']['pct']}%)",
-            f"- MA60 위: {fb['aboveMA60']['count']} ({fb['aboveMA60']['pct']}%)",
-            f"- MA120 위: {fb['aboveMA120']['count']} ({fb['aboveMA120']['pct']}%)",
-            f"- 20일 돌파: {fb['breakout20']['count']} ({fb['breakout20']['pct']}%)",
-            f"- 52주 고점 근접: {fb['near52wHigh']['count']} ({fb['near52wHigh']['pct']}%)",
-            f"- 거래량 확산: {fb['volumeAbove20DayAverage']['count']} ({fb['volumeAbove20DayAverage']['pct']}%)",
+            f"- 상승/하락/보합: {fb.get('advancers', '확인 불가')}/"
+            f"{fb.get('decliners', '확인 불가')}/{fb.get('unchanged', '확인 불가')}",
+            f"- MA20 위: {full_market_metric('aboveMA20')}",
+            f"- MA60 위: {full_market_metric('aboveMA60')}",
+            f"- MA120 위: {full_market_metric('aboveMA120')}",
+            f"- 20일 돌파: {full_market_metric('breakout20')}",
+            f"- 52주 고점 근접: {full_market_metric('near52wHigh')}",
+            f"- 거래량 확산: {full_market_metric('volumeAbove20DayAverage')}",
             f"- Full-market leaders: {len(full_market['leaders'])}종목",
         ])
         delta = full_market.get("quality", {}).get("universeDelta")

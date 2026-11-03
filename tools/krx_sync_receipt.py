@@ -300,6 +300,12 @@ def stage_m10_report_inputs(
         "schemaVersion": "krx-m10-report-staging-v1", "targetDate": target,
         "source": "KRX_M10_GENERATION", "generationId": generation,
         "sourceArtifactSha256": source_sha, "counts": counts,
+        "historicalIndicatorSource": "KRX",
+        "historicalPriority": "PRIMARY",
+        "historicalFallbackAllowed": False,
+        "conflictPolicy": "KRX_PRIMARY_NO_MERGE",
+        "missingDataPolicy": "MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK",
+        "currentObservationPolicy": "NAVER_CURRENT_AND_AFTERMARKET_SEPARATE",
     }
     _write_json(output / "technicals.json", {**common, "datas": technical_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
     _write_json(output / "states.json", {**common, "datas": state_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
@@ -308,6 +314,18 @@ def stage_m10_report_inputs(
         "source": "KRX_M10_GENERATION", "generationId": generation,
         "sourceCanonicalSha256": source_sha,
         "byCode": {row["code"]: provenance(row) for row in instruments},
+    })
+    _write_json(output / "conflict-audit.json", {
+        "schemaVersion": "krx-m10-conflict-audit-v1",
+        "targetDate": target,
+        "generationId": generation,
+        "status": "NO_NAVER_HISTORICAL_COMPARISON",
+        "policy": "KRX_PRIMARY_NO_MERGE",
+        "entries": [],
+        "note": (
+            "NAVER historical indicators are excluded from the KRX input path; "
+            "current and aftermarket observations remain separate."
+        ),
     })
     _write_json(output / "group-states.json", {
         "schemaVersion": "krx-m10-group-state-v1", "targetDate": target,
@@ -321,12 +339,17 @@ def stage_m10_report_inputs(
         "schemaVersion": "krx-m10-report-projection-v1", "status": "PARTIAL",
         "asOf": target, "observedAt": None, "source": "KRX_M10_GENERATION",
         "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "historicalIndicatorSource": "KRX",
+        "historicalPriority": "PRIMARY",
+        "historicalFallbackAllowed": False,
+        "conflictPolicy": "KRX_PRIMARY_NO_MERGE",
         "generationId": generation, "fullMarket": {"quality": counts, "breadth": {}, "leaders": []},
     })
     return {
         "status": "STAGED_NOT_CONNECTED", "targetDate": target, "generationId": generation,
         "entityCount": len(entities), "instrumentCount": len(instruments), "indexCount": len(indexes),
         "nullIndicatorCounts": null_counts, "outputDir": str(output), "reportInputReady": False,
+        "conflictAuditPath": str(output / "conflict-audit.json"),
     }
 
 

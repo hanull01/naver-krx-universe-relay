@@ -21,6 +21,7 @@ FORBIDDEN_FALLBACK_MARKERS = (
     "/data/states.json",
     "/data/group-states.json",
 )
+KRX_M10_SOURCE_STAGING = "KRX_M10_GENERATION"
 
 
 class FullMarketTechnicalAdapterError(ValueError):
@@ -122,6 +123,7 @@ def load_full_market_staging(
     states_path: str | Path,
     group_states_path: str | Path,
     expected_target_date: str | None = None,
+    expected_source_staging: str | None = None,
 ) -> dict[str, Any]:
     """Load full-market technical/state staging without any production fallback."""
     provenance_path = Path(technicals_path).with_name("provenance.json")
@@ -133,6 +135,10 @@ def load_full_market_staging(
         expected_target_date=expected_target_date,
     )
     source = str(next(iter(technicals["rows"].values()))["provenance"]["sourceStaging"])
+    if expected_source_staging is not None and source != expected_source_staging:
+        raise FullMarketTechnicalAdapterError(
+            f"staged source mismatch: {source} != {expected_source_staging}"
+        )
     states = _load_rows(
         states_path,
         expected_source=source,
@@ -156,6 +162,10 @@ def load_full_market_staging(
         "statePayload": states["payload"],
         "groupStates": groups,
         "fallbackUsed": False,
+        "historicalIndicatorSource": "KRX" if source == KRX_M10_SOURCE_STAGING else "STAGED_EXTERNAL",
+        "historicalPriority": "PRIMARY" if source == KRX_M10_SOURCE_STAGING else "UNSPECIFIED",
+        "historicalFallbackAllowed": False,
+        "currentObservationPolicy": "SEPARATE",
     }
 
 
@@ -221,6 +231,7 @@ def build_report_input(
     universe_path: str | Path,
     current_snapshot: Mapping[str, Any] | None = None,
     expected_target_date: str | None = None,
+    expected_source_staging: str | None = None,
 ) -> dict[str, Any]:
     """Build separated report inputs; current snapshot remains an independent source."""
     full_market = load_full_market_staging(
@@ -228,6 +239,7 @@ def build_report_input(
         states_path,
         group_states_path,
         expected_target_date=expected_target_date,
+        expected_source_staging=expected_source_staging,
     )
     registered = project_registered_universe(full_market, universe_path)
     current = dict(current_snapshot) if current_snapshot is not None else {
@@ -252,4 +264,8 @@ def build_report_input(
         "currentSnapshot": current,
         "currentSnapshotSeparated": True,
         "fallbackUsed": False,
+        "historicalIndicatorSource": full_market["historicalIndicatorSource"],
+        "historicalPriority": full_market["historicalPriority"],
+        "historicalFallbackAllowed": full_market["historicalFallbackAllowed"],
+        "currentObservationPolicy": full_market["currentObservationPolicy"],
     }

@@ -173,6 +173,38 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         self.assertTrue(restricted["currentSnapshotSeparated"])
         self.assertEqual(restricted["currentSnapshotDateStatus"], "CURRENT_OBSERVATION_SEPARATE")
 
+    def test_krx_staging_is_primary_and_never_falls_back_to_naver_history(self):
+        technicals = json.loads(self.technicals.read_text())
+        states = json.loads(self.states.read_text())
+        for payload in (technicals, states):
+            payload["source"] = "KRX_M10_GENERATION"
+            payload["historicalIndicatorSource"] = "KRX"
+            payload["historicalFallbackAllowed"] = False
+        provenance = {
+            "sourceStaging": "KRX_M10_GENERATION",
+            "sourceCanonicalPath": "m10/monitoring_interchange.json",
+            "sourceCanonicalSha256": "b" * 64,
+        }
+        for payload in (technicals, states):
+            payload["datas"][0]["provenance"] = provenance
+        self.technicals.write_text(json.dumps(technicals), encoding="utf-8")
+        self.states.write_text(json.dumps(states), encoding="utf-8")
+        result = build_report_input(
+            self.technicals, self.states, self.groups, self.universe,
+            expected_source_staging="KRX_M10_GENERATION",
+        )
+        self.assertEqual(result["historicalIndicatorSource"], "KRX")
+        self.assertEqual(result["historicalPriority"], "PRIMARY")
+        self.assertFalse(result["historicalFallbackAllowed"])
+        self.assertEqual(result["currentObservationPolicy"], "SEPARATE")
+
+    def test_krx_source_mismatch_fails_closed(self):
+        with self.assertRaisesRegex(FullMarketTechnicalAdapterError, "staged source mismatch"):
+            build_report_input(
+                self.technicals, self.states, self.groups, self.universe,
+                expected_source_staging="KRX_M10_GENERATION",
+            )
+
     def test_derived_projection_is_reported_as_partial_not_final(self):
         projection = {
             "asOf": "20261029", "status": "AVAILABLE",
