@@ -99,9 +99,16 @@ durable outbox. Raw files, the metrics bundle, credentials, and GitHub
 contents are excluded. A receiver rechecks the generation, date, entity
 count, schema, and SHA before atomic promotion. It records accepted
 generation/date/SHA tuples, returns `NO_CHANGES` for repeats, rejects a
-different generation for the same date, and leaves failed attempts in the
-queue for the next invocation after restart. This bridge is local-only and
-does not activate an external transport.
+different generation for the same date, rejects older trading dates without
+moving `CURRENT`, and leaves failed attempts in the queue for the next
+invocation after restart. Receiver promotion uses a durable pending state,
+an atomic generation directory move, and a final atomic `CURRENT` update;
+ambiguous ledger/current state is fail-closed for manual review. A receiver
+lock makes concurrent delivery return `ALREADY_RUNNING`, and existing
+generations are never deleted or overwritten. The module also exposes an
+authentication/replay-protection interface for a future approved transport;
+SHA-256 alone is not treated as sender authentication. This bridge is
+local-only and does not activate an external transport.
 
 `derived_input_resolver.py` is intentionally not changed: its
 `monitoring-derived` pointer is the existing NAVER/derived generation

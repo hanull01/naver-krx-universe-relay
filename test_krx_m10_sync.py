@@ -1,5 +1,6 @@
 import hashlib
 import json
+import fcntl
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,6 +9,7 @@ from tools.krx_m10_sync import (
     deliver_pending_once,
     inspect_current_generation,
     stage_current_generation,
+    validate_authenticated_envelope,
 )
 
 
@@ -111,6 +113,143 @@ class KrxM10SyncTests(unittest.TestCase):
         result = deliver_pending_once(self.outbox, self.receiver)
         self.assertEqual(result["status"], "FAILED")
         self.assertIn("SAME_DATE_DIFFERENT_GENERATION", result["error"])
+
+    def test_past_trading_date_is_rejected_without_current_regression(self):
+        self.write_generation("gen_20261103_a", "20261103")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-new")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+        self.write_generation("gen_20261102_b", "20261102")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-old")
+        result = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(result["status"], "REJECTED_STALE")
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261103_a")
+
+    def test_generation_copy_interruption_recovers_from_staging(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        failed = deliver_pending_once(self.outbox, self.receiver, failure_point="generation_copy")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertFalse((self.receiver / "CURRENT").exists())
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "ACCEPTED")
+
+    def test_generation_promotion_interruption_recovers_without_deleting_generation(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        failed = deliver_pending_once(self.outbox, self.receiver, failure_point="generation_promote")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertTrue((self.receiver / "generations" / "gen_20261102_a").is_dir())
+        self.assertFalse((self.receiver / "CURRENT").exists())
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "NO_CHANGES")
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261102_a")
+
+    def test_current_write_interruption_recovers_from_pending_ledger(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        failed = deliver_pending_once(self.outbox, self.receiver, failure_point="current_write")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertFalse((self.receiver / "CURRENT").exists())
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "NO_CHANGES")
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261102_a")
+
+    def test_current_write_after_commit_interruption_is_idempotent(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        failed = deliver_pending_once(self.outbox, self.receiver, failure_point="after_current")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261102_a")
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "NO_CHANGES")
+
+    def test_receiver_ledger_save_failure_preserves_previous_current(self):
+        self.write_generation("gen_20261101_a", "20261101")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-old")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+        previous = (self.receiver / "CURRENT").read_text()
+        self.write_generation("gen_20261102_a", "20261102")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-new")
+        failed = deliver_pending_once(self.outbox, self.receiver, failure_point="receiver_ledger_save")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertEqual((self.receiver / "CURRENT").read_text(), previous)
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "NO_CHANGES")
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261102_a")
+
+    def test_same_package_concurrent_receive_is_single_instance(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        self.receiver.mkdir(parents=True, exist_ok=True)
+        with (self.receiver / ".sync.lock").open("a+") as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            result = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(result["status"], "ALREADY_RUNNING")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+
+    def test_restart_reconciles_ledger_current_mismatch_forward_only(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver, failure_point="current_write")["status"], "FAILED")
+        state = json.loads((self.receiver / "received_state.json").read_text())
+        self.assertIsNotNone(state["pendingPromotion"])
+        recovered = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(recovered["status"], "NO_CHANGES")
+        state = json.loads((self.receiver / "received_state.json").read_text())
+        self.assertIsNone(state["pendingPromotion"])
+
+    def test_existing_generation_is_immutable_when_new_generation_arrives(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+        old_monitoring = (self.receiver / "generations" / "gen_20261102_a" / "monitoring_interchange.json").read_bytes()
+        self.write_generation("gen_20261103_a", "20261103")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-2")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+        self.assertEqual(
+            old_monitoring,
+            (self.receiver / "generations" / "gen_20261102_a" / "monitoring_interchange.json").read_bytes(),
+        )
+
+    def test_tampered_current_generation_fails_closed(self):
+        stage_current_generation(self.source, self.outbox, execution_id="exec-1")
+        self.assertEqual(deliver_pending_once(self.outbox, self.receiver)["status"], "ACCEPTED")
+        current_file = self.receiver / "generations" / "gen_20261102_a" / "monitoring_interchange.json"
+        current_file.write_text("tampered", encoding="utf-8")
+        self.write_generation("gen_20261103_a", "20261103")
+        stage_current_generation(self.source, self.outbox, execution_id="exec-2")
+        result = deliver_pending_once(self.outbox, self.receiver)
+        self.assertEqual(result["status"], "FAILED")
+        self.assertIn("RECEIVER_CURRENT_INTEGRITY_MISMATCH", result["error"])
+        self.assertEqual((self.receiver / "CURRENT").read_text().strip(), "gen_20261102_a")
+
+    def test_authenticated_transport_requires_sender_signature_and_replay_protection(self):
+        envelope = {"sender": "krx-private-producer", "transferId": "t-1", "expiresAt": 200}
+        result = validate_authenticated_envelope(
+            envelope,
+            allowed_senders={"krx-private-producer"},
+            replay_ids=set(),
+            verifier=lambda value: value is envelope,
+            now_epoch=100,
+        )
+        self.assertTrue(result["authenticated"])
+        with self.assertRaisesRegex(ValueError, "UNAUTHORIZED_SENDER"):
+            validate_authenticated_envelope(
+                {**envelope, "sender": "unknown"},
+                allowed_senders={"krx-private-producer"},
+                replay_ids=set(),
+                verifier=lambda value: True,
+                now_epoch=100,
+            )
+        with self.assertRaisesRegex(ValueError, "REPLAYED_TRANSFER"):
+            validate_authenticated_envelope(
+                envelope,
+                allowed_senders={"krx-private-producer"},
+                replay_ids={"t-1"},
+                verifier=lambda value: True,
+                now_epoch=100,
+            )
+        with self.assertRaisesRegex(ValueError, "AUTHENTICATION_FAILED"):
+            validate_authenticated_envelope(
+                envelope,
+                allowed_senders={"krx-private-producer"},
+                replay_ids=set(),
+                verifier=lambda value: False,
+                now_epoch=100,
+            )
 
 
 if __name__ == "__main__":

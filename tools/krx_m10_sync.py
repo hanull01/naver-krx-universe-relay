@@ -14,8 +14,10 @@ import re
 import shutil
 import tempfile
 import argparse
+import fcntl
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping, Protocol
 
 
 GENERATION_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
@@ -28,6 +30,48 @@ TRANSFER_SCHEMA = "krx_m10_private_transfer_v1"
 
 class SyncError(ValueError):
     """The source or receiver package cannot be trusted."""
+
+
+class AuthenticatedTransport(Protocol):
+    """Interface reserved for a future approved private transport.
+
+    The local bridge never instantiates or calls this interface.  A production
+    adapter must authenticate the sender, verify the signed envelope, enforce
+    an authorization scope, and reject replayed transfer IDs before delivery.
+    """
+
+    def send(self, package: Path, *, envelope: Mapping[str, Any]) -> Mapping[str, Any]:
+        ...
+
+
+def validate_authenticated_envelope(
+    envelope: Mapping[str, Any],
+    *,
+    allowed_senders: set[str],
+    replay_ids: set[str],
+    verifier: Any,
+    now_epoch: int,
+) -> dict[str, Any]:
+    """Validate the security contract without enabling external transport.
+
+    SHA-256 is intentionally not treated as sender authentication.  The
+    caller must inject a verifier backed by the approved key-management
+    system; no secret or signature material is logged by this module.
+    """
+    sender = envelope.get("sender")
+    transfer_id = envelope.get("transferId")
+    expires_at = envelope.get("expiresAt")
+    if not isinstance(sender, str) or sender not in allowed_senders:
+        raise SyncError("UNAUTHORIZED_SENDER")
+    if not isinstance(transfer_id, str) or not transfer_id:
+        raise SyncError("AUTH_TRANSFER_ID_MISSING")
+    if transfer_id in replay_ids:
+        raise SyncError("REPLAYED_TRANSFER")
+    if type(expires_at) is not int or expires_at <= now_epoch:
+        raise SyncError("AUTH_ENVELOPE_EXPIRED")
+    if not callable(verifier) or not verifier(envelope):
+        raise SyncError("AUTHENTICATION_FAILED")
+    return {"sender": sender, "transferId": transfer_id, "authenticated": True}
 
 
 def _sha256(path: Path) -> str:
@@ -51,11 +95,60 @@ def _json(path: Path) -> dict[str, Any]:
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    os.replace(temporary, path)
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        _fsync_dir(path.parent)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _fsync_dir(path: Path) -> None:
+    try:
+        descriptor = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _write_text_atomic(path: Path, value: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(value)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        _fsync_dir(path.parent)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+@contextmanager
+def _receiver_lock(receiver: Path) -> Iterator[bool]:
+    receiver.mkdir(parents=True, exist_ok=True)
+    lock_path = receiver / ".sync.lock"
+    handle = lock_path.open("a+")
+    acquired = False
+    try:
+        try:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            acquired = True
+        except BlockingIOError:
+            yield False
+            return
+        yield True
+    finally:
+        if acquired:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
 
 
 def _copy_atomic(source: Path, destination: Path) -> None:
@@ -270,66 +363,274 @@ def _validate_package(package: Path) -> dict[str, Any]:
     return {"transfer": transfer, "monitoring": monitoring, "manifest": manifest}
 
 
+def _empty_receiver_state() -> dict[str, Any]:
+    return {
+        "schemaVersion": "krx_m10_receiver_v1",
+        "accepted": [],
+        "rejected": [],
+        "pendingPromotion": None,
+        "currentGeneration": None,
+        "currentTradingDate": None,
+    }
+
+
+def _load_receiver_state(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return _empty_receiver_state()
+    state = _json(path)
+    if state.get("schemaVersion") != "krx_m10_receiver_v1":
+        raise SyncError("RECEIVER_STATE_SCHEMA_INVALID")
+    if not isinstance(state.get("accepted", []), list) or not isinstance(state.get("rejected", []), list):
+        raise SyncError("RECEIVER_STATE_LEDGER_INVALID")
+    return state
+
+
+def _receiver_record(state: Mapping[str, Any], generation_id: str) -> Mapping[str, Any] | None:
+    return next(
+        (row for row in state.get("accepted", []) if isinstance(row, Mapping) and row.get("generationId") == generation_id),
+        None,
+    )
+
+
+def _receiver_generation_matches(generation_dir: Path, transfer: Mapping[str, Any]) -> bool:
+    if not generation_dir.is_dir() or generation_dir.is_symlink():
+        return False
+    try:
+        transfer_record = _json(generation_dir / "transfer_manifest.json")
+        if transfer_record.get("transferId") != transfer.get("transferId"):
+            return False
+        _verify_artifact(
+            generation_dir / "monitoring_interchange.json",
+            {"bytes": transfer["monitoringBytes"], "sha256": transfer["monitoringSha256"]},
+            "receiver_monitoring",
+        )
+        _verify_artifact(
+            generation_dir / "generation_manifest.json",
+            {"bytes": generation_dir.joinpath("generation_manifest.json").stat().st_size, "sha256": transfer["manifestSha256"]},
+            "receiver_manifest",
+        )
+        return True
+    except (OSError, KeyError, SyncError):
+        return False
+
+
+def _pending_record(transfer: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "transferId": transfer["transferId"],
+        "generationId": transfer["generationId"],
+        "tradingDate": transfer["tradingDate"],
+        "manifestSha256": transfer["manifestSha256"],
+        "monitoringSha256": transfer["monitoringSha256"],
+        "monitoringBytes": transfer["monitoringBytes"],
+        "entityCount": transfer["entityCount"],
+    }
+
+
+def _accepted_record(transfer: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "transferId": transfer["transferId"],
+        "generationId": transfer["generationId"],
+        "tradingDate": transfer["tradingDate"],
+        "manifestSha256": transfer["manifestSha256"],
+        "monitoringSha256": transfer["monitoringSha256"],
+        "monitoringBytes": transfer["monitoringBytes"],
+        "entityCount": transfer["entityCount"],
+    }
+
+
+def _current_generation(receiver: Path) -> str | None:
+    current_path = receiver / "CURRENT"
+    if not current_path.exists():
+        return None
+    current = _generation_id(current_path.read_text(encoding="utf-8").strip())
+    if not (receiver / "generations" / current).is_dir():
+        raise SyncError("CURRENT_GENERATION_MISSING")
+    return current
+
+
+def _write_receiver_state(path: Path, state: Mapping[str, Any], failure_point: str | None, point: str) -> None:
+    if failure_point == point:
+        raise SyncError(f"INJECTED_{point.upper()}")
+    _write_json(path, state)
+
+
+def _reconcile_receiver_state(receiver: Path, state: dict[str, Any]) -> tuple[dict[str, Any], str | None]:
+    """Recover only forward-safe state; leave ambiguous state for review."""
+    current_id = _current_generation(receiver)
+    accepted = state.setdefault("accepted", [])
+    pending = state.get("pendingPromotion")
+
+    if pending is not None:
+        if not isinstance(pending, Mapping):
+            raise SyncError("RECEIVER_PENDING_STATE_INVALID")
+        pending_id = _generation_id(pending.get("generationId"))
+        pending_dir = receiver / "generations" / pending_id
+        if pending_dir.exists() and not _receiver_generation_matches(pending_dir, pending):
+            raise SyncError("RECEIVER_PENDING_GENERATION_MISMATCH")
+        pending_record = next((row for row in accepted if row.get("transferId") == pending.get("transferId")), None)
+        if pending_dir.exists() and pending_record is None:
+            accepted.append(dict(pending))
+            pending_record = pending
+            _write_json(receiver / "received_state.json", state)
+        if pending_dir.exists() and current_id is None:
+            _write_text_atomic(receiver / "CURRENT", pending_id + "\n")
+            current_id = pending_id
+        elif pending_dir.exists() and current_id != pending_id:
+            current_record = _receiver_record(state, current_id) if current_id is not None else None
+            if current_record is None:
+                raise SyncError("RECEIVER_STATE_REQUIRES_REVIEW")
+            current_date = _date(current_record.get("tradingDate"), "receiver_current_date")
+            pending_date = _date(pending.get("tradingDate"), "pending_date")
+            if pending_date > current_date:
+                _write_text_atomic(receiver / "CURRENT", pending_id + "\n")
+                current_id = pending_id
+            elif pending_date < current_date:
+                raise SyncError("RECEIVER_STATE_REQUIRES_REVIEW")
+            else:
+                raise SyncError("SAME_DATE_DIFFERENT_GENERATION_REQUIRES_REVIEW")
+        if current_id == pending_id:
+            state["currentGeneration"] = pending_id
+            state["currentTradingDate"] = pending.get("tradingDate")
+            state["pendingPromotion"] = None
+            _write_json(receiver / "received_state.json", state)
+            pending = None
+        elif current_id is not None and pending.get("tradingDate", "") < state.get("currentTradingDate", ""):
+            raise SyncError("RECEIVER_STATE_REQUIRES_REVIEW")
+
+    if current_id is not None:
+        record = _receiver_record(state, current_id)
+        if record is None:
+            raise SyncError("RECEIVER_STATE_REQUIRES_REVIEW")
+        if not _receiver_generation_matches(receiver / "generations" / current_id, record):
+            raise SyncError("RECEIVER_CURRENT_INTEGRITY_MISMATCH")
+        current_date = _date(record.get("tradingDate"), "receiver_current_date")
+        if state.get("currentGeneration") != current_id or state.get("currentTradingDate") != current_date:
+            state["currentGeneration"] = current_id
+            state["currentTradingDate"] = current_date
+            _write_json(receiver / "received_state.json", state)
+        return state, current_id
+
+    if not accepted:
+        return state, None
+
+    latest = max(accepted, key=lambda row: _date(row.get("tradingDate"), "accepted_date"))
+    latest_id = _generation_id(latest.get("generationId"))
+    latest_dir = receiver / "generations" / latest_id
+    if not latest_dir.is_dir():
+        raise SyncError("RECEIVER_STATE_REQUIRES_REVIEW")
+    _write_text_atomic(receiver / "CURRENT", latest_id + "\n")
+    state["currentGeneration"] = latest_id
+    state["currentTradingDate"] = _date(latest.get("tradingDate"), "accepted_date")
+    _write_json(receiver / "received_state.json", state)
+    return state, latest_id
+
+
+def _mark_queue(queue_path: Path, queue: dict[str, Any], item: dict[str, Any], status: str, error: str | None = None) -> None:
+    item["status"] = status
+    item["lastError"] = error
+    _write_json(queue_path, queue)
+
+
 def deliver_pending_once(
     outbox_root: str | Path,
     receiver_root: str | Path,
     *,
     failure_injection: bool = False,
+    failure_point: str | None = None,
 ) -> dict[str, Any]:
-    """Deliver one queued package; a later invocation retries FAILED items."""
+    """Deliver one queued package with forward-only atomic receiver promotion."""
     outbox = Path(outbox_root)
-    queue_path = outbox / "queue.json"
-    queue = _json(queue_path)
-    item = next((item for item in queue.get("items", []) if item.get("status") in {"PENDING", "FAILED"}), None)
-    if item is None:
-        return {"status": "NO_CHANGES", "reason": "QUEUE_EMPTY"}
-    item["attempts"] = int(item.get("attempts") or 0) + 1
-    package = Path(item["package"])
-    try:
-        verified = _validate_package(package)
-        if failure_injection:
-            raise SyncError("INJECTED_BEFORE_PROMOTION")
-        transfer = verified["transfer"]
-        receiver = Path(receiver_root)
-        state_path = receiver / "received_state.json"
-        state = _json(state_path) if state_path.exists() else {"schemaVersion": "krx_m10_receiver_v1", "accepted": []}
-        transfer_id = transfer["transferId"]
-        if any(row.get("transferId") == transfer_id for row in state.get("accepted", [])):
-            result = {"status": "NO_CHANGES", "transferId": transfer_id, "reason": "ALREADY_ACCEPTED"}
-        else:
-            conflict = next((row for row in state.get("accepted", []) if row.get("tradingDate") == transfer["tradingDate"] and row.get("generationId") != transfer["generationId"]), None)
-            if conflict:
-                raise SyncError("SAME_DATE_DIFFERENT_GENERATION_REQUIRES_REVIEW")
-            generation_dir = receiver / "generations" / transfer["generationId"]
-            staging = receiver / ".staging" / transfer["transferId"]
-            staging.mkdir(parents=True, exist_ok=True)
-            _copy_atomic(package / "monitoring_interchange.json", staging / "monitoring_interchange.json")
-            _copy_atomic(package / "generation_manifest.json", staging / "generation_manifest.json")
-            _copy_atomic(package / "transfer_manifest.json", staging / "transfer_manifest.json")
-            generation_dir.parent.mkdir(parents=True, exist_ok=True)
-            if generation_dir.exists():
-                shutil.rmtree(generation_dir)
-            os.replace(staging, generation_dir)
-            current_tmp = receiver / ".CURRENT.tmp"
-            current_tmp.write_text(transfer["generationId"] + "\n", encoding="utf-8")
-            os.replace(current_tmp, receiver / "CURRENT")
-            state.setdefault("accepted", []).append({
-                "transferId": transfer_id,
-                "generationId": transfer["generationId"],
-                "tradingDate": transfer["tradingDate"],
-                "monitoringSha256": transfer["monitoringSha256"],
-            })
+    receiver = Path(receiver_root)
+    with _receiver_lock(receiver) as acquired:
+        if not acquired:
+            return {"status": "ALREADY_RUNNING"}
+        queue_path = outbox / "queue.json"
+        queue = _json(queue_path)
+        item = next((item for item in queue.get("items", []) if item.get("status") in {"PENDING", "FAILED"}), None)
+        if item is None:
+            return {"status": "NO_CHANGES", "reason": "QUEUE_EMPTY"}
+        item["attempts"] = int(item.get("attempts") or 0) + 1
+        _write_json(queue_path, queue)
+        package = Path(item["package"])
+        point = failure_point or ("before_generation_promote" if failure_injection else None)
+        try:
+            verified = _validate_package(package)
+            transfer = verified["transfer"]
+            transfer_id = transfer["transferId"]
+            state_path = receiver / "received_state.json"
+            state = _load_receiver_state(state_path)
+            state, current_id = _reconcile_receiver_state(receiver, state)
+            accepted = state.setdefault("accepted", [])
+            if any(row.get("transferId") == transfer_id for row in accepted):
+                _mark_queue(queue_path, queue, item, "DELIVERED")
+                return {"status": "NO_CHANGES", "transferId": transfer_id, "reason": "ALREADY_ACCEPTED"}
+
+            if current_id is not None:
+                current_record = _receiver_record(state, current_id)
+                current_date = _date(current_record.get("tradingDate"), "receiver_current_date")
+                incoming_date = _date(transfer["tradingDate"], "incoming_date")
+                if incoming_date < current_date:
+                    state.setdefault("rejected", []).append({
+                        "transferId": transfer_id,
+                        "generationId": transfer["generationId"],
+                        "tradingDate": incoming_date,
+                        "reason": "STALE_TRADING_DATE_CURRENT_UNCHANGED",
+                    })
+                    _write_json(state_path, state)
+                    _mark_queue(queue_path, queue, item, "REJECTED_STALE", "STALE_TRADING_DATE_CURRENT_UNCHANGED")
+                    return {"status": "REJECTED_STALE", "transferId": transfer_id, "currentGeneration": current_id}
+                if incoming_date == current_date and transfer["generationId"] != current_id:
+                    raise SyncError("SAME_DATE_DIFFERENT_GENERATION_REQUIRES_REVIEW")
+
+            generation_id = _generation_id(transfer["generationId"])
+            generation_dir = receiver / "generations" / generation_id
+            staging = receiver / ".staging" / transfer_id
+            if generation_dir.exists() and not _receiver_generation_matches(generation_dir, transfer):
+                raise SyncError("RECEIVER_GENERATION_COLLISION")
+            if not generation_dir.exists():
+                if staging.exists() and not _receiver_generation_matches(staging, transfer):
+                    shutil.rmtree(staging)
+                staging.mkdir(parents=True, exist_ok=True)
+                _copy_atomic(package / "monitoring_interchange.json", staging / "monitoring_interchange.json")
+                _copy_atomic(package / "generation_manifest.json", staging / "generation_manifest.json")
+                _copy_atomic(package / "transfer_manifest.json", staging / "transfer_manifest.json")
+                if point == "generation_copy":
+                    raise SyncError("INJECTED_GENERATION_COPY")
+                _write_receiver_state(
+                    state_path,
+                    {**state, "pendingPromotion": _pending_record(transfer)},
+                    point,
+                    "pending_state_write",
+                )
+                if point == "before_generation_promote":
+                    raise SyncError("INJECTED_BEFORE_GENERATION_PROMOTE")
+                generation_dir.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(staging, generation_dir)
+                _fsync_dir(generation_dir.parent)
+                if point == "generation_promote":
+                    raise SyncError("INJECTED_GENERATION_PROMOTE")
+
+            state["pendingPromotion"] = _pending_record(transfer)
+            if not any(row.get("transferId") == transfer_id for row in accepted):
+                accepted.append(_accepted_record(transfer))
+            _write_receiver_state(state_path, state, point, "receiver_ledger_save")
+            if point == "after_accepted_state":
+                raise SyncError("INJECTED_AFTER_ACCEPTED_STATE")
+            if current_id != generation_id:
+                if point == "current_write":
+                    raise SyncError("INJECTED_CURRENT_WRITE")
+                _write_text_atomic(receiver / "CURRENT", generation_id + "\n")
+                if point == "after_current":
+                    raise SyncError("INJECTED_AFTER_CURRENT")
+            state["currentGeneration"] = generation_id
+            state["currentTradingDate"] = _date(transfer["tradingDate"], "incoming_date")
+            state["pendingPromotion"] = None
             _write_json(state_path, state)
-            result = {"status": "ACCEPTED", "transferId": transfer_id, "generationId": transfer["generationId"]}
-        item["status"] = "DELIVERED"
-        item["lastError"] = None
-        _write_json(queue_path, queue)
-        return result
-    except Exception as exc:
-        item["status"] = "FAILED"
-        item["lastError"] = str(exc)
-        _write_json(queue_path, queue)
-        return {"status": "FAILED", "transferId": item.get("transferId"), "error": str(exc), "attempts": item["attempts"]}
+            _mark_queue(queue_path, queue, item, "DELIVERED")
+            return {"status": "ACCEPTED", "transferId": transfer_id, "generationId": generation_id}
+        except Exception as exc:
+            _mark_queue(queue_path, queue, item, "FAILED", str(exc))
+            return {"status": "FAILED", "transferId": item.get("transferId"), "error": str(exc), "attempts": item["attempts"]}
 
 
 def main(argv=None) -> int:
