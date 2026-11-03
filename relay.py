@@ -1576,7 +1576,7 @@ def timed_step(name, fn, *args, **kwargs):
     return result
 
 
-def run_quote_pipeline():
+def run_quote_pipeline(krx_staging_dir=None):
     """Refresh quotes and derive intraday outputs from the selected history."""
     failed = False
     result = timed_step('quotes', collect_quotes)
@@ -1585,6 +1585,46 @@ def run_quote_pipeline():
         print('Quote collection failed; preserving last successful production snapshot.')
         return True
     daily_loader = None
+    if krx_staging_dir is not None:
+        # Explicit opt-in only: KRX owns historical indicators, while this
+        # existing NAVER quote payload remains the current observation layer.
+        from tools.krx_operational_bridge import load_krx_technicals
+        configured_codes = {str(row.get('itemCode')) for row in result.get('datas', [])
+                            if row.get('itemCode')}
+        technicals = timed_step(
+            'technicals-krx', load_krx_technicals, krx_staging_dir,
+            allowed_codes=configured_codes,
+        )
+        save('data/technicals.json', technicals)
+        lite = {key: technicals[key] for key in
+                ('generatedAt', 'expectedCount', 'count', 'missingCodes', 'status')}
+        lite['datas'] = [{key: row.get(key) for key in TECHNICAL_LITE_FIELDS}
+                         for row in technicals['datas']]
+        save('data/technicals-lite.json', lite, compact=True)
+        failed |= technicals['count'] != result['expectedCount']
+        states = timed_step(
+            'states-krx', build_states, result, technicals,
+            daily_loader=lambda _code: None,
+        )
+        states.update({
+            'targetDate': technicals['targetDate'],
+            'source': 'KRX_M10_GENERATION',
+            'historicalIndicatorSource': 'KRX',
+            'historicalFallbackAllowed': False,
+            'currentObservationPolicy': 'NAVER_CURRENT_AND_AFTERMARKET_SEPARATE',
+        })
+        save('data/states.json', states)
+        fields = ('itemCode', 'price', 'priceVsMA20', 'priceVsMA60',
+                  'maAlignment', 'priorHigh20', 'priorHigh60', 'breakout20',
+                  'breakout60', 'volumeRatio20', 'volumeState',
+                  'pullbackState', 'status')
+        save('data/states-lite.json', {
+            **{key: states[key] for key in
+               ('generatedAt', 'expectedCount', 'count', 'missingCodes', 'status')},
+            'datas': [{key: row.get(key) for key in fields} for row in states['datas']],
+        }, compact=True)
+        timed_step('group-states', build_group_states, result, technicals, states)
+        return failed
     derived_run = os.environ.get('DERIVED_RUN_DIR')
     if derived_run:
         try:
@@ -1635,12 +1675,15 @@ def run_quote_pipeline():
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['quotes', 'daily', 'intraday', 'all'], default='all', nargs='?')
+    parser.add_argument('--krx-staging', help='explicit verified KRX M10 staging directory; no NAVER history is read')
     args = parser.parse_args(argv)
     failed = False
-    if args.mode in ('daily', 'all'):
+    if args.mode in ('daily', 'all') and args.krx_staging is None:
         failed |= any(r['status'] in ('error', 'insufficient') for r in timed_step('daily', collect_all_daily))
+    elif args.mode in ('daily', 'all'):
+        print('KRX staging mode: NAVER daily collection skipped')
     if args.mode in ('quotes', 'intraday', 'all'):
-        failed |= run_quote_pipeline()
+        failed |= run_quote_pipeline(args.krx_staging)
     return 1 if failed else 0
 
 

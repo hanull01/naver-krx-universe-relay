@@ -115,6 +115,23 @@ local-only and does not activate an external transport.
 contract, while M10 KRX staging is an independent source that must not be
 silently mixed into that resolver.
 
+## Opt-in legacy-engine bridge
+
+`relay.py` now accepts `--krx-staging <verified-staging-dir>` as an explicit,
+isolated input mode.  In that mode `tools/krx_operational_bridge.py` projects
+the existing M10 technical rows into the legacy `technicals.json` shape,
+`relay.build_states` compares the NAVER current quote with those KRX values,
+and existing group/V1/V2 consumers can read the same generated payloads.  No
+NAVER daily history is opened and no KRX indicator is recalculated.  The
+default relay command remains unchanged, so this branch does not activate the
+operational switch or alter any workflow schedule.
+
+The two former NAVER historical producers remain available for compatibility
+and recovery: `relay.calculate_technicals` and
+`tools.build_full_market_derivatives._technical_row`.  The opt-in KRX path
+does not call either producer.  `current`, `regularSession`, and after-hours
+observations stay separate from KRX historical indicators.
+
 ## Operational boundaries
 
 - no M10 LaunchAgent change
