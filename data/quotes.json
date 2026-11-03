@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T15:00:51.591830+09:00",
-  "collectionStartedAt": "2026-11-03T15:00:50.832999+09:00",
+  "generatedAt": "2026-11-03T16:00:51.984125+09:00",
+  "collectionStartedAt": "2026-11-03T16:00:51.222457+09:00",
   "source": "NAVER_KRX",
   "count": 1,
   "expectedCount": 1,
   "coverageCount": 1,
   "freshCount": 1,
-  "liveCount": 0,
+  "liveCount": 1,
   "noAfterTradeCount": 0,
   "status": "ok",
   "fresh": true,
   "errors": [],
   "missingCodes": [],
-  "sourceTime": "2026-11-03T15:00:51.517889+09:00",
-  "sourceTimeLatest": "2026-11-03T15:00:51.517889+09:00",
+  "sourceTime": "2026-11-03T16:00:51.908651+09:00",
+  "sourceTimeLatest": "2026-11-03T16:00:51.908651+09:00",
   "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
   "datas": [
     {
@@ -26,11 +26,11 @@
       "openPrice": 220500,
       "highPrice": 223000,
       "lowPrice": 217000,
-      "accumulatedTradingVolume": 10711192,
-      "accumulatedTradingValue": 2355467000000,
+      "accumulatedTradingVolume": 12954749,
+      "accumulatedTradingValue": 2847749000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-03T15:00:51.517889+09:00",
-      "localTradedAt": "2026-11-03T15:00:51.517889+09:00",
+      "sourceTime": "2026-11-03T16:00:51.908651+09:00",
+      "localTradedAt": "2026-11-03T16:00:51.908651+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -38,18 +38,28 @@
         "name": "KOSPI",
         "delayTime": 0
       },
-      "marketSessionType": "regularMarket",
+      "marketSessionType": "afterMarket",
       "overMarketPriceInfo": {
-        "tradingSessionType": "REGULAR_MARKET",
+        "tradingSessionType": "AFTER_MARKET",
         "overPrice": "219,500",
-        "localTradedAt": "2026-11-03T15:00:51.517907+09:00"
+        "localTradedAt": "2026-11-03T16:00:51.908668+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
       "status": "ok",
-      "freshnessReason": "krx_regular_live",
-      "session": "REGULAR",
-      "priceBasis": "KRX_REGULAR"
+      "freshnessReason": "after_market_live",
+      "session": "AFTER",
+      "priceBasis": "AFTER_MARKET",
+      "sessionPrice": 219500,
+      "sessionSourceTime": "2026-11-03T16:00:51.908651+09:00",
+      "sessionPriceBasis": "AFTER_MARKET",
+      "sessionStatus": "LIVE",
+      "referencePrice": null,
+      "referenceSourceTime": null,
+      "referencePriceBasis": "TODAY_REGULAR_CLOSE",
+      "referenceStatus": "unavailable",
+      "sessionChange": null,
+      "sessionChangeRate": null
     }
   ]
 }
