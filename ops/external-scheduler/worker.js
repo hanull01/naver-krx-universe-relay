@@ -26,8 +26,8 @@ export function planForCron(cron) {
   if (cron === "0 22 * * SUN-THU" || cron === "0 22 * * 0-4") {
     return { slot: "07:00", key: "backfill-derived", ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } };
   }
-  if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "7 0-10 * * MON-FRI" || cron === "7 0-10 * * 1-5") {
-    return { slot: cron.startsWith("0 23") ? "08:00" : "09:07-19:07", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
+  if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "0 0-10 * * MON-FRI" || cron === "0 0-10 * * 1-5") {
+    return { slot: cron.startsWith("0 23") ? "08:00" : "09:00-19:00", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
   }
   if (cron === "0 14 * * MON-FRI" || cron === "0 14 * * 1-5") return { slot: "23:00", key: "daily-report", ...WORKFLOWS.report, inputs: {} };
   if (cron === "17 0 * * MON-FRI" || cron === "17 0 * * 1-5") return { slot: "09:17", key: "schedule-diagnostic", ...WORKFLOWS.diagnostic, inputs: {} };
@@ -44,7 +44,7 @@ export function planForKey(key) {
   const plans = {
     "refresh-final": { slot: "20:30", key, ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } },
     "backfill-derived": { slot: "07:00", key, ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } },
-    "refresh-intraday": { slot: "08:00-19:07", key, ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } },
+    "refresh-intraday": { slot: "08:00-19:00", key, ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } },
     "daily-report": { slot: "23:00", key, ...WORKFLOWS.report, inputs: {} },
     "schedule-diagnostic": { slot: "09:17", key, ...WORKFLOWS.diagnostic, inputs: {} },
     research: { slot: "research", key, ...WORKFLOWS.research, inputs: {} },
