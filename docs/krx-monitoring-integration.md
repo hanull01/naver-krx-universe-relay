@@ -132,6 +132,26 @@ and recovery: `relay.calculate_technicals` and
 does not call either producer.  `current`, `regularSession`, and after-hours
 observations stay separate from KRX historical indicators.
 
+## V1/V2 impact comparison
+
+`tools/krx_v1v2_impact.py` is a read-only, in-memory comparison tool. It
+reuses `aggregate_industries`, `build_theme_signals`,
+`dynamic_universe_manager.build_management_result`, and the existing V2
+evaluator without changing their formulas. It overlays only KRX historical
+MA/return/prior-high fields onto the existing feature scope and keeps NAVER
+current price, change rate, and trading value as current observations.
+
+The KRX `volume_ratio_prev20` field is retained as
+`krx_volume_ratio_prev20`; it is never copied into
+`current_volume_ratio_20`. Missing KRX fields remain nullable and there is no
+NAVER historical fallback. Stock/ETF filtering, date mismatch, duplicate
+identity, and missing-code diagnostics are emitted before comparison.
+
+The tool can be run against a local M10 interchange and existing monitoring
+snapshots to compare group metrics, V1 status/leader changes, and V2 status
+changes. The output is an audit artifact selected by the caller; no canonical
+monitoring file, workflow, or external transport is written by the tool.
+
 ## Operational boundaries
 
 - no M10 LaunchAgent change
