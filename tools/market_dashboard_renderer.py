@@ -396,6 +396,12 @@ def render_contract_views(
     }
 
 
+def _metric_line(label: str, metric: Mapping[str, Any]) -> str:
+    pct = metric.get("pct")
+    value = _metric_line_value(metric)
+    width = _num(pct) or 0
+    return f'<div class="metric-row"><div>{_escape(label)}<div class="meter"><span style="width:{max(0, min(100, width))}%"></span></div></div><strong>{_escape(value)}</strong></div>'
+
 def _compact_date(value: Any) -> str:
     text = str(value or "").strip().replace("-", "")
     if len(text) == 8 and text.isdigit():
