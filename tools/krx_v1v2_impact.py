@@ -461,10 +461,17 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
             "sectorStatusChanges": _status_changes(results["existing"]["v1"].get("sectors", []), results["krx"]["v1"].get("sectors", [])),
             "themeStatusChanges": _status_changes(results["existing"]["v1"].get("themes", []), results["krx"]["v1"].get("themes", [])),
             "leaderCodeChanges": _code_changes(results["existing"]["v1"].get("leaders", []), results["krx"]["v1"].get("leaders", [])),
+            "sectorScoreRankChanges": _score_rank_changes(results["existing"]["v1"].get("sectors", []), results["krx"]["v1"].get("sectors", [])),
+            "themeScoreRankChanges": _score_rank_changes(results["existing"]["v1"].get("themes", []), results["krx"]["v1"].get("themes", [])),
+            "leaderScoreRankChanges": _score_rank_changes(results["existing"]["v1"].get("leaders", []), results["krx"]["v1"].get("leaders", [])),
         },
         "v2Comparison": {
             "statusChanges": _status_changes(results["existing"]["v2"].get("industries", []) + results["existing"]["v2"].get("themes", []),
                                                results["krx"]["v2"].get("industries", []) + results["krx"]["v2"].get("themes", [])),
+            "scoreRankChanges": _score_rank_changes(
+                results["existing"]["v2"].get("industries", []) + results["existing"]["v2"].get("themes", []),
+                results["krx"]["v2"].get("industries", []) + results["krx"]["v2"].get("themes", []),
+            ),
         },
         "contract": {
             "historicalSource": "KRX",
@@ -495,6 +502,33 @@ def _code_changes(left: Iterable[Mapping[str, Any]], right: Iterable[Mapping[str
     a = {str(row.get("code")) for row in left if row.get("code")}
     b = {str(row.get("code")) for row in right if row.get("code")}
     return {"existingCount": len(a), "krxCount": len(b), "added": sorted(b - a), "removed": sorted(a - b)}
+
+
+def _score_rank_changes(left: Iterable[Mapping[str, Any]], right: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    """Compare deterministic score/rank without changing the scoring engine."""
+    left_rows = {str(row.get("id")): row for row in left if row.get("id") is not None}
+    right_rows = {str(row.get("id")): row for row in right if row.get("id") is not None}
+
+    def score(row: Mapping[str, Any]) -> float | None:
+        value = row.get("score")
+        return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+    def ranks(rows: Mapping[str, Mapping[str, Any]]) -> dict[str, int | None]:
+        ordered = sorted(((key, score(row)) for key, row in rows.items() if score(row) is not None),
+                         key=lambda item: (-item[1], item[0]))
+        return {key: index for index, (key, _value) in enumerate(ordered, 1)}
+
+    left_ranks, right_ranks = ranks(left_rows), ranks(right_rows)
+    changes = []
+    for key in sorted(set(left_rows) | set(right_rows)):
+        old_score, new_score = score(left_rows.get(key, {})), score(right_rows.get(key, {}))
+        old_rank, new_rank = left_ranks.get(key), right_ranks.get(key)
+        if old_score != new_score or old_rank != new_rank:
+            changes.append({"id": key, "existingScore": old_score, "krxScore": new_score,
+                            "existingRank": old_rank, "krxRank": new_rank})
+    return {"changedCount": len(changes), "rankChangedCount": sum(
+        row["existingRank"] != row["krxRank"] for row in changes
+    ), "rows": changes}
 
 
 def main(argv: list[str] | None = None) -> int:
