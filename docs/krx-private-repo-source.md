@@ -2,9 +2,10 @@
 
 The monitoring repository may consume only the designated files under
 `hanull01/KIS_Trading:data/krx_sync`. It must use an authenticated read-only
-GitHub Contents client scoped to that repository and path. It must not clone
-the repository, read KIS source code, read Actions, or write to the private
-repository.
+GitHub Contents client with repository-level `contents:read` access. GitHub
+does not make that permission path-scoped; the adapter's allowlist is the
+path-level control. It must not clone the repository, read KIS source code,
+read Actions, or write to the private repository.
 
 The source adapter fetches exactly:
 
