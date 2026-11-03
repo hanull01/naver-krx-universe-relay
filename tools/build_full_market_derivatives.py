@@ -17,7 +17,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
-from tools.file_digest import sha256_file
+from tools.file_digest import sha256_bytes, sha256_file
 
 
 ROLLING_WINDOW = 120
@@ -97,7 +97,7 @@ def _date(value: Any) -> str | None:
 def _write_json(path: Path, payload: Mapping[str, Any]) -> dict[str, Any]:
     encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
     path.write_text(encoded, encoding="utf-8")
-    return {"path": str(path), "bytes": len(encoded.encode("utf-8")), "sha256": hashlib.sha256(encoded.encode("utf-8")).hexdigest()}
+    return {"path": str(path), "bytes": len(encoded.encode("utf-8")), "sha256": sha256_bytes(encoded.encode("utf-8"))}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
