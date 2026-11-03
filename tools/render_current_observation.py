@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
+
 import json
 import os
 import sys
 from pathlib import Path
 from typing import Any, Mapping
+
+from tools.file_digest import sha256_bytes, sha256_file
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -17,6 +19,7 @@ if str(ROOT) not in sys.path:
 from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     build_dashboard_model,
+    load_approved_template,
     render_dashboard_html,
     render_dashboard_markdown,
     validate_rendered_files,
@@ -24,10 +27,6 @@ from tools.market_dashboard_renderer import (
 
 DEFAULT_CONTRACT = ROOT / "data/monitoring/latest-report-contract.json"
 DEFAULT_OUTPUT_ROOT = ROOT / "data/reports/current-observation"
-
-
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _session(indices: list[Mapping[str, Any]]) -> str:
@@ -94,8 +93,19 @@ def render_current_observation(
         "writtenAt": observed_at,
     }
     model = build_dashboard_model(report, allow_current_observation=True)
-    markdown = render_dashboard_markdown(report, allow_current_observation=True)
-    html = render_dashboard_html(report, allow_current_observation=True)
+    assets = load_approved_template()
+    markdown = render_dashboard_markdown(
+        report,
+        allow_current_observation=True,
+        _model=model,
+        _template_assets=assets,
+    )
+    html = render_dashboard_html(
+        report,
+        allow_current_observation=True,
+        _model=model,
+        _assets=assets,
+    )
 
     run_id = str(run_id or os.environ.get("GITHUB_RUN_ID") or "local")
     head_sha = str(head_sha or os.environ.get("GITHUB_SHA") or "UNAVAILABLE")
@@ -136,15 +146,15 @@ def render_current_observation(
         "tradingDateStatus": contract.get("tradingDateStatus") or "UNAVAILABLE",
         "sourceTime": _source_time(contract, indices),
         "reportContractPath": repo_path(contract_path),
-        "reportContractSha256": hashlib.sha256(contract_bytes).hexdigest(),
+        "reportContractSha256": sha256_bytes(contract_bytes),
         "reportContractGeneratedAt": observed_at,
         "workflowRunId": run_id,
         "executionHead": head_sha,
         "markdownPath": repo_path(markdown_path),
         "htmlPath": repo_path(html_path),
         "manifestPath": repo_path(manifest_path),
-        "markdownSha256": _sha256(markdown_path),
-        "htmlSha256": _sha256(html_path),
+        "markdownSha256": sha256_file(markdown_path),
+        "htmlSha256": sha256_file(html_path),
         "reportStatus": contract.get("status"),
         "currentObservationAllowed": True,
         "finalPending": final_pending,

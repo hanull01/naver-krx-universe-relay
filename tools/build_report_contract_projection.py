@@ -8,12 +8,14 @@ into this contract, so the Work contract stays below its transport limit.
 from __future__ import annotations
 
 import argparse
-import hashlib
+
 import json
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
+
+from tools.file_digest import sha256_bytes, sha256_file
 
 from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
 
@@ -32,14 +34,6 @@ def _read(path: Path) -> dict[str, Any]:
     return payload
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
 def _artifact(root: Path, name: str) -> dict[str, Any]:
     path = root / name
     if not path.exists():
@@ -47,7 +41,7 @@ def _artifact(root: Path, name: str) -> dict[str, Any]:
     return {
         "path": str(path),
         "bytes": path.stat().st_size,
-        "sha256": _sha256(path),
+        "sha256": sha256_file(path),
     }
 
 
@@ -317,7 +311,7 @@ def build_report_contract_projection(
         "contract": contract,
         "payload": payload,
         "bytes": len(payload),
-        "sha256": hashlib.sha256(payload).hexdigest(),
+        "sha256": sha256_bytes(payload),
         "artifacts": artifacts,
     }
     if output_path is not None:

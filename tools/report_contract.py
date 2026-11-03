@@ -153,22 +153,6 @@ def _valid_code_name_rows(stocks: list[Any], symbols: list[Any], bindings: Any) 
     return bool(stocks)
 
 
-def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
-    """Keep theme metrics without duplicating every member quote row."""
-    compact: list[dict[str, Any]] = []
-    for row in rows or []:
-        if not isinstance(row, Mapping):
-            continue
-        item = dict(row)
-        stocks = item.pop("stocks", None)
-        if isinstance(stocks, list):
-            item["stockDetailCount"] = len(stocks)
-            item["stockDetailSource"] = (
-                "data/monitoring/latest-theme-signals.json#themes[].stocks"
-            )
-        compact.append(item)
-    return compact
-
 
 _GROUP_SUMMARY_FIELDS = (
     "id", "name", "kind", "status", "v1Status", "v2Status",
@@ -246,6 +230,106 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
 
 def _compact_group_rows(rows: Any, kind: str) -> list[dict[str, Any]]:
     return [item for item in (_compact_group_row(row, kind) for row in rows or []) if item]
+
+
+_REPORT_V1_STATUSES = {"ACTIVE", "DISCOVERED", "MAINTAINED", "WATCH"}
+
+
+def _compact_v1_rows(
+    groups: Mapping[str, Any] | None,
+    kind: str,
+    relative_rows: list[Mapping[str, Any]],
+    trading_date: Any,
+) -> list[dict[str, Any]]:
+    """Project the existing V1 selection without changing its policy."""
+    if not isinstance(groups, Mapping):
+        return []
+    source_key = "sectors" if kind == "industry" else "themes"
+    relative_by_id = {
+        str(row.get("id")): row
+        for row in relative_rows
+        if isinstance(row, Mapping) and row.get("id") is not None
+    }
+    expected_date = str(trading_date or "").replace("-", "")
+    rows: list[dict[str, Any]] = []
+    for row in groups.get(source_key) or []:
+        if not isinstance(row, Mapping):
+            continue
+        status = str(row.get("status") or "").upper()
+        row_date = str(row.get("lastObservedTradingDate") or "").replace("-", "")
+        if status not in _REPORT_V1_STATUSES or (expected_date and row_date and row_date != expected_date):
+            continue
+        relative = relative_by_id.get(str(row.get("id")), {})
+        rows.append({
+            "id": row.get("id"),
+            "name": row.get("name"),
+            "kind": kind,
+            "status": status,
+            "score": row.get("score"),
+            "tradingDate": row.get("lastObservedTradingDate") or trading_date,
+            "leaders": _compact_group_leaders(relative.get("leaderCandidates") or relative.get("leaders") or []),
+        })
+    rows.sort(key=lambda item: (-float(item["score"]) if isinstance(item.get("score"), (int, float)) else 1e9, str(item.get("id") or "")))
+    return rows[:5]
+
+
+def _compact_research_analysis(
+    research: Mapping[str, Any] | None,
+    trading_date: Any,
+    relative_tracking: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Summarize the existing research intelligence for the user view."""
+    if not isinstance(research, Mapping):
+        return {"status": "UNAVAILABLE", "asOf": None, "items": []}
+    as_of = str(research.get("asOf") or "").replace("-", "")
+    expected = str(trading_date or "").replace("-", "")
+    stocks = [row for row in research.get("stocks") or [] if isinstance(row, Mapping)]
+    if not stocks or (expected and as_of != expected):
+        return {"status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": []}
+    eligible = [row for row in stocks if row.get("rankingEligible") is True]
+    if not eligible:
+        return {"status": str(research.get("status") or "UNAVAILABLE"), "asOf": research.get("asOf"), "items": []}
+
+    items: list[dict[str, Any]] = []
+    focus = max(eligible, key=lambda row: (row.get("recentReportCount") or 0, row.get("brokerCount") or 0))
+    items.append({
+        "category": "리서치 집중",
+        "text": f"{focus.get('itemName') or focus.get('itemCode')}에 최근 리서치 {focus.get('recentReportCount') or 0}건이 집중되었습니다.",
+    })
+    revisions = sorted(eligible, key=lambda row: abs(row.get("targetMeanChangePct") or 0), reverse=True)
+    if revisions and revisions[0].get("targetMeanChangePct") is not None:
+        row = revisions[0]
+        direction = "상향" if row.get("targetMeanChangePct", 0) > 0 else "하향" if row.get("targetMeanChangePct", 0) < 0 else "변동 없음"
+        items.append({
+            "category": "목표주가 방향",
+            "text": f"{row.get('itemName') or row.get('itemCode')} 목표주가 평균 {direction} {abs(row.get('targetMeanChangePct')):.2f}%.",
+        })
+    opinion = max(eligible, key=lambda row: (row.get("revisionUp") or 0) + (row.get("revisionDown") or 0))
+    opinion_count = (opinion.get("revisionUp") or 0) + (opinion.get("revisionDown") or 0)
+    if opinion_count:
+        items.append({
+            "category": "투자의견 변경",
+            "text": f"{opinion.get('itemName') or opinion.get('itemCode')} 의견 변경 관측 {opinion_count}건 (상향 {opinion.get('revisionUp') or 0}·하향 {opinion.get('revisionDown') or 0}).",
+        })
+    repeated = max(eligible, key=lambda row: (row.get("brokerCount") or 0, row.get("recentReportCount") or 0))
+    items.append({
+        "category": "반복 언급",
+        "text": f"{repeated.get('itemName') or repeated.get('itemCode')}가 {repeated.get('brokerCount') or 0}개 증권사에서 언급되었습니다.",
+    })
+    leader_codes = {
+        str(leader.get("code"))
+        for section in (relative_tracking.get("industries") or {}, relative_tracking.get("themes") or {})
+        for row in section.get("top5") or []
+        for leader in row.get("leaderCandidates") or []
+        if isinstance(leader, Mapping) and leader.get("code")
+    }
+    aligned = next((row for row in eligible if str(row.get("itemCode")) in leader_codes), None)
+    if aligned:
+        items.append({
+            "category": "시장 방향 일치",
+            "text": f"{aligned.get('itemName') or aligned.get('itemCode')}가 오늘의 주도 그룹 대표 종목과 리서치 양쪽에서 확인됩니다.",
+        })
+    return {"status": str(research.get("status") or "AVAILABLE"), "asOf": research.get("asOf"), "items": items[:5]}
 
 
 def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
@@ -770,6 +854,7 @@ def build_report_contract(
     v2_changes: list[Mapping[str, Any]] | None = None,
     session_context: Mapping[str, Any] | None = None,
     registered_universe: Mapping[str, Any] | None = None,
+    v1_groups: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -911,6 +996,15 @@ def build_report_contract(
         trading_date=trading_date,
         source_commit=v2_source_commit,
     )
+    v1_industries = _compact_v1_rows(
+        v1_groups, "industry", relative_strength_tracking["industries"]["top5"], trading_date
+    )
+    v1_themes = _compact_v1_rows(
+        v1_groups, "theme", relative_strength_tracking["themes"]["top5"], trading_date
+    )
+    research_analysis = _compact_research_analysis(
+        research, trading_date, relative_strength_tracking
+    )
     observations = v2_history.get("observations") or []
     unique_dates = sorted({str(row.get("tradingDate")) for row in observations if row.get("tradingDate")})
     v2_history_summary = _v2_history_summary(
@@ -1039,6 +1133,11 @@ def build_report_contract(
         "industries": _compact_group_rows(industries.get("industries") or [], "industry"),
         "themes": _compact_group_rows(themes.get("themes") or [], "theme"),
         "relativeStrengthTop5": relative_strength_tracking,
+        "v1": {
+            "status": "AVAILABLE" if v1_industries or v1_themes else "UNAVAILABLE",
+            "industries": v1_industries,
+            "themes": v1_themes,
+        },
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
         "registeredUniverse": dict(registered_universe or {
             "status": "AVAILABLE_EMPTY",
@@ -1066,6 +1165,7 @@ def build_report_contract(
             "research": {
                 "status": (research or {}).get("status") if isinstance(research, Mapping) else "UNAVAILABLE",
                 "asOf": (research or {}).get("asOf") if isinstance(research, Mapping) else None,
+                "analysis": research_analysis,
             },
             "investorFlow": {
                 "status": "UNAVAILABLE",

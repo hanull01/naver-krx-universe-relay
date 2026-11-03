@@ -316,6 +316,44 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("부분 테마", html)
         self.assertIn("부분 테마", markdown)
 
+    def test_v1_operating_groups_are_separate_limited_and_exclude_removed(self):
+        report = report_fixture()
+        report["reportContract"]["v1"] = {
+            "industries": [
+                {"id": str(i), "name": f"운영 업종 {i}", "status": "ACTIVE"}
+                for i in range(6)
+            ] + [{"id": "removed", "name": "제외 업종", "status": "REMOVED"}],
+            "themes": [
+                {"id": str(i), "name": f"운영 테마 {i}", "status": "DISCOVERED"}
+                for i in range(6)
+            ],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("운영 업종 0", output)
+            self.assertIn("운영 테마 0", output)
+            self.assertNotIn("제외 업종", output)
+        model = build_dashboard_model(report)
+        self.assertEqual(len(model["v1Industries"]), 5)
+        self.assertEqual(len(model["v1Themes"]), 5)
+
+    def test_research_analysis_is_user_section_and_missing_research_is_explicit(self):
+        report = report_fixture()
+        report["reportContract"]["independentAnalysis"]["research"]["analysis"] = {
+            "status": "AVAILABLE",
+            "asOf": "2026-10-29",
+            "items": [{"category": "리서치 집중", "text": "삼성전자에 리서치가 집중되었습니다."}],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("네이버 리서치 분석", html)
+        self.assertIn("삼성전자에 리서치가 집중되었습니다.", html)
+        self.assertIn("삼성전자에 리서치가 집중되었습니다.", markdown)
+        report["reportContract"]["independentAnalysis"]["research"].pop("analysis")
+        self.assertIn("네이버 리서치 자료 없음", html_lib.unescape(render_dashboard_html(report)))
+        self.assertIn("자료 없음", render_dashboard_markdown(report))
+
     def test_missing_kospi_and_kosdaq_are_reported_individually(self):
         report = report_fixture()
         report["reportContract"]["indices"] = [{"name": "KOSPI", "close": 3000.0}]
