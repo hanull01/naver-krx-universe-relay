@@ -13,7 +13,9 @@ import json
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping\n\nfrom tools.file_digest import sha256_bytes, sha256_file
+from typing import Any, Mapping
+
+from tools.file_digest import sha256_bytes, sha256_file
 
 from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
 
@@ -30,14 +32,6 @@ def _read(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ReportContractProjectionError(f"JSON object expected: {path}")
     return payload
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def _artifact(root: Path, name: str) -> dict[str, Any]:
