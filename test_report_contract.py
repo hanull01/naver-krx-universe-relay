@@ -63,6 +63,30 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
+    def test_v1_projection_and_research_analysis_are_compact_and_date_bound(self):
+        common = {"generatedAt": "2026-10-28T10:09:19+00:00"}
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {"tradingDate": "20261028", "authoritativeCount": 1, "markets": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}}}},
+            breadth={**common, "fullMarket": {"marketTradingValue": {}}},
+            quality={**common, "tradingDateEvidence": self.evidence("20261028")},
+            industries={**common, "industries": []}, themes={**common, "themes": []},
+            v2_latest={**common, "tradingDate": "20261028", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            research={"status": "OK", "asOf": "2026-10-28", "stocks": [{
+                "itemCode": "005930", "itemName": "삼성전자", "rankingEligible": True,
+                "recentReportCount": 3, "brokerCount": 2, "targetMeanChangePct": 4.2,
+                "revisionUp": 2, "revisionDown": 0,
+            }]},
+            v1_groups={"sectors": [
+                {"id": "1", "name": "운영 업종", "status": "ACTIVE", "score": 90, "lastObservedTradingDate": "20261028"},
+                {"id": "2", "name": "제외 업종", "status": "REMOVED", "score": 100, "lastObservedTradingDate": "20261028"},
+            ], "themes": []},
+        )
+        self.assertEqual([row["name"] for row in contract["v1"]["industries"]], ["운영 업종"])
+        self.assertEqual(contract["independentAnalysis"]["research"]["analysis"]["status"], "OK")
+        self.assertLessEqual(len(contract["independentAnalysis"]["research"]["analysis"]["items"]), 5)
+
     def test_v2_real_names_leaders_and_recent_history_are_same_generation(self):
         generated = "2026-10-29T05:08:56+00:00"
         evidence = {
