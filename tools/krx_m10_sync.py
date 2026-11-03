@@ -340,7 +340,7 @@ def stage_current_generation(
 
 def _validate_package(package: Path) -> dict[str, Any]:
     transfer = _json(package / "transfer_manifest.json")
-    if transfer.get("schemaVersion") != TRANSFER_SCHEMA or transfer.get("publication") != "PRIVATE_LOCAL_ONLY":
+    if transfer.get("schemaVersion") != TRANSFER_SCHEMA or transfer.get("publication") not in {"PRIVATE_LOCAL_ONLY", "PRIVATE_KIS_TRADING_ONLY"}:
         raise SyncError("TRANSFER_MANIFEST_INVALID")
     generation = _generation_id(transfer.get("generationId"))
     trading_date = _date(transfer.get("tradingDate"), "trading_date")
@@ -360,6 +360,15 @@ def _validate_package(package: Path) -> dict[str, Any]:
         raise SyncError("TRANSFER_MONITORING_CONTRACT_INVALID")
     if monitoring.get("entity_count") != transfer.get("entityCount") or len(monitoring.get("entities") or []) != transfer.get("entityCount"):
         raise SyncError("TRANSFER_ENTITY_COUNT_MISMATCH")
+    if transfer.get("publication") == "PRIVATE_KIS_TRADING_ONLY":
+        if transfer.get("rawIncluded") or transfer.get("metricsIncluded") or transfer.get("aftermarketIncluded"):
+            raise SyncError("TRANSFER_FORBIDDEN_ARTIFACT_INCLUDED")
+        expected = {
+            "private_sync_manifest.json": (transfer.get("privateManifestSha256"), transfer.get("privateManifestBytes")),
+            "report_input.json": (transfer.get("reportInputSha256"), transfer.get("reportInputBytes")),
+        }
+        for name, (sha256, size) in expected.items():
+            _verify_artifact(package / name, {"sha256": sha256, "bytes": size}, f"transfer_{name}")
     return {"transfer": transfer, "monitoring": monitoring, "manifest": manifest}
 
 
@@ -594,6 +603,9 @@ def deliver_pending_once(
                 _copy_atomic(package / "monitoring_interchange.json", staging / "monitoring_interchange.json")
                 _copy_atomic(package / "generation_manifest.json", staging / "generation_manifest.json")
                 _copy_atomic(package / "transfer_manifest.json", staging / "transfer_manifest.json")
+                if transfer.get("publication") == "PRIVATE_KIS_TRADING_ONLY":
+                    _copy_atomic(package / "private_sync_manifest.json", staging / "private_sync_manifest.json")
+                    _copy_atomic(package / "report_input.json", staging / "report_input.json")
                 if point == "generation_copy":
                     raise SyncError("INJECTED_GENERATION_COPY")
                 _write_receiver_state(
