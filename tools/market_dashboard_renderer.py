@@ -1363,6 +1363,42 @@ def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
     )
 
 
+def _markdown_cell(value: Any, fallback: str = "확인 대기") -> str:
+    """Keep user-facing Markdown tables valid and compact."""
+    text = _text(value, fallback).replace("\r", " ").replace("\n", " ")
+    return text.replace("|", "\\|")
+
+
+def _markdown_table(headers: tuple[str, ...], rows: list[tuple[Any, ...]]) -> list[str]:
+    """Build a readable pipe table without exposing renderer metadata."""
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join("---" for _ in headers) + " |",
+    ]
+    for row in rows:
+        lines.append("| " + " | ".join(_markdown_cell(value) for value in row) + " |")
+    return lines
+
+
+def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, ...]]:
+    rows = model["kiwoom"].get("stocks") or []
+    result = []
+    for row in rows:
+        baseline = _first(row, "selectionPrice", "baselinePrice", "referencePrice", "selectedPrice")
+        technical = _first(row, "technicalSummary", "technicalStatus", "trend", "trendStatus")
+        condition = _display_status(row.get("conditionStatus") or row.get("state"), "확인 대기")
+        next_check = _first(row, "nextCheck", "nextObservation", "nextAction") or "다음 관찰에서 확인"
+        result.append((
+            f"{_text(row.get('itemName'))} ({_text(row.get('itemCode'))})",
+            _price(baseline),
+            _price(_first(row, "price", "currentPrice")),
+            _display_status(technical, "확인 대기"),
+            condition,
+            next_check,
+        ))
+    return result
+
+
 def _compact_conclusions(model: Mapping[str, Any]) -> list[str]:
     market = model["fullMarket"]
     result = []
@@ -1435,47 +1471,95 @@ def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLAT
     if not model["renderable"]:
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:REQUIRED_RENDER_FIELDS")
     market = model["fullMarket"]
-    lines = [f"# 국내증시 시장 모니터링 - {model['asOf']}", "", f"- 기준시각: {model['observedAt']}", f"- 거래일 상태: {model['tradingDateStatus']}"]
+    lines = [
+        f"# 국내증시 시장 모니터링 — {model['asOf']}",
+        "",
+        "| 기준일 | 기준시각 | 시장 세션 | 거래일 상태 |",
+        "| --- | --- | --- | --- |",
+        f"| {model['asOf']} | {model['observedAt']} | {model['indexSessionLabel']} | {model['tradingDateStatus']} |",
+    ]
     if model["status"].upper() != "AVAILABLE":
-        lines += [f"- 리포트 상태: {_display_status(model['status'])}", f"- 안내: {model['reason']}"]
-    lines += ["", "## 1. 시장 대시보드", "", f"- 세션: {model['indexSessionLabel']}"]
+        lines += ["", f"> 안내: {_display_status(model['status'])} — {model['reason']}"]
+    lines += ["", "## 1. 시장 대시보드", ""]
     if (model.get("sessionContext") or {}).get("mode") == "PREOPEN":
         observation = model["sessionContext"].get("observation") or {}
         previous = model["sessionContext"].get("previousTradingDay") or {}
         lines += [
             "",
             "### 장전 관측과 직전 거래일 참고자료",
-            f"- 당일 장전 관측: {_compact_date(observation.get('tradingDate'))} · 상태 {_display_status(observation.get('status'))}",
-            f"- 직전 거래일 참고: {_compact_date(previous.get('tradingDate'))} · 상태 {_display_status(previous.get('status'))}",
+            f"당일 장전 관측: {_compact_date(observation.get('tradingDate'))} · 상태 {_display_status(observation.get('status'))}",
+            f"직전 거래일 참고: {_compact_date(previous.get('tradingDate'))} · 상태 {_display_status(previous.get('status'))}",
         ]
         for row in previous.get("indices") or []:
-            lines.append(f"- 직전 {row.get('name') or row.get('code')}: {row.get('close') if row.get('close') is not None else '확인 불가'} · {row.get('changeRate') if row.get('changeRate') is not None else '확인 불가'}% · 당일 장전 자료와 혼합하지 않음")
-    for row in model["indices"]:
-        name = _index_code(row)
-        if name in {"KOSPI", "KOSDAQ"}:
-            available = _compact_index_available(row, model.get("asOfRaw"))
-            points = row.get("changePoints")
-            points_text = f"{points:+,.2f}p" if isinstance(points, (int, float)) else "확인 불가"
-            display_name = "코스피 (KOSPI)" if name == "KOSPI" else "코스닥 (KOSDAQ)" if name == "KOSDAQ" else name
-            lines.append(f"- {display_name}: {_index_close(row.get('close')) if available else '확인 불가'} · {points_text if available else '확인 불가'} ({_pct(row.get('changeRate')) if available else '확인 불가'}) · {_compact_kst(row.get('sourceTime')) if available else '원천 확인 대기'}")
-    lines += [f"- 상승/하락/보합: {market['advancers']:,}/{market['decliners']:,}/{market['unchanged']:,}", f"- 하락 비율: {_plain_pct(market['declineRatio'])}", f"- 시장 거래대금: {_market_value_text(market['marketTradingValue'])}"]
-    for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")):
-        lines.append(f"- {label}: {_metric_line_value(market['metrics'].get(key) or {})}")
+            lines.append(f"직전 {row.get('name') or row.get('code')}: {row.get('close') if row.get('close') is not None else '확인 불가'} · {row.get('changeRate') if row.get('changeRate') is not None else '확인 불가'}% · 당일 장전 자료와 혼합하지 않음")
+
+    rows_by_name = {
+        _index_code(row): row
+        for row in model["indices"]
+        if _index_code(row) in {"KOSPI", "KOSDAQ"}
+    }
+    index_rows = []
+    for name in ("KOSPI", "KOSDAQ"):
+        row = rows_by_name.get(name) or {}
+        available = _compact_index_available(row, model.get("asOfRaw"))
+        points = row.get("changePoints")
+        points_text = f"{points:+,.2f}p" if isinstance(points, (int, float)) else "확인 불가"
+        display_name = "코스피 (KOSPI)" if name == "KOSPI" else "코스닥 (KOSDAQ)"
+        index_rows.append((
+            display_name,
+            _index_close(row.get("close")) if available else "확인 불가",
+            points_text if available else "확인 불가",
+            _pct(row.get("changeRate")) if available else "확인 불가",
+        ))
+    lines += _markdown_table(("지수", "현재값", "전일 대비", "등락률"), index_rows)
+    lines += ["", "### 시장 확산"]
+    lines += _markdown_table(("상승", "하락", "보합", "하락 비율", "시장 거래대금"), [(
+        f"{market['advancers']:,}", f"{market['decliners']:,}", f"{market['unchanged']:,}",
+        _plain_pct(market["declineRatio"]), _market_value_text(market["marketTradingValue"]),
+    )])
+    lines += ["", "### 이동평균 상회율"]
+    lines += _markdown_table(("MA20", "MA60", "MA120"), [tuple(
+        _metric_line_value(market["metrics"].get(key) or {})
+        for key in ("aboveMA20", "aboveMA60", "aboveMA120")
+    )])
     lines += ["", "### 핵심 결론", ""] + [f"- {item}" for item in _compact_conclusions(model)]
     lines += ["", "## 2. 주도 업종·테마", "", "### 업종 상대강도 TOP 5"]
-    lines += [f"- {row.get('rank')}. {row.get('name') or row.get('id')} · 상대강도 {_pct(row.get('relativeStrength'))} · 상승 비율 {_plain_pct(row.get('breadthPct'))} · 주도주 {_compact_leaders(row)} · 상태 {_display_status(row.get('dataQuality') or row.get('status') or row.get('changeClass'))}" for row in model["relativeIndustries"]] or ["- 자료 없음"]
+    industry_rows = [(
+        row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
+        _plain_pct(row.get("breadthPct")), _compact_leaders(row),
+        _display_status(row.get("dataQuality") or row.get("status") or row.get("changeClass")),
+    ) for row in model["relativeIndustries"]]
+    lines += _markdown_table(("순위", "업종", "상대강도", "상승 비율", "대표 주도주", "상태"), industry_rows or [("-", "자료 없음", "-", "-", "-", "확인 대기")])
     lines += ["", "### 테마 상대강도 TOP 5"]
-    lines += [f"- {row.get('rank')}. {row.get('name') or row.get('id')} · 상대강도 {_pct(row.get('relativeStrength'))} · 상승 비율 {_plain_pct(row.get('breadthPct'))} · 주도주 {_compact_leaders(row)}" for row in model["relativeThemes"]] or ["- 자료 없음"]
+    theme_rows = [(
+        row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
+        _plain_pct(row.get("breadthPct")), _compact_leaders(row),
+        _display_status(row.get("dataQuality") or row.get("status") or row.get("changeClass")),
+    ) for row in model["relativeThemes"]]
+    lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "자료 없음", "-", "-", "-", "확인 대기")])
     lines += ["", "### 운영 선정"]
-    lines += [f"- {row.get('name') or row.get('id')} · {_display_status(row.get('v1Status'))} · 주도주 {_compact_leaders(row)}" for row in model["v1Industries"] if _compact_row_available(row)] or ["- 자료 없음"]
-    lines += ["", "### 검증 중인 후보", f"- {'검증된 후보 자료' if model['v2Verified'] else '검증 중인 후보 판정 보류 — 원천 검증 대기'}"]
+    v1_rows = [(
+        row.get("name") or row.get("id"), _display_status(row.get("v1Status")), _compact_leaders(row)
+    ) for row in model["v1Industries"] if _compact_row_available(row)]
+    lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_rows or [("자료 없음", "확인 대기", "-")])
+    lines += ["", "### 검증 중인 후보"]
+    lines += ["검증 중인 후보 판정 보류 — 원천 검증 대기" if not model["v2Verified"] else "검증된 후보 자료를 표시합니다."]
     if model["v2Verified"]:
-        lines += [f"- {row.get('name') or row.get('id')} · {_display_status(row.get('v2Status'))} · 점수 {row.get('score') if row.get('score') is not None else '확인 대기'} · 주도주 {_compact_leaders(row)}" for row in (model["v2Industries"] + model["v2Themes"])[:5]]
+        v2_rows = [(
+            row.get("name") or row.get("id"), _display_status(row.get("v2Status")),
+            f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 대기",
+            _compact_leaders(row),
+        ) for row in (model["v2Industries"] + model["v2Themes"])[:5]]
+        lines += _markdown_table(("그룹", "상태", "점수", "대표 주도주"), v2_rows or [("자료 없음", "확인 대기", "-", "-")])
     lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
-    lines += [f"- {row['name']}({row['code']}) · 현재 관측 {row['price']} · MA20 {row['ma20']} · MA60 {row['ma60']} · 추세 {row['trend']} · 상태 {row['status']}" for row in model["interests"]]
+    interest_rows = [
+        (f"{row['name']} ({row['code']})", row["price"], row["ma20"], row["ma60"], row["trend"], row["status"])
+        for row in model["interests"]
+    ]
+    lines += _markdown_table(("종목", "현재 관측", "MA20", "MA60", "추세", "상태"), interest_rows or [("삼성전자 (005930)", "확인 불가", "확인 불가", "확인 불가", "확인 대기", "확인 불가")])
     lines += ["", "### 키움 전일 발굴 후보"]
-    lines += [f"- {_text(row.get('itemName'))}({row.get('itemCode')}) · 현재 관측 {_price(_first(row, 'price', 'currentPrice'))} · 조건 판정 {row.get('conditionStatus') or row.get('state') or '확인 대기'}" for row in model["kiwoom"].get("stocks") or []] or ["- 자료 없음"]
-    lines += ["", f"> NOTICE: {model['notice']}", ""]
+    lines += _markdown_table(("후보", "기준값", "현재값", "기술지표", "조건 판정", "다음 확인사항"), _compact_kiwoom_markdown_rows(model) or [("자료 없음", "-", "-", "-", "자료 없음", "전일 장마감 후 조건검색 결과 자료 없음")])
+    lines += ["", f"> 안내: {model['notice']}", ""]
     return "\n".join(lines)
 
 
