@@ -319,10 +319,11 @@ class RollingHistoryDailyLoader:
         expected_sha = str(entry.get("sha256") or "")
         if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha):
             raise DerivedInputError(f"ROLLING_HISTORY_SHA256_MISSING:{code}")
-        if _sha256(path).lower() != expected_sha.lower():
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest().lower() != expected_sha.lower():
             raise DerivedInputError(f"ROLLING_HISTORY_SHA256_MISMATCH:{code}")
         rows = []
-        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        for line_number, line in enumerate(raw.decode("utf-8").splitlines(), 1):
             if not line.strip():
                 continue
             try:
