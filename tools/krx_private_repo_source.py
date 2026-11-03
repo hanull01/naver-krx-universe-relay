@@ -146,6 +146,10 @@ def load_verified_private_generation(
         raise PrivateSourceError("TRANSFER_REPORT_INPUT_INTEGRITY_MISMATCH")
     if _digest(payloads["monitoring"]) != transfer.get("monitoringSha256") or len(payloads["monitoring"]) != transfer.get("monitoringBytes"):
         raise PrivateSourceError("TRANSFER_MONITORING_INTEGRITY_MISMATCH")
+    if _digest(payloads["manifest"]) != transfer.get("manifestSha256") or len(payloads["manifest"]) != transfer.get("manifestBytes"):
+        raise PrivateSourceError("TRANSFER_MANIFEST_INTEGRITY_MISMATCH")
+    if _digest(payloads["privateManifest"]) != transfer.get("privateManifestSha256") or len(payloads["privateManifest"]) != transfer.get("privateManifestBytes"):
+        raise PrivateSourceError("TRANSFER_PRIVATE_MANIFEST_INTEGRITY_MISMATCH")
 
     if monitoring.get("schema") != M10_MONITORING_SCHEMA or monitoring.get("source") != "KRX_OPEN_API":
         raise PrivateSourceError("MONITORING_CONTRACT_INVALID")
@@ -166,7 +170,7 @@ def load_verified_private_generation(
         raise PrivateSourceError("KRX_HISTORICAL_POLICY_INVALID")
     if report_input.get("entityCount") != len(report_input.get("entities") or []):
         raise PrivateSourceError("REPORT_INPUT_ENTITY_COUNT_INVALID")
-    if report_input.get("entityCount") != len(entities) or transfer.get("entityCount") != len(entities):
+    if private_manifest.get("entityCount") != len(entities) or report_input.get("entityCount") != len(entities) or transfer.get("entityCount") != len(entities):
         raise PrivateSourceError("PRIVATE_ENTITY_COUNT_MISMATCH")
     report_identities = [row.get("identity") for row in report_input.get("entities") or [] if isinstance(row, Mapping)]
     if len(report_identities) != len(set(report_identities)):
