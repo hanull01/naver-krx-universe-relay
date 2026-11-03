@@ -70,7 +70,7 @@ def report_fixture():
                     {"itemCode": "300120", "itemName": "라온피플", "price": 12000, "changeRate": 1.2, "conditionStatus": "충족"},
                 ]
             },
-            "rendering": {"htmlAllowed": True, "reason": "CONTRACT_VERIFIED"},
+            "rendering": {"status": "RENDERABLE", "reason": "CONFIRMED_CONTRACT"},
         },
     }
 
@@ -97,7 +97,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "005930", "삼성E&A", "028050", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
-        for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
+        for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
             self.assertNotIn(marker, html_text)
             self.assertNotIn(marker, markdown)
         self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_text)
@@ -257,11 +257,56 @@ class MarketDashboardRendererTests(unittest.TestCase):
         right["reportContract"]["kiwoomCandidates"]["stocks"][0]["price"] = 59900
         self.assertIn("kiwoom", validate_renderer_models(left, right))
 
-    def test_contract_not_allowed_fails_closed_without_alternative_html(self):
+    def test_partial_contract_renders_without_html_gate(self):
         report = report_fixture()
-        report["reportContract"]["rendering"]["htmlAllowed"] = False
-        with self.assertRaisesRegex(TemplateUnavailable, "CONTRACT_HTML_NOT_ALLOWED"):
-            render_dashboard_html(report)
+        report["reportContract"]["status"] = "PARTIAL"
+        report["reportContract"]["tradingDateStatus"] = "SOURCE_OBSERVED"
+        report["reportContract"]["rendering"] = {
+            "status": "RENDERABLE", "reason": "PARTIAL_DATA_RETAINED"
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("부분 자료를 포함한 관측 보고서", html)
+        self.assertIn("부분 자료를 포함한 관측 보고서", markdown)
+        self.assertNotIn("HTML_BLOCKED", html)
+        self.assertNotIn("htmlAllowed", markdown)
+
+    def test_registered_universe_values_are_rendered_in_both_views(self):
+        report = report_fixture()
+        report["reportContract"]["registeredUniverse"] = {
+            "status": "AVAILABLE", "scope": "REGISTERED_UNIVERSE", "count": 1,
+            "fallbackUsed": False, "items": [{
+                "itemCode": "005930", "itemName": "삼성전자",
+                "current": {"price": 70000, "changeRate": 1.2, "status": "AVAILABLE"},
+                "technicals": {"ma20": 68000, "ma60": 65000, "status": "AVAILABLE"},
+                "state": {"status": "AVAILABLE", "trend": "DOWNTREND"},
+                "status": "AVAILABLE",
+            }],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("70,000원", output)
+            self.assertIn("68,000원", output)
+            self.assertIn("65,000원", output)
+            self.assertIn("하락 추세" if "하락 추세" in output else "DOWNTREND", output)
+
+    def test_partial_theme_is_visible_but_unavailable_groups_are_not(self):
+        report = report_fixture()
+        report["reportContract"]["relativeStrengthTop5"] = {
+            "status": "AVAILABLE", "tradingDate": "20261029",
+            "themes": {"top5": [{
+                "rank": 1, "id": "t-partial", "name": "부분 테마",
+                "relativeStrength": 1.5, "breadthPct": 60.0,
+                "memberCount": 4, "dataQuality": "PARTIAL",
+                "leaderCandidates": [],
+            }]},
+            "industries": {"top5": []},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("부분 테마", html)
+        self.assertIn("부분 테마", markdown)
 
     def test_missing_kospi_and_kosdaq_are_reported_individually(self):
         report = report_fixture()

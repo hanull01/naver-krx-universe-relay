@@ -769,6 +769,7 @@ def build_report_contract(
     kiwoom_performance: Mapping[str, Any] | None = None,
     v2_changes: list[Mapping[str, Any]] | None = None,
     session_context: Mapping[str, Any] | None = None,
+    registered_universe: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -1028,6 +1029,13 @@ def build_report_contract(
         "themes": _compact_group_rows(themes.get("themes") or [], "theme"),
         "relativeStrengthTop5": relative_strength_tracking,
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
+        "registeredUniverse": dict(registered_universe or {
+            "status": "AVAILABLE_EMPTY",
+            "scope": "REGISTERED_UNIVERSE",
+            "count": 0,
+            "fallbackUsed": False,
+            "items": [],
+        }),
         "v2": {
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
             "sourceQualityStatus": v2_latest.get("inputEvidence", {}).get("sourceQualityStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
@@ -1081,23 +1089,13 @@ def build_report_contract(
         },
         "kiwoomPerformance": compact_kiwoom_performance,
         "rendering": {
-            "htmlAllowed": bool(
-                contract_status == "AVAILABLE"
-                and trading_date
-                and trading_date_evidence_valid
-            ),
+            "status": "RENDERABLE" if contract_status in {"AVAILABLE", "PARTIAL"} and trading_date else "UNAVAILABLE",
             "reason": (
-                "CONTRACT_VERIFIED"
-                if contract_status == "AVAILABLE" and trading_date
-                else "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED"
-                if trading_date_status == "SOURCE_OBSERVED"
-                else "BASELINE_STALE_HTML_BLOCKED"
-                if baseline_status == "BASELINE_STALE"
-                else "TRADING_DATE_UNAVAILABLE_HTML_BLOCKED"
-                if not trading_date
-                else "TRADING_DATE_EVIDENCE_INVALID_HTML_BLOCKED"
-                if not trading_date_evidence_valid
-                else "CONTRACT_UNAVAILABLE_HTML_BLOCKED"
+                "CONFIRMED_CONTRACT"
+                if contract_status == "AVAILABLE"
+                else "PARTIAL_DATA_RETAINED"
+                if contract_status == "PARTIAL" and trading_date
+                else "TRADING_DATE_UNAVAILABLE"
             ),
         },
     }

@@ -160,16 +160,18 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         self.assertEqual(result["metadata"]["currentSnapshotSeparated"], True)
         self.assertFalse(result["metadata"]["fallbackUsed"])
 
-    def test_staging_current_quotes_do_not_use_a_newer_generation(self):
+    def test_staging_current_quotes_remain_visible_as_a_separate_generation(self):
         quotes = {
             "status": "AVAILABLE",
             "sourceTime": "2026-10-30T20:00:00+09:00",
             "datas": [{"itemCode": "005930", "sourceTime": "2026-10-30T20:00:00+09:00"}],
         }
         restricted = daily_report.restrict_staging_current_quotes(quotes, "20261029")
-        self.assertEqual(restricted["status"], "STALE")
-        self.assertEqual(restricted["datas"], [])
+        self.assertEqual(restricted["status"], "AVAILABLE")
+        self.assertEqual(len(restricted["datas"]), 1)
         self.assertEqual(restricted["observedSourceDates"], ["20261030"])
+        self.assertTrue(restricted["currentSnapshotSeparated"])
+        self.assertEqual(restricted["currentSnapshotDateStatus"], "CURRENT_OBSERVATION_SEPARATE")
 
     def test_derived_projection_is_reported_as_partial_not_final(self):
         projection = {

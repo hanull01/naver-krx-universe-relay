@@ -149,7 +149,6 @@ def render_current_observation(
         "currentObservationAllowed": True,
         "finalPending": final_pending,
         "baselineStale": baseline_stale,
-        "contractHtmlAllowed": bool((contract.get("rendering") or {}).get("htmlAllowed")),
     }
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

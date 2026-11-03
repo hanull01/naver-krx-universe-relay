@@ -40,20 +40,24 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
             for heading in ("## 1. 시장 대시보드", "## 2. 주도 업종·테마", "## 3. 관심종목·키움 후보"):
                 self.assertIn(heading, markdown_text)
 
-    def test_html_is_not_written_when_contract_disallows_it(self):
+    def test_partial_contract_is_rendered_without_html_gate(self):
         contract = report_fixture()["reportContract"]
-        contract["rendering"]["htmlAllowed"] = False
+        contract["status"] = "PARTIAL"
+        contract["rendering"] = {
+            "status": "RENDERABLE",
+            "reason": "PARTIAL_DATA_RETAINED",
+        }
         with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaisesRegex(TemplateUnavailable, "CONTRACT_HTML_NOT_ALLOWED"):
-                render_contract_views(contract, Path(directory))
-            self.assertEqual(list(Path(directory).iterdir()), [])
+            result = render_contract_views(contract, Path(directory))
+            self.assertEqual(result["htmlStatus"], "AVAILABLE")
+            self.assertTrue(Path(result["datedHtml"]).exists())
 
     def test_current_observation_mode_allows_validated_partial_contract(self):
         contract = report_fixture()["reportContract"]
         contract["status"] = "PARTIAL"
         contract["rendering"] = {
-            "htmlAllowed": False,
-            "reason": "SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED",
+            "status": "RENDERABLE",
+            "reason": "PARTIAL_DATA_RETAINED",
         }
         with tempfile.TemporaryDirectory() as directory:
             result = render_contract_views(
