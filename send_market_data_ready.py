@@ -189,7 +189,7 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
         artifact = _resolve_manifest_artifact(path, manifest[field])
         try:
             raw = artifact.read_bytes()
-            digest = hashlib.sha256(raw).hexdigest()
+            digest = sha256_bytes(raw)
         except OSError as exc:
             raise ReadyValidationError(f'current observation {field} is unavailable') from exc
         if digest != manifest[digest_field]:
