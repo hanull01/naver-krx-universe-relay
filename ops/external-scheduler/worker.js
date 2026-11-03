@@ -3,10 +3,10 @@ const WORKFLOWS = {
   backfill: { workflow: "backfill-derived.yml", publicationPaths: ["data/monitoring-derived"], commitMessagePrefix: "Publish full-market derived data " },
   report: {
     workflow: "daily-report.yml",
-    publicationPaths: ["data/reports/latest.json", "data/reports/latest.md", "data/reports/latest.html"],
+    publicationPaths: ["data/reports/latest.json"],
     commitMessage: "Update daily market report",
   },
-  research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"], commitMessage: "Update NAVER research intelligence" },
+  research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/intelligence/latest.json"], commitMessage: "Update NAVER research intelligence" },
   snapshots: { workflow: "refresh-market-snapshots.yml", publicationPaths: ["data/market"], commitMessage: "Refresh NAVER market snapshots" },
   diagnostic: { workflow: "schedule-diagnostic.yml", publicationPaths: [] },
 };
