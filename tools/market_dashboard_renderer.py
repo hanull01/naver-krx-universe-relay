@@ -71,6 +71,8 @@ USER_STATUS_LABELS = {
     "RANK_DOWN": "순위 하락",
     "EXITED": "이탈",
     "COMPARISON_UNAVAILABLE": "비교 불가",
+    "OK": "확인 가능",
+    "SUCCESS": "확인 가능",
 }
 
 
@@ -1211,6 +1213,8 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
     relative_industries = _compact_relative_top5(contract, "industries")
     relative_themes = _compact_relative_top5(contract, "themes")
     v2_verified = _compact_v2_verified(contract, v2)
+    v1 = contract.get("v1") or {}
+    research = (contract.get("independentAnalysis") or {}).get("research") or {}
     return {
         "contract": contract,
         "asOf": _compact_date(contract.get("asOf") or report.get("asOf")),
@@ -1237,13 +1241,15 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         },
         "relativeIndustries": relative_industries,
         "relativeThemes": relative_themes,
-        "v1Industries": [row for row in relative_industries if row.get("v1Status") not in (None, "")],
+        "v1Industries": list(v1.get("industries") or [])[:5],
+        "v1Themes": list(v1.get("themes") or [])[:5],
         "v2Verified": v2_verified,
         "v2Industries": list(v2.get("industries") or [])[:5] if v2_verified else [],
         "v2Themes": list(v2.get("themes") or [])[:5] if v2_verified else [],
         "v2HoldReason": "V2 판정 보류 — 원천 검증 대기",
         "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
         "kiwoom": contract.get("kiwoomCandidates") or {},
+        "researchAnalysis": research.get("analysis") or {"status": research.get("status", "UNAVAILABLE"), "items": []},
         "notice": reason,
     }
 
@@ -1324,13 +1330,24 @@ def _compact_rank_cards(rows: list[Mapping[str, Any]], label: str) -> str:
     return "".join(cards) or f'<div class="industry-item"><strong>{_escape(label)} 자료 없음</strong><p>검증된 현재 거래일 자료를 확인 대기 중입니다.</p></div>'
 
 
-def _compact_v1_cards(model: Mapping[str, Any]) -> str:
-    rows = [row for row in model["v1Industries"] if _compact_row_available(row)]
+def _compact_v1_cards(rows: list[Mapping[str, Any]], label: str) -> str:
+    rows = [row for row in rows if _compact_row_available(row)]
     if not rows:
-        return '<div class="industry-item"><strong>운영 선정 자료 없음</strong><p>현재 거래일의 검증된 운영 선정 상태가 없습니다.</p></div>'
+        return f'<div class="industry-item"><strong>운영 선정 {label} 자료 없음</strong><p>현재 거래일의 검증된 운영 선정 상태가 없습니다.</p></div>'
     return "".join(
-        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("v1Status")))}</span></div><p>운영 선정 상태 · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>'
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>운영 선정 상태 · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>'
         for row in rows[:5]
+    )
+
+
+def _compact_research_cards(model: Mapping[str, Any]) -> str:
+    research = model.get("researchAnalysis") or {}
+    items = research.get("items") or []
+    if not items:
+        return '<div class="industry-item"><strong>네이버 리서치 자료 없음</strong><p>현재 거래일 기준의 분석 가능한 리서치가 없습니다.</p></div>'
+    return "".join(
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(item.get("category") or "리서치 분석")}</strong></div><p>{_escape(item.get("text") or "자료 없음")}</p></div>'
+        for item in items[:5]
     )
 
 
@@ -1449,7 +1466,7 @@ def _compact_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DI
     )
     status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>부분 자료 포함</b> · {_escape(model["reason"])}</div>'
     conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
-    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>현재 거래일 업종 상대강도 TOP 5</h3><span class="tag">실측</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>현재 거래일 테마 상대강도 TOP 5</h3><span class="tag">상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V1 운영 상태</h3><span class="tag">V2와 분리</span></div><div class="industry-cards">{_compact_v1_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>V2 시험 관찰</h3><span class="tag">공식 승격 금지</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
     return (
         output
         .replace("MARKET / DASHBOARD", "국내증시")
@@ -1537,12 +1554,17 @@ def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLAT
         _display_status(row.get("dataQuality") or row.get("status") or row.get("changeClass")),
     ) for row in model["relativeThemes"]]
     lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "자료 없음", "-", "-", "-", "확인 대기")])
-    lines += ["", "### 운영 선정"]
-    v1_rows = [(
-        row.get("name") or row.get("id"), _display_status(row.get("v1Status")), _compact_leaders(row)
+    lines += ["", "### 운영 관심 업종"]
+    v1_industry_rows = [(
+        row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
     ) for row in model["v1Industries"] if _compact_row_available(row)]
-    lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_rows or [("자료 없음", "확인 대기", "-")])
-    lines += ["", "### 검증 중인 후보"]
+    lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_industry_rows or [("자료 없음", "확인 대기", "-")])
+    lines += ["", "### 운영 관심 테마"]
+    v1_theme_rows = [(
+        row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
+    ) for row in model["v1Themes"] if _compact_row_available(row)]
+    lines += _markdown_table(("테마", "상태", "대표 주도주"), v1_theme_rows or [("자료 없음", "확인 대기", "-")])
+    lines += ["", "### 추가 관찰 업종·테마"]
     lines += ["검증 중인 후보 판정 보류 — 원천 검증 대기" if not model["v2Verified"] else "검증된 후보 자료를 표시합니다."]
     if model["v2Verified"]:
         v2_rows = [(
@@ -1551,6 +1573,15 @@ def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLAT
             _compact_leaders(row),
         ) for row in (model["v2Industries"] + model["v2Themes"])[:5]]
         lines += _markdown_table(("그룹", "상태", "점수", "대표 주도주"), v2_rows or [("자료 없음", "확인 대기", "-", "-")])
+    lines += ["", "### 네이버 리서치 분석"]
+    research_items = (model.get("researchAnalysis") or {}).get("items") or []
+    if research_items:
+        lines += _markdown_table(("분석 항목", "핵심 내용"), [
+            (item.get("category") or "리서치 분석", item.get("text") or "자료 없음")
+            for item in research_items[:5]
+        ])
+    else:
+        lines.append("자료 없음")
     lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
     interest_rows = [
         (f"{row['name']} ({row['code']})", row["price"], row["ma20"], row["ma60"], row["trend"], row["status"])
@@ -1639,7 +1670,7 @@ def validate_rendered_files(markdown_path: Path, html_path: Path, model: Mapping
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
     left = _compact_model(markdown_report)
     right = _compact_model(html_report)
-    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "status", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v2Industries", "v2Themes", "interests", "kiwoom") if left.get(key) != right.get(key)]
+    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "status", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v1Themes", "v2Industries", "v2Themes", "researchAnalysis", "interests", "kiwoom") if left.get(key) != right.get(key)]
 
 
 def _compact_session_context_html(model: Mapping[str, Any]) -> str:

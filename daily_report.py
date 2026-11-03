@@ -1816,6 +1816,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         v2_changes=v2_changes,
         session_context=session_context,
         registered_universe=registered_projection,
+        v1_groups={
+            "sectors": dynamic_universe.get("sectors") or [],
+            "themes": dynamic_universe.get("themes") or [],
+        },
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract
