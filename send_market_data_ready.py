@@ -182,19 +182,22 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
     if manifest.get('currentObservationAllowed') is not True:
         raise ReadyValidationError('current observation is not allowed')
     resolved = {}
+    artifact_bytes = {}
     for field, digest_field in (('reportContractPath', 'reportContractSha256'),
                                 ('markdownPath', 'markdownSha256'),
                                 ('htmlPath', 'htmlSha256')):
         artifact = _resolve_manifest_artifact(path, manifest[field])
         try:
-            digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+            raw = artifact.read_bytes()
+            digest = hashlib.sha256(raw).hexdigest()
         except OSError as exc:
             raise ReadyValidationError(f'current observation {field} is unavailable') from exc
         if digest != manifest[digest_field]:
             raise ReadyValidationError(f'current observation {field} hash mismatch')
         resolved[field] = artifact
+        artifact_bytes[field] = raw
     try:
-        contract_payload = json.loads(resolved['reportContractPath'].read_text(encoding='utf-8'))
+        contract_payload = json.loads(artifact_bytes['reportContractPath'].decode('utf-8'))
     except (OSError, json.JSONDecodeError) as exc:
         raise ReadyValidationError('current observation report contract is unavailable') from exc
     contract = contract_payload.get('reportContract') if isinstance(contract_payload, dict) else None
