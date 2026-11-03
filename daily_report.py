@@ -458,12 +458,19 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         derived_projection = load_json(projection_path)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         raise ValueError(f"DERIVED_REPORT_PROJECTION_UNAVAILABLE:{projection_path}") from exc
+    technicals_payload = load_json(root / "technicals.json")
+    expected_source_staging = (
+        "KRX_M10_GENERATION"
+        if technicals_payload.get("source") == "KRX_M10_GENERATION"
+        else None
+    )
     staged = build_staged_technical_input(
         root / "technicals.json",
         root / "states.json",
         root / "group-states.json",
         UNIVERSE_PATH,
         current_snapshot=current_snapshot,
+        expected_source_staging=expected_source_staging,
     )
     full_market = staged["fullMarket"]
     registered = staged["registeredUniverse"]
@@ -494,6 +501,20 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "historicalGroupsStatus": staged["historicalGroups"].get("availabilityStatus"),
         "currentSnapshot": dict(staged["currentSnapshot"]),
         "currentSnapshotSeparated": True,
+        "historicalIndicatorSource": staged["historicalIndicatorSource"],
+        "historicalPriority": staged["historicalPriority"],
+        "historicalFallbackAllowed": staged["historicalFallbackAllowed"],
+        "currentObservationPolicy": staged["currentObservationPolicy"],
+        "conflictPolicy": (
+            "KRX_PRIMARY_NO_MERGE"
+            if staged["historicalIndicatorSource"] == "KRX"
+            else "EXTERNAL_STAGING_POLICY"
+        ),
+        "missingDataPolicy": (
+            "MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK"
+            if staged["historicalIndicatorSource"] == "KRX"
+            else "STAGING_SOURCE_DEFINED"
+        ),
         "fallbackUsed": False,
     }
     return {
@@ -506,6 +527,27 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "derivedProjection": derived_projection,
         "metadata": metadata,
     }
+
+
+def _legacy_staged_technical_row(row):
+    """Expose verified staging fields at the legacy report-consumer level."""
+    if not isinstance(row, dict) or not isinstance(row.get("technicals"), dict):
+        return row
+    flattened = dict(row)
+    flattened.update(row["technicals"])
+    flattened["sourceDate"] = row.get("asOfDate")
+    flattened["confirmedStatus"] = "ok"
+    flattened["status"] = "ok"
+    return flattened
+
+
+def _legacy_staged_state_row(row):
+    """Keep KRX state/provenance without mixing NAVER current quotes."""
+    if not isinstance(row, dict) or not isinstance(row.get("state"), dict):
+        return row
+    flattened = dict(row)
+    flattened.update(row["state"])
+    return flattened
 
 
 def restrict_staging_current_quotes(quotes, target_date):
@@ -1190,6 +1232,9 @@ def full_market_summary(full_market, alignment):
         "quality": quality,
         "breadth": full_market.get("breadth") if (verified or derived_summary) else None,
         "marketTradingValue": full_market.get("marketTradingValue", {}) if (verified or derived_summary) else {},
+        "marketBreakdown": full_market.get("marketBreakdown", {}) if (verified or derived_summary) else {},
+        "indexIdentities": full_market.get("indexIdentities", []) if (verified or derived_summary) else [],
+        "indicatorAvailability": full_market.get("indicatorAvailability", {}) if (verified or derived_summary) else {},
         "industries": industries,
         "industrySortBasis": "AVG_RETURN_1D_DESC_NULLS_LAST",
         "leaders": full_market.get("leaders", []) if (verified or derived_summary) else [],
@@ -1587,8 +1632,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         code = item["itemCode"]
 
         q = quote_summary(quote_idx.get(code))
-        t = tech_idx.get(code, {})
-        s = state_idx.get(code, {})
+        t = _legacy_staged_technical_row(tech_idx.get(code, {}))
+        s = _legacy_staged_state_row(state_idx.get(code, {}))
         r = research_idx.get(code, {})
         current_state = s.get("current") if isinstance(s.get("current"), dict) else s
         regular_state = (s.get("regularSession")
@@ -1609,6 +1654,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                         "ma5",
                         "ma20",
                         "ma60",
+                        "ma120",
+                        "ma240",
+                        "return1dPct",
+                        "return5dPct",
+                        "return20dPct",
+                        "return60dPct",
+                        "return120dPct",
+                        "return240dPct",
                         "sourceDate",
                         "sourceTime",
                         "high20",
@@ -1796,16 +1849,37 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         kiwoom_performance = None
     v2_changes = compare_v2_changes(shadow_history)
     technical_candidate_section = next_session_candidates(rows, report_date)
+    contract_summary = published_summary
+    contract_breadth = published_breadth
+    contract_quality = published_quality
+    contract_leaders = published_leaders
+    if technical_inputs["metadata"].get("historicalIndicatorSource") == "KRX":
+        # The KRX generation is authoritative for historical indicators and
+        # market breadth in this isolated path.  NAVER current observations,
+        # industries, themes, and research remain separate inputs.
+        krx_projection = technical_inputs["derivedProjection"] or {}
+        krx_full_market = krx_projection.get("fullMarket") or {}
+        contract_summary = {"fullMarket": krx_full_market}
+        contract_breadth = {"fullMarket": {"marketTradingValue": {}}}
+        contract_quality = {
+            "tradingDate": technical_inputs["metadata"].get("targetDate"),
+            "baselineAsOfDate": technical_inputs["metadata"].get("targetDate"),
+            "collectionQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+            "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+            "currentCount": krx_full_market.get("quality", {}).get("currentCount"),
+            "authoritativeCount": krx_full_market.get("quality", {}).get("authoritativeCount"),
+        }
+        contract_leaders = {"fullMarketLeaders": krx_full_market.get("leaders", [])}
     report_contract = build_report_contract(
         indices=indices,
-        summary=published_summary,
-        breadth=published_breadth,
-        quality=published_quality,
+        summary=contract_summary,
+        breadth=contract_breadth,
+        quality=contract_quality,
         industries=published_industries,
         themes=published_themes,
         v2_latest=shadow_latest,
         v2_history=shadow_history,
-        leaders=published_leaders,
+        leaders=contract_leaders,
         technical_candidates=technical_candidate_section.get("priority") or [],
         kiwoom_candidates=kiwoom_section,
         research=research,
@@ -2038,6 +2112,7 @@ def write_markdown(report, path):
     market_summary = report.get("marketSummary") or {}
     full_summary = market_summary.get("fullMarket") or {}
     monitored_summary = market_summary.get("monitoredUniverse") or report.get("monitoredUniverse") or {}
+    historical_source = (report.get("technicalInput") or {}).get("historicalIndicatorSource")
     degraded = report["status"] != "OK"
     lines = [
         f"# 국내증시 일일 종합 리포트 - {report['asOf']}",
@@ -2459,24 +2534,67 @@ def write_markdown(report, path):
             f"{row['changeRate']:+.2f}%"
         )
 
+    if historical_source == "KRX":
+        krx_stock_rows = [
+            row for row in (report.get("stocks") or [])
+            if isinstance(row.get("technical"), dict)
+            and (row.get("technical", {}).get("ma20") is not None
+                 or row.get("technical", {}).get("ma60") is not None)
+        ]
+        if krx_stock_rows:
+            lines.extend(["", "### KRX 확정 기술지표", ""])
+            for row in krx_stock_rows:
+                technical = row.get("technical") or {}
+                lines.append(
+                    f"- {row.get('itemName') or '이름 미확인'} ({row.get('itemCode') or '코드 미확인'}): "
+                    f"MA20 {display_number(technical.get('ma20'), '원')}, "
+                    f"MA60 {display_number(technical.get('ma60'), '원')}, "
+                    f"기준일 {row.get('asOfDate') or '확인 불가'}"
+                )
+
     full_market = report.get("fullMarket", {})
+    krx_projection = (report.get("marketSummary") or {}).get("fullMarket") or {}
+    krx_projection_available = (
+        historical_source == "KRX"
+        and isinstance(krx_projection.get("breadth"), dict)
+        and krx_projection.get("asOfDate")
+    )
     lines.extend(["", "## 1-A. Full-market evidence", ""])
-    if full_market.get("status") != "AVAILABLE":
+    if full_market.get("status") != "AVAILABLE" and not krx_projection_available:
         lines.append(f"- 상태: UNAVAILABLE ({full_market.get('reason', 'UNKNOWN')})")
     else:
+        if krx_projection_available and full_market.get("status") != "AVAILABLE":
+            lines.append(
+                "- 상태: KRX_M10_VERIFIED_GENERATION "
+                "(외부 지수·현재 스냅샷 정합성 상태와 별도 표시)"
+            )
+            full_market = krx_projection
         lines.append(f"- 수집 품질: {full_market.get('qualityStatus', 'UNKNOWN')}")
-        fb = full_market["breadth"]
+        # KRX-only staging deliberately does not synthesize breadth/leader
+        # aggregates that were not supplied by the verified generation.
+        # Render unavailable values instead of failing the whole report.
+        fb = full_market.get("breadth") or {}
+
+        def full_market_metric(name):
+            metric = fb.get(name)
+            if not isinstance(metric, dict):
+                return "확인 불가"
+            count = metric.get("count", "확인 불가")
+            pct = metric.get("pct", "확인 불가")
+            return f"{count} ({pct}%)"
+
         lines.extend([
             f"- 기준일: {full_market['asOfDate']}",
             f"- 분석 대상/기준 Universe: {full_market.get('quality', {}).get('currentCount', 'UNKNOWN')}/"
             f"{full_market.get('quality', {}).get('authoritativeCount', 'UNKNOWN')}종목",
-            f"- 상승/하락/보합: {fb['advancers']}/{fb['decliners']}/{fb['unchanged']}",
-            f"- MA20 위: {fb['aboveMA20']['count']} ({fb['aboveMA20']['pct']}%)",
-            f"- MA60 위: {fb['aboveMA60']['count']} ({fb['aboveMA60']['pct']}%)",
-            f"- MA120 위: {fb['aboveMA120']['count']} ({fb['aboveMA120']['pct']}%)",
-            f"- 20일 돌파: {fb['breakout20']['count']} ({fb['breakout20']['pct']}%)",
-            f"- 52주 고점 근접: {fb['near52wHigh']['count']} ({fb['near52wHigh']['pct']}%)",
-            f"- 거래량 확산: {fb['volumeAbove20DayAverage']['count']} ({fb['volumeAbove20DayAverage']['pct']}%)",
+            f"- 상승/하락/보합: {fb.get('advancers', '확인 불가')}/"
+            f"{fb.get('decliners', '확인 불가')}/{fb.get('unchanged', '확인 불가')}",
+            f"- MA20 위: {full_market_metric('aboveMA20')}",
+            f"- MA60 위: {full_market_metric('aboveMA60')}",
+            f"- MA120 위: {full_market_metric('aboveMA120')}",
+            f"- 20일 돌파: {full_market_metric('breakout20')}",
+            f"- 52주 고점 근접: {full_market_metric('near52wHigh')}",
+            f"- 거래량 확산: {full_market_metric('volumeAbove20DayAverage')}",
             f"- Full-market leaders: {len(full_market['leaders'])}종목",
         ])
         delta = full_market.get("quality", {}).get("universeDelta")

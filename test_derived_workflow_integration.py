@@ -43,6 +43,21 @@ class DerivedWorkflowIntegrationTests(unittest.TestCase):
         self.assertNotIn("TECHNICALS_PATH", staging_block)
         self.assertNotIn("STATES_PATH", staging_block)
 
+    def test_krx_staging_enforces_krx_primary_policy(self):
+        text = (ROOT / "daily_report.py").read_text(encoding="utf-8")
+        block = text[text.index("def load_report_technical_inputs"):text.index("def restrict_staging_current_quotes")]
+        self.assertIn('technicals_payload.get("source") == "KRX_M10_GENERATION"', block)
+        self.assertIn('expected_source_staging=expected_source_staging', block)
+        self.assertIn('"KRX_PRIMARY_NO_MERGE"', block)
+        self.assertIn('"MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK"', block)
+
+    def test_krx_staged_rows_are_flattened_for_legacy_report_consumer(self):
+        text = (ROOT / "daily_report.py").read_text(encoding="utf-8")
+        self.assertIn("def _legacy_staged_technical_row", text)
+        self.assertIn('flattened.update(row["technicals"])', text)
+        self.assertIn('"ma120"', text)
+        self.assertIn('"volumeRatio20"', text)
+
 
 if __name__ == "__main__":
     unittest.main()
