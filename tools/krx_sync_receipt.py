@@ -15,6 +15,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Mapping
 
+from tools.krx_m10_market_aggregates import build_m10_market_aggregates, safe_number
+
 HEX_SHA = re.compile(r"^[0-9a-f]{64}$")
 DATE = re.compile(r"^\d{8}$")
 GENERATION = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$")
@@ -120,25 +122,26 @@ def map_m10_entity(row: Mapping[str, Any]) -> dict[str, Any]:
         "assetType": row["category"],
         "asOfDate": row["asof"],
         "technicals": {
-            "ma5": row["MA"].get("MA5"),
-            "ma20": row["MA"].get("MA20"),
-            "ma60": row["MA"].get("MA60"),
-            "ma120": row["MA"].get("MA120"),
-            "ma240": row["MA"].get("MA240"),
-            "return1dPct": row["returns_pct"].get("return_1d_pct"),
-            "return5dPct": row["returns_pct"].get("return_5d_pct"),
-            "return20dPct": row["returns_pct"].get("return_20d_pct"),
-            "return60dPct": row["returns_pct"].get("return_60d_pct"),
-            "return120dPct": row["returns_pct"].get("return_120d_pct"),
-            "return240dPct": row["returns_pct"].get("return_240d_pct"),
+            "ma5": safe_number(row["MA"].get("MA5")),
+            "ma20": safe_number(row["MA"].get("MA20")),
+            "ma60": safe_number(row["MA"].get("MA60")),
+            "ma120": safe_number(row["MA"].get("MA120")),
+            "ma240": safe_number(row["MA"].get("MA240")),
+            "return1dPct": safe_number(row["returns_pct"].get("return_1d_pct")),
+            "return5dPct": safe_number(row["returns_pct"].get("return_5d_pct")),
+            "return20dPct": safe_number(row["returns_pct"].get("return_20d_pct")),
+            "return60dPct": safe_number(row["returns_pct"].get("return_60d_pct")),
+            "return120dPct": safe_number(row["returns_pct"].get("return_120d_pct")),
+            "return240dPct": safe_number(row["returns_pct"].get("return_240d_pct")),
             "highBreakoutPrev20": row["high_breakouts"].get("high_breakout_prev20"),
             "highBreakoutPrev60": row["high_breakouts"].get("high_breakout_prev60"),
-            "volumeRatioPrev20": row.get("volume_ratio_prev20"),
+            "volumeRatioPrev20": safe_number(row.get("volume_ratio_prev20")),
+            "volumeRatio20": safe_number(row.get("volume_ratio_prev20")),
         },
         "regularSession": {
-            "open": row.get("open_regular"),
-            "close": row.get("close_regular"),
-            "volume": row.get("official_daily_volume"),
+            "open": safe_number(row.get("open_regular")),
+            "close": safe_number(row.get("close_regular")),
+            "volume": safe_number(row.get("official_daily_volume")),
             "basis": "KRX_OFFICIAL_1530_CLOSE",
             "aftermarketUsed": False,
         },
@@ -260,6 +263,7 @@ def stage_m10_report_inputs(
     source_sha = validation["monitoringSha256"]
     instruments = [row for row in entities if row["category"] in {"stock", "etf"}]
     indexes = [row for row in entities if row["category"] == "index"]
+    aggregates = build_m10_market_aggregates(monitoring)
 
     def provenance(row: Mapping[str, Any]) -> dict[str, Any]:
         return {
@@ -306,6 +310,7 @@ def stage_m10_report_inputs(
         "conflictPolicy": "KRX_PRIMARY_NO_MERGE",
         "missingDataPolicy": "MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK",
         "currentObservationPolicy": "NAVER_CURRENT_AND_AFTERMARKET_SEPARATE",
+        "marketAggregateSchema": aggregates["schemaVersion"],
     }
     _write_json(output / "technicals.json", {**common, "datas": technical_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
     _write_json(output / "states.json", {**common, "datas": state_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
@@ -332,6 +337,32 @@ def stage_m10_report_inputs(
         "availabilityStatus": "KRX_M10_INDEX_SEPARATE", "generationId": generation,
         "counts": counts, "indexes": [{"code": row["code"], "name": row["name"], "asof": target} for row in indexes],
     })
+    aggregate_full_market = {
+        "status": "PARTIAL",
+        "asOfDate": target,
+        "snapshotDate": target,
+        "snapshotDateStatus": "DERIVED_TARGET_DATE",
+        "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "qualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "historicalIndicatorSource": "KRX",
+        "historicalPriority": "PRIMARY",
+        "historicalFallbackAllowed": False,
+        "quality": {
+            **counts,
+            "currentCount": len(instruments),
+            "authoritativeCount": len(instruments),
+        },
+        "authoritativeCount": len(instruments),
+        "tradingDate": target,
+        "baselineAsOfDate": target,
+        "breadth": aggregates["markets"]["TOTAL"],
+        "leaders": aggregates["markets"]["TOTAL"]["leaderCandidates"],
+        "markets": aggregates["markets"],
+        "marketBreakdown": aggregates["marketBreakdown"],
+        "indexIdentities": aggregates["indexIdentities"],
+        "indicatorAvailability": aggregates["indicatorAvailability"],
+        "marketTradingValue": {},
+    }
     # The existing report loader requires a derived projection. This explicit
     # PARTIAL object carries only metadata; it never pretends to be a FINAL
     # breadth/leader/baseline result.
@@ -343,7 +374,7 @@ def stage_m10_report_inputs(
         "historicalPriority": "PRIMARY",
         "historicalFallbackAllowed": False,
         "conflictPolicy": "KRX_PRIMARY_NO_MERGE",
-        "generationId": generation, "fullMarket": {"quality": counts, "breadth": {}, "leaders": []},
+        "generationId": generation, "fullMarket": aggregate_full_market,
     })
     return {
         "status": "STAGED_NOT_CONNECTED", "targetDate": target, "generationId": generation,

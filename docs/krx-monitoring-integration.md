@@ -75,6 +75,21 @@ report renderer prints unavailable breadth values as `확인 불가` when the M1
 generation does not provide a verified aggregate, rather than fabricating
 zeros or failing the report.
 
+The staged report projection also contains a deterministic KRX aggregate:
+stocks and ETFs are counted separately, each indicator uses its own valid-row
+denominator, and direction breadth uses only rows with a valid `return_1d_pct`.
+`MA.MA20`, `MA.MA60`, and `MA.MA120` are exposed as numeric `ma20`, `ma60`,
+and `ma120`; `volume_ratio_prev20` is exposed as `volumeRatio20`. The 132
+index entities remain source-qualified by `identity`. Relative strength,
+new-low, and trading-value fields are marked unavailable because they are not
+present in this M10 interchange; they are never inferred from NAVER.
+
+The report consumer receives KRX historical values in the legacy `technical`
+shape while NAVER current observations remain in the separate `market` and
+current-snapshot fields. The isolated 2026-11-02 report QA produced matching
+JSON, Markdown, and HTML values for the KRX breadth and Samsung Electronics
+MA20/MA60 fields.
+
 `derived_input_resolver.py` is intentionally not changed: its
 `monitoring-derived` pointer is the existing NAVER/derived generation
 contract, while M10 KRX staging is an independent source that must not be

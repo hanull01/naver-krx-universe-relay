@@ -51,6 +51,13 @@ class DerivedWorkflowIntegrationTests(unittest.TestCase):
         self.assertIn('"KRX_PRIMARY_NO_MERGE"', block)
         self.assertIn('"MISSING_OR_LAGGED_NO_NAVER_HISTORICAL_FALLBACK"', block)
 
+    def test_krx_staged_rows_are_flattened_for_legacy_report_consumer(self):
+        text = (ROOT / "daily_report.py").read_text(encoding="utf-8")
+        self.assertIn("def _legacy_staged_technical_row", text)
+        self.assertIn('flattened.update(row["technicals"])', text)
+        self.assertIn('"ma120"', text)
+        self.assertIn('"volumeRatio20"', text)
+
 
 if __name__ == "__main__":
     unittest.main()

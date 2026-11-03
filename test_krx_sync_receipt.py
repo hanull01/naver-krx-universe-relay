@@ -72,7 +72,8 @@ class KrxSyncReceiptTests(unittest.TestCase):
         self.assertEqual(mapped["regularSession"]["basis"], "KRX_OFFICIAL_1530_CLOSE")
         self.assertFalse(mapped["regularSession"]["aftermarketUsed"])
         self.assertIsNone(mapped["currentSnapshot"])
-        self.assertEqual(mapped["technicals"]["ma20"], "210000")
+        self.assertEqual(mapped["technicals"]["ma20"], 210000)
+        self.assertEqual(mapped["technicals"]["volumeRatio20"], 0.8)
 
     def test_publication_interlock_is_fail_closed(self):
         self.receipt["publicationAuthorized"] = False

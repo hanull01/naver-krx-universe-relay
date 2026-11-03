@@ -529,6 +529,27 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
     }
 
 
+def _legacy_staged_technical_row(row):
+    """Expose verified staging fields at the legacy report-consumer level."""
+    if not isinstance(row, dict) or not isinstance(row.get("technicals"), dict):
+        return row
+    flattened = dict(row)
+    flattened.update(row["technicals"])
+    flattened["sourceDate"] = row.get("asOfDate")
+    flattened["confirmedStatus"] = "ok"
+    flattened["status"] = "ok"
+    return flattened
+
+
+def _legacy_staged_state_row(row):
+    """Keep KRX state/provenance without mixing NAVER current quotes."""
+    if not isinstance(row, dict) or not isinstance(row.get("state"), dict):
+        return row
+    flattened = dict(row)
+    flattened.update(row["state"])
+    return flattened
+
+
 def restrict_staging_current_quotes(quotes, target_date):
     """Keep current observations even when their date differs from history.
 
@@ -1211,6 +1232,9 @@ def full_market_summary(full_market, alignment):
         "quality": quality,
         "breadth": full_market.get("breadth") if (verified or derived_summary) else None,
         "marketTradingValue": full_market.get("marketTradingValue", {}) if (verified or derived_summary) else {},
+        "marketBreakdown": full_market.get("marketBreakdown", {}) if (verified or derived_summary) else {},
+        "indexIdentities": full_market.get("indexIdentities", []) if (verified or derived_summary) else [],
+        "indicatorAvailability": full_market.get("indicatorAvailability", {}) if (verified or derived_summary) else {},
         "industries": industries,
         "industrySortBasis": "AVG_RETURN_1D_DESC_NULLS_LAST",
         "leaders": full_market.get("leaders", []) if (verified or derived_summary) else [],
@@ -1608,8 +1632,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         code = item["itemCode"]
 
         q = quote_summary(quote_idx.get(code))
-        t = tech_idx.get(code, {})
-        s = state_idx.get(code, {})
+        t = _legacy_staged_technical_row(tech_idx.get(code, {}))
+        s = _legacy_staged_state_row(state_idx.get(code, {}))
         r = research_idx.get(code, {})
         current_state = s.get("current") if isinstance(s.get("current"), dict) else s
         regular_state = (s.get("regularSession")
@@ -1630,6 +1654,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                         "ma5",
                         "ma20",
                         "ma60",
+                        "ma120",
+                        "ma240",
+                        "return1dPct",
+                        "return5dPct",
+                        "return20dPct",
+                        "return60dPct",
+                        "return120dPct",
+                        "return240dPct",
                         "sourceDate",
                         "sourceTime",
                         "high20",
@@ -1817,16 +1849,37 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         kiwoom_performance = None
     v2_changes = compare_v2_changes(shadow_history)
     technical_candidate_section = next_session_candidates(rows, report_date)
+    contract_summary = published_summary
+    contract_breadth = published_breadth
+    contract_quality = published_quality
+    contract_leaders = published_leaders
+    if technical_inputs["metadata"].get("historicalIndicatorSource") == "KRX":
+        # The KRX generation is authoritative for historical indicators and
+        # market breadth in this isolated path.  NAVER current observations,
+        # industries, themes, and research remain separate inputs.
+        krx_projection = technical_inputs["derivedProjection"] or {}
+        krx_full_market = krx_projection.get("fullMarket") or {}
+        contract_summary = {"fullMarket": krx_full_market}
+        contract_breadth = {"fullMarket": {"marketTradingValue": {}}}
+        contract_quality = {
+            "tradingDate": technical_inputs["metadata"].get("targetDate"),
+            "baselineAsOfDate": technical_inputs["metadata"].get("targetDate"),
+            "collectionQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+            "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+            "currentCount": krx_full_market.get("quality", {}).get("currentCount"),
+            "authoritativeCount": krx_full_market.get("quality", {}).get("authoritativeCount"),
+        }
+        contract_leaders = {"fullMarketLeaders": krx_full_market.get("leaders", [])}
     report_contract = build_report_contract(
         indices=indices,
-        summary=published_summary,
-        breadth=published_breadth,
-        quality=published_quality,
+        summary=contract_summary,
+        breadth=contract_breadth,
+        quality=contract_quality,
         industries=published_industries,
         themes=published_themes,
         v2_latest=shadow_latest,
         v2_history=shadow_history,
-        leaders=published_leaders,
+        leaders=contract_leaders,
         technical_candidates=technical_candidate_section.get("priority") or [],
         kiwoom_candidates=kiwoom_section,
         research=research,
