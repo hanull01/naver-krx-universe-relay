@@ -64,12 +64,14 @@ class ReadyMailTests(unittest.TestCase):
             'baselineStale': False,
         }), encoding='utf-8')
         return manifest
-    def test_valid_payload_uses_markdown_as_the_entire_mail_body(self):
-        metadata = self.with_markdown(ready.validate_quotes(self.payload(), current=self.current, collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT']))
+    def test_valid_payload_uses_legacy_signal_body(self):
+        metadata = ready.validate_quotes(self.payload(), current=self.current, collection_started_at=self.env()['MARKET_DATA_COLLECTION_STARTED_AT'])
         message = ready.ready_message(metadata, self.env())
         self.assertTrue(message['Subject'].startswith('MARKET_DATA_READY '))
         self.assertNotIn('[MARKET_DATA_READY]', message['Subject'])
-        self.assertEqual(message.get_content(), '# 국내증시 시장 모니터링\n')
+        self.assertIn('run_id=123', message.get_content())
+        self.assertIn('generatedAt=2026-09-29T10:39:00+09:00', message.get_content())
+        self.assertNotIn('# 국내증시 시장 모니터링', message.get_content())
 
     def test_ready_signal_body_does_not_expose_publication_metadata(self):
         metadata = {
@@ -84,8 +86,9 @@ class ReadyMailTests(unittest.TestCase):
         env = dict(self.env(), MARKET_HTML_PUBLISHED='true', MARKET_HTML_STATUS='SUCCESS',
                    MARKET_HTML_SHA256='a' * 64, MARKET_HTML_BYTES='105246',
                    MARKET_HTML_PATH='data/reports/2026-09-29.html')
-        content = ready.ready_message(self.with_markdown(metadata), env).get_content()
-        self.assertEqual(content, '# 국내증시 시장 모니터링\n')
+        content = ready.ready_message(metadata, env).get_content()
+        self.assertIn('fullMarket.publicationStatus=SUCCESS', content)
+        self.assertIn('run_id=123', content)
     def test_invalid_coverage_status_delay_and_times_are_blocked(self):
         for changes in ({'count':1},{'missingCodes':['005930']},{'status':'error'},{'generatedAt':None}):
             payload=self.payload(); payload.update(changes)
@@ -116,7 +119,7 @@ class ReadyMailTests(unittest.TestCase):
         metadata = ready.validate_quotes(payload, current=self.current)
         self.assertEqual(metadata['coverageCount'], 2)
         self.assertEqual(metadata['noAfterTradeCount'], 1)
-        self.assertEqual(ready.ready_message(self.with_markdown(metadata), self.env()).get_content(), '# 국내증시 시장 모니터링\n')
+        self.assertIn('coverageCount=2', ready.ready_message(metadata, self.env()).get_content())
     def test_main_sends_with_mock_and_never_exposes_secret_on_failure(self):
         FakeSMTP.messages=[]
         with tempfile.TemporaryDirectory() as directory:
@@ -125,9 +128,8 @@ class ReadyMailTests(unittest.TestCase):
             env = dict(self.env(), CURRENT_OBSERVATION_MANIFEST_PATH=str(manifest))
             self.assertEqual(ready.main(env,path,FakeSMTP,current=self.current),0)
         self.assertEqual(len(FakeSMTP.messages),1); self.assertEqual(FakeSMTP.login_args,('sender@example.com','secret')); self.assertNotIn('secret',FakeSMTP.messages[0].as_string())
-        self.assertEqual(FakeSMTP.messages[0].get_body(preferencelist=('plain',)).get_content(), '# current observation\n')
-        self.assertEqual([part.get_filename() for part in FakeSMTP.messages[0].iter_attachments()], ['report.html'])
-        self.assertNotIn('report.md', FakeSMTP.messages[0].as_string())
+        self.assertIn('currentObservation.workflowRunId=123', FakeSMTP.messages[0].get_body(preferencelist=('plain',)).get_content())
+        self.assertEqual(list(FakeSMTP.messages[0].iter_attachments()), [])
     def test_smtp_failure_hides_exception_and_secret_values(self):
         class FailingSMTP(FakeSMTP):
             def login(self, username, password): raise RuntimeError(f'upstream rejected {password}')
@@ -142,7 +144,7 @@ class ReadyMailTests(unittest.TestCase):
         class FailingSMTP(FakeSMTP):
             def login(self, username, password): raise error
         with self.assertRaisesRegex(RuntimeError, expected) as caught:
-            ready.send_ready_email(ready.ready_message(self.with_markdown(ready.validate_quotes(self.payload(), current=self.current)), self.env()),
+            ready.send_ready_email(ready.ready_message(ready.validate_quotes(self.payload(), current=self.current), self.env()),
                                    self.env(), FailingSMTP)
         self.assertNotIn('secret', str(caught.exception))
     def test_smtp_authentication_failure_is_safe_and_includes_only_status_code(self):
@@ -339,9 +341,10 @@ class ReadyMailTests(unittest.TestCase):
             self.assertEqual(ready.main(env, missing_quotes, FakeSMTP, current=self.current,
                                         summary_path=summary, quality_path=quality), 0)
             content = FakeSMTP.messages[-1].get_body(preferencelist=('plain',)).get_content()
-            self.assertEqual(content, '# current observation\n')
+            self.assertIn('fullMarket.count=2764', content)
+            self.assertIn('legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY', content)
 
-    def test_current_observation_manifest_adds_same_generation_attachments(self):
+    def test_current_observation_manifest_keeps_same_generation_signal_without_attachments(self):
         FakeSMTP.messages = []
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -373,11 +376,9 @@ class ReadyMailTests(unittest.TestCase):
                                         quality_path=quality), 0)
             message = FakeSMTP.messages[-1]
             content = message.get_body(preferencelist=('plain',)).get_content()
-            self.assertEqual(content, '# current observation\n')
-            self.assertEqual(
-                sorted(part.get_filename() for part in message.iter_attachments()),
-                ['report.html'],
-            )
+            self.assertIn('currentObservation.workflowRunId=123', content)
+            self.assertIn('currentObservation.markdownPath=report.md', content)
+            self.assertEqual(list(message.iter_attachments()), [])
 
     def test_full_market_manifest_failure_does_not_send(self):
         FakeSMTP.messages = []
@@ -413,9 +414,10 @@ class ReadyMailTests(unittest.TestCase):
             metadata = ready.validate_full_market_publication(summary, quality, current=self.current)
             self.assertIsNone(metadata['tradingDate'])
             self.assertEqual(metadata['tradingDateStatus'], 'UNAVAILABLE')
-            message = ready.ready_message(self.with_markdown(metadata), dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
+            message = ready.ready_message(metadata, dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
             content = message.get_content()
-            self.assertEqual(content, '# 국내증시 시장 모니터링\n')
+            self.assertIn('fullMarket.tradingDate=UNAVAILABLE', content)
+            self.assertIn('fullMarket.tradingDateEvidenceReason=CANONICAL_COVERAGE_INCOMPLETE', content)
 
     def test_full_market_primary_rejects_stale_publication(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -450,9 +452,10 @@ class ReadyMailTests(unittest.TestCase):
             quality.write_text(json.dumps({'publicationStatus': 'SUCCESS'}), encoding='utf-8')
             metadata = ready.validate_full_market_publication(summary, quality, current=self.current)
             self.assertEqual(metadata['qualityStatus'], 'WARNING')
-            message = ready.ready_message(self.with_markdown(metadata), dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
+            message = ready.ready_message(metadata, dict(self.env(), MARKET_DATA_COMMIT_SHA='abc123'))
             content = message.get_content()
-            self.assertEqual(content, '# 국내증시 시장 모니터링\n')
+            self.assertIn('fullMarket.missingCodes=028080', content)
+            self.assertIn('fullMarket.qualityStatus=WARNING', content)
 
     def test_october_19_scale_warning_keeps_ready_eligible(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -503,8 +506,9 @@ class ReadyMailTests(unittest.TestCase):
             )
             self.assertEqual(result["coverageCount"], 2763)
 
-            content = ready.ready_message(self.with_markdown(result), self.env()).get_content()
-            self.assertEqual(content, '# 국내증시 시장 모니터링\n')
+            content = ready.ready_message(result, self.env()).get_content()
+            self.assertIn('fullMarket.publicationStatus=COMPLETE_RECONCILIATION_PENDING', content)
+            self.assertIn('fullMarket.newCodes=0013Y0,0015M0,0158S0', content)
 
     def test_pending_composition_rejects_failed_quality(self):
         with tempfile.TemporaryDirectory() as directory:

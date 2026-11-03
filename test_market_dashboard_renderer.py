@@ -109,6 +109,11 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("## 1. 시장 대시보드", markdown)
         self.assertIn("## 2. 주도 업종·테마", markdown)
         self.assertIn("## 3. 관심종목·키움 후보", markdown)
+        self.assertIn("| 지수 | 현재값 | 전일 대비 | 등락률 |", markdown)
+        self.assertIn("| 순위 | 업종 | 상대강도 | 상승 비율 | 대표 주도주 | 상태 |", markdown)
+        self.assertNotIn("\n-\n", markdown)
+        self.assertNotIn("1)\n", markdown)
+        self.assertNotIn("2)\n", markdown)
         self.assertIn("장후 관측", html_text)
         self.assertNotIn("정규장 장중 관측", html_text)
         self.assertNotIn("2,205/2,767 산술 검증", html_text)
@@ -315,8 +320,18 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["indices"] = [{"name": "KOSPI", "close": 3000.0}]
         html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
         self.assertIn("KOSPI sourceTime 누락", html)
         self.assertIn("KOSDAQ 원천이 계약에 없음", html)
+        self.assertIn("| 코스피 (KOSPI) | 확인 불가 |", markdown)
+        self.assertIn("| 코스닥 (KOSDAQ) | 확인 불가 |", markdown)
+
+    def test_empty_kiwoom_candidates_are_a_user_facing_no_data_state(self):
+        report = report_fixture()
+        report["reportContract"]["kiwoomCandidates"] = {"stocks": []}
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("전일 장마감 후 조건검색 결과 자료 없음", markdown)
+        self.assertNotIn("조건검색 실패", markdown)
 
     def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):
         report = report_fixture()
