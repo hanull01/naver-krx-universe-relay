@@ -7,7 +7,9 @@ import smtplib
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
-from zoneinfo import ZoneInfo\n\nfrom tools.file_digest import sha256_bytes
+from zoneinfo import ZoneInfo
+
+from tools.file_digest import sha256_bytes
 
 KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
