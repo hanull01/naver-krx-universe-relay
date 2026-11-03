@@ -1,13 +1,13 @@
 """Send a guarded Gmail signal after production market data reaches GitHub."""
 import json
-import hashlib
+
 import os
 import socket
 import smtplib
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo\n\nfrom tools.file_digest import sha256_bytes
 
 KST = ZoneInfo('Asia/Seoul')
 ROOT = Path(__file__).resolve().parent
