@@ -377,8 +377,9 @@ def intraday_trading_date_evidence(current, now, freshness_status,
 
     ``freshness_status`` is the result of ``baseline_freshness``; for an open
     KRX day it proves that the calendar check succeeded without making the
-    wall-clock date the source of truth.  This evidence is deliberately not a
-    daily-bar confirmation and is rejected by the report date resolver.
+    wall-clock date the source of truth.  PRE is valid for identifying the
+    KRX trading day and current snapshot, but it is never daily-bar or final
+    close confirmation.
     """
     session = session_at(now)
     evidence_class = (
@@ -410,7 +411,7 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     # when the calendar and every collection timestamp agree.  Keep it as a
     # non-final post-market observation; final daily-bar validation remains a
     # separate contract.
-    if session not in {"REGULAR", "REGULAR_CLOSED", "AFTER", "CLOSED"}:
+    if session not in {"PRE", "REGULAR", "REGULAR_CLOSED", "AFTER", "CLOSED"}:
         return {**base, "reason": "OUTSIDE_INTRADAY_SESSION"}
     if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
         return {**base, "reason": freshness_status}

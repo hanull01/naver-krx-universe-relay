@@ -196,6 +196,25 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
         self.assertFalse(result["finalConfirmed"])
 
+    def test_pre_market_date_evidence_uses_validated_current_snapshot_without_finality(self):
+        now = datetime(2026, 10, 28, 8, 2, tzinfo=KST)
+        snapshot = {
+            "status": "SUCCESS", "collectionStatus": "SUCCESS",
+            "generatedAt": "2026-10-28T08:02:03+09:00",
+            "expectedCount": 2, "coverageCount": 2, "count": 2,
+            "stocks": [
+                {"code": "000001", "snapshotGeneratedAt": "2026-10-28T08:02:00+09:00"},
+                {"code": "000002", "snapshotGeneratedAt": "2026-10-28T08:02:00+09:00"},
+            ],
+        }
+        result = runner.intraday_trading_date_evidence(
+            snapshot, now, "VALID_PREVIOUS_TRADING_DAY", open_day
+        )
+        self.assertEqual(result["tradingDate"], "20261028")
+        self.assertEqual(result["reason"], "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT")
+        self.assertEqual(result["evidenceClass"], "INTRADAY_SESSION")
+        self.assertFalse(result["finalConfirmed"])
+
     def test_session_boundaries_keep_observation_types_distinct(self):
         self.assertEqual(runner.session_at(datetime(2026, 10, 28, 9, 9, tzinfo=KST)), "REGULAR")
         self.assertEqual(runner.session_at(datetime(2026, 10, 28, 15, 30, tzinfo=KST)), "REGULAR_CLOSED")
@@ -241,7 +260,9 @@ class MonitoringProductionTests(unittest.TestCase):
         self.assertEqual(weekend["reason"], "WEEKEND")
         before_session = runner.intraday_trading_date_evidence(
             base, datetime(2026, 10, 28, 8, 59, tzinfo=KST), "VALID_PREVIOUS_TRADING_DAY", open_day)
-        self.assertEqual(before_session["reason"], "OUTSIDE_INTRADAY_SESSION")
+        # PRE is a valid current-observation session; the stale snapshot still
+        # fails because its collection date does not match the KRX trading day.
+        self.assertEqual(before_session["reason"], "SNAPSHOT_COLLECTION_TIME_MISMATCH")
 
         def calendar_failure(_):
             raise RuntimeError("calendar unavailable")
