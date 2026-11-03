@@ -90,6 +90,19 @@ current-snapshot fields. The isolated 2026-11-02 report QA produced matching
 JSON, Markdown, and HTML values for the KRX breadth and Samsung Electronics
 MA20/MA60 fields.
 
+## Private delivery bridge
+
+`tools/krx_m10_sync.py` resolves `krx_m9_runtime_data/CURRENT`, verifies the
+matching generation manifest and consumer SHA/byte counts, and stages only
+`generation_manifest.json` plus `monitoring_interchange.json` in a local
+durable outbox. Raw files, the metrics bundle, credentials, and GitHub
+contents are excluded. A receiver rechecks the generation, date, entity
+count, schema, and SHA before atomic promotion. It records accepted
+generation/date/SHA tuples, returns `NO_CHANGES` for repeats, rejects a
+different generation for the same date, and leaves failed attempts in the
+queue for the next invocation after restart. This bridge is local-only and
+does not activate an external transport.
+
 `derived_input_resolver.py` is intentionally not changed: its
 `monitoring-derived` pointer is the existing NAVER/derived generation
 contract, while M10 KRX staging is an independent source that must not be
