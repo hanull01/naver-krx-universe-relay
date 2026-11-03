@@ -2530,10 +2530,23 @@ def write_markdown(report, path):
         )
 
     full_market = report.get("fullMarket", {})
+    krx_projection = (report.get("marketSummary") or {}).get("fullMarket") or {}
+    historical_source = (report.get("technicalInput") or {}).get("historicalIndicatorSource")
+    krx_projection_available = (
+        historical_source == "KRX"
+        and isinstance(krx_projection.get("breadth"), dict)
+        and krx_projection.get("asOfDate")
+    )
     lines.extend(["", "## 1-A. Full-market evidence", ""])
-    if full_market.get("status") != "AVAILABLE":
+    if full_market.get("status") != "AVAILABLE" and not krx_projection_available:
         lines.append(f"- 상태: UNAVAILABLE ({full_market.get('reason', 'UNKNOWN')})")
     else:
+        if krx_projection_available and full_market.get("status") != "AVAILABLE":
+            lines.append(
+                "- 상태: KRX_M10_VERIFIED_GENERATION "
+                "(외부 지수·현재 스냅샷 정합성 상태와 별도 표시)"
+            )
+            full_market = krx_projection
         lines.append(f"- 수집 품질: {full_market.get('qualityStatus', 'UNKNOWN')}")
         # KRX-only staging deliberately does not synthesize breadth/leader
         # aggregates that were not supplied by the verified generation.
