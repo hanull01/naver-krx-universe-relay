@@ -20,7 +20,7 @@ DATE = re.compile(r"^\d{8}$")
 GENERATION = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$")
 STOCK_OR_ETF_CODE = re.compile(r"^[A-Z0-9]{6}$")
 M10_SCHEMA = "krx_monitoring_interchange_v1"
-GENERATION_SCHEMA = "krx_generation_v1"
+GENERATION_SCHEMA = "krx_m9_generation_manifest_v1"
 REQUIRED_ENTITY_FIELDS = {
     "code", "name", "category", "identity", "asof", "source_api",
     "open_regular", "close_regular", "official_daily_volume", "MA",
@@ -100,6 +100,11 @@ def _validate_entity(row: Any, expected_date: str) -> None:
         raise KrxReceiptError("INVALID_ENTITY_RETURNS")
     if not isinstance(row.get("high_breakouts"), Mapping):
         raise KrxReceiptError("INVALID_ENTITY_BREAKOUTS")
+
+
+def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
 
 
 def map_m10_entity(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -184,8 +189,20 @@ def validate_m10_staging(staging_dir: str | Path, *, expected_date: str | None =
     entities = monitoring.get("entities")
     if not isinstance(entities, list) or monitoring.get("entity_count") != len(entities):
         raise KrxReceiptError("ENTITY_COUNT_MISMATCH")
+    seen_instrument_codes: set[str] = set()
+    seen_identities: set[str] = set()
     for row in entities:
         _validate_entity(row, trading_date)
+        if row["identity"] in seen_identities:
+            raise KrxReceiptError(f"DUPLICATE_ENTITY_IDENTITY:{row['identity']}")
+        # KOSPI/KOSDAQ sector index labels can legitimately share a display
+        # code (for example, "IT 서비스"); their source-qualified identity is
+        # the unique key. Instrument codes remain globally unique.
+        if row["category"] in {"stock", "etf"}:
+            if row["code"] in seen_instrument_codes:
+                raise KrxReceiptError(f"DUPLICATE_ENTITY_CODE:{row['code']}")
+            seen_instrument_codes.add(row["code"])
+        seen_identities.add(row["identity"])
     if manifest.get("schema") != GENERATION_SCHEMA:
         raise KrxReceiptError("UNSUPPORTED_GENERATION_SCHEMA")
     if manifest.get("generation") != generation_id or _date(manifest.get("date"), "manifest_date") != trading_date:
@@ -194,6 +211,13 @@ def validate_m10_staging(staging_dir: str | Path, *, expected_date: str | None =
         raise KrxReceiptError("MANIFEST_ENTITY_COUNT_MISMATCH")
     if not isinstance(manifest.get("artifacts"), Mapping):
         raise KrxReceiptError("GENERATION_ARTIFACTS_MISSING")
+    manifest_monitoring = manifest["artifacts"].get("monitoring")
+    receipt_monitoring = artifacts["monitoring"]
+    if not isinstance(manifest_monitoring, Mapping):
+        raise KrxReceiptError("GENERATION_MONITORING_ARTIFACT_MISSING")
+    if (manifest_monitoring.get("sha256") != receipt_monitoring.get("sha256")
+            or manifest_monitoring.get("bytes") != receipt_monitoring.get("bytes")):
+        raise KrxReceiptError("GENERATION_MONITORING_ARTIFACT_MISMATCH")
     source_metrics_sha = monitoring.get("source_metrics_gzip_sha256")
     if not isinstance(source_metrics_sha, str) or not HEX_SHA.fullmatch(source_metrics_sha):
         raise KrxReceiptError("INVALID_SOURCE_METRICS_SHA")
@@ -211,6 +235,98 @@ def validate_m10_staging(staging_dir: str | Path, *, expected_date: str | None =
         "sourceMetricsGzipSha256": source_metrics_sha,
         "fieldMappingVersion": "krx-m10-to-monitoring-v1",
         "reportInputReady": False,
+    }
+
+
+def stage_m10_report_inputs(
+    staging_dir: str | Path,
+    output_dir: str | Path,
+    *,
+    expected_date: str | None = None,
+) -> dict[str, Any]:
+    """Materialize verified M10 fields for the existing staged report adapter.
+
+    This is a local, authenticated-receipt staging operation only. It writes
+    a compact adapter input directory and never updates a GitHub workflow,
+    production report, baseline, or public repository artifact.
+    """
+    validation = validate_m10_staging(staging_dir, expected_date=expected_date)
+    staging = Path(staging_dir).resolve(strict=True)
+    output = Path(output_dir)
+    monitoring = _object(staging / "monitoring_interchange.json")
+    entities = monitoring["entities"]
+    target = validation["tradingDate"]
+    generation = validation["generationId"]
+    source_sha = validation["monitoringSha256"]
+    instruments = [row for row in entities if row["category"] in {"stock", "etf"}]
+    indexes = [row for row in entities if row["category"] == "index"]
+
+    def provenance(row: Mapping[str, Any]) -> dict[str, Any]:
+        return {
+            "sourceCanonicalPath": "m10/monitoring_interchange.json",
+            "sourceCanonicalSha256": source_sha,
+            "sourceStaging": "KRX_M10_GENERATION",
+            "sourceGenerationId": generation,
+            "sourceApi": row["source_api"],
+            "sourceDate": row["asof"],
+            "aftermarketUsed": False,
+        }
+
+    technical_rows = []
+    state_rows = []
+    null_counts: dict[str, int] = {}
+    for row in instruments:
+        mapped = map_m10_entity(row)
+        technicals = dict(mapped["technicals"])
+        for field, value in technicals.items():
+            if value is None:
+                null_counts[field] = null_counts.get(field, 0) + 1
+        technical_rows.append({
+            "itemCode": row["code"], "stockName": row["name"], "asOfDate": target,
+            "technicals": technicals, "provenance": provenance(row),
+        })
+        state_rows.append({
+            "itemCode": row["code"], "asOfDate": target,
+            "state": {"status": "KRX_CONFIRMED", "sourceDate": target, "generationId": generation},
+            "provenance": provenance(row),
+        })
+
+    counts = {
+        "entityCount": len(entities), "instrumentCount": len(instruments),
+        "indexCount": len(indexes), "stockCount": sum(r["category"] == "stock" for r in instruments),
+        "etfCount": sum(r["category"] == "etf" for r in instruments),
+    }
+    common = {
+        "schemaVersion": "krx-m10-report-staging-v1", "targetDate": target,
+        "source": "KRX_M10_GENERATION", "generationId": generation,
+        "sourceArtifactSha256": source_sha, "counts": counts,
+    }
+    _write_json(output / "technicals.json", {**common, "datas": technical_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
+    _write_json(output / "states.json", {**common, "datas": state_rows, "scope": "FULL_MARKET_INSTRUMENTS"})
+    _write_json(output / "provenance.json", {
+        "schemaVersion": "krx-m10-provenance-v1", "targetDate": target,
+        "source": "KRX_M10_GENERATION", "generationId": generation,
+        "sourceCanonicalSha256": source_sha,
+        "byCode": {row["code"]: provenance(row) for row in instruments},
+    })
+    _write_json(output / "group-states.json", {
+        "schemaVersion": "krx-m10-group-state-v1", "targetDate": target,
+        "availabilityStatus": "KRX_M10_INDEX_SEPARATE", "generationId": generation,
+        "counts": counts, "indexes": [{"code": row["code"], "name": row["name"], "asof": target} for row in indexes],
+    })
+    # The existing report loader requires a derived projection. This explicit
+    # PARTIAL object carries only metadata; it never pretends to be a FINAL
+    # breadth/leader/baseline result.
+    _write_json(output / "report-contract-projection.json", {
+        "schemaVersion": "krx-m10-report-projection-v1", "status": "PARTIAL",
+        "asOf": target, "observedAt": None, "source": "KRX_M10_GENERATION",
+        "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "generationId": generation, "fullMarket": {"quality": counts, "breadth": {}, "leaders": []},
+    })
+    return {
+        "status": "STAGED_NOT_CONNECTED", "targetDate": target, "generationId": generation,
+        "entityCount": len(entities), "instrumentCount": len(instruments), "indexCount": len(indexes),
+        "nullIndicatorCounts": null_counts, "outputDir": str(output), "reportInputReady": False,
     }
 
 

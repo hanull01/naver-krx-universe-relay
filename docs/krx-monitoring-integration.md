@@ -8,7 +8,7 @@ publish KRX data.
 
 The local M10 generation was inspected directly:
 
-- generation manifest schema: `krx_generation_v1`
+- generation manifest schema: `krx_m9_generation_manifest_v1`
 - consumer schema: `krx_monitoring_interchange_v1`
 - consumer date field: `date`
 - generation identifier: `generation_manifest.json.generation` and `CURRENT`
@@ -17,10 +17,13 @@ The local M10 generation was inspected directly:
 - after-hours policy: `aftermarket_used=false`
 - source metrics integrity: `source_metrics_gzip_sha256`
 - actual M10 entity categories: `stock`, `etf`, `index`
+- actual 2026-11-02 counts: 2,767 stocks, 1,183 ETFs, 132 indexes
 
 Stock and ETF identifiers are six-character alphanumeric codes. Index
 identifiers are descriptive KRX labels such as `KOSPI`, so the adapter does
-not incorrectly impose the stock-code rule on indexes.
+not incorrectly impose the stock-code rule on indexes. Index display labels
+can repeat across KOSPI/KOSDAQ; the source-qualified `identity` is the unique
+key. Stock/ETF codes remain unique.
 
 ## Mapping
 
@@ -53,6 +56,19 @@ technical validation.
 Successful validation still returns `reportInputReady=false` in this branch.
 Transport, legal redistribution approval, report wiring, Cloudflare changes,
 and public publication remain separate deployment gates.
+
+`stage_m10_report_inputs` materializes a local-only adapter directory for the
+existing `full_market_technical_adapter` contract. It emits
+`technicals.json`, `states.json`, `group-states.json`, `provenance.json`, and a
+`PARTIAL` report projection. For the inspected generation, all 4,082 entities
+are validated, 3,950 stock/ETF rows are staged for the existing instrument
+adapter, and 132 index rows remain in the separate index metadata section.
+Per-indicator null counts are reported; nulls are not synthesized.
+
+`derived_input_resolver.py` is intentionally not changed: its
+`monitoring-derived` pointer is the existing NAVER/derived generation
+contract, while M10 KRX staging is an independent source that must not be
+silently mixed into that resolver.
 
 ## Operational boundaries
 
