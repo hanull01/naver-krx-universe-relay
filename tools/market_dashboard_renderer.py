@@ -979,15 +979,20 @@ def render_contract_views(
     model = build_dashboard_model(
         contract, allow_current_observation=allow_current_observation
     )
+    assets = load_approved_template(template_dir)
     markdown_text = render_dashboard_markdown(
         contract,
         template_dir=template_dir,
         allow_current_observation=allow_current_observation,
+        _model=model,
+        _template_assets=assets,
     )
     html_text = render_dashboard_html(
         contract,
         template_dir=template_dir,
         allow_current_observation=allow_current_observation,
+        _model=model,
+        _assets=assets,
     )
     issues = validate_rendered_outputs(markdown_text, html_text, model)
     if issues:
@@ -1053,7 +1058,7 @@ def render_contract_views(
         "html": str(latest_html),
         "datedMarkdown": str(dated_markdown),
         "datedHtml": str(dated_html),
-        "templateTrace": load_approved_template(template_dir)["templateTrace"],
+        "templateTrace": assets["templateTrace"],
         "htmlSha256": hashlib.sha256(html_text.encode("utf-8")).hexdigest(),
         "htmlBytes": len(html_text.encode("utf-8")),
     }
@@ -1441,9 +1446,18 @@ def _compact_market_html(model: Mapping[str, Any]) -> str:
     return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article><article class="card"><div class="kpi-label">시장 거래대금</div><div class="kpi-value" style="font-size:16px">{_escape(_market_value_text(market["marketTradingValue"]))}</div><div class="kpi-sub">동일 기준일</div></article></div><div class="grid two"><article class="card"><h3>시장 확산</h3><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율</h3>{metric_html}</article></div>'
 
 
-def _compact_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR, allow_current_observation: bool = False) -> str:
-    assets = load_approved_template(template_dir)
-    model = _compact_model(report, allow_current_observation=allow_current_observation)
+def _compact_html(
+    report: Mapping[str, Any],
+    *,
+    template_dir: Path = TEMPLATE_DIR,
+    allow_current_observation: bool = False,
+    _model: Mapping[str, Any] | None = None,
+    _assets: Mapping[str, Any] | None = None,
+) -> str:
+    assets = _assets if _assets is not None else load_approved_template(template_dir)
+    model = _model if _model is not None else _compact_model(
+        report, allow_current_observation=allow_current_observation
+    )
     if not model["renderable"]:
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:REQUIRED_RENDER_FIELDS")
     css = assets["css"] + (
@@ -1482,9 +1496,19 @@ def _compact_html(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DI
     )
 
 
-def _compact_markdown(report: Mapping[str, Any], *, template_dir: Path = TEMPLATE_DIR, allow_current_observation: bool = False) -> str:
-    load_approved_template(template_dir)
-    model = _compact_model(report, allow_current_observation=allow_current_observation)
+def _compact_markdown(
+    report: Mapping[str, Any],
+    *,
+    template_dir: Path = TEMPLATE_DIR,
+    allow_current_observation: bool = False,
+    _model: Mapping[str, Any] | None = None,
+    _template_assets: Mapping[str, Any] | None = None,
+) -> str:
+    if _template_assets is None:
+        load_approved_template(template_dir)
+    model = _model if _model is not None else _compact_model(
+        report, allow_current_observation=allow_current_observation
+    )
     if not model["renderable"]:
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:REQUIRED_RENDER_FIELDS")
     market = model["fullMarket"]
