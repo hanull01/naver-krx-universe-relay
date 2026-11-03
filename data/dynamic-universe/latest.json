@@ -1,12 +1,12 @@
 {
   "version": "dynamic-universe-management-v1",
-  "generatedAt": "2026-11-03T01:08:33.180235+00:00",
+  "generatedAt": "2026-11-03T02:07:53.751988+00:00",
   "networkCalls": 0,
   "industryEvidence": {
-    "status": "PARTIAL_WITH_COVERAGE",
-    "sourceStatus": "PARTIAL",
-    "industryEvidenceUsable": "PARTIAL_WITH_COVERAGE",
-    "analyzedIndustryCount": 78
+    "status": "FULL",
+    "sourceStatus": "OK",
+    "industryEvidenceUsable": "FULL",
+    "analyzedIndustryCount": 79
   },
   "sectors": [
     {
@@ -24,8 +24,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
@@ -43,185 +43,14 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "332",
-      "name": "문구류",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "331",
-      "name": "복합유틸리티",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "287",
-      "name": "소프트웨어",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "336",
-      "name": "다각화된통신서비스",
-      "status": "DISCOVERED",
-      "score": 100.0,
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "328",
-      "name": "전문소매",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "324",
-      "name": "상업서비스와공급품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "264",
-      "name": "백화점과일반상점",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "303",
-      "name": "가구",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
       "id": "315",
       "name": "손해보험",
       "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "296",
-      "name": "운송인프라",
-      "status": "REMOVED",
       "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 1,
@@ -233,179 +62,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "275",
-      "name": "담배",
-      "status": "DISCOVERED",
-      "score": 80.0,
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "277",
-      "name": "창업투자",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "319",
-      "name": "기타금융",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "302",
-      "name": "식품과기본식료품소매",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "320",
-      "name": "건축제품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "309",
-      "name": "음료",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "274",
-      "name": "섬유,의류,신발,호화품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "267",
-      "name": "IT서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "317",
-      "name": "호텔,레스토랑,레저",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
@@ -423,13 +81,13 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "323",
-      "name": "해운사",
+      "id": "309",
+      "name": "음료",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -442,13 +100,108 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "311",
-      "name": "포장재",
+      "id": "319",
+      "name": "기타금융",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "264",
+      "name": "백화점과일반상점",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "336",
+      "name": "다각화된통신서비스",
+      "status": "DISCOVERED",
+      "score": 100.0,
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "331",
+      "name": "복합유틸리티",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "332",
+      "name": "문구류",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "324",
+      "name": "상업서비스와공급품",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -461,89 +214,89 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "338",
-      "name": "사무용전자제품",
+      "id": "328",
+      "name": "전문소매",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 1,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": false,
+        "advancerPct": true,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "325",
-      "name": "전기유틸리티",
+      "id": "296",
+      "name": "운송인프라",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 1,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": false,
+        "advancerPct": true,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "281",
-      "name": "건강관리장비와용품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
       "id": "263",
       "name": "게임엔터테인먼트",
       "status": "REMOVED",
-      "score": 60.0,
+      "score": 80.0,
       "qualifyStreak": 0,
       "weakenStreak": 1,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": false,
+        "advancerPct": true,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "276",
-      "name": "복합기업",
+      "id": "317",
+      "name": "호텔,레스토랑,레저",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "303",
+      "name": "가구",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -556,13 +309,13 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "290",
-      "name": "교육서비스",
+      "id": "287",
+      "name": "소프트웨어",
       "status": "REMOVED",
       "score": 60.0,
       "qualifyStreak": 0,
@@ -575,122 +328,8 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "321",
-      "name": "증권",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "280",
-      "name": "부동산",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "261",
-      "name": "제약",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "301",
-      "name": "은행",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "272",
-      "name": "화학",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "289",
-      "name": "건축자재",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
@@ -708,768 +347,141 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
-      "id": "312",
-      "name": "가스유틸리티",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
+      "id": "275",
+      "name": "담배",
+      "status": "DISCOVERED",
+      "score": 80.0,
+      "qualifyStreak": 1,
+      "weakenStreak": 0,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "265",
-      "name": "판매업체",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "285",
-      "name": "방송과엔터테인먼트",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "266",
-      "name": "화장품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "329",
-      "name": "도로와철도운송",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "291",
-      "name": "조선",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "268",
-      "name": "식품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "322",
-      "name": "비철금속",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "293",
-      "name": "컴퓨터와주변기기",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "279",
-      "name": "건설",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "270",
-      "name": "자동차부품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "286",
-      "name": "생물공학",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "310",
-      "name": "광고",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "288",
-      "name": "건강관리기술",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "297",
-      "name": "가정용품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "307",
-      "name": "전자제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "316",
-      "name": "건강관리업체및서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "314",
-      "name": "출판",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "271",
-      "name": "레저용장비와제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "298",
-      "name": "가정용기기와용품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "273",
-      "name": "자동차",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "262",
-      "name": "생명과학도구및서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "304",
-      "name": "철강",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "284",
-      "name": "우주항공과국방",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "308",
-      "name": "인터넷과카탈로그소매",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "282",
-      "name": "전자장비와기기",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "327",
-      "name": "디스플레이패널",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "294",
-      "name": "통신장비",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "299",
-      "name": "기계",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "269",
-      "name": "디스플레이장비및부품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "300",
-      "name": "양방향미디어와서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "295",
-      "name": "에너지장비및서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "292",
-      "name": "핸드셋",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "333",
-      "name": "무선통신서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "306",
-      "name": "전기장비",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "283",
-      "name": "전기제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "330",
-      "name": "생명보험",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
         "advancerPct": false,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": true,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "313",
-      "name": "석유와가스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
-      "lastObservedTradingDate": "20261103"
-    },
-    {
-      "id": "278",
-      "name": "반도체와반도체장비",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
       "id": "337",
       "name": "카드",
       "status": "REMOVED",
-      "score": 80.0,
+      "score": 60.0,
       "qualifyStreak": 0,
       "weakenStreak": 1,
       "checks": {
         "relativeStrength": true,
-        "advancerPct": true,
+        "advancerPct": false,
         "turnoverConcentrationPct": true,
         "pctAboveMA20": false,
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "277",
+      "name": "창업투자",
+      "status": "REMOVED",
+      "score": 80.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "320",
+      "name": "건축제품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "274",
+      "name": "섬유,의류,신발,호화품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "267",
+      "name": "IT서비스",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "280",
+      "name": "부동산",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     },
     {
@@ -1487,8 +499,1015 @@
         "leaderCount": true
       },
       "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-03T01:08:30.863663+00:00",
-      "evidenceQuality": "PARTIAL_WITH_COVERAGE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "290",
+      "name": "교육서비스",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "285",
+      "name": "방송과엔터테인먼트",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "266",
+      "name": "화장품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "289",
+      "name": "건축자재",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "272",
+      "name": "화학",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "261",
+      "name": "제약",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "321",
+      "name": "증권",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "268",
+      "name": "식품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "302",
+      "name": "식품과기본식료품소매",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "276",
+      "name": "복합기업",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "281",
+      "name": "건강관리장비와용품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "291",
+      "name": "조선",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "322",
+      "name": "비철금속",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "310",
+      "name": "광고",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "323",
+      "name": "해운사",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "301",
+      "name": "은행",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "312",
+      "name": "가스유틸리티",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "265",
+      "name": "판매업체",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "311",
+      "name": "포장재",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "325",
+      "name": "전기유틸리티",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "286",
+      "name": "생물공학",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "338",
+      "name": "사무용전자제품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": true,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "279",
+      "name": "건설",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "270",
+      "name": "자동차부품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "316",
+      "name": "건강관리업체및서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "271",
+      "name": "레저용장비와제품",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": true,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "284",
+      "name": "우주항공과국방",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "329",
+      "name": "도로와철도운송",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "304",
+      "name": "철강",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "288",
+      "name": "건강관리기술",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "314",
+      "name": "출판",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "273",
+      "name": "자동차",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "308",
+      "name": "인터넷과카탈로그소매",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "293",
+      "name": "컴퓨터와주변기기",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "307",
+      "name": "전자제품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "297",
+      "name": "가정용품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "327",
+      "name": "디스플레이패널",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "25",
+      "name": "기타",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "294",
+      "name": "통신장비",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "295",
+      "name": "에너지장비및서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "298",
+      "name": "가정용기기와용품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "282",
+      "name": "전자장비와기기",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "262",
+      "name": "생명과학도구및서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "300",
+      "name": "양방향미디어와서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "292",
+      "name": "핸드셋",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "299",
+      "name": "기계",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "269",
+      "name": "디스플레이장비및부품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "306",
+      "name": "전기장비",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "330",
+      "name": "생명보험",
+      "status": "REMOVED",
+      "score": 60.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": true,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "313",
+      "name": "석유와가스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "283",
+      "name": "전기제품",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "278",
+      "name": "반도체와반도체장비",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
+      "lastObservedTradingDate": "20261103"
+    },
+    {
+      "id": "333",
+      "name": "무선통신서비스",
+      "status": "REMOVED",
+      "score": 40.0,
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
+      "checks": {
+        "relativeStrength": false,
+        "advancerPct": false,
+        "turnoverConcentrationPct": true,
+        "pctAboveMA20": false,
+        "leaderCount": true
+      },
+      "source": "FULL_MARKET_EVIDENCE",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "evidenceQuality": "FULL",
       "lastObservedTradingDate": "20261103"
     }
   ],
@@ -1942,7 +1961,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "234",
@@ -1959,7 +1978,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "497",
@@ -1976,7 +1995,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "165",
@@ -1993,7 +2012,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "531",
@@ -2010,7 +2029,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "164",
@@ -2027,7 +2046,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "493",
@@ -2044,7 +2063,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "270",
@@ -2061,7 +2080,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "151",
@@ -2078,7 +2097,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "384",
@@ -2095,7 +2114,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "487",
@@ -2112,7 +2131,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "489",
@@ -2129,7 +2148,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "111",
@@ -2146,7 +2165,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "343",
@@ -2163,7 +2182,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "36",
@@ -2180,7 +2199,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "266",
@@ -2197,7 +2216,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "108",
@@ -2214,7 +2233,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "141",
@@ -2231,7 +2250,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "571",
@@ -2248,7 +2267,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "543",
@@ -2265,7 +2284,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "283",
@@ -2282,7 +2301,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "567",
@@ -2299,7 +2318,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "521",
@@ -2316,7 +2335,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "483",
@@ -2333,7 +2352,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "593",
@@ -2350,7 +2369,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "166",
@@ -2367,7 +2386,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "496",
@@ -2384,7 +2403,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "38",
@@ -2401,7 +2420,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "86",
@@ -2418,7 +2437,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "501",
@@ -2435,7 +2454,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "506",
@@ -2452,7 +2471,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "76",
@@ -2469,7 +2488,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "197",
@@ -2486,7 +2505,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "139",
@@ -2503,7 +2522,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "176",
@@ -2520,7 +2539,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "241",
@@ -2537,7 +2556,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "167",
@@ -2554,7 +2573,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "421",
@@ -2571,7 +2590,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "170",
@@ -2588,7 +2607,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "330",
@@ -2605,7 +2624,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "172",
@@ -2622,7 +2641,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "580",
@@ -2639,7 +2658,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "59",
@@ -2656,7 +2675,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "90",
@@ -2673,7 +2692,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "13",
@@ -2690,7 +2709,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "171",
@@ -2707,7 +2726,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "290",
@@ -2724,7 +2743,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "316",
@@ -2741,7 +2760,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "592",
@@ -2758,7 +2777,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "447",
@@ -2775,7 +2794,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "19",
@@ -2792,7 +2811,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "284",
@@ -2809,7 +2828,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "44",
@@ -2826,7 +2845,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "126",
@@ -2843,7 +2862,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "159",
@@ -2860,7 +2879,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "540",
@@ -2877,7 +2896,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "597",
@@ -2894,7 +2913,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "16",
@@ -2911,7 +2930,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "232",
@@ -2928,7 +2947,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "92",
@@ -2945,7 +2964,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "105",
@@ -2962,7 +2981,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "32",
@@ -2979,7 +2998,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "325",
@@ -2996,7 +3015,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "63",
@@ -3013,7 +3032,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "136",
@@ -3030,7 +3049,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "504",
@@ -3047,7 +3066,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "467",
@@ -3064,7 +3083,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "113",
@@ -3081,7 +3100,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "407",
@@ -3098,7 +3117,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "302",
@@ -3115,7 +3134,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "48",
@@ -3132,7 +3151,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "585",
@@ -3149,7 +3168,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "402",
@@ -3166,7 +3185,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "417",
@@ -3183,7 +3202,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "324",
@@ -3200,7 +3219,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "124",
@@ -3217,7 +3236,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "426",
@@ -3234,7 +3253,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "436",
@@ -3251,7 +3270,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "319",
@@ -3268,7 +3287,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "31",
@@ -3285,7 +3304,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "586",
@@ -3302,7 +3321,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "598",
@@ -3319,7 +3338,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "332",
@@ -3336,7 +3355,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "52",
@@ -3353,7 +3372,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "310",
@@ -3370,7 +3389,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "448",
@@ -3387,7 +3406,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "289",
@@ -3404,7 +3423,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "514",
@@ -3421,7 +3440,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "242",
@@ -3438,7 +3457,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "397",
@@ -3455,7 +3474,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "524",
@@ -3472,7 +3491,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "119",
@@ -3489,7 +3508,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "27",
@@ -3506,7 +3525,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "376",
@@ -3523,7 +3542,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "228",
@@ -3540,7 +3559,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "298",
@@ -3557,7 +3576,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "47",
@@ -3574,7 +3593,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "470",
@@ -3591,7 +3610,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "265",
@@ -3608,7 +3627,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "285",
@@ -3625,7 +3644,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "42",
@@ -3642,7 +3661,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "204",
@@ -3659,7 +3678,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "210",
@@ -3676,7 +3695,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "174",
@@ -3693,7 +3712,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "331",
@@ -3710,7 +3729,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "82",
@@ -3727,7 +3746,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "206",
@@ -3744,7 +3763,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "482",
@@ -3761,7 +3780,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "342",
@@ -3778,7 +3797,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "546",
@@ -3795,7 +3814,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "60",
@@ -3812,7 +3831,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "480",
@@ -3829,7 +3848,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "8",
@@ -3846,7 +3865,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "462",
@@ -3863,7 +3882,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "322",
@@ -3880,7 +3899,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "317",
@@ -3897,7 +3916,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "400",
@@ -3914,7 +3933,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "49",
@@ -3931,7 +3950,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "378",
@@ -3948,7 +3967,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "488",
@@ -3965,7 +3984,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "110",
@@ -3982,7 +4001,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "272",
@@ -3999,7 +4018,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "45",
@@ -4016,7 +4035,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "127",
@@ -4033,7 +4052,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "507",
@@ -4050,7 +4069,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "79",
@@ -4067,7 +4086,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "520",
@@ -4084,7 +4103,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "576",
@@ -4101,7 +4120,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "582",
@@ -4118,7 +4137,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "481",
@@ -4135,7 +4154,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "534",
@@ -4152,7 +4171,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "318",
@@ -4169,7 +4188,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "581",
@@ -4186,7 +4205,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "66",
@@ -4203,7 +4222,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "377",
@@ -4220,7 +4239,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "387",
@@ -4237,7 +4256,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "405",
@@ -4254,7 +4273,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "474",
@@ -4271,7 +4290,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "525",
@@ -4288,7 +4307,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "326",
@@ -4305,7 +4324,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "380",
@@ -4322,7 +4341,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "386",
@@ -4339,7 +4358,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "591",
@@ -4356,7 +4375,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "62",
@@ -4373,7 +4392,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "513",
@@ -4390,7 +4409,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "154",
@@ -4407,7 +4426,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "147",
@@ -4424,7 +4443,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "385",
@@ -4441,7 +4460,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "415",
@@ -4458,7 +4477,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "121",
@@ -4475,7 +4494,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "287",
@@ -4492,7 +4511,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "41",
@@ -4509,7 +4528,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "517",
@@ -4526,7 +4545,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "276",
@@ -4543,7 +4562,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "557",
@@ -4560,7 +4579,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "590",
@@ -4577,7 +4596,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "608",
@@ -4594,7 +4613,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "191",
@@ -4611,7 +4630,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "297",
@@ -4628,7 +4647,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "72",
@@ -4645,7 +4664,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "288",
@@ -4662,7 +4681,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "12",
@@ -4679,7 +4698,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "464",
@@ -4696,7 +4715,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "335",
@@ -4713,7 +4732,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "435",
@@ -4730,7 +4749,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "149",
@@ -4747,7 +4766,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "398",
@@ -4764,7 +4783,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "445",
@@ -4781,7 +4800,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "128",
@@ -4798,7 +4817,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "381",
@@ -4815,7 +4834,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "56",
@@ -4832,7 +4851,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "389",
@@ -4849,7 +4868,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "98",
@@ -4866,7 +4885,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "144",
@@ -4883,7 +4902,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "14",
@@ -4900,7 +4919,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "55",
@@ -4917,7 +4936,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "446",
@@ -4934,7 +4953,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "564",
@@ -4951,7 +4970,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "313",
@@ -4968,7 +4987,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "392",
@@ -4985,7 +5004,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "223",
@@ -5002,7 +5021,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "227",
@@ -5019,7 +5038,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "468",
@@ -5036,7 +5055,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "152",
@@ -5053,7 +5072,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "17",
@@ -5070,7 +5089,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "349",
@@ -5087,7 +5106,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "452",
@@ -5104,7 +5123,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "250",
@@ -5121,7 +5140,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "529",
@@ -5138,7 +5157,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "600",
@@ -5155,7 +5174,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "200",
@@ -5172,7 +5191,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "559",
@@ -5189,7 +5208,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "177",
@@ -5206,7 +5225,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "229",
@@ -5223,7 +5242,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "560",
@@ -5240,7 +5259,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "595",
@@ -5257,7 +5276,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "106",
@@ -5274,7 +5293,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "527",
@@ -5291,7 +5310,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "185",
@@ -5308,7 +5327,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "213",
@@ -5325,7 +5344,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "269",
@@ -5342,7 +5361,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "472",
@@ -5359,7 +5378,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "537",
@@ -5376,7 +5395,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "18",
@@ -5393,7 +5412,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "64",
@@ -5410,7 +5429,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "30",
@@ -5427,7 +5446,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "323",
@@ -5444,7 +5463,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "181",
@@ -5461,7 +5480,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "188",
@@ -5478,7 +5497,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "178",
@@ -5495,7 +5514,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "575",
@@ -5512,7 +5531,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "180",
@@ -5529,7 +5548,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "123",
@@ -5546,7 +5565,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "505",
@@ -5563,7 +5582,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "94",
@@ -5580,7 +5599,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "329",
@@ -5597,7 +5616,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "205",
@@ -5614,7 +5633,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "500",
@@ -5631,7 +5650,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "379",
@@ -5648,7 +5667,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "566",
@@ -5665,7 +5684,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "579",
@@ -5682,7 +5701,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "99",
@@ -5699,7 +5718,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "449",
@@ -5716,7 +5735,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "237",
@@ -5733,7 +5752,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "422",
@@ -5750,7 +5769,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "184",
@@ -5767,7 +5786,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "523",
@@ -5784,7 +5803,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "511",
@@ -5801,7 +5820,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "401",
@@ -5818,7 +5837,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "584",
@@ -5835,7 +5854,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "615",
@@ -5852,7 +5871,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "187",
@@ -5869,7 +5888,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     },
     {
       "id": "503",
@@ -5886,7 +5905,7 @@
       "lastObservedTradingDate": "20261103",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-03T00:08:58.235364+00:00"
+      "lastVerifiedAt": "2026-11-03T01:08:33.180235+00:00"
     }
   ],
   "leaders": [
@@ -5999,8 +6018,8 @@
       "qualifyStreak": 0,
       "weakenStreak": 13,
       "collectionAdmitted": false,
-      "currentPrice": 24100.0,
-      "changeRate": -7.66,
+      "currentPrice": 23850.0,
+      "changeRate": -8.62,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
@@ -6426,8 +6445,8 @@
       "qualifyStreak": 0,
       "weakenStreak": 53,
       "collectionAdmitted": false,
-      "currentPrice": 8110.0,
-      "changeRate": 10.04,
+      "currentPrice": 7610.0,
+      "changeRate": -6.74,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
@@ -6696,7 +6715,71 @@
       "lastObservedTradingDate": "20261103"
     }
   ],
-  "initialObservationCandidates": [],
+  "initialObservationCandidates": [
+    {
+      "id": "initial:305:003495",
+      "code": "003495",
+      "name": "대한항공우",
+      "groupType": "sector",
+      "groupId": "305",
+      "score": 100.0,
+      "assetType": "STOCK",
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true,
+        "assetType": "STOCK",
+        "assetTypeEligible": true,
+        "tradingDateVerified": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "currentPrice": 24500.0,
+      "changeRate": 13.95
+    },
+    {
+      "id": "initial:305:180640",
+      "code": "180640",
+      "name": "한진칼",
+      "groupType": "sector",
+      "groupId": "305",
+      "score": 100.0,
+      "assetType": "STOCK",
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true,
+        "assetType": "STOCK",
+        "assetTypeEligible": true,
+        "tradingDateVerified": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "currentPrice": 175200.0,
+      "changeRate": 29.97
+    },
+    {
+      "id": "initial:305:18064K",
+      "code": "18064K",
+      "name": "한진칼우",
+      "groupType": "sector",
+      "groupId": "305",
+      "score": 100.0,
+      "assetType": "STOCK",
+      "checks": {
+        "minimumScore": true,
+        "minimumPersistence": true,
+        "assetType": "STOCK",
+        "assetTypeEligible": true,
+        "tradingDateVerified": true
+      },
+      "status": "INITIAL_OBSERVATION",
+      "source": "INITIAL_OBSERVATION",
+      "sourceTime": "2026-11-03T02:07:50.318539+00:00",
+      "currentPrice": 39000.0,
+      "changeRate": 30.0
+    }
+  ],
   "kiwoomDiscovery": [
     {
       "code": "042510",
@@ -6753,35 +6836,21 @@
   "pending": [
     {
       "type": "INITIAL_OBSERVATION",
-      "groupId": "305",
-      "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
-    },
-    {
-      "type": "AUTO_LEADER",
-      "id": "sector:287:0147B0",
-      "code": "0147B0",
-      "status": "PENDING",
-      "reason": "LEADER_ASSET_TYPE_UNVERIFIED",
-      "assetType": "UNKNOWN"
-    },
-    {
-      "type": "INITIAL_OBSERVATION",
       "groupId": "336",
       "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+      "reason": "NO_VALID_GROUP_CANDIDATE"
     },
     {
       "type": "INITIAL_OBSERVATION",
       "groupId": "275",
       "status": "PENDING",
-      "reason": "INDUSTRY_EVIDENCE_NOT_USABLE"
+      "reason": "NO_VALID_GROUP_CANDIDATE"
     }
   ],
   "changes": [
     {
       "type": "AUTO_SECTOR",
-      "id": "339",
+      "id": "25",
       "from": null,
       "to": "REMOVED"
     }
