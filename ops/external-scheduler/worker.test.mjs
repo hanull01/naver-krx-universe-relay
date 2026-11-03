@@ -386,20 +386,19 @@ test("the Run provenance artifact directly supplies its publication SHA", async 
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
-test("daily report publication is unverified when the official HTML is missing", async () => {
+test("daily report publication verifies the JSON-only artifact contract", async () => {
   const now = new Date();
-  const run = { id: 113, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "missing-html" };
+  const run = { id: 113, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "json-only" };
   const api = apiWith({ run });
   const wrapped = async (path, init) => {
     if (path.includes("/artifacts?")) return { artifacts: [{ name: "production-publication-113-artifactsha-true" }] };
     if (path === `/repos/${repo}/commits/artifactsha`) return { files: [
       { filename: "data/reports/latest.json" },
-      { filename: "data/reports/latest.md" },
     ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return api(path, init);
   };
   const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
-  assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
+  assert.equal(result.publicationStatus, "PUBLISHED");
   assert.equal(result.deliveryStatus, "UNVERIFIED");
 });
 
