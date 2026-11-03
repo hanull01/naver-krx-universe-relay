@@ -27,7 +27,7 @@ DEFAULT_CONTRACT = ROOT / "data/monitoring/latest-report-contract.json"
 DEFAULT_OUTPUT_ROOT = ROOT / "data/reports/current-observation"
 
 
-def _sha256(path: Path) -> str:
+def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
@@ -148,15 +148,15 @@ def render_current_observation(
         "tradingDateStatus": contract.get("tradingDateStatus") or "UNAVAILABLE",
         "sourceTime": _source_time(contract, indices),
         "reportContractPath": repo_path(contract_path),
-        "reportContractSha256": hashlib.sha256(contract_bytes).hexdigest(),
+        "reportContractSha256": sha256_bytes(contract_bytes),
         "reportContractGeneratedAt": observed_at,
         "workflowRunId": run_id,
         "executionHead": head_sha,
         "markdownPath": repo_path(markdown_path),
         "htmlPath": repo_path(html_path),
         "manifestPath": repo_path(manifest_path),
-        "markdownSha256": _sha256(markdown_path),
-        "htmlSha256": _sha256(html_path),
+        "markdownSha256": sha256_file(markdown_path),
+        "htmlSha256": sha256_file(html_path),
         "reportStatus": contract.get("status"),
         "currentObservationAllowed": True,
         "finalPending": final_pending,
