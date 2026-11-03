@@ -56,13 +56,19 @@ def filesystem_date(value: Any, field: str = "targetDate") -> str:
     return f"{text[:4]}-{text[4:6]}-{text[6:]}"
 
 
-def _read_json(path: Path) -> dict[str, Any]:
+def _read_json(
+    path: Path,
+    cache: dict[Path, tuple[dict[str, Any], str, int]] | None = None,
+) -> dict[str, Any]:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_bytes()
+        payload = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise DerivedInputError(f"DERIVED_JSON_READ_FAILED:{path}:{exc}") from exc
     if not isinstance(payload, dict):
         raise DerivedInputError(f"DERIVED_JSON_OBJECT_REQUIRED:{path}")
+    if cache is not None:
+        cache[path] = (payload, hashlib.sha256(raw).hexdigest(), len(raw))
     return payload
 
 
@@ -79,6 +85,7 @@ def _verify_artifact_record(
     name: str,
     record: Mapping[str, Any],
     run_id: str,
+    cache: dict[Path, tuple[dict[str, Any], str, int]] | None = None,
 ) -> Path:
     """Verify a manifest record against the immutable file in this run."""
     if not isinstance(record, Mapping):
@@ -97,11 +104,16 @@ def _verify_artifact_record(
     path = root / name
     if not path.is_file():
         raise DerivedInputError(f"DERIVED_ARTIFACT_MISSING:{name}")
-    actual_sha = _sha256(path)
+    cached = cache.get(path) if cache is not None else None
+    if cached is None:
+        actual_sha = _sha256(path)
+        actual_bytes = path.stat().st_size
+    else:
+        actual_sha, actual_bytes = cached[1], cached[2]
     if actual_sha.lower() != expected_sha.lower():
         raise DerivedInputError(f"DERIVED_ARTIFACT_SHA256_MISMATCH:{name}")
     declared_bytes = record.get("bytes")
-    if declared_bytes not in (None, "") and int(declared_bytes) != path.stat().st_size:
+    if declared_bytes not in (None, "") and int(declared_bytes) != actual_bytes:
         raise DerivedInputError(f"DERIVED_ARTIFACT_BYTES_MISMATCH:{name}")
     return path
 
@@ -158,7 +170,8 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
     if missing:
         raise DerivedInputError(f"DERIVED_ARTIFACT_MISSING:{','.join(missing)}")
 
-    artifacts = {name: _read_json(path) for name, path in paths.items()}
+    cache: dict[Path, tuple[dict[str, Any], str, int]] = {}
+    artifacts = {name: _read_json(path, cache) for name, path in paths.items()}
     for name, payload in artifacts.items():
         observed = _target(payload, name)
         if observed != target:
@@ -188,6 +201,7 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
         "report-contract-projection.json",
         contract,
         run_id,
+        cache,
     )
 
     source_artifacts = report_manifest.get("sourceArtifacts")
@@ -199,13 +213,15 @@ def validate_derived_run(run_dir: str | Path, target_date: str, expected_run_id:
     source_payloads: dict[str, dict[str, Any]] = {}
     for name in REPORT_CONTRACT_SOURCE_ARTIFACTS:
         source_record = source_artifacts.get(name)
-        _verify_artifact_record(root, name, source_record, run_id)
+        _verify_artifact_record(root, name, source_record, run_id, cache)
         _verify_artifact_metadata_consistency(
             name,
             manifest_files.get(name),
             source_record,
         )
-        source_payloads[name] = _read_json(root / name)
+        source_path = root / name
+        cached = cache.get(source_path)
+        source_payloads[name] = cached[0] if cached is not None else _read_json(source_path, cache)
         if _has_fallback(source_payloads[name]):
             raise DerivedInputError(f"DERIVED_FALLBACK_USED:{name}")
 
