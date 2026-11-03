@@ -220,11 +220,10 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
 
 
 def attach_current_observation(message, manifest):
-    """Attach exactly the two validated artifacts described by the manifest."""
+    """Attach only the validated HTML artifact; Markdown is the mail body."""
     resolved = manifest.get('_resolvedPaths') or {}
     attachments = []
     for field, digest_field, filename, maintype, subtype in (
-        ('markdownPath', 'markdownSha256', 'report.md', 'text', 'markdown'),
         ('htmlPath', 'htmlSha256', 'report.html', 'text', 'html'),
     ):
         path = resolved.get(field)
@@ -240,11 +239,10 @@ def attach_current_observation(message, manifest):
 
 
 def current_observation_attachment_metadata(manifest):
-    """Recheck the two files and return MIME metadata before sending."""
+    """Recheck the HTML attachment and return MIME metadata before sending."""
     resolved = manifest.get('_resolvedPaths') or {}
     attachments = []
     for field, digest_field, filename in (
-        ('markdownPath', 'markdownSha256', 'report.md'),
         ('htmlPath', 'htmlSha256', 'report.html'),
     ):
         path = resolved.get(field)
@@ -312,88 +310,17 @@ def validate_quotes(payload, current=None, collection_started_at=None):
             'collectionStartedAt': payload.get('collectionStartedAt')}
 
 def ready_message(metadata, env):
-    commit_sha = env.get('MARKET_DATA_COMMIT_SHA'); run_id = env.get('GITHUB_RUN_ID')
-    repository = env.get('GITHUB_REPOSITORY'); server = env.get('GITHUB_SERVER_URL', 'https://github.com').rstrip('/')
-    if not all((commit_sha, run_id, repository)):
-        raise ReadyValidationError('GitHub run metadata is missing')
-    generated = parse_timestamp(metadata['generatedAt'], 'generatedAt')
-    message = EmailMessage(); message['Subject'] = f'{SUBJECT_PREFIX} {generated:%Y-%m-%d %H:%M}'
-    message['From'] = env.get('MARKET_GMAIL_USERNAME', ''); message['To'] = env.get('MARKET_GMAIL_TO', '')
-    lines = [f'repository={repository}', 'workflow=Refresh market data', f'run_id={run_id}',
-             f'run_url={server}/{repository}/actions/runs/{run_id}', f'commit_sha={commit_sha}']
-    if metadata.get('mode') == 'FULL_MARKET':
-        lines.extend([
-            'fullMarket.status=SUCCESS',
-            f'fullMarket.publicationStatus={metadata["publicationStatus"]}',
-            'fullMarket.scope=AUTHORITATIVE_FULL_MARKET',
-            f'fullMarket.generatedAt={metadata["generatedAt"]}',
-            f'fullMarket.tradingDate={metadata["tradingDate"] or "UNAVAILABLE"}',
-            f'fullMarket.tradingDateStatus={metadata["tradingDateStatus"]}',
-            f'fullMarket.tradingDateEvidenceReason={metadata["tradingDateEvidenceReason"]}',
-            f'fullMarket.marketSession={metadata["marketSession"]}',
-            f'fullMarket.count={metadata["count"]}',
-            f'fullMarket.expectedCount={metadata["expectedCount"]}',
-            f'fullMarket.coverageCount={metadata["coverageCount"]}',
-            f'fullMarket.qualityStatus={metadata["qualityStatus"]}',
-            f'fullMarket.missingCodes={",".join(metadata["missingCodes"]) or "none"}',
-            f'fullMarket.unconfirmedMissingCodes={",".join(metadata["unconfirmedMissingCodes"]) or "none"}',
-            f'fullMarket.newCodes={",".join(metadata["newCodes"]) or "none"}',
-            f'fullMarket.qualityWarnings={",".join(metadata["qualityWarnings"]) or "none"}',
-            f'fullMarket.publicationCommitSha={commit_sha}',
-            'legacyQuotes.mode=SUPPLEMENTAL_ONLY',
-            'legacyQuotes.validation=SKIPPED_FULL_MARKET_PRIMARY',
-        ])
-        lines.extend([
-            f'html.published={env.get("MARKET_HTML_PUBLISHED", "false")}',
-            f'html.status={env.get("MARKET_HTML_STATUS", "UNAVAILABLE")}',
-            f'html.sha256={env.get("MARKET_HTML_SHA256", "UNAVAILABLE")}',
-            f'html.bytes={env.get("MARKET_HTML_BYTES", "UNAVAILABLE")}',
-            f'html.path={env.get("MARKET_HTML_PATH", "UNAVAILABLE")}',
-        ])
-    else:
-        lines.extend([
-            f'generatedAt={metadata["generatedAt"]}', f'sourceTime={metadata["sourceTime"]}',
-            f'count={metadata["count"]}', f'expectedCount={metadata["expectedCount"]}',
-            f'freshCount={metadata["freshCount"]}', f'coverageCount={metadata["coverageCount"]}',
-            'missingCodes=[]', 'delayTime=0', 'status=ok',
-            f'session={metadata["session"]}', f'priceBasis={metadata["priceBasis"]}'])
     observation = metadata.get('currentObservation') or {}
-    lines.extend([
-        f'currentObservation.status={observation.get("status", "UNAVAILABLE")}',
-        f'currentObservation.session={observation.get("session", "UNAVAILABLE")}',
-        f'currentObservation.targetDate={observation.get("tradingDate", observation.get("targetDate", "UNAVAILABLE"))}',
-        f'currentObservation.manifestPath={observation.get("manifestPath", "UNAVAILABLE")}',
-        f'currentObservation.markdownPath={observation.get("markdownPath", "UNAVAILABLE")}',
-        f'currentObservation.htmlPath={observation.get("htmlPath", "UNAVAILABLE")}',
-        f'currentObservation.reportContractGeneratedAt={observation.get("reportContractGeneratedAt", "UNAVAILABLE")}',
-        f'currentObservation.sourceTime={observation.get("sourceTime", "UNAVAILABLE")}',
-        f'currentObservation.workflowRunId={observation.get("workflowRunId", "UNAVAILABLE")}',
-        f'currentObservation.executionHead={observation.get("executionHead", "UNAVAILABLE")}',
-        f'currentObservation.markdownSha256={observation.get("markdownSha256", "UNAVAILABLE")}',
-        f'currentObservation.htmlSha256={observation.get("htmlSha256", "UNAVAILABLE")}',
-        f'currentObservation.reportStatus={observation.get("reportStatus", "UNAVAILABLE")}',
-        f'currentObservation.tradingDateStatus={observation.get("tradingDateStatus", "UNAVAILABLE")}',
-        f'currentObservation.finalPending={observation.get("finalPending", "UNAVAILABLE")}',
-        f'currentObservation.baselineStale={observation.get("baselineStale", "UNAVAILABLE")}',
-        f'currentObservation.reason={observation.get("reason", "none")}',
-        f'currentObservation.attachmentCount={observation.get("attachmentCount", 0)}',
-        f'currentObservation.attachmentSha256={";".join(item.get("filename", "") + ":" + item.get("sha256", "") for item in observation.get("attachments", [])) or "UNAVAILABLE"}',
-    ])
     markdown_body = observation.get("markdownBody")
-    if isinstance(markdown_body, str) and markdown_body:
-        lines.extend(["", "--- current observation Markdown ---", markdown_body.rstrip()])
-    for key in ('liveCount', 'noAfterTradeCount'):
-        if metadata.get(key) is not None:
-            lines.append(f'{key}={metadata[key]}')
-    if metadata.get('collectionStartedAt'): lines.append(f'collectionStartedAt={metadata["collectionStartedAt"]}')
-    if env.get('MARKET_DATA_COLLECTION_FINISHED_AT'): lines.append(f'collectionFinishedAt={env["MARKET_DATA_COLLECTION_FINISHED_AT"]}')
-    lines.extend([
-        f'fullMarketStatus={env.get("FULL_MARKET_STATUS", "UNKNOWN")}',
-        f'fullMarketFailureReason={env.get("FULL_MARKET_FAILURE_REASON", "UNKNOWN")}',
-        f'fullMarketLastPublishedAt={env.get("FULL_MARKET_LAST_PUBLISHED_AT", "UNKNOWN")}',
-        'fullMarketDataWarning=Do not use prior full-market data as today data',
-    ])
-    message.set_content('\n'.join(lines) + '\n'); return message
+    if not isinstance(markdown_body, str) or not markdown_body.strip():
+        raise ReadyValidationError('current observation Markdown body is unavailable')
+    generated = parse_timestamp(metadata['generatedAt'], 'generatedAt')
+    message = EmailMessage()
+    message['Subject'] = f'{SUBJECT_PREFIX} {generated:%Y-%m-%d %H:%M}'
+    message['From'] = env.get('MARKET_GMAIL_USERNAME', '')
+    message['To'] = env.get('MARKET_GMAIL_TO', '')
+    message.set_content(markdown_body.rstrip() + '\n')
+    return message
 
 def send_ready_email(message, env, smtp_factory=smtplib.SMTP_SSL):
     username = env.get('MARKET_GMAIL_USERNAME'); password = env.get('MARKET_GMAIL_APP_PASSWORD'); recipient = env.get('MARKET_GMAIL_TO')

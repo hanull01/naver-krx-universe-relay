@@ -100,6 +100,9 @@ class MarketDashboardRendererTests(unittest.TestCase):
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
             self.assertNotIn(marker, html_text)
             self.assertNotIn(marker, markdown)
+        for output in (html_text, markdown):
+            self.assertNotIn(" V1 ", output)
+            self.assertNotIn(" V2 ", output)
         self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_text)
         self.assertNotIn("과거 예시 데이터", html_text)
         self.assertEqual(["part1", "part2", "part3"], re.findall(r'<section[^>]+id="(part\d)"', html))
@@ -160,8 +163,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["v2"]["themes"] = []
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
-        self.assertIn("V2 판정 보류 — 원천 검증 대기", html_lib.unescape(html))
-        self.assertIn("V2 판정 보류 — 원천 검증 대기", markdown)
+        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", html_lib.unescape(html))
+        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
@@ -355,7 +358,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
         html = html_lib.unescape(render_dashboard_html(report))
-        self.assertIn("V2 판정 보류 — 원천 검증 대기", html)
+        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", html)
         self.assertNotIn("91.20", html)
         self.assertNotIn("SK하이닉스(000660)", html)
 
