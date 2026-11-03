@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "000270",
   "itemName": "기아",
-  "reportCount": 56,
-  "latestReportNid": "97501",
-  "latestWriteDate": "2026-11-02",
+  "reportCount": 57,
+  "latestReportNid": "97507",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "97501",
-    "writeDate": "2026-11-02",
-    "brokerName": "한화투자증권",
-    "title": "예상 대비 큰 PT/지역 믹스 악화 영향",
-    "goalPrice": 210000,
+    "nid": "97507",
+    "writeDate": "2026-11-03",
+    "brokerName": "키움증권",
+    "title": "가시밭길 위로 EV Riding, 결국 연간 감익으로",
+    "goalPrice": 140000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
+        "positive": 9,
         "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
-        "자동차": 1
+        "자동차": 3,
+        "가격": 2,
+        "파업": 2,
+        "환율": 2,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97507",
     "97501",
     "97487",
     "97473",

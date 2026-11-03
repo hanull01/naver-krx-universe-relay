@@ -2,31 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "020000",
   "itemName": "한섬",
-  "reportCount": 16,
-  "latestReportNid": "96342",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 20,
+  "latestReportNid": "97555",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "96342",
-    "writeDate": "2026-09-29",
-    "brokerName": "iM증권",
-    "title": "좋아질 이유가 많아지고 있다",
-    "goalPrice": 28000,
+    "nid": "97555",
+    "writeDate": "2026-11-03",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Review : 모멘텀 폭격기",
+    "goalPrice": 36000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 7,
-        "negative": 0
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "원가": 1,
+        "자동차": 1,
         "재고": 1
       }
     }
   },
   "reportNids": [
+    "97555",
+    "97534",
+    "97523",
+    "97517",
     "96342",
     "96286",
     "96284",

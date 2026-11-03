@@ -2,31 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "010950",
   "itemName": "S-Oil",
-  "reportCount": 18,
-  "latestReportNid": "95920",
-  "latestWriteDate": "2026-08-28",
+  "reportCount": 22,
+  "latestReportNid": "97548",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "95920",
-    "writeDate": "2026-08-28",
-    "brokerName": "유안타증권",
-    "title": "미국 Valero 마진을 넘어서다!",
-    "goalPrice": 205000,
+    "nid": "97548",
+    "writeDate": "2026-11-03",
+    "brokerName": "하나증권",
+    "title": "역사적 신고가 재경신을 위한 조건: 배당과 샤힌",
+    "goalPrice": 180000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 8,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1
+        "환율": 3,
+        "가격": 2,
+        "AI": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97548",
+    "97527",
+    "97522",
+    "97509",
     "95920",
     "95036",
     "95027",

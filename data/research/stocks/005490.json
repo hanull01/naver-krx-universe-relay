@@ -2,36 +2,41 @@
   "schemaVersion": 1,
   "itemCode": "005490",
   "itemName": "POSCO홀딩스",
-  "reportCount": 19,
-  "latestReportNid": "96610",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 25,
+  "latestReportNid": "97554",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "96610",
-    "writeDate": "2026-10-12",
-    "brokerName": "미래에셋증권",
-    "title": "철강으로 지키고 리튬으로 넓힌다",
-    "goalPrice": 470000,
+    "nid": "97554",
+    "writeDate": "2026-11-03",
+    "brokerName": "한화투자증권",
+    "title": "3분기 컨센서스 상회, 철강·비철 업종 내 최선호주",
+    "goalPrice": 500000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 7
+        "positive": 3,
+        "negative": 6
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 7,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "가격": 3,
+        "수요": 2,
         "원가": 2,
-        "배터리": 1,
         "자동차": 1,
-        "재고": 1,
-        "환율": 1
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97554",
+    "97547",
+    "97541",
+    "97524",
+    "97520",
+    "97516",
     "96610",
     "96450",
     "96403",

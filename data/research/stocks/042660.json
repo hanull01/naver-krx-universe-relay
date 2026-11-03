@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "042660",
   "itemName": "한화오션",
-  "reportCount": 40,
-  "latestReportNid": "97178",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 41,
+  "latestReportNid": "97537",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "97178",
-    "writeDate": "2026-10-28",
-    "brokerName": "DS투자증권",
-    "title": "점차 회복할 실적. 해양과 특수선 수주가 관건",
-    "goalPrice": 100000,
+    "nid": "97537",
+    "writeDate": "2026-11-03",
+    "brokerName": "대신증권",
+    "title": "특수선 모멘텀 시그널",
+    "goalPrice": 102000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 8
+        "positive": 0,
+        "negative": 3
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 7,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "환율": 4,
-        "원가": 2,
-        "수주": 1,
-        "조선": 1
+        "수주": 2,
+        "미국": 1,
+        "조선": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97537",
     "97178",
     "97163",
     "97142",

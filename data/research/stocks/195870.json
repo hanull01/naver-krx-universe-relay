@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "195870",
   "itemName": "해성디에스",
-  "reportCount": 15,
-  "latestReportNid": "97491",
-  "latestWriteDate": "2026-11-02",
+  "reportCount": 16,
+  "latestReportNid": "97521",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "97491",
-    "writeDate": "2026-11-02",
-    "brokerName": "교보증권",
-    "title": "패키지기판 턴어라운드 시작",
-    "goalPrice": 85000,
+    "nid": "97521",
+    "writeDate": "2026-11-03",
+    "brokerName": "키움증권",
+    "title": "기판 실적 기여 시작, 리드프레임 수요 유지가 관건",
+    "goalPrice": 70000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 1
+        "positive": 6,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 3,
+        "가격": 2,
         "자동차": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "97521",
     "97491",
     "97351",
     "96549",

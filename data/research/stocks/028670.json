@@ -2,31 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "028670",
   "itemName": "팬오션",
-  "reportCount": 23,
-  "latestReportNid": "96701",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 29,
+  "latestReportNid": "97550",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "96701",
-    "writeDate": "2026-10-14",
-    "brokerName": "신한투자증권",
-    "title": "빛을 보기 시작한 포트폴리오 변화",
-    "goalPrice": 9700,
+    "nid": "97550",
+    "writeDate": "2026-11-03",
+    "brokerName": "하나증권",
+    "title": "3Q26 Re: Energy & Beyond",
+    "goalPrice": 9000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 1
+        "positive": 5,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 5,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 2
+        "원가": 1,
+        "조선": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97550",
+    "97542",
+    "97538",
+    "97531",
+    "97530",
+    "97526",
     "96701",
     "96696",
     "96545",

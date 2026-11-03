@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "058650",
   "itemName": "세아홀딩스",
-  "reportCount": 1,
-  "latestReportNid": "95798",
-  "latestWriteDate": "2026-08-21",
+  "reportCount": 2,
+  "latestReportNid": "97512",
+  "latestWriteDate": "2026-11-03",
   "latest": {
-    "nid": "95798",
-    "writeDate": "2026-08-21",
-    "brokerName": "신한투자증권",
-    "title": "나도 실적 성장주, 나도 주주환원에 진심!",
-    "goalPrice": 200000,
-    "normalizedOpinion": "BUY",
+    "nid": "97512",
+    "writeDate": "2026-11-03",
+    "brokerName": "한국IR협의회",
+    "title": "실적 개선과 주주환원으로 주가 재평가 기대",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 7,
         "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "97512",
     "95798"
   ]
 }
