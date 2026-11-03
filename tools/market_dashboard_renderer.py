@@ -18,9 +18,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_DIR = ROOT / "report_templates" / "market-dashboard-A-v1.1"
-MANIFEST_PATH = TEMPLATE_DIR / "manifest.json"
-REFERENCE_PATH = TEMPLATE_DIR / "market-dashboard-A-v1.1.reference.html"
-CSS_PATH = TEMPLATE_DIR / "market-dashboard-A-v1.1.css"
 
 
 class TemplateUnavailable(RuntimeError):
