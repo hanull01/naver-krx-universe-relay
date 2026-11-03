@@ -32,7 +32,7 @@ def _read(path: Path) -> dict[str, Any]:
     return payload
 
 
-def _sha256(path: Path) -> str:
+def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
@@ -47,7 +47,7 @@ def _artifact(root: Path, name: str) -> dict[str, Any]:
     return {
         "path": str(path),
         "bytes": path.stat().st_size,
-        "sha256": _sha256(path),
+        "sha256": sha256_file(path),
     }
 
 
