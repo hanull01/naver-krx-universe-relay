@@ -2108,6 +2108,7 @@ def write_markdown(report, path):
     market_summary = report.get("marketSummary") or {}
     full_summary = market_summary.get("fullMarket") or {}
     monitored_summary = market_summary.get("monitoredUniverse") or report.get("monitoredUniverse") or {}
+    historical_source = (report.get("technicalInput") or {}).get("historicalIndicatorSource")
     degraded = report["status"] != "OK"
     lines = [
         f"# 국내증시 일일 종합 리포트 - {report['asOf']}",
@@ -2529,9 +2530,26 @@ def write_markdown(report, path):
             f"{row['changeRate']:+.2f}%"
         )
 
+    if historical_source == "KRX":
+        krx_stock_rows = [
+            row for row in (report.get("stocks") or [])
+            if isinstance(row.get("technical"), dict)
+            and (row.get("technical", {}).get("ma20") is not None
+                 or row.get("technical", {}).get("ma60") is not None)
+        ]
+        if krx_stock_rows:
+            lines.extend(["", "### KRX 확정 기술지표", ""])
+            for row in krx_stock_rows:
+                technical = row.get("technical") or {}
+                lines.append(
+                    f"- {row.get('itemName') or '이름 미확인'} ({row.get('itemCode') or '코드 미확인'}): "
+                    f"MA20 {display_number(technical.get('ma20'), '원')}, "
+                    f"MA60 {display_number(technical.get('ma60'), '원')}, "
+                    f"기준일 {row.get('asOfDate') or '확인 불가'}"
+                )
+
     full_market = report.get("fullMarket", {})
     krx_projection = (report.get("marketSummary") or {}).get("fullMarket") or {}
-    historical_source = (report.get("technicalInput") or {}).get("historicalIndicatorSource")
     krx_projection_available = (
         historical_source == "KRX"
         and isinstance(krx_projection.get("breadth"), dict)
