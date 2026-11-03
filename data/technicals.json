@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T08:01:50.435808+09:00",
+  "generatedAt": "2026-11-03T09:08:34.024840+09:00",
   "expectedCount": 1,
   "count": 1,
   "missingCodes": [],
@@ -18,10 +18,22 @@
       "high52w": 374500.0,
       "high52wComplete": false,
       "avgVolume20": 18120747.1,
-      "volumeRatio20": null,
+      "volumeRatio20": 0.08,
       "status": "ok",
       "confirmedStatus": "ok",
-      "provisional": null
+      "provisional": {
+        "status": "provisional",
+        "basis": "VERIFIED_HISTORY_PLUS_NAVER_CURRENT_PRICE",
+        "sourceTime": "2026-11-03T09:08:32.124759+09:00",
+        "session": "REGULAR",
+        "asOf": "2026-11-03T09:08:32.124759+09:00",
+        "ma5": 228800.0,
+        "ma20": 230775.0,
+        "ma60": 250741.67,
+        "price": 218000,
+        "confirmed": false,
+        "note": "current price is not a completed regular-session OHLCV bar"
+      }
     }
   ]
 }
