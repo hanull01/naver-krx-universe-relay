@@ -19,7 +19,7 @@ class ExternalSchedulerContractTests(unittest.TestCase):
 
     def test_intraday_slot_keeps_intraday_mode(self):
         self.assertIn('run_mode: "intraday"', self.worker)
-        self.assertIn('cron === "7 0-10 * * MON-FRI"', self.worker)
+        self.assertIn('cron === "0 0-10 * * MON-FRI"', self.worker)
 
     def test_duplicate_claim_and_secret_protection_are_explicit(self):
         self.assertIn("SLOT_GATE", self.worker)

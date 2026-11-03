@@ -8,7 +8,7 @@ head_sampling_rate = 1
 
 # Cron activation and Secret registration remain a separate approved operation.
 [triggers]
-crons = ["0 22,23 * * SUN-THU", "7 0-10 * * MON-FRI", "30 11 * * MON-FRI", "10,17,20,30,50 * * * SUN-FRI"]
+crons = ["0 22,23 * * SUN-THU", "0 0-10 * * MON-FRI", "30 11 * * MON-FRI", "10,17,20,30,50 * * * SUN-FRI"]
 
 [vars]
 GITHUB_REPOSITORY = "hanull01/naver-krx-universe-relay"

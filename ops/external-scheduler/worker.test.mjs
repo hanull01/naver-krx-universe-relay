@@ -28,10 +28,10 @@ function apiWith({ existing = null, run = null, commits = [], contents = {} } = 
   return api;
 }
 
-test("09:07 and 10:07 are independent slots", () => {
-  const plan = planForCron("7 0-10 * * 1-5");
-  const nine = slotKeyFor(plan, "7 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 7));
-  const ten = slotKeyFor(plan, "7 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 7));
+test("09:00 and 10:00 are independent slots", () => {
+  const plan = planForCron("0 0-10 * * 1-5");
+  const nine = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 0));
+  const ten = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 0));
   assert.notEqual(nine, ten);
 });
 
@@ -47,7 +47,7 @@ test("the composite daily cron dispatches backfill at 07:00 KST and refresh at 0
   assert.equal(backfill.plan.slot, "07:00");
   assert.equal(refresh.plan.workflow, "refresh.yml");
   assert.deepEqual(refresh.plan.inputs, { run_mode: "intraday" });
-  assert.equal(refresh.plan.slot, "08:00-19:07");
+  assert.equal(refresh.plan.slot, "08:00-19:00");
   assert.notEqual(slotKeyFor(backfill.plan, backfill.slotCron, mondayBackfill), slotKeyFor(refresh.plan, refresh.slotCron, mondayRefresh));
 });
 
@@ -59,7 +59,7 @@ test("the composite daily cron maps UTC Sunday-Thursday to KST Monday-Friday and
 });
 
 test("existing intraday, final, report, and auxiliary cron branches remain intact", () => {
-  assert.equal(planForCron("7 0-10 * * MON-FRI").key, "refresh-intraday");
+  assert.equal(planForCron("0 0-10 * * MON-FRI").key, "refresh-intraday");
   assert.equal(planForCron("30 11 * * MON-FRI").key, "refresh-final");
   assert.equal(planForCron("0 14 * * MON-FRI").key, "daily-report");
   assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
@@ -127,12 +127,12 @@ test("Durable Object claim is idempotent and records state", async () => {
     list: async () => values,
   } };
   const gate = new SlotGate(state);
-  const request = () => new Request("https://slot-gate/claim", { method: "POST", body: JSON.stringify({ slotKey: "refresh:2026-10-27T09:07" }) });
+  const request = () => new Request("https://slot-gate/claim", { method: "POST", body: JSON.stringify({ slotKey: "refresh:2026-10-27T09:00" }) });
   assert.equal((await gate.fetch(request())).status, 201);
   assert.equal((await gate.fetch(request())).status, 409);
-  const stateResponse = await gate.fetch(new Request("https://slot-gate/state", { method: "POST", body: JSON.stringify({ slotKey: "refresh:2026-10-27T09:07", status: "RUN_VERIFIED" }) }));
+  const stateResponse = await gate.fetch(new Request("https://slot-gate/state", { method: "POST", body: JSON.stringify({ slotKey: "refresh:2026-10-27T09:00", status: "RUN_VERIFIED" }) }));
   assert.equal(stateResponse.status, 200);
-  assert.equal(values.get("refresh:2026-10-27T09:07").status, "RUN_VERIFIED");
+  assert.equal(values.get("refresh:2026-10-27T09:00").status, "RUN_VERIFIED");
 });
 
 test("existing scheduled run blocks external dispatch", async () => {
@@ -146,7 +146,7 @@ test("existing scheduled run blocks external dispatch", async () => {
 test("dispatch matches the newly created run and reports missing publication", async () => {
   const dispatchedRun = { id: 101, event: "workflow_dispatch", created_at: new Date(Date.now()).toISOString(), status: "completed", conclusion: "success", head_sha: "abc" };
   const api = apiWith({ run: dispatchedRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_VERIFIED");
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
   assert.equal(result.runId, 101);
@@ -155,7 +155,7 @@ test("dispatch matches the newly created run and reports missing publication", a
 test("a run created before dispatch is not matched", async () => {
   const oldRun = { id: 104, event: "workflow_dispatch", created_at: new Date(Date.now() - 60_000).toISOString(), status: "completed", conclusion: "success", head_sha: "old" };
   const api = apiWith({ run: oldRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_UNVERIFIED");
 });
 
@@ -167,7 +167,7 @@ test("GitHub dispatch errors are surfaced", async () => {
     throw new Error(`unexpected path ${path}`);
   };
   await assert.rejects(
-    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
+    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
     /GITHUB_HTTP_500/,
   );
 });
@@ -282,7 +282,7 @@ test("FINAL date mismatch is not accepted", async () => {
 test("a long-running Run returns its identity for later completion polling", async () => {
   const run = { id: 105, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "in_progress", head_sha: "long" };
   const api = apiWith({ run });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("7 0-10 * * 1-5"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.runId, 105);
   const completed = { ...run, status: "completed", conclusion: "success", updated_at: new Date().toISOString() };
@@ -291,7 +291,7 @@ test("a long-running Run returns its identity for later completion polling", asy
     if (path.includes("/commits?")) return [];
     throw new Error(`unexpected path ${path}`);
   };
-  const later = await verifyRunCompletion(completionApi, repo, planForCron("7 0-10 * * 1-5"), run);
+  const later = await verifyRunCompletion(completionApi, repo, planForCron("0 0-10 * * 1-5"), run);
   assert.equal(later.status, "RUN_VERIFIED");
   assert.equal(later.publicationStatus, "PUBLISH_UNVERIFIED");
 });
@@ -350,7 +350,7 @@ test("Run creation remains observable at the 60-second boundary", async () => {
     if (path.includes("/actions/runs/107")) return run;
     throw new Error(`unexpected path ${path}`);
   };
-  const result = await waitForDispatchedRun(api, repo, planForCron("7 0-10 * * 1-5"), Date.now(), async () => { sleeps += 1; });
+  const result = await waitForDispatchedRun(api, repo, planForCron("0 0-10 * * 1-5"), Date.now(), async () => { sleeps += 1; });
   assert.equal(sleeps, 12);
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.run.id, 107);
