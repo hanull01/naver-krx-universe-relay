@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T17:01:16.800226+09:00",
-  "collectionStartedAt": "2026-11-03T17:01:15.967220+09:00",
+  "generatedAt": "2026-11-03T18:01:07.012076+09:00",
+  "collectionStartedAt": "2026-11-03T18:01:06.015885+09:00",
   "source": "NAVER_KRX",
   "count": 1,
   "expectedCount": 1,
@@ -13,8 +13,8 @@
   "fresh": true,
   "errors": [],
   "missingCodes": [],
-  "sourceTime": "2026-11-03T17:01:16.703627+09:00",
-  "sourceTimeLatest": "2026-11-03T17:01:16.703627+09:00",
+  "sourceTime": "2026-11-03T18:01:06.942947+09:00",
+  "sourceTimeLatest": "2026-11-03T18:01:06.942947+09:00",
   "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
   "datas": [
     {
@@ -26,11 +26,11 @@
       "openPrice": 220500,
       "highPrice": 223000,
       "lowPrice": 217000,
-      "accumulatedTradingVolume": 13000613,
-      "accumulatedTradingValue": 2857818000000,
+      "accumulatedTradingVolume": 13084484,
+      "accumulatedTradingValue": 2876228000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-03T17:01:16.703627+09:00",
-      "localTradedAt": "2026-11-03T17:01:16.703627+09:00",
+      "sourceTime": "2026-11-03T18:01:06.942947+09:00",
+      "localTradedAt": "2026-11-03T18:01:06.942947+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -41,8 +41,8 @@
       "marketSessionType": "afterMarket",
       "overMarketPriceInfo": {
         "tradingSessionType": "AFTER_MARKET",
-        "overPrice": "220,000",
-        "localTradedAt": "2026-11-03T17:01:16.703658+09:00"
+        "overPrice": "219,500",
+        "localTradedAt": "2026-11-03T18:01:06.942977+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
@@ -51,7 +51,7 @@
       "session": "AFTER",
       "priceBasis": "AFTER_MARKET",
       "sessionPrice": 220000,
-      "sessionSourceTime": "2026-11-03T17:01:16.703627+09:00",
+      "sessionSourceTime": "2026-11-03T18:01:06.942947+09:00",
       "sessionPriceBasis": "AFTER_MARKET",
       "sessionStatus": "LIVE",
       "referencePrice": null,
