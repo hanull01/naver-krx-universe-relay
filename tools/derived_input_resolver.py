@@ -9,10 +9,11 @@ snapshots.
 from __future__ import annotations
 
 import json
-import hashlib
 import re
 from pathlib import Path
 from typing import Any, Mapping
+
+from tools.file_digest import sha256_bytes, sha256_file
 
 
 DATE_RE = re.compile(r"^\d{8}$")
@@ -68,16 +69,9 @@ def _read_json(
     if not isinstance(payload, dict):
         raise DerivedInputError(f"DERIVED_JSON_OBJECT_REQUIRED:{path}")
     if cache is not None:
-        cache[path] = (payload, hashlib.sha256(raw).hexdigest(), len(raw))
+        cache[path] = (payload, sha256_bytes(raw), len(raw))
     return payload
 
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def _verify_artifact_record(
@@ -106,7 +100,7 @@ def _verify_artifact_record(
         raise DerivedInputError(f"DERIVED_ARTIFACT_MISSING:{name}")
     cached = cache.get(path) if cache is not None else None
     if cached is None:
-        actual_sha = _sha256(path)
+        actual_sha = sha256_file(path)
         actual_bytes = path.stat().st_size
     else:
         actual_sha, actual_bytes = cached[1], cached[2]
