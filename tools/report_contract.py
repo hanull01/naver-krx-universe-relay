@@ -153,22 +153,6 @@ def _valid_code_name_rows(stocks: list[Any], symbols: list[Any], bindings: Any) 
     return bool(stocks)
 
 
-def _compact_theme_rows(rows: Any) -> list[dict[str, Any]]:
-    """Keep theme metrics without duplicating every member quote row."""
-    compact: list[dict[str, Any]] = []
-    for row in rows or []:
-        if not isinstance(row, Mapping):
-            continue
-        item = dict(row)
-        stocks = item.pop("stocks", None)
-        if isinstance(stocks, list):
-            item["stockDetailCount"] = len(stocks)
-            item["stockDetailSource"] = (
-                "data/monitoring/latest-theme-signals.json#themes[].stocks"
-            )
-        compact.append(item)
-    return compact
-
 
 _GROUP_SUMMARY_FIELDS = (
     "id", "name", "kind", "status", "v1Status", "v2Status",

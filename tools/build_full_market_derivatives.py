@@ -9,7 +9,6 @@ canonical file and records its content hash.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import statistics
@@ -17,6 +16,8 @@ from collections import deque
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
+
+from tools.file_digest import sha256_bytes, sha256_file
 
 
 ROLLING_WINDOW = 120
@@ -93,18 +94,10 @@ def _date(value: Any) -> str | None:
     return text
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
 def _write_json(path: Path, payload: Mapping[str, Any]) -> dict[str, Any]:
     encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
     path.write_text(encoded, encoding="utf-8")
-    return {"path": str(path), "bytes": len(encoded.encode("utf-8")), "sha256": hashlib.sha256(encoded.encode("utf-8")).hexdigest()}
+    return {"path": str(path), "bytes": len(encoded.encode("utf-8")), "sha256": sha256_bytes(encoded.encode("utf-8"))}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -236,7 +229,7 @@ def _load_asset_files(directory: Path, *, source_kind: str) -> tuple[dict[str, l
         assets[code] = rows
         file_meta[code] = {
             "sourceCanonicalPath": str(path),
-            "sourceCanonicalSha256": _sha256(path),
+            "sourceCanonicalSha256": sha256_file(path),
             "historyCount": line_count,
             "sourceDateRange": {
                 "earliest": _date(first_row.get("date")) if isinstance(first_row, dict) else None,
@@ -472,7 +465,7 @@ def _write_rolling_history(
             "assetType": asset_type,
             "path": str(path.relative_to(output)),
             "bytes": path.stat().st_size,
-            "sha256": _sha256(path),
+            "sha256": sha256_file(path),
             "rowCount": len(rows),
             "earliest": rows[0]["date"] if rows else None,
             "latest": rows[-1]["date"] if rows else None,
