@@ -141,6 +141,13 @@ evaluator without changing their formulas. It overlays only KRX historical
 MA/return/prior-high fields onto the existing feature scope and keeps NAVER
 current price, change rate, and trading value as current observations.
 
+For impact analysis, the analysis trading date is the NAVER current snapshot
+date and the KRX technical date is retained separately. The legacy engine's
+`ret_1d` input is supplied from NAVER's current `changeRate`; KRX's confirmed
+one-day return is retained as `krx_ret_1d_pct` and is not used as today's
+relative strength. KRX historical close/volume validity and NAVER current
+quote validity are separate fields.
+
 The KRX `volume_ratio_prev20` field is retained as
 `krx_volume_ratio_prev20`; it is never copied into
 `current_volume_ratio_20`. Missing KRX fields remain nullable and there is no

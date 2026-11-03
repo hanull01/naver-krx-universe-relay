@@ -5,8 +5,10 @@ from pathlib import Path
 
 from tools.krx_v1v2_impact import (
     KrxImpactError,
+    build_current_naver_scope,
     build_krx_overlay_features,
     load_m10_entities,
+    _analysis_features,
 )
 
 
@@ -74,6 +76,37 @@ class KrxV1V2ImpactTests(unittest.TestCase):
         )
         self.assertEqual(features, [])
         self.assertEqual(diagnostics["missingCodes"], ["005930"])
+
+    def test_current_scope_expands_from_registry_without_filling_history(self):
+        existing = [{"code": "005930", "ma20": 1, "name": "old"}]
+        registry = {"assets": [
+            {"code": "005930", "assetType": "STOCK", "name": "삼성전자", "market": "KOSPI",
+             "currentPrice": 219500, "changeRate": -1.57, "change": -3500,
+             "accumulatedTradingVolume": 100, "accumulatedTradingValue": 200,
+             "openPrice": 220000, "highPrice": 221000, "lowPrice": 218000,
+             "snapshotGeneratedAt": "2026-11-03T11:00:00+09:00"},
+            {"code": "000660", "assetType": "STOCK", "name": "SK하이닉스", "market": "KOSPI",
+             "currentPrice": 100000, "changeRate": 1.0, "change": 1000,
+             "accumulatedTradingVolume": 10, "accumulatedTradingValue": 20,
+             "openPrice": 99000, "highPrice": 101000, "lowPrice": 98000},
+            {"code": "0000D0", "assetType": "ETF", "name": "ETF", "market": "KOSPI"},
+        ]}
+        rows = build_current_naver_scope(existing, registry, current_observation_date="20261103")
+        self.assertEqual([row["code"] for row in rows], ["000660", "005930"])
+        new_listing = next(row for row in rows if row["code"] == "000660")
+        self.assertIsNone(new_listing.get("ma20"))
+        self.assertEqual(new_listing["currentObservationDate"], "20261103")
+
+    def test_analysis_uses_naver_current_return_and_preserves_krx_return(self):
+        rows = _analysis_features([{
+            "code": "005930", "currentPrice": 222000, "changeRate": -3.06,
+            "change": -7000, "accumulatedTradingVolume": 100,
+            "openPrice": 223000, "highPrice": 224000, "lowPrice": 221000,
+            "ret_1d": 1.777777, "krx_ret_1d_pct": 1.777777,
+        }])
+        self.assertEqual(rows[0]["ret_1d"], -3.06)
+        self.assertEqual(rows[0]["krx_ret_1d_pct"], 1.777777)
+        self.assertEqual(rows[0]["analysisReturn1dSource"], "NAVER_CURRENT_CHANGE_RATE")
 
 
 if __name__ == "__main__":

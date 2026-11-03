@@ -155,6 +155,58 @@ def load_existing_feature_scope(theme_signals_path: str | Path,
     return [by_code[code] for code in sorted(by_code)]
 
 
+def build_current_naver_scope(existing_rows: Iterable[Mapping[str, Any]],
+                              registry: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+                              *, current_observation_date: str) -> list[dict[str, Any]]:
+    """Expand legacy features to the complete current NAVER STOCK snapshot.
+
+    Existing historical fields are retained where present.  Current quote
+    fields always come from the supplied current snapshot, and missing legacy
+    history stays missing rather than being filled from another source.
+    """
+    current_date = _date(current_observation_date)
+    existing = {str(row.get("code")): dict(row) for row in existing_rows if row.get("code")}
+    rows = _registry_by_code(registry)
+    output = []
+    for code, current in sorted(rows.items()):
+        if str(current.get("assetType") or "STOCK").upper() != "STOCK":
+            continue
+        row = dict(existing.get(code, {}))
+        row.update({
+            "code": code,
+            "name": current.get("name") or row.get("name"),
+            "market": current.get("market") or row.get("market"),
+            "assetType": "STOCK",
+            "currentPrice": current.get("currentPrice"),
+            "change": current.get("change"),
+            "changeRate": current.get("changeRate"),
+            "accumulatedTradingVolume": current.get("accumulatedTradingVolume"),
+            "accumulatedTradingValue": current.get("accumulatedTradingValue"),
+            "openPrice": current.get("openPrice"),
+            "highPrice": current.get("highPrice"),
+            "lowPrice": current.get("lowPrice"),
+            "high52Week": current.get("high52Week"),
+            "snapshotGeneratedAt": current.get("snapshotGeneratedAt"),
+            "currentObservationSource": "NAVER",
+            "currentObservationDate": current_date,
+        })
+        output.append(row)
+    return output
+
+
+def _naver_current_validity(row: Mapping[str, Any]) -> dict[str, bool]:
+    close = _number(row.get("currentPrice"))
+    volume = _number(row.get("accumulatedTradingVolume"))
+    open_ = _number(row.get("openPrice"))
+    high = _number(row.get("highPrice"))
+    low = _number(row.get("lowPrice"))
+    close_valid = close is not None and close > 0
+    ohlc_valid = close_valid and None not in (open_, high, low) and high >= max(open_, close) and low <= min(open_, close)
+    volume_valid = volume is not None and volume > 0
+    return {"close_valid": close_valid, "ohlc_valid": ohlc_valid,
+            "volume_valid": volume_valid, "traded_bar": close_valid and ohlc_valid and volume_valid}
+
+
 def _current_fields(base: Mapping[str, Any]) -> dict[str, Any]:
     """Keep NAVER quote fields and never reinterpret them as KRX history."""
     return {
@@ -162,6 +214,7 @@ def _current_fields(base: Mapping[str, Any]) -> dict[str, Any]:
         for key in (
             "code", "name", "market", "currentPrice", "change", "changeRate",
             "accumulatedTradingValue", "currentHigh", "snapshotGeneratedAt",
+            "accumulatedTradingVolume", "openPrice", "highPrice", "lowPrice",
             "close_valid", "ohlc_valid", "volume_valid", "traded_bar",
         )
         if key in base
@@ -176,6 +229,7 @@ def _overlay_row(base: Mapping[str, Any], entity: Mapping[str, Any], *, target_d
     close = _number(entity.get("close_regular"))
     volume = _number(entity.get("official_daily_volume"))
     current_price = _number(base.get("currentPrice"))
+    naver_validity = _naver_current_validity(base)
     row = _current_fields(base)
     row.update({
         "name": base.get("name") or entity.get("name"),
@@ -187,6 +241,13 @@ def _overlay_row(base: Mapping[str, Any], entity: Mapping[str, Any], *, target_d
         "currentObservationDate": current_observation_date,
         "krx_regular_close": close,
         "krx_official_daily_volume": volume,
+        "krx_close_valid": close is not None and close > 0,
+        "krx_volume_valid": volume is not None and volume > 0,
+        "krx_traded_bar": close is not None and close > 0 and volume is not None and volume > 0,
+        "naver_current_close_valid": naver_validity["close_valid"],
+        "naver_current_ohlc_valid": naver_validity["ohlc_valid"],
+        "naver_current_volume_valid": naver_validity["volume_valid"],
+        "naver_current_traded_bar": naver_validity["traded_bar"],
         "close_valid": close is not None and close > 0,
         # M10 interchange does not provide regular high/low.  Do not claim
         # confirmed OHLC or synthesize intraday breakout fields.
@@ -227,6 +288,7 @@ def _overlay_row(base: Mapping[str, Any], entity: Mapping[str, Any], *, target_d
     for window in RETURN_WINDOWS:
         value = _number(returns.get(f"return_{window}d_pct"))
         row[f"ret_{window}d"] = value
+        row[f"krx_ret_{window}d_pct"] = value
     for window in (20, 60, 120):
         row[f"above_ma{window}"] = current_price > row.get(f"ma{window}") if current_price and row.get(f"ma{window}") else None
     row["ma20_rising"] = None
@@ -237,7 +299,6 @@ def _overlay_row(base: Mapping[str, Any], entity: Mapping[str, Any], *, target_d
     )
     row["provenance"] = {
         "source": "KRX_OPEN_API",
-        "sourceApi": entity.get("source_api"),
         "identity": entity.get("identity"),
         "historicalDate": target_date,
         "currentObservationSource": "NAVER",
@@ -303,6 +364,17 @@ def build_krx_overlay_features(
         key: sum(item["missing"].get(key, False) for item in diagnostics)
         for key in MISSING_METRIC_KEYS
     }
+    missing_details = [
+        {
+            "code": code,
+            "assetType": str(registry_rows.get(code, {}).get("assetType") or "UNKNOWN").upper(),
+            "market": registry_rows.get(code, {}).get("market"),
+            "name": registry_rows.get(code, {}).get("name"),
+            "reason": "NO_M10_ENTITY_FOR_KRX_TARGET_DATE",
+            "exactCause": "UNVERIFIED_FROM_LOCAL_EVIDENCE",
+        }
+        for code in sorted(missing_codes)
+    ]
     return output, {
         "targetDate": target,
         "currentObservationDate": current_date,
@@ -311,6 +383,7 @@ def build_krx_overlay_features(
         "overlayCount": len(output),
         "m10StockCount": len(entities),
         "missingCodes": sorted(missing_codes),
+        "missingCodeDetails": missing_details,
         "extraKrxCodes": extra_krx_codes,
         "duplicateBaseCodes": sorted(set(duplicate_base)),
         "mixedAssetCodes": sorted(set(mixed_asset_codes)),
@@ -383,7 +456,7 @@ def _v1_input(industry_payload: Mapping[str, Any], theme_membership: Mapping[str
         metrics = {
             "relativeStrength": group.get("averageChangeRate"),
             "advancerPct": group.get("risingCount", 0) * 100 / group.get("knownQuoteCount", 1),
-            "turnoverConcentrationPct": 0,
+            "turnoverConcentrationPct": None,
             "pctAboveMA20": pct(sum(row.get("above_ma20") is True for row in above), len(above)),
             "leaderCount": len(group.get("leaders", [])),
         }
@@ -392,7 +465,7 @@ def _v1_input(industry_payload: Mapping[str, Any], theme_membership: Mapping[str
         )
         ranked_themes.append({
             **group,
-            "verifiedMembership": True,
+            "verifiedMembership": group.get("status") == "OK",
             "membershipStatus": group.get("status"),
             "systemLeaders": group.get("leaders", []),
             "score": score,
@@ -419,21 +492,22 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
                          *, industries: Mapping[str, Any], industry_membership: Mapping[str, Any],
                          theme_membership: Mapping[str, Any], previous: Mapping[str, Any],
                          universe: Mapping[str, Any], policy: Mapping[str, Any],
-                         asset_registry: Mapping[str, Any], trading_date: str) -> dict[str, Any]:
+                         asset_registry: Mapping[str, Any], analysis_trading_date: str,
+                         krx_technical_date: str) -> dict[str, Any]:
     """Run unchanged aggregators/engines against two isolated feature sets."""
     # The published theme payload predates a few optional compatibility
     # fields.  Fill only structural defaults; never invent historical values.
-    existing_features = [_canonicalize_existing_row(row) for row in existing_features]
-    krx_features = [_canonicalize_existing_row(row) for row in krx_features]
+    existing_features = _analysis_features(existing_features)
+    krx_features = _analysis_features(krx_features)
     results = {}
     for label, features in (("existing", existing_features), ("krx", krx_features)):
         quality, industry_rows = aggregate_industries(
             features, industries, industry_membership
         )
         industry_payload = {"quality": quality, "industries": industry_rows}
-        theme_payload = build_theme_signals(trading_date, features, theme_membership)
+        theme_payload = build_theme_signals(analysis_trading_date, features, theme_membership)
         context = _v1_input(
-            industry_payload, theme_membership, features, trading_date=trading_date,
+            industry_payload, theme_membership, features, trading_date=analysis_trading_date,
             sector_policy=policy.get("sector", {}),
         )
         v1 = universe_manager.build_management_result(
@@ -441,7 +515,7 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
             generated_at="2026-11-03T00:00:00+09:00", asset_registry=asset_registry,
         )
         v2 = evaluate_snapshot(
-            {"tradingDate": trading_date, **industry_payload},
+            {"tradingDate": analysis_trading_date, **industry_payload},
             theme_payload,
             v1,
         )
@@ -455,6 +529,7 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
     return {
         "existing": results["existing"],
         "krx": results["krx"],
+        "causeDecomposition": _cause_decomposition(existing_features, krx_features),
         "industryComparison": compare_group_rows(results["existing"]["industry"], results["krx"]["industry"], kind="industry"),
         "themeComparison": compare_group_rows(results["existing"]["theme"], results["krx"]["theme"], kind="theme"),
         "v1Comparison": {
@@ -476,6 +551,11 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
         "contract": {
             "historicalSource": "KRX",
             "currentObservationSource": "NAVER",
+            "analysisTradingDate": _date(analysis_trading_date),
+            "krxTechnicalDate": _date(krx_technical_date),
+            "krxReturn1dField": "krx_ret_1d_pct",
+            "analysisReturn1dField": "ret_1d",
+            "analysisReturn1dSource": "NAVER_CURRENT_CHANGE_RATE",
             "volumeRatio20": "UNAVAILABLE_FOR_INTRADAY; KRX volume_ratio_prev20 kept separate",
             "naverHistoricalFallback": False,
         },
@@ -484,11 +564,96 @@ def run_v1_v2_comparison(existing_features: list[dict[str, Any]], krx_features: 
 
 def _canonicalize_existing_row(row: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(row)
+    result.setdefault("legacy_historical_ret_1d", result.get("ret_1d"))
+    historical_fields = [f"ma{window}" for window in HISTORICAL_WINDOWS]
+    historical_fields.extend(f"ret_{window}d" for window in RETURN_WINDOWS)
+    result.setdefault("legacyHistoricalMetricAvailableCount",
+                      sum(row.get(field) is not None for field in historical_fields))
     result.setdefault("accumulatedTradingValue", None)
     result.setdefault("ma5", None)
+    for key in (
+        "ret_1d", "ret_5d", "ret_20d", "ret_60d", "ret_120d", "ret_240d",
+        "above_ma20", "above_ma60", "above_ma120", "breakout_20_intraday",
+        "breakout_60_intraday", "near_52week_high", "current_volume_ratio_20",
+    ):
+        result.setdefault(key, None)
     result.setdefault("traded_bar", bool(result.get("close_valid") and result.get("volume_valid")))
     result.setdefault("derivedMetricsUsable", True)
     return result
+
+
+def _analysis_features(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Prepare engine inputs with today's NAVER return as the 1-day signal.
+
+    KRX historical returns remain available under ``krx_ret_*``.  The legacy
+    engines still read ``ret_1d`` by contract, so this adapter supplies the
+    NAVER current change rate there without changing any engine formula.
+    """
+    output = []
+    for row in rows:
+        result = _canonicalize_existing_row(row)
+        validity = _naver_current_validity(result)
+        result.update({
+            "naver_current_close_valid": validity["close_valid"],
+            "naver_current_ohlc_valid": validity["ohlc_valid"],
+            "naver_current_volume_valid": validity["volume_valid"],
+            "naver_current_traded_bar": validity["traded_bar"],
+            "close_valid": validity["close_valid"],
+            "ohlc_valid": validity["ohlc_valid"],
+            "volume_valid": validity["volume_valid"],
+            "traded_bar": validity["traded_bar"],
+            "naver_current_return_1d_pct": _number(result.get("changeRate")) if validity["close_valid"] else None,
+            "analysisReturn1dSource": "NAVER_CURRENT_CHANGE_RATE",
+            "ret_1d": _number(result.get("changeRate")) if validity["close_valid"] else None,
+        })
+        output.append(result)
+    return output
+
+
+def _cause_decomposition(existing: Iterable[Mapping[str, Any]],
+                         krx: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    left = {str(row.get("code")): row for row in existing if row.get("code")}
+    right = {str(row.get("code")): row for row in krx if row.get("code")}
+    common = sorted(set(left) & set(right))
+    ma_fields = [f"ma{window}" for window in HISTORICAL_WINDOWS]
+    return_fields = [f"ret_{window}d" for window in RETURN_WINDOWS]
+    ma_changed = [code for code in common if any(left[code].get(field) != right[code].get(field) for field in ma_fields)]
+    historical_return_changed = []
+    for code in common:
+        old = left[code]
+        new = right[code]
+        pairs = [("legacy_historical_ret_1d", "krx_ret_1d_pct")]
+        pairs.extend((f"ret_{window}d", f"krx_ret_{window}d_pct") for window in RETURN_WINDOWS if window != 1)
+        if any(old.get(a) != new.get(b) for a, b in pairs):
+            historical_return_changed.append(code)
+    current_quote_changed = [code for code in common if any(
+        left[code].get(field) != right[code].get(field)
+        for field in ("currentPrice", "change", "changeRate", "accumulatedTradingValue")
+    )]
+    return {
+        "population": {
+            "existingCurrentScope": len(left), "krxScope": len(right),
+            "common": len(common), "existingOnly": sorted(set(left) - set(right)),
+            "krxOnly": sorted(set(right) - set(left)),
+        },
+        "ma": {"changedCodeCount": len(ma_changed), "changedCodes": ma_changed},
+        "historicalReturns": {"changedCodeCount": len(historical_return_changed),
+                               "changedCodes": historical_return_changed,
+                               "oneDayAnalysisSource": "NAVER_CURRENT_CHANGE_RATE"},
+        "currentQuote": {"changedCodeCount": len(current_quote_changed),
+                          "changedCodes": current_quote_changed,
+                          "source": "NAVER_CURRENT"},
+        "dataMissing": {
+            "krxHistoricalRowsMissingFromCurrentScope": len(set(left) - set(right)),
+            "naverHistoricalRowsUnavailableInExistingScope": sum(
+                left[code].get("legacyHistoricalMetricAvailableCount", 0) == 0 for code in left
+            ),
+            "naverHistoricalRowsPartialInExistingScope": sum(
+                0 < left[code].get("legacyHistoricalMetricAvailableCount", 0) < len(ma_fields + return_fields)
+                for code in left
+            ),
+        },
+    }
 
 
 def _status_changes(left: Iterable[Mapping[str, Any]], right: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
@@ -549,8 +714,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--target-date", required=True)
     parser.add_argument("--current-date", required=True)
     args = parser.parse_args(argv)
-    base_rows = load_existing_feature_scope(args.base, args.stock_signals)
     registry = _read_json(args.registry)
+    base_rows = build_current_naver_scope(
+        load_existing_feature_scope(args.base, args.stock_signals),
+        registry,
+        current_observation_date=args.current_date,
+    )
     m10 = load_m10_entities(args.m10, expected_date=args.target_date)
     overlay, diagnostics = build_krx_overlay_features(
         base_rows, m10, expected_date=args.target_date,
@@ -566,7 +735,9 @@ def main(argv: list[str] | None = None) -> int:
         base_rows, overlay, industries=industries,
         industry_membership=industry_membership, theme_membership=theme_membership,
         previous=previous, universe=universe, policy=policy,
-        asset_registry=registry, trading_date=_date(args.target_date),
+        asset_registry=registry,
+        analysis_trading_date=_date(args.current_date),
+        krx_technical_date=_date(args.target_date),
     )
     payload = {"diagnostics": diagnostics, "comparison": comparison}
     Path(args.out).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
