@@ -17,7 +17,7 @@ from typing import Any, Mapping
 
 from tools.file_digest import sha256_bytes, sha256_file
 
-from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
+from tools.report_contract import MAX_WORK_CONTRACT_BYTES, compact_code_diagnostic, validate_contract_payload
 
 
 class ReportContractProjectionError(ValueError):
@@ -283,8 +283,18 @@ def build_report_contract_projection(
             round(krx_observed_count * 100 / krx_instrument_count, 6)
             if isinstance(krx_instrument_count, int) and krx_instrument_count > 0 else None
         )
-        quality_summary["missingHistoryCodes"] = list(
-            quality_summary.get("missingHistoryCodes") or quality_summary.get("missingCodes") or []
+    quality_summary["missingCodes"] = compact_code_diagnostic(
+        quality_summary.get("missingCodes") or [],
+        source_path="quality.json#missingCodes",
+    )
+    quality_summary["missingHistoryCodes"] = compact_code_diagnostic(
+        quality_summary.get("missingHistoryCodes") or quality.get("missingCodes") or [],
+        source_path="quality.json#missingHistoryCodes",
+    )
+    for field in ("regularSessionUnavailableCodes", "currentSnapshotMissingCodes"):
+        quality_summary[field] = compact_code_diagnostic(
+            quality_summary.get(field) or [],
+            source_path=f"quality.json#{field}",
         )
     contract = {
         "schemaVersion": "market-report-contract-v1",
