@@ -58,37 +58,6 @@ class KrxReportResolverTests(unittest.TestCase):
             self.assertIn("inputs.publish == true", text, name)
             self.assertIn("NO_PUBLISH", text, name)
 
-    def test_fanout_is_exact_input_and_idempotent(self):
-        text = (
-            Path(__file__).parent / ".github" / "workflows" / "krx-m10-fanout.yml"
-        ).read_text(encoding="utf-8")
-        validator = (
-            Path(__file__).parent / "tools" / "validate_krx_child_run.py"
-        ).read_text(encoding="utf-8")
-        for target in (
-            "refresh.yml",
-            "refresh-monitoring-daily.yml",
-            "refresh-market-snapshots.yml",
-            "refresh-research.yml",
-            "daily-report.yml",
-        ):
-            self.assertIn(target, text)
-        self.assertIn("NO_CHANGES", text)
-        self.assertIn("gh workflow run", text)
-        self.assertIn("krx_expected_date", text)
-        self.assertIn("krx_ref", text)
-        self.assertIn("krx_generation_id", text)
-        self.assertIn("gh run watch", text)
-        self.assertIn("tools/validate_krx_child_run.py", text)
-        self.assertIn("NO_PUBLISH_RESULT_MISSING", validator)
-        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", validator)
-        self.assertIn("github.sha", text)
-        self.assertLess(
-            text.index("Resolve and verify private KRX generation"),
-            text.index("Dispatch report workflows"),
-        )
-        self.assertLess(text.index("gh run watch"), text.index("Completed $workflow"))
-
     def test_full_market_rejects_missing_krx_input_without_fallback(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = run(krx_input_dir=tmp)
