@@ -1164,6 +1164,48 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["status"], "OK")
         self.assertEqual(got["mismatches"], [])
 
+    def test_date_alignment_accepts_krx_historical_and_naver_current_dates_separately(self):
+        got = daily_report.date_alignment(
+            "2026-11-03",
+            {"indices": [{"sourceTime": "2026-11-04T08:05:00+09:00"}]},
+            {
+                "status": "AVAILABLE", "asOfDate": "20261103",
+                "snapshotDate": "20261103", "snapshotDateStatus": "DERIVED_TARGET_DATE",
+                "maBasisDates": ["20261103"],
+                "marketTradingValue": {
+                    "KOSPI": {"sourceTime": "2026-11-03T15:30:00+09:00"},
+                },
+            },
+            observed_date="20261104",
+            historical_source="KRX",
+            current_snapshot_source="NAVER_SEPARATE",
+        )
+        self.assertEqual(got["status"], "SEPARATE_SOURCES_ALIGNED")
+        self.assertEqual(got["dateAlignmentMode"], "KRX_HISTORICAL_NAVER_CURRENT_SEPARATE")
+        self.assertEqual(got["historicalAsOfDate"], "20261103")
+        self.assertEqual(got["observedDate"], "20261104")
+        self.assertEqual(got["indexAlignmentStatus"], "ALIGNED_TO_OBSERVED_DATE")
+        self.assertEqual(got["mismatches"], [])
+
+    def test_date_alignment_rejects_old_naver_current_index_for_separate_sources(self):
+        got = daily_report.date_alignment(
+            "2026-11-03",
+            {"indices": [{"sourceTime": "2026-11-02T15:30:00+09:00"}]},
+            {
+                "status": "AVAILABLE", "asOfDate": "20261103",
+                "snapshotDate": "20261103", "snapshotDateStatus": "DERIVED_TARGET_DATE",
+                "maBasisDates": ["20261103"],
+                "marketTradingValue": {
+                    "KOSPI": {"sourceTime": "2026-11-03T15:30:00+09:00"},
+                },
+            },
+            observed_date="20261104",
+            historical_source="KRX",
+            current_snapshot_source="NAVER_SEPARATE",
+        )
+        self.assertEqual(got["status"], "PARTIAL")
+        self.assertIn("OBSERVED_VS_INDEX_SOURCE_DATE", got["mismatches"])
+
     def test_date_alignment_reports_unavailable_full_market_and_index_mismatch(self):
         got = daily_report.date_alignment(
             "2026-10-16",

@@ -232,15 +232,43 @@ def full_market_date_evidence(payloads):
     }
 
 
-def date_alignment(report_date, indices, full_market):
-    """Describe date alignment without treating source timestamps as trading dates."""
+def date_alignment(
+    report_date,
+    indices,
+    full_market,
+    *,
+    observed_date=None,
+    historical_source=None,
+    current_snapshot_source=None,
+):
+    """Describe date alignment by source role, not by calendar equality.
+
+    KRX historical indicators and a NAVER current snapshot intentionally have
+    different dates. That combination is valid only when each source's own
+    date evidence matches its declared role; an old or mismatched current
+    snapshot remains a real alignment failure.
+    """
     report_compact = compact_date(report_date)
+    observed_compact = compact_date(observed_date)
+    separate_sources = (
+        str(historical_source or "").upper() == "KRX"
+        and str(current_snapshot_source or "").upper() == "NAVER_SEPARATE"
+        and bool(observed_compact)
+        and observed_compact != report_compact
+    )
+    index_expected_date = observed_compact if separate_sources else report_compact
     full_market_available = full_market.get("status") == "AVAILABLE"
     result = {
         "status": "OK" if full_market_available else "UNAVAILABLE",
+        "dateAlignmentMode": (
+            "KRX_HISTORICAL_NAVER_CURRENT_SEPARATE"
+            if separate_sources else "SINGLE_SOURCE"
+        ),
         "fullMarketStatus": full_market.get("status", "UNAVAILABLE"),
         "fullMarketReason": full_market.get("reason"),
         "reportTradingDate": report_compact,
+        "historicalAsOfDate": report_compact,
+        "observedDate": observed_compact,
         "baselineDate": compact_date(full_market.get("asOfDate")),
         "indexSourceDates": [],
         "marketTradingValueSourceDates": [],
@@ -257,16 +285,25 @@ def date_alignment(report_date, indices, full_market):
 
     if not result["indexSourceDates"]:
         result["missingEvidence"].append("INDEX_SOURCE_DATE")
-    elif report_compact and any(date != report_compact for date in result["indexSourceDates"]):
-        result["mismatches"].append("REPORT_VS_INDEX_SOURCE_DATE")
+    elif index_expected_date and any(date != index_expected_date for date in result["indexSourceDates"]):
+        result["mismatches"].append(
+            "OBSERVED_VS_INDEX_SOURCE_DATE"
+            if separate_sources else "REPORT_VS_INDEX_SOURCE_DATE"
+        )
+    result["indexAlignmentStatus"] = (
+        "ALIGNED_TO_OBSERVED_DATE"
+        if separate_sources and result["indexSourceDates"]
+        and all(date == index_expected_date for date in result["indexSourceDates"])
+        else "ALIGNED_TO_HISTORICAL_DATE"
+        if result["indexSourceDates"]
+        and all(date == report_compact for date in result["indexSourceDates"])
+        else "MISMATCH" if result["indexSourceDates"] else "UNAVAILABLE"
+    )
 
     if not full_market_available:
         result["missingEvidence"].append("FULL_MARKET_EVIDENCE")
-        result["indexAlignmentStatus"] = (
-            "MISMATCH" if "REPORT_VS_INDEX_SOURCE_DATE" in result["mismatches"]
-            else "ALIGNED" if result["indexSourceDates"]
-            else "UNAVAILABLE"
-        )
+        if result["indexSourceDates"] and result["indexAlignmentStatus"] == "ALIGNED_TO_HISTORICAL_DATE":
+            result["indexAlignmentStatus"] = "ALIGNED"
         return result
 
     result["marketTradingValueSourceDates"] = sorted({
@@ -293,12 +330,14 @@ def date_alignment(report_date, indices, full_market):
         if dates and report_compact and any(date != report_compact for date in dates):
             result["mismatches"].append(f"REPORT_VS_{label}")
     present = [date for dates in observed.values() for date in dates]
-    if present and len(set(present)) > 1:
+    if present and len(set(present)) > 1 and not separate_sources:
         result["mismatches"].append("SOURCE_DATE_MISMATCH")
     if result["fullMarketSnapshotDateStatus"] == "INCONSISTENT":
         result["mismatches"].append("FULL_MARKET_TRADING_DATE_INCONSISTENT")
     if result["missingEvidence"] or result["mismatches"]:
         result["status"] = "PARTIAL"
+    elif separate_sources:
+        result["status"] = "SEPARATE_SOURCES_ALIGNED"
     return result
 
 
@@ -1237,10 +1276,11 @@ def full_market_summary(full_market, alignment):
     alignment = alignment if isinstance(alignment, dict) else {}
     evidence_status = full_market.get("status", "UNAVAILABLE")
     alignment_status = alignment.get("status", "UNAVAILABLE")
+    alignment_is_valid = alignment_status in {"OK", "SEPARATE_SOURCES_ALIGNED"}
     snapshot_status = full_market.get("snapshotDateStatus", "MISSING")
     verified = (
         evidence_status == "AVAILABLE"
-        and alignment_status == "OK"
+        and alignment_is_valid
         and snapshot_status == "VERIFIED_EXPLICIT"
         and bool(full_market.get("snapshotDate"))
     )
@@ -1249,7 +1289,11 @@ def full_market_summary(full_market, alignment):
         reason = None
     elif evidence_status == "AVAILABLE":
         status = "PARTIAL"
-        reason = "DATE_ALIGNMENT_NOT_VERIFIED"
+        reason = (
+            "DERIVED_KRX_PROJECTION_NOT_FINAL"
+            if snapshot_status == "DERIVED_TARGET_DATE"
+            else "DATE_ALIGNMENT_NOT_VERIFIED"
+        )
     else:
         status = "UNAVAILABLE"
         reason = full_market.get("reason") or "FULL_MARKET_EVIDENCE_UNAVAILABLE"
@@ -1783,7 +1827,20 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         )
     else:
         full_market = full_market_evidence(report_date)
-    alignment = date_alignment(report_date, indices, full_market)
+    technical_metadata = technical_inputs.get("metadata") or {}
+    current_metadata = technical_metadata.get("currentSnapshot") or {}
+    alignment = date_alignment(
+        report_date,
+        indices,
+        full_market,
+        observed_date=(
+            current_metadata.get("observedDate")
+            or current_metadata.get("tradingDate")
+            or current_metadata.get("asOfDate")
+        ),
+        historical_source=technical_metadata.get("historicalIndicatorSource"),
+        current_snapshot_source=technical_metadata.get("currentSnapshotSource"),
+    )
     discovery = trading_discovery.discovery_status(
         report_date, discovery_source_path(report_date)
     )
@@ -2044,9 +2101,21 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     monitored_regular = monitored_evidence.get("regularSession", regular_breadth)
     full_market_summary_data = full_market_summary(full_market, alignment)
 
+    alignment_is_valid = alignment["status"] in {"OK", "SEPARATE_SOURCES_ALIGNED"}
     report_status = "OK" if coverage_state == "OK" else "DEGRADED"
-    if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or alignment["status"] != "OK":
+    status_reason = None
+    if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or not alignment_is_valid:
         report_status = "PARTIAL"
+        status_reason = "DATE_ALIGNMENT_UNVERIFIED"
+    elif (
+        technical_metadata.get("historicalIndicatorSource") == "KRX"
+        and (technical_inputs.get("derivedProjection") or {}).get("status") == "PARTIAL"
+    ):
+        # The date roles are valid, but the staged M10 projection is not a
+        # final production generation. Keep this PARTIAL explicit rather than
+        # misreporting it as a date or coverage failure.
+        report_status = "PARTIAL"
+        status_reason = "KRX_STAGED_PROJECTION_NOT_FINAL"
     monitored_scope = (
         "MONITORED_UNIVERSE_EMPTY" if not enabled
         else "MONITORED_UNIVERSE_CONFIGURED"
@@ -2087,6 +2156,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
 
     return {
         "status": report_status,
+        "statusReason": status_reason,
         "coverageStatus": coverage_state,
         "version": "daily-market-research-report-v2",
         "asOf": report_date,
@@ -2229,7 +2299,7 @@ def write_markdown(report, path):
         ])
 
     alignment = report.get("dateAlignment") or {}
-    if alignment.get("status") != "OK":
+    if alignment.get("status") not in {"OK", "SEPARATE_SOURCES_ALIGNED"}:
         lines.extend([
             "",
             f"> **기준일 정합성 경고:** 상태 {alignment.get('status') or '확인 불가'}, "
@@ -2241,6 +2311,14 @@ def write_markdown(report, path):
             f"확인된 지수 날짜: {', '.join(alignment.get('indexSourceDates', [])) or '확인 불가'}",
             f"> 원천 날짜 차이: {', '.join(alignment.get('mismatches', [])) or '없음'}; "
             f"누락 증거: {', '.join(alignment.get('missingEvidence', [])) or '없음'}",
+        ])
+    elif alignment.get("status") == "SEPARATE_SOURCES_ALIGNED":
+        lines.extend([
+            "",
+            "> 기준일 분리: KRX 전일 확정 지표와 NAVER 당일 현재 관측을 "
+            "서로 다른 원천 날짜로 검증했습니다.",
+            f"> historicalAsOfDate: {alignment.get('historicalAsOfDate') or '확인 불가'}; "
+            f"observedDate: {alignment.get('observedDate') or '확인 불가'}",
         ])
 
     lines.extend([

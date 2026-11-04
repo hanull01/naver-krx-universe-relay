@@ -164,8 +164,8 @@ jobs:
         run: |
           {
             echo "## Monitoring daily rolling state"
-            echo "- status: \\`KRX_ROLLING_STATE_UNAVAILABLE\\`"
-            echo "- result: \\`NOOP\\`"
+            echo "- status: KRX_ROLLING_STATE_UNAVAILABLE"
+            echo "- result: NOOP"
             echo "- intraday refresh remains independent of final-close timing"
           } >> "$GITHUB_STEP_SUMMARY"
 
