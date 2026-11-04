@@ -5,14 +5,6 @@ run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{
 on:
   workflow_dispatch:
     inputs:
-      run_mode:
-        description: 'Refresh mode; final_recovery is only for an explicitly approved recovery run'
-        required: false
-        default: intraday
-        type: choice
-        options:
-          - intraday
-          - final_recovery
       krx_expected_date:
         description: Expected KRX generation trading date (YYYYMMDD); required for an exact-date operational run
         required: false
@@ -31,14 +23,6 @@ on:
         required: false
         default: true
         type: boolean
-      source_mode:
-        description: Historical input mode; krx is the operational default, legacy_naver is explicit backfill-only
-        required: false
-        default: krx
-        type: choice
-        options:
-          - krx
-          - legacy_naver
   push:
     branches: [main]
     paths:
@@ -100,23 +84,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Resolve refresh mode
-        id: mode
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          EVENT_SCHEDULE: ${{ github.event.schedule }}
-          RUN_MODE: ${{ inputs.run_mode || 'intraday' }}
-        shell: bash
-        run: |
-          final_run=false
-          if [ "$EVENT_NAME" = "schedule" ] && [ "$EVENT_SCHEDULE" = "30 11 * * 1-5" ]; then
-            final_run=true
-          elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$RUN_MODE" = "final_recovery" ]; then
-            final_run=true
-          fi
-          echo "final_run=$final_run" >> "$GITHUB_OUTPUT"
-          echo "Resolved refresh mode: event=$EVENT_NAME schedule=${EVENT_SCHEDULE:-none} run_mode=$RUN_MODE final_run=$final_run"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -174,41 +141,8 @@ jobs:
           target_ref="${GITHUB_REF_NAME:-main}"
           git pull --ff-only origin "$target_ref"
 
-      - name: Resolve derived generation for refresh
-        id: derived
-        if: steps.market_day.outputs.run == 'true' && inputs.source_mode == 'legacy_naver'
-        shell: bash
-        run: |
-          set -euo pipefail
-          target_date=$(python3 - <<'PY'
-          from datetime import date, datetime, timedelta
-          from zoneinfo import ZoneInfo
-          import krx_market_day
-
-          candidate = datetime.now(ZoneInfo('Asia/Seoul')).date()
-          for _ in range(370):
-              candidate -= timedelta(days=1)
-              if krx_market_day.market_day(candidate)[0]:
-                  print(candidate.strftime('%Y%m%d'))
-                  break
-          else:
-              raise SystemExit('PREVIOUS_KRX_TRADING_DATE_UNAVAILABLE')
-          PY
-          )
-          python3 - "$target_date" <<'PY'
-          import sys
-          from tools.derived_input_resolver import resolve_derived_input
-
-          result = resolve_derived_input("data/monitoring-derived", sys.argv[1])
-          with open(__import__("os").environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"target_date={result['targetDate']}\n")
-              output.write(f"run_id={result['runId']}\n")
-              output.write(f"run_dir={result['runDir']}\n")
-          print(f"Using derived targetDate={result['targetDate']} runId={result['runId']}")
-          PY
-
       - name: Validate KRX report input contract
-        if: steps.market_day.outputs.run == 'true' && inputs.source_mode != 'legacy_naver'
+        if: steps.market_day.outputs.run == 'true'
         env:
           KRX_INPUT_DIR: ${{ steps.krx.outputs.krx_report_input_dir }}
           KRX_GENERATION_ID: ${{ steps.krx.outputs.krx_generation_id }}
@@ -238,9 +172,6 @@ jobs:
         id: collect
         if: steps.market_day.outputs.run == 'true'
         shell: bash
-        env:
-          DERIVED_RUN_DIR: ${{ steps.derived.outputs.run_dir }}
-          DERIVED_TARGET_DATE: ${{ steps.derived.outputs.target_date }}
         run: |
           set +e
           if python3 - <<'PY'
@@ -266,7 +197,8 @@ jobs:
           started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
           echo "Collection started at ${started_at}"
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
-          python relay.py intraday
+          python relay.py intraday \
+            --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}"
           code=$?
           finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
           echo "Collection finished at ${finished_at}"
@@ -306,14 +238,14 @@ jobs:
           try:
               baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
           except (OSError, ValueError, json.JSONDecodeError):
-              print("BASELINE_UNAVAILABLE")
+              print("KRX_PRIMARY_NO_BASELINE")
               raise SystemExit
           now = datetime.now(ZoneInfo("Asia/Seoul"))
           print(collection_readiness(baseline, now)[1])
           PY
           )
           echo "baseline targetDate=${target_date} readiness=${readiness}"
-          if [ "$readiness" != "READY" ] && [ "$readiness" != "BASELINE_STALE" ]; then
+          if [ "$readiness" != "READY" ] && [ "$readiness" != "BASELINE_STALE" ] && [ "$readiness" != "KRX_PRIMARY_NO_BASELINE" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "exit_code=0" >> "$GITHUB_OUTPUT"
             echo "market_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
@@ -328,7 +260,7 @@ jobs:
           fi
           # The complete NAVER STOCK snapshot is runner-temporary only.  It is
           # collected once, structurally validated by the collector, then
-          # reused by evidence and FINAL reconciliation without another API call.
+          # reused by the intraday evidence path without another API call.
           started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
           echo "Full-market collection started at ${started_at}"
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
@@ -340,9 +272,7 @@ jobs:
             python tools/run_full_market_monitoring.py \
               --current-file "$RUNNER_TEMP/full-market-current.json" \
               --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
-              --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}" \
-              --allow-source-observed-final \
-              --source-observed-date "$target_date"
+              --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}"
             code=$?
           fi
           if [ "$code" -eq 0 ]; then
@@ -391,185 +321,12 @@ jobs:
           finished_at=$(python3 -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="microseconds"))')
           echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
           if [ "$index_exit_code" -eq 0 ]; then
-            python3 - "data/market/indices.json" "$RUNNER_TEMP/final-trading-date-evidence.json" \
-              "$started_at" "$finished_at" <<'PY'
-          import json, sys
-          from pathlib import Path
-          from market_indices import validate_final_payload
-
-          indices_path, evidence_path, started_at, finished_at = sys.argv[1:]
-          try:
-              indices = json.loads(Path(indices_path).read_text(encoding="utf-8"))
-              evidence = validate_final_payload(indices, started_at, finished_at)
-              result = {
-                  "status": "VERIFIED",
-                  "evidenceClass": "POST_MARKET_INDEX_SNAPSHOT",
-                  "targetDate": evidence["targetDate"],
-                  "generatedAt": evidence["generatedAt"],
-                  "collectionStartedAt": started_at,
-                  "collectionFinishedAt": finished_at,
-                  "errors": [],
-              }
-          except (OSError, ValueError, json.JSONDecodeError) as exc:
-              result = {
-                  "status": "UNVERIFIED",
-                  "evidenceClass": "POST_MARKET_INDEX_SNAPSHOT",
-                  "targetDate": None,
-                  "generatedAt": None,
-                  "collectionStartedAt": started_at,
-                  "collectionFinishedAt": finished_at,
-                  "errors": [str(exc)],
-              }
-          Path(evidence_path).write_text(json.dumps(result, ensure_ascii=False) + "\n", encoding="utf-8")
-          print(json.dumps(result, ensure_ascii=False))
-          PY
-            evidence_status=$(python3 - "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
-          import json, sys
-          from pathlib import Path
-          try:
-              print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")).get("status", "UNVERIFIED"))
-          except (OSError, ValueError, json.JSONDecodeError):
-              print("UNVERIFIED")
-          PY
-            )
-            target_date=$(python3 - "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
-          import json, sys
-          from pathlib import Path
-          try:
-              print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")).get("targetDate") or "")
-          except (OSError, ValueError, json.JSONDecodeError):
-              print("")
-          PY
-            )
-            echo "final_date_evidence_status=$evidence_status" >> "$GITHUB_OUTPUT"
-            echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
+            echo "final_date_evidence_status=INTRADAY_INDEX_SNAPSHOT" >> "$GITHUB_OUTPUT"
+            echo "target_date=$(TZ=Asia/Seoul date +%Y%m%d)" >> "$GITHUB_OUTPUT"
           else
             echo "final_date_evidence_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
             echo "target_date=" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Diagnose final daily-bar evidence
-        id: final_daily_evidence
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.indices.outputs.exit_code == '0' && steps.mode.outputs.final_run == 'true'
-        continue-on-error: true
-        shell: bash
-        run: |
-          # Reuse the validated runner-temporary snapshot; never refetch quotes.
-          python tools/final_daily_evidence.py \
-            --snapshot "$RUNNER_TEMP/full-market-current.json" \
-            --baseline data/monitoring-baseline/latest.json \
-            --target-date "${{ steps.indices.outputs.target_date }}"
-
-      - name: Prepare final daily monitoring update (disabled by default)
-        id: final_daily_history
-        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true' && steps.indices.outputs.exit_code == '0' && steps.mode.outputs.final_run == 'true' && vars.FINAL_DAILY_HISTORY_WRITE == 'true'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - "$RUNNER_TEMP/full-market-current.json" "$RUNNER_TEMP/final-daily-target.txt" \
-            "${{ steps.indices.outputs.collection_started_at }}" \
-            "${{ steps.indices.outputs.collection_finished_at }}" \
-            "$RUNNER_TEMP/final-trading-date-evidence.json" <<'PY'
-          import json, sys
-          from pathlib import Path
-          from tools.final_daily_evidence import validate_snapshot
-
-          snapshot = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          date_evidence = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8"))
-          observed_stocks = snapshot.get("stocks") or []
-          if (snapshot.get("status") not in {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
-                  or snapshot.get("collectionStatus", "SUCCESS") != "SUCCESS"):
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_SNAPSHOT_INVALID")
-          expected = [str(row.get("code") or "") for row in observed_stocks]
-          if (len(expected) != len(observed_stocks) or len(expected) != len(set(expected))
-                  or not expected or any(str(row.get("assetType") or "").upper() != "STOCK"
-                                         for row in observed_stocks)):
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:OBSERVED_STOCK_UNIVERSE_INVALID")
-
-          if date_evidence.get("status") != "VERIFIED" or not date_evidence.get("targetDate"):
-              errors = ",".join(date_evidence.get("errors") or ["TRADING_DATE_EVIDENCE_UNVERIFIED"])
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:" + errors)
-          target_date = str(date_evidence["targetDate"])
-
-          final_evidence = validate_snapshot(
-              snapshot, json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8")),
-              target_date=target_date, expected_codes=expected)
-          print(json.dumps({"finalDailyEvidence": final_evidence}, ensure_ascii=False))
-          if not final_evidence["finalEligible"]:
-              raise SystemExit("FINAL_DAILY_HISTORY_NOT_READY:FINAL_DAILY_EVIDENCE_UNUSABLE:" +
-                               ",".join(final_evidence["errors"]))
-
-          Path(sys.argv[2]).write_text(target_date, encoding="utf-8")
-          print(json.dumps({"status": "READY", "targetDate": target_date,
-                            "observedCodes": len(expected)}, ensure_ascii=False))
-          PY
-          python tools/build_monitoring_daily_state.py update-latest \
-            --date "$(cat "$RUNNER_TEMP/final-daily-target.txt")" \
-            --observed-snapshot "$RUNNER_TEMP/full-market-current.json" \
-            --refresh-universe --fetch-today --allow-source-observed \
-            --session-diagnostic-output "$RUNNER_TEMP/trading-session-diagnostic.json" \
-            > "$RUNNER_TEMP/final-daily-monitoring-result.json"
-          cat "$RUNNER_TEMP/final-daily-monitoring-result.json"
-          final_status=$(tail -n 1 "$RUNNER_TEMP/final-daily-monitoring-result.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "FAILED"))')
-          echo "FINAL_DAILY_STATUS=$final_status"
-          test "$final_status" = "SUCCESS"
-          diagnostic_path="$RUNNER_TEMP/trading-session-diagnostic.json"
-          if [ ! -f "$diagnostic_path" ]; then
-            diagnostic_path=data/monitoring-daily/trading-session-diagnostic.json
-          fi
-          target_date=$(python3 - "$diagnostic_path" "$RUNNER_TEMP/full-market-current.json" <<'PY'
-          import json, sys
-          from pathlib import Path
-          diagnostic = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          snapshot = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-          expected = {str(row.get("code") or "") for row in snapshot.get("stocks") or []}
-          if diagnostic.get("status") == "VERIFIED":
-              if (set(diagnostic.get("expectedCodes") or []) != expected
-                      or set(diagnostic.get("observedCodes") or []) != expected
-                      or diagnostic.get("missingCodes")
-                      or diagnostic.get("unexpectedCodes")
-                      or diagnostic.get("duplicateCodes")
-                      or diagnostic.get("mismatchCodes")
-                      or diagnostic.get("dateMismatchCodes")):
-                  raise SystemExit("TRADING_DATE_DIAGNOSTIC_CODE_SET_UNVERIFIED")
-          elif diagnostic.get("status") == "SOURCE_OBSERVED":
-              missing = set(diagnostic.get("missingCodes") or [])
-              source_missing = set(diagnostic.get("sourceMissingCodes") or [])
-              reasons = diagnostic.get("sourceMissingReasons") or {}
-              if (set(diagnostic.get("expectedCodes") or []) != expected
-                      or not source_missing.issubset(expected)
-                      or missing != source_missing
-                      or set(diagnostic.get("observedCodes") or []) != expected - source_missing
-                      or diagnostic.get("unexpectedCodes")
-                      or diagnostic.get("duplicateCodes")
-                      or diagnostic.get("mismatchCodes")
-                      or diagnostic.get("dateMismatchCodes")
-                      or set(reasons) != source_missing
-                      or any(value != "NORMAL_EMPTY_DAILY" for value in reasons.values())):
-                  raise SystemExit("TRADING_DATE_DIAGNOSTIC_SOURCE_OBSERVED_UNSAFE")
-          else:
-              raise SystemExit("TRADING_DATE_DIAGNOSTIC_UNVERIFIED")
-          print(str(diagnostic.get("targetDate") or "").replace("-", ""))
-          PY
-          )
-          test "$target_date" = "$(cat "$RUNNER_TEMP/final-daily-target.txt")"
-          cp "$diagnostic_path" data/monitoring-daily/trading-session-diagnostic.json
-          # FINAL is now part of the date-evidence path.  Rebuild the compact
-          # full-market artifacts from the already validated runner snapshot
-          # so latest-summary.json observes the just-published FINAL state.
-          # This intentionally makes no additional NAVER request.
-          python tools/run_full_market_monitoring.py \
-            --current-file "$RUNNER_TEMP/full-market-current.json" \
-            --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
-            --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}" \
-            --allow-source-observed-final \
-            --source-observed-date "$target_date"
-          # FINAL/Baseline now represents the same target date.  Reuse the
-          # generated full-market artifacts and rebuild V1 before V2 observes
-          # them; this adds no NAVER request.
-          python tools/build_dynamic_universe.py
-          echo "write=true" >> "$GITHUB_OUTPUT"
 
       - name: Run V2 shadow observation
         id: v2_shadow
@@ -596,7 +353,8 @@ jobs:
         shell: bash
         run: |
           set +e
-          python -m tools.build_report_contract
+          python -m tools.build_report_contract \
+            --staging-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}"
           code=$?
           if [ "$code" -eq 0 ]; then
             echo "status=SUCCESS" >> "$GITHUB_OUTPUT"
@@ -614,12 +372,13 @@ jobs:
               print('')
           PY
           )" > "$RUNNER_TEMP/report-contract-diagnostic.json"
-            echo "::warning::Report contract generation failed; preserving the previous contract and continuing with independently validated market publication."
+          echo "::error::Report contract generation failed; no report or market publication is eligible."
+          exit "$code"
           fi
           exit 0
 
       - name: Upload report contract diagnostic
-        if: steps.report_contract.outputs.status == 'FAILED'
+        if: always() && steps.report_contract.outputs.status == 'FAILED'
         uses: actions/upload-artifact@v4
         with:
           name: report-contract-diagnostic-${{ github.run_id }}
@@ -780,16 +539,8 @@ jobs:
             echo "Market index snapshot unavailable; preserving prior snapshot."
           fi
 
-          final_daily_gate_required=false
-          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
-            && [ "${{ steps.mode.outputs.final_run }}" = "true" ] \
-            && [ "${{ steps.final_daily_history.outcome }}" != "success" ]; then
-            final_daily_gate_required=true
-          fi
-
           if [ "${{ steps.full_market.outputs.ready }}" = "true" ] \
-            && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ] \
-            && [ "$final_daily_gate_required" = "false" ]; then
+            && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ]; then
             git add \
               data/monitoring/latest-breadth.json \
               data/monitoring/latest-stock-signals.json \
@@ -811,20 +562,7 @@ jobs:
             echo "Evidence files are not eligible for publish; preserving prior evidence. Core 42-stock data remains publishable."
           fi
 
-          if [ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ] \
-            && [ "${{ steps.mode.outputs.final_run }}" = "true" ] \
-            && [ "${{ steps.final_daily_history.outcome }}" = "success" ]; then
-            git add \
-              data/market-universe/all-assets.json \
-              data/monitoring-daily/kospi.json \
-              data/monitoring-daily/kosdaq.json \
-              data/monitoring-daily/retired.json \
-              data/monitoring-daily/universe-lifecycle.json \
-              data/monitoring-baseline/latest.json \
-              data/monitoring-daily/trading-session-diagnostic.json
-          else
-            echo "Final daily history not eligible for publish; preserving prior monitoring-daily files."
-          fi
+          echo "Intraday refresh does not publish daily rolling history; preserving monitoring-daily files."
 
           if [ "${{ steps.discovery_quotes.outputs.exit_code }}" = "0" ]; then
             git add -- data/trading-discovery/quotes
@@ -864,7 +602,6 @@ jobs:
           contract_publish_eligible=false
           if [ "${{ steps.full_market.outputs.ready }}" = "true" ] \
             && [ "${{ steps.full_market.outputs.exit_code }}" = "0" ] \
-            && [ "$final_daily_gate_required" = "false" ] \
             && [ "${{ steps.report_contract.outputs.status }}" = "SUCCESS" ] \
             && [ -f data/monitoring/latest-report-contract.json ]; then
             contract_publish_eligible=true
@@ -916,28 +653,7 @@ jobs:
             echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Refresh NAVER market data"
-            if [ "$final_daily_gate_required" = "true" ]; then
-              echo "Final daily update failed; restoring only its generated production paths before synchronization."
-              for path in \
-                data/market-universe/all-assets.json \
-                data/monitoring-daily/kospi.json \
-                data/monitoring-daily/kosdaq.json \
-                data/monitoring-daily/retired.json \
-                data/monitoring-daily/universe-lifecycle.json \
-                data/monitoring-daily/trading-session-diagnostic.json \
-                data/monitoring-baseline/latest.json \
-                data/dynamic-universe/latest.json \
-                data/monitoring/latest-breadth.json \
-                data/monitoring/latest-changes.json \
-                data/monitoring/latest-industries.json \
-                data/monitoring/latest-leaders.json \
-                data/monitoring/latest-quality.json \
-                data/monitoring/latest-stock-signals.json \
-                data/monitoring/latest-summary.json \
-                data/monitoring/latest-theme-signals.json; do
-                restore_generated_path "$path"
-              done
-            fi
+            # FINAL daily history is intentionally outside this intraday writer.
             if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
               echo "::error::Unexpected unstaged or untracked files remain before data synchronization; preserving production data."
               git status --short

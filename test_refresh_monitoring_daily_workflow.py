@@ -32,9 +32,11 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('per-code bounded retries', self.text)
         self.assertIn('preserving all production artifacts', self.text)
 
-    def test_before_close_skips_fetch_and_only_incomplete_rows_retry(self):
-        self.assertIn('Check KST final-close window', self.text)
-        self.assertIn('BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
+    def test_krx_morning_generation_allows_intraday_rolling_state(self):
+        self.assertIn('Resolve intraday rolling-state window', self.text)
+        self.assertIn('KRX_PRIMARY_AVAILABLE', self.text)
+        self.assertIn('KRX_ROLLING_STATE_UNAVAILABLE', self.text)
+        self.assertNotIn('BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
         self.assertIn("steps.closing_window.outputs.eligible == 'true'", self.text)
         self.assertIn('if [ "$code" -eq 2 ]', self.text)
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)

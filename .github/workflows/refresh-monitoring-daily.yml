@@ -90,22 +90,22 @@ jobs:
           generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
-      - name: Check KST final-close window
+      - name: Resolve intraday rolling-state window
         id: closing_window
         if: steps.market_day.outputs.run == 'true'
         shell: bash
         run: |
-          window=$(python tools/build_monitoring_daily_state.py --closing-window)
-          echo "$window"
-          status=$(python -c 'import json,sys; print(json.load(sys.stdin)["status"])' <<<"$window")
-          target_date=$(python -c 'import json,sys; print(json.load(sys.stdin)["targetDate"])' <<<"$window")
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
-          if [ "$status" = "AFTER_FINAL_CLOSE" ]; then
+          target_date='${{ steps.krx.outputs.krx_target_date }}'
+          if [ -n "$target_date" ]; then
+            echo "status=KRX_PRIMARY_AVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
             echo "eligible=true" >> "$GITHUB_OUTPUT"
+            echo "Using KRX morning generation for rolling-state input: $target_date"
           else
             echo "eligible=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish."
+            echo "status=KRX_ROLLING_STATE_UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "target_date=" >> "$GITHUB_OUTPUT"
+            echo "::notice::KRX_ROLLING_STATE_UNAVAILABLE: recording NOOP; intraday report is not blocked by final-close timing."
           fi
 
       - name: Sync latest main before collection
@@ -113,6 +113,17 @@ jobs:
         run: |
           git fetch origin main
           git rebase origin/main
+
+      - name: Record unavailable rolling-state NOOP
+        if: steps.market_day.outputs.run == 'true' && steps.closing_window.outputs.eligible != 'true'
+        shell: bash
+        run: |
+          {
+            echo "## Monitoring daily rolling state"
+            echo "- status: \\`KRX_ROLLING_STATE_UNAVAILABLE\\`"
+            echo "- result: \\`NOOP\\`"
+            echo "- intraday refresh remains independent of final-close timing"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Collect, validate, and update rolling state
         id: update

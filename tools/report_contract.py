@@ -46,6 +46,115 @@ SOURCE_OBSERVED_TRADING_DATE_REASON = "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DA
 MAX_WORK_CONTRACT_BYTES = 900_000
 
 
+def compact_detail_reference(
+    value: Any,
+    *,
+    source_path: str,
+    source_sha256: str | None = None,
+    preview_limit: int = 3,
+) -> dict[str, Any]:
+    """Represent large diagnostic/detail collections without copying them.
+
+    The complete collection remains in the generation artifact named by
+    ``sourcePath``.  The Work-facing contract carries only the count,
+    availability, integrity metadata, and a tiny deterministic preview.
+    Already compact references are preserved so this helper is safe at both
+    the projection and final-contract boundaries.
+    """
+    if isinstance(value, Mapping) and "count" in value and "sourcePath" in value:
+        result = dict(value)
+        result.setdefault("available", bool(result.get("count")))
+        result.setdefault("preview", [])
+        return result
+    if isinstance(value, Mapping):
+        entries = list(value)
+    elif isinstance(value, (list, tuple, set)):
+        entries = list(value)
+    elif value in (None, ""):
+        entries = []
+    else:
+        entries = [value]
+    return {
+        "count": len(entries),
+        "available": bool(entries),
+        "sourcePath": source_path,
+        "sourceSha256": source_sha256,
+        "preview": entries[:preview_limit],
+    }
+
+
+def compact_registered_universe(
+    registered: Mapping[str, Any] | None,
+    *,
+    source_path: str = "data/monitoring-derived/registered-universe-technicals.json",
+) -> dict[str, Any]:
+    """Keep registered-universe coverage while leaving member rows in artifacts."""
+    source = dict(registered or {})
+    items = source.get("items") if isinstance(source.get("items"), list) else []
+    count = source.get("registeredCount", source.get("count", len(items)))
+    observed = source.get("registeredObservedCount", len(items))
+    missing = source.get("missingCodes")
+    if not isinstance(missing, list):
+        missing = []
+    result = {
+        "status": source.get("status") or ("AVAILABLE" if count else "AVAILABLE_EMPTY"),
+        "scope": source.get("scope") or "REGISTERED_UNIVERSE",
+        "registeredCount": count,
+        "observedCount": observed,
+        "count": count,
+        "fallbackUsed": bool(source.get("fallbackUsed", False)),
+        "missing": compact_detail_reference(
+            missing,
+            source_path=f"{source_path}#missingCodes",
+            source_sha256=source.get("sourceSha256") or source.get("detailSha256"),
+        ),
+        "detailSource": source_path,
+        "detailSha256": source.get("sourceSha256") or source.get("detailSha256"),
+        "preview": [
+            {
+                "itemCode": row.get("itemCode"),
+                "itemName": row.get("stockName") or row.get("itemName"),
+                "asOfDate": row.get("asOfDate"),
+                "metrics": {
+                    key: (row.get("metrics") or {}).get(key)
+                    for key in ("ma20", "ma60", "ma120", "return20d", "volumeRatio20")
+                    if (row.get("metrics") or {}).get(key) is not None
+                },
+            }
+            for row in items[:3]
+            if isinstance(row, Mapping)
+        ],
+    }
+    return result
+
+
+def compact_candidate_rows(rows: list[Mapping[str, Any]] | None, limit: int = 100) -> list[dict[str, Any]]:
+    """Keep the report-facing candidate summary bounded and deterministic."""
+    compact: list[dict[str, Any]] = []
+    for row in rows or []:
+        if not isinstance(row, Mapping):
+            continue
+        item = {
+            key: row.get(key)
+            for key in (
+                "rank", "itemCode", "itemName", "primaryBucket", "allBuckets",
+                "candidateAsOf", "candidateDate", "regularClose", "breakoutStrength",
+                "volumeState", "state", "status",
+            )
+            if row.get(key) not in (None, "", [])
+        }
+        if isinstance(row.get("regular"), Mapping):
+            item["regular"] = {
+                key: row["regular"].get(key)
+                for key in ("close", "changeRate", "asOfDate", "availabilityStatus")
+                if row["regular"].get(key) not in (None, "")
+            }
+        compact.append(item)
+        if len(compact) >= limit:
+            break
+    return compact
+
+
 def classify_contract_transport_response(response: Any) -> dict[str, Any]:
     """Distinguish an API inline-content limitation from an empty file."""
     if not isinstance(response, Mapping):
@@ -174,6 +283,13 @@ def _historical_lineage(
     observed_count = quality.get("historicalObservedInstrumentCount")
     if observed_count is None:
         observed_count = quality.get("currentCount")
+    detail_sha = (
+        quality.get("detailSha256")
+        or quality.get("sourceSha256")
+        or quality.get("historicalDetailSha256")
+        or quality.get("manifestSha256")
+        or quality.get("monitoringSha256")
+    )
     missing_history = quality.get("missingHistoryCodes")
     if not isinstance(missing_history, list):
         missing_history = quality.get("missingCodes") if is_krx else []
@@ -208,9 +324,21 @@ def _historical_lineage(
         "instrumentCount": instrument_count,
         "observedInstrumentCount": observed_count,
         "historyCoveragePct": coverage,
-        "missingHistoryCodes": missing_history,
-        "regularSessionUnavailableCodes": regular_unavailable,
-        "currentSnapshotMissingCodes": current_missing,
+        "missingHistoryCodes": compact_detail_reference(
+            missing_history,
+            source_path="data/monitoring/latest-quality.json#missingHistoryCodes",
+            source_sha256=detail_sha,
+        ),
+        "regularSessionUnavailableCodes": compact_detail_reference(
+            regular_unavailable,
+            source_path="data/monitoring/latest-quality.json#regularSessionUnavailableCodes",
+            source_sha256=detail_sha,
+        ),
+        "currentSnapshotMissingCodes": compact_detail_reference(
+            current_missing,
+            source_path="data/monitoring/latest-quality.json#currentSnapshotMissingCodes",
+            source_sha256=detail_sha,
+        ),
         "adjustmentStatus": quality.get("historicalAdjustmentStatus") or "UNAVAILABLE",
         "currentSnapshotSource": quality.get("currentSnapshotSource") or "NAVER_SEPARATE",
     }
@@ -960,6 +1088,17 @@ def build_report_contract(
         or full_market.get("expectedPreviousTradingDate")
     )
     historical_lineage = _historical_lineage(quality, full_market)
+    observed_date = (
+        quality.get("observedDate")
+        or full_market.get("observedDate")
+        or quality.get("currentSnapshotDate")
+        or trading_date
+    )
+    observed_at = (
+        quality.get("observedAt")
+        or full_market.get("observedAt")
+        or generation
+    )
 
     def indices_are_complete() -> bool:
         """Require both current index observations before marking a contract available."""
@@ -1093,6 +1232,7 @@ def build_report_contract(
     technical_candidates = (
         technical_candidates if technical_candidates is not None else candidates or []
     )
+    compact_technical_candidates = compact_candidate_rows(technical_candidates)
     kiwoom_candidates = kiwoom_candidates if isinstance(kiwoom_candidates, Mapping) else {}
     kiwoom_symbols = list(kiwoom_candidates.get("symbols") or [])
     kiwoom_stocks = list(kiwoom_candidates.get("stocks") or [])
@@ -1140,14 +1280,21 @@ def build_report_contract(
         "schemaVersion": "market-report-contract-v1",
         "status": contract_status,
         "asOf": trading_date,
-        "observedAt": generation,
+        "observedAt": observed_at,
+        "historicalAsOfDate": historical_lineage["targetDate"],
+        "observedDate": observed_date,
         "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
         "historicalIndicatorSource": historical_lineage["source"],
+        "sourceGeneration": historical_lineage["generationId"],
         "historicalGenerationId": historical_lineage["generationId"],
         "historicalTargetDate": historical_lineage["targetDate"],
         "historicalFallbackAllowed": historical_lineage["fallbackAllowed"],
         "currentSnapshotSource": historical_lineage["currentSnapshotSource"],
+        "manifestSha256": quality.get("manifestSha256") or full_market.get("manifestSha256"),
+        "monitoringSha256": quality.get("monitoringSha256") or full_market.get("monitoringSha256"),
+        "entityCount": quality.get("entityCount") or historical_lineage["entityCount"],
+        "instrumentCount": quality.get("instrumentCount") or historical_lineage["instrumentCount"],
         "historicalLineage": historical_lineage,
         "tradingDateEvidence": _compact_trading_date_evidence(evidence),
         "sessionContext": session_context,
@@ -1162,7 +1309,11 @@ def build_report_contract(
             "markdownReport": "data/reports/latest.md",
             "htmlReport": "data/reports/latest.html",
             "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
-            "technicalCandidates": "data/reports/latest.json#nextSessionCandidates",
+            "technicalCandidates": {
+                "path": "data/reports/latest.json#nextSessionCandidates",
+                "count": len(technical_candidates),
+                "included": len(compact_technical_candidates),
+            },
             "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",
             "industryDetails": "data/monitoring/latest-industries.json#industries[]",
             "v2HistoryDetails": "data/dynamic-universe/v2-shadow-history.json#observations[]",
@@ -1211,13 +1362,7 @@ def build_report_contract(
             "themes": v1_themes,
         },
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
-        "registeredUniverse": dict(registered_universe or {
-            "status": "AVAILABLE_EMPTY",
-            "scope": "REGISTERED_UNIVERSE",
-            "count": 0,
-            "fallbackUsed": False,
-            "items": [],
-        }),
+        "registeredUniverse": compact_registered_universe(registered_universe),
         "v2": {
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
             "sourceQualityStatus": v2_latest.get("inputEvidence", {}).get("sourceQualityStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
@@ -1248,10 +1393,14 @@ def build_report_contract(
                 "reason": "이 계약 입력에 동일 기준시각의 공시 원천이 없습니다.",
             },
         },
-        # Keep the legacy key as the technical-candidate alias.  Renderers
-        # must use the explicit keys below for source-sensitive sections.
-        "candidates": technical_candidates,
-        "technicalCandidates": technical_candidates,
+        # Keep one canonical candidate list.  The second key is a pointer,
+        # not a second copy of thousands of rows.
+        "candidates": {
+            "source": "reportContract.technicalCandidates",
+            "count": len(technical_candidates),
+            "included": len(compact_technical_candidates),
+        },
+        "technicalCandidates": compact_technical_candidates,
         "kiwoomCandidates": {
             # ``source`` is the immutable date-selected file actually read by
             # the report.  Keep the semantic producer in sourceType so callers

@@ -32,12 +32,53 @@ def _serialize_contract(contract: dict) -> bytes:
     if not payload:
         raise SystemExit("REPORT_CONTRACT_EMPTY")
     if len(payload) > MAX_WORK_CONTRACT_BYTES:
+        diagnostics = contract_byte_diagnostics(contract)
+        print(json.dumps({
+            "status": "REPORT_CONTRACT_TOO_LARGE",
+            "bytes": len(payload),
+            "limit": MAX_WORK_CONTRACT_BYTES,
+            "overBytes": len(payload) - MAX_WORK_CONTRACT_BYTES,
+            "diagnostics": diagnostics,
+        }, ensure_ascii=False))
         raise SystemExit("REPORT_CONTRACT_TOO_LARGE")
     try:
         json.loads(payload)
     except json.JSONDecodeError as exc:
         raise SystemExit("REPORT_CONTRACT_INVALID_JSON") from exc
     return payload
+
+
+def contract_byte_diagnostics(contract: dict) -> dict:
+    """Return deterministic top-level and nested collection size diagnostics."""
+    def encoded(value) -> int:
+        return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+    top_level = {
+        key: encoded(value)
+        for key, value in sorted(contract.items(), key=lambda item: encoded(item[1]), reverse=True)
+    }
+    nested_arrays = []
+
+    def walk(value, path="$"):
+        if isinstance(value, list):
+            nested_arrays.append({
+                "path": path,
+                "items": len(value),
+                "bytes": encoded(value),
+            })
+            for index, item in enumerate(value[:3]):
+                walk(item, f"{path}[{index}]")
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                walk(child, f"{path}.{key}")
+
+    walk(contract)
+    nested_arrays.sort(key=lambda item: item["bytes"], reverse=True)
+    return {
+        "topLevelBytes": top_level,
+        "largestTopLevelField": next(iter(top_level), None),
+        "nestedArrays": nested_arrays[:20],
+    }
 
 
 def _write_atomic(path: Path, payload: bytes) -> None:
@@ -124,12 +165,17 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="data/monitoring/latest-report-contract.json")
+    parser.add_argument(
+        "--staging-input-dir",
+        default=None,
+        help="Use the verified KRX report input directly instead of legacy production history.",
+    )
     args = parser.parse_args()
     quality = load_json(Path("data/monitoring/latest-quality.json"))
     summary = load_json(Path("data/monitoring/latest-summary.json"))
     raw_date, evidence = _trading_date_evidence(quality, summary)
     as_of = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:]}"
-    report = build_report(as_of=as_of)
+    report = build_report(as_of=as_of, staging_input_dir=args.staging_input_dir)
     contract = report.get("reportContract")
     if not isinstance(contract, dict):
         raise SystemExit("REPORT_CONTRACT_UNAVAILABLE")

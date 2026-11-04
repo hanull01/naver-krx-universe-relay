@@ -5,264 +5,46 @@ from pathlib import Path
 WORKFLOW = Path(__file__).parent / ".github" / "workflows" / "refresh.yml"
 
 
-class RefreshFinalDailyWorkflowContractTests(unittest.TestCase):
+class RefreshIntradayWorkflowContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.text = WORKFLOW.read_text(encoding="utf-8")
-        cls.start = cls.text.index("      - name: Prepare final daily monitoring update")
-        cls.end = cls.text.index("      - name: Run V2 shadow observation", cls.start)
-        cls.final_step = cls.text[cls.start:cls.end]
-        cls.diagnostic_start = cls.text.index("      - name: Diagnose final daily-bar evidence")
-        cls.diagnostic_step = cls.text[cls.diagnostic_start:cls.start]
-        cls.indices_start = cls.text.index("      - name: Collect market indices")
-        cls.indices_step = cls.text[cls.indices_start:cls.start]
-        cls.publish_start = cls.text.index("      - name: Commit refreshed production data")
-        cls.publish = cls.text[cls.publish_start:]
 
-    def test_final_history_is_opt_in_and_schedule_gated(self):
-        self.assertIn("vars.FINAL_DAILY_HISTORY_WRITE == 'true'", self.final_step)
-        self.assertIn("steps.mode.outputs.final_run == 'true'", self.final_step)
-        self.assertIn("run_mode:", self.text)
-        self.assertIn("final_recovery", self.text)
-
-    def test_final_recovery_mode_is_explicit_and_intraday_dispatch_remains_default(self):
-        mode_start = self.text.index("      - name: Resolve refresh mode")
-        mode_end = self.text.index("      - name: Set up Python", mode_start)
-        mode = self.text[mode_start:mode_end]
-        self.assertIn('RUN_MODE: ${{ inputs.run_mode || \'intraday\' }}', mode)
-        self.assertIn('EVENT_SCHEDULE" = "30 11 * * 1-5"', mode)
-        self.assertIn('RUN_MODE" = "final_recovery"', mode)
-        self.assertIn('final_run=false', mode)
-
-    def test_opt_in_path_writes_and_no_longer_forces_no_write(self):
-        self.assertIn("build_monitoring_daily_state.py update-latest", self.final_step)
-        self.assertIn('--observed-snapshot "$RUNNER_TEMP/full-market-current.json"', self.final_step)
-        self.assertIn("--refresh-universe", self.final_step)
-        self.assertNotIn("--no-write", self.final_step)
-        self.assertIn('echo "write=true" >> "$GITHUB_OUTPUT"', self.final_step)
-
-    def test_final_success_rebuilds_evidence_from_same_snapshot_without_refetch(self):
-        update = self.final_step.index("build_monitoring_daily_state.py update-latest")
-        rebuild = self.final_step.index("tools/run_full_market_monitoring.py", update)
-        self.assertLess(update, rebuild)
-        self.assertIn('--current-file "$RUNNER_TEMP/full-market-current.json"', self.final_step[rebuild:])
-        self.assertNotIn("naver_full_market_current.py", self.final_step[rebuild:])
-
-    def test_final_success_rebuilds_v1_after_final_baseline(self):
-        rebuild = self.final_step.index("tools/run_full_market_monitoring.py")
-        v1 = self.final_step.index("tools/build_dynamic_universe.py", rebuild)
-        self.assertLess(rebuild, v1)
-
-    def test_final_update_requires_explicit_snapshot_session_date(self):
-        self.assertIn("final-trading-date-evidence.json", self.indices_step)
-        self.assertIn("validate_final_payload", self.indices_step)
-        self.assertIn("from market_indices import validate_final_payload", self.indices_step)
-        self.assertIn("final-trading-date-evidence.json", self.final_step)
-        self.assertNotIn("data/market/indices.json", self.final_step)
-        self.assertNotIn("from market_indices import validate_final_payload", self.final_step)
-        self.assertNotIn("datetime.now(ZoneInfo(\"Asia/Seoul\"))", self.final_step)
-
-    def test_initial_diagnostic_reuses_validated_index_date(self):
-        self.assertIn('--target-date "${{ steps.indices.outputs.target_date }}"', self.diagnostic_step)
-        self.assertIn("final-trading-date-evidence.json", self.indices_step)
-        self.assertIn('echo "target_date=$target_date"', self.indices_step)
-
-    def test_final_daily_evidence_is_a_publication_gate(self):
-        self.assertIn("from tools.final_daily_evidence import validate_snapshot", self.final_step)
-        self.assertIn("final_evidence = validate_snapshot", self.final_step)
-        self.assertIn('if not final_evidence["finalEligible"]:', self.final_step)
-        self.assertIn("FINAL_DAILY_HISTORY_NOT_READY:FINAL_DAILY_EVIDENCE_UNUSABLE", self.final_step)
-
-    def test_index_collection_records_a_fresh_execution_window(self):
-        self.assertIn('isoformat(timespec="microseconds")', self.indices_step)
-        self.assertEqual(self.indices_step.count('timespec="microseconds"'), 2)
-        self.assertIn("collection_started_at", self.indices_step)
-        self.assertIn("collection_finished_at", self.indices_step)
-
-    def test_final_requires_closed_indices_before_local_date_collection(self):
-        self.assertIn("validate_final_payload", self.indices_step)
-        self.assertIn("final-trading-date-evidence.json", self.final_step)
-        self.assertIn("--fetch-today", self.final_step)
-        self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
-        self.assertIn("steps.indices.outputs.exit_code == '0'", self.final_step)
-
-    def test_final_update_collects_naver_daily_local_dates_for_observed_set(self):
-        self.assertIn("--observed-snapshot", self.final_step)
-        self.assertIn("--fetch-today", self.final_step)
-        self.assertIn("--allow-source-observed", self.final_step)
-        self.assertIn("--session-diagnostic-output", self.final_step)
-        self.assertIn("final-daily-target.txt", self.final_step)
-        self.assertNotIn("from tools.monitoring_daily_state_update import collect_today_rows", self.final_step)
-        self.assertNotIn("monitoring_daily_payload", self.final_step)
-
-    def test_duplicate_final_run_reuses_same_day_state_without_daily_refetch_contract(self):
-        self.assertIn("--fetch-today", self.final_step)
-        self.assertIn("update_with_universe_refresh", Path(__file__).parent.joinpath(
-            "tools", "monitoring_daily_state_update.py").read_text(encoding="utf-8"))
-        self.assertIn("same-day final generation", Path(__file__).parent.joinpath(
-            "tools", "monitoring_daily_state_update.py").read_text(encoding="utf-8"))
-
-    def test_indices_are_collected_before_final_date_resolution(self):
-        self.assertIn("id: indices", self.indices_step)
-        self.assertLess(self.indices_start, self.start)
-
-    def test_only_successful_opt_in_update_is_publishable(self):
-        self.assertIn('[ "${{ vars.FINAL_DAILY_HISTORY_WRITE }}" = "true" ]', self.publish)
-        self.assertIn('[ "${{ steps.mode.outputs.final_run }}" = "true" ]', self.publish)
-        self.assertIn('[ "${{ steps.final_daily_history.outcome }}" = "success" ]', self.publish)
-        self.assertIn("data/monitoring-daily/kospi.json", self.publish)
-        self.assertIn("data/monitoring-daily/kosdaq.json", self.publish)
-        self.assertIn("data/market-universe/all-assets.json", self.publish)
-        self.assertIn("data/monitoring-daily/retired.json", self.publish)
-        self.assertIn("data/monitoring-daily/universe-lifecycle.json", self.publish)
-        self.assertIn("data/monitoring-daily/trading-session-diagnostic.json", self.publish)
-        self.assertIn("data/monitoring-baseline/latest.json", self.publish)
-        self.assertIn("final_daily_gate_required", self.publish)
-        self.assertIn('preserving prior evidence', self.publish)
-
-    def test_failed_final_paths_are_restored_before_rebase(self):
-        self.assertIn("Final daily update failed; restoring only its generated production paths", self.publish)
-        self.assertIn("restore_generated_path()", self.publish)
-        self.assertIn("git ls-files --error-unmatch", self.publish)
-        self.assertIn("git restore --source=HEAD --staged --worktree", self.publish)
-        self.assertIn("rm -f --", self.publish)
-        for path in (
-            "data/dynamic-universe/latest.json",
-            "data/monitoring/latest-breadth.json",
-            "data/monitoring/latest-changes.json",
-            "data/monitoring/latest-industries.json",
-            "data/monitoring/latest-leaders.json",
-            "data/monitoring/latest-quality.json",
-            "data/monitoring/latest-stock-signals.json",
-            "data/monitoring/latest-summary.json",
-            "data/monitoring/latest-theme-signals.json",
+    def test_refresh_is_intraday_only(self):
+        for forbidden in (
+            "run_mode:", "final_recovery", "source_mode:",
+            "Resolve refresh mode", "steps.mode", "final_daily_history",
+            "Diagnose final daily-bar evidence", "Prepare final daily monitoring update",
+            "FINAL_DAILY_HISTORY_WRITE", "--allow-source-observed-final",
+            "--source-observed-date",
         ):
-            self.assertIn(path, self.publish)
-        self.assertIn("git ls-files --others --exclude-standard", self.publish)
+            self.assertNotIn(forbidden, self.text)
 
-    def test_report_contract_is_publishable_only_after_successful_generation(self):
-        self.assertIn('steps.report_contract.outputs.status }}" = "SUCCESS"', self.publish)
-        self.assertIn("data/monitoring/latest-report-contract.json", self.publish)
-        self.assertIn("contract_publish_eligible=false", self.publish)
-        self.assertIn('contract_publish_eligible=true', self.publish)
+    def test_krx_primary_input_is_passed_to_relay_and_full_market(self):
+        self.assertIn("--krx-input-dir", self.text)
+        self.assertIn("KRX_INPUT=AVAILABLE historicalSource=KRX fallbackUsed=false", self.text)
+        self.assertIn('"${{ steps.krx.outputs.krx_report_input_dir }}"', self.text)
 
-    def test_contract_publish_eligibility_matches_market_add_gate(self):
-        start = self.publish.index("contract_publish_eligible=false")
-        end = self.publish.index("if [ \"$contract_publish_eligible\" != \"true\" ]", start)
-        eligibility = self.publish[start:end]
-        for condition in (
-            'steps.full_market.outputs.ready }}" = "true"',
-            'steps.full_market.outputs.exit_code }}" = "0"',
-            '"$final_daily_gate_required" = "false"',
-            'steps.report_contract.outputs.status }}" = "SUCCESS"',
-            "-f data/monitoring/latest-report-contract.json",
-        ):
-            self.assertIn(condition, eligibility)
+    def test_current_indices_are_collected_without_final_close_validation(self):
+        self.assertIn("python market_indices.py", self.text)
+        self.assertIn("INTRADAY_INDEX_SNAPSHOT", self.text)
+        self.assertNotIn("validate_final_payload", self.text)
+        self.assertNotIn("POST_MARKET_INDEX_SNAPSHOT", self.text)
 
-    def test_ineligible_report_contract_restores_or_removes_runner_file(self):
-        cleanup = self.publish[self.publish.index("restore_generated_path()"):
-                               self.publish.index("if git diff --cached --quiet")]
-        self.assertIn("data/monitoring/latest-report-contract.json", cleanup)
-        self.assertIn("if [ \"$contract_publish_eligible\" != \"true\" ]", cleanup)
-        self.assertLess(cleanup.index("contract_publish_eligible=false"),
-                        cleanup.index("restore_generated_path data/monitoring/latest-report-contract.json"))
+    def test_contract_failure_stops_publication(self):
+        self.assertIn("no report or market publication is eligible", self.text)
+        self.assertIn('exit "$code"', self.text)
+        self.assertIn("steps.report_contract.outputs.status == 'SUCCESS'", self.text)
 
-    def test_contract_cleanup_precedes_publish_cleanliness_gate(self):
-        cleanup_at = self.publish.index("restore_generated_path data/monitoring/latest-report-contract.json")
-        cleanliness_at = self.publish.index('git ls-files --others --exclude-standard')
-        self.assertLess(cleanup_at, cleanliness_at)
+    def test_push_event_remains_noop(self):
+        self.assertIn("NOOP_PUSH_EVENT", self.text)
+        self.assertIn("No market data collection or publication was performed.", self.text)
 
-    def test_contract_ready_builds_validated_html_before_publication(self):
-        html_start = self.text.index("      - name: Build and validate GitHub HTML report")
-        publish_at = self.text.index("      - name: Commit refreshed production data")
-        html_step = self.text[html_start:publish_at]
-        self.assertIn("id: html_report", html_step)
-        self.assertIn("tools/render_report_from_contract.py", html_step)
-        self.assertIn("--current-observation", html_step)
-        self.assertIn("data/monitoring/latest-report-contract.json", html_step)
-        self.assertIn("continue-on-error: true", html_step)
-        self.assertIn("status=SUCCESS", html_step)
-        self.assertIn("sha256=", html_step)
-        self.assertLess(html_start, publish_at)
-
-    def test_html_is_staged_only_with_the_same_contract_publication_gate(self):
-        start = self.publish.index("html_publish_eligible=false")
-        end = self.publish.index("if git diff --cached --quiet", start)
-        html_publish = self.publish[start:end]
-        for condition in (
-            '"$contract_publish_eligible" = "true"',
-            'steps.html_report.outputs.status }}" = "SUCCESS"',
-            'html_source="${{ steps.html_report.outputs.source_path }}"',
-            'html_filename=$(basename -- "$html_source")',
-            'html_target="$GITHUB_WORKSPACE/data/reports/$html_filename"',
-            'published_html_sha256=$(sha256sum "$html_target"',
-            '"$published_html_sha256" = "${{ steps.html_report.outputs.sha256 }}"',
-            'git add --',
-            'data/reports/latest.html',
-        ):
-            self.assertIn(condition, html_publish)
-
-    def test_html_generation_and_publication_share_resolved_paths_and_hash(self):
-        html_start = self.text.index("      - name: Build and validate GitHub HTML report")
-        publish_start = self.text.index("      - name: Commit refreshed production data")
-        html_step = self.text[html_start:publish_start]
-        self.assertIn("result.get('datedHtml')", html_step)
-        self.assertIn("result.get('html')", html_step)
-        self.assertNotIn('html_path="$HTML_OUTPUT_DIR/${html_as_of}.html"', html_step)
-        self.assertIn('echo "source_path=$html_path" >> "$GITHUB_OUTPUT"', html_step)
-        self.assertIn('echo "latest_source_path=$latest_html_path" >> "$GITHUB_OUTPUT"', html_step)
-
-    def test_ready_email_carries_html_publication_provenance(self):
-        mail_start = self.text.index("      - name: Send MARKET_DATA_READY signal")
-        mail = self.text[mail_start:]
-        for value in (
-            "MARKET_HTML_PUBLISHED",
-            "MARKET_HTML_STATUS",
-            "MARKET_HTML_SHA256",
-            "MARKET_HTML_BYTES",
-            "MARKET_HTML_PATH",
-        ):
-            self.assertIn(value, mail)
-        self.assertIn("htmlPublished", self.text)
-        self.assertIn("htmlSha256", self.text)
-
-    def test_final_update_writes_and_validates_local_date_diagnostic(self):
-        self.assertIn("observed_stocks = snapshot.get(\"stocks\") or []", self.final_step)
-        self.assertIn("OBSERVED_STOCK_UNIVERSE_INVALID", self.final_step)
-        self.assertIn("--session-diagnostic-output", self.final_step)
-        self.assertIn("diagnostic_path=\"$RUNNER_TEMP/trading-session-diagnostic.json\"", self.final_step)
-        self.assertIn("TRADING_DATE_DIAGNOSTIC_UNVERIFIED", self.final_step)
-
-    def test_ready_signal_requires_a_new_publication_commit(self):
-        mail = self.text[self.text.index("id: ready_email"):]
-        self.assertIn("steps.publish.outputs.publication_changed == 'true'", mail[:1200])
-
-    def test_ready_signal_requires_same_generation_markdown_and_html(self):
-        mail = self.text[self.text.index("id: ready_email"):]
-        for condition in (
-            "steps.report_contract.outputs.status == 'SUCCESS'",
-            "steps.observation_report.outputs.status == 'SUCCESS'",
-            "steps.html_report.outputs.status == 'SUCCESS'",
-            "steps.publish.outputs.html_published == 'true'",
-        ):
-            self.assertIn(condition, mail[:1800])
-
-    def test_report_delivery_failure_blocks_ready_signal_and_fails_workflow(self):
-        start = self.text.index("      - name: Fail when current observation report is unavailable")
-        end = self.text.index("      - name: Send MARKET_DATA_READY signal", start)
-        gate = self.text[start:end]
-        self.assertIn("steps.observation_report.outputs.status != 'SUCCESS'", gate)
-        self.assertIn("steps.html_report.outputs.status != 'SUCCESS'", gate)
-        self.assertIn("steps.publish.outputs.html_published != 'true'", gate)
-        self.assertIn("MARKET_DATA_READY is blocked", gate)
-        self.assertIn("exit 1", gate)
-
-    def test_full_market_entrypoint_opts_into_source_observed_only_with_explicit_date(self):
-        calls = self.text.count("--allow-source-observed-final")
-        self.assertEqual(calls, 2)
-        self.assertEqual(self.text.count('--source-observed-date "$target_date"'), 2)
-        self.assertIn("baselineFreshnessStatus", Path(__file__).parent.joinpath(
-            "tools", "run_full_market_monitoring.py").read_text(encoding="utf-8"))
+    def test_publish_split_and_report_delivery_gate_remain(self):
+        self.assertIn("inputs.publish == true", self.text)
+        self.assertIn("Commit refreshed production data", self.text)
+        self.assertIn("MARKET_DATA_READY", self.text)
+        self.assertIn("data/monitoring/latest-report-contract.json", self.text)
 
 
 if __name__ == "__main__":

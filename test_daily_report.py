@@ -527,6 +527,28 @@ class DailyReportTests(unittest.TestCase):
             "OK",
         )
 
+    def test_krx_previous_day_and_naver_current_observation_are_not_stale(self):
+        self.assertEqual(
+            daily_report.coverage_status(
+                42, 42, 42, 42, "ok", False,
+                historical_as_of_date="20261103",
+                observed_date="20261104",
+                current_snapshot_source="NAVER_SEPARATE",
+            ),
+            "OK",
+        )
+
+    def test_old_naver_current_observation_remains_stale(self):
+        self.assertEqual(
+            daily_report.coverage_status(
+                42, 42, 42, 42, "ok", False,
+                historical_as_of_date="20261103",
+                observed_date="20261101",
+                current_snapshot_source="NAVER_SEPARATE",
+            ),
+            "STALE_MARKET_DATA",
+        )
+
     def test_research_index(self):
         payload = {
             "stocks": [

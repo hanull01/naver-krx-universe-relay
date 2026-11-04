@@ -1338,6 +1338,29 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(before, after)
 
 
+    def test_krx_intraday_input_keeps_historical_source_separate_from_quotes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            common = {
+                "source": "KRX_M10_GENERATION", "generationId": "gen_test",
+                "targetDate": "20261103", "datas": [], "status": "ok",
+            }
+            (root / "technicals.json").write_text(json.dumps(common), encoding="utf-8")
+            (root / "states.json").write_text(json.dumps(common), encoding="utf-8")
+            (root / "group-states.json").write_text(json.dumps({"groups": []}), encoding="utf-8")
+            (root / "krx-resolution.json").write_text(json.dumps({
+                "receiptStatus": "VERIFIED", "publicationAuthorized": True,
+                "sourceGeneration": "gen_test", "targetDate": "20261103",
+                "manifestSha256": "a" * 64, "monitoringSha256": "b" * 64,
+            }), encoding="utf-8")
+            with patch.object(relay, "save") as save:
+                relay.load_krx_intraday_inputs(root)
+            written = {call.args[0]: call.args[1] for call in save.call_args_list}
+            self.assertEqual(written["data/technicals.json"]["historicalSource"], "KRX")
+            self.assertEqual(written["data/technicals.json"]["currentSnapshotSource"], "NAVER_SEPARATE")
+            self.assertFalse(written["data/technicals.json"]["historicalFallbackAllowed"])
+
+
 class UniverseCliTests(unittest.TestCase):
     def setUp(self):
         self.tempdir = tempfile.TemporaryDirectory()
@@ -1448,7 +1471,6 @@ class UniverseCliTests(unittest.TestCase):
         self.assertEqual(self.path.read_text(encoding='utf-8'), before)
         self.run_cli('apply', payload)
         self.assertIn('272210', [s['itemCode'] for s in self.universe()['stocks']])
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -45,8 +45,9 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         self.assertEqual(contract["status"], "AVAILABLE")
         self.assertNotIn("htmlAllowed", contract)
         self.assertEqual(contract["fullMarket"]["totalCount"], 1)
-        self.assertEqual(contract["registeredUniverse"]["items"][0]["itemCode"], "005930")
-        self.assertEqual(contract["registeredUniverse"]["items"][0]["metrics"]["ma20"], 114.5)
+        self.assertEqual(contract["registeredUniverse"]["observedCount"], 1)
+        self.assertNotIn("items", contract["registeredUniverse"])
+        self.assertIn("registered-universe-technicals.json", contract["registeredUniverse"]["detailSource"])
         self.assertEqual(contract["provenance"]["fullMarketRows"], 1)
         self.assertIn("technicals.json", contract["fullMarket"]["artifacts"])
         self.assertIn("rolling-history-manifest.json", contract["fullMarket"]["artifacts"])
@@ -92,7 +93,7 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         result = build_report_contract_projection(self.derived, self.universe)
         self.assertEqual(result["contract"]["historicalIndicatorSource"], "KRX")
         self.assertEqual(result["contract"]["fullMarket"]["quality"]["historyCoveragePct"], 100.0)
-        self.assertEqual(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"], [])
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"]["count"], 0)
 
 
 if __name__ == "__main__":

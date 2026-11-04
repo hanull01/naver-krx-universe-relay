@@ -468,7 +468,10 @@ def _compact_relative_top5(contract: Mapping[str, Any], key: str) -> list[Mappin
 def _compact_interest_rows(contract: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     for key in ("registeredUniverse", "monitoredUniverse", "userWatchlist", "interestStocks"):
         value = contract.get(key)
-        items = value.get("items") or value.get("stocks") or [] if isinstance(value, Mapping) else value or []
+        items = (
+            value.get("items") or value.get("stocks") or value.get("preview") or []
+            if isinstance(value, Mapping) else value or []
+        )
         if items:
             return [row for row in items if isinstance(row, Mapping)][:1]
     # The configured user universe is Samsung Electronics.  No market values
