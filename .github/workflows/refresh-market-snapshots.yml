@@ -2,6 +2,11 @@ name: Refresh market snapshots
 
 on:
   workflow_dispatch:
+    inputs:
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD)
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -51,6 +56,15 @@ jobs:
         if: steps.market_day.outputs.run == 'true'
         run: python -m unittest test_naver_market.py test_krx_market_day.py -v
 
+      - name: Resolve approved KRX generation
+        id: krx
+        if: steps.market_day.outputs.run == 'true'
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          expected-date: ${{ inputs.krx_expected_date || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
+
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
         run: git pull --ff-only origin main
@@ -76,7 +90,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/market-snapshots.json
           git add data/market
+          git add data/krx/provenance/market-snapshots.json
           if git diff --cached --quiet; then
             echo "No market snapshot changes to commit"
           else

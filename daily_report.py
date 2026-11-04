@@ -517,6 +517,24 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         ),
         "fallbackUsed": False,
     }
+    resolution_path = root / "krx-resolution.json"
+    if resolution_path.exists():
+        resolution = load_json(resolution_path)
+        if resolution.get("receiptStatus") != "VERIFIED" or resolution.get("publicationAuthorized") is not True:
+            raise ValueError("KRX_RESOLUTION_NOT_VERIFIED")
+        if resolution.get("sourceGeneration") != technicals_payload.get("generationId"):
+            raise ValueError("KRX_RESOLUTION_GENERATION_MISMATCH")
+        if resolution.get("targetDate") != staged["targetDate"]:
+            raise ValueError("KRX_RESOLUTION_DATE_MISMATCH")
+        metadata.update({
+            "sourceGeneration": resolution.get("sourceGeneration"),
+            "manifestSha256": resolution.get("manifestSha256"),
+            "monitoringSha256": resolution.get("monitoringSha256"),
+            "entityCount": resolution.get("entityCount"),
+            "instrumentCount": resolution.get("instrumentCount"),
+            "receiptStatus": resolution.get("receiptStatus"),
+            "publicationAuthorized": resolution.get("publicationAuthorized"),
+        })
     return {
         "mode": "STAGING",
         "technicals": registered_technicals,

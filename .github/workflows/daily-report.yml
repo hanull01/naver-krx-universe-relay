@@ -7,6 +7,10 @@ on:
         description: 'Optional already-published trading date (YYYY-MM-DD) for manual validation'
         required: false
         type: string
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD); defaults to as_of when provided
+        required: false
+        type: string
 permissions:
   contents: write
 
@@ -60,6 +64,15 @@ jobs:
             echo "expected_date=" >> "$GITHUB_OUTPUT"
             echo "Skipping daily report: closed or unverifiable KRX trading day."
           fi
+
+      - name: Resolve approved KRX generation
+        id: krx
+        if: steps.market_day.outputs.run == 'true'
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          expected-date: ${{ inputs.krx_expected_date || inputs.as_of || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main
         if: steps.market_day.outputs.run == 'true'
@@ -120,7 +133,7 @@ jobs:
           # Markdown/HTML is produced by Refresh market data from the same
           # report contract and is never duplicated here.
           python3 daily_report.py --as-of "$as_of" --output-dir data/reports --json-only \
-            --staging-input-dir "$derived_dir"
+            --staging-input-dir '${{ steps.krx.outputs.krx_report_input_dir }}'
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}
           EXPECTED_KRX_TRADING_DATE: ${{ steps.market_day.outputs.expected_date }}
@@ -188,6 +201,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/reports/*.json
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/daily-report.json
+          git add data/krx/provenance/daily-report.json
 
           if git diff --cached --quiet; then
             echo "No daily report changes to commit."

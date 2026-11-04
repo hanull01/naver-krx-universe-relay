@@ -11,6 +11,10 @@ on:
         options:
           - intraday
           - final_recovery
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD); required for an exact-date operational run
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -93,6 +97,15 @@ jobs:
             test_daily_monitoring_baseline.py \
             test_monitoring_production.py \
             test_trading_discovery_quotes.py -v
+
+      - name: Resolve approved KRX generation
+        id: krx
+        if: steps.market_day.outputs.run == 'true'
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          expected-date: ${{ inputs.krx_expected_date || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
@@ -238,6 +251,7 @@ jobs:
           if [ "$code" -eq 0 ]; then
             python tools/run_full_market_monitoring.py \
               --current-file "$RUNNER_TEMP/full-market-current.json" \
+              --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
               --allow-source-observed-final \
               --source-observed-date "$target_date"
             code=$?
@@ -458,6 +472,7 @@ jobs:
           # This intentionally makes no additional NAVER request.
           python tools/run_full_market_monitoring.py \
             --current-file "$RUNNER_TEMP/full-market-current.json" \
+            --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
             --allow-source-observed-final \
             --source-observed-date "$target_date"
           # FINAL/Baseline now represents the same target date.  Reuse the
@@ -643,6 +658,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/refresh.json
+          git add data/krx/provenance/refresh.json
 
           # relay.py owns these Universe-core outputs.  In particular, it does
           # not own data/market, data/research, or data/reports.

@@ -8,6 +8,10 @@ on:
         required: false
         default: false
         type: boolean
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD)
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -58,6 +62,15 @@ jobs:
             test_monitoring_daily_state_update.py \
             test_monitoring_local_date_collection.py \
             test_daily_monitoring_baseline.py -v
+
+      - name: Resolve approved KRX generation
+        id: krx
+        if: steps.market_day.outputs.run == 'true'
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          expected-date: ${{ inputs.krx_expected_date || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Check KST final-close window
         id: closing_window
@@ -132,6 +145,12 @@ jobs:
           if [ "$log_code" -ne 0 ]; then exit "$log_code"; fi
           exit 1
 
+      - name: Stage KRX source metadata
+        if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true'
+        run: |
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/monitoring-daily.json
+
       - name: Commit final rolling state and baseline
         id: publish
         if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run != true
@@ -144,6 +163,7 @@ jobs:
           # stage raw NAVER rows, canonical history, temporary files, or code.
           git add -- \
             data/market-universe/all-assets.json \
+            data/krx/provenance/monitoring-daily.json \
             data/monitoring-daily/kospi.json \
             data/monitoring-daily/kosdaq.json \
             data/monitoring-daily/universe-lifecycle.json \
@@ -156,7 +176,7 @@ jobs:
           else
             echo "PARTIAL result: baseline is intentionally not staged."
           fi
-          expected=$'data/market-universe/all-assets.json\ndata/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/retired.json\ndata/monitoring-daily/trading-session-diagnostic.json\ndata/monitoring-daily/universe-lifecycle.json'
+          expected=$'data/krx/provenance/monitoring-daily.json\ndata/market-universe/all-assets.json\ndata/monitoring-baseline/latest.json\ndata/monitoring-daily/kosdaq.json\ndata/monitoring-daily/retired.json\ndata/monitoring-daily/trading-session-diagnostic.json\ndata/monitoring-daily/universe-lifecycle.json'
           actual=$(git diff --cached --name-only | LC_ALL=C sort)
           if [ -z "$actual" ]; then
             echo "No rolling-state changes to commit (same-day NOOP)."

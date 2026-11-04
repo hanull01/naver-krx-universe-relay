@@ -2,6 +2,11 @@ name: Refresh NAVER Research
 
 on:
   workflow_dispatch:
+    inputs:
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD)
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -27,6 +32,14 @@ jobs:
 
       - name: Install required test dependency
         run: python -m pip install --disable-pip-version-check -r requirements-qa.txt
+
+      - name: Resolve approved KRX generation
+        id: krx
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          expected-date: ${{ inputs.krx_expected_date || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
         run: git pull --ff-only origin main
@@ -139,9 +152,12 @@ jobs:
       - name: Commit updates
         shell: bash
         run: |
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/research.json
           git add data/research
+          git add data/krx/provenance/research.json
 
-          if git diff --cached --quiet -- data/research; then
+          if git diff --cached --quiet -- data/research data/krx/provenance/research.json; then
             echo "No research or intelligence changes."
             exit 0
           fi
