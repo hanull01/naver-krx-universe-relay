@@ -183,7 +183,7 @@ jobs:
                     raise SystemExit("PUBLISH_TRUE_COMMIT_STEP_FAILED")
                 if not provenance or any(step.get("conclusion") != "success" for step in provenance):
                     raise SystemExit("PUBLISH_TRUE_PROVENANCE_STEP_FAILED")
-            PY
+          PY
             conclusion=$(printf '%s' "$run_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("conclusion", ""))')
             printf '{"workflow":%s,"runId":%s,"generationId":%s,"targetDate":%s,"publish":%s,"conclusion":%s}\n' \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$workflow")" \
