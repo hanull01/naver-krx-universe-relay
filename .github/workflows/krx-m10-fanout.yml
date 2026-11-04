@@ -147,9 +147,44 @@ jobs:
               echo "::error::Child workflow $workflow failed: run_id=$run_id"
               exit 1
             fi
-            run_json=$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json jobs)
-            printf '%s' "$run_json" | python3 -c 'import json,sys; payload=json.load(sys.stdin); steps=[step for job in (payload.get("jobs") or []) for step in (job.get("steps") or [])]; commits=[step for step in steps if str(step.get("name", "")).startswith("Commit")]; raise SystemExit("PUBLISH_FALSE_COMMIT_STEP_RAN" if any(step.get("conclusion") not in {"skipped", None} for step in commits) else ("NO_PUBLISH_RESULT_MISSING" if not any(step.get("name") == "Report NO_PUBLISH validation result" and step.get("conclusion") == "success" for step in steps) else 0))'
-            conclusion=$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json conclusion --jq .conclusion)
+            run_json=$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json conclusion,jobs)
+            printf '%s' "$run_json" > "$RUNNER_TEMP/krx-child-run.json"
+            PUBLISH_STATE="$PUBLISH" python3 - "$RUNNER_TEMP/krx-child-run.json" <<'PY'
+            import json
+            import os
+            import sys
+
+            payload = json.load(open(sys.argv[1], encoding="utf-8"))
+            publish = os.environ["PUBLISH_STATE"]
+            steps = [
+                step
+                for job in (payload.get("jobs") or [])
+                for step in (job.get("steps") or [])
+            ]
+            commits = [step for step in steps if str(step.get("name", "")).startswith("Commit")]
+            provenance = [
+                step for step in steps
+                if "publication provenance" in str(step.get("name", "")).lower()
+            ]
+            no_publish = [
+                step for step in steps
+                if step.get("name") == "Report NO_PUBLISH validation result"
+            ]
+
+            if payload.get("conclusion") != "success":
+                raise SystemExit("CHILD_WORKFLOW_NOT_SUCCESS")
+            if publish == "false":
+                if any(step.get("conclusion") not in {"skipped", None} for step in commits + provenance):
+                    raise SystemExit("PUBLISH_FALSE_COMMIT_STEP_RAN")
+                if not any(step.get("conclusion") == "success" for step in no_publish):
+                    raise SystemExit("NO_PUBLISH_RESULT_MISSING")
+            else:
+                if not commits or any(step.get("conclusion") != "success" for step in commits):
+                    raise SystemExit("PUBLISH_TRUE_COMMIT_STEP_FAILED")
+                if not provenance or any(step.get("conclusion") != "success" for step in provenance):
+                    raise SystemExit("PUBLISH_TRUE_PROVENANCE_STEP_FAILED")
+            PY
+            conclusion=$(printf '%s' "$run_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("conclusion", ""))')
             printf '{"workflow":%s,"runId":%s,"generationId":%s,"targetDate":%s,"publish":%s,"conclusion":%s}\n' \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$workflow")" \
               "${run_id:-null}" \
