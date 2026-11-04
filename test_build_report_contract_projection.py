@@ -84,7 +84,9 @@ class BuildReportContractProjectionTests(unittest.TestCase):
             "historicalObservedInstrumentCount": 1,
             "historyCoveragePct": 0.0,
             "missingCodes": [],
-            "missingHistoryCodes": [],
+            "missingHistoryCodes": [f"{index:06d}" for index in range(4085)],
+            "regularSessionUnavailableCodes": [f"{index:06d}" for index in range(3953)],
+            "currentSnapshotMissingCodes": [f"{index:06d}" for index in range(4085)],
             "historicalReceiptStatus": "VERIFIED",
             "historicalLineageStatus": "VERIFIED",
         })
@@ -92,7 +94,11 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         result = build_report_contract_projection(self.derived, self.universe)
         self.assertEqual(result["contract"]["historicalIndicatorSource"], "KRX")
         self.assertEqual(result["contract"]["fullMarket"]["quality"]["historyCoveragePct"], 100.0)
-        self.assertEqual(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"], [])
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"]["count"], 4085)
+        self.assertTrue(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"]["available"])
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["regularSessionUnavailableCodes"]["count"], 3953)
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["currentSnapshotMissingCodes"]["count"], 4085)
+        self.assertEqual(len(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"]["preview"]), 3)
 
 
 if __name__ == "__main__":

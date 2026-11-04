@@ -315,6 +315,47 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2Changes"][0]["officialChangeClass"], "COMPARISON_UNAVAILABLE")
         self.assertEqual(contract["v2"]["changesSource"], "reportContract.v2Changes")
 
+    def test_full_market_v2_change_fixture_drops_diagnostics_and_stays_compact(self):
+        rows = []
+        for index in range(343):
+            rows.append({
+                "kind": "theme" if index >= 79 else "industry",
+                "id": str(index),
+                "name": f"그룹-{index}",
+                "baseTradingDate": "20261102",
+                "currentTradingDate": "20261103",
+                "changeClass": "STATUS_CHANGED",
+                "officialChangeClass": "COMPARISON_AVAILABLE",
+                "status": "ACTIVE",
+                "membershipStatus": "VERIFIED",
+                "scoreDelta": 1.25,
+                "relativeStrengthDelta": 0.5,
+                "tradingValueConcentrationDelta": 0.1,
+                "persistenceDays": 3,
+                "leaderChanged": False,
+                "membershipChanged": False,
+                "diagnostics": {"members": [f"{code:06d}" for code in range(4085)]},
+                "rawHistory": "x" * 2000,
+            })
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261103", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"},
+            industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []},
+            leaders={},
+            v2_changes=rows,
+        )
+        payload = json.dumps(contract, ensure_ascii=False, separators=(",", ":")).encode()
+        self.assertLess(len(payload), 900_000)
+        self.assertEqual(len(contract["v2Changes"]), 343)
+        self.assertNotIn("diagnostics", contract["v2Changes"][0])
+        self.assertNotIn("rawHistory", contract["v2Changes"][0])
+        self.assertEqual(contract["v2Changes"][0]["officialChangeClass"], "COMPARISON_AVAILABLE")
+
     def test_full_market_date_diagnostics_are_compacted_with_reference_counts(self):
         generated = "2026-10-30T00:09:00+09:00"
         evidence = {
@@ -631,5 +672,45 @@ class ReportContractTests(unittest.TestCase):
         self.assertFalse(contract["historicalFallbackAllowed"])
         self.assertEqual(contract["currentSnapshotSource"], "NAVER_SEPARATE")
         self.assertEqual(contract["historicalLineage"]["historyCoveragePct"], 100.0)
-        self.assertEqual(contract["historicalLineage"]["missingHistoryCodes"], [])
-        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"], ["005930"])
+        self.assertEqual(contract["historicalLineage"]["missingHistoryCodes"]["count"], 0)
+        self.assertTrue(contract["historicalLineage"]["missingHistoryCodes"]["available"])
+        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"]["count"], 1)
+        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"]["preview"], ["005930"])
+
+    def test_krx_lineage_diagnostics_compact_at_real_entity_scale(self):
+        generated = "2026-11-03T20:05:00+09:00"
+        evidence = {
+            "tradingDate": "20261103", "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "POST_MARKET_SNAPSHOT", "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        quality = {
+            "generatedAt": generated, "tradingDateEvidence": evidence,
+            "historicalIndicatorSource": "KRX", "historicalGenerationId": "gen_20261103",
+            "historicalTargetDate": "20261103", "historicalReceiptStatus": "VERIFIED",
+            "historicalLineageStatus": "VERIFIED", "historicalEntityCount": 4085,
+            "historicalInstrumentCount": 3953, "historicalObservedInstrumentCount": 3953,
+            "missingHistoryCodes": [f"{index:06d}" for index in range(4085)],
+            "regularSessionUnavailableCodes": [f"{index:06d}" for index in range(3953)],
+            "currentSnapshotMissingCodes": [f"{index:06d}" for index in range(4085)],
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261103", "tradingDateEvidence": evidence, "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality=quality, industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        payload = json.dumps(contract, ensure_ascii=False, separators=(",", ":")).encode()
+        self.assertLess(len(payload), 900_000)
+        lineage = contract["historicalLineage"]
+        self.assertEqual(lineage["missingHistoryCodes"]["count"], 4085)
+        self.assertEqual(lineage["regularSessionUnavailableCodes"]["count"], 3953)
+        self.assertEqual(len(lineage["missingHistoryCodes"]["preview"]), 3)
+        self.assertEqual(len(lineage["regularSessionUnavailableCodes"]["preview"]), 3)
+        self.assertEqual(lineage["source"], "KRX")
+        self.assertFalse(lineage["fallbackAllowed"])
+        self.assertEqual(contract["currentSnapshotSource"], "NAVER_SEPARATE")

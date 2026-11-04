@@ -197,6 +197,19 @@ def _historical_lineage(
         quality.get("historicalLineageStatus")
         or ("VERIFIED" if receipt_status == "VERIFIED" and is_krx else "UNAVAILABLE" if is_krx else "NOT_APPLICABLE")
     ).upper()
+    diagnostic_sources = {
+        "missingHistoryCodes": "data/monitoring/latest-quality.json#missingHistoryCodes",
+        "regularSessionUnavailableCodes": "data/monitoring/latest-quality.json#regularSessionUnavailableCodes",
+        "currentSnapshotMissingCodes": "data/monitoring/latest-quality.json#currentSnapshotMissingCodes",
+    }
+    diagnostics = {
+        name: compact_code_diagnostic(values, source_path=diagnostic_sources[name])
+        for name, values in (
+            ("missingHistoryCodes", missing_history),
+            ("regularSessionUnavailableCodes", regular_unavailable),
+            ("currentSnapshotMissingCodes", current_missing),
+        )
+    }
     return {
         "source": "KRX" if is_krx else source,
         "generationId": quality.get("historicalGenerationId") or quality.get("sourceGeneration"),
@@ -208,11 +221,37 @@ def _historical_lineage(
         "instrumentCount": instrument_count,
         "observedInstrumentCount": observed_count,
         "historyCoveragePct": coverage,
-        "missingHistoryCodes": missing_history,
-        "regularSessionUnavailableCodes": regular_unavailable,
-        "currentSnapshotMissingCodes": current_missing,
+        "missingHistoryCodes": diagnostics["missingHistoryCodes"],
+        "regularSessionUnavailableCodes": diagnostics["regularSessionUnavailableCodes"],
+        "currentSnapshotMissingCodes": diagnostics["currentSnapshotMissingCodes"],
         "adjustmentStatus": quality.get("historicalAdjustmentStatus") or "UNAVAILABLE",
         "currentSnapshotSource": quality.get("currentSnapshotSource") or "NAVER_SEPARATE",
+    }
+
+
+def compact_code_diagnostic(value: Any, *, source_path: str) -> dict[str, Any]:
+    """Represent a large code list without copying it into the Work contract."""
+    if isinstance(value, Mapping):
+        entries = list(value.items())
+        normalized: Any = value
+        preview = [{str(key): item} for key, item in entries[:3]]
+    elif isinstance(value, list):
+        entries = value
+        normalized = value
+        preview = value[:3]
+    else:
+        entries = []
+        normalized = []
+        preview = []
+    digest = hashlib.sha256(
+        json.dumps(normalized, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "count": len(entries),
+        "available": isinstance(value, (list, Mapping)),
+        "sourcePath": source_path,
+        "detailSha256": digest,
+        "preview": preview,
     }
 
 
@@ -897,6 +936,43 @@ def _v2_history_summary(
     }
 
 
+_V2_CHANGE_FIELDS = (
+    "kind",
+    "id",
+    "name",
+    "baseTradingDate",
+    "currentTradingDate",
+    "changeClass",
+    "officialChangeClass",
+    "status",
+    "membershipStatus",
+    "scoreDelta",
+    "relativeStrengthDelta",
+    "tradingValueConcentrationDelta",
+    "persistenceDays",
+    "leaderChanged",
+    "membershipChanged",
+)
+
+
+def _compact_v2_changes(rows: Any) -> list[dict[str, Any]]:
+    """Keep change decisions while excluding duplicated history diagnostics.
+
+    The detailed V1/V2 history and source snapshots remain in their dated
+    artifacts.  The report contract only needs the fields used to explain a
+    change in a rendered report; arbitrary per-group diagnostics must not
+    cross the Work transport boundary.
+    """
+    compact: list[dict[str, Any]] = []
+    for row in rows or []:
+        if not isinstance(row, Mapping):
+            continue
+        item = {key: row[key] for key in _V2_CHANGE_FIELDS if key in row}
+        if item:
+            compact.append(item)
+    return compact
+
+
 def build_report_contract(
     *,
     indices: Mapping[str, Any],
@@ -1082,7 +1158,7 @@ def build_report_contract(
     # Keep the report contract compact: detailed raw history remains in the
     # dated source files and only the per-candidate horizon results cross the
     # Work boundary.
-    compact_v2_changes = [dict(row) for row in (v2_changes or []) if isinstance(row, Mapping)]
+    compact_v2_changes = _compact_v2_changes(v2_changes)
     session_context = dict(session_context) if isinstance(session_context, Mapping) else {
         "mode": "NOT_PREOPEN",
         "status": "NOT_APPLICABLE",
