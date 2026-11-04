@@ -22,6 +22,11 @@ on:
         required: false
         default: false
         type: boolean
+      dispatch_ref:
+        description: Workflow ref for child runs; main for operations, PR branch for isolated validation
+        required: false
+        default: main
+        type: string
   repository_dispatch:
     types: [krx_generation_ready]
 
@@ -49,6 +54,7 @@ jobs:
           REQUEST_REF: ${{ inputs.krx_ref || github.event.client_payload.krx_ref || '' }}
           REQUEST_GENERATION: ${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || '' }}
           REQUEST_PUBLISH: ${{ inputs.publish || github.event.client_payload.publish || 'false' }}
+          REQUEST_DISPATCH_REF: ${{ inputs.dispatch_ref || github.event.client_payload.dispatch_ref || 'main' }}
         run: |
           set -euo pipefail
           test -n "$REQUEST_DATE" || { echo "EXPECTED_DATE_REQUIRED" >&2; exit 2; }
@@ -66,6 +72,7 @@ jobs:
           echo "krx_ref=$REQUEST_REF" >> "$GITHUB_OUTPUT"
           echo "generation_id=$REQUEST_GENERATION" >> "$GITHUB_OUTPUT"
           echo "publish=$REQUEST_PUBLISH" >> "$GITHUB_OUTPUT"
+          echo "dispatch_ref=$REQUEST_DISPATCH_REF" >> "$GITHUB_OUTPUT"
 
       - name: Resolve and verify private KRX generation
         id: krx
@@ -106,13 +113,14 @@ jobs:
           KRX_REF: ${{ steps.request.outputs.krx_ref }}
           GENERATION_ID: ${{ steps.request.outputs.generation_id }}
           PUBLISH: ${{ steps.request.outputs.publish }}
+          DISPATCH_REF: ${{ steps.request.outputs.dispatch_ref }}
         shell: bash
         run: |
           set -euo pipefail
           targets=(refresh.yml refresh-monitoring-daily.yml refresh-market-snapshots.yml refresh-research.yml daily-report.yml)
           : > "$RUNNER_TEMP/krx-fanout-results.jsonl"
           for workflow in "${targets[@]}"; do
-            gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref main \
+            gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref "$DISPATCH_REF" \
               -f krx_expected_date="$EXPECTED_DATE" \
               -f krx_ref="$KRX_REF" \
               -f krx_generation_id="$GENERATION_ID" \
