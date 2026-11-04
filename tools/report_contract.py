@@ -1101,11 +1101,16 @@ def build_report_contract(
         },
         "indices": indices.get("indices") or [],
         "fullMarket": {
-            "totalCount": full_market.get("authoritativeCount"),
+            # Breadth arithmetic is evaluated against the valid direction
+            # denominator.  Entity coverage remains available in the market
+            # breakdown and quality fields; missing returns are not coerced
+            # into unchanged rows.
+            "totalCount": total.get("directionEligibleCount") or full_market.get("authoritativeCount"),
             "breadth": {
                 "advancers": total.get("advancers"),
                 "decliners": total.get("decliners"),
                 "unchanged": total.get("unchanged"),
+                "directionEligibleCount": total.get("directionEligibleCount"),
             },
             "metrics": {
                 "aboveMA20": metric("aboveMA20", "aboveMA20Count", "aboveMA20EligibleCount", "pctAboveMA20"),
@@ -1116,6 +1121,12 @@ def build_report_contract(
                 "volumeAbove20DayAverage": metric("volumeAbove20DayAverage", "volumeAbove20DayAverageCount", "volumeAbove20DayAverageEligibleCount", "pctVolumeAbove20DayAverage"),
             },
             "marketTradingValue": market_values,
+            "marketBreakdown": full_market.get("marketBreakdown") or {},
+            "indexIdentities": full_market.get("indexIdentities") or [],
+            "indicatorAvailability": full_market.get("indicatorAvailability") or {},
+            "historicalIndicatorSource": full_market.get("historicalIndicatorSource"),
+            "historicalPriority": full_market.get("historicalPriority"),
+            "historicalFallbackAllowed": full_market.get("historicalFallbackAllowed", False),
         },
         # Full member-level source rows stay in their published artifacts;
         # the contract carries only the stable group summary needed by Work.

@@ -447,8 +447,18 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,
         relay_states_file=RELAY_STATES_FILE, monitoring_daily_dir=MONITORING_DAILY_DIR,
-        allow_source_observed_final=False, source_observed_date=None):
+        allow_source_observed_final=False, source_observed_date=None,
+        krx_resolution_file=None):
     now = now or datetime.now(KST)
+    krx_resolution = None
+    if krx_resolution_file:
+        krx_resolution = load_json(krx_resolution_file)
+        if krx_resolution.get("receiptStatus") != "VERIFIED":
+            return {"status": "NOT_PUBLISHED", "reason": "KRX_RESOLUTION_NOT_VERIFIED"}
+        if krx_resolution.get("publicationAuthorized") is not True:
+            return {"status": "NOT_PUBLISHED", "reason": "KRX_PUBLICATION_NOT_AUTHORIZED"}
+        if krx_resolution.get("historicalSource") != "KRX":
+            return {"status": "NOT_PUBLISHED", "reason": "KRX_HISTORICAL_SOURCE_INVALID"}
     baseline = load_json(baseline_file)
     source_observed_requested = bool(
         allow_source_observed_final
@@ -496,6 +506,15 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         "universeCrossCheck": cross_check,
         "monitoredUniverse": monitored,
         "monitoredUniverseLeaders": monitored["monitoredUniverseLeaders"],
+        "sourceGeneration": (krx_resolution or {}).get("sourceGeneration"),
+        "krxManifestSha": (krx_resolution or {}).get("manifestSha256"),
+        "krxMonitoringSha": (krx_resolution or {}).get("monitoringSha256"),
+        "krxTargetDate": (krx_resolution or {}).get("targetDate"),
+        "krxReceiptStatus": (krx_resolution or {}).get("receiptStatus"),
+        "krxEntityCount": (krx_resolution or {}).get("entityCount"),
+        "krxInstrumentCount": (krx_resolution or {}).get("instrumentCount"),
+        "historicalSource": (krx_resolution or {}).get("historicalSource", "NAVER_LEGACY"),
+        "currentSnapshotSource": (krx_resolution or {}).get("currentSnapshotSource", "NAVER"),
     }
     if freshness_status == "BASELINE_STALE":
         context["expectedPreviousTradingDate"] = expected_previous_date
@@ -535,12 +554,14 @@ def main():
     parser.add_argument("--allow-source-observed-final", action="store_true")
     parser.add_argument("--source-observed-date")
     parser.add_argument("--no-write", action="store_true")
+    parser.add_argument("--krx-resolution")
     args = parser.parse_args()
     result = run(baseline_file=args.baseline_file, output_dir=args.output_dir, current_file=args.current_file,
                  relay_quotes_file=args.relay_quotes_file, relay_states_file=args.relay_states_file,
                  monitoring_daily_dir=args.monitoring_daily_dir,
                  allow_source_observed_final=args.allow_source_observed_final,
-                 source_observed_date=args.source_observed_date, no_write=args.no_write)
+                 source_observed_date=args.source_observed_date, no_write=args.no_write,
+                 krx_resolution_file=args.krx_resolution)
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["status"] == "SUCCESS" else 2
 

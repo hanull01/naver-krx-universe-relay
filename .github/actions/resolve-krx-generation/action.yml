@@ -1,0 +1,81 @@
+name: Resolve approved KRX generation
+description: Read and validate one private KRX generation without publishing payloads
+inputs:
+  repository:
+    description: Private repository containing data/krx_sync
+    required: false
+    default: hanull01/KIS_Trading
+  ref:
+    description: Private staging branch or immutable commit
+    required: false
+    default: codex/krx-private-sync
+  expected-date:
+    description: Expected KRX trading date in YYYYMMDD form
+    required: false
+    default: ''
+  generation-id:
+    description: Expected immutable KRX generation ID
+    required: false
+    default: ''
+  require-generation-id:
+    description: Refuse to resolve a generation unless the caller supplies its exact ID
+    required: false
+    default: 'true'
+  output-dir:
+    description: Runner-temporary output directory
+    required: true
+  token:
+    description: GitHub token with read access to the private KRX repository
+    required: true
+  require-expected-date:
+    description: Refuse to resolve a generation unless the caller supplies an exact trading date
+    required: false
+    default: 'true'
+outputs:
+  status:
+    value: ${{ steps.resolve.outputs.status }}
+  krx_generation_id:
+    value: ${{ steps.resolve.outputs.krx_generation_id }}
+  krx_manifest_sha:
+    value: ${{ steps.resolve.outputs.krx_manifest_sha }}
+  krx_monitoring_sha:
+    value: ${{ steps.resolve.outputs.krx_monitoring_sha }}
+  krx_target_date:
+    value: ${{ steps.resolve.outputs.krx_target_date }}
+  krx_entity_count:
+    value: ${{ steps.resolve.outputs.krx_entity_count }}
+  krx_instrument_count:
+    value: ${{ steps.resolve.outputs.krx_instrument_count }}
+  krx_receipt_status:
+    value: ${{ steps.resolve.outputs.krx_receipt_status }}
+  krx_report_input_dir:
+    value: ${{ steps.resolve.outputs.krx_report_input_dir }}
+  krx_metadata_path:
+    value: ${{ steps.resolve.outputs.krx_metadata_path }}
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        KRX_PRIVATE_REPO_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        args=(
+          --repository '${{ inputs.repository }}'
+          --ref '${{ inputs.ref }}'
+          --output-dir '${{ inputs.output-dir }}'
+        )
+        if [ -n '${{ inputs.expected-date }}' ]; then
+          args+=(--expected-date '${{ inputs.expected-date }}')
+        fi
+        if [ -n '${{ inputs.generation-id }}' ]; then
+          args+=(--generation-id '${{ inputs.generation-id }}')
+        fi
+        if [ '${{ inputs.require-generation-id }}' = 'true' ]; then
+          args+=(--require-generation-id)
+        fi
+        if [ '${{ inputs.require-expected-date }}' = 'true' ]; then
+          args+=(--require-expected-date)
+        fi
+        python3 -m tools.krx_report_resolver "${args[@]}"

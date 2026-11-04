@@ -1,7 +1,28 @@
 name: Refresh NAVER Research
 
+run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || 'missing-date' }}
+
 on:
   workflow_dispatch:
+    inputs:
+      krx_expected_date:
+        description: Expected KRX generation trading date (YYYYMMDD)
+        required: false
+        type: string
+      krx_ref:
+        description: Immutable private KRX branch or commit SHA
+        required: false
+        default: codex/krx-private-sync
+        type: string
+      krx_generation_id:
+        description: Expected immutable KRX generation ID
+        required: false
+        type: string
+      publish:
+        description: Publish research data; false performs validation only
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -27,6 +48,16 @@ jobs:
 
       - name: Install required test dependency
         run: python -m pip install --disable-pip-version-check -r requirements-qa.txt
+
+      - name: Resolve approved KRX generation
+        id: krx
+        uses: ./.github/actions/resolve-krx-generation
+        with:
+          token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
+          expected-date: ${{ inputs.krx_expected_date || '' }}
+          generation-id: ${{ inputs.krx_generation_id || '' }}
+          output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
         run: git pull --ff-only origin main
@@ -137,11 +168,15 @@ jobs:
         run: python3 -m unittest discover -s . -p 'test_*.py'
 
       - name: Commit updates
+        if: github.event_name != 'workflow_dispatch' || inputs.publish == true
         shell: bash
         run: |
+          mkdir -p data/krx/provenance
+          cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/research.json
           git add data/research
+          git add data/krx/provenance/research.json
 
-          if git diff --cached --quiet -- data/research; then
+          if git diff --cached --quiet -- data/research data/krx/provenance/research.json; then
             echo "No research or intelligence changes."
             exit 0
           fi
@@ -172,3 +207,8 @@ jobs:
           done
           echo "::error::Research collection succeeded, but push was rejected after 3 attempts."
           exit 1
+
+      - name: Report NO_PUBLISH validation result
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == false
+        run: |
+          echo "NO_PUBLISH: validation completed; no commit, push, main publication, or provenance publication was performed."
