@@ -96,6 +96,17 @@ the historical indicator source, kept NAVER current observations separate,
 and reported the staged projection as `PARTIAL` because it is not a final
 production generation.
 
+Date alignment is source-role aware. `historicalAsOfDate=20261103` with a
+`NAVER_SEPARATE` `observedDate=20261104` is a valid
+`KRX_HISTORICAL_NAVER_CURRENT_SEPARATE` combination when the index snapshot
+matches the observed date and the KRX full-market evidence matches the
+historical date. It is reported as `SEPARATE_SOURCES_ALIGNED`, not as a
+calendar-date mismatch. A report may still be `PARTIAL` with
+`statusReason=KRX_STAGED_PROJECTION_NOT_FINAL` while the dates are valid; this
+means the KRX projection has not been promoted to a final generation, not that
+the current snapshot is stale. An older or mismatched NAVER observation keeps
+the alignment status `PARTIAL` and is not cleared by the source split.
+
 The local outbox/receiver QA accepted the generation once, reproduced both
 artifact SHA-256 values on receiver readback, and returned `NO_CHANGES` on the
 second delivery attempt. This is a local receiver test, not a GitHub data

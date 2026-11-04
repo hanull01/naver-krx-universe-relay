@@ -45,6 +45,14 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)
         self.assertIn('nowKst=', self.text)
 
+    def test_unavailable_rolling_state_summary_is_literal_shell_text(self):
+        block = self.text.split('      - name: Record unavailable rolling-state NOOP', 1)[1]
+        block = block.split('      - name:', 1)[0]
+        self.assertIn('echo "- status: KRX_ROLLING_STATE_UNAVAILABLE"', block)
+        self.assertIn('echo "- result: NOOP"', block)
+        self.assertNotIn('\\`KRX_ROLLING_STATE_UNAVAILABLE\\`', block)
+        self.assertNotIn('\\`NOOP\\`', block)
+
     def test_no_workflow_run_provisional_path_remains(self):
         self.assertNotIn('workflow_run', self.text)
         self.assertNotIn('extra+=(--provisional)', self.text)

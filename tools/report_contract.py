@@ -1104,7 +1104,14 @@ def build_report_contract(
         """Require both current index observations before marking a contract available."""
         rows = [row for row in (indices.get("indices") or []) if isinstance(row, Mapping)]
         by_name = {str(row.get("name") or row.get("indexName")): row for row in rows}
-        expected = str(trading_date or "").replace("-", "")
+        expected = str(
+            (
+                observed_date
+                if historical_lineage.get("currentSnapshotSource") == "NAVER_SEPARATE"
+                else trading_date
+            )
+            or ""
+        ).replace("-", "")
         if not expected or not {"KOSPI", "KOSDAQ"}.issubset(by_name):
             return False
         for name in ("KOSPI", "KOSDAQ"):
