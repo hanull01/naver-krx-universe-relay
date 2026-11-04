@@ -30,7 +30,7 @@ def make_fixture():
         "source": "KRX_OPEN_API",
         "date": "20261102",
         "entity_count": 1,
-        "entities": [{"identity": "stk_bydd_trd:005930", "code": "005930", "category": "stock"}],
+        "entities": [{"identity": "stk_bydd_trd:005930", "code": "005930", "category": "stock", "asof": "20261102"}],
     }
     report = {
         "schema": "krx_private_report_input_v1",
@@ -41,7 +41,7 @@ def make_fixture():
         "historicalIndicatorSource": "KRX",
         "historicalPriority": "PRIMARY",
         "historicalFallbackAllowed": False,
-        "entities": [{"identity": "stk_bydd_trd:005930", "code": "005930", "category": "stock"}],
+        "entities": [{"identity": "stk_bydd_trd:005930", "code": "005930", "category": "stock", "asof": "20261102"}],
     }
     manifest = {"schema": "krx_m9_generation_manifest_v1", "generation": generation, "date": "20261102", "metrics_date": "20261102"}
     files = {
@@ -62,6 +62,7 @@ def make_fixture():
     private = json.loads(files[f"{base}/private_sync_manifest.json"])
     transfer = {
         "schemaVersion": "krx_m10_private_transfer_v1", "publication": "PRIVATE_KIS_TRADING_ONLY",
+        "publicationAuthorized": True,
         "transferId": f"{generation}:20261102",
         "generationId": generation, "tradingDate": "20261102", "rawIncluded": False,
         "entityCount": 1,
@@ -105,6 +106,19 @@ class PrivateRepoSourceTests(unittest.TestCase):
         files = make_fixture()
         with self.assertRaisesRegex(PrivateSourceError, "PATH_TRAVERSAL"):
             load_verified_private_generation(FixtureFetcher(files), repository="hanull01/KIS_Trading", root="data/krx_sync/../private")
+
+    def test_expected_date_and_publication_authorization_are_required(self):
+        files = make_fixture()
+        with self.assertRaisesRegex(PrivateSourceError, "TARGET_DATE_MISMATCH"):
+            load_verified_private_generation(
+                FixtureFetcher(files), repository="hanull01/KIS_Trading", expected_date="20261103"
+            )
+        transfer_path = "data/krx_sync/generations/gen_20261102_test/transfer_manifest.json"
+        transfer = json.loads(files[transfer_path])
+        transfer["publicationAuthorized"] = False
+        files[transfer_path] = json.dumps(transfer).encode()
+        with self.assertRaisesRegex(PrivateSourceError, "PUBLICATION_NOT_AUTHORIZED"):
+            load_verified_private_generation(FixtureFetcher(files), repository="hanull01/KIS_Trading")
 
     def test_private_source_materializes_into_existing_receiver(self):
         import tempfile

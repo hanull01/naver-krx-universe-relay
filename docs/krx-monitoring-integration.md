@@ -101,6 +101,32 @@ artifact SHA-256 values on receiver readback, and returned `NO_CHANGES` on the
 second delivery attempt. This is a local receiver test, not a GitHub data
 publication.
 
+The approved private staging path was then exercised through
+`hanull01/KIS_Trading` Draft PR #1, branch `codex/krx-private-sync`. Commit
+`f88cf5e0ad6786c10cb9c5b9c148ebdf234db47a` contains only the allowlisted
+`data/krx_sync` generation files for 2026-11-03. The remote Git blob readback
+matched the local manifest, monitoring, report-input, transfer-manifest, and
+`CURRENT` SHA/byte pairs. The public monitoring repository was not used as a
+KRX data sink.
+
+## Report-source matrix
+
+| Report path | Current input owner | KRX generation status | NAVER input retained |
+| --- | --- | --- | --- |
+| `daily_report.py` with `--staging-input-dir` | staged KRX technicals/states plus separate current snapshot | connected in isolated QA | current quotes, research, themes |
+| `daily-report.yml` | existing derived resolver unless staging input is explicitly supplied | not automatically connected | existing report paths |
+| `refresh.yml` / `run_full_market_monitoring.py` | NAVER current snapshot, baseline, industry/theme evidence | not connected to M10 | yes |
+| `refresh-monitoring-daily.yml` | NAVER daily rolling state and baseline | not connected to M10 | yes |
+| `refresh-market-snapshots.yml` | NAVER indices, market and membership snapshots | not connected to M10 | yes |
+| `refresh-research.yml` | NAVER research intelligence and theme membership | not connected to M10 | yes |
+| `backfill-derived.yml` | existing NAVER-derived rolling input | separate legacy path | yes |
+
+Therefore the 2026-11-03 end-to-end result is intentionally `PARTIAL`: the
+daily report adapter consumed the verified KRX generation, while the
+intraday, after-hours, snapshot, and research workflows remain separate
+NAVER-owned paths until an authenticated common resolver is wired into each
+entry point.
+
 ## Private delivery bridge
 
 `tools/krx_m10_sync.py` resolves `krx_m9_runtime_data/CURRENT`, verifies the
@@ -130,7 +156,7 @@ silently mixed into that resolver.
 
 - no M10 LaunchAgent change
 - no KRX API call
-- no KRX raw or derived data committed
+- no KRX raw or derived data committed to this public repository
 - no Cloudflare schedule change
 - no workflow/main change
 - existing NAVER current snapshots remain separate
@@ -142,7 +168,7 @@ The current `daily-report.yml` has `workflow_dispatch` only; it has no fixed
 dispatch of `daily-report.yml` after a successful derived backfill. The
 un-deployed `ops/external-scheduler/worker.js` still contains legacy 23:00
 and 08:00 slot mappings; this branch does not activate or change that
-external scheduler. No KRX 08:05 → sync → report chain is active in this
+external scheduler. No KRX 08:05 → sync → full-report chain is active in this
 branch. The safe production sequence remains a future gated integration:
 verify the KRX generation, use an approved private transport, re-read and
 verify the receiver SHA, then invoke the report and pre-open stages. Until

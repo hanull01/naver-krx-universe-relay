@@ -89,6 +89,7 @@ def load_verified_private_generation(
     repository: str,
     ref: str = "main",
     root: str = "data/krx_sync",
+    expected_date: str | None = None,
 ) -> dict[str, Any]:
     """Fetch and verify only one private KRX generation.
 
@@ -102,6 +103,8 @@ def load_verified_private_generation(
     current = _json(_fetch(fetcher, repository, ref, current_path), current_path)
     generation = _generation(current.get("generationId"))
     trading_date = _date(current.get("tradingDate"), "current_trading_date")
+    if expected_date is not None and trading_date != _date(expected_date, "expected_date"):
+        raise PrivateSourceError("TARGET_DATE_MISMATCH")
     generation_root = _safe_path(root, f"generations/{generation}")
     paths = {
         "manifest": _safe_path(generation_root, "generation_manifest.json"),
@@ -127,6 +130,8 @@ def load_verified_private_generation(
         raise PrivateSourceError("M10_MANIFEST_DATE_MISMATCH")
     if transfer.get("schemaVersion") != "krx_m10_private_transfer_v1" or transfer.get("publication") != "PRIVATE_KIS_TRADING_ONLY":
         raise PrivateSourceError("TRANSFER_CONTRACT_INVALID")
+    if transfer.get("publicationAuthorized") is not True:
+        raise PrivateSourceError("PUBLICATION_NOT_AUTHORIZED")
     if transfer.get("transferId") != f"{generation}:{trading_date}":
         raise PrivateSourceError("TRANSFER_ID_INVALID")
     if transfer.get("generationId") != generation or _date(transfer.get("tradingDate"), "transfer_date") != trading_date:
@@ -161,6 +166,13 @@ def load_verified_private_generation(
     identities = [row.get("identity") for row in entities if isinstance(row, Mapping)]
     if len(identities) != len(entities) or len(identities) != len(set(identities)):
         raise PrivateSourceError("MONITORING_IDENTITY_INVALID")
+    for row in entities:
+        if not isinstance(row, Mapping):
+            raise PrivateSourceError("MONITORING_ENTITY_OBJECT_INVALID")
+        if _date(row.get("asof"), "entity_date") != trading_date:
+            raise PrivateSourceError("MONITORING_ENTITY_DATE_MISMATCH")
+        if str(row.get("status") or "").upper() in {"STALE", "STALE_MARKET_DATA"}:
+            raise PrivateSourceError("MONITORING_ENTITY_STALE")
 
     if report_input.get("schema") != PRIVATE_INPUT_SCHEMA or report_input.get("source") != "KRX_OPEN_API":
         raise PrivateSourceError("REPORT_INPUT_CONTRACT_INVALID")
