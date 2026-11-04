@@ -1187,6 +1187,37 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["indexAlignmentStatus"], "ALIGNED_TO_OBSERVED_DATE")
         self.assertEqual(got["mismatches"], [])
 
+    def test_krx_projection_keeps_missing_trading_value_explicit_but_accepts_ma_basis_evidence(self):
+        got = daily_report.date_alignment(
+            "2026-11-03",
+            {"indices": [{"sourceTime": "2026-11-04T08:05:00+09:00"}]},
+            {
+                "status": "AVAILABLE", "asOfDate": "20261103",
+                "snapshotDate": "20261103", "snapshotDateStatus": "DERIVED_TARGET_DATE",
+                "maBasisDates": ["20261103"],
+                "maBasisDateEvidence": {
+                    "status": "VERIFIED", "source": "KRX_M10_GENERATION",
+                    "sourceDate": "20261103",
+                },
+                "marketTradingValue": {},
+                "marketTradingValueEvidence": {
+                    "status": "UNAVAILABLE",
+                    "reason": "UNAVAILABLE_M10_FIELD_MISSING",
+                    "source": "KRX_M10_GENERATION",
+                    "sourceDate": None,
+                },
+            },
+            observed_date="2026-11-04",
+            historical_source="KRX",
+            current_snapshot_source="NAVER_SEPARATE",
+        )
+        self.assertEqual(got["status"], "PARTIAL")
+        self.assertEqual(got["missingEvidence"], ["MARKET_TRADING_VALUE_SOURCE_DATE"])
+        self.assertEqual(
+            got["missingEvidenceDetails"]["MARKET_TRADING_VALUE_SOURCE_DATE"]["reason"],
+            "UNAVAILABLE_M10_FIELD_MISSING",
+        )
+
     def test_date_alignment_rejects_old_naver_current_index_for_separate_sources(self):
         got = daily_report.date_alignment(
             "2026-11-03",

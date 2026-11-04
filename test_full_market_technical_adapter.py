@@ -281,9 +281,17 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         projection = {
             "asOf": "20261029", "status": "AVAILABLE",
             "observedAt": "2026-11-01T07:00:00+09:00",
-            "fullMarket": {"breadth": {"advancers": 1}, "leaders": [], "quality": {}},
+            "fullMarket": {
+                "breadth": {"advancers": 1}, "leaders": [], "quality": {},
+                "maBasisDates": ["20261029"],
+                "maBasisDateEvidence": {"status": "VERIFIED"},
+                "marketTradingValueEvidence": {"status": "UNAVAILABLE"},
+            },
         }
         result = daily_report.full_market_from_derived_projection(projection, "2026-10-29")
+        self.assertEqual(result["maBasisDates"], ["20261029"])
+        self.assertEqual(result["maBasisDateEvidence"]["status"], "VERIFIED")
+        self.assertEqual(result["marketTradingValueEvidence"]["status"], "UNAVAILABLE")
         summary = daily_report.full_market_summary(
             result, {"status": "OK", "mismatches": [], "missingEvidence": []}
         )
