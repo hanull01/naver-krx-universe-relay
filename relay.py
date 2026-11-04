@@ -1576,7 +1576,70 @@ def timed_step(name, fn, *args, **kwargs):
     return result
 
 
-def run_quote_pipeline():
+def load_krx_intraday_inputs(input_dir):
+    """Install verified KRX historical inputs while keeping NAVER quotes separate."""
+    root = Path(input_dir)
+    required = ("technicals.json", "states.json", "group-states.json", "krx-resolution.json")
+    missing = [name for name in required if not (root / name).is_file()]
+    if missing:
+        raise ValueError("KRX_INPUT_UNAVAILABLE:" + ",".join(missing))
+    resolution = json.loads((root / "krx-resolution.json").read_text(encoding="utf-8"))
+    if resolution.get("receiptStatus") != "VERIFIED" or resolution.get("publicationAuthorized") is not True:
+        raise ValueError("KRX_RESOLUTION_NOT_VERIFIED")
+    technicals = json.loads((root / "technicals.json").read_text(encoding="utf-8"))
+    states = json.loads((root / "states.json").read_text(encoding="utf-8"))
+    groups = json.loads((root / "group-states.json").read_text(encoding="utf-8"))
+    if technicals.get("source") != "KRX_M10_GENERATION":
+        raise ValueError("KRX_HISTORICAL_SOURCE_INVALID")
+    if technicals.get("generationId") != resolution.get("sourceGeneration"):
+        raise ValueError("KRX_INPUT_GENERATION_MISMATCH")
+    if technicals.get("targetDate") != resolution.get("targetDate"):
+        raise ValueError("KRX_INPUT_DATE_MISMATCH")
+    provenance = {
+        "historicalSource": "KRX",
+        "historicalFallbackAllowed": False,
+        "sourceGeneration": resolution.get("sourceGeneration"),
+        "targetDate": resolution.get("targetDate"),
+        "manifestSha256": resolution.get("manifestSha256"),
+        "monitoringSha256": resolution.get("monitoringSha256"),
+        "currentSnapshotSource": "NAVER_SEPARATE",
+        "receiptStatus": resolution.get("receiptStatus"),
+    }
+    for payload in (technicals, states, groups):
+        payload.update(provenance)
+    save("data/technicals.json", technicals)
+    save("data/technicals-lite.json", {
+        **{key: technicals.get(key) for key in ("generatedAt", "expectedCount", "count", "missingCodes", "status")},
+        **provenance,
+        "datas": [
+            {key: row.get(key) for key in TECHNICAL_LITE_FIELDS}
+            for row in technicals.get("datas", [])
+        ],
+    }, compact=True)
+    save("data/states.json", states)
+    save("data/states-lite.json", {
+        **{key: states.get(key) for key in ("generatedAt", "expectedCount", "count", "missingCodes", "status")},
+        **provenance,
+        "datas": [
+            {key: row.get(key) for key in (
+                "itemCode", "price", "priceVsMA20", "priceVsMA60", "maAlignment",
+                "priorHigh20", "priorHigh60", "breakout20", "breakout60",
+                "volumeRatio20", "volumeState", "pullbackState", "status",
+            )}
+            for row in states.get("datas", [])
+        ],
+    }, compact=True)
+    save("data/group-states.json", groups)
+    save("data/group-states-lite.json", groups, compact=True)
+    print(
+        "KRX_INPUT=PRIMARY "
+        f"generation={resolution.get('sourceGeneration')} targetDate={resolution.get('targetDate')} "
+        "currentSnapshotSource=NAVER_SEPARATE historicalFallbackAllowed=false"
+    )
+    return technicals, states, groups
+
+
+def run_quote_pipeline(krx_input_dir=None):
     """Refresh quotes and derive intraday outputs from the selected history."""
     failed = False
     result = timed_step('quotes', collect_quotes)
@@ -1584,6 +1647,13 @@ def run_quote_pipeline():
     if quote_snapshot_unusable(result):
         print('Quote collection failed; preserving last successful production snapshot.')
         return True
+    if krx_input_dir:
+        try:
+            load_krx_intraday_inputs(krx_input_dir)
+            return False
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"KRX_INPUT=UNAVAILABLE reason={exc}")
+            return True
     daily_loader = None
     derived_run = os.environ.get('DERIVED_RUN_DIR')
     if derived_run:
@@ -1635,12 +1705,13 @@ def run_quote_pipeline():
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['quotes', 'daily', 'intraday', 'all'], default='all', nargs='?')
+    parser.add_argument('--krx-input-dir', default=None)
     args = parser.parse_args(argv)
     failed = False
     if args.mode in ('daily', 'all'):
         failed |= any(r['status'] in ('error', 'insufficient') for r in timed_step('daily', collect_all_daily))
     if args.mode in ('quotes', 'intraday', 'all'):
-        failed |= run_quote_pipeline()
+        failed |= run_quote_pipeline(args.krx_input_dir)
     return 1 if failed else 0
 
 

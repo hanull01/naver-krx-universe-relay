@@ -28,13 +28,18 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertNotIn('sleep 300', self.text)
         self.assertNotIn('Full-market daily readiness attempt', self.text)
         self.assertIn('python krx_market_day.py', self.text)
-        self.assertIn('--fetch-today --refresh-universe --date', self.text)
+        self.assertNotIn('--fetch-today', self.text)
+        self.assertIn('--daily-input', self.text)
         self.assertIn('per-code bounded retries', self.text)
         self.assertIn('preserving all production artifacts', self.text)
 
-    def test_before_close_skips_fetch_and_only_incomplete_rows_retry(self):
-        self.assertIn('Check KST final-close window', self.text)
-        self.assertIn('BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
+    def test_krx_morning_generation_allows_intraday_rolling_state(self):
+        self.assertIn('Resolve intraday rolling-state window', self.text)
+        self.assertIn('KRX_PRIMARY_AVAILABLE', self.text)
+        self.assertIn('KRX_ROLLING_STATE_UNAVAILABLE', self.text)
+        self.assertIn('DAILY_INPUT_NOT_PRESENT', self.text)
+        self.assertIn('validate_krx_daily_input.py', self.text)
+        self.assertNotIn('BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish', self.text)
         self.assertIn("steps.closing_window.outputs.eligible == 'true'", self.text)
         self.assertIn('if [ "$code" -eq 2 ]', self.text)
         self.assertIn('UNIVERSE_HISTORY_REQUIRED', self.text)
@@ -54,12 +59,19 @@ class ClosingRollingWorkflowTests(unittest.TestCase):
         self.assertNotIn('git push --force', self.text)
         self.assertIn('git diff --cached --name-only', self.text)
 
+    def test_publish_false_cannot_commit_or_push_rolling_state(self):
+        block = self.text.split('      - name: Commit final rolling state and baseline', 1)[1]
+        condition = next(line for line in block.splitlines() if line.strip().startswith('if:'))
+        self.assertIn('inputs.publish == true', condition)
+        self.assertIn('inputs.dry_run != true', condition)
+
     def run_update_step(self, payload, exit_code=0, dry_run=True, tee_exit=0):
         # Execute the actual workflow shell with a fake collector. JSON parsing,
         # tee, PIPESTATUS and the output gate are real; no network is used.
         step = self.text.split('      - name: Collect, validate, and update rolling state', 1)[1]
         body = textwrap.dedent(step.split('        run: |\n', 1)[1].split('\n      - name:', 1)[0])
         body = body.replace('${{ steps.closing_window.outputs.target_date }}', '2026-10-26')
+        body = body.replace('${{ steps.krx_daily.outputs.path }}', str(Path(tempfile.gettempdir()) / 'daily-input.json'))
         body = body.replace('${{ vars.PARTIAL_FINAL_ENABLED }}', 'true')
         stub = '''python() {
           if [ "$1" = "tools/build_monitoring_daily_state.py" ]; then

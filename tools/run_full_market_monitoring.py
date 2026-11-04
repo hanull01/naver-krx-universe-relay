@@ -482,7 +482,7 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         krx_resolution = dict(krx_resolution or input_resolution)
         krx_resolution["inputMode"] = "DIRECT_KRX_REPORT_INPUT"
         krx_resolution["inputArtifacts"] = list(required)
-    baseline = load_json(baseline_file)
+    baseline = load_json(baseline_file) or {}
     source_observed_requested = bool(
         allow_source_observed_final
         and baseline.get("historyStatus") == "SOURCE_OBSERVED"
@@ -503,7 +503,10 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     # collection deadlock; the resulting evidence records the warning and
     # must not be treated as a current-day baseline.
     if not fresh and freshness_status != "BASELINE_STALE":
-        return {"status": "NOT_PUBLISHED", "reason": freshness_status}
+        if krx_input_dir and freshness_status == "BASELINE_UNAVAILABLE":
+            freshness_status = "KRX_PRIMARY_NO_BASELINE"
+        else:
+            return {"status": "NOT_PUBLISHED", "reason": freshness_status}
     current = load_json(current_file) if current_file else collector()
     if not snapshot_is_publishable(current):
         return {"status": "NOT_PUBLISHED", "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
@@ -514,11 +517,13 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     cross_check = cross_check_universe_snapshot(universe_subset, relay_quotes_file)
     monitored = monitored_universe_summary(universe_subset, relay_quotes_file, relay_states_file)
     context = {
-        "baselineAsOfDate": baseline["asOfDate"], "baselineGeneratedAt": baseline.get("generatedAt"),
+        "baselineAsOfDate": baseline.get("asOfDate"), "baselineGeneratedAt": baseline.get("generatedAt"),
         "baselineCoverage": baseline.get("coveragePct"), "baselineFreshnessStatus": freshness_status,
         # These deliberately name distinct clocks.  A delayed full-market
         # collection must not be mistaken for the relay quote's source time.
         "currentSnapshotGeneratedAt": current.get("generatedAt"), "currentCoverage": current.get("coverageCount"),
+        "observedDate": now.strftime("%Y%m%d"),
+        "observedAt": current.get("generatedAt") or now.isoformat(),
         "currentAttempt": current.get("attemptCount"), "evidenceGeneratedAt": now.isoformat(),
         "relayQuoteGeneratedAt": cross_check.get("relayGeneratedAt"),
         "relayQuoteSourceTime": cross_check.get("relaySourceTime"),

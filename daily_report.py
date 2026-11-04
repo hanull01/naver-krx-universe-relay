@@ -501,6 +501,7 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "historicalGroupsStatus": staged["historicalGroups"].get("availabilityStatus"),
         "currentSnapshot": dict(staged["currentSnapshot"]),
         "currentSnapshotSeparated": True,
+        "currentSnapshotSource": "NAVER_SEPARATE",
         "historicalIndicatorSource": staged["historicalIndicatorSource"],
         "historicalPriority": staged["historicalPriority"],
         "historicalFallbackAllowed": staged["historicalFallbackAllowed"],
@@ -1119,6 +1120,11 @@ def coverage_status(
     state_count,
     quote_status=None,
     quote_fresh=None,
+    *,
+    historical_as_of_date=None,
+    observed_date=None,
+    observed_at=None,
+    current_snapshot_source=None,
 ):
     if enabled_count == 0:
         return "EMPTY_CONFIGURED_UNIVERSE"
@@ -1131,7 +1137,14 @@ def coverage_status(
     if not complete:
         return "INCOMPLETE_MARKET_COVERAGE"
 
-    if quote_status != "ok" or quote_fresh is not True:
+    aligned_current_observation = (
+        str(current_snapshot_source or "").upper() in {"NAVER", "NAVER_SEPARATE"}
+        and historical_as_of_date
+        and observed_date
+        and str(observed_date).replace("-", "") >= str(historical_as_of_date).replace("-", "")
+        and quote_status == "ok"
+    )
+    if (quote_status != "ok" or quote_fresh is not True) and not aligned_current_observation:
         return "STALE_MARKET_DATA"
 
     return "OK"
@@ -1596,9 +1609,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                  discovery_clock=None, staging_input_dir=None):
     universe = load_json(UNIVERSE_PATH)
     quotes = load_json(QUOTES_PATH)
+    quote_observed_at = quotes.get("generatedAt") or quotes.get("sourceTime") if isinstance(quotes, dict) else None
+    quote_observed_date = None
+    if quote_observed_at:
+        quote_observed_date = str(quote_observed_at)[:10].replace("-", "")
     current_snapshot = {
         "status": "AVAILABLE" if MARKET_INDICES_PATH.exists() else "UNAVAILABLE",
-        "source": "CURRENT_SNAPSHOT_INPUT",
+        "source": "NAVER_SEPARATE",
+        "currentSnapshotSource": "NAVER_SEPARATE",
+        "observedDate": quote_observed_date,
+        "observedAt": quote_observed_at,
         "path": str(MARKET_INDICES_PATH),
     }
     technical_inputs = load_report_technical_inputs(staging_input_dir, current_snapshot)
@@ -1903,6 +1923,17 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             krx_missing_history = krx_technicals.get("missingCodes") or []
         krx_regular_unavailable = krx_states.get("regularSessionUnavailableCodes") or []
         krx_current_missing = quotes.get("missingCodes") or []
+        current_snapshot = technical_inputs["metadata"].get("currentSnapshot") or {}
+        observed_date = (
+            current_snapshot.get("observedDate")
+            or current_snapshot.get("tradingDate")
+            or current_snapshot.get("asOfDate")
+        )
+        observed_at = (
+            current_snapshot.get("observedAt")
+            or current_snapshot.get("generatedAt")
+            or quotes.get("generatedAt")
+        )
         contract_summary = {"fullMarket": krx_full_market}
         contract_breadth = {"fullMarket": {"marketTradingValue": {}}}
         contract_quality = {
@@ -1926,6 +1957,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "currentSnapshotMissingCodes": list(krx_current_missing),
             "historicalAdjustmentStatus": krx_lineage.get("adjustmentStatus", "UNAVAILABLE"),
             "currentSnapshotSource": "NAVER_SEPARATE",
+            "observedDate": observed_date,
+            "observedAt": observed_at,
+            "manifestSha256": technical_inputs["metadata"].get("manifestSha256"),
+            "monitoringSha256": technical_inputs["metadata"].get("monitoringSha256"),
+            "entityCount": technical_inputs["metadata"].get("entityCount"),
+            "instrumentCount": technical_inputs["metadata"].get("instrumentCount"),
         }
         contract_leaders = {"fullMarketLeaders": krx_full_market.get("leaders", [])}
     report_contract = build_report_contract(
@@ -1982,6 +2019,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         len(state_idx),
         quotes.get("status"),
         quotes.get("fresh"),
+        historical_as_of_date=(technical_inputs.get("metadata") or {}).get("historicalTargetDate")
+        or (technical_inputs.get("metadata") or {}).get("targetDate"),
+        observed_date=(technical_inputs.get("metadata") or {}).get("currentSnapshot", {}).get("observedDate")
+        or (technical_inputs.get("metadata") or {}).get("currentSnapshot", {}).get("tradingDate")
+        or (technical_inputs.get("metadata") or {}).get("currentSnapshot", {}).get("asOfDate"),
+        current_snapshot_source=(technical_inputs.get("metadata") or {}).get("currentSnapshotSource"),
     )
     breadth = market_breadth(rows)
     current_breadth = market_breadth(rows, "currentState")

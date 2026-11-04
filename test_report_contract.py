@@ -631,5 +631,51 @@ class ReportContractTests(unittest.TestCase):
         self.assertFalse(contract["historicalFallbackAllowed"])
         self.assertEqual(contract["currentSnapshotSource"], "NAVER_SEPARATE")
         self.assertEqual(contract["historicalLineage"]["historyCoveragePct"], 100.0)
-        self.assertEqual(contract["historicalLineage"]["missingHistoryCodes"], [])
-        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"], ["005930"])
+        self.assertEqual(contract["historicalLineage"]["missingHistoryCodes"]["count"], 0)
+        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"]["count"], 1)
+        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"]["preview"], ["005930"])
+
+    def test_krx_scale_compacts_registered_and_candidate_details(self):
+        generated = "2026-11-03T08:05:00+09:00"
+        evidence = {
+            "tradingDate": "20261103", "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        candidates = [
+            {"rank": index, "itemCode": f"{index:06d}", "itemName": "종목",
+             "primaryBucket": "MOMENTUM", "allBuckets": ["MOMENTUM"],
+             "candidateAsOf": "20261103"}
+            for index in range(3953)
+        ]
+        registered = {
+            "status": "AVAILABLE", "registeredCount": 4085,
+            "items": [{"itemCode": f"{index:06d}", "metrics": {"ma20": index}}
+                      for index in range(4085)],
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261103", "tradingDateEvidence": evidence,
+                "markets": {"TOTAL": {}},
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence,
+                     "historicalIndicatorSource": "KRX", "historicalGenerationId": "gen_scale",
+                     "historicalTargetDate": "20261103", "historicalReceiptStatus": "VERIFIED",
+                     "historicalLineageStatus": "VERIFIED", "historicalInstrumentCount": 3953,
+                     "historicalObservedInstrumentCount": 3953},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            technical_candidates=candidates, registered_universe=registered,
+        )
+        payload = json.dumps(contract, ensure_ascii=False, separators=(",", ":")).encode()
+        self.assertLess(len(payload), 900_000)
+        self.assertNotIn("items", contract["registeredUniverse"])
+        self.assertEqual(contract["registeredUniverse"]["registeredCount"], 4085)
+        self.assertEqual(contract["candidates"]["count"], 3953)
+        self.assertLessEqual(len(contract["technicalCandidates"]), 100)
+        self.assertEqual(contract["historicalLineage"]["generationId"], "gen_scale")

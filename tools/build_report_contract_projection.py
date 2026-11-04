@@ -17,7 +17,11 @@ from typing import Any, Mapping
 
 from tools.file_digest import sha256_bytes, sha256_file
 
-from tools.report_contract import MAX_WORK_CONTRACT_BYTES, validate_contract_payload
+from tools.report_contract import (
+    MAX_WORK_CONTRACT_BYTES,
+    compact_detail_reference,
+    validate_contract_payload,
+)
 
 
 class ReportContractProjectionError(ValueError):
@@ -196,8 +200,13 @@ def _registered_projection(
         "status": "AVAILABLE" if not missing else "PARTIAL" if items else "UNAVAILABLE",
         "configuredCount": len(codes),
         "observedCount": len(items),
-        "missingCodes": missing,
-        "items": items,
+        "missingCodes": compact_detail_reference(
+            missing,
+            source_path="registered-universe-technicals.json#missingCodes",
+        ),
+        "detailCount": len(items),
+        "detailSource": "registered-universe-technicals.json,registered-universe-states.json",
+        "detailSha256": None,
         "watchlists": universe.get("watchlists") or {},
         "source": "registered-universe-projection-from-full-market-derivatives",
     }
@@ -256,8 +265,7 @@ def build_report_contract_projection(
         key: quality.get(key)
         for key in (
             "status", "totalAssets", "byAssetType", "statusCounts", "missingCodes",
-            "missingHistoryCodes", "regularSessionUnavailableCodes",
-            "currentSnapshotMissingCodes", "historyCoveragePct", "historicalIndicatorSource",
+            "historyCoveragePct", "historicalIndicatorSource",
             "historicalFallbackAllowed", "currentSnapshotSource", "historicalGenerationId",
             "historicalTargetDate", "historicalReceiptStatus", "historicalLineageStatus",
             "historicalEntityCount", "historicalInstrumentCount", "historicalAdjustmentStatus",
@@ -265,6 +273,16 @@ def build_report_contract_projection(
             "noDailyBar", "date20261030Rows", "historicalGroups", "rollingHistory",
         )
     }
+    detail_sha = artifacts["quality.json"]["sha256"]
+    for key in (
+        "missingCodes", "missingHistoryCodes", "regularSessionUnavailableCodes",
+        "currentSnapshotMissingCodes",
+    ):
+        quality_summary[key] = compact_detail_reference(
+            quality.get(key) or [],
+            source_path=f"quality.json#{key}",
+            source_sha256=detail_sha,
+        )
     if str(quality_summary.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource") or "").upper() == "KRX":
         krx_instrument_count = (
             quality_summary.get("historicalInstrumentCount")
@@ -283,15 +301,13 @@ def build_report_contract_projection(
             round(krx_observed_count * 100 / krx_instrument_count, 6)
             if isinstance(krx_instrument_count, int) and krx_instrument_count > 0 else None
         )
-        quality_summary["missingHistoryCodes"] = list(
-            quality_summary.get("missingHistoryCodes") or quality_summary.get("missingCodes") or []
-        )
     contract = {
         "schemaVersion": "market-report-contract-v1",
         "status": quality.get("status", "PARTIAL"),
         "asOf": target,
         "observedAt": generated_at,
         "historicalIndicatorSource": quality.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource"),
+        "sourceGeneration": quality.get("historicalGenerationId") or technicals.get("generationId"),
         "historicalGenerationId": quality.get("historicalGenerationId") or technicals.get("generationId"),
         "historicalTargetDate": quality.get("historicalTargetDate") or target,
         "historicalFallbackAllowed": quality.get("historicalFallbackAllowed", technicals.get("historicalFallbackAllowed", False)),

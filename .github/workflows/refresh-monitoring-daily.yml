@@ -90,22 +90,66 @@ jobs:
           generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
-      - name: Check KST final-close window
+      - name: Resolve optional KRX daily input
+        id: krx_daily
+        if: steps.market_day.outputs.run == 'true'
+        shell: bash
+        env:
+          KRX_INPUT_DIR: ${{ steps.krx.outputs.krx_report_input_dir }}
+          KRX_TARGET_DATE: ${{ steps.krx.outputs.krx_target_date }}
+          KRX_GENERATION_ID: ${{ steps.krx.outputs.krx_generation_id }}
+        run: |
+          set -u
+          daily_input=""
+          for candidate in "$KRX_INPUT_DIR/daily-input.json" "$KRX_INPUT_DIR/daily_input.json"; do
+            if [ -f "$candidate" ]; then
+              daily_input="$candidate"
+              break
+            fi
+          done
+          if [ -z "$daily_input" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "status=KRX_ROLLING_STATE_UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "reason=DAILY_INPUT_NOT_PRESENT" >> "$GITHUB_OUTPUT"
+            echo "::notice::KRX_ROLLING_STATE_UNAVAILABLE: verified KRX generation has no daily input; no NAVER historical fetch will run."
+            exit 0
+          fi
+          set +e
+          validation=$(python3 tools/validate_krx_daily_input.py \
+            --input "$daily_input" \
+            --metadata "$KRX_INPUT_DIR/krx-resolution.json" \
+            --expected-date "$KRX_TARGET_DATE" \
+            --generation-id "$KRX_GENERATION_ID" 2>&1)
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "status=KRX_ROLLING_STATE_UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "reason=DAILY_INPUT_REJECTED" >> "$GITHUB_OUTPUT"
+            echo "::notice::KRX_ROLLING_STATE_UNAVAILABLE: explicit KRX daily input failed validation; no NAVER historical fetch will run."
+            exit 0
+          fi
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "status=KRX_PRIMARY_AVAILABLE" >> "$GITHUB_OUTPUT"
+          echo "path=$daily_input" >> "$GITHUB_OUTPUT"
+          echo "Verified KRX daily input for rolling-state update."
+
+      - name: Resolve intraday rolling-state window
         id: closing_window
         if: steps.market_day.outputs.run == 'true'
         shell: bash
         run: |
-          window=$(python tools/build_monitoring_daily_state.py --closing-window)
-          echo "$window"
-          status=$(python -c 'import json,sys; print(json.load(sys.stdin)["status"])' <<<"$window")
-          target_date=$(python -c 'import json,sys; print(json.load(sys.stdin)["targetDate"])' <<<"$window")
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
-          if [ "$status" = "AFTER_FINAL_CLOSE" ]; then
+          target_date='${{ steps.krx.outputs.krx_target_date }}'
+          if [ '${{ steps.krx_daily.outputs.available }}' = 'true' ]; then
+            echo "status=KRX_PRIMARY_AVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "target_date=$target_date" >> "$GITHUB_OUTPUT"
             echo "eligible=true" >> "$GITHUB_OUTPUT"
+            echo "Using verified KRX daily input for rolling-state input: $target_date"
           else
             echo "eligible=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::BEFORE_FINAL_CLOSE: skipping NAVER fetch, retry, and publish."
+            echo "status=KRX_ROLLING_STATE_UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "target_date=" >> "$GITHUB_OUTPUT"
+            echo "::notice::KRX_ROLLING_STATE_UNAVAILABLE: recording NOOP; intraday report is not blocked by final-close timing."
           fi
 
       - name: Sync latest main before collection
@@ -113,6 +157,17 @@ jobs:
         run: |
           git fetch origin main
           git rebase origin/main
+
+      - name: Record unavailable rolling-state NOOP
+        if: steps.market_day.outputs.run == 'true' && steps.closing_window.outputs.eligible != 'true'
+        shell: bash
+        run: |
+          {
+            echo "## Monitoring daily rolling state"
+            echo "- status: \\`KRX_ROLLING_STATE_UNAVAILABLE\\`"
+            echo "- result: \\`NOOP\\`"
+            echo "- intraday refresh remains independent of final-close timing"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Collect, validate, and update rolling state
         id: update
@@ -131,7 +186,7 @@ jobs:
           echo "Full-market daily collection: targetDate=${target_date}, nowKst=${now_kst}"
           result_file="$RUNNER_TEMP/monitoring-daily-update-result.json"
           python tools/build_monitoring_daily_state.py update-latest \
-            --fetch-today --refresh-universe --date "$target_date" "${extra[@]}" | tee "$result_file"
+            --daily-input "${{ steps.krx_daily.outputs.path }}" --date "$target_date" "${extra[@]}" | tee "$result_file"
           pipeline_codes=("${PIPESTATUS[@]}")
           code=${pipeline_codes[0]}
           log_code=${pipeline_codes[1]}
