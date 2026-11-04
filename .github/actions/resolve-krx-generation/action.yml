@@ -13,6 +13,14 @@ inputs:
     description: Expected KRX trading date in YYYYMMDD form
     required: false
     default: ''
+  generation-id:
+    description: Expected immutable KRX generation ID
+    required: false
+    default: ''
+  require-generation-id:
+    description: Refuse to resolve a generation unless the caller supplies its exact ID
+    required: false
+    default: 'true'
   output-dir:
     description: Runner-temporary output directory
     required: true
@@ -60,6 +68,12 @@ runs:
         )
         if [ -n '${{ inputs.expected-date }}' ]; then
           args+=(--expected-date '${{ inputs.expected-date }}')
+        fi
+        if [ -n '${{ inputs.generation-id }}' ]; then
+          args+=(--generation-id '${{ inputs.generation-id }}')
+        fi
+        if [ '${{ inputs.require-generation-id }}' = 'true' ]; then
+          args+=(--require-generation-id)
         fi
         if [ '${{ inputs.require-expected-date }}' = 'true' ]; then
           args+=(--require-expected-date)

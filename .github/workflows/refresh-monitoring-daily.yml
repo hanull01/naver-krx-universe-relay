@@ -1,5 +1,7 @@
 name: Refresh full-market rolling daily state
 
+run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || 'missing-date' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -12,6 +14,20 @@ on:
         description: Expected KRX generation trading date (YYYYMMDD)
         required: false
         type: string
+      krx_ref:
+        description: Immutable private KRX branch or commit SHA
+        required: false
+        default: codex/krx-private-sync
+        type: string
+      krx_generation_id:
+        description: Expected immutable KRX generation ID
+        required: false
+        type: string
+      publish:
+        description: Publish generated rolling state; false performs validation only
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -69,7 +85,9 @@ jobs:
         uses: ./.github/actions/resolve-krx-generation
         with:
           token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || '' }}
+          generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Check KST final-close window
@@ -153,7 +171,7 @@ jobs:
 
       - name: Commit final rolling state and baseline
         id: publish
-        if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run != true
+        if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run != true && (github.event_name != 'workflow_dispatch' || inputs.publish == true)
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -221,3 +239,8 @@ jobs:
       - name: Report dry-run success
         if: steps.market_day.outputs.run == 'true' && steps.update.outcome == 'success' && steps.update.outputs.ready == 'true' && steps.update.outputs.final_status == 'SUCCESS' && inputs.dry_run == true
         run: echo "Dry-run succeeded; no rolling state or baseline was published."
+
+      - name: Report NO_PUBLISH validation result
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == false && inputs.dry_run != true
+        run: |
+          echo "NO_PUBLISH: validation completed; no commit, push, main publication, or provenance publication was performed."

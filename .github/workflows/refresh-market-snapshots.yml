@@ -1,5 +1,7 @@
 name: Refresh market snapshots
 
+run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || 'missing-date' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,6 +9,20 @@ on:
         description: Expected KRX generation trading date (YYYYMMDD)
         required: false
         type: string
+      krx_ref:
+        description: Immutable private KRX branch or commit SHA
+        required: false
+        default: codex/krx-private-sync
+        type: string
+      krx_generation_id:
+        description: Expected immutable KRX generation ID
+        required: false
+        type: string
+      publish:
+        description: Publish market snapshots; false performs validation only
+        required: false
+        default: true
+        type: boolean
   push:
     branches: [main]
     paths:
@@ -62,7 +78,9 @@ jobs:
         uses: ./.github/actions/resolve-krx-generation
         with:
           token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || '' }}
+          generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
@@ -85,7 +103,7 @@ jobs:
           exit 0
 
       - name: Commit market snapshots
-        if: steps.market_day.outputs.run == 'true'
+        if: steps.market_day.outputs.run == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish == true)
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -152,3 +170,8 @@ jobs:
         run: |
           echo "Market collector reported one or more failures."
           exit 1
+
+      - name: Report NO_PUBLISH validation result
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == false
+        run: |
+          echo "NO_PUBLISH: validation completed; no commit, push, main publication, or provenance publication was performed."

@@ -30,6 +30,7 @@ from tools.krx_sync_receipt import stage_m10_report_inputs
 DEFAULT_REPOSITORY = "hanull01/KIS_Trading"
 DEFAULT_REF = "codex/krx-private-sync"
 DATE_RE = re.compile(r"^\d{8}$")
+COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 class ResolverError(RuntimeError):
@@ -146,11 +147,17 @@ def resolve(
     repository: str = DEFAULT_REPOSITORY,
     ref: str = DEFAULT_REF,
     expected_date: str | None = None,
+    expected_generation_id: str | None = None,
+    require_expected_generation_id: bool = False,
     require_expected_date: bool = False,
     output_dir: str | Path,
 ) -> dict[str, Any]:
     if require_expected_date and not expected_date:
         raise ResolverError("EXPECTED_DATE_REQUIRED")
+    if require_expected_generation_id and not expected_generation_id:
+        raise ResolverError("GENERATION_ID_REQUIRED")
+    if ref != DEFAULT_REF and not COMMIT_RE.fullmatch(ref):
+        raise ResolverError("IMMUTABLE_REF_REQUIRED")
     token = os.environ.get("KRX_PRIVATE_REPO_TOKEN", "").strip()
     fetcher = GitHubContentsFetcher(token, repository)
     try:
@@ -166,6 +173,8 @@ def resolve(
 
     target = _date(verified["tradingDate"], "target_date")
     source_generation = verified["generationId"]
+    if expected_generation_id and source_generation != expected_generation_id:
+        raise ResolverError("GENERATION_ID_MISMATCH")
     monitoring = verified["monitoring"]
     entities = monitoring.get("entities") or []
     instrument_count = sum(row.get("category") in {"stock", "etf"} for row in entities)
@@ -176,6 +185,7 @@ def resolve(
         "sourceGeneration": source_generation,
         "targetDate": target,
         "expectedTradingDate": expected_date,
+        "expectedGenerationId": expected_generation_id,
         "manifestSha256": _sha256(verified["payloads"]["manifest"]),
         "monitoringSha256": _sha256(verified["payloads"]["monitoring"]),
         "entityCount": len(entities),
@@ -241,6 +251,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repository", default=DEFAULT_REPOSITORY)
     parser.add_argument("--ref", default=DEFAULT_REF)
     parser.add_argument("--expected-date")
+    parser.add_argument("--generation-id")
+    parser.add_argument("--require-generation-id", action="store_true")
     parser.add_argument("--require-expected-date", action="store_true")
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -249,6 +261,8 @@ def main(argv: list[str] | None = None) -> int:
             repository=args.repository,
             ref=args.ref,
             expected_date=args.expected_date,
+            expected_generation_id=args.generation_id,
+            require_expected_generation_id=args.require_generation_id,
             require_expected_date=args.require_expected_date,
             output_dir=args.output_dir,
         )

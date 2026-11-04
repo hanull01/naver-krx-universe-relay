@@ -1,5 +1,7 @@
 name: Build daily market report
 
+run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || inputs.as_of || 'missing-date' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,6 +13,20 @@ on:
         description: Expected KRX generation trading date (YYYYMMDD); defaults to as_of when provided
         required: false
         type: string
+      krx_ref:
+        description: Immutable private KRX branch or commit SHA
+        required: false
+        default: codex/krx-private-sync
+        type: string
+      krx_generation_id:
+        description: Expected immutable KRX generation ID
+        required: false
+        type: string
+      publish:
+        description: Publish daily report; false performs validation only
+        required: false
+        default: true
+        type: boolean
 permissions:
   contents: write
 
@@ -71,7 +87,9 @@ jobs:
         uses: ./.github/actions/resolve-krx-generation
         with:
           token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || inputs.as_of || '' }}
+          generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main
@@ -194,7 +212,7 @@ jobs:
           PY
 
       - name: Commit daily report
-        if: steps.market_day.outputs.run == 'true'
+        if: steps.market_day.outputs.run == 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish == true)
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -228,3 +246,8 @@ jobs:
           done
           echo "::error::Daily report build succeeded, but push was rejected after 3 attempts."
           exit 1
+
+      - name: Report NO_PUBLISH validation result
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == false
+        run: |
+          echo "NO_PUBLISH: validation completed; no commit, push, main publication, or provenance publication was performed."

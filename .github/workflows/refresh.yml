@@ -1,5 +1,7 @@
 name: Refresh market data
 
+run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || 'missing-date' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -15,6 +17,20 @@ on:
         description: Expected KRX generation trading date (YYYYMMDD); required for an exact-date operational run
         required: false
         type: string
+      krx_ref:
+        description: Immutable private KRX branch or commit SHA
+        required: false
+        default: codex/krx-private-sync
+        type: string
+      krx_generation_id:
+        description: Expected immutable KRX generation ID
+        required: false
+        type: string
+      publish:
+        description: Publish generated data to main; false performs validation only
+        required: false
+        default: true
+        type: boolean
   push:
     branches: [main]
     paths:
@@ -104,7 +120,9 @@ jobs:
         uses: ./.github/actions/resolve-krx-generation
         with:
           token: ${{ secrets.KRX_PRIVATE_REPO_TOKEN }}
+          ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || '' }}
+          generation-id: ${{ inputs.krx_generation_id || '' }}
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
@@ -653,7 +671,7 @@ jobs:
 
       - name: Commit refreshed production data
         id: publish
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0'
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && (github.event_name != 'workflow_dispatch' || inputs.publish == true)
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -969,7 +987,7 @@ jobs:
         run: echo "::warning::MARKET_DATA_READY email was not sent; market data publication remains successful."
 
       - name: Commit collector diagnostic only
-        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != ''
+        if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code != '0' && steps.full_market.outputs.exit_code != '0' && hashFiles('data/status/quotes-error.json') != '' && (github.event_name != 'workflow_dispatch' || inputs.publish == true)
         shell: bash
         run: |
           echo "Collector failed; preserving last successful production snapshot."
@@ -1001,3 +1019,8 @@ jobs:
         if: steps.market_day.outputs.run == 'true' && steps.collect.outputs.exit_code == '0' && steps.full_market.outputs.exit_code != '0'
         run: |
           echo "Full-market evidence failed; core 42-stock publication and MARKET_DATA_READY remain eligible."
+
+      - name: Report NO_PUBLISH validation result
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == false
+        run: |
+          echo "NO_PUBLISH: validation completed; no commit, push, main publication, or provenance publication was performed."
