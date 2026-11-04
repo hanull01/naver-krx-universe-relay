@@ -31,6 +31,14 @@ on:
         required: false
         default: true
         type: boolean
+      source_mode:
+        description: Historical input mode; krx is the operational default, legacy_naver is explicit backfill-only
+        required: false
+        default: krx
+        type: choice
+        options:
+          - krx
+          - legacy_naver
   push:
     branches: [main]
     paths:
@@ -133,7 +141,7 @@ jobs:
 
       - name: Resolve derived generation for refresh
         id: derived
-        if: steps.market_day.outputs.run == 'true'
+        if: steps.market_day.outputs.run == 'true' && inputs.source_mode == 'legacy_naver'
         shell: bash
         run: |
           set -euo pipefail
@@ -162,6 +170,33 @@ jobs:
               output.write(f"run_id={result['runId']}\n")
               output.write(f"run_dir={result['runDir']}\n")
           print(f"Using derived targetDate={result['targetDate']} runId={result['runId']}")
+          PY
+
+      - name: Validate KRX report input contract
+        if: steps.market_day.outputs.run == 'true' && inputs.source_mode != 'legacy_naver'
+        env:
+          KRX_INPUT_DIR: ${{ steps.krx.outputs.krx_report_input_dir }}
+          KRX_GENERATION_ID: ${{ steps.krx.outputs.krx_generation_id }}
+          KRX_TARGET_DATE: ${{ steps.krx.outputs.krx_target_date }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          root = Path(os.environ["KRX_INPUT_DIR"])
+          required = ("technicals.json", "states.json", "group-states.json", "report-contract-projection.json", "krx-resolution.json")
+          missing = [name for name in required if not (root / name).is_file()]
+          if missing:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:" + ",".join(missing))
+          resolution = json.loads((root / "krx-resolution.json").read_text(encoding="utf-8"))
+          if resolution.get("receiptStatus") != "VERIFIED":
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:receipt")
+          if resolution.get("sourceGeneration") != os.environ["KRX_GENERATION_ID"]:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:generation")
+          if resolution.get("targetDate") != os.environ["KRX_TARGET_DATE"]:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:date")
+          print("KRX_INPUT=AVAILABLE historicalSource=KRX fallbackUsed=false")
           PY
 
       - name: Collect NAVER data
@@ -270,6 +305,7 @@ jobs:
             python tools/run_full_market_monitoring.py \
               --current-file "$RUNNER_TEMP/full-market-current.json" \
               --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
+              --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}" \
               --allow-source-observed-final \
               --source-observed-date "$target_date"
             code=$?
@@ -491,6 +527,7 @@ jobs:
           python tools/run_full_market_monitoring.py \
             --current-file "$RUNNER_TEMP/full-market-current.json" \
             --krx-resolution "${{ steps.krx.outputs.krx_metadata_path }}" \
+            --krx-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}" \
             --allow-source-observed-final \
             --source-observed-date "$target_date"
           # FINAL/Baseline now represents the same target date.  Reuse the

@@ -95,7 +95,8 @@ jobs:
       - name: Sync latest main
         if: steps.market_day.outputs.run == 'true'
         run: |
-          git pull --ff-only origin main
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git pull --ff-only origin "$target_ref"
 
       - name: Run report tests
         if: steps.market_day.outputs.run == 'true'
@@ -108,33 +109,46 @@ jobs:
         if: steps.market_day.outputs.run == 'true'
         env:
           REPORT_AS_OF: ${{ inputs.as_of || '' }}
+          KRX_EXPECTED_DATE: ${{ inputs.krx_expected_date || inputs.as_of || '' }}
+          KRX_INPUT_DIR: ${{ steps.krx.outputs.krx_report_input_dir }}
+          KRX_GENERATION_ID: ${{ steps.krx.outputs.krx_generation_id }}
+          KRX_TARGET_DATE: ${{ steps.krx.outputs.krx_target_date }}
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import os
+          import json
+          from pathlib import Path
           from daily_report import resolve_report_trading_date
-          from tools.derived_input_resolver import resolve_derived_input
+          from daily_report import compact_date
 
           requested = os.environ.get("REPORT_AS_OF") or None
-          if requested:
-              from daily_report import compact_date
-              as_of = compact_date(requested)
-              derived = resolve_derived_input("data/monitoring-derived", as_of)
-              print(f"Resolved explicit derived report date: {as_of}")
-          else:
-              result = resolve_report_trading_date()
-              if result.get("status") != "READY":
-                  raise SystemExit(result.get("reason", "TRADING_DATE_UNAVAILABLE"))
-              as_of = result["tradingDate"]
-              derived = resolve_derived_input("data/monitoring-derived", as_of)
-              print(f"Resolved evidence report date: {as_of}")
+          expected = os.environ.get("KRX_EXPECTED_DATE") or ""
+          if not expected:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:EXPECTED_DATE_REQUIRED")
+          as_of = compact_date(expected)
+          if requested and compact_date(requested) != as_of:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:REPORT_DATE_MISMATCH")
+          root = Path(os.environ["KRX_INPUT_DIR"])
+          required = ("technicals.json", "states.json", "group-states.json", "report-contract-projection.json", "krx-resolution.json")
+          missing = [name for name in required if not (root / name).is_file()]
+          if missing:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:" + ",".join(missing))
+          resolution = json.loads((root / "krx-resolution.json").read_text(encoding="utf-8"))
+          if resolution.get("receiptStatus") != "VERIFIED":
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:receipt")
+          if resolution.get("sourceGeneration") != os.environ["KRX_GENERATION_ID"]:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:generation")
+          if resolution.get("targetDate") != os.environ["KRX_TARGET_DATE"] or as_of != os.environ["KRX_TARGET_DATE"]:
+              raise SystemExit("KRX_INPUT_UNAVAILABLE:date")
+          print(f"Resolved KRX report input: targetDate={as_of} generation={resolution['sourceGeneration']}")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"as_of={as_of}\n")
-              output.write(f"derived_dir={derived['runDir']}\n")
-              output.write(f"derived_run_id={derived['runId']}\n")
+              output.write(f"derived_dir={root}\n")
+              output.write(f"derived_run_id={resolution['sourceGeneration']}\n")
           print(f"Resolved report trading date: {as_of}")
-          print(f"Resolved derived run: {derived['runId']}")
+          print("Resolved report source: KRX_PRIMARY")
           PY
 
       - name: Build daily report

@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.krx_report_resolver import ResolverError, resolve
+from tools.run_full_market_monitoring import run
 
 
 class KrxReportResolverTests(unittest.TestCase):
@@ -74,10 +75,21 @@ class KrxReportResolverTests(unittest.TestCase):
         self.assertIn("krx_expected_date", text)
         self.assertIn("krx_ref", text)
         self.assertIn("krx_generation_id", text)
+        self.assertIn("gh run watch", text)
+        self.assertIn("NO_PUBLISH_RESULT_MISSING", text)
+        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", text)
+        self.assertIn("github.sha", text)
         self.assertLess(
             text.index("Resolve and verify private KRX generation"),
             text.index("Dispatch report workflows"),
         )
+        self.assertLess(text.index("gh run watch"), text.index("Completed $workflow"))
+
+    def test_full_market_rejects_missing_krx_input_without_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = run(krx_input_dir=tmp)
+        self.assertEqual(result["status"], "NOT_PUBLISHED")
+        self.assertEqual(result["reason"], "KRX_INPUT_UNAVAILABLE")
 
 
 if __name__ == "__main__":
