@@ -1,6 +1,6 @@
 name: KRX M10 report fan-out
 
-run-name: KRX M10 fan-out ${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }} ${{ github.sha }}
+run-name: KRX M10 fan-out ${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }} publish-${{ inputs.publish || github.event.client_payload.publish || 'false' }} ${{ github.sha }}
 
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: krx-m10-fanout-${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }}-${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }}
+  group: krx-m10-fanout-${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }}-${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }}-${{ inputs.publish || github.event.client_payload.publish || 'false' }}
   cancel-in-progress: false
 
 jobs:
@@ -60,6 +60,10 @@ jobs:
           test -n "$REQUEST_DATE" || { echo "EXPECTED_DATE_REQUIRED" >&2; exit 2; }
           test -n "$REQUEST_REF" || { echo "KRX_REF_REQUIRED" >&2; exit 2; }
           test -n "$REQUEST_GENERATION" || { echo "GENERATION_ID_REQUIRED" >&2; exit 2; }
+          case "$REQUEST_PUBLISH" in
+            true|false) ;;
+            *) echo "PUBLISH_VALUE_REQUIRED" >&2; exit 2 ;;
+          esac
           case "$REQUEST_DATE" in
             [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
             *) echo "INVALID_EXPECTED_DATE" >&2; exit 2 ;;
@@ -73,6 +77,7 @@ jobs:
           echo "generation_id=$REQUEST_GENERATION" >> "$GITHUB_OUTPUT"
           echo "publish=$REQUEST_PUBLISH" >> "$GITHUB_OUTPUT"
           echo "dispatch_ref=$REQUEST_DISPATCH_REF" >> "$GITHUB_OUTPUT"
+          echo "execution_id=${REQUEST_GENERATION}_${REQUEST_DATE}_${REQUEST_PUBLISH}" >> "$GITHUB_OUTPUT"
 
       - name: Resolve and verify private KRX generation
         id: krx
@@ -88,13 +93,15 @@ jobs:
         id: duplicate
         env:
           GH_TOKEN: ${{ github.token }}
-          EXPECTED_TITLE: KRX M10 fan-out ${{ steps.request.outputs.generation_id }} ${{ steps.request.outputs.expected_date }} ${{ github.sha }}
+          EXPECTED_TITLE: KRX M10 fan-out ${{ steps.request.outputs.generation_id }} ${{ steps.request.outputs.expected_date }} publish-${{ steps.request.outputs.publish }} ${{ github.sha }}
+          LEGACY_TITLE: KRX M10 fan-out ${{ steps.request.outputs.generation_id }} ${{ steps.request.outputs.expected_date }} ${{ github.sha }}
+          PUBLISH_STATE: ${{ steps.request.outputs.publish }}
           CURRENT_RUN: ${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
           runs=$(gh run list --repo "${GITHUB_REPOSITORY}" --workflow krx-m10-fanout.yml --limit 50 --json databaseId,displayTitle,status,conclusion)
-          existing=$(printf '%s' "$runs" | python3 -c 'import json,os,sys; rows=json.load(sys.stdin); title=os.environ["EXPECTED_TITLE"]; current=os.environ["CURRENT_RUN"]; matches=[r for r in rows if r.get("databaseId") != int(current) and str(r.get("displayTitle", "")).startswith(title) and (r.get("conclusion") == "success" or r.get("status") in {"queued", "in_progress"})]; print(matches[0]["databaseId"] if matches else "")')
+          existing=$(printf '%s' "$runs" | python3 -c 'import json,os,sys; rows=json.load(sys.stdin); title=os.environ["EXPECTED_TITLE"]; legacy=os.environ["LEGACY_TITLE"]; publish=os.environ["PUBLISH_STATE"]; current=os.environ["CURRENT_RUN"]; matches=[r for r in rows if r.get("databaseId") != int(current) and (r.get("conclusion") == "success" or r.get("status") in {"queued", "in_progress"}) and (str(r.get("displayTitle", "")).startswith(title) or (publish == "false" and str(r.get("displayTitle", "")).startswith(legacy) and " publish-" not in str(r.get("displayTitle", ""))))]; print(matches[0]["databaseId"] if matches else "")')
           if [ -n "$existing" ]; then
             echo "status=NO_CHANGES" >> "$GITHUB_OUTPUT"
             echo "existing_run_id=$existing" >> "$GITHUB_OUTPUT"
@@ -162,6 +169,8 @@ jobs:
             echo "## KRX M10 fan-out"
             echo "- generation: ${{ steps.request.outputs.generation_id }}"
             echo "- target date: ${{ steps.request.outputs.expected_date }}"
+            echo "- execution id: ${{ steps.request.outputs.execution_id }}"
+            echo "- publish: ${{ steps.request.outputs.publish }}"
             echo "- private ref: immutable SHA supplied to resolver"
             echo "- resolver: ${{ steps.krx.outputs.krx_receipt_status || 'BLOCKED' }}"
             echo "- dispatch: ${{ steps.duplicate.outputs.status || 'BLOCKED' }}"
