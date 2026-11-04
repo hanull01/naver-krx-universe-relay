@@ -139,9 +139,12 @@ silently mixed into that resolver.
 
 The current `daily-report.yml` has `workflow_dispatch` only; it has no fixed
 23:00 schedule. `backfill-derived.yml` still contains its existing manual
-dispatch of `daily-report.yml` after a successful derived backfill. No KRX
-08:05 → sync → report chain is active in this branch. The safe production
-sequence remains a future gated integration: verify the KRX generation, use an
-approved private transport, re-read and verify the receiver SHA, then invoke
-the report and pre-open stages. Until those gates are approved, the existing
-NAVER paths remain in place and are not deleted.
+dispatch of `daily-report.yml` after a successful derived backfill. The
+un-deployed `ops/external-scheduler/worker.js` still contains legacy 23:00
+and 08:00 slot mappings; this branch does not activate or change that
+external scheduler. No KRX 08:05 → sync → report chain is active in this
+branch. The safe production sequence remains a future gated integration:
+verify the KRX generation, use an approved private transport, re-read and
+verify the receiver SHA, then invoke the report and pre-open stages. Until
+those gates are approved, the existing NAVER paths remain in place and are
+not deleted.
