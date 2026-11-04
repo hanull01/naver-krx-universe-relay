@@ -40,7 +40,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  push-event-noop:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout for calendar-only gate
+        uses: actions/checkout@v4
+
+      - name: Check KRX trading day (NOOP only)
+        shell: bash
+        run: |
+          set +e
+          python3 krx_market_day.py
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            calendar_status=OPEN
+          else
+            calendar_status=CLOSED_OR_UNVERIFIED
+          fi
+          echo "KRX calendar check: ${calendar_status}; push event remains NOOP."
+          echo "KRX calendar check: ${calendar_status}; push event remains NOOP." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
+      - name: Report push event NOOP
+        shell: bash
+        run: |
+          echo "NOOP_PUSH_EVENT"
+          echo "No market data collection or publication was performed."
+          {
+            echo "## Push event"
+            echo
+            echo "NOOP_PUSH_EVENT"
+            echo "No market data collection or publication was performed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
   refresh-market-snapshots:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
