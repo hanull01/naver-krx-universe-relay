@@ -17,7 +17,9 @@ The local M10 generation was inspected directly:
 - after-hours policy: `aftermarket_used=false`
 - source metrics integrity: `source_metrics_gzip_sha256`
 - actual M10 entity categories: `stock`, `etf`, `index`
-- actual 2026-11-02 counts: 2,767 stocks, 1,183 ETFs, 132 indexes
+- verified 2026-11-03 generation: `gen_20261103_1793748502562386000`
+- verified 2026-11-03 counts: 2,768 stocks, 1,185 ETFs, 132 indexes
+- monitoring consumer count: 4,085; trading consumer count: 3,953
 
 Stock and ETF identifiers are six-character alphanumeric codes. Index
 identifiers are descriptive KRX labels such as `KOSPI`, so the adapter does
@@ -60,9 +62,11 @@ and public publication remain separate deployment gates.
 `stage_m10_report_inputs` materializes a local-only adapter directory for the
 existing `full_market_technical_adapter` contract. It emits
 `technicals.json`, `states.json`, `group-states.json`, `provenance.json`, and a
-`conflict-audit.json` plus a `PARTIAL` report projection. For the inspected generation, all 4,082 entities
-are validated, 3,950 stock/ETF rows are staged for the existing instrument
-adapter, and 132 index rows remain in the separate index metadata section.
+`conflict-audit.json` plus a `PARTIAL` report projection. For the inspected
+2026-11-03 generation, all 4,085 entities are validated, 3,953 stock/ETF rows
+are staged for the existing instrument adapter, and 132 index rows remain in
+the separate index metadata section. The 20 repeated display codes are index
+labels shared across markets; source-qualified identities remain unique.
 Per-indicator null counts are reported; nulls are not synthesized.
 
 When the staging source is `KRX_M10_GENERATION`, KRX is the primary and only
@@ -86,9 +90,16 @@ present in this M10 interchange; they are never inferred from NAVER.
 
 The report consumer receives KRX historical values in the legacy `technical`
 shape while NAVER current observations remain in the separate `market` and
-current-snapshot fields. The isolated 2026-11-02 report QA produced matching
-JSON, Markdown, and HTML values for the KRX breadth and Samsung Electronics
-MA20/MA60 fields.
+current-snapshot fields. The isolated 2026-11-03 report QA produced JSON,
+Markdown, and HTML outputs from the staged KRX input. It preserved `KRX` as
+the historical indicator source, kept NAVER current observations separate,
+and reported the staged projection as `PARTIAL` because it is not a final
+production generation.
+
+The local outbox/receiver QA accepted the generation once, reproduced both
+artifact SHA-256 values on receiver readback, and returned `NO_CHANGES` on the
+second delivery attempt. This is a local receiver test, not a GitHub data
+publication.
 
 ## Private delivery bridge
 
@@ -123,3 +134,14 @@ silently mixed into that resolver.
 - no Cloudflare schedule change
 - no workflow/main change
 - existing NAVER current snapshots remain separate
+
+## Trigger status
+
+The current `daily-report.yml` has `workflow_dispatch` only; it has no fixed
+23:00 schedule. `backfill-derived.yml` still contains its existing manual
+dispatch of `daily-report.yml` after a successful derived backfill. No KRX
+08:05 → sync → report chain is active in this branch. The safe production
+sequence remains a future gated integration: verify the KRX generation, use an
+approved private transport, re-read and verify the receiver SHA, then invoke
+the report and pre-open stages. Until those gates are approved, the existing
+NAVER paths remain in place and are not deleted.
