@@ -1,6 +1,6 @@
 name: KRX M10 report fan-out
 
-run-name: KRX M10 fan-out ${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }}
+run-name: KRX M10 fan-out ${{ inputs.krx_generation_id || github.event.client_payload.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || github.event.client_payload.krx_expected_date || 'missing-date' }} ${{ github.sha }}
 
 on:
   workflow_dispatch:
@@ -88,7 +88,7 @@ jobs:
         id: duplicate
         env:
           GH_TOKEN: ${{ github.token }}
-          EXPECTED_TITLE: KRX M10 fan-out ${{ steps.request.outputs.generation_id }} ${{ steps.request.outputs.expected_date }}
+          EXPECTED_TITLE: KRX M10 fan-out ${{ steps.request.outputs.generation_id }} ${{ steps.request.outputs.expected_date }} ${{ github.sha }}
           CURRENT_RUN: ${{ github.run_id }}
         shell: bash
         run: |
@@ -132,14 +132,26 @@ jobs:
               run_id=$(printf '%s' "$runs" | python3 -c 'import json,os,sys; rows=json.load(sys.stdin); title="KRX report "+os.environ["GENERATION_ID"]+" "+os.environ["EXPECTED_DATE"]; current=max((r for r in rows if str(r.get("displayTitle", "")).startswith(title)), key=lambda r:r.get("createdAt", ""), default=None); print(current.get("databaseId", "") if current else "")')
               if [ -n "$run_id" ]; then break; fi
             done
-            printf '{"workflow":%s,"runId":%s,"generationId":%s,"targetDate":%s,"publish":%s}\n' \
+            if [ -z "$run_id" ]; then
+              echo "::error::Child workflow $workflow did not produce a run ID."
+              exit 1
+            fi
+            if ! gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --exit-status; then
+              echo "::error::Child workflow $workflow failed: run_id=$run_id"
+              exit 1
+            fi
+            run_json=$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json jobs)
+            printf '%s' "$run_json" | python3 -c 'import json,sys; payload=json.load(sys.stdin); steps=[step for job in (payload.get("jobs") or []) for step in (job.get("steps") or [])]; commits=[step for step in steps if str(step.get("name", "")).startswith("Commit")]; raise SystemExit("PUBLISH_FALSE_COMMIT_STEP_RAN" if any(step.get("conclusion") not in {"skipped", None} for step in commits) else ("NO_PUBLISH_RESULT_MISSING" if not any(step.get("name") == "Report NO_PUBLISH validation result" and step.get("conclusion") == "success" for step in steps) else 0))'
+            conclusion=$(gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --json conclusion --jq .conclusion)
+            printf '{"workflow":%s,"runId":%s,"generationId":%s,"targetDate":%s,"publish":%s,"conclusion":%s}\n' \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$workflow")" \
               "${run_id:-null}" \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$GENERATION_ID")" \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$EXPECTED_DATE")" \
               "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$PUBLISH")" \
+              "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$conclusion")" \
               >> "$RUNNER_TEMP/krx-fanout-results.jsonl"
-            echo "Dispatched $workflow run_id=${run_id:-PENDING}"
+            echo "Completed $workflow run_id=$run_id conclusion=$conclusion NO_PUBLISH=true"
           done
           echo "results_path=$RUNNER_TEMP/krx-fanout-results.jsonl" >> "$GITHUB_OUTPUT"
 
