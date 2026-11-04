@@ -3,12 +3,14 @@ import unittest
 
 
 WORKFLOW = pathlib.Path(__file__).parent / ".github/workflows/krx-m10-fanout.yml"
+VALIDATOR = pathlib.Path(__file__).parent / "tools/validate_krx_child_run.py"
 
 
 class KRXM10FanoutContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.text = WORKFLOW.read_text(encoding="utf-8")
+        cls.validator_text = VALIDATOR.read_text(encoding="utf-8")
 
     def test_run_name_and_concurrency_include_publish_state(self):
         self.assertIn("publish-${{ inputs.publish || github.event.client_payload.publish || 'false' }}", self.text)
@@ -26,22 +28,27 @@ class KRXM10FanoutContractTests(unittest.TestCase):
 
     def test_publish_false_safety_contract_remains(self):
         self.assertIn("-f publish=\"$PUBLISH\"", self.text)
-        self.assertIn("Report NO_PUBLISH validation result", self.text)
-        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.text)
-        self.assertIn('publish == "false"', self.text)
-        self.assertIn("PUBLISH_TRUE_COMMIT_STEP_FAILED", self.text)
+        self.assertIn("tools/validate_krx_child_run.py", self.text)
+        self.assertIn("Report NO_PUBLISH validation result", self.validator_text)
+        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.validator_text)
 
     def test_publish_true_allows_successful_commit_and_provenance(self):
-        self.assertIn("PUBLISH_TRUE_PROVENANCE_STEP_FAILED", self.text)
-        self.assertIn("publication provenance", self.text)
-        self.assertIn('payload.get("conclusion") != "success"', self.text)
-        self.assertIn("CHILD_WORKFLOW_NOT_SUCCESS", self.text)
+        self.assertIn("PUBLISH_TRUE_PROVENANCE_STEP_FAILED", self.validator_text)
+        self.assertIn("publication provenance", self.validator_text)
+        self.assertIn('payload.get("conclusion") != "success"', self.validator_text)
+        self.assertIn("CHILD_WORKFLOW_NOT_SUCCESS", self.validator_text)
 
     def test_publish_state_is_checked_before_post_validation(self):
-        self.assertIn('PUBLISH_STATE="$PUBLISH"', self.text)
-        self.assertIn('if publish == "false"', self.text)
-        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.text)
-        self.assertIn("PUBLISH_TRUE_COMMIT_STEP_FAILED", self.text)
+        self.assertIn('"$PUBLISH"', self.text)
+        self.assertIn('if publish == "false"', self.validator_text)
+        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.validator_text)
+        self.assertIn("PUBLISH_TRUE_COMMIT_STEP_FAILED", self.validator_text)
+
+    def test_child_validation_is_external_and_has_no_heredoc(self):
+        self.assertNotIn("<<'PY'", self.text)
+        self.assertIn("python3 tools/validate_krx_child_run.py", self.text)
+        self.assertIn('"$RUNNER_TEMP/krx-child-run.json"', self.text)
+        self.assertIn('"$PUBLISH"', self.text)
 
     def test_resolver_and_sequential_children_remain(self):
         self.assertIn("resolve-krx-generation", self.text)
