@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-04T13:17:21.548602+09:00",
-  "collectionStartedAt": "2026-11-04T13:17:20.762437+09:00",
+  "generatedAt": "2026-11-04T13:29:46.799339+09:00",
+  "collectionStartedAt": "2026-11-04T13:29:45.901703+09:00",
   "source": "NAVER_KRX",
   "count": 1,
   "expectedCount": 1,
@@ -13,24 +13,24 @@
   "fresh": true,
   "errors": [],
   "missingCodes": [],
-  "sourceTime": "2026-11-04T13:17:21.483082+09:00",
-  "sourceTimeLatest": "2026-11-04T13:17:21.483082+09:00",
+  "sourceTime": "2026-11-04T13:29:46.726182+09:00",
+  "sourceTimeLatest": "2026-11-04T13:29:46.726182+09:00",
   "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
   "datas": [
     {
       "itemCode": "005930",
       "stockName": "삼성전자",
-      "closePrice": 209500,
-      "compareToPreviousClosePrice": -10000,
-      "fluctuationsRatio": -4.56,
+      "closePrice": 210250,
+      "compareToPreviousClosePrice": -9250,
+      "fluctuationsRatio": -4.21,
       "openPrice": 226500,
       "highPrice": 228000,
       "lowPrice": 208000,
-      "accumulatedTradingVolume": 13339284,
-      "accumulatedTradingValue": 2882817000000,
+      "accumulatedTradingVolume": 13721707,
+      "accumulatedTradingValue": 2963013000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-04T13:17:21.483082+09:00",
-      "localTradedAt": "2026-11-04T13:17:21.483082+09:00",
+      "sourceTime": "2026-11-04T13:29:46.726182+09:00",
+      "localTradedAt": "2026-11-04T13:29:46.726182+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -42,7 +42,7 @@
       "overMarketPriceInfo": {
         "tradingSessionType": "REGULAR_MARKET",
         "overPrice": "210,000",
-        "localTradedAt": "2026-11-04T13:17:21.483098+09:00"
+        "localTradedAt": "2026-11-04T13:29:46.726199+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
