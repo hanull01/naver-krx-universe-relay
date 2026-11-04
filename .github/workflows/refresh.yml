@@ -635,7 +635,7 @@ jobs:
         run: |
           set +e
           output_dir="data/reports/current-observation/${GITHUB_RUN_ID}"
-          python tools/render_current_observation.py \
+          python -m tools.render_current_observation \
             --contract data/monitoring/latest-report-contract.json \
             --output-dir "$output_dir" \
             --run-id "$GITHUB_RUN_ID" \

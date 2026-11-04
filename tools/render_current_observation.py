@@ -10,12 +10,11 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
-from tools.file_digest import sha256_bytes, sha256_file
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.file_digest import sha256_bytes, sha256_file
 from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     build_dashboard_model,
