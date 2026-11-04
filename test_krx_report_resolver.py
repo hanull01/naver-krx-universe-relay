@@ -62,6 +62,9 @@ class KrxReportResolverTests(unittest.TestCase):
         text = (
             Path(__file__).parent / ".github" / "workflows" / "krx-m10-fanout.yml"
         ).read_text(encoding="utf-8")
+        validator = (
+            Path(__file__).parent / "tools" / "validate_krx_child_run.py"
+        ).read_text(encoding="utf-8")
         for target in (
             "refresh.yml",
             "refresh-monitoring-daily.yml",
@@ -76,8 +79,9 @@ class KrxReportResolverTests(unittest.TestCase):
         self.assertIn("krx_ref", text)
         self.assertIn("krx_generation_id", text)
         self.assertIn("gh run watch", text)
-        self.assertIn("NO_PUBLISH_RESULT_MISSING", text)
-        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", text)
+        self.assertIn("tools/validate_krx_child_run.py", text)
+        self.assertIn("NO_PUBLISH_RESULT_MISSING", validator)
+        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", validator)
         self.assertIn("github.sha", text)
         self.assertLess(
             text.index("Resolve and verify private KRX generation"),
