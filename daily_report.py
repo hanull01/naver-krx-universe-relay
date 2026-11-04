@@ -505,6 +505,10 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
         "historicalPriority": staged["historicalPriority"],
         "historicalFallbackAllowed": staged["historicalFallbackAllowed"],
         "currentObservationPolicy": staged["currentObservationPolicy"],
+        "historicalLineage": dict(staged.get("historicalLineage") or {}),
+        "missingHistoryCodes": list(staged.get("missingHistoryCodes") or []),
+        "regularSessionUnavailableCodes": list(staged.get("regularSessionUnavailableCodes") or []),
+        "currentSnapshotMissingCodes": list(staged.get("currentSnapshotMissingCodes") or []),
         "conflictPolicy": (
             "KRX_PRIMARY_NO_MERGE"
             if staged["historicalIndicatorSource"] == "KRX"
@@ -534,6 +538,19 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
             "instrumentCount": resolution.get("instrumentCount"),
             "receiptStatus": resolution.get("receiptStatus"),
             "publicationAuthorized": resolution.get("publicationAuthorized"),
+        })
+    lineage = metadata.get("historicalLineage") or {}
+    if metadata.get("historicalIndicatorSource") == "KRX":
+        metadata.update({
+            "historicalGenerationId": lineage.get("generationId") or metadata.get("sourceGeneration"),
+            "historicalTargetDate": lineage.get("targetDate") or metadata.get("targetDate"),
+            "historicalReceiptStatus": lineage.get("receiptStatus", "UNAVAILABLE"),
+            "historicalReceiptVerified": lineage.get("receiptVerified") is True,
+            "historicalEntityCount": lineage.get("entityCount"),
+            "historicalInstrumentCount": lineage.get("instrumentCount"),
+            "historicalAdjustmentStatus": lineage.get("adjustmentStatus", "UNAVAILABLE"),
+            "historicalLineageStatus": lineage.get("status", "UNAVAILABLE"),
+            "currentSnapshotSource": "NAVER_SEPARATE",
         })
     return {
         "mode": "STAGING",
@@ -1877,6 +1894,15 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         # industries, themes, and research remain separate inputs.
         krx_projection = technical_inputs["derivedProjection"] or {}
         krx_full_market = krx_projection.get("fullMarket") or {}
+        krx_lineage = technical_inputs["metadata"].get("historicalLineage") or {}
+        krx_technicals = technical_inputs.get("analysisTechnicals") or {}
+        krx_states = technical_inputs.get("analysisStates") or {}
+        krx_quality = krx_full_market.get("quality") or {}
+        krx_missing_history = krx_technicals.get("missingHistoryCodes")
+        if not isinstance(krx_missing_history, list):
+            krx_missing_history = krx_technicals.get("missingCodes") or []
+        krx_regular_unavailable = krx_states.get("regularSessionUnavailableCodes") or []
+        krx_current_missing = quotes.get("missingCodes") or []
         contract_summary = {"fullMarket": krx_full_market}
         contract_breadth = {"fullMarket": {"marketTradingValue": {}}}
         contract_quality = {
@@ -1886,6 +1912,20 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
             "currentCount": krx_full_market.get("quality", {}).get("currentCount"),
             "authoritativeCount": krx_full_market.get("quality", {}).get("authoritativeCount"),
+            "historicalIndicatorSource": "KRX",
+            "historicalGenerationId": krx_lineage.get("generationId") or technical_inputs["metadata"].get("historicalGenerationId"),
+            "historicalTargetDate": krx_lineage.get("targetDate") or technical_inputs["metadata"].get("targetDate"),
+            "historicalFallbackAllowed": False,
+            "historicalReceiptStatus": krx_lineage.get("receiptStatus", "UNAVAILABLE"),
+            "historicalLineageStatus": krx_lineage.get("status", "UNAVAILABLE"),
+            "historicalEntityCount": krx_lineage.get("entityCount") or krx_quality.get("entityCount"),
+            "historicalInstrumentCount": krx_lineage.get("instrumentCount") or krx_quality.get("instrumentCount"),
+            "historicalObservedInstrumentCount": krx_quality.get("currentCount"),
+            "missingHistoryCodes": list(krx_missing_history),
+            "regularSessionUnavailableCodes": list(krx_regular_unavailable),
+            "currentSnapshotMissingCodes": list(krx_current_missing),
+            "historicalAdjustmentStatus": krx_lineage.get("adjustmentStatus", "UNAVAILABLE"),
+            "currentSnapshotSource": "NAVER_SEPARATE",
         }
         contract_leaders = {"fullMarketLeaders": krx_full_market.get("leaders", [])}
     report_contract = build_report_contract(

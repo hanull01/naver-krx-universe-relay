@@ -205,6 +205,78 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
                 expected_source_staging="KRX_M10_GENERATION",
             )
 
+    def test_krx_lineage_uses_verified_receipt_and_provenance(self):
+        technicals = json.loads(self.technicals.read_text())
+        states = json.loads(self.states.read_text())
+        generation = "gen_20261029_krx"
+        provenance = {
+            "sourceStaging": "KRX_M10_GENERATION",
+            "sourceCanonicalPath": "m10/monitoring_interchange.json",
+            "sourceCanonicalSha256": "b" * 64,
+            "sourceGenerationId": generation,
+        }
+        for payload in (technicals, states):
+            payload.update({
+                "source": "KRX_M10_GENERATION",
+                "generationId": generation,
+                "historicalIndicatorSource": "KRX",
+                "historicalFallbackAllowed": False,
+                "receiptStatus": "VERIFIED",
+                "counts": {"entityCount": 1, "instrumentCount": 1},
+            })
+            payload["datas"][0]["provenance"] = provenance
+        technicals["datas"][0]["regularSession"] = {"status": "UNAVAILABLE"}
+        states["datas"][0]["regularSession"] = {"status": "UNAVAILABLE"}
+        self.technicals.write_text(json.dumps(technicals), encoding="utf-8")
+        self.states.write_text(json.dumps(states), encoding="utf-8")
+        (self.root / "provenance.json").write_text(json.dumps({
+            "source": "KRX_OPEN_API", "generationId": generation,
+            "byCode": {"005930": provenance},
+        }), encoding="utf-8")
+        (self.root / "receipt.json").write_text(json.dumps({
+            "schemaVersion": 2, "source": "KRX_OPEN_API",
+            "tradingDate": "20261029", "generationId": generation,
+            "generationStatus": "VERIFIED", "publicationAuthorized": True,
+        }), encoding="utf-8")
+
+        result = build_report_input(
+            self.technicals, self.states, self.groups, self.universe,
+            expected_source_staging="KRX_M10_GENERATION",
+        )
+        lineage = result["historicalLineage"]
+        self.assertEqual(lineage["status"], "VERIFIED")
+        self.assertEqual(lineage["generationId"], generation)
+        self.assertEqual(lineage["targetDate"], "20261029")
+        self.assertEqual(lineage["receiptStatus"], "VERIFIED")
+        self.assertEqual(lineage["instrumentCount"], 1)
+        self.assertFalse(lineage["fallbackAllowed"])
+        self.assertEqual(result["registeredUniverse"]["missingCodes"], [])
+        self.assertEqual(result["registeredUniverse"]["missingHistoryCodes"], [])
+        self.assertEqual(result["registeredUniverse"]["regularSessionUnavailableCodes"], ["005930"])
+
+    def test_krx_lineage_without_verified_receipt_is_unavailable(self):
+        technicals = json.loads(self.technicals.read_text())
+        states = json.loads(self.states.read_text())
+        for payload in (technicals, states):
+            payload.update({
+                "source": "KRX_M10_GENERATION",
+                "generationId": "gen_missing_receipt",
+                "historicalIndicatorSource": "KRX",
+                "historicalFallbackAllowed": False,
+            })
+            payload["datas"][0]["provenance"].update({
+                "sourceStaging": "KRX_M10_GENERATION",
+                "sourceGenerationId": "gen_missing_receipt",
+            })
+        self.technicals.write_text(json.dumps(technicals), encoding="utf-8")
+        self.states.write_text(json.dumps(states), encoding="utf-8")
+        result = build_report_input(
+            self.technicals, self.states, self.groups, self.universe,
+            expected_source_staging="KRX_M10_GENERATION",
+        )
+        self.assertEqual(result["historicalLineage"]["status"], "UNAVAILABLE")
+        self.assertEqual(result["historicalLineage"]["receiptStatus"], "UNAVAILABLE")
+
     def test_derived_projection_is_reported_as_partial_not_final(self):
         projection = {
             "asOf": "20261029", "status": "AVAILABLE",
