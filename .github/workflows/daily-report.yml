@@ -95,7 +95,8 @@ jobs:
       - name: Sync latest main
         if: steps.market_day.outputs.run == 'true'
         run: |
-          git pull --ff-only origin main
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git pull --ff-only origin "$target_ref"
 
       - name: Run report tests
         if: steps.market_day.outputs.run == 'true'

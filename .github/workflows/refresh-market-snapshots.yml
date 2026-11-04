@@ -85,7 +85,9 @@ jobs:
 
       - name: Sync latest main before collection
         if: steps.market_day.outputs.run == 'true'
-        run: git pull --ff-only origin main
+        run: |
+          target_ref="${GITHUB_REF_NAME:-main}"
+          git pull --ff-only origin "$target_ref"
 
       - name: Collect market snapshots
         id: collect

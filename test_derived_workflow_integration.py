@@ -24,6 +24,7 @@ class DerivedWorkflowIntegrationTests(unittest.TestCase):
         self.assertIn("KRX_INPUT=AVAILABLE", text)
         self.assertIn("DERIVED_RUN_DIR", text)
         self.assertIn("DERIVED_TARGET_DATE", text)
+        self.assertIn('target_ref="${GITHUB_REF_NAME:-main}"', text)
         self.assertIn("Intraday collection or derived technical validation failed", text)
         self.assertNotIn("data/daily/", text[text.index("- name: Collect NAVER data"):text.index("- name: Collect full-market monitoring evidence")])
 
