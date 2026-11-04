@@ -28,6 +28,20 @@ class KRXM10FanoutContractTests(unittest.TestCase):
         self.assertIn("-f publish=\"$PUBLISH\"", self.text)
         self.assertIn("Report NO_PUBLISH validation result", self.text)
         self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.text)
+        self.assertIn('publish == "false"', self.text)
+        self.assertIn("PUBLISH_TRUE_COMMIT_STEP_FAILED", self.text)
+
+    def test_publish_true_allows_successful_commit_and_provenance(self):
+        self.assertIn("PUBLISH_TRUE_PROVENANCE_STEP_FAILED", self.text)
+        self.assertIn("publication provenance", self.text)
+        self.assertIn('payload.get("conclusion") != "success"', self.text)
+        self.assertIn("CHILD_WORKFLOW_NOT_SUCCESS", self.text)
+
+    def test_publish_state_is_checked_before_post_validation(self):
+        self.assertIn('PUBLISH_STATE="$PUBLISH"', self.text)
+        self.assertIn('if publish == "false"', self.text)
+        self.assertIn("PUBLISH_FALSE_COMMIT_STEP_RAN", self.text)
+        self.assertIn("PUBLISH_TRUE_COMMIT_STEP_FAILED", self.text)
 
     def test_resolver_and_sequential_children_remain(self):
         self.assertIn("resolve-krx-generation", self.text)
