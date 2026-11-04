@@ -256,14 +256,55 @@ def build_report_contract_projection(
         key: quality.get(key)
         for key in (
             "status", "totalAssets", "byAssetType", "statusCounts", "missingCodes",
+            "missingHistoryCodes", "regularSessionUnavailableCodes",
+            "currentSnapshotMissingCodes", "historyCoveragePct", "historicalIndicatorSource",
+            "historicalFallbackAllowed", "currentSnapshotSource", "historicalGenerationId",
+            "historicalTargetDate", "historicalReceiptStatus", "historicalLineageStatus",
+            "historicalEntityCount", "historicalInstrumentCount", "historicalAdjustmentStatus",
+            "historicalObservedInstrumentCount",
             "noDailyBar", "date20261030Rows", "historicalGroups", "rollingHistory",
         )
     }
+    if str(quality_summary.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource") or "").upper() == "KRX":
+        krx_instrument_count = (
+            quality_summary.get("historicalInstrumentCount")
+            or quality_summary.get("instrumentCount")
+            or sum((quality_summary.get("byAssetType") or {}).values())
+            or len(technical_rows)
+        )
+        krx_observed_count = sum(
+            row.get("asOfDate") == target
+            and str(row.get("availabilityStatus") or row.get("status") or "AVAILABLE").upper() != "UNAVAILABLE"
+            for row in technical_rows
+        )
+        quality_summary["historicalInstrumentCount"] = krx_instrument_count
+        quality_summary["historicalObservedInstrumentCount"] = krx_observed_count
+        quality_summary["historyCoveragePct"] = (
+            round(krx_observed_count * 100 / krx_instrument_count, 6)
+            if isinstance(krx_instrument_count, int) and krx_instrument_count > 0 else None
+        )
+        quality_summary["missingHistoryCodes"] = list(
+            quality_summary.get("missingHistoryCodes") or quality_summary.get("missingCodes") or []
+        )
     contract = {
         "schemaVersion": "market-report-contract-v1",
         "status": quality.get("status", "PARTIAL"),
         "asOf": target,
         "observedAt": generated_at,
+        "historicalIndicatorSource": quality.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource"),
+        "historicalGenerationId": quality.get("historicalGenerationId") or technicals.get("generationId"),
+        "historicalTargetDate": quality.get("historicalTargetDate") or target,
+        "historicalFallbackAllowed": quality.get("historicalFallbackAllowed", technicals.get("historicalFallbackAllowed", False)),
+        "currentSnapshotSource": quality.get("currentSnapshotSource") or technicals.get("currentSnapshotSource") or "NAVER_SEPARATE",
+        "historicalLineage": {
+            "source": quality.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource"),
+            "generationId": quality.get("historicalGenerationId") or technicals.get("generationId"),
+            "targetDate": quality.get("historicalTargetDate") or target,
+            "receiptStatus": quality.get("historicalReceiptStatus") or technicals.get("receiptStatus") or "UNAVAILABLE",
+            "lineageStatus": quality.get("historicalLineageStatus") or "UNAVAILABLE",
+            "fallbackAllowed": quality.get("historicalFallbackAllowed", technicals.get("historicalFallbackAllowed", False)),
+            "currentSnapshotSource": quality.get("currentSnapshotSource") or technicals.get("currentSnapshotSource") or "NAVER_SEPARATE",
+        },
         "tradingDateStatus": "SOURCE_OBSERVED",
         "sourceQualityStatus": quality.get("status", "PARTIAL"),
         "finalityStatus": "SOURCE_OBSERVED",

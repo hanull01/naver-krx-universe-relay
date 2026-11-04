@@ -153,6 +153,69 @@ def _valid_code_name_rows(stocks: list[Any], symbols: list[Any], bindings: Any) 
     return bool(stocks)
 
 
+def _historical_lineage(
+    quality: Mapping[str, Any], full_market: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Return KRX lineage and coverage metadata without using legacy history.
+
+    The KRX receipt/resolution is authoritative for this metadata.  A missing
+    or unverified receipt is intentionally represented as unavailable rather
+    than being inferred from deprecated NAVER canonical coverage.
+    """
+    source = quality.get("historicalIndicatorSource") or full_market.get("historicalIndicatorSource")
+    source = str(source or "UNAVAILABLE")
+    is_krx = source == "KRX"
+    instrument_count = quality.get("historicalInstrumentCount")
+    if instrument_count is None:
+        instrument_count = quality.get("instrumentCount")
+    entity_count = quality.get("historicalEntityCount")
+    if entity_count is None:
+        entity_count = quality.get("entityCount")
+    observed_count = quality.get("historicalObservedInstrumentCount")
+    if observed_count is None:
+        observed_count = quality.get("currentCount")
+    missing_history = quality.get("missingHistoryCodes")
+    if not isinstance(missing_history, list):
+        missing_history = quality.get("missingCodes") if is_krx else []
+    missing_history = list(missing_history) if isinstance(missing_history, list) else []
+    regular_unavailable = quality.get("regularSessionUnavailableCodes")
+    current_missing = quality.get("currentSnapshotMissingCodes")
+    regular_unavailable = list(regular_unavailable) if isinstance(regular_unavailable, list) else []
+    current_missing = list(current_missing) if isinstance(current_missing, list) else []
+    coverage = quality.get("historyCoveragePct")
+    # KRX generation counts are authoritative. Do not preserve a stale
+    # coverage value inherited from the deprecated NAVER canonical path.
+    if is_krx and isinstance(instrument_count, int) and instrument_count > 0:
+        if isinstance(observed_count, int):
+            coverage = round(observed_count * 100 / instrument_count, 6)
+    receipt_status = str(
+        quality.get("historicalReceiptStatus")
+        or quality.get("receiptStatus")
+        or "UNAVAILABLE"
+    ).upper()
+    lineage_status = str(
+        quality.get("historicalLineageStatus")
+        or ("VERIFIED" if receipt_status == "VERIFIED" and is_krx else "UNAVAILABLE" if is_krx else "NOT_APPLICABLE")
+    ).upper()
+    return {
+        "source": "KRX" if is_krx else source,
+        "generationId": quality.get("historicalGenerationId") or quality.get("sourceGeneration"),
+        "targetDate": quality.get("historicalTargetDate") or quality.get("tradingDate") or full_market.get("tradingDate"),
+        "fallbackAllowed": False if is_krx else quality.get("historicalFallbackAllowed", False),
+        "receiptStatus": receipt_status,
+        "lineageStatus": lineage_status,
+        "entityCount": entity_count,
+        "instrumentCount": instrument_count,
+        "observedInstrumentCount": observed_count,
+        "historyCoveragePct": coverage,
+        "missingHistoryCodes": missing_history,
+        "regularSessionUnavailableCodes": regular_unavailable,
+        "currentSnapshotMissingCodes": current_missing,
+        "adjustmentStatus": quality.get("historicalAdjustmentStatus") or "UNAVAILABLE",
+        "currentSnapshotSource": quality.get("currentSnapshotSource") or "NAVER_SEPARATE",
+    }
+
+
 
 _GROUP_SUMMARY_FIELDS = (
     "id", "name", "kind", "status", "v1Status", "v2Status",
@@ -896,6 +959,7 @@ def build_report_contract(
         or summary.get("expectedPreviousTradingDate")
         or full_market.get("expectedPreviousTradingDate")
     )
+    historical_lineage = _historical_lineage(quality, full_market)
 
     def indices_are_complete() -> bool:
         """Require both current index observations before marking a contract available."""
@@ -1068,6 +1132,7 @@ def build_report_contract(
         "PARTIAL"
         if baseline_status == "BASELINE_STALE" or not trading_date or not trading_date_evidence_valid
         or not indices_are_complete()
+        or (historical_lineage["source"] == "KRX" and historical_lineage["lineageStatus"] != "VERIFIED")
         else "AVAILABLE" if aligned and full_market else "PARTIAL"
     )
 
@@ -1078,6 +1143,12 @@ def build_report_contract(
         "observedAt": generation,
         "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
+        "historicalIndicatorSource": historical_lineage["source"],
+        "historicalGenerationId": historical_lineage["generationId"],
+        "historicalTargetDate": historical_lineage["targetDate"],
+        "historicalFallbackAllowed": historical_lineage["fallbackAllowed"],
+        "currentSnapshotSource": historical_lineage["currentSnapshotSource"],
+        "historicalLineage": historical_lineage,
         "tradingDateEvidence": _compact_trading_date_evidence(evidence),
         "sessionContext": session_context,
         "sourceGenerations": {
@@ -1127,6 +1198,7 @@ def build_report_contract(
             "historicalIndicatorSource": full_market.get("historicalIndicatorSource"),
             "historicalPriority": full_market.get("historicalPriority"),
             "historicalFallbackAllowed": full_market.get("historicalFallbackAllowed", False),
+            "historicalLineage": historical_lineage,
         },
         # Full member-level source rows stay in their published artifacts;
         # the contract carries only the stable group summary needed by Work.

@@ -940,7 +940,7 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
     for field, token, text in (("MARKDOWN_PART1", "## 1. 시장 대시보드", markdown_text), ("MARKDOWN_PART2", "## 2. 주도 업종·테마", markdown_text), ("MARKDOWN_PART3", "## 3. 관심종목·키움 후보", markdown_text), ("HTML_PART1", 'id="part1"', plain), ("HTML_PART2", 'id="part2"', plain), ("HTML_PART3", 'id="part3"', plain)):
         if token not in text:
             issues.append(f"{field}_MISSING")
-    for forbidden in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "manifestPath", "runId", "executionHead", "provenance", "generatedAt", "generationId", "fallbackUsed", "finality", "evidenceClass"):
+    for forbidden in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "manifestPath", "runId", "executionHead", "provenance", "generatedAt", "generationId", "historicalGenerationId", "historicalTargetDate", "historicalLineage", "historicalIndicatorSource", "historicalFallbackAllowed", "currentSnapshotSource", "fallbackUsed", "finality", "evidenceClass"):
         if forbidden in markdown_text or forbidden in plain:
             issues.append(f"INTERNAL_TRACE_EXPOSED:{forbidden}")
     if "<pre" in plain.lower():
