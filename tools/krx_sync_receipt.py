@@ -264,6 +264,7 @@ def stage_m10_report_inputs(
     instruments = [row for row in entities if row["category"] in {"stock", "etf"}]
     indexes = [row for row in entities if row["category"] == "index"]
     aggregates = build_m10_market_aggregates(monitoring)
+    ma_basis_dates = sorted({row["asof"] for row in instruments if row.get("asof")})
 
     def provenance(row: Mapping[str, Any]) -> dict[str, Any]:
         return {
@@ -373,7 +374,34 @@ def stage_m10_report_inputs(
         "marketBreakdown": aggregates["marketBreakdown"],
         "indexIdentities": aggregates["indexIdentities"],
         "indicatorAvailability": aggregates["indicatorAvailability"],
+        # The M10 interchange contains official daily volume, but it does not
+        # contain a market-wide trading-value field.  Keep that absence
+        # explicit instead of manufacturing a source date from the KRX
+        # session date.
         "marketTradingValue": {},
+        "marketTradingValueEvidence": {
+            "status": "UNAVAILABLE",
+            "reason": "UNAVAILABLE_M10_FIELD_MISSING",
+            "source": "KRX_M10_GENERATION",
+            "sourcePath": "monitoring_interchange.json.entities[].official_daily_trading_value",
+            "sourceDate": None,
+            "generationId": generation,
+            "sourceSha256": source_sha,
+            "manifestSha256": validation["generationManifestSha256"],
+        },
+        # The source entity carries an explicit KRX asof date, and validation
+        # above requires every entity date to equal target.  This is source
+        # evidence, not a copied wall-clock date.
+        "maBasisDates": ma_basis_dates,
+        "maBasisDateEvidence": {
+            "status": "VERIFIED",
+            "source": "KRX_M10_GENERATION",
+            "sourcePath": "monitoring_interchange.json.entities[].asof",
+            "sourceDate": ma_basis_dates[0] if len(ma_basis_dates) == 1 else None,
+            "generationId": generation,
+            "sourceSha256": source_sha,
+            "manifestSha256": validation["generationManifestSha256"],
+        },
     }
     # The existing report loader requires a derived projection. This explicit
     # PARTIAL object carries only metadata; it never pretends to be a FINAL

@@ -112,6 +112,19 @@ class KrxSyncReceiptTests(unittest.TestCase):
             expected_target_date="20261102")
         self.assertEqual(loaded["targetDate"], "20261102")
         self.assertEqual(len(loaded["technicals"]), 1)
+        projection = json.loads((output / "report-contract-projection.json").read_text())
+        full_market = projection["fullMarket"]
+        self.assertEqual(full_market["maBasisDates"], ["20261102"])
+        self.assertEqual(full_market["maBasisDateEvidence"]["status"], "VERIFIED")
+        self.assertEqual(
+            full_market["maBasisDateEvidence"]["sourcePath"],
+            "monitoring_interchange.json.entities[].asof",
+        )
+        self.assertEqual(
+            full_market["marketTradingValueEvidence"]["reason"],
+            "UNAVAILABLE_M10_FIELD_MISSING",
+        )
+        self.assertIsNone(full_market["marketTradingValueEvidence"]["sourceDate"])
         universe = self.root / "universe.json"
         universe.write_text(json.dumps({"stocks": [{"enabled": True, "itemCode": "005930", "stockName": "삼성전자"}], "watchlists": {}}), encoding="utf-8")
         report_input = build_report_input(

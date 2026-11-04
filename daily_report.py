@@ -275,6 +275,7 @@ def date_alignment(
         "fullMarketSnapshotDate": full_market.get("snapshotDate"),
         "fullMarketSnapshotDateStatus": full_market.get("snapshotDateStatus", "MISSING"),
         "maBasisDates": full_market.get("maBasisDates", []),
+        "missingEvidenceDetails": {},
         "mismatches": [],
         "missingEvidence": [],
     }
@@ -315,8 +316,16 @@ def date_alignment(
         result["missingEvidence"].append("FULL_MARKET_TRADING_DATE")
     if not result["marketTradingValueSourceDates"]:
         result["missingEvidence"].append("MARKET_TRADING_VALUE_SOURCE_DATE")
+        result["missingEvidenceDetails"]["MARKET_TRADING_VALUE_SOURCE_DATE"] = (
+            full_market.get("marketTradingValueEvidence")
+            or {"status": "UNAVAILABLE", "reason": "EVIDENCE_NOT_PROVIDED"}
+        )
     if not result["maBasisDates"]:
         result["missingEvidence"].append("MA_BASIS_DATE")
+        result["missingEvidenceDetails"]["MA_BASIS_DATE"] = (
+            full_market.get("maBasisDateEvidence")
+            or {"status": "UNAVAILABLE", "reason": "EVIDENCE_NOT_PROVIDED"}
+        )
 
     observed = {
         "INDEX_SOURCE_DATE": result["indexSourceDates"],
@@ -799,7 +808,10 @@ def full_market_from_derived_projection(projection, target_date):
         "breadth": summary.get("breadth") or {},
         "leaders": summary.get("leaders") or [],
         "industries": [],
-        "marketTradingValue": {},
+        "marketTradingValue": summary.get("marketTradingValue") or {},
+        "marketTradingValueEvidence": summary.get("marketTradingValueEvidence") or {},
+        "maBasisDates": summary.get("maBasisDates") or [],
+        "maBasisDateEvidence": summary.get("maBasisDateEvidence") or {},
         "generatedAt": projection.get("observedAt"),
         "sourceTime": None,
         "reason": "DERIVED_SOURCE_OBSERVED_NOT_FINAL",
@@ -1332,6 +1344,7 @@ def full_market_summary(full_market, alignment):
         "leaders": full_market.get("leaders", []) if (verified or derived_summary) else [],
         "mismatches": alignment.get("mismatches", []),
         "missingEvidence": alignment.get("missingEvidence", []),
+        "missingEvidenceDetails": alignment.get("missingEvidenceDetails", {}),
     }
 
 
