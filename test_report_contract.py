@@ -596,3 +596,40 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(row["stockDetailCount"], 2)
         self.assertIn("latest-theme-signals.json", row["stockDetailSource"])
         self.assertIn("themeStockDetails", contract["sourceBindings"])
+
+    def test_krx_lineage_and_coverage_do_not_use_deprecated_naver_history(self):
+        generated = "2026-11-03T20:05:00+09:00"
+        evidence = {
+            "tradingDate": "20261103", "status": "VERIFIED",
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "POST_MARKET_SNAPSHOT", "finalConfirmed": False,
+            "collectionGeneratedAt": generated,
+        }
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {
+                "tradingDate": "20261103", "tradingDateEvidence": evidence,
+                "markets": {"TOTAL": {}}, "historicalIndicatorSource": "KRX",
+            }},
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence,
+                     "historicalIndicatorSource": "KRX", "historicalGenerationId": "gen_20261103",
+                     "historicalTargetDate": "20261103", "historicalReceiptStatus": "VERIFIED",
+                     "historicalLineageStatus": "VERIFIED", "historicalEntityCount": 2,
+                     "historicalInstrumentCount": 2, "historicalObservedInstrumentCount": 2,
+                     "historyCoveragePct": 0.0, "missingCodes": [],
+                     "regularSessionUnavailableCodes": ["005930"],
+                     "currentSnapshotMissingCodes": [], "historicalAdjustmentStatus": "UNAVAILABLE"},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["historicalIndicatorSource"], "KRX")
+        self.assertEqual(contract["historicalGenerationId"], "gen_20261103")
+        self.assertEqual(contract["historicalTargetDate"], "20261103")
+        self.assertFalse(contract["historicalFallbackAllowed"])
+        self.assertEqual(contract["currentSnapshotSource"], "NAVER_SEPARATE")
+        self.assertEqual(contract["historicalLineage"]["historyCoveragePct"], 100.0)
+        self.assertEqual(contract["historicalLineage"]["missingHistoryCodes"], [])
+        self.assertEqual(contract["historicalLineage"]["regularSessionUnavailableCodes"], ["005930"])

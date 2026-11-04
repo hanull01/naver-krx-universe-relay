@@ -529,29 +529,62 @@ def build_derivatives(
     missing_codes = sorted(code for code, rows in assets.items() if not rows)
     coverage = _load_coverage(root)
     no_daily_bar = sorted({str(row.get("code")) for row in coverage if row.get("missingReason") == "NO_DAILY_BAR"})
+    regular_session_unavailable = sorted({
+        code for code, rows in assets.items()
+        if any(
+            isinstance(row.get("regularSession"), Mapping)
+            and str(row["regularSession"].get("status") or "").upper() == "UNAVAILABLE"
+            for row in rows
+        )
+    })
+    current_snapshot_missing = sorted({
+        str(row.get("code")) for row in coverage
+        if isinstance(row, Mapping) and row.get("currentSnapshotMissing") is True and row.get("code")
+    })
+    observed_history_count = sum(
+        bool(rows) and rows[-1].get("date") == target for rows in assets.values()
+    )
+    history_coverage_pct = round(observed_history_count * 100 / len(assets), 6) if assets else None
     source = {
         "sourceStaging": str(root), "sourceCanonicalDir": str(canonical), "targetDate": target,
         "date20261030Rows": sum(row.get("date") == "20261030" for rows in assets.values() for row in rows),
         "fallbackUsed": False,
+        # A generic staged canonical directory is not sufficient evidence of
+        # KRX provenance; KRX runs are marked explicitly by their receipt path.
+        "historicalIndicatorSource": "STAGED_EXTERNAL",
+        "historicalFallbackAllowed": False,
+        "currentSnapshotSource": "NAVER_SEPARATE",
     }
     technical_payload = {
         "schemaVersion": 1, "generatedAt": datetime.now().astimezone().isoformat(),
         "expectedCount": len(technical_rows), "count": len(technical_rows), "targetDate": target,
-        **source, "missingCodes": missing_codes, "noDailyBar": no_daily_bar,
+        **source, "missingCodes": missing_codes, "missingHistoryCodes": missing_codes,
+        "regularSessionUnavailableCodes": regular_session_unavailable,
+        "currentSnapshotMissingCodes": current_snapshot_missing,
+        "noDailyBar": no_daily_bar, "historyCoveragePct": history_coverage_pct,
         "status": "AVAILABLE" if all(row["availabilityStatus"] == "AVAILABLE" for row in technical_rows) else "PARTIAL",
         "datas": public_technical_rows,
     }
     state_payload = {
         "schemaVersion": 1, "generatedAt": technical_payload["generatedAt"],
         "expectedCount": len(state_rows), "count": len(state_rows), "targetDate": target,
-        **source, "missingCodes": missing_codes, "noDailyBar": no_daily_bar,
+        **source, "missingCodes": missing_codes, "missingHistoryCodes": missing_codes,
+        "regularSessionUnavailableCodes": regular_session_unavailable,
+        "currentSnapshotMissingCodes": current_snapshot_missing,
+        "noDailyBar": no_daily_bar, "historyCoveragePct": history_coverage_pct,
         "status": "AVAILABLE" if all(row["availabilityStatus"] == "AVAILABLE" for row in state_rows) else "PARTIAL",
         "datas": public_state_rows,
     }
     registered_codes = sorted({str(row.get("itemCode")) for row in universe["stocks"]} | {str(code) for values in universe["watchlists"].values() for code in values})
     registered_missing = [code for code in registered_codes if code not in technical_by_code]
-    registered_technicals = {**technical_payload, "scope": "REGISTERED_UNIVERSE_PROJECTION", "expectedCount": len(registered_codes), "count": len(registered_codes) - len(registered_missing), "missingCodes": registered_missing, "datas": [public_technical_by_code[code] for code in registered_codes if code in public_technical_by_code]}
-    registered_states = {**state_payload, "scope": "REGISTERED_UNIVERSE_PROJECTION", "expectedCount": len(registered_codes), "count": len(registered_codes) - len(registered_missing), "missingCodes": registered_missing, "datas": [public_state_by_code[code] for code in registered_codes if code in public_state_by_code]}
+    registered_quality_lists = {
+        "missingCodes": registered_missing,
+        "missingHistoryCodes": [code for code in missing_codes if code in registered_codes],
+        "regularSessionUnavailableCodes": [code for code in regular_session_unavailable if code in registered_codes],
+        "currentSnapshotMissingCodes": [code for code in current_snapshot_missing if code in registered_codes],
+    }
+    registered_technicals = {**technical_payload, "scope": "REGISTERED_UNIVERSE_PROJECTION", "expectedCount": len(registered_codes), "count": len(registered_codes) - len(registered_missing), **registered_quality_lists, "datas": [public_technical_by_code[code] for code in registered_codes if code in public_technical_by_code]}
+    registered_states = {**state_payload, "scope": "REGISTERED_UNIVERSE_PROJECTION", "expectedCount": len(registered_codes), "count": len(registered_codes) - len(registered_missing), **registered_quality_lists, "datas": [public_state_by_code[code] for code in registered_codes if code in public_state_by_code]}
     group_payload = _group_states(public_state_by_code, universe, target, root)
     provenance = {"schemaVersion": 1, "sourceStaging": str(root), "targetDate": target, "byCode": {code: {key: value for key, value in row["provenance"].items() if key != "targetDate"} for code, row in technical_by_code.items()}}
     generated_at = technical_payload["generatedAt"]
@@ -563,7 +596,10 @@ def build_derivatives(
             kind: sum(row["assetType"] == kind for row in technical_rows) for kind in ("STOCK", "ETF")
         },
         "statusCounts": {status: sum(row["availabilityStatus"] == status for row in technical_rows) for status in ("AVAILABLE", "PARTIAL", "UNAVAILABLE")},
-        "missingCodes": missing_codes, "noDailyBar": no_daily_bar,
+        "missingCodes": missing_codes, "missingHistoryCodes": missing_codes,
+        "regularSessionUnavailableCodes": regular_session_unavailable,
+        "currentSnapshotMissingCodes": current_snapshot_missing,
+        "noDailyBar": no_daily_bar, "historyCoveragePct": history_coverage_pct,
         "date20261030Rows": source["date20261030Rows"],
         "historicalGroups": "UNAVAILABLE" if not group_payload["groups"] else "WATCHLIST_ONLY",
         "currentSnapshot": {"status": "SEPARATE_NOT_INCLUDED", "reason": "CURRENT_SNAPSHOT_IS_NOT_BACKFILL_DERIVATIVE"},

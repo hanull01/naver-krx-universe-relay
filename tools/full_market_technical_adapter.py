@@ -46,6 +46,76 @@ def _read_json(path: str | Path) -> dict[str, Any]:
     return payload
 
 
+def _historical_lineage(
+    root: Path,
+    technicals_payload: Mapping[str, Any],
+    states_payload: Mapping[str, Any],
+    provenance_payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Describe the historical source without treating missing receipt as valid.
+
+    KRX generations already carry their generation and receipt metadata in the
+    staged input.  This helper only reads that metadata; it never reconstructs
+    historical values from the deprecated NAVER canonical tree.
+    """
+    source = str(
+        technicals_payload.get("source")
+        or technicals_payload.get("historicalIndicatorSource")
+        or ""
+    )
+    is_krx = source == KRX_M10_SOURCE_STAGING or technicals_payload.get("historicalIndicatorSource") == "KRX"
+    generation = technicals_payload.get("generationId")
+    target = technicals_payload.get("targetDate")
+    counts = technicals_payload.get("counts") if isinstance(technicals_payload.get("counts"), Mapping) else {}
+    receipt_path = root / "receipt.json"
+    receipt: Mapping[str, Any] = {}
+    if receipt_path.is_file():
+        try:
+            loaded = _read_json(receipt_path)
+            receipt = loaded if isinstance(loaded, Mapping) else {}
+        except FullMarketTechnicalAdapterError:
+            receipt = {}
+    receipt_status = str(
+        receipt.get("generationStatus")
+        or technicals_payload.get("receiptStatus")
+        or "UNAVAILABLE"
+    ).upper()
+    receipt_matches = bool(
+        receipt
+        and receipt.get("source") == "KRX_OPEN_API"
+        and receipt.get("generationId") == generation
+        and str(receipt.get("tradingDate") or "").replace("-", "") == str(target or "").replace("-", "")
+        and receipt_status == "VERIFIED"
+    )
+    provenance_rows = provenance_payload.get("byCode") if isinstance(provenance_payload, Mapping) else {}
+    provenance_rows = provenance_rows if isinstance(provenance_rows, Mapping) else {}
+    provenance_generation_ok = bool(provenance_rows) and all(
+        isinstance(row, Mapping) and row.get("sourceGenerationId") == generation
+        for row in provenance_rows.values()
+    )
+    status = "NOT_APPLICABLE" if not is_krx else (
+        "VERIFIED" if receipt_matches and provenance_generation_ok else "UNAVAILABLE"
+    )
+    return {
+        "source": "KRX" if is_krx else source or "UNKNOWN",
+        "generationId": generation,
+        "targetDate": target,
+        "receiptStatus": receipt_status,
+        "receiptVerified": receipt_matches,
+        "provenanceGenerationVerified": provenance_generation_ok if is_krx else None,
+        "entityCount": counts.get("entityCount"),
+        "instrumentCount": counts.get("instrumentCount"),
+        "adjustmentStatus": (
+            receipt.get("adjustmentStatus")
+            or technicals_payload.get("adjustmentStatus")
+            or "UNAVAILABLE"
+        ),
+        "status": status,
+        "fallbackAllowed": False,
+        "currentSnapshotSource": "NAVER_SEPARATE",
+    }
+
+
 def _validate_provenance(
     row: Mapping[str, Any], expected_source: str | None,
     provenance: Mapping[str, Any] | None = None,
@@ -146,6 +216,7 @@ def load_full_market_staging(
         expected_target_date=technicals["targetDate"],
     )
     groups = _read_json(group_states_path)
+    provenance = provenance_payload if isinstance(provenance_payload, Mapping) else {}
     target = technicals["targetDate"]
     if states["targetDate"] != target or _date(groups.get("targetDate"), "group targetDate") != target:
         raise FullMarketTechnicalAdapterError("staged input target dates do not match")
@@ -161,6 +232,15 @@ def load_full_market_staging(
         "technicalPayload": technicals["payload"],
         "statePayload": states["payload"],
         "groupStates": groups,
+        "historicalLineage": _historical_lineage(
+            Path(technicals_path).parent,
+            technicals["payload"],
+            states["payload"],
+            provenance,
+        ),
+        "missingHistoryCodes": list(technicals["payload"].get("missingHistoryCodes") or technicals["payload"].get("missingCodes") or []),
+        "regularSessionUnavailableCodes": list(technicals["payload"].get("regularSessionUnavailableCodes") or []),
+        "currentSnapshotMissingCodes": list(technicals["payload"].get("currentSnapshotMissingCodes") or []),
         "fallbackUsed": False,
         "historicalIndicatorSource": "KRX" if source == KRX_M10_SOURCE_STAGING else "STAGED_EXTERNAL",
         "historicalPriority": "PRIMARY" if source == KRX_M10_SOURCE_STAGING else "UNSPECIFIED",
@@ -202,15 +282,25 @@ def project_registered_universe(
     states = full_market["states"]
     items = []
     missing = []
+    regular_session_unavailable = []
+    current_snapshot_missing = []
     for code in codes:
         if code not in technicals or code not in states:
             missing.append(code)
             continue
+        technical = technicals[code]
+        state = states[code]
+        regular = state.get("regularSession") or technical.get("regularSession")
+        if isinstance(regular, Mapping) and str(regular.get("status") or "").upper() == "UNAVAILABLE":
+            regular_session_unavailable.append(code)
+        current = state.get("currentSnapshot") or technical.get("currentSnapshot")
+        if isinstance(current, Mapping) and str(current.get("status") or "").upper() == "UNAVAILABLE":
+            current_snapshot_missing.append(code)
         items.append({
             "itemCode": code,
             "stockName": names.get(code),
-            "technicals": technicals[code],
-            "state": states[code],
+            "technicals": technical,
+            "state": state,
             "watchlistGroups": sorted(group for group, values in watchlists.items() if code in values),
         })
     return {
@@ -219,6 +309,9 @@ def project_registered_universe(
         "registeredCount": len(codes),
         "items": items,
         "missingCodes": missing,
+        "missingHistoryCodes": missing,
+        "regularSessionUnavailableCodes": sorted(regular_session_unavailable),
+        "currentSnapshotMissingCodes": sorted(current_snapshot_missing),
         "watchlists": watchlists,
         "fallbackUsed": False,
     }
@@ -268,4 +361,8 @@ def build_report_input(
         "historicalPriority": full_market["historicalPriority"],
         "historicalFallbackAllowed": full_market["historicalFallbackAllowed"],
         "currentObservationPolicy": full_market["currentObservationPolicy"],
+        "historicalLineage": full_market["historicalLineage"],
+        "missingHistoryCodes": list(full_market.get("missingHistoryCodes") or []),
+        "regularSessionUnavailableCodes": list(full_market.get("regularSessionUnavailableCodes") or []),
+        "currentSnapshotMissingCodes": list(full_market.get("currentSnapshotMissingCodes") or []),
     }

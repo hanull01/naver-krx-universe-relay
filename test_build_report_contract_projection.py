@@ -74,6 +74,26 @@ class BuildReportContractProjectionTests(unittest.TestCase):
         )
         self.assertEqual(result["contract"]["asOf"], "20261030")
 
+    def test_krx_coverage_uses_generation_rows_not_deprecated_history_counter(self):
+        quality_path = self.derived / "quality.json"
+        quality = json.loads(quality_path.read_text(encoding="utf-8"))
+        quality.update({
+            "historicalIndicatorSource": "KRX",
+            "historicalGenerationId": "gen_20261029",
+            "historicalInstrumentCount": 1,
+            "historicalObservedInstrumentCount": 1,
+            "historyCoveragePct": 0.0,
+            "missingCodes": [],
+            "missingHistoryCodes": [],
+            "historicalReceiptStatus": "VERIFIED",
+            "historicalLineageStatus": "VERIFIED",
+        })
+        quality_path.write_text(json.dumps(quality), encoding="utf-8")
+        result = build_report_contract_projection(self.derived, self.universe)
+        self.assertEqual(result["contract"]["historicalIndicatorSource"], "KRX")
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["historyCoveragePct"], 100.0)
+        self.assertEqual(result["contract"]["fullMarket"]["quality"]["missingHistoryCodes"], [])
+
 
 if __name__ == "__main__":
     unittest.main()
