@@ -276,6 +276,7 @@ def date_alignment(
         "fullMarketSnapshotDateStatus": full_market.get("snapshotDateStatus", "MISSING"),
         "maBasisDates": full_market.get("maBasisDates", []),
         "missingEvidenceDetails": {},
+        "dateAlignmentMissingEvidence": [],
         "mismatches": [],
         "missingEvidence": [],
     }
@@ -303,6 +304,7 @@ def date_alignment(
 
     if not full_market_available:
         result["missingEvidence"].append("FULL_MARKET_EVIDENCE")
+        result["dateAlignmentMissingEvidence"] = list(result["missingEvidence"])
         if result["indexSourceDates"] and result["indexAlignmentStatus"] == "ALIGNED_TO_HISTORICAL_DATE":
             result["indexAlignmentStatus"] = "ALIGNED"
         return result
@@ -343,7 +345,20 @@ def date_alignment(
         result["mismatches"].append("SOURCE_DATE_MISMATCH")
     if result["fullMarketSnapshotDateStatus"] == "INCONSISTENT":
         result["mismatches"].append("FULL_MARKET_TRADING_DATE_INCONSISTENT")
-    if result["missingEvidence"] or result["mismatches"]:
+    date_alignment_missing = list(result["missingEvidence"])
+    market_value_evidence = result["missingEvidenceDetails"].get(
+        "MARKET_TRADING_VALUE_SOURCE_DATE"
+    ) or {}
+    if (
+        market_value_evidence.get("reason") == "UNAVAILABLE_M10_FIELD_MISSING"
+        and "MARKET_TRADING_VALUE_SOURCE_DATE" in date_alignment_missing
+    ):
+        # M10 does not publish a market-wide trading-value field. Preserve
+        # the completeness diagnostic, but do not turn an explicitly known
+        # unavailable field into a date-alignment failure.
+        date_alignment_missing.remove("MARKET_TRADING_VALUE_SOURCE_DATE")
+    result["dateAlignmentMissingEvidence"] = date_alignment_missing
+    if date_alignment_missing or result["mismatches"]:
         result["status"] = "PARTIAL"
     elif separate_sources:
         result["status"] = "SEPARATE_SOURCES_ALIGNED"
