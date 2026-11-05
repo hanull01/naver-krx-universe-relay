@@ -1,7 +1,5 @@
 name: Build daily market report
 
-run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || inputs.as_of || 'missing-date' }}
-
 on:
   workflow_dispatch:
     inputs:

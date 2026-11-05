@@ -1,7 +1,5 @@
 name: Refresh full-market rolling daily state
 
-run-name: KRX report ${{ inputs.krx_generation_id || 'missing-generation' }} ${{ inputs.krx_expected_date || 'missing-date' }}
-
 on:
   workflow_dispatch:
     inputs:
