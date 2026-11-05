@@ -22,6 +22,14 @@ class CurrentObservationReportTests(unittest.TestCase):
             "evidenceClass": "SOURCE_OBSERVED",
             "finalConfirmed": False,
         }
+        contract["observationDate"] = "20261030"
+        contract["observationDateStatus"] = "VERIFIED"
+        contract["observationDateEvidence"] = {
+            "tradingDate": "20261030",
+            "status": "VERIFIED",
+            "evidenceClass": "INTRADAY_SESSION",
+            "finalConfirmed": False,
+        }
         contract["rendering"] = {
             "status": "RENDERABLE",
             "reason": "PARTIAL_DATA_RETAINED",
@@ -45,6 +53,8 @@ class CurrentObservationReportTests(unittest.TestCase):
             )
             self.assertEqual(output["status"], "SUCCESS")
             self.assertEqual(manifest["session"], "POST_MARKET")
+            self.assertEqual(manifest["tradingDate"], "20261030")
+            self.assertEqual(manifest["tradingDateStatus"], "VERIFIED")
             self.assertTrue(manifest["finalPending"])
             self.assertNotIn("contractHtmlAllowed", manifest)
             for field, filename in (("markdownSha256", "report.md"), ("htmlSha256", "report.html")):
@@ -63,6 +73,14 @@ class CurrentObservationReportTests(unittest.TestCase):
             "tradingDate": "20261029",
             "status": "SOURCE_OBSERVED",
             "evidenceClass": "SOURCE_OBSERVED",
+            "finalConfirmed": False,
+        }
+        contract["observationDate"] = "20261030"
+        contract["observationDateStatus"] = "VERIFIED"
+        contract["observationDateEvidence"] = {
+            "tradingDate": "20261030",
+            "status": "VERIFIED",
+            "evidenceClass": "INTRADAY_SESSION",
             "finalConfirmed": False,
         }
         contract["rendering"] = {"status": "RENDERABLE", "reason": "PARTIAL_DATA_RETAINED"}
@@ -94,6 +112,8 @@ class CurrentObservationReportTests(unittest.TestCase):
                 self.assertTrue((output_dir / "report.html").is_file())
                 self.assertEqual(manifest["workflowRunId"], f"{label}-run")
                 self.assertEqual(manifest["executionHead"], "a" * 40)
+                self.assertEqual(manifest["tradingDate"], "20261030")
+                self.assertEqual(manifest["tradingDateStatus"], "VERIFIED")
                 self.assertEqual(manifest["markdownSha256"], hashlib.sha256((output_dir / "report.md").read_bytes()).hexdigest())
                 self.assertEqual(manifest["htmlSha256"], hashlib.sha256((output_dir / "report.html").read_bytes()).hexdigest())
 
