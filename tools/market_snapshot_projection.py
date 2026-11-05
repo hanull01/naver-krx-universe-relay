@@ -50,12 +50,21 @@ def _stock(row: Mapping[str, Any], *, investor: bool = False) -> dict[str, Any]:
         "changeRate": _number(row.get("changeRate") if "changeRate" in row else row.get("prevChangeRate")),
     }
     if investor:
+        explicit_amount = "amount" in row
+        amount = _number(row.get("amount") if explicit_amount else row.get("accTradeAmount"))
         result.update({
-            "amount": _number(row.get("accTradeAmount")),
             "volume": _number(row.get("accTradeVolume")),
             "from": row.get("bizdateFrom"),
             "to": row.get("bizdateTo"),
         })
+        # NAVER uses accTradeAmount=0 when the money field is not supplied.
+        # Do not turn that missing field into a user-visible zero.
+        if explicit_amount or amount not in (None, 0):
+            result["amount"] = amount
+            if explicit_amount:
+                result["amountStatus"] = "AVAILABLE"
+        else:
+            result["amountStatus"] = "UNAVAILABLE_SOURCE_FIELD"
     else:
         result.update({
             "volume": _number(row.get("volume") if "volume" in row else row.get("tradeVolume")),

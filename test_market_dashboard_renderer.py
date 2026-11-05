@@ -141,6 +141,22 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("123,456", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
+    def test_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "OK", "rankings": {"items": {}},
+            "investorFlow": {"periods": {"DAY": [{
+                "investorType": "FOREIGNER",
+                "buy": [{"name": "삼성전자", "code": "005930", "amount": 0}],
+                "sell": [],
+            }]}}
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertNotIn(">0</td>", html)
+        self.assertIn("확인 불가", html)
+        self.assertIn("확인 불가", markdown)
+
     def test_saved_output_validation_detects_missing_dynamic_information(self):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "VERIFIED"
@@ -337,6 +353,22 @@ class MarketDashboardRendererTests(unittest.TestCase):
         markdown = render_dashboard_markdown(report)
         self.assertIn("부분 테마", html)
         self.assertIn("부분 테마", markdown)
+
+    def test_baseline_stale_current_relative_group_remains_visible(self):
+        report = report_fixture()
+        report["reportContract"]["relativeStrengthTop5"] = {
+            "status": "AVAILABLE", "tradingDate": "20261029",
+            "industries": {"top5": [{
+                "rank": 1, "id": "i-stale", "name": "당일 업종",
+                "relativeStrength": 1.2, "breadthPct": 55.0,
+                "dataQuality": "BASELINE_STALE", "leaderCandidates": [],
+            }]},
+            "themes": {"top5": []},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("당일 업종", html)
+        self.assertIn("당일 업종", markdown)
 
     def test_v1_operating_groups_are_separate_limited_and_exclude_removed(self):
         report = report_fixture()

@@ -140,7 +140,7 @@ class ReportContractTests(unittest.TestCase):
             industries={**common, "industries": []}, themes={**common, "themes": []},
             v2_latest={**common, "tradingDate": "20261028", "industries": [], "themes": []},
             v2_history={"observations": []}, leaders={},
-            research={"status": "OK", "asOf": "2026-10-28", "stocks": [{
+            research={"status": "OK", "asOf": "2026-10-28", "sourceGeneration": "research-gen", "stocks": [{
                 "itemCode": "005930", "itemName": "삼성전자", "rankingEligible": True,
                 "recentReportCount": 3, "brokerCount": 2, "targetMeanChangePct": 4.2,
                 "revisionUp": 2, "revisionDown": 0,
@@ -673,6 +673,40 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
         self.assertEqual(contract["rendering"]["reason"], "CONFIRMED_CONTRACT")
+
+    def test_stale_baseline_records_date_reason_without_blocking_current_data(self):
+        generated = "2026-10-29T10:00:00+09:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261027", "fullMarket": {
+                         "tradingDate": "20261029", "tradingDateEvidence": self.evidence("20261029")}},
+            breadth={"generatedAt": generated, "fullMarket": {}},
+            quality={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261027", "expectedPreviousTradingDate": "20261028",
+                     "tradingDateEvidence": self.evidence("20261029")},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"industries": [], "themes": []}, v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["baseline"]["reason"], "BASELINE_DATE_MISMATCH")
+
+    def test_registered_universe_projection_keeps_current_and_historical_values(self):
+        source = {
+            "status": "AVAILABLE", "registeredCount": 1,
+            "items": [{
+                "itemCode": "005930", "itemName": "삼성전자",
+                "current": {"price": 203000, "changeRate": -6.88, "status": "AVAILABLE"},
+                "technicals": {"ma20": 227700, "ma60": 250000, "sourceDate": "20261104"},
+                "state": {"trend": "DOWNTREND", "status": "AVAILABLE"},
+            }],
+        }
+        from tools.report_contract import compact_registered_universe
+        compact = compact_registered_universe(source)
+        item = compact["preview"][0]
+        self.assertEqual(item["current"]["price"], 203000)
+        self.assertEqual(item["technicals"]["ma20"], 227700)
+        self.assertEqual(item["technicals"]["ma60"], 250000)
 
     def test_theme_member_rows_are_compacted_for_github_contents_transport(self):
         generated = "2026-10-29T04:09:16+00:00"
