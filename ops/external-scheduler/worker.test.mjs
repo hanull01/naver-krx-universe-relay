@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, RESEARCH_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForKey("refresh");
@@ -25,14 +25,14 @@ function apiWith({ existing = null, run = null, commits = [], contents = {} } = 
 
 test("09:00 and 10:00 are independent slots", () => {
   const plan = planForKey("refresh");
-  const nine = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 0));
+  const nine = slotKeyFor(plan, CONSOLIDATED_CRON, Date.UTC(2026, 9, 27, 0, 0));
   const ten = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 0));
   assert.notEqual(nine, ten);
 });
 
 test("the daily refresh cron dispatches the unified refresh at 08:30 KST", () => {
   const mondayRefresh = Date.UTC(2026, 9, 25, 23, 30);
-  const refresh = resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayRefresh);
+  const refresh = resolveScheduledPlan(CONSOLIDATED_CRON, mondayRefresh);
 
   assert.equal(refresh.plan.workflow, "refresh.yml");
   assert.deepEqual(refresh.plan.inputs, {});
@@ -43,18 +43,27 @@ test("the daily refresh cron dispatches the unified refresh at 08:30 KST", () =>
 test("the refresh cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects weekends", () => {
   const mondayKst = Date.UTC(2026, 9, 25, 23, 30);
   const sundayKst = Date.UTC(2026, 9, 24, 23, 30);
-  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayKst).plan.key, "refresh");
-  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, sundayKst), null);
+  assert.equal(resolveScheduledPlan(CONSOLIDATED_CRON, mondayKst).plan.key, "refresh");
+  assert.equal(resolveScheduledPlan(CONSOLIDATED_CRON, sundayKst), null);
 });
 
 test("the canonical cron maps only refresh and research slots", () => {
-  assert.equal(planForCron("30 0-11 * * MON-FRI").key, "refresh");
-  assert.equal(planForCron("30 23 * * SUN-THU").key, "refresh");
-  assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
+  assert.equal(planForCron(CONSOLIDATED_CRON).key, "refresh");
+  assert.equal(planForCron(RESEARCH_CRON).key, "research");
+  assert.equal(planForCron("30 0-11 * * MON-FRI"), null);
+  assert.equal(planForCron("20 10 * * MON-FRI"), null);
   assert.equal(planForCron("0 22 * * SUN-THU"), null);
   assert.equal(planForCron("0 23 * * SUN-THU"), null);
   assert.equal(planForCron("0 14 * * MON-FRI"), null);
   assert.equal(planForCron("10,17,20,30,50 * * * 0-5"), null);
+});
+
+test("the research cron dispatches only the three approved KST times", () => {
+  const at = (utcHour, utcMinute) => Date.UTC(2026, 9, 25, utcHour, utcMinute);
+  assert.equal(resolveScheduledPlan(RESEARCH_CRON, at(22, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(RESEARCH_CRON, at(3, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(RESEARCH_CRON, at(10, 20)).plan.key, "research");
+  assert.equal(resolveScheduledPlan(RESEARCH_CRON, at(0, 20)), null);
 });
 
 test("backfill publication verification accepts the workflow's dated commit message", async () => {
