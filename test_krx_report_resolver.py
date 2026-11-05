@@ -82,12 +82,17 @@ class KrxReportResolverTests(unittest.TestCase):
 
     def test_only_refresh_allows_current_generation_resolution_without_inputs(self):
         root = Path(__file__).parent / ".github" / "workflows"
-        refresh = (root / "refresh.yml").read_text(encoding="utf-8")
-        daily = (root / "daily-report.yml").read_text(encoding="utf-8")
-        self.assertIn("require-expected-date: false", refresh)
-        self.assertIn("require-generation-id: false", refresh)
-        self.assertNotIn("require-expected-date: false", daily)
-        self.assertNotIn("require-generation-id: false", daily)
+        for name in ("refresh.yml", "refresh-research.yml", "refresh-monitoring-daily.yml", "daily-report.yml"):
+            text = (root / name).read_text(encoding="utf-8")
+            self.assertIn("require-expected-date: false", text, name)
+            self.assertIn("require-generation-id: false", text, name)
+
+    def test_daily_report_uses_resolved_krx_target_date_when_input_is_empty(self):
+        text = (Path(__file__).parent / ".github" / "workflows" / "daily-report.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            'expected = os.environ.get("KRX_EXPECTED_DATE") or os.environ.get("KRX_TARGET_DATE") or ""',
+            text,
+        )
 
     def test_full_market_rejects_missing_krx_input_without_fallback(self):
         with tempfile.TemporaryDirectory() as tmp:
