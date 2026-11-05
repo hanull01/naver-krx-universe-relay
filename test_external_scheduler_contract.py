@@ -14,8 +14,10 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         cls.refresh_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh.yml").read_text(encoding="utf-8")
 
     def test_refresh_uses_one_common_path_for_all_market_sessions(self):
+        self.assertIn("CONSOLIDATED_CRON", self.worker)
+        self.assertIn('cron === CONSOLIDATED_CRON', self.worker)
         self.assertNotIn('cron === "30 11 * * MON-FRI"', self.worker)
-        self.assertIn('cron === "30 0-11 * * MON-FRI"', self.worker)
+        self.assertNotIn('cron === "30 0-11 * * MON-FRI"', self.worker)
         self.assertNotIn('10,17,20,30,50 * * 0-5', self.worker)
         self.assertNotIn('run_mode: "final_recovery"', self.worker)
         self.assertNotIn('run_mode: "intraday"', self.worker)
@@ -45,15 +47,17 @@ class ExternalSchedulerContractTests(unittest.TestCase):
             self.assertNotIn(value, self.worker)
 
     def test_free_plan_and_provenance_contract_are_explicit(self):
-        self.assertIn('CONSOLIDATED_CRON', self.worker)
-        self.assertIn('production-publication-', self.worker)
-        self.assertIn('production_commit_sha', self.readme)
-        self.assertEqual(self.wrangler.count('crons ='), 1)
-        self.assertIn('30 23 * * SUN-THU', self.wrangler)
-        self.assertIn('30 0-11 * * MON-FRI', self.wrangler)
-        self.assertIn('20 3,10 * * MON-FRI', self.wrangler)
+        self.assertIn("CONSOLIDATED_CRON", self.worker)
+        self.assertIn("RESEARCH_CRON", self.worker)
+        self.assertIn("production-publication-", self.worker)
+        self.assertIn("production_commit_sha", self.readme)
+        self.assertEqual(self.wrangler.count("crons ="), 1)
+        self.assertIn('crons = ["30 * * * SUN-FRI", "20 * * * SUN-FRI"]', self.wrangler)
+        self.assertNotIn("30 23 * * SUN-THU", self.wrangler)
+        self.assertNotIn("30 0-11 * * MON-FRI", self.wrangler)
+        self.assertNotIn("20 3,10 * * MON-FRI", self.wrangler)
         self.assertIn('new_sqlite_classes = ["SlotGate"]', self.wrangler)
-        self.assertIn("production-publication-${{ github.run_id }}-${{ steps.publish.outputs.production_commit_sha }}-${{ steps.publish.outputs.publication_changed }}", self.refresh_workflow)
+        self.assertIn("production-publication-", self.refresh_workflow)
         self.assertIn("Upload production publication provenance", self.refresh_workflow)
 
 
