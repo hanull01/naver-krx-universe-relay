@@ -132,6 +132,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         }
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
+        self.assertNotIn("시장 거래대금", html)
+        self.assertNotIn("시장 거래대금", markdown)
         for text in (html, markdown):
             self.assertIn("현재 스냅샷 순위·수급", text)
             self.assertIn("삼성전자", text)

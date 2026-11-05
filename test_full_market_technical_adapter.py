@@ -291,7 +291,7 @@ class FullMarketTechnicalAdapterTests(unittest.TestCase):
         result = daily_report.full_market_from_derived_projection(projection, "2026-10-29")
         self.assertEqual(result["maBasisDates"], ["20261029"])
         self.assertEqual(result["maBasisDateEvidence"]["status"], "VERIFIED")
-        self.assertEqual(result["marketTradingValueEvidence"]["status"], "UNAVAILABLE")
+        self.assertNotIn("marketTradingValueEvidence", result)
         summary = daily_report.full_market_summary(
             result, {"status": "OK", "mismatches": [], "missingEvidence": []}
         )

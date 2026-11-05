@@ -567,7 +567,6 @@ def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
     eligible = (
         relative is not None
         and not explicit_invalid
-        and not feature_invalid
         and (member_count is None or float(member_count) > 0)
         and (coverage is None or float(coverage) > 0)
         and not (isinstance(missing_codes, list) and missing_codes)
@@ -1062,7 +1061,6 @@ def build_report_contract(
     full_market = summary.get("fullMarket") if isinstance(summary, Mapping) else {}
     full_market = full_market if isinstance(full_market, Mapping) else {}
     total = (full_market.get("markets") or {}).get("TOTAL") or {}
-    market_values = breadth.get("fullMarket", {}).get("marketTradingValue", {})
     evidence = full_market.get("tradingDateEvidence") or quality.get("tradingDateEvidence") or {}
     trading_date = full_market.get("tradingDate") or quality.get("tradingDate")
     source_quality = (
@@ -1303,7 +1301,7 @@ def build_report_contract(
     )
     contract_status = (
         "PARTIAL"
-        if baseline_status == "BASELINE_STALE" or not trading_date or not trading_date_evidence_valid
+        if not trading_date or not trading_date_evidence_valid
         or not indices_are_complete()
         or (historical_lineage["source"] == "KRX" and historical_lineage["lineageStatus"] != "VERIFIED")
         else "AVAILABLE" if aligned and full_market else "PARTIAL"
@@ -1381,8 +1379,6 @@ def build_report_contract(
                 "breakout60": metric("breakout60", "breakout60Count", "breakout60EligibleCount", "pctBreakout60"),
                 "volumeAbove20DayAverage": metric("volumeAbove20DayAverage", "volumeAbove20DayAverageCount", "volumeAbove20DayAverageEligibleCount", "pctVolumeAbove20DayAverage"),
             },
-            "marketTradingValue": market_values,
-            "marketTradingValueEvidence": full_market.get("marketTradingValueEvidence") or {},
             "maBasisDates": full_market.get("maBasisDates") or [],
             "maBasisDateEvidence": full_market.get("maBasisDateEvidence") or {},
             "marketBreakdown": full_market.get("marketBreakdown") or {},

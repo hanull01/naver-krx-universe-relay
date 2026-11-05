@@ -68,6 +68,7 @@ USER_STATUS_LABELS = {
     "RANK_DOWN": "순위 하락",
     "EXITED": "이탈",
     "COMPARISON_UNAVAILABLE": "비교 불가",
+    "BASELINE_STALE": "부분 자료",
     "OK": "확인 가능",
     "SUCCESS": "확인 가능",
 }
@@ -218,15 +219,6 @@ def _session_context_html(model: Mapping[str, Any]) -> str:
     return '<article class="card session-context"><h3>장전 관측과 직전 거래일 참고자료</h3>' + "".join(
         f"<p>{_escape(line[2:] if line.startswith('- ') else line)}</p>" for line in lines[1:]
     ) + "</article>"
-
-
-def _market_value_text(market_values: Mapping[str, Any]) -> str:
-    values = []
-    for market in ("KOSPI", "KOSDAQ"):
-        value = (market_values.get(market) or {}).get("value")
-        value_text = f"{value:,.0f}원" if isinstance(value, (int, float)) else "확인 불가"
-        values.append(f"{market} {value_text}")
-    return " · ".join(values)
 
 
 def _metric_line_value(metric: Mapping[str, Any]) -> str:
@@ -607,6 +599,7 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
             "PARTIAL_DATA_RETAINED": "부분 자료를 포함한 관측 보고서",
             "CONFIRMED_CONTRACT": "검증된 계약 자료",
             "TRADING_DATE_UNAVAILABLE": "거래일 자료 확인 대기",
+            "BASELINE_STALE": "부분 자료를 포함한 현재 관측",
         }.get(reason, "선택 자료 일부 확인 대기" if status != "AVAILABLE" else "확인된 계약 자료")
     relative_industries = _compact_relative_top5(contract, "industries")
     relative_themes = _compact_relative_top5(contract, "themes")
@@ -634,7 +627,6 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
             "decliners": decliners,
             "unchanged": unchanged,
             "declineRatio": round(decliners / total * 100, 2) if total else None,
-            "marketTradingValue": full_market.get("marketTradingValue") or {},
             "metrics": full_market.get("metrics") or {},
         },
         "marketSnapshot": contract.get("marketSnapshot") or {
@@ -841,7 +833,7 @@ def _compact_market_html(model: Mapping[str, Any]) -> str:
     total = market["total"]
     metrics = market["metrics"]
     metric_html = "".join(_metric_line(label, metrics.get(key) or {}) for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")))
-    return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article><article class="card"><div class="kpi-label">시장 거래대금</div><div class="kpi-value" style="font-size:16px">{_escape(_market_value_text(market["marketTradingValue"]))}</div><div class="kpi-sub">동일 기준일</div></article></div><div class="grid two"><article class="card"><h3>시장 확산</h3><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율</h3>{metric_html}</article></div>'
+    return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article></div><div class="grid two"><article class="card"><h3>시장 확산</h3><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율</h3>{metric_html}</article></div>'
 
 
 def _compact_html(
@@ -952,9 +944,9 @@ def _compact_markdown(
         ))
     lines += _markdown_table(("지수", "현재값", "전일 대비", "등락률"), index_rows)
     lines += ["", "### 시장 확산"]
-    lines += _markdown_table(("상승", "하락", "보합", "하락 비율", "시장 거래대금"), [(
+    lines += _markdown_table(("상승", "하락", "보합", "하락 비율"), [(
         f"{market['advancers']:,}", f"{market['decliners']:,}", f"{market['unchanged']:,}",
-        _plain_pct(market["declineRatio"]), _market_value_text(market["marketTradingValue"]),
+        _plain_pct(market["declineRatio"]),
     )])
     lines += ["", "### 이동평균 상회율"]
     lines += _markdown_table(("MA20", "MA60", "MA120"), [tuple(
@@ -1042,7 +1034,7 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
     part2_md, part2_html = markdown_section("## 2. 주도 업종·테마"), html_section("part2")
     part3_md, part3_html = markdown_section("## 3. 관심종목·키움 후보"), html_section("part3")
 
-    required = [model["asOf"], model["tradingDateStatus"], model["indexSessionLabel"], f"{model['fullMarket']['advancers']:,}", f"{model['fullMarket']['decliners']:,}", f"{model['fullMarket']['unchanged']:,}", _market_value_text(model["fullMarket"]["marketTradingValue"])]
+    required = [model["asOf"], model["tradingDateStatus"], model["indexSessionLabel"], f"{model['fullMarket']['advancers']:,}", f"{model['fullMarket']['decliners']:,}", f"{model['fullMarket']['unchanged']:,}"]
     required += [_metric_line_value(model["fullMarket"]["metrics"].get(key) or {}) for key in ("aboveMA20", "aboveMA60", "aboveMA120")]
     for value in required:
         if value and (str(value) not in markdown_text or str(value) not in plain):
