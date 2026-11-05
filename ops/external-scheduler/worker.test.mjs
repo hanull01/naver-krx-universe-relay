@@ -69,7 +69,7 @@ test("backfill publication verification accepts the workflow's dated commit mess
     head_sha: "backfill-run",
     production_commit_sha: "backfill-pub",
   };
-  const plan = planForCron("0 22 * * SUN-THU");
+  const plan = planForKey("backfill-derived");
   const api = async (path) => {
     if (path === `/repos/${repo}/actions/runs/114`) return run;
     if (path === `/repos/${repo}/commits/backfill-pub`) return {
@@ -316,7 +316,7 @@ test("the Run provenance artifact directly supplies its publication SHA", async 
     ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return api(path, init);
   };
-  const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
+  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
   assert.equal(result.publicationSha, "artifactsha");
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
@@ -333,7 +333,7 @@ test("daily report publication is unverified when the official HTML is missing",
     ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return api(path, init);
   };
-  const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
+  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
   assert.equal(result.deliveryStatus, "UNVERIFIED");
 });
