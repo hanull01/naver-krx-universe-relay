@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "376300",
   "itemName": "디어유",
-  "reportCount": 13,
-  "latestReportNid": "96850",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 14,
+  "latestReportNid": "97622",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "96850",
-    "writeDate": "2026-10-20",
-    "brokerName": "신한투자증권",
-    "title": "버블 바이럴을 위하여!",
-    "goalPrice": 27000,
+    "nid": "97622",
+    "writeDate": "2026-11-04",
+    "brokerName": "키움증권",
+    "title": "구독자 바닥 확인, 증명은 뉴욕에서",
+    "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 5,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 4,
+        "중국": 2,
+        "미국": 1,
+        "원가": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "97622",
     "96850",
     "96843",
     "95441",

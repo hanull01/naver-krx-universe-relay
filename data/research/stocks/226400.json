@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "226400",
   "itemName": "오스테오닉",
-  "reportCount": 2,
-  "latestReportNid": "94970",
-  "latestWriteDate": "2026-08-03",
+  "reportCount": 3,
+  "latestReportNid": "97674",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "94970",
-    "writeDate": "2026-08-03",
+    "nid": "97674",
+    "writeDate": "2026-11-05",
     "brokerName": "SK증권",
-    "title": "실적 성장에 더해질 주가 모멘텀",
-    "goalPrice": 10300,
+    "title": "본업 성장 지속 + 수술로봇 신사업",
+    "goalPrice": 7000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 3
+        "positive": 2,
+        "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1,
-        "수요": 1,
-        "원가": 1
+        "로봇": 8,
+        "미국": 2,
+        "환율": 2,
+        "가격": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97674",
     "94970",
     "92064"
   ]

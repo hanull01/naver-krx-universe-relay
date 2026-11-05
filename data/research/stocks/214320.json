@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "214320",
   "itemName": "이노션",
-  "reportCount": 10,
-  "latestReportNid": "96953",
-  "latestWriteDate": "2026-10-22",
+  "reportCount": 14,
+  "latestReportNid": "97725",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "96953",
-    "writeDate": "2026-10-22",
-    "brokerName": "대신증권",
-    "title": "디지털도 확장합니다.",
-    "goalPrice": 27000,
+    "nid": "97725",
+    "writeDate": "2026-11-05",
+    "brokerName": "한화투자증권",
+    "title": "향후 성장의 기반을 만드는 시기",
+    "goalPrice": 25000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 6,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "97725",
+    "97687",
+    "97673",
+    "97645",
     "96953",
     "96393",
     "95443",

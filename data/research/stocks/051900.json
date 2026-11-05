@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "051900",
   "itemName": "LG생활건강",
-  "reportCount": 13,
-  "latestReportNid": "96349",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 17,
+  "latestReportNid": "97623",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "96349",
-    "writeDate": "2026-09-29",
-    "brokerName": "교보증권",
-    "title": "쉬어가는 3분기",
-    "goalPrice": 310000,
-    "normalizedOpinion": "NONE",
+    "nid": "97623",
+    "writeDate": "2026-11-04",
+    "brokerName": "키움증권",
+    "title": "방향성은 좋지만 지속성 확인이 필요한 시점",
+    "goalPrice": 280000,
+    "normalizedOpinion": "MARKETPERFORM",
     "analysis": {
       "textSignalBalance": {
-        "positive": 11,
-        "negative": 7
+        "positive": 1,
+        "negative": 10
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3,
         "중국": 2,
-        "가격": 1,
-        "자동차": 1
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "97623",
+    "97602",
+    "97593",
+    "97567",
     "96349",
     "95866",
     "95086",

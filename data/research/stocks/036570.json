@@ -2,33 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "036570",
   "itemName": "NC",
-  "reportCount": 30,
-  "latestReportNid": "96950",
-  "latestWriteDate": "2026-10-22",
+  "reportCount": 31,
+  "latestReportNid": "97644",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "96950",
-    "writeDate": "2026-10-22",
-    "brokerName": "미래에셋증권",
-    "title": "AI 시대, 우월전략을 갖춘 게임사",
-    "goalPrice": 300000,
+    "nid": "97644",
+    "writeDate": "2026-11-05",
+    "brokerName": "키움증권",
+    "title": "과도기적 단계",
+    "goalPrice": 290000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
+        "positive": 1,
         "negative": 3
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "AI": 4,
-        "수요": 1,
-        "원가": 1
-      }
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "97644",
     "96950",
     "96663",
     "96627",

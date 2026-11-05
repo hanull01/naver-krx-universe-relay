@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "003620",
   "itemName": "KG모빌리티",
-  "reportCount": 5,
-  "latestReportNid": "95106",
-  "latestWriteDate": "2026-08-06",
+  "reportCount": 6,
+  "latestReportNid": "97712",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "95106",
-    "writeDate": "2026-08-06",
-    "brokerName": "키움증권",
-    "title": "체리자동차 전략적 파트너십 체결 및 2Q26 실적 리뷰",
+    "nid": "97712",
+    "writeDate": "2026-11-05",
+    "brokerName": "하나증권",
+    "title": "중국 전기차의 영향권",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 0
+        "positive": 4,
+        "negative": 15
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "자동차": 3,
+        "수요": 2,
         "원가": 2,
         "환율": 2,
-        "수요": 1
+        "가격": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97712",
     "95106",
     "94692",
     "94353",

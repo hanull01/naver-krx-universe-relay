@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "064960",
   "itemName": "SNT모티브",
-  "reportCount": 8,
-  "latestReportNid": "97551",
-  "latestWriteDate": "2026-11-03",
+  "reportCount": 9,
+  "latestReportNid": "97616",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "97551",
-    "writeDate": "2026-11-03",
-    "brokerName": "하나증권",
-    "title": "주식 수는 줄고, 2027년부터 성장이 온다",
-    "goalPrice": 39000,
+    "nid": "97616",
+    "writeDate": "2026-11-04",
+    "brokerName": "대신증권",
+    "title": "빠지는게 없다",
+    "goalPrice": 37000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 3
+        "positive": 3,
+        "negative": 5
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "파업": 2,
-        "반도체": 1,
-        "방산": 1
+        "자동차": 2,
+        "AI": 1,
+        "반도체": 1
       }
     }
   },
   "reportNids": [
+    "97616",
     "97551",
     "97535",
     "96346",

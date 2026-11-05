@@ -2,34 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "103140",
   "itemName": "풍산",
-  "reportCount": 18,
-  "latestReportNid": "96838",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 22,
+  "latestReportNid": "97605",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "96838",
-    "writeDate": "2026-10-19",
+    "nid": "97605",
+    "writeDate": "2026-11-04",
     "brokerName": "한화투자증권",
-    "title": "3Q26 Preview: 메탈은 줄고 방산은 이연된 3분기",
-    "goalPrice": 98000,
+    "title": "3Q26 Review: 연결은 상회, 4분기 눈높이는 하향",
+    "goalPrice": 72000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 6
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
-        "방산": 3,
+        "환율": 3,
         "가격": 2,
-        "재고": 1
+        "방산": 2,
+        "수요": 1,
+        "수주": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97605",
+    "97594",
+    "97569",
+    "97568",
     "96838",
     "96779",
     "96757",

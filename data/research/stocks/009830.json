@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "009830",
   "itemName": "한화솔루션",
-  "reportCount": 32,
-  "latestReportNid": "97378",
-  "latestWriteDate": "2026-10-30",
+  "reportCount": 33,
+  "latestReportNid": "97643",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "97378",
-    "writeDate": "2026-10-30",
-    "brokerName": "교보증권",
-    "title": "3Q26 Review: 빅쇼크",
-    "goalPrice": 33000,
+    "nid": "97643",
+    "writeDate": "2026-11-05",
+    "brokerName": "iM증권",
+    "title": "2027년부터는 확실히 좋아질 대외적 여건",
+    "goalPrice": 40000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 5
+        "positive": 3,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "가격": 1,
-        "수요": 1,
-        "원가": 1,
-        "환율": 1
+        "가격": 3,
+        "중국": 3,
+        "미국": 2,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "97643",
     "97378",
     "97371",
     "97338",

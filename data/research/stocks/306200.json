@@ -2,35 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "306200",
   "itemName": "세아제강",
-  "reportCount": 8,
-  "latestReportNid": "97012",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 9,
+  "latestReportNid": "97649",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "97012",
-    "writeDate": "2026-10-23",
-    "brokerName": "한화투자증권",
-    "title": "3분기 눈높이 하회, 4분기 회복 전망",
-    "goalPrice": 207000,
+    "nid": "97649",
+    "writeDate": "2026-11-05",
+    "brokerName": "유진투자증권",
+    "title": "OCTG 판가는 계속 상승하는 중",
+    "goalPrice": 170000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 3
+        "positive": 11,
+        "negative": 11
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "환율": 5,
-        "가격": 4,
+        "환율": 11,
+        "가격": 7,
+        "미국": 5,
+        "수주": 4,
         "원가": 4,
-        "미국": 1,
-        "자동차": 1
+        "수요": 2,
+        "자동차": 2,
+        "방산": 1
       }
     }
   },
   "reportNids": [
+    "97649",
     "97012",
     "96715",
     "95717",

@@ -2,32 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "030200",
   "itemName": "KT",
-  "reportCount": 40,
-  "latestReportNid": "97169",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 41,
+  "latestReportNid": "97589",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "97169",
-    "writeDate": "2026-10-28",
+    "nid": "97589",
+    "writeDate": "2026-11-04",
     "brokerName": "하나증권",
-    "title": "11월 전략 - 이 가격에선 장기 매수가 유리해 보입니다",
+    "title": "2027년도엔 투자 환경 개선이 예상됩니다",
     "goalPrice": 76000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 3
+        "positive": 7,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {
-        "금리": 2,
-        "가격": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "97589",
     "97169",
     "96731",
     "96729",

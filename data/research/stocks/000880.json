@@ -2,29 +2,31 @@
   "schemaVersion": 1,
   "itemCode": "000880",
   "itemName": "한화",
-  "reportCount": 17,
-  "latestReportNid": "96172",
-  "latestWriteDate": "2026-09-16",
+  "reportCount": 19,
+  "latestReportNid": "97691",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "96172",
-    "writeDate": "2026-09-16",
-    "brokerName": "SK증권",
-    "title": "쪼갠 후 증가한 시가총액",
-    "goalPrice": 170000,
+    "nid": "97691",
+    "writeDate": "2026-11-05",
+    "brokerName": "대신증권",
+    "title": "분할 회계는 끝났고, 다음 과제는 디레버리징",
+    "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 2,
+        "negative": 4
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "DOWN",
       "topics": {}
     }
   },
   "reportNids": [
+    "97691",
+    "97675",
     "96172",
     "95856",
     "95832",

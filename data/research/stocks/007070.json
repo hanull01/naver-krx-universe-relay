@@ -2,29 +2,41 @@
   "schemaVersion": 1,
   "itemCode": "007070",
   "itemName": "GS리테일",
-  "reportCount": 24,
-  "latestReportNid": "96632",
-  "latestWriteDate": "2026-10-12",
+  "reportCount": 32,
+  "latestReportNid": "97723",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "96632",
-    "writeDate": "2026-10-12",
-    "brokerName": "교보증권",
-    "title": "3Q26 Preview: 수퍼가 이끈 실적",
-    "goalPrice": 36000,
+    "nid": "97723",
+    "writeDate": "2026-11-05",
+    "brokerName": "하나증권",
+    "title": "3Q26 Re: 야무지게 좋아지는 수익성",
+    "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 13,
-        "negative": 1
+        "positive": 6,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1,
+        "재고": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "97723",
+    "97711",
+    "97695",
+    "97688",
+    "97684",
+    "97636",
+    "97632",
+    "97627",
     "96632",
     "96566",
     "96130",

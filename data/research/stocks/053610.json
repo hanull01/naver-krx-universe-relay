@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "053610",
   "itemName": "프로텍",
-  "reportCount": 1,
-  "latestReportNid": "93933",
-  "latestWriteDate": "2026-07-07",
+  "reportCount": 2,
+  "latestReportNid": "97629",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "93933",
-    "writeDate": "2026-07-07",
-    "brokerName": "대신증권",
-    "title": "자회사 적자 축소 본업도 업사이클",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97629",
+    "writeDate": "2026-11-05",
+    "brokerName": "IBK투자증권",
+    "title": "증설의 계절, 만개할 성장",
+    "goalPrice": 89000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 7
+        "positive": 3,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 5,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 1
+        "반도체": 2
       }
     }
   },
   "reportNids": [
+    "97629",
     "93933"
   ]
 }

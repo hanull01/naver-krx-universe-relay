@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "323410",
   "itemName": "카카오뱅크",
-  "reportCount": 11,
-  "latestReportNid": "95258",
-  "latestWriteDate": "2026-08-07",
+  "reportCount": 15,
+  "latestReportNid": "97715",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "95258",
-    "writeDate": "2026-08-07",
-    "brokerName": "대신증권",
-    "title": "순조로운 성장 중",
-    "goalPrice": 26000,
-    "normalizedOpinion": "MARKETPERFORM",
+    "nid": "97715",
+    "writeDate": "2026-11-05",
+    "brokerName": "하나증권",
+    "title": "4분기 큰폭의 대출성장률 회복 기대",
+    "goalPrice": 35000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 13,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "topics": {
+        "원가": 4
+      }
     }
   },
   "reportNids": [
+    "97715",
+    "97708",
+    "97705",
+    "97624",
     "95258",
     "95180",
     "95179",

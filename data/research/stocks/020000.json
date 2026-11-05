@@ -2,33 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "020000",
   "itemName": "한섬",
-  "reportCount": 20,
-  "latestReportNid": "97555",
-  "latestWriteDate": "2026-11-03",
+  "reportCount": 21,
+  "latestReportNid": "97615",
+  "latestWriteDate": "2026-11-04",
   "latest": {
-    "nid": "97555",
-    "writeDate": "2026-11-03",
-    "brokerName": "한화투자증권",
-    "title": "3Q26 Review : 모멘텀 폭격기",
-    "goalPrice": 36000,
+    "nid": "97615",
+    "writeDate": "2026-11-04",
+    "brokerName": "대신증권",
+    "title": "4분기 성수기 효과 기대",
+    "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 1
+        "positive": 6,
+        "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "원가": 1,
-        "자동차": 1,
-        "재고": 1
-      }
+      "targetPriceMentionDirection": "UP",
+      "topics": {}
     }
   },
   "reportNids": [
+    "97615",
     "97555",
     "97534",
     "97523",

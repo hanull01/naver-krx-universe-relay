@@ -2,32 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "145020",
   "itemName": "휴젤",
-  "reportCount": 21,
-  "latestReportNid": "96885",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 27,
+  "latestReportNid": "97706",
+  "latestWriteDate": "2026-11-05",
   "latest": {
-    "nid": "96885",
-    "writeDate": "2026-10-21",
-    "brokerName": "키움증권",
-    "title": "직판하러 가는 길",
-    "goalPrice": 250000,
+    "nid": "97706",
+    "writeDate": "2026-11-05",
+    "brokerName": "교보증권",
+    "title": "3Q26 Review: 칼을 뽑았으니 끝장을 보자",
+    "goalPrice": 310000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 8,
+        "negative": 1
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 3,
-        "재고": 1
+        "미국": 8,
+        "수요": 1,
+        "재고": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "97706",
+    "97689",
+    "97672",
+    "97670",
+    "97669",
+    "97639",
     "96885",
     "96705",
     "96673",
