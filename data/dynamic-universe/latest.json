@@ -1,1516 +1,14 @@
 {
   "version": "dynamic-universe-management-v1",
-  "generatedAt": "2026-11-04T05:47:46.750080+00:00",
+  "generatedAt": "2026-11-05T03:57:45.807992+00:00",
   "networkCalls": 0,
   "industryEvidence": {
     "status": "FULL",
     "sourceStatus": "OK",
     "industryEvidenceUsable": "FULL",
-    "analyzedIndustryCount": 79
+    "analyzedIndustryCount": 0
   },
-  "sectors": [
-    {
-      "id": "305",
-      "name": "항공사",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "333",
-      "name": "무선통신서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "283",
-      "name": "전기제품",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "336",
-      "name": "다각화된통신서비스",
-      "status": "ACTIVE",
-      "score": 100.0,
-      "qualifyStreak": 2,
-      "weakenStreak": 0,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "295",
-      "name": "에너지장비및서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "325",
-      "name": "전기유틸리티",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "334",
-      "name": "무역회사와판매업체",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "306",
-      "name": "전기장비",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "328",
-      "name": "전문소매",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "272",
-      "name": "화학",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "290",
-      "name": "교육서비스",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "318",
-      "name": "종이와목재",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "329",
-      "name": "도로와철도운송",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "339",
-      "name": "다각화된소비자서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "299",
-      "name": "기계",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "289",
-      "name": "건축자재",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "303",
-      "name": "가구",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "301",
-      "name": "은행",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "320",
-      "name": "건축제품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "280",
-      "name": "부동산",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "282",
-      "name": "전자장비와기기",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "331",
-      "name": "복합유틸리티",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "302",
-      "name": "식품과기본식료품소매",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "25",
-      "name": "기타",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "312",
-      "name": "가스유틸리티",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "263",
-      "name": "게임엔터테인먼트",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "304",
-      "name": "철강",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "330",
-      "name": "생명보험",
-      "status": "REMOVED",
-      "score": 100.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "270",
-      "name": "자동차부품",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "279",
-      "name": "건설",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "264",
-      "name": "백화점과일반상점",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "276",
-      "name": "복합기업",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "337",
-      "name": "카드",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "313",
-      "name": "석유와가스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "268",
-      "name": "식품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "275",
-      "name": "담배",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 1,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": true,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "277",
-      "name": "창업투자",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "261",
-      "name": "제약",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "322",
-      "name": "비철금속",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "316",
-      "name": "건강관리업체및서비스",
-      "status": "REMOVED",
-      "score": 80.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": true,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "315",
-      "name": "손해보험",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "323",
-      "name": "해운사",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "278",
-      "name": "반도체와반도체장비",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "309",
-      "name": "음료",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "273",
-      "name": "자동차",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "294",
-      "name": "통신장비",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "284",
-      "name": "우주항공과국방",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "298",
-      "name": "가정용기기와용품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "292",
-      "name": "핸드셋",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "338",
-      "name": "사무용전자제품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "293",
-      "name": "컴퓨터와주변기기",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "311",
-      "name": "포장재",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "307",
-      "name": "전자제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "269",
-      "name": "디스플레이장비및부품",
-      "status": "REMOVED",
-      "score": 60.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": true,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "324",
-      "name": "상업서비스와공급품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "321",
-      "name": "증권",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "319",
-      "name": "기타금융",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "327",
-      "name": "디스플레이패널",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "267",
-      "name": "IT서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "285",
-      "name": "방송과엔터테인먼트",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "274",
-      "name": "섬유,의류,신발,호화품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "317",
-      "name": "호텔,레스토랑,레저",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "291",
-      "name": "조선",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "326",
-      "name": "항공화물운송과물류",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "286",
-      "name": "생물공학",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "296",
-      "name": "운송인프라",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "310",
-      "name": "광고",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "271",
-      "name": "레저용장비와제품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "308",
-      "name": "인터넷과카탈로그소매",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "281",
-      "name": "건강관리장비와용품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "266",
-      "name": "화장품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "288",
-      "name": "건강관리기술",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "300",
-      "name": "양방향미디어와서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "297",
-      "name": "가정용품",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "262",
-      "name": "생명과학도구및서비스",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "265",
-      "name": "판매업체",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "287",
-      "name": "소프트웨어",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "314",
-      "name": "출판",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    },
-    {
-      "id": "332",
-      "name": "문구류",
-      "status": "REMOVED",
-      "score": 40.0,
-      "qualifyStreak": 0,
-      "weakenStreak": 2,
-      "checks": {
-        "relativeStrength": false,
-        "advancerPct": false,
-        "turnoverConcentrationPct": true,
-        "pctAboveMA20": false,
-        "leaderCount": true
-      },
-      "source": "FULL_MARKET_EVIDENCE",
-      "sourceTime": "2026-11-04T05:47:44.225152+00:00",
-      "evidenceQuality": "FULL",
-      "lastObservedTradingDate": "20261104"
-    }
-  ],
+  "sectors": [],
   "themes": [
     {
       "id": "568",
@@ -1518,13 +16,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "587",
@@ -1532,13 +30,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "104",
@@ -1546,13 +44,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "311",
@@ -1560,13 +58,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "348",
@@ -1574,13 +72,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "492",
@@ -1588,13 +86,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "175",
@@ -1602,13 +100,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "556",
@@ -1616,13 +114,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "373",
@@ -1630,13 +128,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "382",
@@ -1644,13 +142,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "328",
@@ -1658,13 +156,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "112",
@@ -1672,13 +170,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "33",
@@ -1686,13 +184,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "352",
@@ -1700,13 +198,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "390",
@@ -1714,13 +212,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "9",
@@ -1728,13 +226,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "321",
@@ -1742,13 +240,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "404",
@@ -1756,13 +254,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "393",
@@ -1770,13 +268,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "279",
@@ -1784,13 +282,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "362",
@@ -1798,13 +296,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "614",
@@ -1812,13 +310,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "155",
@@ -1826,13 +324,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "533",
@@ -1840,13 +338,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "547",
@@ -1854,13 +352,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "307",
@@ -1868,13 +366,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "599",
@@ -1882,13 +380,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "536",
@@ -1896,13 +394,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "173",
@@ -1910,13 +408,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "545",
@@ -1924,13 +422,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "388",
@@ -1938,13 +436,13 @@
       "status": "REMOVED",
       "score": 40.0,
       "qualifyStreak": 0,
-      "weakenStreak": 2,
+      "weakenStreak": 3,
       "checks": {
         "verifiedMembership": true,
         "minimumScore": false
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "28",
@@ -1958,10 +456,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "234",
@@ -1975,10 +473,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "497",
@@ -1992,10 +490,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "165",
@@ -2009,10 +507,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "531",
@@ -2026,10 +524,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "164",
@@ -2043,10 +541,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "493",
@@ -2060,10 +558,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "270",
@@ -2077,10 +575,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "151",
@@ -2094,10 +592,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "384",
@@ -2111,10 +609,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "487",
@@ -2128,10 +626,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "489",
@@ -2145,10 +643,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "111",
@@ -2162,10 +660,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "343",
@@ -2179,10 +677,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "36",
@@ -2196,10 +694,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "266",
@@ -2213,10 +711,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "108",
@@ -2230,10 +728,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "141",
@@ -2247,10 +745,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "571",
@@ -2264,10 +762,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "543",
@@ -2281,10 +779,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "283",
@@ -2298,10 +796,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "567",
@@ -2315,10 +813,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "521",
@@ -2332,10 +830,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "483",
@@ -2349,10 +847,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "593",
@@ -2366,10 +864,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "166",
@@ -2383,10 +881,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "496",
@@ -2400,10 +898,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "38",
@@ -2417,10 +915,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "86",
@@ -2434,10 +932,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "501",
@@ -2451,10 +949,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "506",
@@ -2468,10 +966,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "76",
@@ -2485,10 +983,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "197",
@@ -2502,10 +1000,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "139",
@@ -2519,10 +1017,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "176",
@@ -2536,10 +1034,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "241",
@@ -2553,10 +1051,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "167",
@@ -2570,10 +1068,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "421",
@@ -2587,10 +1085,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "170",
@@ -2604,10 +1102,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "330",
@@ -2621,10 +1119,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "172",
@@ -2638,10 +1136,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "580",
@@ -2655,10 +1153,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "59",
@@ -2672,10 +1170,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "90",
@@ -2689,10 +1187,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "13",
@@ -2706,10 +1204,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "171",
@@ -2723,10 +1221,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "290",
@@ -2740,10 +1238,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "316",
@@ -2757,10 +1255,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "592",
@@ -2774,10 +1272,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "447",
@@ -2791,10 +1289,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "19",
@@ -2808,10 +1306,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "284",
@@ -2825,10 +1323,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "44",
@@ -2842,10 +1340,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "126",
@@ -2859,10 +1357,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "159",
@@ -2876,10 +1374,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "540",
@@ -2893,10 +1391,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "597",
@@ -2910,10 +1408,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "16",
@@ -2927,10 +1425,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "232",
@@ -2944,10 +1442,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "92",
@@ -2961,10 +1459,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "105",
@@ -2978,10 +1476,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "32",
@@ -2995,10 +1493,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "325",
@@ -3012,10 +1510,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "63",
@@ -3029,10 +1527,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "136",
@@ -3046,10 +1544,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "504",
@@ -3063,10 +1561,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "467",
@@ -3080,10 +1578,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "113",
@@ -3097,10 +1595,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "407",
@@ -3114,10 +1612,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "302",
@@ -3131,10 +1629,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "48",
@@ -3148,10 +1646,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "585",
@@ -3165,10 +1663,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "402",
@@ -3182,10 +1680,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "417",
@@ -3199,10 +1697,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "324",
@@ -3216,10 +1714,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "124",
@@ -3233,10 +1731,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "426",
@@ -3250,10 +1748,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "436",
@@ -3267,10 +1765,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "319",
@@ -3284,10 +1782,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "31",
@@ -3301,10 +1799,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "586",
@@ -3318,10 +1816,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "598",
@@ -3335,10 +1833,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "332",
@@ -3352,10 +1850,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "52",
@@ -3369,10 +1867,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "310",
@@ -3386,10 +1884,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "448",
@@ -3403,10 +1901,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "289",
@@ -3420,10 +1918,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "514",
@@ -3437,10 +1935,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "242",
@@ -3454,10 +1952,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "397",
@@ -3471,10 +1969,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "524",
@@ -3488,10 +1986,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "119",
@@ -3505,10 +2003,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "27",
@@ -3522,10 +2020,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "376",
@@ -3539,10 +2037,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "228",
@@ -3556,10 +2054,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "298",
@@ -3573,10 +2071,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "47",
@@ -3590,10 +2088,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "470",
@@ -3607,10 +2105,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "265",
@@ -3624,10 +2122,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "285",
@@ -3641,10 +2139,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "42",
@@ -3658,10 +2156,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "204",
@@ -3675,10 +2173,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "210",
@@ -3692,10 +2190,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "174",
@@ -3709,10 +2207,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "331",
@@ -3726,10 +2224,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "82",
@@ -3743,10 +2241,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "206",
@@ -3760,10 +2258,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "482",
@@ -3777,10 +2275,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "342",
@@ -3794,10 +2292,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "546",
@@ -3811,10 +2309,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "60",
@@ -3828,10 +2326,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "480",
@@ -3845,10 +2343,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "8",
@@ -3862,10 +2360,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "462",
@@ -3879,10 +2377,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "322",
@@ -3896,10 +2394,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "317",
@@ -3913,10 +2411,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "400",
@@ -3930,10 +2428,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "49",
@@ -3947,10 +2445,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "378",
@@ -3964,10 +2462,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "488",
@@ -3981,10 +2479,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "110",
@@ -3998,10 +2496,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "272",
@@ -4015,10 +2513,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "45",
@@ -4032,10 +2530,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "127",
@@ -4049,10 +2547,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "507",
@@ -4066,10 +2564,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "79",
@@ -4083,10 +2581,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "520",
@@ -4100,10 +2598,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "576",
@@ -4117,10 +2615,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "582",
@@ -4134,10 +2632,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "481",
@@ -4151,10 +2649,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "534",
@@ -4168,10 +2666,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "318",
@@ -4185,10 +2683,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "581",
@@ -4202,10 +2700,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "66",
@@ -4219,10 +2717,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "377",
@@ -4236,10 +2734,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "387",
@@ -4253,10 +2751,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "405",
@@ -4270,10 +2768,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "474",
@@ -4287,10 +2785,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "525",
@@ -4304,10 +2802,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "326",
@@ -4321,10 +2819,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "380",
@@ -4338,10 +2836,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "386",
@@ -4355,10 +2853,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "591",
@@ -4372,10 +2870,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "62",
@@ -4389,10 +2887,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "513",
@@ -4406,10 +2904,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "154",
@@ -4423,10 +2921,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "147",
@@ -4440,10 +2938,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "385",
@@ -4457,10 +2955,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "415",
@@ -4474,10 +2972,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "121",
@@ -4491,10 +2989,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "287",
@@ -4508,10 +3006,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "41",
@@ -4525,10 +3023,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "517",
@@ -4542,10 +3040,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "276",
@@ -4559,10 +3057,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "557",
@@ -4576,10 +3074,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "590",
@@ -4593,10 +3091,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "608",
@@ -4610,10 +3108,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "191",
@@ -4627,10 +3125,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "297",
@@ -4644,10 +3142,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "72",
@@ -4661,10 +3159,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "288",
@@ -4678,10 +3176,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "12",
@@ -4695,10 +3193,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "464",
@@ -4712,10 +3210,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "335",
@@ -4729,10 +3227,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "435",
@@ -4746,10 +3244,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "149",
@@ -4763,10 +3261,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "398",
@@ -4780,10 +3278,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "445",
@@ -4797,10 +3295,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "128",
@@ -4814,10 +3312,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "381",
@@ -4831,10 +3329,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "56",
@@ -4848,10 +3346,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "389",
@@ -4865,10 +3363,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "98",
@@ -4882,10 +3380,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "144",
@@ -4899,10 +3397,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "14",
@@ -4916,10 +3414,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "55",
@@ -4933,10 +3431,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "446",
@@ -4950,10 +3448,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "564",
@@ -4967,10 +3465,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "313",
@@ -4984,10 +3482,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "392",
@@ -5001,10 +3499,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "223",
@@ -5018,10 +3516,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "227",
@@ -5035,10 +3533,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "468",
@@ -5052,10 +3550,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "152",
@@ -5069,10 +3567,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "17",
@@ -5086,10 +3584,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "349",
@@ -5103,10 +3601,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "452",
@@ -5120,10 +3618,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "250",
@@ -5137,10 +3635,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "529",
@@ -5154,10 +3652,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "600",
@@ -5171,10 +3669,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "200",
@@ -5188,10 +3686,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "559",
@@ -5205,10 +3703,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "177",
@@ -5222,10 +3720,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "229",
@@ -5239,10 +3737,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "560",
@@ -5256,10 +3754,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "595",
@@ -5273,10 +3771,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "106",
@@ -5290,10 +3788,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "527",
@@ -5307,10 +3805,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "185",
@@ -5324,10 +3822,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "213",
@@ -5341,10 +3839,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "269",
@@ -5358,10 +3856,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "472",
@@ -5375,10 +3873,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "537",
@@ -5392,10 +3890,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "18",
@@ -5409,10 +3907,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "64",
@@ -5426,10 +3924,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "30",
@@ -5443,10 +3941,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "323",
@@ -5460,10 +3958,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "181",
@@ -5477,10 +3975,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "188",
@@ -5494,10 +3992,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "178",
@@ -5511,10 +4009,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "575",
@@ -5528,10 +4026,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "180",
@@ -5545,10 +4043,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "123",
@@ -5562,10 +4060,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "505",
@@ -5579,10 +4077,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "94",
@@ -5596,10 +4094,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "329",
@@ -5613,10 +4111,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "205",
@@ -5630,10 +4128,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "500",
@@ -5647,10 +4145,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "379",
@@ -5664,10 +4162,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "566",
@@ -5681,10 +4179,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "579",
@@ -5698,10 +4196,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "99",
@@ -5715,10 +4213,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "449",
@@ -5732,10 +4230,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "237",
@@ -5749,10 +4247,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "422",
@@ -5766,10 +4264,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "184",
@@ -5783,10 +4281,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "523",
@@ -5800,10 +4298,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "511",
@@ -5817,10 +4315,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "401",
@@ -5834,10 +4332,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "584",
@@ -5851,10 +4349,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "615",
@@ -5868,10 +4366,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "187",
@@ -5885,10 +4383,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     },
     {
       "id": "503",
@@ -5902,10 +4400,10 @@
         "minimumScore": true
       },
       "source": "VERIFIED_THEME_EVIDENCE",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "dataQuality": "LIST_NOT_FOUND",
       "selectionDeferred": true,
-      "lastVerifiedAt": "2026-11-04T05:19:43.281813+00:00"
+      "lastVerifiedAt": "2026-11-04T05:47:46.750080+00:00"
     }
   ],
   "leaders": [
@@ -5925,13 +4423,15 @@
         "tradingDateVerified": true
       },
       "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
       "collectionAdmitted": false,
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "currentPrice": 189400.0,
-      "changeRate": 8.11
+      "changeRate": 8.11,
+      "selectionDeferred": false,
+      "selectionBlockReason": null
     },
     {
       "id": "sector:305:18064K",
@@ -5949,13 +4449,15 @@
         "tradingDateVerified": true
       },
       "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
       "collectionAdmitted": false,
-      "lastObservedTradingDate": "20261104",
-      "currentPrice": 50100.0,
-      "changeRate": 28.46
+      "lastObservedTradingDate": "20261105",
+      "currentPrice": 58300.0,
+      "changeRate": 22.09,
+      "selectionDeferred": false,
+      "selectionBlockReason": null
     },
     {
       "id": "sector:336:030200",
@@ -5973,11 +4475,13 @@
         "tradingDateVerified": true
       },
       "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
       "collectionAdmitted": false,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105",
+      "selectionDeferred": false,
+      "selectionBlockReason": null
     },
     {
       "id": "sector:305:020560",
@@ -5995,11 +4499,11 @@
         "tradingDateVerified": true
       },
       "source": "AUTO_LEADER",
-      "status": "DISCOVERED",
-      "qualifyStreak": 1,
-      "weakenStreak": 0,
+      "status": "REMOVED",
+      "qualifyStreak": 0,
+      "weakenStreak": 1,
       "collectionAdmitted": false,
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "selectionDeferred": false,
       "selectionBlockReason": null
     },
@@ -6017,7 +4521,7 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 6,
+      "weakenStreak": 7,
       "collectionAdmitted": false,
       "currentPrice": 10015.0,
       "changeRate": 0.0,
@@ -6025,7 +4529,7 @@
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
       "selectionDeferred": false,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:273:000040",
@@ -6041,14 +4545,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 13,
+      "weakenStreak": 14,
       "collectionAdmitted": false,
       "currentPrice": 1058.0,
       "changeRate": -8.95,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:148930",
@@ -6064,14 +4568,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 13,
+      "weakenStreak": 14,
       "collectionAdmitted": false,
       "currentPrice": 3180.0,
       "changeRate": -8.36,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:012340",
@@ -6087,14 +4591,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 14,
+      "weakenStreak": 15,
       "collectionAdmitted": false,
       "currentPrice": 878.0,
       "changeRate": 29.88,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:091580",
@@ -6110,14 +4614,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 14,
+      "weakenStreak": 15,
       "collectionAdmitted": false,
       "currentPrice": 27300.0,
       "changeRate": 19.47,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:450080",
@@ -6133,14 +4637,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 14,
+      "weakenStreak": 15,
       "collectionAdmitted": false,
       "currentPrice": 36950.0,
       "changeRate": 14.75,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:273:005385",
@@ -6156,12 +4660,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 14,
+      "weakenStreak": 15,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:273:005387",
@@ -6177,12 +4681,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 14,
+      "weakenStreak": 15,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:275:033780",
@@ -6198,12 +4702,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 16,
+      "weakenStreak": 17,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "currentPrice": 193200.0,
       "changeRate": -1.53
     },
@@ -6221,12 +4725,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 18,
+      "weakenStreak": 19,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "currentPrice": 94800.0,
       "changeRate": -12.47
     },
@@ -6244,14 +4748,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 18,
+      "weakenStreak": 19,
       "collectionAdmitted": false,
       "currentPrice": 2575.0,
       "changeRate": -9.65,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:334:047050",
@@ -6267,12 +4771,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 18,
+      "weakenStreak": 19,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:334:38380K",
@@ -6288,12 +4792,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 18,
+      "weakenStreak": 19,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104",
+      "lastObservedTradingDate": "20261105",
       "currentPrice": 7590.0,
       "changeRate": 2.99
     },
@@ -6311,14 +4815,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 29,
+      "weakenStreak": 30,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
       "currentPrice": 4985.0,
       "changeRate": -1.68,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:285:253450",
@@ -6334,14 +4838,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 30,
+      "weakenStreak": 31,
       "collectionAdmitted": false,
       "currentPrice": 23650.0,
       "changeRate": 8.99,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:285:473980",
@@ -6357,14 +4861,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 30,
+      "weakenStreak": 31,
       "collectionAdmitted": false,
       "currentPrice": 11760.0,
       "changeRate": 6.04,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:285:037270",
@@ -6380,14 +4884,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 30,
+      "weakenStreak": 31,
       "collectionAdmitted": false,
       "currentPrice": 3200.0,
       "changeRate": 3.9,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:285:041510",
@@ -6403,12 +4907,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 32,
+      "weakenStreak": 33,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105",
+      "currentPrice": 79600.0,
+      "changeRate": 12.43
     },
     {
       "id": "sector:333:032640",
@@ -6424,14 +4930,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 37,
+      "weakenStreak": 38,
       "collectionAdmitted": false,
       "currentPrice": 15820.0,
       "changeRate": 9.25,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:333:065530",
@@ -6447,12 +4953,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 37,
+      "weakenStreak": 38,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:329:000650",
@@ -6468,14 +4974,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 54,
+      "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 199400.0,
       "changeRate": -5.05,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:329:084670",
@@ -6491,14 +4997,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 54,
+      "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 28850.0,
       "changeRate": -9.13,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:458650",
@@ -6514,14 +5020,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 54,
+      "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 8450.0,
       "changeRate": 2.3,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:393890",
@@ -6537,14 +5043,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 54,
+      "weakenStreak": 55,
       "collectionAdmitted": false,
       "currentPrice": 8300.0,
       "changeRate": 10.52,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:331:071320",
@@ -6560,12 +5066,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 54,
+      "weakenStreak": 55,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:323:011200",
@@ -6581,14 +5087,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 61,
+      "weakenStreak": 62,
       "collectionAdmitted": false,
       "currentPrice": 23100.0,
       "changeRate": 3.59,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:323:028670",
@@ -6604,14 +5110,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 61,
+      "weakenStreak": 62,
       "collectionAdmitted": false,
       "currentPrice": 5490.0,
       "changeRate": -6.47,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:326:004360",
@@ -6627,12 +5133,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 62,
+      "weakenStreak": 63,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:326:009070",
@@ -6648,12 +5154,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 62,
+      "weakenStreak": 63,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:326:033290",
@@ -6669,14 +5175,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 63,
+      "weakenStreak": 64,
       "collectionAdmitted": false,
       "currentPrice": 1613.0,
       "changeRate": 1.45,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:329:403550",
@@ -6692,12 +5198,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 67,
+      "weakenStreak": 68,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:240600",
@@ -6713,14 +5219,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 67,
+      "weakenStreak": 68,
       "collectionAdmitted": false,
       "currentPrice": 925.0,
       "changeRate": -7.87,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:329:095570",
@@ -6736,12 +5242,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 68,
+      "weakenStreak": 69,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:283:417200",
@@ -6757,14 +5263,14 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 68,
+      "weakenStreak": 69,
       "collectionAdmitted": false,
       "currentPrice": 12730.0,
       "changeRate": -8.61,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:329:038390",
@@ -6780,12 +5286,12 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 70,
+      "weakenStreak": 71,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": "LEADER_TRADING_DATE_UNVERIFIED",
       "assetType": "STOCK",
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     },
     {
       "id": "sector:326:000700",
@@ -6801,22 +5307,68 @@
       "source": "AUTO_LEADER",
       "status": "REMOVED",
       "qualifyStreak": 0,
-      "weakenStreak": 70,
+      "weakenStreak": 71,
       "collectionAdmitted": false,
       "selectionDeferred": false,
       "selectionBlockReason": null,
       "assetType": null,
-      "lastObservedTradingDate": "20261104"
+      "lastObservedTradingDate": "20261105"
     }
   ],
   "initialObservationCandidates": [],
-  "kiwoomDiscovery": [],
+  "kiwoomDiscovery": [
+    {
+      "code": "003490",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "015760",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "028050",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "034730",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "068270",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    },
+    {
+      "code": "207940",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "sourceGroup": "장종료후 단타후보군 탐색",
+      "status": "DISCOVERED"
+    }
+  ],
   "userWatchlists": {
     "관심종목": [
       "005930"
     ]
   },
   "memberships": [
+    {
+      "code": "003490",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
     {
       "code": "005930",
       "sources": [
@@ -6825,13 +5377,89 @@
       "reasons": [
         "관심종목"
       ]
+    },
+    {
+      "code": "015760",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "028050",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "034730",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "068270",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
+    },
+    {
+      "code": "207940",
+      "sources": [
+        "KIWOOM_DISCOVERY"
+      ],
+      "reasons": [
+        "장종료후 단타후보군 탐색"
+      ]
     }
   ],
   "collectionCodes": [
-    "005930"
+    "003490",
+    "005930",
+    "015760",
+    "028050",
+    "034730",
+    "068270",
+    "207940"
   ],
   "pending": [],
-  "changes": [],
+  "changes": [
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:305:180640",
+      "from": "DISCOVERED",
+      "to": "REMOVED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:305:18064K",
+      "from": "DISCOVERED",
+      "to": "REMOVED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:336:030200",
+      "from": "DISCOVERED",
+      "to": "REMOVED"
+    },
+    {
+      "type": "AUTO_LEADER",
+      "id": "sector:305:020560",
+      "from": "DISCOVERED",
+      "to": "REMOVED"
+    }
+  ],
   "policy": {
     "version": "dynamic-universe-policy-v1",
     "refreshIntervalMinutes": 60,
@@ -6856,11 +5484,11 @@
       "minimumScore": 60,
       "minimumPersistence": 1
     },
-    "_observedTradingDate": "20261104"
+    "_observedTradingDate": "20261105"
   },
   "load": {
     "limit": 120,
-    "count": 1,
+    "count": 7,
     "limitExceededByProtectedSources": 0
   },
   "safety": {
@@ -6870,7 +5498,7 @@
     "deduplicateCollectionBy": "itemCode"
   },
   "inputEvidence": {
-    "tradingDate": "20261104",
+    "tradingDate": "20261105",
     "sourceQualityStatus": "UNAVAILABLE",
     "sourceCommit": null,
     "sourceCommitStatus": "UNAVAILABLE"
