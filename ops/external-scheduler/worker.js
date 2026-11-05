@@ -12,25 +12,13 @@ const WORKFLOWS = {
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
 export const CONSOLIDATED_CRON = "30 * * * SUN-FRI";
-export const DAILY_COMPOSITE_CRON = "30 23 * * SUN-THU";
+export const DAILY_COMPOSITE_CRON = "30 23 * * SUN-THU"; // 08:30 KST refresh slot
 export const GITHUB_USER_AGENT = "naver-krx-external-scheduler";
-const LEGACY_CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
-const LEGACY_DAILY_COMPOSITE_CRON = "0 22,23 * * 0-4";
 
 export function planForCron(cron) {
   if (cron === "30 23 * * SUN-THU" || cron === "30 23 * * 0-4" || cron === "30 0-11 * * MON-FRI" || cron === "30 0-11 * * 1-5") {
     return { slot: "08:30-20:30", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
   }
-  if (cron === "30 11 * * MON-FRI" || cron === "30 11 * * 1-5") {
-    return { slot: "20:30", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
-  }
-  if (cron === "0 22 * * SUN-THU" || cron === "0 22 * * 0-4") {
-    return { slot: "07:00", key: "backfill-derived", ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } };
-  }
-  if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "0 0-10 * * MON-FRI" || cron === "0 0-10 * * 1-5") {
-    return { slot: cron.startsWith("0 23") ? "08:00" : "09:00-19:00", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
-  }
-  if (cron === "0 14 * * MON-FRI" || cron === "0 14 * * 1-5") return { slot: "23:00", key: "daily-report", ...WORKFLOWS.report, inputs: {} };
   if (cron === "20 22 * * SUN-THU" || cron === "20 22 * * 0-4" || cron === "20 3 * * MON-FRI" || cron === "20 3 * * 1-5" || cron === "20 10 * * MON-FRI" || cron === "20 10 * * 1-5" || cron === "20 3,10 * * MON-FRI" || cron === "20 3,10 * * 1-5") {
     return { slot: "research", key: "research", ...WORKFLOWS.research, inputs: {} };
   }
@@ -64,14 +52,14 @@ export function slotKeyFor(plan, cron, scheduledTime) {
 
 export function resolveScheduledPlan(cron, scheduledTime) {
   const kst = kstParts(scheduledTime);
-  if (cron === DAILY_COMPOSITE_CRON || cron === LEGACY_DAILY_COMPOSITE_CRON) {
+  if (cron === DAILY_COMPOSITE_CRON) {
     if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const hour = Number(kst.hour);
     const minute = Number(kst.minute);
     if (hour === 8 && minute === 30) return { plan: planForKey("refresh"), slotCron: "30 23 * * 0-4" };
     return null;
   }
-  if (cron !== CONSOLIDATED_CRON && cron !== LEGACY_CONSOLIDATED_CRON) {
+  if (cron !== CONSOLIDATED_CRON) {
     if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const plan = planForCron(cron);
     return plan ? { plan, slotCron: cron } : null;
@@ -80,7 +68,6 @@ export function resolveScheduledPlan(cron, scheduledTime) {
   const hour = Number(kst.hour);
   const minute = Number(kst.minute);
   if (minute === 30 && hour >= 8 && hour <= 20) return { plan: planForKey("refresh"), slotCron: "30 refresh" };
-  if (minute === 20 && hour >= 7 && hour <= 19) return { plan: planForKey("research"), slotCron: "20 research" };
   return null;
 }
 
