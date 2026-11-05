@@ -1122,6 +1122,23 @@ def build_report_contract(
                 return False
         return True
 
+    observation_date = str(observed_date or "").replace("-", "")
+    observation_date_verified = bool(observation_date and indices_are_complete())
+    observation_date_status = "VERIFIED" if observation_date_verified else "UNAVAILABLE"
+    observation_date_evidence = {
+        "tradingDate": observation_date or None,
+        "status": observation_date_status,
+        "reason": (
+            "VERIFIED_CURRENT_SNAPSHOT_INDICES"
+            if observation_date_verified
+            else "CURRENT_SNAPSHOT_DATE_EVIDENCE_INVALID"
+        ),
+        "evidenceClass": "INTRADAY_SESSION",
+        "finalConfirmed": False,
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "collectionGeneratedAt": observed_at,
+    }
+
     def metric(name: str, count: str, eligible: str, pct: str) -> dict[str, Any]:
         return {
             "count": total.get(count),
@@ -1299,6 +1316,9 @@ def build_report_contract(
         "observedAt": observed_at,
         "historicalAsOfDate": historical_lineage["targetDate"],
         "observedDate": observed_date,
+        "observationDate": observation_date or None,
+        "observationDateStatus": observation_date_status,
+        "observationDateEvidence": observation_date_evidence,
         "tradingDateStatus": trading_date_status,
         "sourceQualityStatus": source_quality,
         "historicalIndicatorSource": historical_lineage["source"],
