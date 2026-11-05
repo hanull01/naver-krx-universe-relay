@@ -1102,7 +1102,7 @@ def build_report_contract(
     def indices_are_complete() -> bool:
         """Require both current index observations before marking a contract available."""
         rows = [row for row in (indices.get("indices") or []) if isinstance(row, Mapping)]
-        by_name = {str(row.get("name") or row.get("indexName")): row for row in rows}
+        by_name = {str(row.get("code") or row.get("indexCode") or row.get("name") or row.get("indexName")): row for row in rows}
         expected = str(
             (
                 observed_date

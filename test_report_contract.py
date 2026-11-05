@@ -74,6 +74,61 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
+    def test_observation_date_uses_index_code_when_names_are_localized(self):
+        generated = "2026-10-28T10:09:19+00:00"
+        contract = build_report_contract(
+            indices={
+                "generatedAt": generated,
+                "indices": [
+                    {
+                        "code": "KOSPI",
+                        "name": "코스피",
+                        "close": 6012.44,
+                        "sourceTime": "2026-10-29T10:09:19+00:00",
+                    },
+                    {
+                        "code": "KOSDAQ",
+                        "name": "코스닥",
+                        "close": 900.12,
+                        "sourceTime": "2026-10-29T10:09:19+00:00",
+                    },
+                ],
+            },
+            summary={
+                "generatedAt": generated,
+                "fullMarket": {
+                    "tradingDate": "20261028",
+                    "tradingDateEvidence": self.evidence("20261028"),
+                    "authoritativeCount": 1,
+                    "markets": {
+                        "TOTAL": {
+                            "advancers": 1,
+                            "decliners": 0,
+                            "unchanged": 0,
+                        }
+                    },
+                },
+            },
+            breadth={"generatedAt": generated, "fullMarket": {"marketTradingValue": {}}},
+            quality={
+                "generatedAt": generated,
+                "tradingDateEvidence": self.evidence("20261028"),
+                "observedDate": "20261029",
+                "currentSnapshotSource": "NAVER_SEPARATE",
+            },
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []},
+            leaders={},
+        )
+        self.assertEqual(contract["observationDate"], "20261029")
+        self.assertEqual(contract["observationDateStatus"], "VERIFIED")
+        self.assertEqual(
+            contract["observationDateEvidence"]["source"],
+            "NAVER_CURRENT_SNAPSHOT",
+        )
+
     def test_v1_projection_and_research_analysis_are_compact_and_date_bound(self):
         common = {"generatedAt": "2026-10-28T10:09:19+00:00"}
         contract = build_report_contract(
