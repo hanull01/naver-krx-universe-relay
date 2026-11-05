@@ -572,11 +572,9 @@ def _snapshot_amount_millions(value: Any) -> str:
 
 def _snapshot_amount(row: Mapping[str, Any]) -> str:
     """Render investor money only when the source explicitly vouches for it."""
-    if row.get("amountStatus") not in (None, "AVAILABLE"):
+    if row.get("amountStatus") not in (None, "AVAILABLE", "SOURCE_ZERO"):
         return "자료 없음"
-    # Older projections carried a zero placeholder without a source status.
-    # Treat that ambiguous value as missing; explicit zero now carries AVAILABLE.
-    if row.get("amount") == 0 and row.get("amountStatus") != "AVAILABLE":
+    if row.get("amount") == 0 and row.get("amountStatus") not in ("AVAILABLE", "SOURCE_ZERO"):
         return "자료 없음"
     return _snapshot_amount_millions(row.get("amount"))
 

@@ -143,7 +143,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertNotIn("000660", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
-    def test_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
+    def test_legacy_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
         report = report_fixture()
         report["reportContract"]["marketSnapshot"] = {
             "status": "OK", "rankings": {"items": {}},

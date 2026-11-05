@@ -1996,10 +1996,18 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         **quotes,
         "datas": list(quotes.get("datas") or []) + supplemental_quotes["datas"],
     }
+    candidate_baseline = monitoring_baseline
+    if technical_inputs.get("metadata", {}).get("historicalIndicatorSource") == "KRX":
+        # The selection-date close must come from the same KRX generation as
+        # the staged technical/state payload. Never replace it with a stale
+        # monitoring-baseline when the generation is date-aligned.
+        candidate_baseline = trading_discovery.krx_selection_baseline(
+            discovery, analysis_states
+        )
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes,
         analysis_technicals, analysis_states,
-        full_market_signals, previous_discovery, monitoring_baseline,
+        full_market_signals, previous_discovery, candidate_baseline,
         discovery_name_lookup,
     )
     leader_by_code = {

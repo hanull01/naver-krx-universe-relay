@@ -38,7 +38,7 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
         self.assertEqual(payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]["amountStatus"], "AVAILABLE")
         self.assertIn("WEEK", payload["investorFlow"]["periods"])
 
-    def test_missing_investor_amount_is_not_rendered_as_zero(self):
+    def test_source_zero_investor_amount_is_distinguished_and_rendered(self):
         entry = {
             "investorType": "FOREIGNER",
             "periodType": "DAY",
@@ -53,8 +53,23 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
             membership={"status": "OK"},
         )
         row = payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]
+        self.assertEqual(row["amount"], 0)
+        self.assertEqual(row["amountStatus"], "SOURCE_ZERO")
+        self.assertEqual(row["amountSourceField"], "accTradeAmount")
+
+    def test_missing_investor_amount_is_distinguished_from_source_zero(self):
+        entry = {
+            "investorType": "FOREIGNER", "periodType": "DAY", "status": "OK",
+            "buy": [stock()], "sell": [],
+        }
+        payload = build_projection(
+            rankings={"status": "OK", "rankings": []},
+            investor_flow={"status": "OK", "investors": [entry]},
+            industries={"status": "OK", "industries": []}, membership={"status": "OK"},
+        )
+        row = payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]
         self.assertNotIn("amount", row)
-        self.assertEqual(row["amountStatus"], "UNAVAILABLE_SOURCE_FIELD")
+        self.assertEqual(row["amountStatus"], "SOURCE_UNAVAILABLE")
 
     def test_explicit_zero_investor_amount_remains_a_verified_zero(self):
         entry = {
@@ -68,7 +83,7 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
         )
         row = payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]
         self.assertEqual(row["amount"], 0)
-        self.assertEqual(row["amountStatus"], "AVAILABLE")
+        self.assertEqual(row["amountStatus"], "SOURCE_ZERO")
 
     def test_failed_source_is_unavailable_and_not_silent_success(self):
         payload = build_projection(
