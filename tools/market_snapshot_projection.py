@@ -8,6 +8,7 @@ large ranking or investor-flow response cannot make the contract too large.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -51,20 +52,24 @@ def _stock(row: Mapping[str, Any], *, investor: bool = False) -> dict[str, Any]:
     }
     if investor:
         explicit_amount = "amount" in row
+        source_field = row.get("accTradeAmountSourceField") or (
+            "amount" if explicit_amount else "accTradeAmount"
+        )
+        source_status = row.get("accTradeAmountSourceStatus")
         amount = _number(row.get("amount") if explicit_amount else row.get("accTradeAmount"))
         result.update({
             "volume": _number(row.get("accTradeVolume")),
             "from": row.get("bizdateFrom"),
             "to": row.get("bizdateTo"),
         })
-        # NAVER uses accTradeAmount=0 when the money field is not supplied.
-        # Do not turn that missing field into a user-visible zero.
-        if explicit_amount or amount not in (None, 0):
+        if (explicit_amount or source_field in row) and amount is not None:
             result["amount"] = amount
-            if explicit_amount:
-                result["amountStatus"] = "AVAILABLE"
+            result["amountStatus"] = "SOURCE_ZERO" if amount == 0 else "AVAILABLE"
+            result["amountSourceField"] = source_field
+            if source_status:
+                result["amountSourceStatus"] = source_status
         else:
-            result["amountStatus"] = "UNAVAILABLE_SOURCE_FIELD"
+            result["amountStatus"] = "SOURCE_UNAVAILABLE"
     else:
         result.update({
             "volume": _number(row.get("volume") if "volume" in row else row.get("tradeVolume")),
@@ -106,6 +111,7 @@ def _flow_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
 
 def _investor_projection(payload: Mapping[str, Any]) -> dict[str, Any]:
     result: dict[str, Any] = {"status": payload.get("status", "UNAVAILABLE"), "periods": {}}
+    result["sourceDates"] = _source_dates(payload)
     day = [_flow_entry(entry) for entry in (payload.get("investors") or []) if isinstance(entry, Mapping)]
     result["periods"]["DAY"] = day
     for period, value in (payload.get("multiPeriod", {}).get("periods") or {}).items():
@@ -169,6 +175,7 @@ def build_projection(
         "source": "NAVER_CURRENT_SNAPSHOT",
         "status": status,
         "generatedAt": generated_at,
+        "sourceDates": _source_dates(investor_flow),
         "sourcePaths": {
             "rankings": "data/market/rankings.json",
             "investorFlow": "data/market/investor-flow.json",
@@ -180,6 +187,40 @@ def build_projection(
         "industries": _industry_projection(industries),
         "industryMembership": _membership_projection(membership),
     }
+
+
+def _source_dates(payload: Mapping[str, Any]) -> list[str]:
+    dates = set()
+    for entry in payload.get("investors") or []:
+        if not isinstance(entry, Mapping):
+            continue
+        for row in (entry.get("buy") or []) + (entry.get("sell") or []):
+            if not isinstance(row, Mapping):
+                continue
+            for key in ("bizdateFrom", "bizdateTo", "from", "to"):
+                if row.get(key) not in (None, ""):
+                    dates.add(str(row[key]).replace("-", ""))
+    return sorted(dates)
+
+
+def validate_for_report(payload: Mapping[str, Any], expected_date: Any) -> dict[str, Any]:
+    """Prevent an investor snapshot from crossing into a different report date."""
+    result = copy.deepcopy(dict(payload))
+    expected = str(expected_date or "").replace("-", "")[:8]
+    flow = result.get("investorFlow")
+    if not expected or not isinstance(flow, Mapping):
+        return result
+    dates = {str(value).replace("-", "") for value in flow.get("sourceDates", []) if value}
+    if dates and dates != {expected}:
+        result["status"] = "PARTIAL"
+        result["investorFlow"] = {
+            **dict(flow),
+            "status": "STALE_ARTIFACT",
+            "sourceDates": sorted(dates),
+            "periods": {},
+            "reason": "INVESTOR_FLOW_DATE_MISMATCH",
+        }
+    return result
 
 
 def build_from_directory(market_dir: Path = MARKET_DIR) -> dict[str, Any]:

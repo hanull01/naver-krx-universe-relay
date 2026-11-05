@@ -159,10 +159,18 @@ def normalize_stock(row, investor=False):
         'source': dict(row),
     }
     if investor:
+        amount_present = 'accTradeAmount' in row and row.get('accTradeAmount') not in (None, '')
+        raw_amount = row.get('accTradeAmount')
         result.update({
             'dailyVolume': numeric(row.get('dailyTradeVolume')),
             'accTradeVolume': numeric(row.get('accTradeVolume')),
-            'accTradeAmount': numeric(row.get('accTradeAmount')),
+            'accTradeAmount': numeric(raw_amount),
+            'accTradeAmountSourceField': 'accTradeAmount' if amount_present else None,
+            'accTradeAmountSourceStatus': (
+                'PRESENT_ZERO' if amount_present and numeric(raw_amount) == 0
+                else 'PRESENT' if amount_present and numeric(raw_amount) is not None
+                else 'MISSING'
+            ),
             'bizdateFrom': row.get('bizdateFrom'),
             'bizdateTo': row.get('bizdateTo'),
             'toRankingAt': row.get('toRankingAt'),

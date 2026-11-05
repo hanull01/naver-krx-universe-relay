@@ -17,6 +17,7 @@ from tools.v2_source_provenance import build_source_provenance
 from tools.kiwoom_performance import build_kiwoom_performance, load_monitoring_daily_prices
 from tools.v2_change_analysis import compare_v2_changes
 from tools.full_market_technical_adapter import build_report_input as build_staged_technical_input
+from tools.market_snapshot_projection import validate_for_report as validate_market_snapshot_for_report
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -1785,6 +1786,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "industries": {"status": "UNAVAILABLE", "top": []},
         "industryMembership": {"status": "UNAVAILABLE"},
     })
+    market_snapshot = validate_market_snapshot_for_report(market_snapshot, report_input_date)
 
     group_states = technical_inputs["groupStates"]
 
@@ -1999,8 +2001,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes,
         analysis_technicals, analysis_states,
-        full_market_signals, previous_discovery, monitoring_baseline,
-        discovery_name_lookup,
+        full_market_signals, previous_discovery,
+        name_lookup=discovery_name_lookup,
+        historical_technicals=analysis_technicals,
+        historical_states=analysis_states,
     )
     leader_by_code = {
         str(row.get("code")): row for row in full_market.get("leaders", [])

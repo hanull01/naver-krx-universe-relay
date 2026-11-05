@@ -229,6 +229,39 @@ class TradingDiscoveryTests(unittest.TestCase):
         row = td.analyze("2026-10-12", discovery, quote, {}, {}, previous=previous)["stocks"][0]
         self.assertEqual(row["previousReportChange"]["price"], 10)
 
+    def test_krx_generation_connects_selection_close_and_nested_indicators(self):
+        discovery = td.published_payload(snapshot(["003490"]))
+        technicals = {
+            "generationId": "krx-20261009", "asOfDate": "20261009",
+            "datas": [{"itemCode": "003490", "stockName": "대한항공", "close": 29050,
+                        "technicals": {"ma5": 28070, "ma20": 27952.5, "ma60": 28420,
+                                       "volumeRatio20": 1.1}}],
+        }
+        states = {
+            "generationId": "krx-20261009", "asOfDate": "20261009",
+            "datas": [{"itemCode": "003490", "state": {"breakout20": "confirmed", "pullbackState": "none"}}],
+        }
+        result = td.analyze("2026-10-12", discovery, {}, technicals, states,
+                            historical_technicals=technicals, historical_states=states)
+        row = result["stocks"][0]
+        self.assertEqual(row["selectionPrice"], 29050)
+        self.assertEqual(row["ma20"], 27952.5)
+        self.assertEqual(row["ma60"], 28420)
+        self.assertEqual(row["volumeRatio20"], 1.1)
+        self.assertEqual(row["breakout20"], "confirmed")
+        self.assertEqual(row["technicalSourceDate"], "20261009")
+
+    def test_krx_generation_mismatch_does_not_leak_indicators(self):
+        discovery = td.published_payload(snapshot(["003490"]))
+        technicals = {"generationId": "g1", "asOfDate": "20261009",
+                      "datas": [{"itemCode": "003490", "ma20": 100, "ma60": 90, "close": 110}]}
+        states = {"generationId": "g2", "asOfDate": "20261009",
+                  "datas": [{"itemCode": "003490", "state": {"breakout20": "confirmed"}}]}
+        result = td.analyze("2026-10-12", discovery, {}, {}, {},
+                            historical_technicals=technicals, historical_states=states)
+        self.assertEqual(result["stocks"][0]["technicalStatus"], "UNAVAILABLE")
+        self.assertIsNone(result["stocks"][0]["selectionPrice"])
+
     def test_bounded_fetch_requests_only_missing_once(self):
         calls = []
         def fetcher(codes):

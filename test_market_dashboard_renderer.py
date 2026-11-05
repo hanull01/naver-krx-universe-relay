@@ -94,7 +94,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "005930", "삼성E&A", "028050", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "삼성E&A", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -103,6 +103,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         for output in (html_text, markdown):
             self.assertNotIn(" V1 ", output)
             self.assertNotIn(" V2 ", output)
+            self.assertNotIn("005930", output)
+            self.assertNotIn("028050", output)
         self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_text)
         self.assertNotIn("과거 예시 데이터", html_text)
         self.assertEqual(["part1", "part2", "part3"], re.findall(r'<section[^>]+id="(part\d)"', html))
@@ -127,7 +129,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
                 "gainers": {"status": "OK", "rows": [{"code": "005930", "name": "삼성전자", "changeRate": 4.2}]},
             }},
             "investorFlow": {"status": "OK", "periods": {"DAY": [
-                {"investorType": "FOREIGNER", "status": "OK", "buy": [{"code": "000660", "name": "SK하이닉스", "amount": 123456}], "sell": []},
+                {"investorType": "FOREIGNER", "status": "OK", "buy": [{"code": "000660", "name": "SK하이닉스", "amount": 123456000, "amountStatus": "AVAILABLE"}], "sell": []},
             ]}},
         }
         html = html_lib.unescape(render_dashboard_html(report))
@@ -138,7 +140,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("현재 스냅샷 순위·수급", text)
             self.assertIn("삼성전자", text)
             self.assertIn("SK하이닉스", text)
-            self.assertIn("123,456", text)
+            self.assertIn("123백만원", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
@@ -154,8 +156,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
         self.assertNotIn(">0</td>", html)
-        self.assertIn("확인 불가", html)
-        self.assertIn("확인 불가", markdown)
+        self.assertIn("자료 없음", html)
+        self.assertIn("자료 없음", markdown)
 
     def test_saved_output_validation_detects_missing_dynamic_information(self):
         report = report_fixture()
@@ -425,6 +427,26 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("전일 장마감 후 조건검색 결과 자료 없음", markdown)
         self.assertNotIn("조건검색 실패", markdown)
 
+    def test_kiwoom_candidate_renders_krx_baseline_and_indicators_without_code(self):
+        report = report_fixture()
+        report["reportContract"]["kiwoomCandidates"] = {"stocks": [{
+            "itemCode": "003490", "itemName": "대한항공", "selectionPrice": 29050,
+            "price": 30300, "ma20": 27952.5, "ma60": 28420,
+            "technicalMetrics": {"ma5": 28070, "ma20": 27952.5, "ma60": 28420,
+                                  "volumeRatio20": 1.1, "breakout20": "confirmed"},
+            "conditionStatus": "UNAVAILABLE", "status": "PARTIAL",
+        }]}
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("대한항공", output)
+            self.assertIn("29,050원", output)
+            self.assertIn("30,300원", output)
+            self.assertIn("27,952원", output)
+            self.assertIn("28,420원", output)
+            self.assertIn("조건판정 자료 없음", output)
+            self.assertNotIn("003490", output)
+
     def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):
         report = report_fixture()
         report["reportContract"]["indices"] = [
@@ -476,7 +498,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         markdown = render_dashboard_markdown(report)
         for text in (html, markdown):
             self.assertIn("삼성전자", text)
-            self.assertIn("005930", text)
+            self.assertNotIn("005930", text)
 
     def test_rendered_views_use_kst_and_hide_lineage_metadata(self):
         report = report_fixture()
