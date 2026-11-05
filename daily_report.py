@@ -271,11 +271,11 @@ def date_alignment(
         "observedDate": observed_compact,
         "baselineDate": compact_date(full_market.get("asOfDate")),
         "indexSourceDates": [],
-        "marketTradingValueSourceDates": [],
         "fullMarketSnapshotDate": full_market.get("snapshotDate"),
         "fullMarketSnapshotDateStatus": full_market.get("snapshotDateStatus", "MISSING"),
         "maBasisDates": full_market.get("maBasisDates", []),
         "missingEvidenceDetails": {},
+        "dateAlignmentMissingEvidence": [],
         "mismatches": [],
         "missingEvidence": [],
     }
@@ -303,23 +303,13 @@ def date_alignment(
 
     if not full_market_available:
         result["missingEvidence"].append("FULL_MARKET_EVIDENCE")
+        result["dateAlignmentMissingEvidence"] = list(result["missingEvidence"])
         if result["indexSourceDates"] and result["indexAlignmentStatus"] == "ALIGNED_TO_HISTORICAL_DATE":
             result["indexAlignmentStatus"] = "ALIGNED"
         return result
 
-    result["marketTradingValueSourceDates"] = sorted({
-        date for row in (full_market.get("marketTradingValue") or {}).values()
-        if (date := source_date(row.get("sourceTime")))
-    })
-
     if not result["fullMarketSnapshotDate"]:
         result["missingEvidence"].append("FULL_MARKET_TRADING_DATE")
-    if not result["marketTradingValueSourceDates"]:
-        result["missingEvidence"].append("MARKET_TRADING_VALUE_SOURCE_DATE")
-        result["missingEvidenceDetails"]["MARKET_TRADING_VALUE_SOURCE_DATE"] = (
-            full_market.get("marketTradingValueEvidence")
-            or {"status": "UNAVAILABLE", "reason": "EVIDENCE_NOT_PROVIDED"}
-        )
     if not result["maBasisDates"]:
         result["missingEvidence"].append("MA_BASIS_DATE")
         result["missingEvidenceDetails"]["MA_BASIS_DATE"] = (
@@ -329,7 +319,6 @@ def date_alignment(
 
     observed = {
         "INDEX_SOURCE_DATE": result["indexSourceDates"],
-        "MARKET_TRADING_VALUE_SOURCE_DATE": result["marketTradingValueSourceDates"],
         "FULL_MARKET_TRADING_DATE": [result["fullMarketSnapshotDate"]] if result["fullMarketSnapshotDate"] else [],
         "MA_BASIS_DATE": result["maBasisDates"],
     }
@@ -343,6 +332,7 @@ def date_alignment(
         result["mismatches"].append("SOURCE_DATE_MISMATCH")
     if result["fullMarketSnapshotDateStatus"] == "INCONSISTENT":
         result["mismatches"].append("FULL_MARKET_TRADING_DATE_INCONSISTENT")
+    result["dateAlignmentMissingEvidence"] = list(result["missingEvidence"])
     if result["missingEvidence"] or result["mismatches"]:
         result["status"] = "PARTIAL"
     elif separate_sources:

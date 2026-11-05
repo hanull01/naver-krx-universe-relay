@@ -107,6 +107,14 @@ means the KRX projection has not been promoted to a final generation, not that
 the current snapshot is stale. An older or mismatched NAVER observation keeps
 the alignment status `PARTIAL` and is not cleared by the source split.
 
+`marketTradingValue` is optional in the daily-report JSON contract. The M10
+projection may explicitly report `UNAVAILABLE_M10_FIELD_MISSING`; this absence
+does not create `MARKET_TRADING_VALUE_SOURCE_DATE` evidence or change
+`dateAlignment`. No market-wide trading value or source date is synthesized or
+substituted. If the staged projection is otherwise valid, the report retains
+`SEPARATE_SOURCES_ALIGNED` and any remaining `PARTIAL` status is reported as
+`KRX_STAGED_PROJECTION_NOT_FINAL`.
+
 The local outbox/receiver QA accepted the generation once, reproduced both
 artifact SHA-256 values on receiver readback, and returned `NO_CHANGES` on the
 second delivery attempt. This is a local receiver test, not a GitHub data

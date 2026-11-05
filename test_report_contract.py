@@ -3,6 +3,7 @@ import unittest
 
 from tools.report_contract import (
     build_report_contract,
+    REQUIRED_RENDER_FIELDS,
     classify_contract_transport_response,
     validate_contract_payload,
     validate_kiwoom_candidate_binding,
@@ -11,6 +12,16 @@ from tools.report_contract import (
 
 
 class ReportContractTests(unittest.TestCase):
+    def test_market_trading_value_is_not_a_required_render_field(self):
+        self.assertNotIn(
+            "fullMarket.marketTradingValue.KOSPI.value",
+            REQUIRED_RENDER_FIELDS,
+        )
+        self.assertNotIn(
+            "fullMarket.marketTradingValue.KOSDAQ.value",
+            REQUIRED_RENDER_FIELDS,
+        )
+
     def evidence(self, date="20261028"):
         return {
             "tradingDate": date,
