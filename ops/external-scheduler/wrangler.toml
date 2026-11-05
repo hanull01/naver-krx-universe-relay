@@ -2,13 +2,16 @@ name = "naver-krx-external-scheduler"
 main = "worker.js"
 compatibility_date = "2026-10-27"
 
+
 [observability]
 enabled = true
 head_sampling_rate = 1
 
+
 # Cron activation and Secret registration remain a separate approved operation.
 [triggers]
-crons = ["30 23 * * SUN-THU", "30 0-11 * * MON-FRI", "20 22 * * SUN-THU", "20 3,10 * * MON-FRI"]
+crons = ["30 * * SUN-FRI", "20 * * SUN-FRI"]
+
 
 [vars]
 GITHUB_REPOSITORY = "hanull01/naver-krx-universe-relay"
@@ -16,10 +19,13 @@ SCHEDULE_OBSERVE_ONLY = "false"
 SCHEDULE_RECHECK_ONLY = "false"
 SCHEDULE_RECHECK_STARTED = "true"
 
+
 [[durable_objects.bindings]]
 name = "SLOT_GATE"
 class_name = "SlotGate"
 
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["SlotGate"]
+
