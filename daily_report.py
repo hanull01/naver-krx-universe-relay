@@ -146,6 +146,7 @@ TECHNICALS_PATH = DATA / "technicals.json"
 STATES_PATH = DATA / "states.json"
 GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
+RESEARCH_MANIFEST_PATH = DATA / "research" / "manifest.json"
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
@@ -1720,10 +1721,28 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             quotes, technical_inputs["metadata"]["targetDate"]
         )
     report_input_date = as_of or quote_observed_date or technical_inputs["metadata"].get("targetDate")
+    research_payload = load_json(RESEARCH_PATH)
+    try:
+        research_manifest = load_json(RESEARCH_MANIFEST_PATH)
+    except (OSError, ValueError, json.JSONDecodeError):
+        research_manifest = {}
+    research_generation = (
+        research_payload.get("sourceGeneration")
+        or research_payload.get("generationId")
+        or research_payload.get("generatedAt")
+        or research_manifest.get("sourceGeneration")
+        or research_manifest.get("generationId")
+        or research_manifest.get("generatedAt")
+    )
+    if research_generation and not (
+        research_payload.get("sourceGeneration")
+        or research_payload.get("generationId")
+    ):
+        research_payload = {**research_payload, "sourceGeneration": research_generation}
     research = validated_research_for_report(
-        load_json(RESEARCH_PATH),
+        research_payload,
         report_input_date,
-        technical_inputs["metadata"].get("historicalGenerationId"),
+        research_generation,
     )
     try:
         indices = load_json(MARKET_INDICES_PATH)

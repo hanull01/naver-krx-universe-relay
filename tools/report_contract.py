@@ -94,6 +94,51 @@ def compact_registered_universe(
     missing = source.get("missingCodes")
     if not isinstance(missing, list):
         missing = []
+    def compact_item(row: Mapping[str, Any]) -> dict[str, Any]:
+        current = row.get("current") or row.get("market") or {}
+        technicals = row.get("technicals") or row.get("technical") or row.get("metrics") or {}
+        state = row.get("state") or row.get("currentState") or {}
+        if not isinstance(current, Mapping):
+            current = {}
+        if not isinstance(technicals, Mapping):
+            technicals = {}
+        if not isinstance(state, Mapping):
+            state = {}
+        compact = {
+            "itemCode": row.get("itemCode") or row.get("code"),
+            "itemName": row.get("stockName") or row.get("itemName") or row.get("name"),
+            "asOfDate": (
+                row.get("asOfDate")
+                or technicals.get("sourceDate")
+                or technicals.get("asOfDate")
+            ),
+            "current": {
+                key: current.get(key)
+                for key in ("price", "currentPrice", "changeRate", "sourceTime", "status")
+                if current.get(key) is not None
+            },
+            "technicals": {
+                key: technicals.get(key)
+                for key in ("ma20", "ma60", "ma120", "return20d", "volumeRatio20", "sourceDate", "status")
+                if technicals.get(key) is not None
+            },
+            "state": {
+                key: state.get(key)
+                for key in ("trend", "trendStatus", "status", "priceVsMA20", "priceVsMA60")
+                if state.get(key) is not None
+            },
+            "status": row.get("status") or "UNAVAILABLE",
+        }
+        # Preserve the compact metrics shape for older report readers while
+        # carrying the current/staged fields needed by the registered card.
+        if isinstance(row.get("metrics"), Mapping):
+            compact["metrics"] = {
+                key: row["metrics"].get(key)
+                for key in ("ma20", "ma60", "ma120", "return20d", "volumeRatio20")
+                if row["metrics"].get(key) is not None
+            }
+        return compact
+
     result = {
         "status": source.get("status") or ("AVAILABLE" if count else "AVAILABLE_EMPTY"),
         "scope": source.get("scope") or "REGISTERED_UNIVERSE",
@@ -108,20 +153,7 @@ def compact_registered_universe(
         ),
         "detailSource": source_path,
         "detailSha256": source.get("sourceSha256") or source.get("detailSha256"),
-        "preview": [
-            {
-                "itemCode": row.get("itemCode"),
-                "itemName": row.get("stockName") or row.get("itemName"),
-                "asOfDate": row.get("asOfDate"),
-                "metrics": {
-                    key: (row.get("metrics") or {}).get(key)
-                    for key in ("ma20", "ma60", "ma120", "return20d", "volumeRatio20")
-                    if (row.get("metrics") or {}).get(key) is not None
-                },
-            }
-            for row in items[:3]
-            if isinstance(row, Mapping)
-        ],
+        "preview": [compact_item(row) for row in items[:3] if isinstance(row, Mapping)],
     }
     return result
 
@@ -473,7 +505,12 @@ def _compact_research_analysis(
     as_of = str(research.get("asOf") or "").replace("-", "")
     expected = str(trading_date or "").replace("-", "")
     stocks = [row for row in research.get("stocks") or [] if isinstance(row, Mapping)]
-    if not stocks or (expected and as_of != expected):
+    source_generation = (
+        research.get("sourceGeneration")
+        or research.get("generationId")
+        or research.get("generatedAt")
+    )
+    if not stocks or (expected and as_of != expected) or not source_generation:
         return {"status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": []}
     eligible = [row for row in stocks if row.get("rankingEligible") is True]
     if not eligible:
@@ -555,7 +592,10 @@ def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
         coverage = metrics.get("coveragePct")
     missing_codes = row.get("missingCodes")
     quality = row.get("dataQuality") or row.get("qualityStatus") or metrics.get("dataQuality")
-    explicit_invalid = quality in {"UNAVAILABLE", "BASELINE_STALE", "MISMATCH", "ERROR"}
+    # BASELINE_STALE quarantines derived/persistence metrics, but the current
+    # NAVER group observation remains usable when its own date and membership
+    # evidence are valid. It must not erase today's relative-strength rows.
+    explicit_invalid = quality in {"UNAVAILABLE", "MISMATCH", "ERROR"}
     if kind == "industry":
         derived = row.get("derivedFeatureValidMemberCount")
         if derived is None:
@@ -1420,6 +1460,12 @@ def build_report_contract(
             "research": {
                 "status": (research or {}).get("status") if isinstance(research, Mapping) else "UNAVAILABLE",
                 "asOf": (research or {}).get("asOf") if isinstance(research, Mapping) else None,
+                "sourceGeneration": (
+                    (research or {}).get("sourceGeneration")
+                    or (research or {}).get("generationId")
+                    or (research or {}).get("generatedAt")
+                ) if isinstance(research, Mapping) else None,
+                "generatedAt": (research or {}).get("generatedAt") if isinstance(research, Mapping) else None,
                 "analysis": research_analysis,
             },
             "investorFlow": {
@@ -1471,11 +1517,30 @@ def build_report_contract(
         },
     }
     if baseline_status == "BASELINE_STALE":
+        baseline_generation = (
+            quality.get("baselineGenerationId")
+            or summary.get("baselineGenerationId")
+            or full_market.get("baselineGenerationId")
+        )
+        generation_match = (
+            baseline_generation is not None
+            and baseline_generation == historical_lineage.get("generationId")
+        )
+        if expected_previous and baseline_as_of and str(expected_previous).replace("-", "") != str(baseline_as_of).replace("-", ""):
+            baseline_reason = "BASELINE_DATE_MISMATCH"
+        elif baseline_generation and not generation_match:
+            baseline_reason = "BASELINE_GENERATION_MISMATCH"
+        else:
+            baseline_reason = "BASELINE_STALE"
         contract["baseline"] = {
             "asOfDate": baseline_as_of,
             "expectedPreviousTradingDate": expected_previous,
             "freshnessStatus": baseline_status,
             "dateMismatch": True,
+            "reason": baseline_reason,
+            "baselineGenerationId": baseline_generation,
+            "historicalGenerationId": historical_lineage.get("generationId"),
+            "generationMatch": generation_match,
             "derivedMetricsStatus": "UNAVAILABLE",
             "derivedMetricsReason": "BASELINE_STALE",
         }

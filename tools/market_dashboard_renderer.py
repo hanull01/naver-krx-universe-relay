@@ -426,10 +426,17 @@ def _compact_row_available(row: Mapping[str, Any]) -> bool:
         row.get("eligibility"),
     )
     blocked = {"UNAVAILABLE", "FAILED", "STALE", "INVALID", "INELIGIBLE", "REMOVED", "WAIT", "PENDING"}
-    return not any(
-        any(token in str(value).upper() for token in blocked)
-        for value in values if value not in (None, "")
-    )
+    for value in values:
+        if value in (None, ""):
+            continue
+        normalized = str(value).upper()
+        # A stale baseline only removes derived persistence metrics. It does
+        # not invalidate a same-day NAVER relative-strength observation.
+        if normalized == "BASELINE_STALE":
+            continue
+        if any(token in normalized for token in blocked):
+            return False
+    return True
 
 
 def _compact_v2_verified(contract: Mapping[str, Any], v2: Mapping[str, Any]) -> bool:
@@ -529,6 +536,17 @@ def _snapshot_number(value: Any) -> str:
     return "확인 불가"
 
 
+def _snapshot_amount(row: Mapping[str, Any]) -> str:
+    """Render investor money only when the source explicitly vouches for it."""
+    if row.get("amountStatus") not in (None, "AVAILABLE"):
+        return "확인 불가"
+    # Older projections carried a zero placeholder without a source status.
+    # Treat that ambiguous value as missing; explicit zero now carries AVAILABLE.
+    if row.get("amount") == 0 and row.get("amountStatus") != "AVAILABLE":
+        return "확인 불가"
+    return _snapshot_number(row.get("amount"))
+
+
 def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
     snapshot = model.get("marketSnapshot") or {}
     if snapshot.get("status") not in {"OK", "PARTIAL"}:
@@ -545,7 +563,7 @@ def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
         ) or "<li>자료 없음</li>"
         cards.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)}</strong></div><ul>{items}</ul></div>')
     flow_rows = "".join(
-        f'<tr><td>{_escape(investor)}</td><td>{_escape(direction)}</td><td>{_escape(row.get("name") or "이름 확인 대기")}</td><td>{_escape(_snapshot_number(row.get("amount")))}</td></tr>'
+        f'<tr><td>{_escape(investor)}</td><td>{_escape(direction)}</td><td>{_escape(row.get("name") or "이름 확인 대기")}</td><td>{_escape(_snapshot_amount(row))}</td></tr>'
         for investor, direction, row in _snapshot_flow_rows(model)
     )
     flow = (
@@ -567,7 +585,7 @@ def _compact_snapshot_markdown(model: Mapping[str, Any]) -> list[str]:
             ranking_rows.append((label, rank, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _plain_pct(row.get("changeRate"))))
     lines += _markdown_table(("구분", "순위", "종목", "코드", "등락률"), ranking_rows or [("자료 없음", "-", "-", "-", "-")])
     flow_rows = [
-        (investor, direction, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _snapshot_number(row.get("amount")))
+        (investor, direction, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _snapshot_amount(row))
         for investor, direction, row in _snapshot_flow_rows(model)
     ]
     lines += ["", "#### 외국인·기관 수급 상위"]
