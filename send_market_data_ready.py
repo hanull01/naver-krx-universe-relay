@@ -204,7 +204,7 @@ def validate_current_observation_manifest(manifest_path, expected_commit_sha=Non
         raise ReadyValidationError('current observation report contract is unavailable') from exc
     contract = contract_payload.get('reportContract') if isinstance(contract_payload, dict) else None
     contract = contract if isinstance(contract, dict) else contract_payload
-    contract_date = str(contract.get('asOf') or contract.get('tradingDate') or '').replace('-', '')
+    contract_date = str(\n        contract.get('observationDate')\n        or contract.get('observedDate')\n        or contract.get('asOf')\n        or contract.get('tradingDate')\n        or ''\n    ).replace('-', '')
     manifest_date = str(manifest.get('tradingDate') or '').replace('-', '')
     if not manifest_date or contract_date != manifest_date:
         raise ReadyValidationError('current observation report contract trading date mismatch')
