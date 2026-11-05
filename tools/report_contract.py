@@ -21,8 +21,6 @@ REQUIRED_RENDER_FIELDS = (
     "fullMarket.breadth.decliners",
     "fullMarket.breadth.unchanged",
     "fullMarket.metrics.breakout20.count",
-    "fullMarket.marketTradingValue.KOSPI.value",
-    "fullMarket.marketTradingValue.KOSDAQ.value",
     "v2.industries",
     "v2.themes",
     "candidates",
