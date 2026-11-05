@@ -109,6 +109,10 @@ class MarketTests(unittest.TestCase):
         payload = market.collect_investors(fetch, self.CLOCK)
         self.assertEqual(payload['status'], 'OK')
         self.assertEqual(calls, ['FOREIGNER', 'ORGANIZATION'])
+        self.assertEqual(payload['investors'][0]['investorType'], 'FOREIGNER')
+        self.assertEqual(payload['investors'][1]['investorType'], 'ORGANIZATION')
+        self.assertEqual(payload['investors'][0]['buy'][0]['accTradeAmount'], 1000)
+        self.assertEqual(payload['investors'][1]['buy'][0]['accTradeAmount'], 1000)
         sell = payload['investors'][0]['sell'][0]
         self.assertEqual(sell['accTradeAmount'], -1000)
         self.assertEqual(sell['source']['accTradeAmount'], '-1000')

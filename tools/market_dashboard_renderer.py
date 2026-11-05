@@ -100,6 +100,23 @@ def _price(value: Any) -> str:
     return f"{number:,.0f}원" if number is not None else "확인 불가"
 
 
+def _candidate_technical_text(row: Mapping[str, Any]) -> str:
+    metrics = row.get("technicalMetrics") if isinstance(row.get("technicalMetrics"), Mapping) else {}
+    parts = []
+    for label, key in (("MA5", "ma5"), ("MA20", "ma20"), ("MA60", "ma60")):
+        if metrics.get(key) is not None:
+            parts.append(f"{label} {_price(metrics[key])}")
+    if metrics.get("volumeRatio20") is not None:
+        parts.append(f"거래량비율 {float(metrics['volumeRatio20']):.2f}")
+    if metrics.get("breakout20") is not None:
+        parts.append(f"돌파 {_display_status(metrics['breakout20'])}")
+    if metrics.get("pullbackState") is not None:
+        parts.append(f"눌림 {_display_status(metrics['pullbackState'])}")
+    if metrics.get("trend") is not None:
+        parts.append(f"추세 {_display_status(metrics['trend'])}")
+    return " · ".join(parts) or "기술 지표 자료 없음"
+
+
 def _index_close(value: Any) -> str:
     number = _num(value)
     return f"{number:,.2f}" if number is not None else "확인 불가"
@@ -502,7 +519,7 @@ def _compact_interest(row: Mapping[str, Any]) -> dict[str, str]:
 def _compact_leaders(row: Mapping[str, Any]) -> str:
     leaders = row.get("leaderCandidates") or row.get("leaders") or []
     values = [
-        f"{_text(item.get('name'), '이름 확인 대기')}({_text(item.get('code'), '코드 확인 대기')})"
+        _text(item.get('name'), "이름 확인 대기")
         for item in leaders[:3] if isinstance(item, Mapping)
     ]
     return ", ".join(values) if values else "주도주 자료 없음"
@@ -538,13 +555,12 @@ def _snapshot_number(value: Any) -> str:
 
 def _snapshot_amount(row: Mapping[str, Any]) -> str:
     """Render investor money only when the source explicitly vouches for it."""
-    if row.get("amountStatus") not in (None, "AVAILABLE"):
-        return "확인 불가"
-    # Older projections carried a zero placeholder without a source status.
-    # Treat that ambiguous value as missing; explicit zero now carries AVAILABLE.
-    if row.get("amount") == 0 and row.get("amountStatus") != "AVAILABLE":
-        return "확인 불가"
-    return _snapshot_number(row.get("amount"))
+    if row.get("amountStatus") not in {"AVAILABLE", "SOURCE_ZERO"}:
+        return "자료 없음"
+    amount = _num(row.get("amount"))
+    if amount is None:
+        return "자료 없음"
+    return f"{int(amount // 1_000_000):,}백만원"
 
 
 def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
@@ -556,8 +572,7 @@ def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
     for key, label in ranking_names:
         rows = _snapshot_rank_rows(model, key)
         items = "".join(
-            f'<li><strong>{_escape(row.get("name") or "이름 확인 대기")}</strong> '
-            f'<span>{_escape(row.get("code") or "코드 확인 대기")}</span> · '
+            f'<li><strong>{_escape(row.get("name") or "이름 확인 대기")}</strong> · '
             f'{_escape(_plain_pct(row.get("changeRate")))}</li>'
             for row in rows
         ) or "<li>자료 없음</li>"
@@ -565,6 +580,7 @@ def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
     flow_rows = "".join(
         f'<tr><td>{_escape(investor)}</td><td>{_escape(direction)}</td><td>{_escape(row.get("name") or "이름 확인 대기")}</td><td>{_escape(_snapshot_amount(row))}</td></tr>'
         for investor, direction, row in _snapshot_flow_rows(model)
+        if row.get("amountStatus") in {"AVAILABLE", "SOURCE_ZERO"}
     )
     flow = (
         '<table><thead><tr><th>구분</th><th>방향</th><th>종목</th><th>금액</th></tr></thead>'
@@ -582,14 +598,15 @@ def _compact_snapshot_markdown(model: Mapping[str, Any]) -> list[str]:
     ranking_rows = []
     for key, label in (("gainers", "상승률 상위"), ("volume_surge", "거래량 급증"), ("high_52week", "52주 신고가")):
         for rank, row in enumerate(_snapshot_rank_rows(model, key), start=1):
-            ranking_rows.append((label, rank, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _plain_pct(row.get("changeRate"))))
-    lines += _markdown_table(("구분", "순위", "종목", "코드", "등락률"), ranking_rows or [("자료 없음", "-", "-", "-", "-")])
+            ranking_rows.append((label, rank, row.get("name") or "이름 확인 대기", _plain_pct(row.get("changeRate"))))
+    lines += _markdown_table(("구분", "순위", "종목", "등락률"), ranking_rows or [("자료 없음", "-", "-", "-")])
     flow_rows = [
-        (investor, direction, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _snapshot_amount(row))
+        (investor, direction, row.get("name") or "이름 확인 대기", _snapshot_amount(row))
         for investor, direction, row in _snapshot_flow_rows(model)
+        if row.get("amountStatus") in {"AVAILABLE", "SOURCE_ZERO"}
     ]
     lines += ["", "#### 외국인·기관 수급 상위"]
-    lines += _markdown_table(("구분", "방향", "종목", "코드", "금액"), flow_rows or [("자료 없음", "-", "-", "-", "-")])
+    lines += _markdown_table(("구분", "방향", "종목", "금액"), flow_rows or [("자료 없음", "-", "-", "-")])
     return lines
 
 
@@ -778,7 +795,7 @@ def _compact_v2_cards(model: Mapping[str, Any]) -> str:
 
 def _compact_interest_cards(model: Mapping[str, Any]) -> str:
     return "".join(
-        f'<article class="stock"><div class="stock-topline"><span class="stock-role">관심종목</span><span class="status-chip">{_escape(row["status"])}</span></div><div class="stock-header"><h4>{_escape(row["name"])} <small>({_escape(row["code"])})</small></h4></div><div class="stock-stats"><div class="stock-stat"><small>현재 관측</small><strong>{_escape(row["price"])}</strong></div><div class="stock-stat"><small>MA20</small><strong>{_escape(row["ma20"])}</strong></div><div class="stock-stat"><small>MA60</small><strong>{_escape(row["ma60"])}</strong></div><div class="stock-stat"><small>추세</small><strong>{_escape(row["trend"])}</strong></div></div></article>'
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">관심종목</span><span class="status-chip">{_escape(row["status"])}</span></div><div class="stock-header"><h4>{_escape(row["name"])}</h4></div><div class="stock-stats"><div class="stock-stat"><small>현재가</small><strong>{_escape(row["price"])}</strong></div><div class="stock-stat"><small>MA20</small><strong>{_escape(row["ma20"])}</strong></div><div class="stock-stat"><small>MA60</small><strong>{_escape(row["ma60"])}</strong></div><div class="stock-stat"><small>추세</small><strong>{_escape(row["trend"])}</strong></div></div></article>'
         for row in model["interests"]
     )
 
@@ -787,8 +804,11 @@ def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
     rows = model["kiwoom"].get("stocks") or []
     if not rows:
         return '<article class="stock"><h4>키움 후보 자료 없음</h4><p>확인된 후보가 없습니다.</p></article>'
+    def condition_text(row):
+        value = row.get("conditionStatus")
+        return "조건판정 자료 없음" if value in (None, "", "UNAVAILABLE") else _display_status(value)
     return "".join(
-        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName"))} <small>({_escape(row.get("itemCode"))})</small></h4></div><div class="stock-stats"><div class="stock-stat"><small>현재 관측</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>조건 판정</small><strong>{_escape(_display_status(row.get("conditionStatus") or row.get("state"), "확인 대기"))}</strong></div></div></article>'
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName") or "이름 확인 대기")}</h4></div><div class="stock-stats"><div class="stock-stat"><small>기준값</small><strong>{_escape(_price(row.get("selectionPrice")))}</strong></div><div class="stock-stat"><small>현재가</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>20일 이동평균</small><strong>{_escape(_price(row.get("ma20")))}</strong></div><div class="stock-stat"><small>60일 이동평균</small><strong>{_escape(_price(row.get("ma60")))}</strong></div><div class="stock-stat"><small>기술 지표</small><strong>{_escape(_candidate_technical_text(row))}</strong></div><div class="stock-stat"><small>조건 충족 여부</small><strong>{_escape(condition_text(row))}</strong></div></div></article>'
         for row in rows
     )
 
@@ -815,14 +835,16 @@ def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, .
     result = []
     for row in rows:
         baseline = _first(row, "selectionPrice", "baselinePrice", "referencePrice", "selectedPrice")
-        technical = _first(row, "technicalSummary", "technicalStatus", "trend", "trendStatus")
-        condition = _display_status(row.get("conditionStatus") or row.get("state"), "확인 대기")
+        metrics = row.get("technicalMetrics") if isinstance(row.get("technicalMetrics"), Mapping) else {}
+        technical = _candidate_technical_text(row)
+        condition_value = row.get("conditionStatus")
+        condition = "조건판정 자료 없음" if condition_value in (None, "", "UNAVAILABLE") else _display_status(condition_value)
         next_check = _first(row, "nextCheck", "nextObservation", "nextAction") or "다음 관찰에서 확인"
         result.append((
-            f"{_text(row.get('itemName'))} ({_text(row.get('itemCode'))})",
+            _text(row.get("itemName"), "이름 확인 대기"),
             _price(baseline),
             _price(_first(row, "price", "currentPrice")),
-            _display_status(technical, "확인 대기"),
+            technical,
             condition,
             next_check,
         ))
@@ -1017,10 +1039,10 @@ def _compact_markdown(
         lines.append("자료 없음")
     lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
     interest_rows = [
-        (f"{row['name']} ({row['code']})", row["price"], row["ma20"], row["ma60"], row["trend"], row["status"])
+        (row["name"], row["price"], row["ma20"], row["ma60"], row["trend"], row["status"])
         for row in model["interests"]
     ]
-    lines += _markdown_table(("종목", "현재 관측", "MA20", "MA60", "추세", "상태"), interest_rows or [("삼성전자 (005930)", "확인 불가", "확인 불가", "확인 불가", "확인 대기", "확인 불가")])
+    lines += _markdown_table(("종목", "현재가", "MA20", "MA60", "추세", "상태"), interest_rows or [("삼성전자", "확인 불가", "확인 불가", "확인 불가", "확인 대기", "확인 불가")])
     lines += ["", "### 키움 전일 발굴 후보"]
     lines += _markdown_table(("후보", "기준값", "현재값", "기술지표", "조건 판정", "다음 확인사항"), _compact_kiwoom_markdown_rows(model) or [("자료 없음", "-", "-", "-", "자료 없음", "전일 장마감 후 조건검색 결과 자료 없음")])
     lines += ["", f"> 안내: {model['notice']}", ""]
@@ -1061,7 +1083,7 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
         if value and (str(value) not in part1_md or str(value) not in part1_html):
             issues.append(f"PART1_VALUE_MISSING:{value}")
     for row in model["interests"]:
-        for value in (row["name"], row["code"]):
+        for value in (row["name"],):
             if value and (str(value) not in part3_md or str(value) not in part3_html):
                 issues.append(f"PART3_INTEREST_MISSING:{value}")
     for _compact_row in model["relativeIndustries"] + model["relativeThemes"]:

@@ -246,7 +246,26 @@ def discovery_status(as_of, path=None):
     return with_source(payload)
 
 
-def _index(payload, keys=("itemCode", "code")):
+def normalize_item_code(value):
+    if value in (None, ""):
+        return None
+    text = str(value).strip().upper()
+    return text.zfill(6) if text.isdigit() and len(text) < 6 else text
+
+
+def _flatten_row(row):
+    if not isinstance(row, dict):
+        return {}
+    result = dict(row)
+    for key in ("technicals", "metrics", "current", "state"):
+        nested = row.get(key)
+        if isinstance(nested, dict):
+            for name, value in nested.items():
+                result.setdefault(name, value)
+    return result
+
+
+def _index(payload, keys=("itemCode", "code", "itemcode")):
     result = {}
     if not isinstance(payload, dict):
         return result
@@ -256,8 +275,65 @@ def _index(payload, keys=("itemCode", "code")):
             continue
         code = next((row.get(key) for key in keys if row.get(key)), None)
         if code:
-            result[str(code)] = row
+            result[normalize_item_code(code)] = _flatten_row(row)
     return result
+
+
+def _payload_date(payload):
+    if not isinstance(payload, dict):
+        return None
+    return normalize_item_code(payload.get("asOfDate") or payload.get("targetDate") or payload.get("historicalTargetDate"))
+
+
+def _payload_generation(payload):
+    if not isinstance(payload, dict):
+        return None
+    return payload.get("generationId") or payload.get("sourceGeneration") or payload.get("historicalGenerationId")
+
+
+def _krx_payloads_aligned(technicals, states, expected_date):
+    dates = [_payload_date(value) for value in (technicals, states) if _payload_date(value)]
+    generations = [_payload_generation(value) for value in (technicals, states) if _payload_generation(value)]
+    if dates and any(value != expected_date for value in dates):
+        return False
+    return not generations or len(set(generations)) == 1
+
+
+def krx_selection_baseline(discovery, technicals, states):
+    """Project selection-day close and indicators from one aligned KRX generation."""
+    selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
+    if not selection_date or not _krx_payloads_aligned(technicals, states, selection_date):
+        return {"status": "UNAVAILABLE", "reason": "KRX_GENERATION_OR_DATE_MISMATCH", "stocks": []}
+    tidx, sidx = _index(technicals), _index(states)
+    generation = _payload_generation(technicals) or _payload_generation(states)
+    rows = []
+    for raw_code in discovery.get("symbols") or []:
+        code = normalize_item_code(raw_code)
+        technical = tidx.get(code, {})
+        state = sidx.get(code, {})
+        merged = {**state, **technical}
+        close = next((merged.get(key) for key in ("close", "closePrice", "lastClose", "price", "currentPrice")
+                      if merged.get(key) is not None), None)
+        if close is None and not any(merged.get(key) is not None for key in ("ma5", "ma20", "ma60", "volumeRatio20", "breakout20", "pullbackState")):
+            continue
+        rows.append({
+            "code": code,
+            "name": merged.get("stockName") or merged.get("itemName") or merged.get("name"),
+            "lastTradingDate": selection_date,
+            "lastClose": close,
+            "closeValid": close is not None,
+            "ohlcValid": close is not None,
+            "ma5": merged.get("ma5"), "ma20": merged.get("ma20"), "ma60": merged.get("ma60"),
+            "volumeRatio20": merged.get("volumeRatio20"),
+            "breakout20": merged.get("breakout20"),
+            "pullbackState": merged.get("pullbackState"),
+            "trend": merged.get("trend") or merged.get("trendStatus"),
+            "sourceDate": selection_date,
+            "generationId": generation,
+            "priceBasis": "VERIFIED_KRX_GENERATION",
+        })
+    return {"status": "AVAILABLE" if rows else "UNAVAILABLE", "sourceDate": selection_date,
+            "generationId": generation, "stocks": rows}
 
 
 def verified_final_baseline(discovery, baseline):
@@ -288,17 +364,29 @@ def verified_final_baseline(discovery, baseline):
 
 
 def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
-            previous=None, final_baseline=None, name_lookup=None):
+            previous=None, final_baseline=None, name_lookup=None,
+            historical_technicals=None, historical_states=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
-    qidx, tidx, sidx = _index(quotes), _index(technicals), _index(states)
+    qidx = _index(quotes)
+    source_technicals = historical_technicals if historical_technicals is not None else technicals
+    source_states = historical_states if historical_states is not None else states
+    expected_selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
+    aligned = _krx_payloads_aligned(source_technicals, source_states, expected_selection_date)
+    tidx = _index(source_technicals) if aligned else {}
+    sidx = _index(source_states) if aligned else {}
     fidx = _index(full_market_signals or {})
-    baseline = verified_final_baseline(discovery, final_baseline)
+    baseline = (
+        krx_selection_baseline(discovery, source_technicals, source_states)
+        if historical_technicals is not None or historical_states is not None
+        else verified_final_baseline(discovery, final_baseline)
+    )
     bidx = _index(baseline)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     rows = []
-    for code in discovery["symbols"]:
+    for raw_code in discovery["symbols"]:
+        code = normalize_item_code(raw_code)
         quote, technical, state, signal = qidx.get(code), tidx.get(code), sidx.get(code), fidx.get(code)
         identity_quote = quote
         rejected_quote = bool(quote and quote.get("_discoveryAdditionalLookup")
@@ -332,6 +420,17 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "volumeRatio20": technical.get("volumeRatio20", signal.get("current_volume_ratio_20") if signal else None),
             "breakout20": current.get("breakout20", signal.get("breakout_20_intraday") if signal else None),
             "pullbackState": current.get("pullbackState"),
+            "selectionPrice": final.get("lastClose") if final else None,
+            "selectionDate": final.get("sourceDate") if final else expected_selection_date,
+            "conditionStatus": "UNAVAILABLE",
+            "nextCheck": "다음 관찰에서 현재값과 조건 충족 여부를 확인",
+            "technicalMetrics": {
+                key: technical.get(key)
+                for key in ("ma5", "ma20", "ma60", "volumeRatio20", "breakout20", "pullbackState", "trend")
+                if technical.get(key) is not None
+            },
+            "technicalSourceDate": expected_selection_date if technical else None,
+            "technicalGenerationId": _payload_generation(source_technicals) if technical else None,
             "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
                        else "MONITORED_UNIVERSE" if quote
                        else "FULL_MARKET_FINAL" if final
@@ -350,6 +449,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                                   else "PARTIAL" if any(row[key] is not None for key in ("ma5", "ma20", "ma60"))
                                   else "UNAVAILABLE")
         row["analysisStatus"] = row["dataStatus"]
+        row["status"] = row["dataStatus"]
         prior = previous_rows.get(code, {})
         row["previousReportChange"] = {
             "available": bool(prior),
