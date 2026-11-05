@@ -71,6 +71,7 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["status"], "AVAILABLE")
         self.assertEqual(contract["fullMarket"]["metrics"]["breakout20"]["count"], 81)
+        self.assertNotIn("marketTradingValue", contract["fullMarket"])
         self.assertEqual(contract["v2"]["industries"][0]["score"], 69.46)
         self.assertEqual(contract["v2"]["history"]["uniqueTradingDates"], ["2026-10-27", "2026-10-28"])
 
@@ -478,6 +479,23 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(row["relativeStrength"], 0.0)
         self.assertEqual(row["eligibility"], "ELIGIBLE")
 
+    def test_current_relative_strength_survives_missing_derived_feature_count(self):
+        common = {"generatedAt": "2026-10-30T10:00:00+09:00"}
+        contract = build_report_contract(
+            indices={**common, "indices": []},
+            summary={**common, "fullMarket": {"tradingDate": "20261030", "markets": {"TOTAL": {}}}},
+            breadth={**common, "fullMarket": {}}, quality={**common},
+            industries={**common, "tradingDate": "20261030", "industries": [{
+                "id": "i1", "name": "현재 업종", "memberCount": 10,
+                "derivedFeatureValidMemberCount": 0,
+                "officialChangeRateRelativeStrength": 3.2,
+            }]},
+            themes={**common, "themes": []},
+            v2_latest={**common, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["relativeStrengthTop5"]["industries"]["top5"][0]["name"], "현재 업종")
+
     def test_2769_scale_group_contract_stays_below_target_without_member_duplication(self):
         common = {"generatedAt": "2026-10-30T10:00:00+09:00"}
         industries = []
@@ -628,8 +646,33 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertTrue(contract["baseline"]["dateMismatch"])
+
+    def test_stale_baseline_does_not_block_a_valid_current_contract(self):
+        generated = "2026-10-29T10:00:00+09:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": [
+                {"code": "KOSPI", "close": 2500, "sourceTime": generated},
+                {"code": "KOSDAQ", "close": 800, "sourceTime": generated},
+            ]},
+            summary={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261028", "fullMarket": {
+                         "tradingDate": "20261029",
+                         "tradingDateEvidence": self.evidence("20261029"),
+                         "markets": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}},
+                     }},
+            breadth={"generatedAt": generated, "fullMarket": {}},
+            quality={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
+                     "baselineAsOfDate": "20261028", "observedDate": "20261029",
+                     "tradingDateEvidence": self.evidence("20261029")},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+        )
+        self.assertEqual(contract["status"], "AVAILABLE")
+        self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
         self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
-        self.assertEqual(contract["rendering"]["reason"], "PARTIAL_DATA_RETAINED")
+        self.assertEqual(contract["rendering"]["reason"], "CONFIRMED_CONTRACT")
 
     def test_theme_member_rows_are_compacted_for_github_contents_transport(self):
         generated = "2026-10-29T04:09:16+00:00"

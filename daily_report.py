@@ -185,6 +185,52 @@ def compact_date(value):
     return text
 
 
+def _unavailable_research(reason):
+    return {"status": "UNAVAILABLE", "asOf": None, "stocks": [], "unavailableReason": reason}
+
+
+def validated_research_for_report(payload, report_date, expected_generation=None):
+    """Use research only when its date and source generation are explicit."""
+    if not isinstance(payload, dict):
+        return _unavailable_research("RESEARCH_SOURCE_MISSING")
+    if compact_date(payload.get("asOf")) != compact_date(report_date):
+        return _unavailable_research("RESEARCH_DATE_MISMATCH")
+    source_generation = payload.get("sourceGeneration") or payload.get("generationId")
+    if not source_generation:
+        return _unavailable_research("RESEARCH_GENERATION_MISSING")
+    if expected_generation and str(source_generation) != str(expected_generation):
+        return _unavailable_research("RESEARCH_GENERATION_MISMATCH")
+    return payload
+
+
+def validated_group_source(payload, kind, report_date, peer_generated_at=None):
+    """Keep current group observations only when date and generation evidence align."""
+    if not isinstance(payload, dict):
+        return {"status": "UNAVAILABLE", "industries" if kind == "industry" else "themes": []}
+    key = "industries" if kind == "industry" else "themes"
+    rows = payload.get(key) or []
+    generated_at = payload.get("generatedAt")
+    observed_date = payload.get("tradingDate") or payload.get("asOf") or payload.get("sourceTradingDate")
+    if not observed_date and kind == "theme":
+        for row in rows:
+            for stock in (row.get("stocks") or []) if isinstance(row, dict) else []:
+                observed_date = stock.get("temporaryCurrentBarDate") or stock.get("tradingDate")
+                if observed_date:
+                    break
+            if observed_date:
+                break
+    reason = None
+    if compact_date(observed_date) != compact_date(report_date):
+        reason = "GROUP_DATE_MISMATCH"
+    elif not generated_at:
+        reason = "GROUP_GENERATION_MISSING"
+    elif peer_generated_at and str(generated_at) != str(peer_generated_at):
+        reason = "GROUP_GENERATION_MISMATCH"
+    if reason:
+        return {**payload, key: [], "status": "UNAVAILABLE", "validationReason": reason}
+    return payload
+
+
 def source_date(value):
     """Return the local source-observation date without calling it a trading date."""
     text = str(value or "").strip()
@@ -444,7 +490,6 @@ def build_preopen_session_context(report_date, indices, baseline, reports_root=N
             "totalCount": previous_full_market.get("totalCount"),
             "breadth": previous_full_market.get("breadth") or {},
             "metrics": previous_full_market.get("metrics") or {},
-            "marketTradingValue": previous_full_market.get("marketTradingValue") or {},
         },
         "v1V2": {
             "tradingDate": previous_v2.get("tradingDate") or previous_date,
@@ -775,7 +820,6 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
         "industries": payloads["latest-industries.json"].get("industries", []),
         "changes": payloads["latest-changes.json"],
         "monitoredUniverse": summary.get("monitoredUniverse", {}),
-        "marketTradingValue": payloads["latest-breadth.json"].get("fullMarket", {}).get("marketTradingValue", {}),
     }
 
 
@@ -799,8 +843,6 @@ def full_market_from_derived_projection(projection, target_date):
         "breadth": summary.get("breadth") or {},
         "leaders": summary.get("leaders") or [],
         "industries": [],
-        "marketTradingValue": summary.get("marketTradingValue") or {},
-        "marketTradingValueEvidence": summary.get("marketTradingValueEvidence") or {},
         "maBasisDates": summary.get("maBasisDates") or [],
         "maBasisDateEvidence": summary.get("maBasisDateEvidence") or {},
         "generatedAt": projection.get("observedAt"),
@@ -1326,7 +1368,6 @@ def full_market_summary(full_market, alignment):
         "sourceQualityStatus": full_market.get("sourceQualityStatus") if (verified or derived_summary) else None,
         "quality": quality,
         "breadth": full_market.get("breadth") if (verified or derived_summary) else None,
-        "marketTradingValue": full_market.get("marketTradingValue", {}) if (verified or derived_summary) else {},
         "marketBreakdown": full_market.get("marketBreakdown", {}) if (verified or derived_summary) else {},
         "indexIdentities": full_market.get("indexIdentities", []) if (verified or derived_summary) else [],
         "indicatorAvailability": full_market.get("indicatorAvailability", {}) if (verified or derived_summary) else {},
@@ -1678,7 +1719,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         quotes = restrict_staging_current_quotes(
             quotes, technical_inputs["metadata"]["targetDate"]
         )
-    research = load_json(RESEARCH_PATH)
+    report_input_date = as_of or quote_observed_date or technical_inputs["metadata"].get("targetDate")
+    research = validated_research_for_report(
+        load_json(RESEARCH_PATH),
+        report_input_date,
+        technical_inputs["metadata"].get("historicalGenerationId"),
+    )
     try:
         indices = load_json(MARKET_INDICES_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
@@ -1700,6 +1746,15 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     published_quality = optional_json(MONITORING_PATH / "latest-quality.json", {})
     published_industries = optional_json(MONITORING_PATH / "latest-industries.json", {})
     published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
+    published_industries = validated_group_source(
+        published_industries, "industry", report_input_date
+    )
+    published_themes = validated_group_source(
+        published_themes,
+        "theme",
+        report_input_date,
+        published_industries.get("generatedAt"),
+    )
     published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
     market_snapshot = optional_json(MARKET_SNAPSHOT_PROJECTION_PATH, {
         "schemaVersion": "market-snapshot-report-projection-v1",
@@ -2006,7 +2061,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             or quotes.get("generatedAt")
         )
         contract_summary = {"fullMarket": krx_full_market}
-        contract_breadth = {"fullMarket": {"marketTradingValue": {}}}
+        contract_breadth = {"fullMarket": {}}
         contract_quality = {
             "tradingDate": technical_inputs["metadata"].get("targetDate"),
             "baselineAsOfDate": technical_inputs["metadata"].get("targetDate"),
@@ -2244,7 +2299,6 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "monitoredUniverse": monitored_summary,
             "breadth": breadth,
             "indices": indices,
-            "marketTradingValue": full_market_summary_data["marketTradingValue"],
             "dynamicThemes": dynamic_universe.get("themes", []),
             "topGainers": monitored_top_gainers,
             "topDecliners": monitored_top_decliners,
@@ -2348,8 +2402,7 @@ def write_markdown(report, path):
         full_breadth = full_summary.get("breadth") or {}
         lines.extend([
             "- 분석 상태: 검증된 전체시장 자료 사용",
-            f"- 기준일: {full_summary.get('tradingDate') or '확인 불가'}; "
-            f"Baseline 기준일: {full_summary.get('baselineDate') or '확인 불가'}",
+            f"- 기준일: {full_summary.get('tradingDate') or '확인 불가'}",
             f"- 기준시각: {full_summary.get('sourceTime') or '확인 불가'}; "
             f"자료 품질: {full_summary.get('qualityStatus') or '확인 불가'}; "
             f"원천 상태: {full_summary.get('sourceQualityStatus') or '확인 불가'}",
@@ -2371,19 +2424,6 @@ def write_markdown(report, path):
             f"(대상 {volume.get('eligibleCount', '확인 불가')}, "
             f"비율 {volume.get('pct', '확인 불가')}%)"
         )
-        for market in ("KOSPI", "KOSDAQ"):
-            value = (full_summary.get("marketTradingValue") or {}).get(market) or {}
-            amount = value.get("value")
-            source_time = value.get("sourceTime") or "확인 불가"
-            available_count = value.get("availableCount", "확인 불가")
-            observed_count = value.get("observedCount", "확인 불가")
-            lines.append(
-                f"- {market} 전체시장 거래대금: {amount:,.0f}원 "
-                f"(확보 {available_count}/{observed_count}종목, 기준시각 {source_time})"
-                if isinstance(amount, (int, float))
-                else f"- {market} 전체시장 거래대금: 확인 불가 "
-                f"(확보 {available_count}/{observed_count}종목, 기준시각 {source_time})"
-            )
         industries = full_summary.get("industries") or []
         lines.append(f"- 업종 분석: {len(industries)}개 업종")
         lines.append("- 업종 정렬: 1일 평균 수익률 내림차순(값 미확인 업종은 후순위)")
@@ -2392,19 +2432,12 @@ def write_markdown(report, path):
             average = industry.get("avgReturn1D")
             relative = industry.get("relativeStrengthVsMarket")
             advance = industry.get("advancePct")
-            turnover = industry.get("tradingValue") or {}
-            total_turnover = turnover.get("total")
             average_text = f"1일 평균 {average:+.2f}%" if isinstance(average, (int, float)) else "1일 평균 확인 불가"
             relative_text = f"상대강도 {relative:+.2f}" if isinstance(relative, (int, float)) else "상대강도 확인 불가"
             advance_text = f"상승 비율 {advance:.2f}%" if isinstance(advance, (int, float)) else "상승 비율 확인 불가"
-            turnover_text = (
-                f"거래대금 {total_turnover:,.0f}원(확보 {turnover.get('availableCount', 0)}/{industry.get('memberCount', '확인 불가')})"
-                if isinstance(total_turnover, (int, float))
-                else "거래대금 확인 불가"
-            )
             lines.append(
                 f"  - {name}: {average_text}, {relative_text}, {advance_text}, "
-                f"{turnover_text}, 상태 {korean_status(industry.get('persistence', {}).get('status'))}"
+                f"상태 {korean_status(industry.get('persistence', {}).get('status'))}"
             )
         leaders = full_summary.get("leaders") or []
         lines.append(f"- 전체시장 주도주 근거: {len(leaders)}종목")
@@ -2676,7 +2709,7 @@ def write_markdown(report, path):
     lines.append(f"- V2 업종: {v2.get('industries', {}).get('total', 0)}개, 상태 {v2.get('industries', {}).get('statusCounts', {})}")
     lines.append(f"- V2 테마: {v2.get('themes', {}).get('total', 0)}개, 상태 {v2.get('themes', {}).get('statusCounts', {})}")
     lines.append(f"- V2 관측 거래일: {', '.join(v2.get('history', {}).get('uniqueTradingDates', [])) or '확인 불가'}; 지속성은 자료 부족 시 WAIT/PARTIAL")
-    lines.append("- V2 판정 근거: 상대강도·상승 확산·MA20·거래대금·지속성의 실제값과 각 항목 상태를 원본 그대로 표시합니다.")
+    lines.append("- V2 판정 근거: 상대강도·상승 확산·MA20·지속성의 실제값과 각 항목 상태를 원본 그대로 표시합니다.")
     lines.append("- V2 세부 근거는 생성된 JSON의 `v1V2Analysis.v2Shadow.*.rows`에서 확인할 수 있습니다.")
     lines.extend(["", "#### V2 ACTIVE·WATCH 실명·점수·근거", ""])
     for kind, label in (("industries", "업종"), ("themes", "테마")):

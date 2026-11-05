@@ -45,6 +45,40 @@ def verified_full_market():
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_research_requires_matching_date_and_source_generation(self):
+        payload = {
+            "status": "OK", "asOf": "2026-10-29", "sourceGeneration": "gen-1",
+            "stocks": [{"itemCode": "005930", "rankingEligible": True}],
+        }
+        self.assertEqual(
+            daily_report.validated_research_for_report(payload, "2026-10-29", "gen-1"),
+            payload,
+        )
+        self.assertEqual(
+            daily_report.validated_research_for_report(payload, "2026-10-30", "gen-1")["status"],
+            "UNAVAILABLE",
+        )
+        self.assertEqual(
+            daily_report.validated_research_for_report(payload, "2026-10-29", "gen-2")["status"],
+            "UNAVAILABLE",
+        )
+        self.assertEqual(
+            daily_report.validated_research_for_report({**payload, "sourceGeneration": None}, "2026-10-29")["status"],
+            "UNAVAILABLE",
+        )
+
+    def test_current_group_source_requires_same_date_and_generation(self):
+        industries = {
+            "tradingDate": "20261029", "generatedAt": "g1",
+            "industries": [{"name": "업종", "officialChangeRateRelativeStrength": 2.0}],
+        }
+        themes = {
+            "generatedAt": "g1", "themes": [{"name": "테마", "stocks": [{"temporaryCurrentBarDate": "20261029"}]}],
+        }
+        self.assertEqual(len(daily_report.validated_group_source(industries, "industry", "2026-10-29")["industries"]), 1)
+        self.assertEqual(len(daily_report.validated_group_source(themes, "theme", "2026-10-29", "g1")["themes"]), 1)
+        self.assertEqual(daily_report.validated_group_source(industries, "industry", "2026-10-30")["industries"], [])
+        self.assertEqual(daily_report.validated_group_source(themes, "theme", "2026-10-29", "g2")["themes"], [])
     def test_preopen_context_separates_current_observation_from_prior_session(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -130,7 +164,7 @@ class DailyReportTests(unittest.TestCase):
         )
         self.assertEqual(available["status"], "AVAILABLE")
         self.assertEqual(available["breadth"]["advancers"], 1200)
-        self.assertEqual(available["marketTradingValue"]["KOSPI"]["value"], 123456789)
+        self.assertNotIn("marketTradingValue", available)
 
         partial = daily_report.full_market_summary(
             verified_full_market(),
@@ -138,7 +172,7 @@ class DailyReportTests(unittest.TestCase):
         )
         self.assertEqual(partial["status"], "PARTIAL")
         self.assertIsNone(partial["breadth"])
-        self.assertEqual(partial["marketTradingValue"], {})
+        self.assertNotIn("marketTradingValue", partial)
 
     def test_full_market_summary_preserves_missing_industry_and_leader_evidence(self):
         payload = verified_full_market()
@@ -1067,8 +1101,7 @@ class DailyReportTests(unittest.TestCase):
             self.assertIn("전체시장 주도주 근거", rendered)
             self.assertIn("관심종목 등락 상위", rendered)
             self.assertIn("업종 정렬: 1일 평균 수익률 내림차순", rendered)
-            self.assertIn("KOSPI 전체시장 거래대금: 123,456,789원", rendered)
-            self.assertEqual(rendered.count("KOSPI 전체시장 거래대금"), 1)
+            self.assertNotIn("전체시장 거래대금", rendered)
             self.assertIn("연구용 테마 자료(운영 선정 아님)", rendered)
 
             misaligned_full_market = verified_full_market()
@@ -1271,7 +1304,7 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(loaded["statusReason"], "KRX_STAGED_PROJECTION_NOT_FINAL")
         self.assertEqual(loaded["dateAlignment"]["status"], "SEPARATE_SOURCES_ALIGNED")
         self.assertNotIn("MARKET_TRADING_VALUE_SOURCE_DATE", loaded["dateAlignment"]["missingEvidence"])
-        self.assertEqual(loaded["marketSummary"]["fullMarket"]["marketTradingValue"], {})
+        self.assertNotIn("marketTradingValue", loaded["marketSummary"]["fullMarket"])
 
     def test_date_alignment_rejects_old_naver_current_index_for_separate_sources(self):
         got = daily_report.date_alignment(
