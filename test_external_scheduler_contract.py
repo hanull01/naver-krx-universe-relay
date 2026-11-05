@@ -14,8 +14,9 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         cls.refresh_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh.yml").read_text(encoding="utf-8")
 
     def test_refresh_uses_one_common_path_for_all_market_sessions(self):
-        self.assertIn('cron === "30 11 * * MON-FRI"', self.worker)
+        self.assertNotIn('cron === "30 11 * * MON-FRI"', self.worker)
         self.assertIn('cron === "30 0-11 * * MON-FRI"', self.worker)
+        self.assertNotIn('10,17,20,30,50 * * 0-5', self.worker)
         self.assertNotIn('run_mode: "final_recovery"', self.worker)
         self.assertNotIn('run_mode: "intraday"', self.worker)
 

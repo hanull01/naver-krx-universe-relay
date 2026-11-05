@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
-const finalPlan = planForCron("30 11 * * 1-5");
+const finalPlan = planForKey("refresh");
 
 function apiWith({ existing = null, run = null, commits = [], contents = {} } = {}) {
   const calls = [];
@@ -24,7 +24,7 @@ function apiWith({ existing = null, run = null, commits = [], contents = {} } = 
 }
 
 test("09:00 and 10:00 are independent slots", () => {
-  const plan = planForCron("0 0-10 * * 1-5");
+  const plan = planForKey("refresh");
   const nine = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 0));
   const ten = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 0));
   assert.notEqual(nine, ten);
@@ -47,13 +47,14 @@ test("the refresh cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects
   assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, sundayKst), null);
 });
 
-test("the unified refresh branch accepts the operational cron windows", () => {
+test("the canonical cron maps only refresh and research slots", () => {
   assert.equal(planForCron("30 0-11 * * MON-FRI").key, "refresh");
   assert.equal(planForCron("30 23 * * SUN-THU").key, "refresh");
-  assert.deepEqual(planForCron("30 11 * * MON-FRI").inputs, {});
-  assert.equal(planForCron("0 14 * * MON-FRI").key, "daily-report");
   assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
-  assert.equal(planForCron("10,30,50 0-10 * * MON-FRI"), null);
+  assert.equal(planForCron("0 22 * * SUN-THU"), null);
+  assert.equal(planForCron("0 23 * * SUN-THU"), null);
+  assert.equal(planForCron("0 14 * * MON-FRI"), null);
+  assert.equal(planForCron("10,17,20,30,50 * * * 0-5"), null);
 });
 
 test("backfill publication verification accepts the workflow's dated commit message", async () => {
@@ -68,7 +69,7 @@ test("backfill publication verification accepts the workflow's dated commit mess
     head_sha: "backfill-run",
     production_commit_sha: "backfill-pub",
   };
-  const plan = planForCron("0 22 * * SUN-THU");
+  const plan = planForKey("backfill-derived");
   const api = async (path) => {
     if (path === `/repos/${repo}/actions/runs/114`) return run;
     if (path === `/repos/${repo}/commits/backfill-pub`) return {
@@ -87,27 +88,12 @@ test("backfill publication verification accepts the workflow's dated commit mess
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
-test("the consolidated legacy cron keeps research and removes snapshot/diagnostic slots", () => {
+test("the legacy consolidated cron is ignored", () => {
   const cron = "10,17,20,30,50 * * * 0-5";
   const at = (hour, minute) => Date.UTC(2026, 9, 27, hour - 9, minute);
-  assert.equal(resolveScheduledPlan(cron, at(9, 17)), null);
-  assert.equal(resolveScheduledPlan(cron, at(7, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(12, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(19, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(8, 10)), null);
-  assert.equal(resolveScheduledPlan(cron, at(19, 50)), null);
-  assert.equal(resolveScheduledPlan(cron, at(8, 30)).plan.key, "refresh");
-  assert.equal(resolveScheduledPlan(cron, at(9, 18)), null);
-});
-
-test("the consolidated cron covers Monday KST early slots and rejects weekend KST", () => {
-  const cron = "10,17,20,30,50 * * * 0-5";
-  const monday = (hour, minute) => Date.UTC(2026, 9, 26, hour - 9, minute);
-  assert.equal(resolveScheduledPlan(cron, monday(7, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, monday(8, 10)), null);
-
-  const sundayKst = Date.UTC(2026, 9, 24, 23, 20);
-  assert.equal(resolveScheduledPlan(cron, sundayKst), null);
+  for (const [hour, minute] of [[7, 20], [8, 10], [8, 30], [9, 17], [12, 20], [19, 20], [19, 50]]) {
+    assert.equal(resolveScheduledPlan(cron, at(hour, minute)), null);
+  }
 });
 
 test("Durable Object claim is idempotent and records state", async () => {
@@ -137,7 +123,7 @@ test("existing scheduled run blocks external dispatch", async () => {
 test("dispatch matches the newly created run and reports missing publication", async () => {
   const dispatchedRun = { id: 101, event: "workflow_dispatch", created_at: new Date(Date.now()).toISOString(), status: "completed", conclusion: "success", head_sha: "abc" };
   const api = apiWith({ run: dispatchedRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_VERIFIED");
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
   assert.equal(result.runId, 101);
@@ -146,7 +132,7 @@ test("dispatch matches the newly created run and reports missing publication", a
 test("a run created before dispatch is not matched", async () => {
   const oldRun = { id: 104, event: "workflow_dispatch", created_at: new Date(Date.now() - 60_000).toISOString(), status: "completed", conclusion: "success", head_sha: "old" };
   const api = apiWith({ run: oldRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_UNVERIFIED");
 });
 
@@ -158,7 +144,7 @@ test("GitHub dispatch errors are surfaced", async () => {
     throw new Error(`unexpected path ${path}`);
   };
   await assert.rejects(
-    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
+    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
     /GITHUB_HTTP_500/,
   );
 });
@@ -231,7 +217,7 @@ test("scheduled claim failure logs a sanitized stage and code", async () => {
 test("a long-running Run returns its identity for later completion polling", async () => {
   const run = { id: 105, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "in_progress", head_sha: "long" };
   const api = apiWith({ run });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.runId, 105);
   const completed = { ...run, status: "completed", conclusion: "success", updated_at: new Date().toISOString() };
@@ -240,7 +226,7 @@ test("a long-running Run returns its identity for later completion polling", asy
     if (path.includes("/commits?")) return [];
     throw new Error(`unexpected path ${path}`);
   };
-  const later = await verifyRunCompletion(completionApi, repo, planForCron("0 0-10 * * 1-5"), run);
+  const later = await verifyRunCompletion(completionApi, repo, planForKey("refresh"), run);
   assert.equal(later.status, "RUN_VERIFIED");
   assert.equal(later.publicationStatus, "PUBLISH_UNVERIFIED");
 });
@@ -299,7 +285,7 @@ test("Run creation remains observable at the 60-second boundary", async () => {
     if (path.includes("/actions/runs/107")) return run;
     throw new Error(`unexpected path ${path}`);
   };
-  const result = await waitForDispatchedRun(api, repo, planForCron("0 0-10 * * 1-5"), Date.now(), async () => { sleeps += 1; });
+  const result = await waitForDispatchedRun(api, repo, planForKey("refresh"), Date.now(), async () => { sleeps += 1; });
   assert.equal(sleeps, 12);
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.run.id, 107);
@@ -330,7 +316,7 @@ test("the Run provenance artifact directly supplies its publication SHA", async 
     ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return api(path, init);
   };
-  const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
+  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
   assert.equal(result.publicationSha, "artifactsha");
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
@@ -347,7 +333,7 @@ test("daily report publication is unverified when the official HTML is missing",
     ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
     return api(path, init);
   };
-  const result = await verifyRunCompletion(wrapped, repo, planForCron("0 14 * * 1-5"), run);
+  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
   assert.equal(result.deliveryStatus, "UNVERIFIED");
 });
