@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
-const finalPlan = planForCron("30 11 * * 1-5");
+const finalPlan = planForKey("refresh");
 
 function apiWith({ existing = null, run = null, commits = [], contents = {} } = {}) {
   const calls = [];
