@@ -47,13 +47,14 @@ test("the refresh cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects
   assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, sundayKst), null);
 });
 
-test("the unified refresh branch accepts the operational cron windows", () => {
+test("the canonical cron maps only refresh and research slots", () => {
   assert.equal(planForCron("30 0-11 * * MON-FRI").key, "refresh");
   assert.equal(planForCron("30 23 * * SUN-THU").key, "refresh");
-  assert.deepEqual(planForCron("30 11 * * MON-FRI").inputs, {});
-  assert.equal(planForCron("0 14 * * MON-FRI").key, "daily-report");
   assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
-  assert.equal(planForCron("10,30,50 0-10 * * MON-FRI"), null);
+  assert.equal(planForCron("0 22 * * SUN-THU"), null);
+  assert.equal(planForCron("0 23 * * SUN-THU"), null);
+  assert.equal(planForCron("0 14 * * MON-FRI"), null);
+  assert.equal(planForCron("10,17,20,30,50 * * * 0-5"), null);
 });
 
 test("backfill publication verification accepts the workflow's dated commit message", async () => {
@@ -87,27 +88,12 @@ test("backfill publication verification accepts the workflow's dated commit mess
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
-test("the consolidated legacy cron keeps research and removes snapshot/diagnostic slots", () => {
+test("the legacy consolidated cron is ignored", () => {
   const cron = "10,17,20,30,50 * * * 0-5";
   const at = (hour, minute) => Date.UTC(2026, 9, 27, hour - 9, minute);
-  assert.equal(resolveScheduledPlan(cron, at(9, 17)), null);
-  assert.equal(resolveScheduledPlan(cron, at(7, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(12, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(19, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(8, 10)), null);
-  assert.equal(resolveScheduledPlan(cron, at(19, 50)), null);
-  assert.equal(resolveScheduledPlan(cron, at(8, 30)).plan.key, "refresh");
-  assert.equal(resolveScheduledPlan(cron, at(9, 18)), null);
-});
-
-test("the consolidated cron covers Monday KST early slots and rejects weekend KST", () => {
-  const cron = "10,17,20,30,50 * * * 0-5";
-  const monday = (hour, minute) => Date.UTC(2026, 9, 26, hour - 9, minute);
-  assert.equal(resolveScheduledPlan(cron, monday(7, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, monday(8, 10)), null);
-
-  const sundayKst = Date.UTC(2026, 9, 24, 23, 20);
-  assert.equal(resolveScheduledPlan(cron, sundayKst), null);
+  for (const [hour, minute] of [[7, 20], [8, 10], [8, 30], [9, 17], [12, 20], [19, 20], [19, 50]]) {
+    assert.equal(resolveScheduledPlan(cron, at(hour, minute)), null);
+  }
 });
 
 test("Durable Object claim is idempotent and records state", async () => {
