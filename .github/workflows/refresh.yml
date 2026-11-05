@@ -115,10 +115,13 @@ jobs:
             tools/run_full_market_monitoring.py \
             tools/collect_trading_discovery_quotes.py \
             tools/derived_input_resolver.py \
+            tools/market_snapshot_projection.py \
             trading_discovery.py test_trading_discovery_quotes.py
           python -m unittest test_relay.py test_krx_market_day.py -v
           python -m unittest \
+            test_naver_market.py \
             test_naver_full_market_current.py \
+            test_market_snapshot_projection.py \
             test_full_market_monitoring_evidence.py \
             test_daily_monitoring_baseline.py \
             test_monitoring_production.py \
@@ -209,6 +212,78 @@ jobs:
             exit "$code"
           fi
           exit 0
+
+      - name: Collect NAVER report snapshot datasets
+        id: market_snapshots
+        if: steps.market_day.outputs.run == 'true'
+        continue-on-error: true
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set +e
+          started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
+          python naver_market.py all
+          code=$?
+          # Membership is intentionally low frequency.  --if-stale reuses a
+          # verified cache and only calls NAVER after the 24-hour TTL expires.
+          python naver_market.py industry-membership --if-stale
+          membership_code=$?
+          if [ "$membership_code" -ne 0 ]; then code=1; fi
+          finished_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
+          echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
+          echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::NAVER report snapshot collection failed; the report will mark ranking/supply sections UNAVAILABLE and will not publish stale snapshot files."
+          fi
+          exit 0
+
+      - name: Build compact report snapshot projection
+        id: market_snapshot_projection
+        if: steps.market_day.outputs.run == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m tools.market_snapshot_projection \
+            --output data/market/report-snapshot-projection.json
+          code=$?
+          echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Restore failed snapshot inputs
+        if: steps.market_day.outputs.run == 'true' && (steps.market_snapshots.outputs.exit_code != '0' || steps.market_snapshot_projection.outputs.exit_code != '0')
+        shell: bash
+        run: |
+          # A failed current snapshot must never overwrite a prior production
+          # snapshot or leave an unstaged generated file in the writer.
+          for path in \
+            data/market/rankings.json \
+            data/market/industries.json \
+            data/market/investor-flow.json \
+            data/market/manifest.json \
+            data/market/industry-membership.json \
+            data/market/report-snapshot-projection.json; do
+            if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+              git restore --source=HEAD --staged --worktree -- "$path"
+            elif [ -e "$path" ]; then
+              rm -f -- "$path"
+            fi
+          done
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          Path("data/market/report-snapshot-projection.json").write_text(json.dumps({
+              "schemaVersion": "market-snapshot-report-projection-v1",
+              "source": "NAVER_CURRENT_SNAPSHOT",
+              "status": "UNAVAILABLE",
+              "reason": "CURRENT_SNAPSHOT_COLLECTION_FAILED",
+              "rankings": {"status": "UNAVAILABLE", "items": {}},
+              "investorFlow": {"status": "UNAVAILABLE", "periods": {}},
+              "industries": {"status": "UNAVAILABLE", "top": []},
+              "industryMembership": {"status": "UNAVAILABLE"},
+          }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
 
       - name: Collect full-market monitoring evidence
         id: full_market
@@ -537,6 +612,24 @@ jobs:
             git add data/market/indices.json
           else
             echo "Market index snapshot unavailable; preserving prior snapshot."
+          fi
+
+          if [ "${{ steps.market_snapshots.outputs.exit_code }}" = "0" ] \
+            && [ "${{ steps.market_snapshot_projection.outputs.exit_code }}" = "0" ]; then
+            git add \
+              data/market/rankings.json \
+              data/market/industries.json \
+              data/market/investor-flow.json \
+              data/market/manifest.json \
+              data/market/industry-membership.json \
+              data/market/report-snapshot-projection.json
+          else
+            echo "NAVER report snapshot input unavailable; preserving prior published snapshot files."
+            if git ls-files --error-unmatch -- data/market/report-snapshot-projection.json >/dev/null 2>&1; then
+              git restore --source=HEAD --staged --worktree -- data/market/report-snapshot-projection.json
+            elif [ -e data/market/report-snapshot-projection.json ]; then
+              rm -f -- data/market/report-snapshot-projection.json
+            fi
           fi
 
           if [ "${{ steps.full_market.outputs.ready }}" = "true" ] \

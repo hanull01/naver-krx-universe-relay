@@ -5,7 +5,6 @@ import unittest
 ROOT = Path(__file__).parent
 WORKFLOWS = (
     ROOT / ".github/workflows/refresh.yml",
-    ROOT / ".github/workflows/refresh-market-snapshots.yml",
 )
 
 
@@ -26,10 +25,6 @@ class PushEventNoopContractTests(unittest.TestCase):
     def test_collection_job_is_dispatch_only(self):
         expected_jobs = {
             "refresh.yml": "  refresh:\n    if: github.event_name == 'workflow_dispatch'",
-            "refresh-market-snapshots.yml": (
-                "  refresh-market-snapshots:\n"
-                "    if: github.event_name == 'workflow_dispatch'"
-            ),
         }
         for workflow_path in WORKFLOWS:
             text = workflow_path.read_text(encoding="utf-8")

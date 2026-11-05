@@ -13,13 +13,16 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         cls.wrangler = (ROOT / "wrangler.toml").read_text(encoding="utf-8")
         cls.refresh_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh.yml").read_text(encoding="utf-8")
 
-    def test_final_slot_dispatches_explicit_recovery_mode(self):
+    def test_refresh_uses_one_common_path_for_all_market_sessions(self):
         self.assertIn('cron === "30 11 * * MON-FRI"', self.worker)
-        self.assertIn('run_mode: "final_recovery"', self.worker)
+        self.assertIn('cron === "30 0-11 * * MON-FRI"', self.worker)
+        self.assertNotIn('run_mode: "final_recovery"', self.worker)
+        self.assertNotIn('run_mode: "intraday"', self.worker)
 
-    def test_intraday_slot_keeps_intraday_mode(self):
-        self.assertIn('run_mode: "intraday"', self.worker)
-        self.assertIn('cron === "0 0-10 * * MON-FRI"', self.worker)
+    def test_snapshot_and_diagnostic_slots_are_removed(self):
+        self.assertNotIn('refresh-market-snapshots.yml', self.worker)
+        self.assertNotIn('schedule-diagnostic.yml', self.worker)
+        self.assertIn('minute === 30', self.worker)
 
     def test_duplicate_claim_and_secret_protection_are_explicit(self):
         self.assertIn("SLOT_GATE", self.worker)
@@ -36,16 +39,18 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         self.assertIn('runResult.deliveryStatus = "UNVERIFIED"', self.worker)
         self.assertIn("게시 커밋 SHA", self.readme)
 
-    def test_final_publication_contract_is_explicit(self):
-        for value in ("FINAL_DATE_MISMATCH", "FINAL_DIAGNOSTIC_UNVERIFIED", "FINAL_BASELINE_INVALID", "FINAL_PUBLICATION_VERIFIED"):
-            self.assertIn(value, self.worker)
+    def test_final_specific_publication_gate_is_removed(self):
+        for value in ("FINAL_DATE_MISMATCH", "FINAL_DIAGNOSTIC_UNVERIFIED", "FINAL_BASELINE_INVALID"):
+            self.assertNotIn(value, self.worker)
 
     def test_free_plan_and_provenance_contract_are_explicit(self):
         self.assertIn('CONSOLIDATED_CRON', self.worker)
         self.assertIn('production-publication-', self.worker)
         self.assertIn('production_commit_sha', self.readme)
         self.assertEqual(self.wrangler.count('crons ='), 1)
-        self.assertIn('10,17,20,30,50 * * * SUN-FRI', self.wrangler)
+        self.assertIn('30 23 * * SUN-THU', self.wrangler)
+        self.assertIn('30 0-11 * * MON-FRI', self.wrangler)
+        self.assertIn('20 3,10 * * MON-FRI', self.wrangler)
         self.assertIn('new_sqlite_classes = ["SlotGate"]', self.wrangler)
         self.assertIn("production-publication-${{ github.run_id }}-${{ steps.publish.outputs.production_commit_sha }}-${{ steps.publish.outputs.publication_changed }}", self.refresh_workflow)
         self.assertIn("Upload production publication provenance", self.refresh_workflow)

@@ -154,6 +154,7 @@ DEFAULT_TRADING_DISCOVERY_QUOTES_PATH = TRADING_DISCOVERY_QUOTES_PATH
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
 MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 MARKET_INDICES_PATH = DATA / "market" / "indices.json"
+MARKET_SNAPSHOT_PROJECTION_PATH = DATA / "market" / "report-snapshot-projection.json"
 MARKET_UNIVERSE_PATH = DATA / "market-universe" / "all-assets.json"
 DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
@@ -1700,6 +1701,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     published_industries = optional_json(MONITORING_PATH / "latest-industries.json", {})
     published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
     published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
+    market_snapshot = optional_json(MARKET_SNAPSHOT_PROJECTION_PATH, {
+        "schemaVersion": "market-snapshot-report-projection-v1",
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "status": "UNAVAILABLE",
+        "reason": "MARKET_SNAPSHOT_PROJECTION_NOT_FOUND",
+        "rankings": {"status": "UNAVAILABLE", "items": {}},
+        "investorFlow": {"status": "UNAVAILABLE", "periods": {}},
+        "industries": {"status": "UNAVAILABLE", "top": []},
+        "industryMembership": {"status": "UNAVAILABLE"},
+    })
 
     group_states = technical_inputs["groupStates"]
 
@@ -2049,6 +2060,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "sectors": dynamic_universe.get("sectors") or [],
             "themes": dynamic_universe.get("themes") or [],
         },
+        market_snapshot=market_snapshot,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract

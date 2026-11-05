@@ -18,8 +18,8 @@
 - 현재 GitHub Actions의 `production_commit_sha`는 step output이므로 Run API의 일반 응답에 자동 노출된다고 가정하지 않는다. 별도 Run 출력·artifact·API 연결이 없으면 Worker는 보수적으로 게시를 미확인 처리한다.
 - `refresh.yml`과 `daily-report.yml`의 `generated-data-write` concurrency가 저장소 수준의 동시 게시를 직렬화한다. Worker는 슬롯별 사전 Run 확인과 Durable Object claim으로 외부 중복을 차단한다.
 - `wrangler.toml`에는 배포에 필요한 Cron 목록, `SLOT_GATE` Durable Object 바인딩, `SlotGate` SQLite migration을 선언한다. 실제 Cron 활성화와 Secret 등록은 별도 승인 없이는 수행하지 않는다.
-- Free 플랜의 5개 Cron 한도를 위해 장중·FINAL·리포트·보조 슬롯을 5개 표현식으로 통합한다. 보조 통합 Cron은 KST 시각 필터로 Research(07:20/12:20/19:20), Snapshots(08:10~19:50의 10/30/50분), 진단(09:17)만 실행한다.
-- 보조 통합 Cron은 월요일 KST 이른 슬롯을 포함하도록 UTC 일요일~금요일에 발생시키고, Worker가 KST 토·일을 필터링한다. 따라서 UTC 보정으로 인한 주말 실행은 dispatch하지 않는다.
+- refresh는 KST 08:30~20:30 매시 30분에 하나의 공통 경로로 실행한다. 장전·장중·장후를 `run_mode`로 나누지 않으며, 별도 Snapshot·Schedule diagnostic 슬롯은 사용하지 않는다.
+- Research는 KST 07:20/12:20/19:20에만 별도 실행한다. 월요일 KST 이른 슬롯을 포함하도록 UTC 보정 슬롯을 만들고 Worker가 KST 토·일을 필터링한다.
 - Cloudflare Cron은 요일 표기가 `1=일요일`인 규칙을 사용하므로 `SUN-THU`, `MON-FRI`, `SUN-FRI` 명칭을 사용한다. GitHub Actions의 숫자 요일 표기와 혼동하지 않는다.
 - `production-publication-<runId>-<sha>-<changed>` artifact가 Run ID·게시 SHA·변경 여부를 연결한다. artifact가 없거나 SHA 검증이 실패하면 게시 성공으로 승격하지 않는다.
 - `daily-report.yml`은 하나의 보고서 모델에서 `data/reports/latest.json`, `data/reports/latest.md`, `data/reports/latest.html`을 함께 생성한다. Worker의 리포트 게시 검증은 세 파일이 같은 게시 커밋에 모두 포함될 때만 `PUBLISHED`로 기록한다.
@@ -29,14 +29,9 @@
 
 | KST | 대상 | 입력 |
 |---|---|---|
-| 07:00 | Backfill full-market derived data | `dry_run=false`, `publish=true` |
-| 08:00 | Refresh market data | `run_mode=intraday` |
-| 09:07~19:07 | Refresh market data | `run_mode=intraday` |
-| 20:30 | Refresh market data | `run_mode=final_recovery` |
-| 09:17 | Schedule diagnostic | 없음 |
-| 23:00 | Build daily market report | 없음 |
-| 기존 Research/Snapshots 슬롯 | 각 workflow | 없음 |
+| 08:30~20:30 매시 30분 | Refresh market data | 없음 — 공통 경로 |
+| 07:20/12:20/19:20 | Research | 없음 |
 
-20:30 슬롯은 `asOfDate`, KOSPI/KOSDAQ FINAL, Baseline, trading-session diagnostic, 게시 커밋 SHA가 서로 일치하는 경우에만 `FINAL_PUBLICATION_VERIFIED`로 기록한다. `RUN_SUCCESS`만으로 FINAL 또는 사용자 전달 성공을 선언하지 않는다.
+08:30~20:30 refresh는 NAVER 현재 스냅샷과 rankings·investor-flow·업종 자료를 수집한 뒤 compact report projection을 생성하고, 같은 실행의 리포트 contract와 Markdown·HTML에서 소비한다.
 
 실제 배포 전에는 동일 슬롯의 GitHub Run 존재 여부, 게시 SHA, Gmail 수신, Work 결과를 별도 시험해야 한다.

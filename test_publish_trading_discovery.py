@@ -106,12 +106,11 @@ class SafePublisherTests(unittest.TestCase):
 
     def test_discovery_push_does_not_match_existing_refresh_path_filters(self):
         root = Path(__file__).parent
-        for name in ("refresh.yml", "refresh-market-snapshots.yml"):
-            workflow = (root / ".github/workflows" / name).read_text(encoding="utf-8")
-            trigger_paths = workflow.split("permissions:", 1)[0]
-            self.assertNotIn("data/trading-discovery", trigger_paths)
-            self.assertNotIn("trading_discovery.py", trigger_paths)
-            self.assertNotIn("publish_trading_discovery.py", workflow)
+        workflow = (root / ".github/workflows" / "refresh.yml").read_text(encoding="utf-8")
+        trigger_paths = workflow.split("permissions:", 1)[0]
+        self.assertNotIn("data/trading-discovery", trigger_paths)
+        self.assertNotIn("trading_discovery.py", trigger_paths)
+        self.assertNotIn("publish_trading_discovery.py", workflow)
         mail = (root / "send_market_data_ready.py").read_text(encoding="utf-8")
         self.assertIn("MARKET_DATA_READY", mail)
         self.assertNotIn("[MARKET_DATA_READY]", mail)
