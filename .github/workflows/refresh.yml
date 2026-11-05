@@ -136,6 +136,11 @@ jobs:
           ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || '' }}
           generation-id: ${{ inputs.krx_generation_id || '' }}
+          # Automatic scheduler dispatches omit these values. The resolver
+          # then verifies the authenticated private CURRENT generation. Any
+          # explicitly supplied value is still checked for an exact match.
+          require-expected-date: false
+          require-generation-id: false
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main before collection
