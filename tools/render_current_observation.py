@@ -70,7 +70,24 @@ def render_current_observation(
     if contract.get("status") not in {"AVAILABLE", "PARTIAL"}:
         raise TemplateUnavailable("CURRENT_OBSERVATION_CONTRACT_NOT_PUBLISHABLE")
 
-    full_market = contract.get("fullMarket") or {}
+    observation_date = contract.get("observationDate") or contract.get("observedDate")
+    observation_status = (
+        contract.get("observationDateStatus")
+        or contract.get("tradingDateStatus")
+        or "UNAVAILABLE"
+    )
+    observation_evidence = (
+        contract.get("observationDateEvidence")
+        or contract.get("tradingDateEvidence")
+        or {}
+    )
+    display_contract = dict(contract)
+    if observation_date:
+        display_contract["asOf"] = observation_date
+        display_contract["tradingDateStatus"] = observation_status
+        display_contract["tradingDateEvidence"] = observation_evidence
+
+    full_market = display_contract.get("fullMarket") or {}
     breadth = full_market.get("breadth") or {}
     total = full_market.get("totalCount")
     values = [breadth.get(key) for key in ("advancers", "decliners", "unchanged")]
@@ -79,15 +96,15 @@ def render_current_observation(
     if sum(values) != total:
         raise TemplateUnavailable("CURRENT_OBSERVATION_BREADTH_INVALID")
 
-    indices = [row for row in contract.get("indices") or [] if isinstance(row, Mapping)]
+    indices = [row for row in display_contract.get("indices") or [] if isinstance(row, Mapping)]
     if not indices:
         raise TemplateUnavailable("CURRENT_OBSERVATION_INDEX_SOURCE_UNAVAILABLE")
-    observed_at = contract.get("observedAt")
+    observed_at = display_contract.get("observedAt")
     if not observed_at:
         raise TemplateUnavailable("CURRENT_OBSERVATION_GENERATION_MISSING")
 
     report = {
-        "reportContract": contract,
+        "reportContract": display_contract,
         "generatedAt": observed_at,
         "writtenAt": observed_at,
     }
@@ -126,24 +143,23 @@ def render_current_observation(
             return path.relative_to(ROOT).as_posix()
         except ValueError:
             return path.name
-    baseline = contract.get("baseline") or {}
-    evidence = contract.get("tradingDateEvidence") or {}
+    baseline = display_contract.get("baseline") or {}
     baseline_stale = (
         baseline.get("freshnessStatus") == "BASELINE_STALE"
-        or contract.get("baselineFreshnessStatus") == "BASELINE_STALE"
+        or display_contract.get("baselineFreshnessStatus") == "BASELINE_STALE"
     )
     final_pending = (
-        contract.get("status") != "AVAILABLE"
-        or contract.get("tradingDateStatus") != "VERIFIED"
-        or evidence.get("finalConfirmed") is False
+        display_contract.get("status") != "AVAILABLE"
+        or observation_status != "VERIFIED"
+        or observation_evidence.get("finalConfirmed") is False
     )
     manifest = {
         "schemaVersion": "current-observation-manifest-v1",
         "reportType": "current_observation",
         "session": _session(indices),
-        "tradingDate": contract.get("asOf"),
-        "tradingDateStatus": contract.get("tradingDateStatus") or "UNAVAILABLE",
-        "sourceTime": _source_time(contract, indices),
+        "tradingDate": observation_date or display_contract.get("asOf"),
+        "tradingDateStatus": observation_status,
+        "sourceTime": _source_time(display_contract, indices),
         "reportContractPath": repo_path(contract_path),
         "reportContractSha256": sha256_bytes(contract_bytes),
         "reportContractGeneratedAt": observed_at,
@@ -154,7 +170,7 @@ def render_current_observation(
         "manifestPath": repo_path(manifest_path),
         "markdownSha256": sha256_file(markdown_path),
         "htmlSha256": sha256_file(html_path),
-        "reportStatus": contract.get("status"),
+        "reportStatus": display_contract.get("status"),
         "currentObservationAllowed": True,
         "finalPending": final_pending,
         "baselineStale": baseline_stale,
