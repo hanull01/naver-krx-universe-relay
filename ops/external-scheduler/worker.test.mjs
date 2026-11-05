@@ -357,8 +357,8 @@ test("cron observation mode never dispatches", async () => {
 });
 
 test("research and refresh keep execution times in their slot keys", () => {
-  const research = planForCron("20 10 * * 1-5");
-  const refresh = planForCron("30 0-11 * * 1-5");
-  assert.notEqual(slotKeyFor(research, "20 10 * * 1-5", Date.UTC(2026, 9, 27, 10, 20)), slotKeyFor(research, "20 10 * * 1-5", Date.UTC(2026, 9, 27, 11, 20)));
-  assert.notEqual(slotKeyFor(refresh, "30 0-11 * * 1-5", Date.UTC(2026, 9, 27, 1, 30)), slotKeyFor(refresh, "30 0-11 * * 1-5", Date.UTC(2026, 9, 27, 2, 30)));
+  const research = planForKey("research");
+  const refresh = planForKey("refresh");
+  assert.notEqual(slotKeyFor(research, RESEARCH_CRON, Date.UTC(2026, 9, 27, 10, 20)), slotKeyFor(research, RESEARCH_CRON, Date.UTC(2026, 9, 27, 11, 20)));
+  assert.notEqual(slotKeyFor(refresh, CONSOLIDATED_CRON, Date.UTC(2026, 9, 27, 1, 30)), slotKeyFor(refresh, CONSOLIDATED_CRON, Date.UTC(2026, 9, 27, 2, 30)));
 });
