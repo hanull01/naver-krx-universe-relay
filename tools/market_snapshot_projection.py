@@ -61,8 +61,7 @@ def _stock(row: Mapping[str, Any], *, investor: bool = False) -> dict[str, Any]:
         # Do not turn that missing field into a user-visible zero.
         if explicit_amount or amount not in (None, 0):
             result["amount"] = amount
-            if explicit_amount:
-                result["amountStatus"] = "AVAILABLE"
+            result["amountStatus"] = "AVAILABLE"
         else:
             result["amountStatus"] = "UNAVAILABLE_SOURCE_FIELD"
     else:

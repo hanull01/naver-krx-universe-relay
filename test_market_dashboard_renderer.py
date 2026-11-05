@@ -94,7 +94,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "005930", "삼성E&A", "028050", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "삼성E&A", "59,800원", "조건 판정 자료 없음"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -127,7 +127,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
                 "gainers": {"status": "OK", "rows": [{"code": "005930", "name": "삼성전자", "changeRate": 4.2}]},
             }},
             "investorFlow": {"status": "OK", "periods": {"DAY": [
-                {"investorType": "FOREIGNER", "status": "OK", "buy": [{"code": "000660", "name": "SK하이닉스", "amount": 123456}], "sell": []},
+                {"investorType": "FOREIGNER", "status": "OK", "buy": [{"code": "000660", "name": "SK하이닉스", "amount": 78740447000}], "sell": []},
             ]}},
         }
         html = html_lib.unescape(render_dashboard_html(report))
@@ -135,10 +135,12 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertNotIn("시장 거래대금", html)
         self.assertNotIn("시장 거래대금", markdown)
         for text in (html, markdown):
-            self.assertIn("현재 스냅샷 순위·수급", text)
+            self.assertIn("현재 시장 주요종목", text)
             self.assertIn("삼성전자", text)
             self.assertIn("SK하이닉스", text)
-            self.assertIn("123,456", text)
+            self.assertIn("78,740백만원", text)
+            self.assertNotIn("005930", text)
+            self.assertNotIn("000660", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
@@ -476,7 +478,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         markdown = render_dashboard_markdown(report)
         for text in (html, markdown):
             self.assertIn("삼성전자", text)
-            self.assertIn("005930", text)
+            self.assertNotIn("005930", text)
 
     def test_rendered_views_use_kst_and_hide_lineage_metadata(self):
         report = report_fixture()
@@ -487,6 +489,58 @@ class MarketDashboardRendererTests(unittest.TestCase):
         for token in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256"):
             self.assertNotIn(token, html)
             self.assertNotIn(token, markdown)
+
+    def test_current_market_sections_use_names_prices_and_million_won_amounts(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "OK",
+            "rankings": {"items": {
+                "gainers": {"rows": [{"code": "111111", "name": "상승 종목", "price": 1200, "changeRate": 8.5}]},
+                "volume_surge": {"rows": [{"code": "222222", "name": "거래량 종목", "price": 2300, "volumeDiff": 4567, "changeRate": 1.2}]},
+                "high_52week": {"rows": [{"code": "333333", "name": "신고가 종목", "price": 3400, "changeRate": 3.4}]},
+            }},
+            "investorFlow": {"periods": {"DAY": [
+                {"investorType": "FOREIGNER", "buy": [{"code": "444444", "name": "외국인 종목", "amount": 78740447000}], "sell": []},
+                {"investorType": "INSTITUTION", "buy": [], "sell": [{"code": "555555", "name": "기관 종목", "amount": -1234567000}]},
+            ]}},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for text in (html, markdown):
+            for heading in ("현재 시장 주요종목", "상승률 상위", "거래량이 크게 늘어난 종목", "52주 신고가", "외국인 순매수", "외국인 순매도", "기관 순매수", "기관 순매도"):
+                self.assertIn(heading, text)
+            self.assertIn("상승 종목", text)
+            self.assertIn("1,200원", text)
+            self.assertIn("78,740백만원", text)
+            self.assertIn("-1,235백만원", text)
+            for code in ("111111", "222222", "333333", "444444", "555555"):
+                self.assertNotIn(code, text)
+
+    def test_kiwoom_candidate_fields_render_when_source_has_them_and_use_phrases_when_missing(self):
+        report = report_fixture()
+        report["reportContract"]["kiwoomCandidates"] = {"stocks": [
+            {
+                "itemCode": "123456", "itemName": "후보 종목", "price": 12000,
+                "selectionPrice": 11000, "ma20": 10500, "ma60": 10000,
+                "conditionStatus": True, "nextCheck": "다음 장중 가격 확인",
+            },
+            {"itemCode": "654321", "itemName": "자료 없음 종목", "price": 9000},
+        ]}
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for text in (html, markdown):
+            self.assertIn("후보 종목", text)
+            self.assertIn("전일 조건검색 기준값", text)
+            self.assertIn("11,000원", text)
+            self.assertIn("20일 이동평균 10,500원", text)
+            self.assertIn("조건 충족 여부", text)
+            self.assertIn("충족", text)
+            self.assertIn("다음 장중 가격 확인", text)
+            self.assertIn("전일 조건검색 자료 없음", text)
+            self.assertIn("기술 지표 자료 없음", text)
+            self.assertIn("조건 판정 자료 없음", text)
+            self.assertNotIn("123456", text)
+            self.assertNotIn("654321", text)
 
 
 if __name__ == "__main__":

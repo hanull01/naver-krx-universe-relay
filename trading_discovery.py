@@ -343,6 +343,21 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
                                   if rejected_quote and not final and not signal else None),
         }
+        # Preserve optional condition-search evidence when a trusted source
+        # supplies it.  Do not derive or backfill these fields from another
+        # date; the user renderer turns absent values into explicit phrases.
+        for output_key, source_keys in (
+            ("selectionPrice", ("selectionPrice", "baselinePrice", "referencePrice", "selectedPrice")),
+            ("technicalSummary", ("technicalSummary",)),
+            ("conditionStatus", ("conditionStatus", "conditionResult", "conditionState")),
+            ("conditionMet", ("conditionMet",)),
+            ("nextCheck", ("nextCheck", "nextObservation", "nextAction")),
+        ):
+            for source in (market, technical, state, signal or {}):
+                value = next((source.get(key) for key in source_keys if source.get(key) not in (None, "")), None)
+                if value not in (None, ""):
+                    row[output_key] = value
+                    break
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
         row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
         row["priceStatus"] = "AVAILABLE" if row["price"] is not None else "UNAVAILABLE"

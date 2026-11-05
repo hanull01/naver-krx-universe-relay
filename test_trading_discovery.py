@@ -164,6 +164,24 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
+    def test_analysis_preserves_optional_condition_search_evidence_without_deriving_it(self):
+        discovery = td.published_payload(snapshot(["005930"]))
+        result = td.analyze(
+            "2026-10-12",
+            discovery,
+            {"datas": [{"itemCode": "005930", "stockName": "삼성전자", "closePrice": 100,
+                         "selectionPrice": 95, "conditionStatus": "충족",
+                         "nextCheck": "다음 장중 확인"}]},
+            {"datas": [{"itemCode": "005930", "ma20": 90, "ma60": 85,
+                         "technicalSummary": "20일 이동평균 상회"}]},
+            {},
+        )
+        row = result["stocks"][0]
+        self.assertEqual(row["selectionPrice"], 95)
+        self.assertEqual(row["conditionStatus"], "충족")
+        self.assertEqual(row["nextCheck"], "다음 장중 확인")
+        self.assertEqual(row["technicalSummary"], "20일 이동평균 상회")
+
     def test_verified_name_lookup_does_not_supply_price_or_technical_values(self):
         discovery = td.published_payload(snapshot(["000810"]))
         result = td.analyze(

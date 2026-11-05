@@ -35,6 +35,7 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
             membership={"status": "OK"},
         )
         self.assertEqual(payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]["amount"], 123)
+        self.assertEqual(payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]["amountStatus"], "AVAILABLE")
         self.assertIn("WEEK", payload["investorFlow"]["periods"])
 
     def test_missing_investor_amount_is_not_rendered_as_zero(self):
