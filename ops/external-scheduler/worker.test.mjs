@@ -4,11 +4,6 @@ import worker, { CONSOLIDATED_CRON, DAILY_COMPOSITE_CRON, SlotGate, dispatchAndV
 
 const repo = "hanull01/naver-krx-universe-relay";
 const finalPlan = planForCron("30 11 * * 1-5");
-const finalTime = Date.UTC(2026, 9, 27, 11, 30);
-
-function encoded(value) {
-  return { content: Buffer.from(JSON.stringify(value), "utf8").toString("base64") };
-}
 
 function apiWith({ existing = null, run = null, commits = [], contents = {} } = {}) {
   const calls = [];
@@ -35,35 +30,30 @@ test("09:00 and 10:00 are independent slots", () => {
   assert.notEqual(nine, ten);
 });
 
-test("the composite daily cron dispatches backfill at 07:00 KST and refresh at 08:00 KST", () => {
-  const mondayBackfill = Date.UTC(2026, 9, 25, 22, 0);
-  const mondayRefresh = Date.UTC(2026, 9, 25, 23, 0);
-  assert.equal(planForCron("0 22 * * SUN-THU").key, "backfill-derived");
-  const backfill = resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayBackfill);
+test("the daily refresh cron dispatches the unified refresh at 08:30 KST", () => {
+  const mondayRefresh = Date.UTC(2026, 9, 25, 23, 30);
   const refresh = resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayRefresh);
 
-  assert.equal(backfill.plan.workflow, "backfill-derived.yml");
-  assert.deepEqual(backfill.plan.inputs, { dry_run: "false", publish: "true" });
-  assert.equal(backfill.plan.slot, "07:00");
   assert.equal(refresh.plan.workflow, "refresh.yml");
-  assert.deepEqual(refresh.plan.inputs, { run_mode: "intraday" });
-  assert.equal(refresh.plan.slot, "08:00-19:00");
-  assert.notEqual(slotKeyFor(backfill.plan, backfill.slotCron, mondayBackfill), slotKeyFor(refresh.plan, refresh.slotCron, mondayRefresh));
+  assert.deepEqual(refresh.plan.inputs, {});
+  assert.equal(refresh.plan.slot, "08:30-20:30");
+  assert.equal(refresh.plan.key, "refresh");
 });
 
-test("the composite daily cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects weekends", () => {
-  const mondayKst = Date.UTC(2026, 9, 25, 22, 0);
-  const sundayKst = Date.UTC(2026, 9, 24, 22, 0);
-  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayKst).plan.key, "backfill-derived");
+test("the refresh cron maps UTC Sunday-Thursday to KST Monday-Friday and rejects weekends", () => {
+  const mondayKst = Date.UTC(2026, 9, 25, 23, 30);
+  const sundayKst = Date.UTC(2026, 9, 24, 23, 30);
+  assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, mondayKst).plan.key, "refresh");
   assert.equal(resolveScheduledPlan(DAILY_COMPOSITE_CRON, sundayKst), null);
 });
 
-test("existing intraday, final, report, and auxiliary cron branches remain intact", () => {
-  assert.equal(planForCron("0 0-10 * * MON-FRI").key, "refresh-intraday");
-  assert.equal(planForCron("30 11 * * MON-FRI").key, "refresh-final");
+test("the unified refresh branch accepts the operational cron windows", () => {
+  assert.equal(planForCron("30 0-11 * * MON-FRI").key, "refresh");
+  assert.equal(planForCron("30 23 * * SUN-THU").key, "refresh");
+  assert.deepEqual(planForCron("30 11 * * MON-FRI").inputs, {});
   assert.equal(planForCron("0 14 * * MON-FRI").key, "daily-report");
   assert.equal(planForCron("20 10 * * MON-FRI").key, "research");
-  assert.equal(planForCron("10,30,50 0-10 * * MON-FRI").key, "snapshots");
+  assert.equal(planForCron("10,30,50 0-10 * * MON-FRI"), null);
 });
 
 test("backfill publication verification accepts the workflow's dated commit message", async () => {
@@ -97,15 +87,16 @@ test("backfill publication verification accepts the workflow's dated commit mess
   assert.equal(result.publicationStatus, "PUBLISHED");
 });
 
-test("the consolidated Free-plan cron preserves all auxiliary KST slots", () => {
+test("the consolidated legacy cron keeps research and removes snapshot/diagnostic slots", () => {
   const cron = "10,17,20,30,50 * * * 0-5";
   const at = (hour, minute) => Date.UTC(2026, 9, 27, hour - 9, minute);
-  assert.equal(resolveScheduledPlan(cron, at(9, 17)).plan.key, "schedule-diagnostic");
+  assert.equal(resolveScheduledPlan(cron, at(9, 17)), null);
   assert.equal(resolveScheduledPlan(cron, at(7, 20)).plan.key, "research");
   assert.equal(resolveScheduledPlan(cron, at(12, 20)).plan.key, "research");
   assert.equal(resolveScheduledPlan(cron, at(19, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, at(8, 10)).plan.key, "snapshots");
-  assert.equal(resolveScheduledPlan(cron, at(19, 50)).plan.key, "snapshots");
+  assert.equal(resolveScheduledPlan(cron, at(8, 10)), null);
+  assert.equal(resolveScheduledPlan(cron, at(19, 50)), null);
+  assert.equal(resolveScheduledPlan(cron, at(8, 30)).plan.key, "refresh");
   assert.equal(resolveScheduledPlan(cron, at(9, 18)), null);
 });
 
@@ -113,7 +104,7 @@ test("the consolidated cron covers Monday KST early slots and rejects weekend KS
   const cron = "10,17,20,30,50 * * * 0-5";
   const monday = (hour, minute) => Date.UTC(2026, 9, 26, hour - 9, minute);
   assert.equal(resolveScheduledPlan(cron, monday(7, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(cron, monday(8, 10)).plan.key, "snapshots");
+  assert.equal(resolveScheduledPlan(cron, monday(8, 10)), null);
 
   const sundayKst = Date.UTC(2026, 9, 24, 23, 20);
   assert.equal(resolveScheduledPlan(cron, sundayKst), null);
@@ -235,48 +226,6 @@ test("scheduled claim failure logs a sanitized stage and code", async () => {
   } finally {
     console.log = originalLog;
   }
-});
-
-test("FINAL publication checks all dates and diagnostic status", async () => {
-  const now = new Date();
-  const run = { id: 102, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "def", production_commit_sha: "pub123" };
-  const commit = { sha: "pub123" };
-  const common = { asOfDate: "20261027" };
-  const contents = {
-    "data/monitoring-daily/kospi.json?ref=pub123": encoded(common),
-    "data/monitoring-daily/kosdaq.json?ref=pub123": encoded(common),
-    "data/monitoring-baseline/latest.json?ref=pub123": encoded({ ...common, historyStatus: "SOURCE_OBSERVED" }),
-    "data/monitoring-daily/trading-session-diagnostic.json?ref=pub123": encoded({ targetDate: "20261027", status: "VERIFIED" }),
-  };
-  const api = apiWith({ run, commits: [commit], contents });
-  api.detail = true;
-  const original = api;
-  const wrapped = async (path, init) => {
-    if (path === `/repos/${repo}/commits/pub123`) return { files: [{ filename: "data/monitoring/latest-quality.json" }], commit: { message: "Refresh NAVER market data", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
-    return original(path, init);
-  };
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:slot", finalTime, { github: wrapped, sleep: async () => {} });
-  assert.equal(result.status, "FINAL_PUBLICATION_VERIFIED");
-  assert.equal(result.publicationSha, "pub123");
-  assert.equal(api.calls.some((path) => path.includes("/contents/") && path.includes("ref=pub123")), true);
-  assert.equal(api.calls.some((path) => path.includes("/contents/") && path.includes("ref=main")), false);
-});
-
-test("FINAL date mismatch is not accepted", async () => {
-  const now = new Date();
-  const run = { id: 103, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "ghi", production_commit_sha: "pub456" };
-  const commit = { sha: "pub456" };
-  const contents = {
-    "data/monitoring-daily/kospi.json?ref=pub456": encoded({ asOfDate: "20261026" }),
-    "data/monitoring-daily/kosdaq.json?ref=pub456": encoded({ asOfDate: "20261027" }),
-    "data/monitoring-baseline/latest.json?ref=pub456": encoded({ asOfDate: "20261027", historyStatus: "SOURCE_OBSERVED" }),
-    "data/monitoring-daily/trading-session-diagnostic.json?ref=pub456": encoded({ targetDate: "20261027", status: "VERIFIED" }),
-  };
-  const api = apiWith({ run, commits: [commit], contents });
-  const wrapped = async (path, init) => path === `/repos/${repo}/commits/pub456`
-    ? { files: [{ filename: "data/monitoring/latest-quality.json" }], commit: { message: "Refresh NAVER market data", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } } : api(path, init);
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, finalPlan, "refresh-final:slot", finalTime, { github: wrapped, sleep: async () => {} });
-  assert.equal(result.status, "FINAL_DATE_MISMATCH");
 });
 
 test("a long-running Run returns its identity for later completion polling", async () => {
@@ -412,9 +361,9 @@ test("cron observation mode never dispatches", async () => {
   assert.equal(api.calls.some((path) => path.includes("/dispatches")), false);
 });
 
-test("research and snapshots keep execution times in their slot keys", () => {
+test("research and refresh keep execution times in their slot keys", () => {
   const research = planForCron("20 10 * * 1-5");
-  const snapshots = planForCron("10,30,50 0-10 * * 1-5");
+  const refresh = planForCron("30 0-11 * * 1-5");
   assert.notEqual(slotKeyFor(research, "20 10 * * 1-5", Date.UTC(2026, 9, 27, 10, 20)), slotKeyFor(research, "20 10 * * 1-5", Date.UTC(2026, 9, 27, 11, 20)));
-  assert.notEqual(slotKeyFor(snapshots, "10,30,50 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 10)), slotKeyFor(snapshots, "10,30,50 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 30)));
+  assert.notEqual(slotKeyFor(refresh, "30 0-11 * * 1-5", Date.UTC(2026, 9, 27, 1, 30)), slotKeyFor(refresh, "30 0-11 * * 1-5", Date.UTC(2026, 9, 27, 2, 30)));
 });

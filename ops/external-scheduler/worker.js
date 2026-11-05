@@ -7,48 +7,44 @@ const WORKFLOWS = {
     commitMessage: "Update daily market report",
   },
   research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"], commitMessage: "Update NAVER research intelligence" },
-  snapshots: { workflow: "refresh-market-snapshots.yml", publicationPaths: ["data/market"], commitMessage: "Refresh NAVER market snapshots" },
-  diagnostic: { workflow: "schedule-diagnostic.yml", publicationPaths: [] },
 };
 
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
-export const CONSOLIDATED_CRON = "10,17,20,30,50 * * * SUN-FRI";
-export const DAILY_COMPOSITE_CRON = "0 22,23 * * SUN-THU";
+export const CONSOLIDATED_CRON = "30 * * * SUN-FRI";
+export const DAILY_COMPOSITE_CRON = "30 23 * * SUN-THU";
 export const GITHUB_USER_AGENT = "naver-krx-external-scheduler";
 const LEGACY_CONSOLIDATED_CRON = "10,17,20,30,50 * * * 0-5";
 const LEGACY_DAILY_COMPOSITE_CRON = "0 22,23 * * 0-4";
 
 export function planForCron(cron) {
+  if (cron === "30 23 * * SUN-THU" || cron === "30 23 * * 0-4" || cron === "30 0-11 * * MON-FRI" || cron === "30 0-11 * * 1-5") {
+    return { slot: "08:30-20:30", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
+  }
   if (cron === "30 11 * * MON-FRI" || cron === "30 11 * * 1-5") {
-    return { slot: "20:30", key: "refresh-final", ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } };
+    return { slot: "20:30", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
   }
   if (cron === "0 22 * * SUN-THU" || cron === "0 22 * * 0-4") {
     return { slot: "07:00", key: "backfill-derived", ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } };
   }
   if (cron === "0 23 * * SUN-THU" || cron === "0 23 * * 0-4" || cron === "0 0-10 * * MON-FRI" || cron === "0 0-10 * * 1-5") {
-    return { slot: cron.startsWith("0 23") ? "08:00" : "09:00-19:00", key: "refresh-intraday", ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } };
+    return { slot: cron.startsWith("0 23") ? "08:00" : "09:00-19:00", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
   }
   if (cron === "0 14 * * MON-FRI" || cron === "0 14 * * 1-5") return { slot: "23:00", key: "daily-report", ...WORKFLOWS.report, inputs: {} };
-  if (cron === "17 0 * * MON-FRI" || cron === "17 0 * * 1-5") return { slot: "09:17", key: "schedule-diagnostic", ...WORKFLOWS.diagnostic, inputs: {} };
-  if (cron === "20 22 * * SUN-THU" || cron === "20 22 * * 0-4" || cron === "20 3 * * MON-FRI" || cron === "20 3 * * 1-5" || cron === "20 10 * * MON-FRI" || cron === "20 10 * * 1-5") {
+  if (cron === "20 22 * * SUN-THU" || cron === "20 22 * * 0-4" || cron === "20 3 * * MON-FRI" || cron === "20 3 * * 1-5" || cron === "20 10 * * MON-FRI" || cron === "20 10 * * 1-5" || cron === "20 3,10 * * MON-FRI" || cron === "20 3,10 * * 1-5") {
     return { slot: "research", key: "research", ...WORKFLOWS.research, inputs: {} };
-  }
-  if (cron === "10,30,50 23 * * SUN-THU" || cron === "10,30,50 23 * * 0-4" || cron === "10,30,50 0-10 * * MON-FRI" || cron === "10,30,50 0-10 * * 1-5") {
-    return { slot: "snapshots", key: "snapshots", ...WORKFLOWS.snapshots, inputs: {} };
   }
   return null;
 }
 
 export function planForKey(key) {
   const plans = {
-    "refresh-final": { slot: "20:30", key, ...WORKFLOWS.refresh, inputs: { run_mode: "final_recovery" } },
+    refresh: { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
+    "refresh-final": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
+    "refresh-intraday": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
     "backfill-derived": { slot: "07:00", key, ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } },
-    "refresh-intraday": { slot: "08:00-19:00", key, ...WORKFLOWS.refresh, inputs: { run_mode: "intraday" } },
     "daily-report": { slot: "23:00", key, ...WORKFLOWS.report, inputs: {} },
-    "schedule-diagnostic": { slot: "09:17", key, ...WORKFLOWS.diagnostic, inputs: {} },
     research: { slot: "research", key, ...WORKFLOWS.research, inputs: {} },
-    snapshots: { slot: "snapshots", key, ...WORKFLOWS.snapshots, inputs: {} },
   };
   return plans[key] || null;
 }
@@ -72,8 +68,7 @@ export function resolveScheduledPlan(cron, scheduledTime) {
     if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const hour = Number(kst.hour);
     const minute = Number(kst.minute);
-    if (hour === 7 && minute === 0) return { plan: planForKey("backfill-derived"), slotCron: "0 22 * * 0-4" };
-    if (hour === 8 && minute === 0) return { plan: planForKey("refresh-intraday"), slotCron: "0 23 * * 0-4" };
+    if (hour === 8 && minute === 30) return { plan: planForKey("refresh"), slotCron: "30 23 * * 0-4" };
     return null;
   }
   if (cron !== CONSOLIDATED_CRON && cron !== LEGACY_CONSOLIDATED_CRON) {
@@ -84,9 +79,8 @@ export function resolveScheduledPlan(cron, scheduledTime) {
   if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
   const hour = Number(kst.hour);
   const minute = Number(kst.minute);
-  if (hour === 9 && minute === 17) return { plan: planForKey("schedule-diagnostic"), slotCron: "17 0 * * 1-5" };
-  if (minute === 20 && [7, 12, 19].includes(hour)) return { plan: planForKey("research"), slotCron: "20 research" };
-  if ([10, 30, 50].includes(minute) && hour >= 8 && hour <= 19) return { plan: planForKey("snapshots"), slotCron: "10,30,50 snapshots" };
+  if (minute === 30 && hour >= 8 && hour <= 20) return { plan: planForKey("refresh"), slotCron: "30 refresh" };
+  if (minute === 20 && hour >= 7 && hour <= 19) return { plan: planForKey("research"), slotCron: "20 research" };
   return null;
 }
 
@@ -232,10 +226,6 @@ export async function verifyRunCompletion(api, repository, plan, run, options = 
     result.deliveryStatus = "UNVERIFIED";
     return result;
   }
-  if (plan.key === "refresh-final" && result.publicationSha) {
-    const expectedDate = options.expectedDate;
-    Object.assign(result, await verifyFinalPublication(api, repository, expectedDate, result.publicationSha));
-  }
   result.deliveryStatus = "UNVERIFIED";
   return result;
 }
@@ -298,27 +288,6 @@ export async function observeSlot(api, repository, plan, scheduledTime) {
   if (!run) return { workflow: plan.workflow, status: "NO_RUN", observed: true };
   return { workflow: plan.workflow, status: "RUN_OBSERVED", observed: true,
     runId: run.id, runHead: run.head_sha, runEvent: run.event };
-}
-
-export async function verifyFinalPublication(api, repository, expectedDate, publicationSha) {
-  const paths = [
-    "data/monitoring-daily/kospi.json",
-    "data/monitoring-daily/kosdaq.json",
-    "data/monitoring-baseline/latest.json",
-    "data/monitoring-daily/trading-session-diagnostic.json",
-  ];
-  const payloads = {};
-  for (const path of paths) payloads[path] = await api(`/repos/${repository}/contents/${path}?ref=${encodeURIComponent(publicationSha)}`);
-  const decode = (item) => JSON.parse(atob(item.content.replace(/\n/g, "")));
-  const kospi = decode(payloads[paths[0]]);
-  const kosdaq = decode(payloads[paths[1]]);
-  const baseline = decode(payloads[paths[2]]);
-  const diagnostic = decode(payloads[paths[3]]);
-  const dates = [kospi.asOfDate, kosdaq.asOfDate, baseline.asOfDate, String(diagnostic.targetDate || "").replace(/-/g, "")];
-  if (dates.some((date) => date !== expectedDate)) return { status: "FINAL_DATE_MISMATCH", publicationSha };
-  if (diagnostic.status !== "VERIFIED") return { status: "FINAL_DIAGNOSTIC_UNVERIFIED", publicationSha };
-  if (baseline.historyStatus !== "SOURCE_OBSERVED" && baseline.historyStatus !== "OK") return { status: "FINAL_BASELINE_INVALID", publicationSha };
-  return { status: "FINAL_PUBLICATION_VERIFIED", publicationSha };
 }
 
 export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, options = {}) {

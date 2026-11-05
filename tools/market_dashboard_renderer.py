@@ -509,6 +509,80 @@ def _compact_leaders(row: Mapping[str, Any]) -> str:
     return ", ".join(values) if values else "주도주 자료 없음"
 
 
+def _snapshot_rank_rows(model: Mapping[str, Any], name: str) -> list[Mapping[str, Any]]:
+    snapshot = model.get("marketSnapshot") or {}
+    rankings = snapshot.get("rankings") or {}
+    item = rankings.get("items", {}).get(name) or {}
+    return [row for row in (item.get("rows") or []) if isinstance(row, Mapping)]
+
+
+def _snapshot_flow_rows(model: Mapping[str, Any]) -> list[tuple[str, str, Mapping[str, Any]]]:
+    snapshot = model.get("marketSnapshot") or {}
+    periods = (snapshot.get("investorFlow") or {}).get("periods") or {}
+    rows = []
+    for entry in periods.get("DAY") or []:
+        if not isinstance(entry, Mapping):
+            continue
+        label = "외국인" if entry.get("investorType") == "FOREIGNER" else "기관"
+        for direction in ("buy", "sell"):
+            for row in (entry.get(direction) or [])[:3]:
+                if isinstance(row, Mapping):
+                    rows.append((label, "순매수" if direction == "buy" else "순매도", row))
+    return rows
+
+
+def _snapshot_number(value: Any) -> str:
+    if isinstance(value, (int, float)):
+        return f"{value:,.0f}"
+    return "확인 불가"
+
+
+def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
+    snapshot = model.get("marketSnapshot") or {}
+    if snapshot.get("status") not in {"OK", "PARTIAL"}:
+        return '<article class="card"><h3>현재 스냅샷 순위·수급</h3><p>현재 실행의 NAVER 스냅샷 자료를 확인할 수 없습니다.</p></article>'
+    ranking_names = (("gainers", "상승률 상위"), ("volume_surge", "거래량 급증"), ("high_52week", "52주 신고가"))
+    cards = []
+    for key, label in ranking_names:
+        rows = _snapshot_rank_rows(model, key)
+        items = "".join(
+            f'<li><strong>{_escape(row.get("name") or "이름 확인 대기")}</strong> '
+            f'<span>{_escape(row.get("code") or "코드 확인 대기")}</span> · '
+            f'{_escape(_plain_pct(row.get("changeRate")))}</li>'
+            for row in rows
+        ) or "<li>자료 없음</li>"
+        cards.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)}</strong></div><ul>{items}</ul></div>')
+    flow_rows = "".join(
+        f'<tr><td>{_escape(investor)}</td><td>{_escape(direction)}</td><td>{_escape(row.get("name") or "이름 확인 대기")}</td><td>{_escape(_snapshot_number(row.get("amount")))}</td></tr>'
+        for investor, direction, row in _snapshot_flow_rows(model)
+    )
+    flow = (
+        '<table><thead><tr><th>구분</th><th>방향</th><th>종목</th><th>금액</th></tr></thead>'
+        f'<tbody>{flow_rows or "<tr><td colspan=4>자료 없음</td></tr>"}</tbody></table>'
+    )
+    return '<article class="card"><div class="miniheading"><h3>현재 스냅샷 순위·수급</h3><span class="tag">NAVER 현재 관측</span></div><div class="industry-cards">' + "".join(cards) + f'</div><h4>외국인·기관 수급 상위</h4>{flow}</article>'
+
+
+def _compact_snapshot_markdown(model: Mapping[str, Any]) -> list[str]:
+    snapshot = model.get("marketSnapshot") or {}
+    lines = ["", "### 현재 스냅샷 순위·수급"]
+    if snapshot.get("status") not in {"OK", "PARTIAL"}:
+        lines.append("현재 실행의 NAVER 스냅샷 자료를 확인할 수 없습니다.")
+        return lines
+    ranking_rows = []
+    for key, label in (("gainers", "상승률 상위"), ("volume_surge", "거래량 급증"), ("high_52week", "52주 신고가")):
+        for rank, row in enumerate(_snapshot_rank_rows(model, key), start=1):
+            ranking_rows.append((label, rank, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _plain_pct(row.get("changeRate"))))
+    lines += _markdown_table(("구분", "순위", "종목", "코드", "등락률"), ranking_rows or [("자료 없음", "-", "-", "-", "-")])
+    flow_rows = [
+        (investor, direction, row.get("name") or "이름 확인 대기", row.get("code") or "코드 확인 대기", _snapshot_number(row.get("amount")))
+        for investor, direction, row in _snapshot_flow_rows(model)
+    ]
+    lines += ["", "#### 외국인·기관 수급 상위"]
+    lines += _markdown_table(("구분", "방향", "종목", "코드", "금액"), flow_rows or [("자료 없음", "-", "-", "-", "-")])
+    return lines
+
+
 def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool = False) -> dict[str, Any]:
     contract = report.get("reportContract") if isinstance(report.get("reportContract"), Mapping) else report
     if not isinstance(contract, Mapping):
@@ -562,6 +636,11 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
             "declineRatio": round(decliners / total * 100, 2) if total else None,
             "marketTradingValue": full_market.get("marketTradingValue") or {},
             "metrics": full_market.get("metrics") or {},
+        },
+        "marketSnapshot": contract.get("marketSnapshot") or {
+            "status": "UNAVAILABLE",
+            "rankings": {"status": "UNAVAILABLE", "items": {}},
+            "investorFlow": {"status": "UNAVAILABLE", "periods": {}},
         },
         "relativeIndustries": relative_industries,
         "relativeThemes": relative_themes,
@@ -799,7 +878,7 @@ def _compact_html(
     )
     status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>부분 자료 포함</b> · {_escape(model["reason"])}</div>'
     conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
-    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
     return (
         output
         .replace("MARKET / DASHBOARD", "국내증시")
@@ -882,6 +961,7 @@ def _compact_markdown(
         _metric_line_value(market["metrics"].get(key) or {})
         for key in ("aboveMA20", "aboveMA60", "aboveMA120")
     )])
+    lines += _compact_snapshot_markdown(model)
     lines += ["", "### 핵심 결론", ""] + [f"- {item}" for item in _compact_conclusions(model)]
     lines += ["", "## 2. 주도 업종·테마", "", "### 업종 상대강도 TOP 5"]
     industry_rows = [(

@@ -1044,6 +1044,7 @@ def build_report_contract(
     session_context: Mapping[str, Any] | None = None,
     registered_universe: Mapping[str, Any] | None = None,
     v1_groups: Mapping[str, Any] | None = None,
+    market_snapshot: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -1231,6 +1232,16 @@ def build_report_contract(
         "mode": "NOT_PREOPEN",
         "status": "NOT_APPLICABLE",
     }
+    market_snapshot = dict(market_snapshot) if isinstance(market_snapshot, Mapping) else {
+        "schemaVersion": "market-snapshot-report-projection-v1",
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "status": "UNAVAILABLE",
+        "reason": "MARKET_SNAPSHOT_PROJECTION_NOT_SUPPLIED",
+        "rankings": {"status": "UNAVAILABLE", "items": {}},
+        "investorFlow": {"status": "UNAVAILABLE", "periods": {}},
+        "industries": {"status": "UNAVAILABLE", "top": []},
+        "industryMembership": {"status": "UNAVAILABLE"},
+    }
 
     # ``candidates`` is retained as a compatibility alias for older callers.
     # New callers must provide technical and Kiwoom candidates separately.
@@ -1321,12 +1332,15 @@ def build_report_contract(
             },
             "themeStockDetails": "data/monitoring/latest-theme-signals.json#themes[].stocks",
             "industryDetails": "data/monitoring/latest-industries.json#industries[]",
+            "marketSnapshot": "reportContract.marketSnapshot",
+            "marketSnapshotSource": "data/market/report-snapshot-projection.json",
             "v2HistoryDetails": "data/dynamic-universe/v2-shadow-history.json#observations[]",
             "relativeStrengthTop5": "reportContract.relativeStrengthTop5",
             "forbidCandidateMixing": True,
             "historicalAndPreMarketMustRemainSeparate": True,
         },
         "indices": indices.get("indices") or [],
+        "marketSnapshot": market_snapshot,
         "fullMarket": {
             # Breadth arithmetic is evaluated against the valid direction
             # denominator.  Entity coverage remains available in the market
@@ -1393,8 +1407,9 @@ def build_report_contract(
                 "analysis": research_analysis,
             },
             "investorFlow": {
-                "status": "UNAVAILABLE",
-                "reason": "이 계약 입력에 동일 기준시각의 종목별 수급 판정이 없습니다.",
+                "status": (market_snapshot.get("investorFlow") or {}).get("status", "UNAVAILABLE"),
+                "source": "reportContract.marketSnapshot.investorFlow",
+                "periods": (market_snapshot.get("investorFlow") or {}).get("periods", {}),
             },
             "disclosures": {
                 "status": "UNAVAILABLE",

@@ -119,6 +119,26 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertNotIn("2,205/2,767 산술 검증", html_text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
+    def test_market_snapshot_rankings_and_investor_flow_are_rendered(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "OK",
+            "rankings": {"status": "OK", "items": {
+                "gainers": {"status": "OK", "rows": [{"code": "005930", "name": "삼성전자", "changeRate": 4.2}]},
+            }},
+            "investorFlow": {"status": "OK", "periods": {"DAY": [
+                {"investorType": "FOREIGNER", "status": "OK", "buy": [{"code": "000660", "name": "SK하이닉스", "amount": 123456}], "sell": []},
+            ]}},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for text in (html, markdown):
+            self.assertIn("현재 스냅샷 순위·수급", text)
+            self.assertIn("삼성전자", text)
+            self.assertIn("SK하이닉스", text)
+            self.assertIn("123,456", text)
+        self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
+
     def test_saved_output_validation_detects_missing_dynamic_information(self):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "VERIFIED"

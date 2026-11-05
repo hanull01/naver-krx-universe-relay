@@ -43,7 +43,6 @@ class KrxReportResolverTests(unittest.TestCase):
         names = (
             "refresh.yml",
             "refresh-monitoring-daily.yml",
-            "refresh-market-snapshots.yml",
             "refresh-research.yml",
             "daily-report.yml",
         )
