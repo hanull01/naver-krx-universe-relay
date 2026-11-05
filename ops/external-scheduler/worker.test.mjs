@@ -24,7 +24,7 @@ function apiWith({ existing = null, run = null, commits = [], contents = {} } = 
 }
 
 test("09:00 and 10:00 are independent slots", () => {
-  const plan = planForCron("0 0-10 * * 1-5");
+  const plan = planForKey("refresh");
   const nine = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 0, 0));
   const ten = slotKeyFor(plan, "0 0-10 * * 1-5", Date.UTC(2026, 9, 27, 1, 0));
   assert.notEqual(nine, ten);
@@ -123,7 +123,7 @@ test("existing scheduled run blocks external dispatch", async () => {
 test("dispatch matches the newly created run and reports missing publication", async () => {
   const dispatchedRun = { id: 101, event: "workflow_dispatch", created_at: new Date(Date.now()).toISOString(), status: "completed", conclusion: "success", head_sha: "abc" };
   const api = apiWith({ run: dispatchedRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:slot", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_VERIFIED");
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
   assert.equal(result.runId, 101);
@@ -132,7 +132,7 @@ test("dispatch matches the newly created run and reports missing publication", a
 test("a run created before dispatch is not matched", async () => {
   const oldRun = { id: 104, event: "workflow_dispatch", created_at: new Date(Date.now() - 60_000).toISOString(), status: "completed", conclusion: "success", head_sha: "old" };
   const api = apiWith({ run: oldRun });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:old-run", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_UNVERIFIED");
 });
 
@@ -144,7 +144,7 @@ test("GitHub dispatch errors are surfaced", async () => {
     throw new Error(`unexpected path ${path}`);
   };
   await assert.rejects(
-    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
+    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:dispatch-error", Date.now(), { github: api, sleep: async () => {} }),
     /GITHUB_HTTP_500/,
   );
 });
@@ -217,7 +217,7 @@ test("scheduled claim failure logs a sanitized stage and code", async () => {
 test("a long-running Run returns its identity for later completion polling", async () => {
   const run = { id: 105, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "in_progress", head_sha: "long" };
   const api = apiWith({ run });
-  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForCron("0 0-10 * * 1-5"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("refresh"), "refresh-intraday:long", Date.now(), { github: api, sleep: async () => {} });
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.runId, 105);
   const completed = { ...run, status: "completed", conclusion: "success", updated_at: new Date().toISOString() };
@@ -226,7 +226,7 @@ test("a long-running Run returns its identity for later completion polling", asy
     if (path.includes("/commits?")) return [];
     throw new Error(`unexpected path ${path}`);
   };
-  const later = await verifyRunCompletion(completionApi, repo, planForCron("0 0-10 * * 1-5"), run);
+  const later = await verifyRunCompletion(completionApi, repo, planForKey("refresh"), run);
   assert.equal(later.status, "RUN_VERIFIED");
   assert.equal(later.publicationStatus, "PUBLISH_UNVERIFIED");
 });
@@ -285,7 +285,7 @@ test("Run creation remains observable at the 60-second boundary", async () => {
     if (path.includes("/actions/runs/107")) return run;
     throw new Error(`unexpected path ${path}`);
   };
-  const result = await waitForDispatchedRun(api, repo, planForCron("0 0-10 * * 1-5"), Date.now(), async () => { sleeps += 1; });
+  const result = await waitForDispatchedRun(api, repo, planForKey("refresh"), Date.now(), async () => { sleeps += 1; });
   assert.equal(sleeps, 12);
   assert.equal(result.status, "RUN_STARTED");
   assert.equal(result.run.id, 107);
