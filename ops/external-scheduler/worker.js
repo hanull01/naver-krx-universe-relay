@@ -12,14 +12,14 @@ const WORKFLOWS = {
 export const SLOT_GRACE_BEFORE_MS = 5 * 60 * 1000;
 export const SLOT_GRACE_AFTER_MS = 15 * 60 * 1000;
 export const CONSOLIDATED_CRON = "30 * * * SUN-FRI";
-export const DAILY_COMPOSITE_CRON = "30 23 * * SUN-THU"; // 08:30 KST refresh slot
+export const RESEARCH_CRON = "20 * * * SUN-FRI";
 export const GITHUB_USER_AGENT = "naver-krx-external-scheduler";
 
 export function planForCron(cron) {
-  if (cron === "30 23 * * SUN-THU" || cron === "30 23 * * 0-4" || cron === "30 0-11 * * MON-FRI" || cron === "30 0-11 * * 1-5") {
+  if (cron === CONSOLIDATED_CRON) {
     return { slot: "08:30-20:30", key: "refresh", ...WORKFLOWS.refresh, inputs: {} };
   }
-  if (cron === "20 22 * * SUN-THU" || cron === "20 22 * * 0-4" || cron === "20 3 * * MON-FRI" || cron === "20 3 * * 1-5" || cron === "20 10 * * MON-FRI" || cron === "20 10 * * 1-5" || cron === "20 3,10 * * MON-FRI" || cron === "20 3,10 * * 1-5") {
+  if (cron === RESEARCH_CRON) {
     return { slot: "research", key: "research", ...WORKFLOWS.research, inputs: {} };
   }
   return null;
@@ -52,11 +52,13 @@ export function slotKeyFor(plan, cron, scheduledTime) {
 
 export function resolveScheduledPlan(cron, scheduledTime) {
   const kst = kstParts(scheduledTime);
-  if (cron === DAILY_COMPOSITE_CRON) {
+  if (cron === RESEARCH_CRON) {
     if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const hour = Number(kst.hour);
     const minute = Number(kst.minute);
-    if (hour === 8 && minute === 30) return { plan: planForKey("refresh"), slotCron: "30 23 * * 0-4" };
+    if (minute === 20 && (hour === 7 || hour === 12 || hour === 19)) {
+      return { plan: planForKey("research"), slotCron: "20 research" };
+    }
     return null;
   }
   if (cron !== CONSOLIDATED_CRON) {
