@@ -1,9 +1,9 @@
 {
   "schemaVersion": "dynamic-universe-v2-shadow-2",
-  "generatedAt": "2026-11-05T03:57:43.335255+00:00",
+  "generatedAt": "2026-11-05T07:35:16.952356+00:00",
   "source": {
-    "industries": "2026-11-05T03:57:43.335255+00:00",
-    "themes": "2026-11-05T03:57:43.335255+00:00"
+    "industries": "2026-11-05T07:35:16.952356+00:00",
+    "themes": "2026-11-05T07:35:16.952356+00:00"
   },
   "weights": {
     "priceRelativeStrength": 30,
@@ -182,6 +182,174 @@
       ]
     },
     {
+      "id": "336",
+      "name": "다각화된통신서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 2.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "266",
+      "name": "화장품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 62.0,
+      "coveragePct": 98.38709677419355,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "261",
+      "name": "제약",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 169.0,
+      "coveragePct": 95.26627218934911,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
       "id": "309",
       "name": "음료",
       "kind": "industry",
@@ -223,6 +391,62 @@
       "absoluteStrength": null,
       "relativeDefense": null,
       "memberCount": 15.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "298",
+      "name": "가정용기기와용품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 20.0,
       "coveragePct": 100.0,
       "smallGroupCorrection": 1.0,
       "persistenceDays": 0,
@@ -350,342 +574,6 @@
       ]
     },
     {
-      "id": "261",
-      "name": "제약",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 169.0,
-      "coveragePct": 94.67455621301775,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "336",
-      "name": "다각화된통신서비스",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 2.0,
-      "coveragePct": 100.0,
-      "smallGroupCorrection": 0.75,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "266",
-      "name": "화장품",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 62.0,
-      "coveragePct": 98.38709677419355,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "305",
-      "name": "항공사",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 9.0,
-      "coveragePct": 100.0,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "286",
-      "name": "생물공학",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 54.0,
-      "coveragePct": 94.44444444444444,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "298",
-      "name": "가정용기기와용품",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 20.0,
-      "coveragePct": 100.0,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
       "id": "301",
       "name": "은행",
       "kind": "industry",
@@ -727,62 +615,6 @@
       "absoluteStrength": null,
       "relativeDefense": null,
       "memberCount": 11.0,
-      "coveragePct": 100.0,
-      "smallGroupCorrection": 1.0,
-      "persistenceDays": 0,
-      "dataQuality": "BASELINE_STALE",
-      "baselineFreshnessStatus": "BASELINE_STALE",
-      "derivedMetricsStatus": "UNAVAILABLE",
-      "derivedMetricsReason": "BASELINE_STALE",
-      "trendEvidence": "BASELINE_STALE",
-      "watchEligible": false,
-      "watchRank": null,
-      "watchReasons": [
-        "baseline freshness is stale; derived selection deferred"
-      ]
-    },
-    {
-      "id": "318",
-      "name": "종이와목재",
-      "kind": "industry",
-      "v1Status": "WAIT",
-      "v2Status": "WAIT",
-      "score": null,
-      "rawScore": null,
-      "weights": {
-        "priceRelativeStrength": 30,
-        "breadth": 25,
-        "turnoverParticipation": 20,
-        "leaderQuality": 15,
-        "persistence": 10
-      },
-      "components": {
-        "priceRelativeStrength": null,
-        "breadth": null,
-        "turnoverParticipation": null,
-        "leaderQuality": null,
-        "persistence": null
-      },
-      "priceRelativeStrengthBasis": "UNAVAILABLE",
-      "absoluteReturn1D": null,
-      "relativeStrengthVsMarket": null,
-      "componentStatus": {
-        "priceRelativeStrength": "UNAVAILABLE",
-        "breadth": "UNAVAILABLE",
-        "turnoverParticipation": "UNAVAILABLE",
-        "leaderQuality": "UNAVAILABLE",
-        "persistence": "UNAVAILABLE"
-      },
-      "missingComponents": [
-        "baselineFreshness"
-      ],
-      "coreMissingComponents": [
-        "baselineFreshness"
-      ],
-      "availableWeight": 0.0,
-      "absoluteStrength": null,
-      "relativeDefense": null,
-      "memberCount": 14.0,
       "coveragePct": 100.0,
       "smallGroupCorrection": 1.0,
       "persistenceDays": 0,
@@ -854,8 +686,8 @@
       ]
     },
     {
-      "id": "325",
-      "name": "전기유틸리티",
+      "id": "286",
+      "name": "생물공학",
       "kind": "industry",
       "v1Status": "WAIT",
       "v2Status": "WAIT",
@@ -894,7 +726,119 @@
       "availableWeight": 0.0,
       "absoluteStrength": null,
       "relativeDefense": null,
-      "memberCount": 5.0,
+      "memberCount": 54.0,
+      "coveragePct": 94.44444444444444,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "318",
+      "name": "종이와목재",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 14.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "305",
+      "name": "항공사",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 9.0,
       "coveragePct": 100.0,
       "smallGroupCorrection": 1.0,
       "persistenceDays": 0,
@@ -966,6 +910,174 @@
       ]
     },
     {
+      "id": "311",
+      "name": "포장재",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 27.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "338",
+      "name": "사무용전자제품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "275",
+      "name": "담배",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
       "id": "270",
       "name": "자동차부품",
       "kind": "industry",
@@ -1007,7 +1119,735 @@
       "absoluteStrength": null,
       "relativeDefense": null,
       "memberCount": 150.0,
-      "coveragePct": 94.66666666666667,
+      "coveragePct": 95.33333333333334,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "303",
+      "name": "가구",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 11.0,
+      "coveragePct": 90.9090909090909,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "325",
+      "name": "전기유틸리티",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 5.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "337",
+      "name": "카드",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "262",
+      "name": "생명과학도구및서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 38.0,
+      "coveragePct": 92.10526315789474,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "327",
+      "name": "디스플레이패널",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 6.0,
+      "coveragePct": 66.66666666666666,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "316",
+      "name": "건강관리업체및서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 28.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "333",
+      "name": "무선통신서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 4.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "310",
+      "name": "광고",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 19.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "264",
+      "name": "백화점과일반상점",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 14.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "265",
+      "name": "판매업체",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 12.0,
+      "coveragePct": 91.66666666666666,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "315",
+      "name": "손해보험",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 12.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "332",
+      "name": "문구류",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "314",
+      "name": "출판",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 7.0,
+      "coveragePct": 100.0,
       "smallGroupCorrection": 1.0,
       "persistenceDays": 0,
       "dataQuality": "BASELINE_STALE",
@@ -1078,8 +1918,8 @@
       ]
     },
     {
-      "id": "264",
-      "name": "백화점과일반상점",
+      "id": "302",
+      "name": "식품과기본식료품소매",
       "kind": "industry",
       "v1Status": "WAIT",
       "v2Status": "WAIT",
@@ -1118,8 +1958,2472 @@
       "availableWeight": 0.0,
       "absoluteStrength": null,
       "relativeDefense": null,
-      "memberCount": 14.0,
+      "memberCount": 6.0,
       "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "290",
+      "name": "교육서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 23.0,
+      "coveragePct": 91.30434782608695,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "324",
+      "name": "상업서비스와공급품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 29.0,
+      "coveragePct": 86.20689655172413,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "296",
+      "name": "운송인프라",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 8.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "281",
+      "name": "건강관리장비와용품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 91.0,
+      "coveragePct": 90.10989010989012,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "321",
+      "name": "증권",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 39.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "328",
+      "name": "전문소매",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 5.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "317",
+      "name": "호텔,레스토랑,레저",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 20.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "271",
+      "name": "레저용장비와제품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 11.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "320",
+      "name": "건축제품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 11.0,
+      "coveragePct": 90.9090909090909,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "267",
+      "name": "IT서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 112.0,
+      "coveragePct": 99.10714285714286,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "331",
+      "name": "복합유틸리티",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "329",
+      "name": "도로와철도운송",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 8.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "326",
+      "name": "항공화물운송과물류",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 12.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "293",
+      "name": "컴퓨터와주변기기",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 21.0,
+      "coveragePct": 85.71428571428571,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "297",
+      "name": "가정용품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 9.0,
+      "coveragePct": 77.77777777777779,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "288",
+      "name": "건강관리기술",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 13.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "304",
+      "name": "철강",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 54.0,
+      "coveragePct": 94.44444444444444,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "319",
+      "name": "기타금융",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 5.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "277",
+      "name": "창업투자",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 89.0,
+      "coveragePct": 93.25842696629213,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "280",
+      "name": "부동산",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 30.0,
+      "coveragePct": 93.33333333333333,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "289",
+      "name": "건축자재",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 48.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "312",
+      "name": "가스유틸리티",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 12.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "279",
+      "name": "건설",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 76.0,
+      "coveragePct": 88.1578947368421,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "339",
+      "name": "다각화된소비자서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 1.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "272",
+      "name": "화학",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 119.0,
+      "coveragePct": 99.15966386554622,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "25",
+      "name": "기타",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 2.0,
+      "coveragePct": 50.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "295",
+      "name": "에너지장비및서비스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 32.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "307",
+      "name": "전자제품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 15.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "323",
+      "name": "해운사",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 11.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "287",
+      "name": "소프트웨어",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 74.0,
+      "coveragePct": 93.24324324324324,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "299",
+      "name": "기계",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 104.0,
+      "coveragePct": 95.1923076923077,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "269",
+      "name": "디스플레이장비및부품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 67.0,
+      "coveragePct": 94.02985074626866,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "334",
+      "name": "무역회사와판매업체",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 8.0,
+      "coveragePct": 87.5,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "283",
+      "name": "전기제품",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 66.0,
+      "coveragePct": 92.42424242424242,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "291",
+      "name": "조선",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 31.0,
+      "coveragePct": 93.54838709677419,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "292",
+      "name": "핸드셋",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 57.0,
+      "coveragePct": 98.24561403508771,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "330",
+      "name": "생명보험",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 3.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 0.75,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "276",
+      "name": "복합기업",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 24.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "313",
+      "name": "석유와가스",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 19.0,
+      "coveragePct": 94.73684210526315,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "278",
+      "name": "반도체와반도체장비",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 169.0,
+      "coveragePct": 99.40828402366864,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "284",
+      "name": "우주항공과국방",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 33.0,
+      "coveragePct": 100.0,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "294",
+      "name": "통신장비",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 51.0,
+      "coveragePct": 94.11764705882352,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "306",
+      "name": "전기장비",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 32.0,
+      "coveragePct": 96.875,
+      "smallGroupCorrection": 1.0,
+      "persistenceDays": 0,
+      "dataQuality": "BASELINE_STALE",
+      "baselineFreshnessStatus": "BASELINE_STALE",
+      "derivedMetricsStatus": "UNAVAILABLE",
+      "derivedMetricsReason": "BASELINE_STALE",
+      "trendEvidence": "BASELINE_STALE",
+      "watchEligible": false,
+      "watchRank": null,
+      "watchReasons": [
+        "baseline freshness is stale; derived selection deferred"
+      ]
+    },
+    {
+      "id": "282",
+      "name": "전자장비와기기",
+      "kind": "industry",
+      "v1Status": "WAIT",
+      "v2Status": "WAIT",
+      "score": null,
+      "rawScore": null,
+      "weights": {
+        "priceRelativeStrength": 30,
+        "breadth": 25,
+        "turnoverParticipation": 20,
+        "leaderQuality": 15,
+        "persistence": 10
+      },
+      "components": {
+        "priceRelativeStrength": null,
+        "breadth": null,
+        "turnoverParticipation": null,
+        "leaderQuality": null,
+        "persistence": null
+      },
+      "priceRelativeStrengthBasis": "UNAVAILABLE",
+      "absoluteReturn1D": null,
+      "relativeStrengthVsMarket": null,
+      "componentStatus": {
+        "priceRelativeStrength": "UNAVAILABLE",
+        "breadth": "UNAVAILABLE",
+        "turnoverParticipation": "UNAVAILABLE",
+        "leaderQuality": "UNAVAILABLE",
+        "persistence": "UNAVAILABLE"
+      },
+      "missingComponents": [
+        "baselineFreshness"
+      ],
+      "coreMissingComponents": [
+        "baselineFreshness"
+      ],
+      "availableWeight": 0.0,
+      "absoluteStrength": null,
+      "relativeDefense": null,
+      "memberCount": 102.0,
+      "coveragePct": 98.0392156862745,
       "smallGroupCorrection": 1.0,
       "persistenceDays": 0,
       "dataQuality": "BASELINE_STALE",
@@ -15921,7 +19225,7 @@
     }
   ],
   "counts": {
-    "industries": 20,
+    "industries": 79,
     "themes": 264
   },
   "notes": [
@@ -15940,8 +19244,8 @@
       "sourceCommitStatus": "UNAVAILABLE",
       "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
       "tradingDate": "20261105",
-      "calculationGeneration": "2026-11-05T03:57:43.335255+00:00",
-      "inputSnapshotSha256": "66c867e8d48a9801378df299dc25c3520774a6e70dde3799b2f90a811dc5914a",
+      "calculationGeneration": "2026-11-05T07:35:16.952356+00:00",
+      "inputSnapshotSha256": "a3a10cbbe1b55b5a43035559107f1953079e15fcb1613a7996875d5c66549a75",
       "resultSha256": null,
       "historySha256": null,
       "files": [
@@ -15949,9 +19253,9 @@
           "kind": "industries",
           "path": "data/monitoring/latest-industries.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "75606415b1d86f9840228b72788718a9a8db8aab8899a598bfc16f7a43b37580",
-          "bytes": 28145,
-          "generatedAt": "2026-11-05T03:57:43.335255+00:00",
+          "sha256": "c938842f4e9220ea2a5d6288f537eee2e5a602db41569b0fe22d901ceff22b2c",
+          "bytes": 107595,
+          "generatedAt": "2026-11-05T07:35:16.952356+00:00",
           "tradingDate": "20261105",
           "generationStatus": "ALIGNED",
           "dateStatus": "ALIGNED"
@@ -15960,9 +19264,9 @@
           "kind": "themes",
           "path": "data/monitoring/latest-theme-signals.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "dd4355df0da562da654768baf9092d0f92507cc26482b1bff0ae9bd4d4cdf892",
-          "bytes": 10226828,
-          "generatedAt": "2026-11-05T03:57:43.335255+00:00",
+          "sha256": "031f4d8ce7e5f2436f3481a1d43b224c5b5d38ccb12a905c0f29b660b380f44a",
+          "bytes": 10228763,
+          "generatedAt": "2026-11-05T07:35:16.952356+00:00",
           "tradingDate": null,
           "generationStatus": "ALIGNED",
           "dateStatus": "UNAVAILABLE"
@@ -15971,9 +19275,9 @@
           "kind": "v1Universe",
           "path": "data/dynamic-universe/latest.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "0dd6a9fd0e4a12300b72a5a2a66e8527060f99db2b43366ae89e97cbf9fb1549",
-          "bytes": 151511,
-          "generatedAt": "2026-11-05T03:57:45.807992+00:00",
+          "sha256": "7385ea91eba1b5db816fe8a3fd885a29984b64313355ee2b0edb33906987a420",
+          "bytes": 151009,
+          "generatedAt": "2026-11-05T07:35:19.407788+00:00",
           "tradingDate": null,
           "generationStatus": "NOT_REQUIRED",
           "dateStatus": "UNAVAILABLE"
@@ -15984,9 +19288,9 @@
   },
   "summary": {
     "industries": {
-      "count": 20,
+      "count": 79,
       "v2StatusDistribution": {
-        "WAIT": 20
+        "WAIT": 79
       },
       "v1V2StatusDifferences": 0,
       "unavailable": 0
