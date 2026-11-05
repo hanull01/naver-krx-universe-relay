@@ -88,6 +88,8 @@ jobs:
           ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || '' }}
           generation-id: ${{ inputs.krx_generation_id || '' }}
+          require-expected-date: false
+          require-generation-id: false
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Resolve optional KRX daily input

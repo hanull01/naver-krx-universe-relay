@@ -90,6 +90,8 @@ jobs:
           ref: ${{ inputs.krx_ref || 'codex/krx-private-sync' }}
           expected-date: ${{ inputs.krx_expected_date || inputs.as_of || '' }}
           generation-id: ${{ inputs.krx_generation_id || '' }}
+          require-expected-date: false
+          require-generation-id: false
           output-dir: ${{ runner.temp }}/krx-report-input
 
       - name: Sync latest main
@@ -124,7 +126,7 @@ jobs:
           from daily_report import compact_date
 
           requested = os.environ.get("REPORT_AS_OF") or None
-          expected = os.environ.get("KRX_EXPECTED_DATE") or ""
+          expected = os.environ.get("KRX_EXPECTED_DATE") or os.environ.get("KRX_TARGET_DATE") or ""
           if not expected:
               raise SystemExit("KRX_INPUT_UNAVAILABLE:EXPECTED_DATE_REQUIRED")
           as_of = compact_date(expected)
