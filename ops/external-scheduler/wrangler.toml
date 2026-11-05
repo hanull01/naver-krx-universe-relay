@@ -3,14 +3,20 @@ main = "worker.js"
 compatibility_date = "2026-10-27"
 
 
+
+
 [observability]
 enabled = true
 head_sampling_rate = 1
 
 
+
+
 # Cron activation and Secret registration remain a separate approved operation.
 [triggers]
-crons = ["30 * * SUN-FRI", "20 * * SUN-FRI"]
+crons = ["30 * * * SUN-FRI", "20 * * * SUN-FRI"]
+
+
 
 
 [vars]
@@ -20,12 +26,18 @@ SCHEDULE_RECHECK_ONLY = "false"
 SCHEDULE_RECHECK_STARTED = "true"
 
 
+
+
 [[durable_objects.bindings]]
 name = "SLOT_GATE"
 class_name = "SlotGate"
 
 
+
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["SlotGate"]
+
+
 
