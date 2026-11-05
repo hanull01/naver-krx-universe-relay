@@ -606,4 +606,40 @@ class ReadyMailTests(unittest.TestCase):
             with self.assertRaisesRegex(ready.ReadyValidationError, "hash mismatch"):
                 ready.validate_current_observation_manifest(manifest, "commit")
 
+    def test_current_observation_manifest_uses_observation_date_over_historical_asof(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report_contract = root / "contract.json"
+            markdown = root / "report.md"
+            html = root / "report.html"
+            manifest = root / "manifest.json"
+            report_contract.write_text(json.dumps({
+                "asOf": "2026-09-29",
+                "observationDate": "2026-09-30",
+                "observedAt": "2026-09-30T10:00:00+09:00",
+            }) + "\n", encoding="utf-8")
+            markdown.write_text("# observation\n", encoding="utf-8")
+            html.write_text("<!doctype html><p>observation</p>", encoding="utf-8")
+            digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+            manifest.write_text(json.dumps({
+                "reportType": "current_observation",
+                "session": "INTRADAY",
+                "tradingDate": "2026-09-30",
+                "sourceTime": "2026-09-30T10:00:00+09:00",
+                "reportContractGeneratedAt": "2026-09-30T10:00:00+09:00",
+                "workflowRunId": "123",
+                "executionHead": "a" * 40,
+                "reportContractPath": "contract.json",
+                "reportContractSha256": digest(report_contract),
+                "markdownPath": "report.md",
+                "htmlPath": "report.html",
+                "markdownSha256": digest(markdown),
+                "htmlSha256": digest(html),
+                "reportStatus": "PARTIAL",
+                "currentObservationAllowed": True,
+            }), encoding="utf-8")
+            got = ready.validate_current_observation_manifest(manifest, "commit")
+            self.assertEqual(got["tradingDate"], "2026-09-30")
+
+
 if __name__ == '__main__': unittest.main()
