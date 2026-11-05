@@ -114,6 +114,20 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(sell['source']['accTradeAmount'], '-1000')
         self.assertNotIn('netBuyAmount', sell)
 
+    def test_investor_amount_field_status_preserves_raw_zero_and_missing(self):
+        def fetch(path, params, expected):
+            row = investor_row()
+            if params['investorType'] == 'ORGANIZATION':
+                row.pop('accTradeAmount')
+            return {'sections': {'buyRankList': [row], 'sellRankList': []}}
+        payload = market.collect_investors(fetch, self.CLOCK)
+        foreign = payload['investors'][0]['buy'][0]
+        organization = payload['investors'][1]['buy'][0]
+        self.assertEqual(foreign['accTradeAmountSourceField'], 'accTradeAmount')
+        self.assertEqual(foreign['accTradeAmountSourceStatus'], 'PRESENT')
+        self.assertIsNone(organization['accTradeAmount'])
+        self.assertEqual(organization['accTradeAmountSourceStatus'], 'MISSING')
+
     def test_investor_missing_sections_and_partial_failure(self):
         def fetch(path, params, expected):
             if params['investorType'] == 'FOREIGNER':

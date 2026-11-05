@@ -164,6 +164,60 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
+    def test_analysis_preserves_optional_condition_search_evidence_without_deriving_it(self):
+        discovery = td.published_payload(snapshot(["005930"]))
+        result = td.analyze(
+            "2026-10-12",
+            discovery,
+            {"datas": [{"itemCode": "005930", "stockName": "삼성전자", "closePrice": 100,
+                         "selectionPrice": 95, "conditionStatus": "충족",
+                         "nextCheck": "다음 장중 확인"}]},
+            {"datas": [{"itemCode": "005930", "ma20": 90, "ma60": 85,
+                         "technicalSummary": "20일 이동평균 상회"}]},
+            {},
+        )
+        row = result["stocks"][0]
+        self.assertEqual(row["selectionPrice"], 95)
+        self.assertEqual(row["conditionStatus"], "충족")
+        self.assertEqual(row["nextCheck"], "다음 장중 확인")
+        self.assertEqual(row["technicalSummary"], "20일 이동평균 상회")
+
+    def test_krx_generation_supplies_selection_close_and_nested_indicators(self):
+        discovery = td.published_payload(snapshot(["003490"], monitoring="2026-10-12"))
+        states = {
+            "targetDate": "20261009",
+            "datas": [{
+                "itemCode": "003490", "asOfDate": "20261009", "price": 28700,
+                "current": {"status": "AVAILABLE", "price": 28700, "changeRate": 9.1,
+                             "trend": "MIXED", "breakout20": False},
+            }],
+        }
+        technicals = {"datas": [{
+            "itemCode": "003490", "technicals": {
+                "ma5": 26700, "ma20": 28080, "ma60": 28320.833333,
+                "volumeRatio20": 1.513323, "breakout20": False,
+            }
+        }]}
+        baseline = td.krx_selection_baseline(discovery, states)
+        result = td.analyze(
+            "2026-10-12", discovery, {}, technicals, states,
+            final_baseline=baseline, name_lookup={"003490": "대한항공"},
+        )
+        row = result["stocks"][0]
+        self.assertEqual(row["itemName"], "대한항공")
+        self.assertEqual(row["price"], 28700)
+        self.assertEqual(row["selectionPrice"], 28700)
+        self.assertEqual(row["ma20"], 28080)
+        self.assertEqual(row["ma60"], 28320.833333)
+        self.assertEqual(row["source"], "FULL_MARKET_FINAL")
+        self.assertEqual(row["priceSourceDate"], "2026-10-09")
+
+    def test_krx_selection_baseline_rejects_mismatched_generation_date(self):
+        discovery = td.published_payload(snapshot(["003490"], monitoring="2026-10-12"))
+        baseline = td.krx_selection_baseline(discovery, {"targetDate": "20261008", "datas": []})
+        self.assertEqual(baseline["status"], "UNAVAILABLE")
+        self.assertEqual(baseline["reason"], "KRX_SELECTION_DATE_MISMATCH")
+
     def test_verified_name_lookup_does_not_supply_price_or_technical_values(self):
         discovery = td.published_payload(snapshot(["000810"]))
         result = td.analyze(

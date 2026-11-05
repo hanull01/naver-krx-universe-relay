@@ -256,8 +256,77 @@ def _index(payload, keys=("itemCode", "code")):
             continue
         code = next((row.get(key) for key in keys if row.get(key)), None)
         if code:
-            result[str(code)] = row
+            result[_normalize_code(code)] = row
     return result
+
+
+def _normalize_code(value):
+    """Normalize numeric and alphanumeric six-character instrument codes."""
+    text = str(value or "").strip().upper()
+    return text.zfill(6) if text.isdigit() else text
+
+
+def _flatten_source_row(row, nested_keys):
+    """Expose KRX/full-market nested rows to the legacy candidate analyzer."""
+    if not isinstance(row, dict):
+        return {}
+    flattened = {}
+    for key in nested_keys:
+        nested = row.get(key)
+        if isinstance(nested, dict):
+            flattened.update(nested)
+    flattened.update(row)
+    return flattened
+
+
+def krx_selection_baseline(discovery, states_payload):
+    """Project selection-date closes from the same KRX generation as states.
+
+    This is intentionally not a fallback to monitoring-baseline. A date or
+    row mismatch returns an unavailable baseline so stale legacy values cannot
+    replace an authoritative KRX generation.
+    """
+    selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
+    target_date = str((states_payload or {}).get("targetDate") or "").replace("-", "")
+    if not selection_date or target_date != selection_date:
+        return {"status": "UNAVAILABLE", "reason": "KRX_SELECTION_DATE_MISMATCH", "stocks": []}
+    rows = _index(states_payload)
+    symbols = [_normalize_code(code) for code in discovery.get("symbols") or []]
+    stocks = []
+    for code in symbols:
+        row = _flatten_source_row(rows.get(code, {}), ("current", "state"))
+        close = next((row.get(key) for key in ("closePrice", "lastClose", "close", "price", "currentPrice")
+                      if isinstance(row.get(key), (int, float)) and not isinstance(row.get(key), bool)), None)
+        if close is None:
+            continue
+        stocks.append({
+            "itemCode": code,
+            "itemName": row.get("stockName") or row.get("name"),
+            "code": code,
+            "name": row.get("stockName") or row.get("name"),
+            "lastTradingDate": selection_date,
+            "lastClose": close,
+            "closeValid": True,
+            "ohlcValid": True,
+            "priceBasis": "KRX_M10_GENERATION",
+            "sourceDate": selection_date,
+        })
+    present = {row["itemCode"] for row in stocks}
+    complete = len(stocks) == len(symbols)
+    return {
+        "status": "OK" if complete else "UNAVAILABLE",
+        "reason": None if complete else "KRX_SELECTION_CLOSE_MISSING",
+        "asOfDate": selection_date,
+        "historyStatus": "OK" if complete else "PARTIAL",
+        "count": len(stocks),
+        "authoritativeCount": len(stocks),
+        "coveragePct": 100.0 if complete else 0.0,
+        "refreshDiagnostics": {
+            "missingCodes": [code for code in symbols if code not in present],
+            "extraCodes": [],
+        },
+        "stocks": stocks,
+    }
 
 
 def verified_final_baseline(discovery, baseline):
@@ -299,24 +368,29 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     rows = []
     for code in discovery["symbols"]:
-        quote, technical, state, signal = qidx.get(code), tidx.get(code), sidx.get(code), fidx.get(code)
+        normalized_code = _normalize_code(code)
+        quote = qidx.get(normalized_code)
+        technical = _flatten_source_row(tidx.get(normalized_code, {}), ("technicals", "metrics"))
+        state = _flatten_source_row(sidx.get(normalized_code, {}), ("state", "current"))
+        signal = fidx.get(normalized_code)
         identity_quote = quote
         rejected_quote = bool(quote and quote.get("_discoveryAdditionalLookup")
                               and (quote.get("status") not in (None, "ok")
                                    or quote.get("fresh") is False))
         if rejected_quote:
             quote = None
-        final = bidx.get(code)
+        final = bidx.get(normalized_code)
         market = quote or final or signal or {}
         technical = technical or final or signal or {}
         state = state or {}
-        current = state.get("current") if isinstance(state.get("current"), dict) else state
+        current = _flatten_source_row(state.get("current", {}), ()) if isinstance(state.get("current"), dict) else state
         row = {
-            "itemCode": code,
+            "itemCode": normalized_code,
             "itemName": (market.get("stockName") or market.get("name")
                          or technical.get("stockName")
                          or (identity_quote or {}).get("stockName")
-                         or name_lookup.get(code)),
+                         or name_lookup.get(normalized_code)
+                         or name_lookup.get(str(code))),
             "itemNameSource": (
                 "DISCOVERY_MARKET_DATA" if market.get("stockName") or market.get("name")
                 else "VERIFIED_NAME_LOOKUP" if name_lookup.get(code)
@@ -336,13 +410,28 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                        else "MONITORED_UNIVERSE" if quote
                        else "FULL_MARKET_FINAL" if final
                        else "FULL_MARKET_SIGNAL" if signal else None),
-            "priceSourceDate": final.get("sourceDate") if final and not quote else None,
+            "priceSourceDate": (final.get("sourceDate") or final.get("lastTradingDate")) if final and not quote else None,
             "priceSourceTime": market.get("sourceTime"),
             "priceBasis": market.get("priceBasis"),
             "rejectedQuoteReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
             "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
                                   if rejected_quote and not final and not signal else None),
         }
+        # Preserve optional condition-search evidence when a trusted source
+        # supplies it.  Do not derive or backfill these fields from another
+        # date; the user renderer turns absent values into explicit phrases.
+        for output_key, source_keys in (
+            ("selectionPrice", ("selectionPrice", "baselinePrice", "referencePrice", "selectedPrice", "lastClose")),
+            ("technicalSummary", ("technicalSummary",)),
+            ("conditionStatus", ("conditionStatus", "conditionResult", "conditionState")),
+            ("conditionMet", ("conditionMet",)),
+            ("nextCheck", ("nextCheck", "nextObservation", "nextAction")),
+        ):
+            for source in (market, technical, state, signal or {}):
+                value = next((source.get(key) for key in source_keys if source.get(key) not in (None, "")), None)
+                if value not in (None, ""):
+                    row[output_key] = value
+                    break
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
         row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
         row["priceStatus"] = "AVAILABLE" if row["price"] is not None else "UNAVAILABLE"
@@ -350,7 +439,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                                   else "PARTIAL" if any(row[key] is not None for key in ("ma5", "ma20", "ma60"))
                                   else "UNAVAILABLE")
         row["analysisStatus"] = row["dataStatus"]
-        prior = previous_rows.get(code, {})
+        prior = previous_rows.get(normalized_code, {})
         row["previousReportChange"] = {
             "available": bool(prior),
             "price": (row["price"] - prior["price"] if isinstance(row["price"], (int, float)) and isinstance(prior.get("price"), (int, float)) else None),
