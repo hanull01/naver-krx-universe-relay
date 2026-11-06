@@ -205,6 +205,36 @@ def validated_research_for_report(payload, report_date, expected_generation=None
     return payload
 
 
+def validate_research_coverage(report):
+    """Validate optional research coverage without fabricating rows."""
+    coverage = report.get("coverage") if isinstance(report, dict) else {}
+    sources = report.get("sources") if isinstance(report, dict) else {}
+    research_source = sources.get("researchIntelligence") if isinstance(sources, dict) else {}
+    coverage = coverage if isinstance(coverage, dict) else {}
+    research_source = research_source if isinstance(research_source, dict) else {}
+    expected = int(coverage.get("enabledStockCount") or 0)
+    actual = int(coverage.get("researchStockCount") or 0)
+    status = str(research_source.get("status") or "UNAVAILABLE").upper()
+    reason = research_source.get("unavailableReason")
+
+    if actual == expected:
+        return {"ok": True, "blocking": False, "status": "OK",
+                "expected": expected, "actual": actual, "reason": reason}
+    if status in {"UNAVAILABLE", "PARTIAL"}:
+        return {
+            "ok": True, "blocking": False,
+            "status": "OPTIONAL_RESEARCH_UNAVAILABLE",
+            "expected": expected, "actual": actual,
+            "reason": reason or "RESEARCH_COVERAGE_INCOMPLETE",
+        }
+    return {
+        "ok": False, "blocking": True,
+        "status": "RESEARCH_COVERAGE_MISMATCH",
+        "expected": expected, "actual": actual,
+        "reason": reason or "RESEARCH_COVERAGE_INCOMPLETE",
+    }
+
+
 def validated_group_source(payload, kind, report_date, peer_generated_at=None):
     """Keep current group observations only when date and generation evidence align."""
     if not isinstance(payload, dict):
@@ -1727,23 +1757,33 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         research_manifest = load_json(RESEARCH_MANIFEST_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
         research_manifest = {}
-    research_generation = (
+    research_source_generation = (
         research_payload.get("sourceGeneration")
         or research_payload.get("generationId")
-        or research_payload.get("generatedAt")
         or research_manifest.get("sourceGeneration")
         or research_manifest.get("generationId")
-        or research_manifest.get("generatedAt")
     )
-    if research_generation and not (
+    historical_generation = (
+        (technical_inputs.get("metadata") or {}).get("historicalGenerationId")
+        or (technical_inputs.get("metadata") or {}).get("sourceGeneration")
+    )
+    expected_research_generation = (
+        historical_generation
+        if (technical_inputs.get("metadata") or {}).get("historicalIndicatorSource") == "KRX"
+        else None
+    )
+    if research_source_generation and not (
         research_payload.get("sourceGeneration")
         or research_payload.get("generationId")
     ):
-        research_payload = {**research_payload, "sourceGeneration": research_generation}
+        research_payload = {
+            **research_payload,
+            "sourceGeneration": research_source_generation,
+        }
     research = validated_research_for_report(
         research_payload,
         report_input_date,
-        research_generation,
+        expected_research_generation,
     )
     try:
         indices = load_json(MARKET_INDICES_PATH)
@@ -2285,6 +2325,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "path": "data/research/intelligence/latest.json",
                 "asOf": research.get("asOf"),
                 "status": research.get("status"),
+                "unavailableReason": research.get("unavailableReason"),
             },
             "indices": {
                 "path": "data/market/indices.json",

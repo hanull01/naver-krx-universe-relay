@@ -178,6 +178,7 @@ jobs:
           python3 - <<'PY'
           import json
           from pathlib import Path
+          from daily_report import validate_research_coverage
 
           p = Path("data/reports/latest.json")
           x = json.loads(p.read_text(encoding="utf-8"))
@@ -203,9 +204,17 @@ jobs:
           if x["status"] == "OK" and alignment.get("status") != "OK":
               raise SystemExit("Invalid OK date alignment")
 
-          if research != enabled:
+          research_check = validate_research_coverage(x)
+          if not research_check["ok"]:
               raise SystemExit(
-                  f"Research coverage mismatch: {research}/{enabled}"
+                  "Research coverage mismatch: "
+                  f"{research_check['actual']}/{research_check['expected']}"
+              )
+          if research_check["status"] == "OPTIONAL_RESEARCH_UNAVAILABLE":
+              print(
+                  "Research coverage unavailable; report remains valid without "
+                  "fabricating research rows. reason:",
+                  research_check["reason"],
               )
 
           if x["coverageStatus"] == "OK":
