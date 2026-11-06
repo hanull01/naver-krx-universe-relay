@@ -30,6 +30,23 @@ def calendar(path):
 
 
 class TradingDiscoveryTests(unittest.TestCase):
+    def test_candidate_details_are_preserved_and_aligned(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            payload = snapshot(["005930"])
+            payload["candidate_details"] = [{
+                "symbol": "005930", "conditionName": "장종료후 단타후보군 탐색",
+                "conditionResult": True, "discoveredAt": "2026-10-09T21:00:00+09:00",
+                "sourceValues": {}, "sourceValueStatus": "NOT_PROVIDED",
+            }]
+            source = root / "source.json"; source.write_text(json.dumps(payload), encoding="utf-8")
+            published = td.published_payload(payload, calendar(root / "calendar.json"))
+            self.assertEqual(published["candidateDetails"][0]["conditionResult"], True)
+            out = root / "out"; out.mkdir()
+            (out / "latest.json").write_text(json.dumps(published), encoding="utf-8")
+            got = td.discovery_status("2026-10-12", out / "latest.json")
+            self.assertEqual(got["status"], "AVAILABLE")
+
     def test_publish_minimal_schema_and_idempotency(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

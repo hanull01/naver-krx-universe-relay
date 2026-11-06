@@ -94,7 +94,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성전자", "삼성E&A", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성E&A", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -142,6 +142,21 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("SK하이닉스", text)
             self.assertIn("123백만원", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
+
+    def test_market_snapshot_keeps_source_price_and_condition_result_is_user_facing(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "OK", "rankings": {"status": "OK", "items": {
+                "gainers": {"status": "OK", "rows": [{"name": "삼성전자", "price": 70000, "changeRate": 4.2}]},
+            }}, "investorFlow": {"status": "OK", "periods": {"DAY": []}},
+        }
+        report["reportContract"]["kiwoomCandidates"]["stocks"][0]["conditionResult"] = True
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("70,000원", output)
+            self.assertIn("조건검색 충족", output)
+            self.assertNotIn("005930", output)
 
     def test_kiwoom_krx_provenance_stays_internal(self):
         report = report_fixture()
@@ -223,8 +238,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["v2"]["themes"] = []
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
-        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", html_lib.unescape(html))
-        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", markdown)
+        self.assertIn("추가 관찰 원천 검증 대기", html_lib.unescape(html))
+        self.assertIn("추가 관찰 원천 검증 대기", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
@@ -459,7 +474,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("30,300원", output)
             self.assertIn("27,952원", output)
             self.assertIn("28,420원", output)
-            self.assertIn("조건판정 자료 없음", output)
+            self.assertIn("조건검색 결과 미게시", output)
             self.assertNotIn("003490", output)
 
     def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):
@@ -502,17 +517,17 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
         html = html_lib.unescape(render_dashboard_html(report))
-        self.assertIn("검증 중인 후보 판정 보류 — 원천 검증 대기", html)
+        self.assertIn("추가 관찰 원천 검증 대기", html)
         self.assertNotIn("91.20", html)
         self.assertNotIn("SK하이닉스(000660)", html)
 
-    def test_samsung_interest_card_is_present_even_when_values_are_unavailable(self):
+    def test_missing_interest_projection_does_not_recreate_a_historical_stock(self):
         report = report_fixture()
         report["reportContract"].pop("registeredUniverse", None)
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
         for text in (html, markdown):
-            self.assertIn("삼성전자", text)
+            self.assertIn("등록 관심종목 자료 없음", text)
             self.assertNotIn("005930", text)
 
     def test_rendered_views_use_kst_and_hide_lineage_metadata(self):
