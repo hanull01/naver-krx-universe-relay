@@ -66,6 +66,50 @@ class DailyReportTests(unittest.TestCase):
             daily_report.validated_research_for_report({**payload, "sourceGeneration": None}, "2026-10-29")["status"],
             "UNAVAILABLE",
         )
+        self.assertEqual(
+            daily_report.validated_research_for_report(
+                {**payload, "sourceGeneration": None}, "2026-10-29"
+            )["unavailableReason"],
+            "RESEARCH_GENERATION_MISSING",
+        )
+        self.assertEqual(
+            daily_report.validated_research_for_report(None, "2026-10-29")["unavailableReason"],
+            "RESEARCH_SOURCE_MISSING",
+        )
+
+    def test_unavailable_research_does_not_fake_coverage_or_block_report(self):
+        report = {
+            "coverage": {"enabledStockCount": 1, "researchStockCount": 0},
+            "sources": {"researchIntelligence": {
+                "status": "UNAVAILABLE",
+                "unavailableReason": "RESEARCH_DATE_MISMATCH",
+            }},
+        }
+        got = daily_report.validate_research_coverage(report)
+        self.assertTrue(got["ok"])
+        self.assertFalse(got["blocking"])
+        self.assertEqual(got["status"], "OPTIONAL_RESEARCH_UNAVAILABLE")
+        self.assertEqual(got["actual"], 0)
+        self.assertEqual(got["reason"], "RESEARCH_DATE_MISMATCH")
+
+    def test_research_coverage_one_of_one_passes(self):
+        report = {
+            "coverage": {"enabledStockCount": 1, "researchStockCount": 1},
+            "sources": {"researchIntelligence": {"status": "OK"}},
+        }
+        got = daily_report.validate_research_coverage(report)
+        self.assertTrue(got["ok"])
+        self.assertEqual(got["status"], "OK")
+
+    def test_available_but_incomplete_research_blocks(self):
+        report = {
+            "coverage": {"enabledStockCount": 1, "researchStockCount": 0},
+            "sources": {"researchIntelligence": {"status": "OK"}},
+        }
+        got = daily_report.validate_research_coverage(report)
+        self.assertFalse(got["ok"])
+        self.assertTrue(got["blocking"])
+        self.assertEqual(got["status"], "RESEARCH_COVERAGE_MISMATCH")
 
     def test_current_group_source_requires_same_date_and_generation(self):
         industries = {
