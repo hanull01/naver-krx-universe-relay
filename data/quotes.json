@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-06T14:30:58.786093+09:00",
-  "collectionStartedAt": "2026-11-06T14:30:57.779946+09:00",
+  "generatedAt": "2026-11-06T15:30:57.782722+09:00",
+  "collectionStartedAt": "2026-11-06T15:30:56.656861+09:00",
   "source": "NAVER_KRX",
   "count": 1,
   "expectedCount": 1,
@@ -13,24 +13,24 @@
   "fresh": true,
   "errors": [],
   "missingCodes": [],
-  "sourceTime": "2026-11-06T14:30:58.704110+09:00",
-  "sourceTimeLatest": "2026-11-06T14:30:58.704110+09:00",
+  "sourceTime": "2026-11-06T15:30:00+09:00",
+  "sourceTimeLatest": "2026-11-06T15:30:00+09:00",
   "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
   "datas": [
     {
       "itemCode": "005930",
       "stockName": "삼성전자",
-      "closePrice": 190350,
-      "compareToPreviousClosePrice": -11150,
-      "fluctuationsRatio": -5.53,
+      "closePrice": 188700,
+      "compareToPreviousClosePrice": -12800,
+      "fluctuationsRatio": -6.35,
       "openPrice": 180000,
       "highPrice": 196500,
       "lowPrice": 179200,
-      "accumulatedTradingVolume": 28962124,
-      "accumulatedTradingValue": 5460601000000,
+      "accumulatedTradingVolume": 33651356,
+      "accumulatedTradingValue": 6350026000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-06T14:30:58.704110+09:00",
-      "localTradedAt": "2026-11-06T14:30:58.704110+09:00",
+      "sourceTime": "2026-11-06T15:30:00+09:00",
+      "localTradedAt": "2026-11-06T15:30:00+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -41,15 +41,15 @@
       "marketSessionType": "regularMarket",
       "overMarketPriceInfo": {
         "tradingSessionType": "REGULAR_MARKET",
-        "overPrice": "190,300",
-        "localTradedAt": "2026-11-06T14:30:58.704128+09:00"
+        "overPrice": "188,000",
+        "localTradedAt": "2026-11-06T15:20:00.000000+09:00"
       },
-      "ageSeconds": 0,
+      "ageSeconds": 58,
       "fresh": true,
       "status": "ok",
-      "freshnessReason": "krx_regular_live",
-      "session": "REGULAR",
-      "priceBasis": "KRX_REGULAR"
+      "freshnessReason": "krx_close_hold",
+      "session": "REGULAR_CLOSED",
+      "priceBasis": "KRX_CLOSE_HOLD"
     }
   ]
 }
