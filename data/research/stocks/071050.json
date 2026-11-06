@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "071050",
   "itemName": "한국금융지주",
-  "reportCount": 23,
-  "latestReportNid": "97612",
-  "latestWriteDate": "2026-11-04",
+  "reportCount": 26,
+  "latestReportNid": "97814",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97612",
-    "writeDate": "2026-11-04",
-    "brokerName": "대신증권",
-    "title": "업황에 장사 없음",
-    "goalPrice": 200000,
+    "nid": "97814",
+    "writeDate": "2026-11-06",
+    "brokerName": "하나증권",
+    "title": "3Q26 Re - 비우호적 시장 환경에 따른 실적 부진",
+    "goalPrice": 249000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 3
+        "positive": 5,
+        "negative": 13
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "금리": 1
       }
     }
   },
   "reportNids": [
+    "97814",
+    "97758",
+    "97757",
     "97612",
     "96669",
     "96081",

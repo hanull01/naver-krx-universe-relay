@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "018670",
   "itemName": "SK가스",
-  "reportCount": 10,
-  "latestReportNid": "97722",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 11,
+  "latestReportNid": "97759",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97722",
-    "writeDate": "2026-11-05",
-    "brokerName": "하나증권",
-    "title": "순이익 대폭 증가. 기말 DPS 상향",
-    "goalPrice": 365000,
+    "nid": "97759",
+    "writeDate": "2026-11-06",
+    "brokerName": "iM증권",
+    "title": "석이조 기회가 될 수 있는 LPG 하락 LNG 강세",
+    "goalPrice": 330000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 3,
-        "negative": 2
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "topics": {
+        "가격": 1
+      }
     }
   },
   "reportNids": [
+    "97759",
     "97722",
     "96796",
     "96747",

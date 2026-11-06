@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "253450",
   "itemName": "스튜디오드래곤",
-  "reportCount": 17,
-  "latestReportNid": "96760",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 20,
+  "latestReportNid": "97815",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "96760",
-    "writeDate": "2026-10-15",
-    "brokerName": "삼성증권",
-    "title": "수익의 밀도를 높이다",
-    "goalPrice": 30500,
+    "nid": "97815",
+    "writeDate": "2026-11-06",
+    "brokerName": "하나증권",
+    "title": "이제 숨 좀 쉰다",
+    "goalPrice": 33000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 2
+        "positive": 6,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1,
-        "원가": 1,
-        "자동차": 1
+        "AI": 1
       }
     }
   },
   "reportNids": [
+    "97815",
+    "97797",
+    "97784",
     "96760",
     "96592",
     "96483",

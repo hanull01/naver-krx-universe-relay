@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "086280",
   "itemName": "현대글로비스",
-  "reportCount": 26,
-  "latestReportNid": "97614",
-  "latestWriteDate": "2026-11-04",
+  "reportCount": 27,
+  "latestReportNid": "97789",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97614",
-    "writeDate": "2026-11-04",
-    "brokerName": "대신증권",
-    "title": "3분기 PCC 운임 강세 check",
+    "nid": "97789",
+    "writeDate": "2026-11-06",
+    "brokerName": "신한투자증권",
+    "title": "NDR 후기: 물 들어올 때 노 젓자",
     "goalPrice": 320000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 2
+        "positive": 3,
+        "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "원가": 1,
+        "자동차": 1,
         "중국": 1
       }
     }
   },
   "reportNids": [
+    "97789",
     "97614",
     "97533",
     "97503",

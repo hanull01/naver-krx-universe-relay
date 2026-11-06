@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "078930",
   "itemName": "GS",
-  "reportCount": 2,
-  "latestReportNid": "95471",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 3,
+  "latestReportNid": "97769",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "95471",
-    "writeDate": "2026-08-12",
+    "nid": "97769",
+    "writeDate": "2026-11-06",
     "brokerName": "유진투자증권",
-    "title": "땅, 물, 전력을 다 가진 AIDC 성장주",
-    "goalPrice": 138000,
+    "title": "AIDC, 한국으로 풍선효과 기대",
+    "goalPrice": 113000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 3
+        "positive": 6,
+        "negative": 10
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 6,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "AI": 7,
-        "자동차": 2,
-        "재고": 2
+        "재고": 6,
+        "미국": 3,
+        "환율": 3,
+        "AI": 2,
+        "자동차": 2
       }
     }
   },
   "reportNids": [
+    "97769",
     "95471",
     "92905"
   ]

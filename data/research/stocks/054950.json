@@ -2,36 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "054950",
   "itemName": "제이브이엠",
-  "reportCount": 8,
-  "latestReportNid": "97464",
-  "latestWriteDate": "2026-11-02",
+  "reportCount": 9,
+  "latestReportNid": "97775",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97464",
-    "writeDate": "2026-11-02",
-    "brokerName": "유안타증권",
-    "title": "3Q26 Review",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97775",
+    "writeDate": "2026-11-06",
+    "brokerName": "신한투자증권",
+    "title": "NDR후기: 과점기업의 수출 성장",
+    "goalPrice": 34000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 1
+        "positive": 3,
+        "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "미국": 2,
-        "환율": 2,
-        "로봇": 1,
-        "수요": 1,
-        "자동차": 1,
-        "중국": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "97775",
     "97464",
     "96996",
     "95958",

@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "251270",
   "itemName": "넷마블",
-  "reportCount": 22,
-  "latestReportNid": "97282",
-  "latestWriteDate": "2026-10-30",
+  "reportCount": 26,
+  "latestReportNid": "97821",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97282",
-    "writeDate": "2026-10-30",
-    "brokerName": "키움증권",
-    "title": "전략에 대한 강화 필요",
-    "goalPrice": 40000,
-    "normalizedOpinion": "OUTPERFORM",
+    "nid": "97821",
+    "writeDate": "2026-11-06",
+    "brokerName": "하나증권",
+    "title": "시간이 필요하다",
+    "goalPrice": 42000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 2
+        "positive": 1,
+        "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "97821",
+    "97794",
+    "97763",
+    "97740",
     "97282",
     "96949",
     "96832",

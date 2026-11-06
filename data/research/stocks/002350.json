@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "002350",
   "itemName": "넥센타이어",
-  "reportCount": 18,
-  "latestReportNid": "97713",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 19,
+  "latestReportNid": "97779",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97713",
-    "writeDate": "2026-11-05",
-    "brokerName": "하나증권",
-    "title": "회복은 늦어졌지만, 가격은 이미 반영",
-    "goalPrice": 7700,
+    "nid": "97779",
+    "writeDate": "2026-11-06",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Review: 고원가 압력 지속",
+    "goalPrice": 7500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 7,
-        "negative": 6
+        "negative": 12
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 1,
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 5,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원가": 7,
-        "가격": 5,
-        "중국": 3,
-        "환율": 2
+        "가격": 7,
+        "환율": 4,
+        "수요": 3,
+        "원가": 2,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97779",
     "97713",
     "97698",
     "97692",

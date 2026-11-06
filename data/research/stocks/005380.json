@@ -2,36 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "005380",
   "itemName": "현대차",
-  "reportCount": 59,
-  "latestReportNid": "97375",
-  "latestWriteDate": "2026-10-30",
+  "reportCount": 60,
+  "latestReportNid": "97805",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97375",
-    "writeDate": "2026-10-30",
-    "brokerName": "하나증권",
-    "title": "4분기 판매 반등, 로보틱스는 실행 국면 진입",
-    "goalPrice": 480000,
-    "normalizedOpinion": "BUY",
+    "nid": "97805",
+    "writeDate": "2026-11-06",
+    "brokerName": "유진투자증권",
+    "title": "NDR 후기: 로보틱스에서 본업으로 초점 이동",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
         "positive": 7,
-        "negative": 13
+        "negative": 6
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 4,
+        "자동차": 6,
+        "수요": 5,
+        "중국": 3,
         "환율": 3,
-        "로봇": 1,
-        "수요": 1,
-        "원가": 1,
-        "파업": 1
+        "미국": 2,
+        "원가": 2,
+        "로봇": 1
       }
     }
   },
   "reportNids": [
+    "97805",
     "97375",
     "97357",
     "97343",

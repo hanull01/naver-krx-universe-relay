@@ -2,29 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "035720",
   "itemName": "카카오",
-  "reportCount": 31,
-  "latestReportNid": "96658",
-  "latestWriteDate": "2026-10-13",
+  "reportCount": 39,
+  "latestReportNid": "97801",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "96658",
-    "writeDate": "2026-10-13",
-    "brokerName": "대신증권",
-    "title": "광고 성장 숨 고르기, AI 전략 확인이 관건",
-    "goalPrice": 47000,
+    "nid": "97801",
+    "writeDate": "2026-11-06",
+    "brokerName": "교보증권",
+    "title": "목표 달성을 위한 선결 과제",
+    "goalPrice": 51000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 9,
         "negative": 2
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 2,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 8,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "97801",
+    "97793",
+    "97791",
+    "97782",
+    "97762",
+    "97752",
+    "97741",
+    "97726",
     "96658",
     "96463",
     "96236",

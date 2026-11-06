@@ -2,34 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "010780",
   "itemName": "아이에스동서",
-  "reportCount": 3,
-  "latestReportNid": "95643",
-  "latestWriteDate": "2026-08-14",
+  "reportCount": 4,
+  "latestReportNid": "97731",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "95643",
-    "writeDate": "2026-08-14",
-    "brokerName": "하나증권",
-    "title": "아쉬운 지식산업센터, 긍정적인 콘크리트",
-    "goalPrice": 30000,
-    "normalizedOpinion": "BUY",
+    "nid": "97731",
+    "writeDate": "2026-11-06",
+    "brokerName": "서울평가정보",
+    "title": "주택·복합시설 개발과 콘크리트 구조재 제조기술 기반의 종합 건설·환경기업",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 1,
+        "negative": 0
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "원가": 2,
-        "가격": 1,
-        "배터리": 1,
-        "수요": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "97731",
     "95643",
     "93227",
     "92930"

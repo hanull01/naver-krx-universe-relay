@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "089860",
   "itemName": "롯데렌탈",
-  "reportCount": 18,
-  "latestReportNid": "97071",
-  "latestWriteDate": "2026-10-27",
+  "reportCount": 20,
+  "latestReportNid": "97820",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97071",
-    "writeDate": "2026-10-27",
-    "brokerName": "대신증권",
-    "title": "새로운 출발은 좋다! 3Q 실적 호조!",
-    "goalPrice": 60000,
+    "nid": "97820",
+    "writeDate": "2026-11-06",
+    "brokerName": "하나증권",
+    "title": "3Q26 Re: 바닥을 찍은 중고차 시장",
+    "goalPrice": 57000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 9,
+        "negative": 3
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "earningsPositiveSignalCount": 8,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "수요": 1
+      }
     }
   },
   "reportNids": [
+    "97820",
+    "97792",
     "97071",
     "97037",
     "96976",

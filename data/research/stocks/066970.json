@@ -2,35 +2,39 @@
   "schemaVersion": 1,
   "itemCode": "066970",
   "itemName": "엘앤에프",
-  "reportCount": 16,
-  "latestReportNid": "97007",
-  "latestWriteDate": "2026-10-23",
+  "reportCount": 20,
+  "latestReportNid": "97812",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97007",
-    "writeDate": "2026-10-23",
-    "brokerName": "하나증권",
-    "title": "환율 및 광물 가격 하락으로 인한 적자",
-    "goalPrice": 140000,
+    "nid": "97812",
+    "writeDate": "2026-11-06",
+    "brokerName": "DS투자증권",
+    "title": "일회성 적자보다 LFP 수주 100GWh에 주목",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 1,
-        "negative": 6
+        "negative": 9
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "재고": 3,
+        "환율": 4,
+        "수요": 3,
         "가격": 2,
-        "환율": 2,
-        "수요": 1,
-        "원가": 1
+        "재고": 2,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97812",
+    "97799",
+    "97786",
+    "97755",
     "97007",
     "96231",
     "95244",

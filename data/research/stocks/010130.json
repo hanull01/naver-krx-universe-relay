@@ -2,34 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "010130",
   "itemName": "고려아연",
-  "reportCount": 8,
-  "latestReportNid": "96839",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 11,
+  "latestReportNid": "97787",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "96839",
-    "writeDate": "2026-10-19",
+    "nid": "97787",
+    "writeDate": "2026-11-06",
     "brokerName": "한화투자증권",
-    "title": "3Q26 Preview: 3분기 저점 통과 중",
-    "goalPrice": 1400000,
+    "title": "3Q26 Review: 은 가격과 환율이 동시에 낮춘 이익",
+    "goalPrice": 1270000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 0,
-        "negative": 4
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 5,
-        "환율": 4,
-        "원가": 3,
+        "가격": 4,
+        "재고": 2,
+        "환율": 2,
+        "원가": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97787",
+    "97774",
+    "97766",
     "96839",
     "95433",
     "95233",

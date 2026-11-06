@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "028670",
   "itemName": "팬오션",
-  "reportCount": 29,
-  "latestReportNid": "97550",
-  "latestWriteDate": "2026-11-03",
+  "reportCount": 30,
+  "latestReportNid": "97796",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "97550",
-    "writeDate": "2026-11-03",
-    "brokerName": "하나증권",
-    "title": "3Q26 Re: Energy & Beyond",
-    "goalPrice": 9000,
+    "nid": "97796",
+    "writeDate": "2026-11-06",
+    "brokerName": "대신증권",
+    "title": "탱커 벌크 호시황",
+    "goalPrice": 10000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 2,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
+        "원가": 4,
         "조선": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "97796",
     "97550",
     "97542",
     "97538",
