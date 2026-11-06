@@ -51,18 +51,15 @@ def _stock(row: Mapping[str, Any], *, investor: bool = False) -> dict[str, Any]:
         "changeRate": _number(row.get("changeRate") if "changeRate" in row else row.get("prevChangeRate")),
     }
     if investor:
-        explicit_amount = "amount" in row
-        source_field = row.get("accTradeAmountSourceField") or (
-            "amount" if explicit_amount else "accTradeAmount"
-        )
+        source_field = row.get("accTradeAmountSourceField") or "accTradeAmount"
         source_status = row.get("accTradeAmountSourceStatus")
-        amount = _number(row.get("amount") if explicit_amount else row.get("accTradeAmount"))
+        amount = _number(row.get("accTradeAmount"))
         result.update({
             "volume": _number(row.get("accTradeVolume")),
             "from": row.get("bizdateFrom"),
             "to": row.get("bizdateTo"),
         })
-        if (explicit_amount or source_field in row) and amount is not None:
+        if "accTradeAmount" in row and amount is not None and source_status != "UNAVAILABLE":
             result["amount"] = amount
             result["amountStatus"] = "SOURCE_ZERO" if amount == 0 else "AVAILABLE"
             result["amountSourceField"] = source_field

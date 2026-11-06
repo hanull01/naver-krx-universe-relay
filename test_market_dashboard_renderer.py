@@ -143,6 +143,21 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("123백만원", text)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
+    def test_kiwoom_krx_provenance_stays_internal(self):
+        report = report_fixture()
+        report["reportContract"]["kiwoomCandidates"]["technicalProvenance"] = {
+            "generationId": "gen_internal",
+            "targetDate": "20261029",
+            "sourcePath": "data/technicals.json",
+            "sourceSha256": "a" * 64,
+            "receiptStatus": "VERIFIED",
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for marker in ("gen_internal", "data/technicals.json", "technicalProvenance", "receiptStatus"):
+            self.assertNotIn(marker, html)
+            self.assertNotIn(marker, markdown)
+
     def test_ambiguous_zero_investor_amount_is_not_rendered_as_zero(self):
         report = report_fixture()
         report["reportContract"]["marketSnapshot"] = {

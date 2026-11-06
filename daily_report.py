@@ -557,15 +557,33 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
     rows are projected from that same generation without legacy fallback.
     """
     if staging_input_dir is None:
+        technicals_payload = load_json(TECHNICALS_PATH)
+        states_payload = load_json(STATES_PATH)
         return {
             "mode": "DEFAULT",
-            "technicals": load_json(TECHNICALS_PATH),
-            "states": load_json(STATES_PATH),
+            "technicals": technicals_payload,
+            "states": states_payload,
             "groupStates": load_json(GROUP_STATES_PATH) if GROUP_STATES_PATH.exists() else {},
             "analysisTechnicals": None,
             "analysisStates": None,
             "derivedProjection": None,
-            "metadata": {"mode": "DEFAULT", "fallbackUsed": False},
+            "metadata": {
+                "mode": "DEFAULT", "fallbackUsed": False,
+                "historicalIndicatorSource": technicals_payload.get("historicalIndicatorSource") or technicals_payload.get("source"),
+                "sourceGeneration": technicals_payload.get("generationId") or technicals_payload.get("sourceGeneration"),
+                "targetDate": technicals_payload.get("targetDate") or technicals_payload.get("asOfDate"),
+                "historicalLineage": {
+                    "generationId": technicals_payload.get("generationId") or technicals_payload.get("sourceGeneration"),
+                    "targetDate": technicals_payload.get("targetDate") or technicals_payload.get("asOfDate"),
+                    "receiptStatus": technicals_payload.get("receiptStatus", "UNAVAILABLE"),
+                    "status": "VERIFIED" if technicals_payload.get("receiptStatus") == "VERIFIED" else "UNAVAILABLE",
+                },
+                "sourcePath": "data/technicals.json",
+                "manifestSha256": technicals_payload.get("manifestSha256"),
+                "monitoringSha256": technicals_payload.get("monitoringSha256"),
+                "receiptStatus": technicals_payload.get("receiptStatus", "UNAVAILABLE"),
+                "publicationAuthorized": technicals_payload.get("publicationAuthorized"),
+            },
         }
 
     root = Path(staging_input_dir)
@@ -637,6 +655,7 @@ def load_report_technical_inputs(staging_input_dir=None, current_snapshot=None):
             else "STAGING_SOURCE_DEFINED"
         ),
         "fallbackUsed": False,
+        "sourcePath": str(root / "technicals.json"),
     }
     resolution_path = root / "krx-resolution.json"
     if resolution_path.exists():
@@ -2038,6 +2057,17 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         **quotes,
         "datas": list(quotes.get("datas") or []) + supplemental_quotes["datas"],
     }
+    krx_lineage = technical_inputs["metadata"].get("historicalLineage") or {}
+    krx_source = {
+        "status": krx_lineage.get("status") or ("VERIFIED" if technical_inputs["metadata"].get("receiptStatus") == "VERIFIED" else "UNAVAILABLE"),
+        "generationId": krx_lineage.get("generationId") or technical_inputs["metadata"].get("sourceGeneration"),
+        "targetDate": krx_lineage.get("targetDate") or technical_inputs["metadata"].get("targetDate"),
+        "sourcePath": technical_inputs["metadata"].get("sourcePath") or "staging/technicals.json",
+        "manifestSha256": technical_inputs["metadata"].get("manifestSha256"),
+        "sourceSha256": technical_inputs["metadata"].get("monitoringSha256"),
+        "receiptStatus": krx_lineage.get("receiptStatus") or technical_inputs["metadata"].get("receiptStatus", "UNAVAILABLE"),
+        "publicationAuthorized": technical_inputs["metadata"].get("publicationAuthorized"),
+    }
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes,
         analysis_technicals, analysis_states,
@@ -2045,6 +2075,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         name_lookup=discovery_name_lookup,
         historical_technicals=analysis_technicals,
         historical_states=analysis_states,
+        krx_source=krx_source,
     )
     leader_by_code = {
         str(row.get("code")): row for row in full_market.get("leaders", [])

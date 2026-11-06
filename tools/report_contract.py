@@ -1503,6 +1503,7 @@ def build_report_contract(
             "sourceValidation": source_validation if isinstance(source_validation, Mapping) else None,
             "sourceCandidateCount": kiwoom_candidates.get("candidateCount"),
             "performanceStatus": compact_kiwoom_performance.get("status"),
+            "technicalProvenance": kiwoom_candidates.get("technicalProvenance"),
         },
         "kiwoomPerformance": compact_kiwoom_performance,
         "rendering": {

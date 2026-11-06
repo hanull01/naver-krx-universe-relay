@@ -148,7 +148,7 @@ class TradingDiscoveryTests(unittest.TestCase):
             finally:
                 td.DISCOVERY_DIR = original
 
-    def test_analysis_reuses_core_then_full_market_and_isolates_missing(self):
+    def test_analysis_keeps_current_quote_but_blocks_non_krx_technical_fallback(self):
         discovery = td.published_payload(snapshot(["005930", "035420", "999999"]))
         quotes = {"datas": [{"itemCode": "005930", "stockName": "삼성전자", "closePrice": 100,
                               "fluctuationsRatio": 1, "accumulatedTradingVolume": 10,
@@ -160,7 +160,9 @@ class TradingDiscoveryTests(unittest.TestCase):
                                  "breakout_20_intraday": True}]}
         result = td.analyze("2026-10-12", discovery, quotes, technicals, states, signals)
         self.assertEqual([row["source"] for row in result["stocks"]],
-                         ["MONITORED_UNIVERSE", "FULL_MARKET_SIGNAL", None])
+                         ["MONITORED_UNIVERSE", None, None])
+        self.assertIsNone(result["stocks"][1]["price"])
+        self.assertEqual(result["stocks"][1]["technicalStatus"], "UNAVAILABLE")
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
@@ -176,7 +178,7 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertIsNone(row["price"])
         self.assertEqual(row["dataStatus"], "UNAVAILABLE")
 
-    def test_final_baseline_replaces_stale_after_quote_and_leaves_etf_unavailable(self):
+    def test_legacy_final_baseline_does_not_supply_krx_candidate_metrics(self):
         discovery = td.published_payload(snapshot(["051910", "0197X0"]))
         stale_rows = [{
             "itemCode": code, "stockName": code, "closePrice": price,
@@ -197,16 +199,24 @@ class TradingDiscoveryTests(unittest.TestCase):
         result = td.analyze("2026-10-12", discovery, {"datas": stale_rows}, {}, {},
                             final_baseline=baseline)
         stock, etf = result["stocks"]
-        self.assertEqual(stock["source"], "FULL_MARKET_FINAL")
-        self.assertEqual(stock["price"], 282500)
-        self.assertEqual(stock["priceSourceDate"], "2026-10-09")
-        self.assertEqual(stock["priceBasis"], "VERIFIED_FULL_MARKET_FINAL")
-        self.assertEqual(stock["priceStatus"], "AVAILABLE")
-        self.assertEqual(stock["technicalStatus"], "AVAILABLE")
-        self.assertEqual(stock["analysisStatus"], "PARTIAL")
+        self.assertIsNone(stock["price"])
+        self.assertIsNone(stock["selectionPrice"])
+        self.assertEqual(stock["technicalStatus"], "UNAVAILABLE")
+        self.assertEqual(stock["analysisStatus"], "UNAVAILABLE")
         self.assertEqual(etf["dataStatus"], "UNAVAILABLE")
         self.assertEqual(etf["rejectedQuoteReason"], "STALE_OR_UNVERIFIED_QUOTE")
         self.assertIsNone(etf["price"])
+
+    def test_krx_provenance_is_recorded_and_generation_mismatch_stays_unavailable(self):
+        discovery = td.published_payload(snapshot(["005930"]))
+        technicals = {"generationId": "g1", "targetDate": "20261009", "datas": [{"itemCode": "005930", "ma5": 1, "ma20": 2, "ma60": 3}]}
+        states = {"generationId": "g1", "targetDate": "20261009", "datas": [{"itemCode": "005930", "state": {"breakout20": "confirmed"}}]}
+        source = {"status": "VERIFIED", "generationId": "g2", "targetDate": "20261009", "sourcePath": "data/technicals.json", "manifestSha256": "a" * 64, "receiptStatus": "VERIFIED"}
+        result = td.analyze("2026-10-12", discovery, {}, technicals, states, full_market_signals={"stocks": [{"code": "005930", "ma20": 99}]}, krx_source=source)
+        row = result["stocks"][0]
+        self.assertEqual(result["technicalProvenance"]["status"], "UNAVAILABLE")
+        self.assertIsNone(row["ma20"])
+        self.assertEqual(row["unavailableReason"], "KRX_GENERATION_OR_DATE_MISMATCH")
 
     def test_invalid_or_wrong_date_final_baseline_is_not_used(self):
         discovery = td.published_payload(snapshot(["051910"]))
@@ -218,7 +228,7 @@ class TradingDiscoveryTests(unittest.TestCase):
                          "lastClose": 282500, "closeValid": True, "ohlcValid": True}],
         }
         result = td.analyze("2026-10-12", discovery, {}, {}, {}, final_baseline=baseline)
-        self.assertEqual(result["finalBaseline"]["status"], "INVALID")
+        self.assertEqual(result["finalBaseline"]["status"], "UNAVAILABLE")
         self.assertEqual(result["stocks"][0]["dataStatus"], "UNAVAILABLE")
 
     def test_previous_report_change(self):
