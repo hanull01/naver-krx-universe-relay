@@ -301,6 +301,11 @@ class ReportContractTests(unittest.TestCase):
         kiwoom = {
             **discovery,
             "candidateCount": 3,
+            "technicalProvenance": {
+                "status": "VERIFIED", "generationId": "gen_20261028",
+                "targetDate": "20261028", "sourcePath": "data/technicals.json",
+                "sourceSha256": "b" * 64, "receiptStatus": "VERIFIED",
+            },
             "stocks": [
                 {"itemCode": "042510", "itemName": "라온시큐어"},
                 {"itemCode": "064400", "itemName": "LG씨엔에스"},
@@ -320,6 +325,7 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["technicalCandidates"][0]["itemCode"], "028050")
         self.assertEqual(contract["kiwoomCandidates"]["symbols"], discovery["symbols"])
+        self.assertEqual(contract["kiwoomCandidates"]["technicalProvenance"]["generationId"], "gen_20261028")
         self.assertEqual(validate_kiwoom_candidate_binding(discovery, contract), [])
 
     def test_kiwoom_candidate_outside_source_fails_binding(self):

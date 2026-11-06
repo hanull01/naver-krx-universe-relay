@@ -292,11 +292,45 @@ def _payload_generation(payload):
 
 
 def _krx_payloads_aligned(technicals, states, expected_date):
-    dates = [_payload_date(value) for value in (technicals, states) if _payload_date(value)]
-    generations = [_payload_generation(value) for value in (technicals, states) if _payload_generation(value)]
-    if dates and any(value != expected_date for value in dates):
+    dates = [_payload_date(value) for value in (technicals, states)]
+    generations = [_payload_generation(value) for value in (technicals, states)]
+    if any(value is None or value != expected_date for value in dates):
         return False
-    return not generations or len(set(generations)) == 1
+    if any(value in (None, "") for value in generations):
+        return False
+    return len(set(generations)) == 1
+
+
+def _krx_source_status(source, technicals, states, expected_date):
+    """Validate the KRX generation lineage without accepting a legacy fallback."""
+    generation = _payload_generation(technicals)
+    state_generation = _payload_generation(states)
+    source = source if isinstance(source, dict) else {}
+    source_generation = source.get("generationId") or source.get("sourceGeneration")
+    source_date = str(source.get("targetDate") or "").replace("-", "") or None
+    source_sha = source.get("sourceSha256") or source.get("manifestSha256")
+    receipt = str(source.get("receiptStatus") or "UNAVAILABLE").upper()
+    publication_authorized = source.get("publicationAuthorized")
+    metadata_valid = (
+        (not source or source.get("status") == "VERIFIED")
+        and (not source_generation or source_generation == generation == state_generation)
+        and (not source_date or source_date == expected_date)
+        and (not source or bool(source.get("sourcePath")))
+        and (not source or bool(source_sha))
+        and (not source or receipt == "VERIFIED")
+        and (not source or publication_authorized in (None, True))
+    )
+    aligned = metadata_valid and _krx_payloads_aligned(technicals, states, expected_date)
+    return {
+        "status": "VERIFIED" if aligned else "UNAVAILABLE",
+        "reason": "VERIFIED_KRX_GENERATION" if aligned else "KRX_GENERATION_OR_DATE_MISMATCH",
+        "generationId": generation if aligned else source_generation,
+        "targetDate": expected_date if aligned else source_date,
+        "sourcePath": source.get("sourcePath"),
+        "sourceSha256": source_sha,
+        "receiptStatus": receipt,
+        "publicationAuthorized": publication_authorized,
+    }
 
 
 def krx_selection_baseline(discovery, technicals, states):
@@ -336,58 +370,35 @@ def krx_selection_baseline(discovery, technicals, states):
             "generationId": generation, "stocks": rows}
 
 
-def verified_final_baseline(discovery, baseline):
-    """Return immutable stock closes only from the selected-day FINAL baseline."""
-    if not isinstance(baseline, dict):
-        return {"status": "UNAVAILABLE", "reason": "FINAL_BASELINE_MISSING", "stocks": []}
-    selection_date = str(discovery.get("selectionDate") or "")
-    expected_date = selection_date.replace("-", "")
-    diagnostics = baseline.get("refreshDiagnostics") or {}
-    if (baseline.get("asOfDate") != expected_date
-            or baseline.get("historyStatus") != "OK"
-            or baseline.get("count") != baseline.get("authoritativeCount")
-            or baseline.get("coveragePct") != 100.0
-            or diagnostics.get("missingCodes") or diagnostics.get("extraCodes")):
-        return {"status": "INVALID", "reason": "FINAL_BASELINE_CONTRACT_INVALID", "stocks": []}
-    rows = []
-    for row in baseline.get("stocks") or []:
-        if (not isinstance(row, dict) or row.get("lastTradingDate") != expected_date
-                or row.get("closeValid") is not True or row.get("ohlcValid") is not True
-                or not isinstance(row.get("lastClose"), (int, float))
-                or isinstance(row.get("lastClose"), bool)):
-            continue
-        rows.append({
-            **row, "sourceDate": selection_date,
-            "priceBasis": "VERIFIED_FULL_MARKET_FINAL",
-        })
-    return {"status": "AVAILABLE", "sourceDate": selection_date, "stocks": rows}
-
-
 def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
             previous=None, final_baseline=None, name_lookup=None,
-            historical_technicals=None, historical_states=None):
+            historical_technicals=None, historical_states=None, krx_source=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
     qidx = _index(quotes)
     source_technicals = historical_technicals if historical_technicals is not None else technicals
     source_states = historical_states if historical_states is not None else states
     expected_selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
-    aligned = _krx_payloads_aligned(source_technicals, source_states, expected_selection_date)
+    # Candidate analysis is KRX-generation-only.  ``final_baseline`` and
+    # full-market signals remain separate report inputs and are never a
+    # substitute for the selected KRX generation.
+    krx_mode = True
+    krx_status = _krx_source_status(
+        krx_source, source_technicals, source_states, expected_selection_date
+    ) if krx_mode else None
+    aligned = krx_status["status"] == "VERIFIED" if krx_mode else _krx_payloads_aligned(
+        source_technicals, source_states, expected_selection_date
+    )
     tidx = _index(source_technicals) if aligned else {}
     sidx = _index(source_states) if aligned else {}
-    fidx = _index(full_market_signals or {})
-    baseline = (
-        krx_selection_baseline(discovery, source_technicals, source_states)
-        if historical_technicals is not None or historical_states is not None
-        else verified_final_baseline(discovery, final_baseline)
-    )
+    baseline = krx_selection_baseline(discovery, source_technicals, source_states)
     bidx = _index(baseline)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     rows = []
     for raw_code in discovery["symbols"]:
         code = normalize_item_code(raw_code)
-        quote, technical, state, signal = qidx.get(code), tidx.get(code), sidx.get(code), fidx.get(code)
+        quote, technical, state = qidx.get(code), tidx.get(code), sidx.get(code)
         identity_quote = quote
         rejected_quote = bool(quote and quote.get("_discoveryAdditionalLookup")
                               and (quote.get("status") not in (None, "ok")
@@ -395,8 +406,8 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         if rejected_quote:
             quote = None
         final = bidx.get(code)
-        market = quote or final or signal or {}
-        technical = technical or final or signal or {}
+        market = quote or {}
+        technical = technical or {}
         state = state or {}
         current = state.get("current") if isinstance(state.get("current"), dict) else state
         row = {
@@ -417,12 +428,12 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "ma5": technical.get("ma5"),
             "ma20": technical.get("ma20"),
             "ma60": technical.get("ma60"),
-            "volumeRatio20": technical.get("volumeRatio20", signal.get("current_volume_ratio_20") if signal else None),
-            "breakout20": current.get("breakout20", signal.get("breakout_20_intraday") if signal else None),
+            "volumeRatio20": technical.get("volumeRatio20"),
+            "breakout20": current.get("breakout20"),
             "pullbackState": current.get("pullbackState"),
             "selectionPrice": final.get("lastClose") if final else None,
             "selectionDate": final.get("sourceDate") if final else expected_selection_date,
-            "conditionStatus": "UNAVAILABLE",
+            "conditionStatus": current.get("conditionStatus") or state.get("conditionStatus") or "UNAVAILABLE",
             "nextCheck": "다음 관찰에서 현재값과 조건 충족 여부를 확인",
             "technicalMetrics": {
                 key: technical.get(key)
@@ -431,17 +442,19 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             },
             "technicalSourceDate": expected_selection_date if technical else None,
             "technicalGenerationId": _payload_generation(source_technicals) if technical else None,
+            "technicalReceiptStatus": krx_status.get("receiptStatus") if krx_status else None,
             "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
                        else "MONITORED_UNIVERSE" if quote
-                       else "FULL_MARKET_FINAL" if final
-                       else "FULL_MARKET_SIGNAL" if signal else None),
+                       else None),
             "priceSourceDate": final.get("sourceDate") if final and not quote else None,
             "priceSourceTime": market.get("sourceTime"),
             "priceBasis": market.get("priceBasis"),
             "rejectedQuoteReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
             "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
-                                  if rejected_quote and not final and not signal else None),
+                                  if rejected_quote and not final else None),
         }
+        if krx_mode:
+            row["unavailableReason"] = None if aligned and technical else krx_status["reason"]
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
         row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
         row["priceStatus"] = "AVAILABLE" if row["price"] is not None else "UNAVAILABLE"
@@ -466,6 +479,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         "missingCount": len(rows) - available - partial, "stocks": rows,
         "metrics": {"vwap": "UNAVAILABLE", "intradayHighLow": "UNAVAILABLE"},
         "finalBaseline": {key: baseline.get(key) for key in ("status", "reason", "sourceDate") if baseline.get(key) is not None},
+        "technicalProvenance": krx_status,
     }
 
 

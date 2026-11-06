@@ -58,7 +58,7 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
     def test_explicit_zero_investor_amount_remains_a_verified_zero(self):
         entry = {
             "investorType": "FOREIGNER", "periodType": "DAY", "status": "OK",
-            "buy": [stock(amount=0)], "sell": [],
+            "buy": [stock(accTradeAmount=0)], "sell": [],
         }
         payload = build_projection(
             rankings={"status": "OK", "rankings": []},
@@ -79,6 +79,17 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
         row = payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]
         self.assertEqual(row["amount"], 0)
         self.assertEqual(row["amountStatus"], "SOURCE_ZERO")
+
+    def test_generic_amount_is_not_used_without_naver_acc_trade_amount(self):
+        entry = {"investorType": "INSTITUTION", "periodType": "DAY", "status": "OK",
+                 "buy": [stock(amount=123456000)], "sell": []}
+        payload = build_projection(
+            rankings={"status": "OK", "rankings": []}, investor_flow={"status": "OK", "investors": [entry]},
+            industries={"status": "OK", "industries": []}, membership={"status": "OK"},
+        )
+        row = payload["investorFlow"]["periods"]["DAY"][0]["buy"][0]
+        self.assertNotIn("amount", row)
+        self.assertEqual(row["amountStatus"], "SOURCE_UNAVAILABLE")
 
     def test_stale_investor_artifact_is_not_used_for_report_date(self):
         payload = build_projection(
