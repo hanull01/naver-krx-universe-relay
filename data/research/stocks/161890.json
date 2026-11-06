@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "161890",
   "itemName": "한국콜마",
-  "reportCount": 31,
-  "latestReportNid": "96893",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 32,
+  "latestReportNid": "97826",
+  "latestWriteDate": "2026-11-06",
   "latest": {
-    "nid": "96893",
-    "writeDate": "2026-10-21",
-    "brokerName": "신한투자증권",
-    "title": "변함없는 성장세",
-    "goalPrice": 153000,
+    "nid": "97826",
+    "writeDate": "2026-11-06",
+    "brokerName": "한화투자증권",
+    "title": "계절성을 넘어선 수요",
+    "goalPrice": 160000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 5,
-        "negative": 0
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "중국": 2,
         "미국": 1,
-        "수요": 1,
-        "중국": 1
+        "수주": 1,
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "97826",
     "96893",
     "96704",
     "96630",
