@@ -29,7 +29,7 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
             self.assertNotIn("<pre", html_text.lower())
             self.assertNotIn("2026년 10월 28일 · 11:08 KST", html_lib.unescape(html_text))
             self.assertNotIn("2,205/2,767", html_lib.unescape(html_text))
-            for token in ("삼성전자", "키움 후보"):
+            for token in ("삼성E&A", "키움 후보"):
                 self.assertIn(token, html_lib.unescape(html_text))
                 self.assertIn(token, markdown_text)
             self.assertNotIn("005930", html_lib.unescape(html_text))

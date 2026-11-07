@@ -28,11 +28,13 @@ SNAPSHOT_KEYS = {
     "source_group", "group_id", "synced_at", "candidate_count", "symbols",
     "source_sha256", "validation",
 }
+SNAPSHOT_OPTIONAL_KEYS = {"candidate_details", "publisher_version"}
 PUBLISHED_KEYS = {
     "schemaVersion", "status", "monitoringDate", "selectionDate", "source",
     "sourceGroup", "groupId", "syncedAt", "candidateCount", "symbols",
     "sourceSha256", "validation",
 }
+PUBLISHED_OPTIONAL_KEYS = {"candidateDetails", "publisherVersion"}
 SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
 KST = ZoneInfo("Asia/Seoul")
 SOURCE_CONTRACTS = {
@@ -99,7 +101,10 @@ def validate_date_relation(payload, calendar_path):
 
 
 def validate_snapshot(payload, calendar_path=None):
-    if not isinstance(payload, dict) or set(payload) != SNAPSHOT_KEYS or payload.get("schema_version") != 1:
+    if (not isinstance(payload, dict)
+            or not SNAPSHOT_KEYS.issubset(payload)
+            or set(payload) - SNAPSHOT_KEYS - SNAPSHOT_OPTIONAL_KEYS
+            or payload.get("schema_version") != 1):
         raise DiscoveryError("SNAPSHOT_SCHEMA_INVALID")
     if contains_sensitive_key(payload):
         raise DiscoveryError("SNAPSHOT_SENSITIVE_DATA_REJECTED")
@@ -133,6 +138,13 @@ def validate_snapshot(payload, calendar_path=None):
         raise DiscoveryError("SNAPSHOT_HASH_INVALID")
     if payload["source_sha256"] != source_hash(payload):
         raise DiscoveryError("SNAPSHOT_HASH_MISMATCH")
+    details = payload.get("candidate_details")
+    if details is not None:
+        if not isinstance(details, list) or len(details) != len(symbols):
+            raise DiscoveryError("SNAPSHOT_DETAILS_INVALID")
+        detail_codes = [row.get("symbol") for row in details if isinstance(row, dict)]
+        if detail_codes != symbols or any(not isinstance(row, dict) for row in details):
+            raise DiscoveryError("SNAPSHOT_DETAILS_SYMBOL_MISMATCH")
     if calendar_path is not None:
         validate_date_relation(payload, calendar_path)
     return payload
@@ -140,7 +152,7 @@ def validate_snapshot(payload, calendar_path=None):
 
 def published_payload(snapshot, calendar_path=None):
     validate_snapshot(snapshot, calendar_path)
-    return {
+    payload = {
         "schemaVersion": 1,
         "status": snapshot["status"],
         "monitoringDate": snapshot["monitoring_date"],
@@ -158,6 +170,11 @@ def published_payload(snapshot, calendar_path=None):
             "immutable": True,
         },
     }
+    if "candidate_details" in snapshot:
+        payload["candidateDetails"] = snapshot["candidate_details"]
+    if snapshot.get("publisher_version"):
+        payload["publisherVersion"] = snapshot["publisher_version"]
+    return payload
 
 
 def atomic_json(path, payload):
@@ -224,7 +241,10 @@ def discovery_status(as_of, path=None):
         return with_source({"status": "UNAVAILABLE", "reason": "SNAPSHOT_MISSING", "candidateCount": 0, "symbols": []})
     except (OSError, ValueError, json.JSONDecodeError):
         return with_source({"status": "INVALID", "reason": "SNAPSHOT_UNREADABLE", "candidateCount": 0, "symbols": []})
-    if set(payload) != PUBLISHED_KEYS or payload.get("schemaVersion") != 1 or contains_sensitive_key(payload):
+    if (not PUBLISHED_KEYS.issubset(payload)
+            or set(payload) - PUBLISHED_KEYS - PUBLISHED_OPTIONAL_KEYS
+            or payload.get("schemaVersion") != 1
+            or contains_sensitive_key(payload)):
         return with_source({"status": "INVALID", "reason": "SNAPSHOT_SCHEMA_INVALID", "candidateCount": 0, "symbols": []})
     symbols = payload.get("symbols")
     if (not isinstance(symbols, list) or len(symbols) != len(set(symbols))
@@ -240,6 +260,12 @@ def discovery_status(as_of, path=None):
     }
     if payload.get("sourceSha256") != source_hash(material):
         return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_HASH_MISMATCH"})
+    details = payload.get("candidateDetails")
+    if details is not None:
+        if (not isinstance(details, list) or len(details) != len(symbols)
+                or any(not isinstance(row, dict) or row.get("symbol") != code
+                       for row, code in zip(details, symbols))):
+            return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_DETAILS_INVALID"})
     expected = "AVAILABLE" if symbols else "AVAILABLE_EMPTY"
     if payload.get("status") != expected or payload.get("validation", {}).get("status") != "VALID":
         return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_VALIDATION_INVALID"})
@@ -395,6 +421,11 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     bidx = _index(baseline)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
+    candidate_details = {
+        str(row.get("symbol")): row
+        for row in (discovery.get("candidateDetails") or [])
+        if isinstance(row, dict) and row.get("symbol")
+    }
     rows = []
     for raw_code in discovery["symbols"]:
         code = normalize_item_code(raw_code)
@@ -453,6 +484,15 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
                                   if rejected_quote and not final else None),
         }
+        detail = candidate_details.get(code) or {}
+        row.update({
+            "conditionName": detail.get("conditionName"),
+            "conditionSequence": detail.get("conditionSequence"),
+            "conditionResult": detail.get("conditionResult"),
+            "conditionDiscoveredAt": detail.get("discoveredAt"),
+            "conditionSourceValues": detail.get("sourceValues") or {},
+            "conditionSourceValueStatus": detail.get("sourceValueStatus") or "NOT_PROVIDED",
+        })
         if krx_mode:
             row["unavailableReason"] = None if aligned and technical else krx_status["reason"]
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]

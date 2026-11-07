@@ -104,6 +104,22 @@ class MarketSnapshotProjectionTests(unittest.TestCase):
         self.assertEqual(checked["investorFlow"]["status"], "STALE_ARTIFACT")
         self.assertEqual(checked["investorFlow"]["periods"], {})
 
+    def test_foreign_and_institution_dates_are_kept_separate(self):
+        payload = build_projection(
+            rankings={"status": "OK", "rankings": []},
+            investor_flow={"status": "OK", "investors": [
+                {"investorType": "FOREIGNER", "periodType": "DAY", "status": "OK",
+                 "buy": [stock(accTradeAmount=100, bizdateFrom="20261105", bizdateTo="20261105")], "sell": []},
+                {"investorType": "INSTITUTION", "periodType": "DAY", "status": "OK",
+                 "buy": [stock(accTradeAmount=200, bizdateFrom="20261104", bizdateTo="20261104")], "sell": []},
+            ]},
+            industries={"status": "OK", "industries": []}, membership={"status": "OK"},
+        )
+        checked = validate_for_report(payload, "20261105")
+        day = checked["investorFlow"]["periods"]["DAY"]
+        self.assertEqual(day[0]["status"], "OK")
+        self.assertEqual(day[1]["status"], "DATE_MISMATCH")
+
     def test_failed_source_is_unavailable_and_not_silent_success(self):
         payload = build_projection(
             rankings={"status": "ERROR"},

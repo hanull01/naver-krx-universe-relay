@@ -94,12 +94,19 @@ def _ranking_projection(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _flow_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+    rows = [row for row in (entry.get("buy") or []) + (entry.get("sell") or []) if isinstance(row, Mapping)]
     result = {
         "investorType": entry.get("investorType"),
         "periodType": entry.get("periodType"),
         "status": entry.get("status", "UNAVAILABLE"),
         "buy": [_stock(row, investor=True) for row in (entry.get("buy") or [])[:MAX_FLOW_ROWS] if isinstance(row, Mapping)],
         "sell": [_stock(row, investor=True) for row in (entry.get("sell") or [])[:MAX_FLOW_ROWS] if isinstance(row, Mapping)],
+        "sourceDates": sorted({
+            str(row.get(key)).replace("-", "")
+            for row in rows
+            for key in ("bizdateFrom", "bizdateTo", "from", "to")
+            if row.get(key) not in (None, "")
+        }),
     }
     if entry.get("error"):
         result["error"] = entry["error"]
@@ -201,21 +208,44 @@ def _source_dates(payload: Mapping[str, Any]) -> list[str]:
 
 
 def validate_for_report(payload: Mapping[str, Any], expected_date: Any) -> dict[str, Any]:
-    """Prevent an investor snapshot from crossing into a different report date."""
+    """Keep foreign/institution dates separate and never mix stale amounts."""
     result = copy.deepcopy(dict(payload))
     expected = str(expected_date or "").replace("-", "")[:8]
     flow = result.get("investorFlow")
     if not expected or not isinstance(flow, Mapping):
         return result
     dates = {str(value).replace("-", "") for value in flow.get("sourceDates", []) if value}
-    if dates and dates != {expected}:
+    entries = []
+    for entry in flow.get("periods", {}).get("DAY", []) or []:
+        if not isinstance(entry, Mapping):
+            continue
+        entry_copy = dict(entry)
+        entry_dates = {str(value).replace("-", "") for value in entry.get("sourceDates", []) if value}
+        if entry_dates and entry_dates != {expected}:
+            entry_copy["status"] = "DATE_MISMATCH"
+            entry_copy["reason"] = "INVESTOR_FLOW_DATE_MISMATCH"
+        entries.append(entry_copy)
+    mismatched = any(entry.get("status") == "DATE_MISMATCH" for entry in entries)
+    if mismatched and len(entries) > 1:
         result["status"] = "PARTIAL"
         result["investorFlow"] = {
             **dict(flow),
-            "status": "STALE_ARTIFACT",
+            "status": "DATE_MISMATCH",
             "sourceDates": sorted(dates),
-            "periods": {},
+            "periods": {**dict(flow.get("periods") or {}), "DAY": entries},
             "reason": "INVESTOR_FLOW_DATE_MISMATCH",
+        }
+    elif mismatched:
+        result["status"] = "PARTIAL"
+        result["investorFlow"] = {
+            **dict(flow), "status": "STALE_ARTIFACT", "sourceDates": sorted(dates),
+            "periods": {}, "reason": "INVESTOR_FLOW_DATE_MISMATCH",
+        }
+    elif dates and dates != {expected}:
+        result["status"] = "PARTIAL"
+        result["investorFlow"] = {
+            **dict(flow), "status": "STALE_ARTIFACT", "sourceDates": sorted(dates),
+            "periods": {}, "reason": "INVESTOR_FLOW_DATE_MISMATCH",
         }
     return result
 
