@@ -311,41 +311,6 @@ test("a publication commit from another workflow is not selected", async () => {
   assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
 });
 
-test("the Run provenance artifact directly supplies its publication SHA", async () => {
-  const now = new Date();
-  const run = { id: 112, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "artifact-run" };
-  const api = apiWith({ run });
-  const wrapped = async (path, init) => {
-    if (path.includes("/artifacts?")) return { artifacts: [{ name: "production-publication-112-artifactsha-true" }] };
-    if (path === `/repos/${repo}/commits/artifactsha`) return { files: [
-      { filename: "data/reports/latest.json" },
-      { filename: "data/reports/latest.md" },
-      { filename: "data/reports/latest.html" },
-    ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
-    return api(path, init);
-  };
-  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
-  assert.equal(result.publicationSha, "artifactsha");
-  assert.equal(result.publicationStatus, "PUBLISHED");
-});
-
-test("daily report publication is unverified when the official HTML is missing", async () => {
-  const now = new Date();
-  const run = { id: 113, event: "workflow_dispatch", created_at: new Date(now.getTime() - 1000).toISOString(), updated_at: now.toISOString(), status: "completed", conclusion: "success", head_sha: "missing-html" };
-  const api = apiWith({ run });
-  const wrapped = async (path, init) => {
-    if (path.includes("/artifacts?")) return { artifacts: [{ name: "production-publication-113-artifactsha-true" }] };
-    if (path === `/repos/${repo}/commits/artifactsha`) return { files: [
-      { filename: "data/reports/latest.json" },
-      { filename: "data/reports/latest.md" },
-    ], commit: { message: "Update daily market report", committer: { date: now.toISOString() } }, author: { login: "github-actions[bot]" } };
-    return api(path, init);
-  };
-  const result = await verifyRunCompletion(wrapped, repo, planForKey("daily-report"), run);
-  assert.equal(result.publicationStatus, "PUBLISH_UNVERIFIED");
-  assert.equal(result.deliveryStatus, "UNVERIFIED");
-});
-
 test("cron observation mode never dispatches", async () => {
   const scheduledTime = Date.now();
   const api = apiWith({ existing: { id: 106, event: "schedule", created_at: new Date(scheduledTime).toISOString(), head_sha: "obs" } });

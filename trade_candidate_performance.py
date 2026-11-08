@@ -18,7 +18,6 @@ from krx_market_day import CalendarUnavailable, krx_holidays
 
 KST = ZoneInfo("Asia/Seoul")
 ROOT = Path(__file__).resolve().parent
-REPORT_PATH = ROOT / "data" / "reports" / "latest.json"
 REPORT_CONTRACT_PATH = ROOT / "data" / "monitoring" / "latest-report-contract.json"
 CANDIDATE_ROOT = ROOT / "data" / "trade-candidates"
 PERFORMANCE_ROOT = ROOT / "data" / "trade-candidate-performance"
@@ -57,16 +56,12 @@ def next_krx_trading_day(candidate_date, holiday_loader=krx_holidays):
 
 def build_candidate_snapshot(report):
     contract = report.get("reportContract") if isinstance(report, dict) else None
-    if isinstance(contract, dict):
-        source = contract.get("technicalCandidates")
-        source_status = contract.get("status")
-        source_path = "data/monitoring/latest-report-contract.json#technicalCandidates"
-        report_as_of = contract.get("asOf")
-    else:
-        source = report.get("nextSessionCandidates") if isinstance(report, dict) else None
-        source_status = source.get("status") if isinstance(source, dict) else None
-        source_path = "data/reports/latest.json#nextSessionCandidates"
-        report_as_of = report.get("asOf") if isinstance(report, dict) else None
+    if not isinstance(contract, dict):
+        raise ValueError("canonical report contract is required")
+    source = contract.get("technicalCandidates")
+    source_status = contract.get("status")
+    source_path = "data/monitoring/latest-report-contract.json#technicalCandidates"
+    report_as_of = contract.get("asOf")
 
     if isinstance(source, list):
         priority = source
@@ -363,8 +358,6 @@ def main(argv=None):
     if args.snapshot_report:
         source = load_json(args.snapshot_report)
         contract_path = args.snapshot_contract
-        if contract_path is None and args.snapshot_report.resolve() == REPORT_PATH.resolve():
-            contract_path = REPORT_CONTRACT_PATH
         if contract_path is not None and contract_path.exists():
             source = {"reportContract": load_json(contract_path)}
         snapshot = persist_candidate_snapshot(source, args.candidate_root)

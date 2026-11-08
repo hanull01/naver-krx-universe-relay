@@ -1384,7 +1384,7 @@ def build_report_contract(
             "htmlReport": "data/reports/latest.html",
             "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
             "technicalCandidates": {
-                "path": "data/reports/latest.json#nextSessionCandidates",
+                "path": "data/monitoring/latest-report-contract.json#technicalCandidates",
                 "count": len(technical_candidates),
                 "included": len(compact_technical_candidates),
             },

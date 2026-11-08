@@ -39,7 +39,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
         })
         return payload
 
-    def build(self, discovery_path, previous_path):
+    def build(self, discovery_path):
         # Keep these date-based integration tests independent from the mutable
         # production snapshots in data/.  The fixture preserves the published
         # rows but pins the quote contract to the report's fixed trading date.
@@ -70,7 +70,6 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                 TECHNICALS_PATH=technical_fixture,
                 STATES_PATH=state_fixture,
                 TRADING_DISCOVERY_PATH=discovery_path,
-                PREVIOUS_REPORT_PATH=previous_path,
                 TRADING_DISCOVERY_QUOTES_PATH=Path(str(discovery_path) + ".quotes"),
             ):
                 return daily_report.build_report("2026-10-08")
@@ -80,14 +79,14 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_missing_corrupt_stale_and_empty_do_not_change_core_report(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
-            missing = self.build(discovery, previous)
+            root = Path(directory); discovery = root / "latest.json"
+            missing = self.build(discovery)
             discovery.write_text("{broken", encoding="utf-8")
-            corrupt = self.build(discovery, previous)
+            corrupt = self.build(discovery)
             discovery.write_text(json.dumps(self.published(monitoring="2026-10-07")), encoding="utf-8")
-            stale = self.build(discovery, previous)
+            stale = self.build(discovery)
             discovery.write_text(json.dumps(self.published([])), encoding="utf-8")
-            empty = self.build(discovery, previous)
+            empty = self.build(discovery)
             baseline = self.core(missing)
             self.assertEqual(self.core(corrupt), baseline)
             self.assertEqual(self.core(stale), baseline)
@@ -99,9 +98,9 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_partial_candidate_data_does_not_degrade_report(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             discovery.write_text(json.dumps(self.published(["005930", "999999"])), encoding="utf-8")
-            report = self.build(discovery, previous)
+            report = self.build(discovery)
             self.assertEqual(report["status"], "PARTIAL")
             section = report["kiwoomPreviousCandidates"]
             self.assertEqual(section["status"], "AVAILABLE")
@@ -110,10 +109,10 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_kiwoom_contract_keeps_exact_published_symbols(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             symbols = ["042510", "064400", "253590"]
             discovery.write_text(json.dumps(self.published(symbols)), encoding="utf-8")
-            report = self.build(discovery, previous)
+            report = self.build(discovery)
             contract = report["reportContract"]["kiwoomCandidates"]
             self.assertEqual(contract["symbols"], symbols)
             self.assertEqual(
@@ -125,7 +124,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_opt_in_lookup_requests_only_candidates_missing_from_both_sources(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             discovery.write_text(json.dumps(self.published(["005930", "035420", "999999"])), encoding="utf-8")
             signals = root / "signals.json"
             signals.write_text(json.dumps({"stocks": [{"code": "035420", "currentPrice": 1}]}), encoding="utf-8")
@@ -136,7 +135,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                                     "fluctuationsRatio": 1, "accumulatedTradingVolume": 2,
                                     "accumulatedTradingValue": 20}]}
             with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
-                                PREVIOUS_REPORT_PATH=previous, FULL_MARKET_SIGNALS_PATH=signals):
+                                FULL_MARKET_SIGNALS_PATH=signals):
                 report = daily_report.build_report(
                     "2026-10-08", fetch_discovery_missing=True,
                     discovery_quote_fetcher=fetcher,
@@ -150,12 +149,12 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_lookup_failure_is_section_local(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             discovery.write_text(json.dumps(self.published(["999999"])), encoding="utf-8")
             def fail(_codes):
                 raise OSError("offline")
             with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
-                                PREVIOUS_REPORT_PATH=previous):
+                                ):
                 report = daily_report.build_report(
                     "2026-10-08", fetch_discovery_missing=True,
                     discovery_quote_fetcher=fail,
@@ -169,7 +168,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_published_supplemental_quote_is_reused_without_network(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             supplemental = root / "supplemental.json"; quotes = root / "quotes.json"
             market_source_time = "2026-10-08T10:00:00+09:00"
             self.core_quotes(quotes, market_source_time)
@@ -192,7 +191,6 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             }
             supplemental.write_text(json.dumps(payload), encoding="utf-8")
             with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
-                                PREVIOUS_REPORT_PATH=previous,
                                 TRADING_DISCOVERY_QUOTES_PATH=supplemental,
                                 QUOTES_PATH=quotes):
                 report = daily_report.build_report("2026-10-08")
@@ -204,7 +202,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
 
     def test_published_supplemental_quote_with_different_market_time_is_stale(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); discovery = root / "latest.json"; previous = root / "previous.json"
+            root = Path(directory); discovery = root / "latest.json"
             supplemental = root / "supplemental.json"; quotes = root / "quotes.json"
             self.core_quotes(quotes, "2026-10-08T10:00:00+09:00")
             published = self.published(["999999"])
@@ -219,7 +217,6 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             }
             supplemental.write_text(json.dumps(payload), encoding="utf-8")
             with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
-                                PREVIOUS_REPORT_PATH=previous,
                                 TRADING_DISCOVERY_QUOTES_PATH=supplemental,
                                 QUOTES_PATH=quotes):
                 report = daily_report.build_report("2026-10-08")

@@ -162,7 +162,6 @@ DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
 V2_SHADOW_HISTORY_PATH = DATA / "dynamic-universe" / "v2-shadow-history.json"
 V2_SHADOW_STATUS_PATH = DATA / "dynamic-universe" / "v2-shadow-run-status.json"
-PREVIOUS_REPORT_PATH = DATA / "reports" / "latest.json"
 FULL_MARKET_FILES = (
     "latest-breadth.json",
     "latest-stock-signals.json",
@@ -2020,11 +2019,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     session_context = build_preopen_session_context(
         report_date, indices, monitoring_baseline
     )
-    try:
-        previous_report = load_json(PREVIOUS_REPORT_PATH)
-        previous_discovery = previous_report.get("kiwoomPreviousCandidates", {})
-    except (OSError, ValueError, json.JSONDecodeError, AttributeError):
-        previous_discovery = {}
+    # Kiwoom candidates are sourced from the immutable trading-discovery
+    # artifact.  Do not depend on the retired report JSON history for prior
+    # report comparison.
+    previous_discovery = {}
     supplemental_quotes = {"datas": []}
     lookup = {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
     published_supplemental = trading_discovery.supplemental_quotes_status(
@@ -3084,11 +3082,6 @@ def main():
         default="data/reports",
     )
     parser.add_argument(
-        "--json-only",
-        action="store_true",
-        help="write only the dated/latest JSON history; do not create Markdown or HTML",
-    )
-    parser.add_argument(
         "--staging-input-dir",
         help=(
             "opt in to strict staged full-market technicals/states input; "
@@ -3106,33 +3099,22 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    latest_path = out_dir / "latest.json"
-    dated_json = out_dir / f"{report['asOf']}.json"
     dated_md = out_dir / f"{report['asOf']}.md"
     latest_md = out_dir / "latest.md"
 
-    payload = json.dumps(
-        report,
-        ensure_ascii=False,
-        indent=2,
-    ) + "\n"
-
-    latest_path.write_text(payload, encoding="utf-8")
-    dated_json.write_text(payload, encoding="utf-8")
-    html_status = "NOT_REQUESTED" if args.json_only else "TEMPLATE_UNAVAILABLE"
-    if not args.json_only:
-        write_markdown(report, dated_md)
-        # Work Markdown and HTML must be sibling views of the same report model.
-        write_work_markdown(report, latest_md)
-        try:
-            dated_html = out_dir / f"{report['asOf']}.html"
-            latest_html = out_dir / "latest.html"
-            html = render_dashboard_html(report)
-            dated_html.write_text(html, encoding="utf-8")
-            latest_html.write_text(html, encoding="utf-8")
-            html_status = "AVAILABLE"
-        except TemplateUnavailable as exc:
-            print(f"HTML_REPORT={exc}")
+    write_markdown(report, dated_md)
+    # Work Markdown and HTML remain sibling views of the same report model.
+    write_work_markdown(report, latest_md)
+    html_status = "TEMPLATE_UNAVAILABLE"
+    try:
+        dated_html = out_dir / f"{report['asOf']}.html"
+        latest_html = out_dir / "latest.html"
+        html = render_dashboard_html(report)
+        dated_html.write_text(html, encoding="utf-8")
+        latest_html.write_text(html, encoding="utf-8")
+        html_status = "AVAILABLE"
+    except TemplateUnavailable as exc:
+        print(f"HTML_REPORT={exc}")
 
     print(
         json.dumps(
@@ -3146,7 +3128,7 @@ def main():
                 "rankingEligibleCount": report[
                     "researchSummary"
                 ]["rankingEligibleCount"],
-                "output": str(latest_path),
+                "output": str(latest_md),
                 "htmlStatus": html_status,
             },
             ensure_ascii=False,

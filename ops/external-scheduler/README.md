@@ -16,13 +16,12 @@
 - Run 생성 확인과 Run 완료 확인은 분리한다. 60초 안에 완료되지 않아도 Run ID와 HEAD를 `RUN_STARTED`로 보존하고, 후속 조회에서 완료·게시를 검증한다.
 - 게시 커밋은 workflow가 제공한 `production_commit_sha`를 우선 사용하고, 해당 SHA의 커밋 메시지·자동화 주체·허용 경로·Run 구간을 모두 검증한다. Run 출력에 SHA가 없으면 `PUBLISH_UNVERIFIED`로 남긴다. 단순 시간 범위의 임의 커밋은 게시 증거로 사용하지 않는다.
 - 현재 GitHub Actions의 `production_commit_sha`는 step output이므로 Run API의 일반 응답에 자동 노출된다고 가정하지 않는다. 별도 Run 출력·artifact·API 연결이 없으면 Worker는 보수적으로 게시를 미확인 처리한다.
-- `refresh.yml`과 `daily-report.yml`의 `generated-data-write` concurrency가 저장소 수준의 동시 게시를 직렬화한다. Worker는 슬롯별 사전 Run 확인과 Durable Object claim으로 외부 중복을 차단한다.
+- `generated-data-write` concurrency가 저장소 수준의 동시 게시를 직렬화한다. Worker는 슬롯별 사전 Run 확인과 Durable Object claim으로 외부 중복을 차단한다.
 - `wrangler.toml`에는 배포에 필요한 Cron 목록, `SLOT_GATE` Durable Object 바인딩, `SlotGate` SQLite migration을 선언한다. 실제 Cron 활성화와 Secret 등록은 별도 승인 없이는 수행하지 않는다.
 - refresh는 KST 08:30~20:30 매시 30분에 하나의 공통 경로로 실행한다. 장전·장중·장후를 `run_mode`로 나누지 않으며, 별도 Snapshot·Schedule diagnostic 슬롯은 사용하지 않는다.
 - Research는 KST 07:20/12:20/19:20에만 별도 실행한다. 월요일 KST 이른 슬롯을 포함하도록 UTC 보정 슬롯을 만들고 Worker가 KST 토·일을 필터링한다.
 - Cloudflare Cron은 요일 표기가 `1=일요일`인 규칙을 사용하므로 `SUN-THU`, `MON-FRI`, `SUN-FRI` 명칭을 사용한다. GitHub Actions의 숫자 요일 표기와 혼동하지 않는다.
 - `production-publication-<runId>-<sha>-<changed>` artifact가 Run ID·게시 SHA·변경 여부를 연결한다. artifact가 없거나 SHA 검증이 실패하면 게시 성공으로 승격하지 않는다.
-- `daily-report.yml`은 하나의 보고서 모델에서 `data/reports/latest.json`, `data/reports/latest.md`, `data/reports/latest.html`을 함께 생성한다. Worker의 리포트 게시 검증은 세 파일이 같은 게시 커밋에 모두 포함될 때만 `PUBLISHED`로 기록한다.
 - 이 Worker는 GitHub 게시만 검증하며, 외부 Work의 실제 HTML 다운로드·첨부·사용은 확인하지 않는다. 해당 결과는 별도로 `UNVERIFIED`로 남긴다.
 
 ## 슬롯
@@ -32,6 +31,6 @@
 | 08:30~20:30 매시 30분 | Refresh market data | 없음 — 공통 경로 |
 | 07:20/12:20/19:20 | Research | 없음 |
 
-08:30~20:30 refresh는 NAVER 현재 스냅샷과 rankings·investor-flow·업종 자료를 수집한 뒤 compact report projection을 생성하고, 같은 실행의 리포트 contract와 Markdown·HTML에서 소비한다.
+08:30~20:30 refresh는 NAVER 현재 스냅샷과 rankings·investor-flow·업종 자료를 수집한 뒤 compact report projection을 생성하고, 같은 실행의 리포트 contract와 현재 관측 뷰에서 소비한다.
 
 실제 배포 전에는 동일 슬롯의 GitHub Run 존재 여부, 게시 SHA, Gmail 수신, Work 결과를 별도 시험해야 한다.

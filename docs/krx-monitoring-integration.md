@@ -107,7 +107,7 @@ means the KRX projection has not been promoted to a final generation, not that
 the current snapshot is stale. An older or mismatched NAVER observation keeps
 the alignment status `PARTIAL` and is not cleared by the source split.
 
-`marketTradingValue` is optional in the daily-report JSON contract. The M10
+`marketTradingValue` is optional in the report contract. The M10
 projection may explicitly report `UNAVAILABLE_M10_FIELD_MISSING`; this absence
 does not create `MARKET_TRADING_VALUE_SOURCE_DATE` evidence or change
 `dateAlignment`. No market-wide trading value or source date is synthesized or
@@ -133,7 +133,6 @@ KRX data sink.
 | Report path | Current input owner | KRX generation status | NAVER input retained |
 | --- | --- | --- | --- |
 | `daily_report.py` with `--staging-input-dir` | staged KRX technicals/states plus separate current snapshot | connected in isolated QA | current quotes, research, themes |
-| `daily-report.yml` | existing derived resolver unless staging input is explicitly supplied | not automatically connected | existing report paths |
 | `refresh.yml` / `run_full_market_monitoring.py` | NAVER current snapshot, baseline, industry/theme evidence | not connected to M10 | yes |
 | `refresh-monitoring-daily.yml` | NAVER daily rolling state and baseline | not connected to M10 | yes |
 | `refresh-market-snapshots.yml` | NAVER indices, market and membership snapshots | not connected to M10 | yes |
@@ -182,15 +181,10 @@ silently mixed into that resolver.
 
 ## Trigger status
 
-The current `daily-report.yml` has `workflow_dispatch` only; it has no fixed
-23:00 schedule. `backfill-derived.yml` publishes derived data only and no
-longer dispatches `daily-report.yml`. The independent 23:00 JSON-history
-owner remains outside the KRX 08:05 and derived-backfill paths. The
-un-deployed `ops/external-scheduler/worker.js` still contains the separate
-23:00 mapping; this branch does not activate or change that external
-scheduler. No KRX 08:05 → sync → full-report chain is active in this
-branch. The safe production sequence remains a future gated integration:
-verify the KRX generation, use an approved private transport, re-read and
-verify the receiver SHA, then invoke only the explicitly owned report stages.
-Until those gates are approved, the existing NAVER paths remain in place and
-are not deleted.
+The retired JSON-history workflow and external 23:00 plan are no longer
+publication owners. `refresh.yml` remains the owner of current observation,
+report contract, and Markdown/HTML views. `backfill-derived.yml` publishes
+derived data only and does not dispatch a report-history job. No KRX 08:05
+→ sync → report-history chain is active. The safe production sequence remains
+generation verification, approved private transport, receiver SHA readback,
+and only the explicitly owned report stages.
