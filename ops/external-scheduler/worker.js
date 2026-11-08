@@ -1,11 +1,6 @@
 const WORKFLOWS = {
   refresh: { workflow: "refresh.yml", publicationPaths: ["data/monitoring/latest-quality.json"], commitMessage: "Refresh NAVER market data" },
   backfill: { workflow: "backfill-derived.yml", publicationPaths: ["data/monitoring-derived"], commitMessagePrefix: "Publish full-market derived data " },
-  report: {
-    workflow: "daily-report.yml",
-    publicationPaths: ["data/reports/latest.json", "data/reports/latest.md", "data/reports/latest.html"],
-    commitMessage: "Update daily market report",
-  },
   research: { workflow: "refresh-research.yml", publicationPaths: ["data/research/latest.json"], commitMessage: "Update NAVER research intelligence" },
 };
 
@@ -31,7 +26,6 @@ export function planForKey(key) {
     "refresh-final": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
     "refresh-intraday": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
     "backfill-derived": { slot: "07:00", key, ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } },
-    "daily-report": { slot: "23:00", key, ...WORKFLOWS.report, inputs: {} },
     research: { slot: "research", key, ...WORKFLOWS.research, inputs: {} },
   };
   return plans[key] || null;

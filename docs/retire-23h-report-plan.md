@@ -1,14 +1,14 @@
-# 23시 사용자 보고서 폐지 검토 백로그
+# 23시 JSON history 폐지 기록
 
-현재 23시 Cloudflare 예약과 일별 JSON 생성·검증·게시 경로는 유지합니다.
-다만 23시 실행에서 사용자용 Markdown·HTML을 중복 생성·게시하지 않고,
-사용자 보고서는 기존 Work 예약이 담당합니다.
+23시 JSON history 생성·검증·게시 경로는 폐지했습니다.
+현재 observation과 사용자용 Markdown·HTML은 refresh/current-observation
+경로가 담당합니다.
 
-완전 폐지는 다음을 확인한 뒤 별도 작업으로 검토합니다.
+유지한 경계:
 
-- 일별 JSON과 전 거래일 비교 소비자가 다른 경로로 안전하게 전환됐는지
-- 08시 Work 장전 보고서가 최신 `reportContract`와 날짜별 후보 원천을 사용하는지
-- V1/V2 이력, FINAL/Baseline, 키움 조건검색 후보 추적이 23시 문서 산출물 없이 유지되는지
-- 자연 실행에서 JSON 게시와 Work 전달이 각각 성공하는지
+- KRX generation/CURRENT 및 derived staging
+- `latest-report-contract.json`과 current observation
+- Kiwoom trading-discovery artifact와 성과 추적
+- 별도 owner가 필요한 미래의 JSON history는 이 변경 범위 밖
 
-이 백로그는 Cloudflare 예약이나 운영 데이터 변경을 의미하지 않습니다.
+Cloudflare 예약과 운영 서비스는 이 변경에서 수정하지 않았습니다.

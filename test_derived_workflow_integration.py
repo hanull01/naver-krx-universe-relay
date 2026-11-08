@@ -6,16 +6,6 @@ ROOT = Path(__file__).resolve().parent
 
 
 class DerivedWorkflowIntegrationTests(unittest.TestCase):
-    def test_daily_report_passes_the_resolved_generation_to_staging_mode(self):
-        text = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
-        self.assertIn("Resolve report and derived generation", text)
-        self.assertIn("KRX_INPUT_UNAVAILABLE", text)
-        self.assertIn("KRX_INPUT_DIR", text)
-        self.assertNotIn('resolve_derived_input("data/monitoring-derived", as_of)', text)
-        self.assertIn("--staging-input-dir", text)
-        self.assertIn("steps.inputs.outputs.derived_dir", text)
-        self.assertIn("--json-only", text)
-
     def test_refresh_requires_krx_generation_before_intraday_collection(self):
         text = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
         self.assertIn("Validate KRX report input contract", text)
@@ -25,14 +15,11 @@ class DerivedWorkflowIntegrationTests(unittest.TestCase):
         self.assertIn("Intraday collection or derived technical validation failed", text)
         self.assertNotIn("data/daily/", text[text.index("- name: Collect NAVER data"):text.index("- name: Collect full-market monitoring evidence")])
 
-    def test_refresh_and_daily_report_select_the_same_resolved_generation(self):
+    def test_refresh_keeps_generation_resolution_on_the_current_observation_path(self):
         refresh = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
-        daily = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
         self.assertNotIn("source_mode", refresh)
         self.assertNotIn("legacy_naver", refresh)
-        self.assertIn("KRX_INPUT_DIR", daily)
-        self.assertIn("sourceGeneration", daily)
-        self.assertNotIn('resolve_derived_input("data/monitoring-derived", as_of)', daily)
+        self.assertIn("sourceGeneration", refresh)
 
     def test_legacy_fallback_is_not_enabled_by_staging_adapter(self):
         text = (ROOT / "daily_report.py").read_text(encoding="utf-8")

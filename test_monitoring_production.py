@@ -428,14 +428,12 @@ class MonitoringProductionTests(unittest.TestCase):
     def test_market_schedules_match_main_hourly_refresh_contract(self):
         refresh = (ROOT / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
         daily = (ROOT / ".github/workflows/refresh-daily.yml").read_text(encoding="utf-8")
-        report = (ROOT / ".github/workflows/daily-report.yml").read_text(encoding="utf-8")
         self.assertIn("id: market_snapshots", refresh)
         self.assertIn("python naver_market.py all", refresh)
         self.assertIn("python -m tools.market_snapshot_projection", refresh)
         self.assertFalse((ROOT / ".github/workflows/refresh-market-snapshots.yml").exists())
         self.assertNotIn('cron: "35 7 * * 1-5"', daily)
-        self.assertNotIn("\n  schedule:", report)
-        self.assertIn("\n  workflow_dispatch:", report)
+        self.assertFalse((ROOT / ".github/workflows/daily-report.yml").exists())
 
 
 if __name__ == "__main__":

@@ -49,9 +49,10 @@ class TradeCandidatePerformanceTests(unittest.TestCase):
         )
 
     def test_candidate_snapshot_is_immutable_and_idempotent(self):
-        report = {"generatedAt": "t", "nextSessionCandidates": {
-            "status": "AVAILABLE", "asOf": "2026-10-06", "candidateCount": 1,
-            "priority": [candidate()],
+        report = {"reportContract": {
+            "status": "AVAILABLE", "asOf": "2026-10-06",
+            "technicalCandidates": {"status": "AVAILABLE", "candidateCount": 1,
+                                    "priority": [candidate()]},
         }}
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -59,9 +60,13 @@ class TradeCandidatePerformanceTests(unittest.TestCase):
             second = subject.persist_candidate_snapshot(report, root)
             self.assertEqual(first, second)
             changed = deepcopy(report)
-            changed["nextSessionCandidates"]["priority"][0]["rank"] = 2
+            changed["reportContract"]["technicalCandidates"]["priority"][0]["rank"] = 2
             with self.assertRaisesRegex(ValueError, "immutable"):
                 subject.persist_candidate_snapshot(changed, root)
+
+    def test_report_json_without_contract_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "canonical report contract"):
+            subject.build_candidate_snapshot({"nextSessionCandidates": {"status": "AVAILABLE"}})
 
     def test_next_krx_trading_day_skips_weekend_and_holiday(self):
         loader = lambda year: {"2026-10-05", "2026-10-07"}

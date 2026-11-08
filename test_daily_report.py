@@ -1468,7 +1468,7 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["MARKET_QUIET_RESEARCH_LIMITED"]["count"], 1)
         self.assertEqual(got["INSUFFICIENT_DATA"]["count"], 1)
 
-    def test_json_only_writes_no_markdown_or_html(self):
+    def test_report_writer_does_not_create_json_history(self):
         report = {
             "asOf": "2026-10-16",
             "status": "OK",
@@ -1477,18 +1477,18 @@ class DailyReportTests(unittest.TestCase):
             "researchSummary": {"rankingEligibleCount": 0},
         }
         with tempfile.TemporaryDirectory() as directory:
-            with patch.object(daily_report, "build_report", return_value=report), patch(
-                "sys.argv",
-                ["daily_report.py", "--as-of", "2026-10-16", "--output-dir", directory, "--json-only"],
-            ):
+            with patch.object(daily_report, "build_report", return_value=report), \
+                 patch.object(daily_report, "write_markdown"), \
+                 patch.object(daily_report, "write_work_markdown"), \
+                 patch.object(daily_report, "render_dashboard_html", return_value="<html></html>"), patch(
+                     "sys.argv", ["daily_report.py", "--as-of", "2026-10-16", "--output-dir", directory]
+                 ):
                 daily_report.main()
             output = Path(directory)
-            self.assertTrue((output / "latest.json").exists())
-            self.assertTrue((output / "2026-10-16.json").exists())
-            self.assertFalse((output / "latest.md").exists())
-            self.assertFalse((output / "2026-10-16.md").exists())
-            self.assertFalse((output / "latest.html").exists())
-            self.assertFalse((output / "2026-10-16.html").exists())
+            self.assertFalse((output / "latest.json").exists())
+            self.assertFalse((output / "2026-10-16.json").exists())
+            self.assertTrue((output / "latest.html").exists())
+            self.assertTrue((output / "2026-10-16.html").exists())
 
 
 if __name__ == "__main__":
