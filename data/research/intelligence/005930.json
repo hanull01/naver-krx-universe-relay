@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "005930",
   "itemName": "삼성전자",
-  "asOf": "2026-11-06",
+  "asOf": "2026-11-09",
   "dateRange": {
     "from": "2026-03-30",
     "to": "2026-11-04"
@@ -12,102 +12,102 @@
   "brokerCount": 14,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-10-07",
-      "to": "2026-11-06",
-      "reportCount": 17,
+      "from": "2026-10-10",
+      "to": "2026-11-09",
+      "reportCount": 16,
       "brokerCount": 12,
       "targetPrice": {
-        "count": 15,
+        "count": 14,
         "min": 350000,
         "max": 690000,
-        "mean": 497333,
-        "median": 500000,
-        "stdev": 85046,
+        "mean": 491429,
+        "median": 490000,
+        "stdev": 85009,
         "range": 340000
       },
       "earningsDirection": {
-        "UP": 8,
         "UNKNOWN": 8,
-        "MIXED": 1
+        "MIXED": 1,
+        "UP": 7
       },
       "textSignal": {
-        "positive": 80,
+        "positive": 75,
         "negative": 40,
-        "net": 40,
-        "netPerReport": 2.353
+        "net": 35,
+        "netPerReport": 2.188
       },
       "topics": {
         "수요": {
-          "count": 10,
-          "perReport": 0.588
+          "count": 9,
+          "perReport": 0.562
         },
         "환율": {
           "count": 6,
-          "perReport": 0.353
+          "perReport": 0.375
         },
         "원가": {
           "count": 4,
-          "perReport": 0.235
-        },
-        "HBM": {
-          "count": 3,
-          "perReport": 0.176
+          "perReport": 0.25
         },
         "메모리": {
           "count": 3,
-          "perReport": 0.176
+          "perReport": 0.188
         },
         "DRAM": {
           "count": 2,
-          "perReport": 0.118
+          "perReport": 0.125
+        },
+        "HBM": {
+          "count": 2,
+          "perReport": 0.125
         },
         "AI": {
           "count": 2,
-          "perReport": 0.118
+          "perReport": 0.125
         },
         "메모리 가격": {
           "count": 1,
-          "perReport": 0.059
+          "perReport": 0.062
         },
         "주주환원": {
           "count": 1,
-          "perReport": 0.059
+          "perReport": 0.062
         }
       }
     },
     "previous": {
-      "from": "2026-09-07",
-      "to": "2026-10-06",
+      "from": "2026-09-10",
+      "to": "2026-10-09",
       "reportCount": 11,
-      "brokerCount": 10,
+      "brokerCount": 11,
       "targetPrice": {
         "count": 11,
         "min": 350000,
         "max": 630000,
-        "mean": 490909,
-        "median": 480000,
-        "stdev": 86493,
+        "mean": 507273,
+        "median": 500000,
+        "stdev": 84755,
         "range": 280000
       },
       "earningsDirection": {
-        "UNKNOWN": 4,
-        "UP": 4,
+        "UNKNOWN": 3,
+        "UP": 5,
         "MIXED": 3
       },
       "textSignal": {
-        "positive": 55,
-        "negative": 43,
-        "net": 12,
-        "netPerReport": 1.091
+        "positive": 57,
+        "negative": 40,
+        "net": 17,
+        "netPerReport": 1.545
       },
       "topics": {
-        "환율": {
-          "count": 8,
-          "perReport": 0.727
-        },
         "수요": {
-          "count": 6,
-          "perReport": 0.545
+          "count": 7,
+          "perReport": 0.636
+        },
+        "환율": {
+          "count": 7,
+          "perReport": 0.636
         },
         "HBM": {
           "count": 5,
@@ -147,56 +147,56 @@
       {
         "topic": "DRAM",
         "currentCount": 2,
-        "currentPerReport": 0.118,
+        "currentPerReport": 0.125,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.118,
+        "perReportDelta": 0.125,
         "ratio": null
       },
       {
         "topic": "주주환원",
         "currentCount": 1,
-        "currentPerReport": 0.059,
+        "currentPerReport": 0.062,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.059,
+        "perReportDelta": 0.062,
         "ratio": null
-      },
-      {
-        "topic": "수요",
-        "currentCount": 10,
-        "currentPerReport": 0.588,
-        "previousCount": 6,
-        "previousPerReport": 0.545,
-        "perReportDelta": 0.043,
-        "ratio": 1.08
       },
       {
         "topic": "메모리",
         "currentCount": 3,
-        "currentPerReport": 0.176,
+        "currentPerReport": 0.188,
         "previousCount": 2,
         "previousPerReport": 0.182,
-        "perReportDelta": -0.006,
-        "ratio": 0.97
-      },
-      {
-        "topic": "메모리 가격",
-        "currentCount": 1,
-        "currentPerReport": 0.059,
-        "previousCount": 1,
-        "previousPerReport": 0.091,
-        "perReportDelta": -0.032,
-        "ratio": 0.65
+        "perReportDelta": 0.006,
+        "ratio": 1.03
       },
       {
         "topic": "원가",
         "currentCount": 4,
-        "currentPerReport": 0.235,
+        "currentPerReport": 0.25,
         "previousCount": 3,
         "previousPerReport": 0.273,
-        "perReportDelta": -0.038,
-        "ratio": 0.86
+        "perReportDelta": -0.023,
+        "ratio": 0.92
+      },
+      {
+        "topic": "메모리 가격",
+        "currentCount": 1,
+        "currentPerReport": 0.062,
+        "previousCount": 1,
+        "previousPerReport": 0.091,
+        "perReportDelta": -0.029,
+        "ratio": 0.68
+      },
+      {
+        "topic": "수요",
+        "currentCount": 9,
+        "currentPerReport": 0.562,
+        "previousCount": 7,
+        "previousPerReport": 0.636,
+        "perReportDelta": -0.074,
+        "ratio": 0.88
       },
       {
         "topic": "파운드리",
@@ -210,11 +210,11 @@
       {
         "topic": "AI",
         "currentCount": 2,
-        "currentPerReport": 0.118,
+        "currentPerReport": 0.125,
         "previousCount": 3,
         "previousPerReport": 0.273,
-        "perReportDelta": -0.155,
-        "ratio": 0.43
+        "perReportDelta": -0.148,
+        "ratio": 0.46
       },
       {
         "topic": "사이클",
@@ -235,30 +235,30 @@
         "ratio": 0.0
       },
       {
-        "topic": "HBM",
-        "currentCount": 3,
-        "currentPerReport": 0.176,
-        "previousCount": 5,
-        "previousPerReport": 0.455,
-        "perReportDelta": -0.279,
-        "ratio": 0.39
-      },
-      {
         "topic": "환율",
         "currentCount": 6,
-        "currentPerReport": 0.353,
-        "previousCount": 8,
-        "previousPerReport": 0.727,
-        "perReportDelta": -0.374,
-        "ratio": 0.49
+        "currentPerReport": 0.375,
+        "previousCount": 7,
+        "previousPerReport": 0.636,
+        "perReportDelta": -0.261,
+        "ratio": 0.59
+      },
+      {
+        "topic": "HBM",
+        "currentCount": 2,
+        "currentPerReport": 0.125,
+        "previousCount": 5,
+        "previousPerReport": 0.455,
+        "perReportDelta": -0.33,
+        "ratio": 0.27
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 6,
-    "targetMeanChangePct": 1.31,
-    "targetMedianChangePct": 4.17,
-    "targetDispersionChangePct": -1.67
+    "reportCountChange": 5,
+    "targetMeanChangePct": -3.12,
+    "targetMedianChangePct": -2.0,
+    "targetDispersionChangePct": 0.3
   },
   "goalPriceRevisions": {
     "total": 31,
