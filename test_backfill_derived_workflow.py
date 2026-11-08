@@ -28,6 +28,9 @@ class BackfillDerivedWorkflowTests(unittest.TestCase):
         self.assertIn("inputs.publish == true && github.ref == 'refs/heads/main'", self.text)
 
     def test_safety_gates_and_no_report_generation(self):
+        self.assertNotIn("actions: write", self.text)
+        self.assertNotIn("gh workflow run daily-report.yml", self.text)
+        self.assertNotIn("Dispatch daily report after successful backfill", self.text)
         self.assertIn("FULL_MARKET_COLLECTION_ZERO_ROWS", self.text)
         self.assertIn("REPORT_CONTRACT_TOO_LARGE", self.text)
         self.assertIn("DERIVED_FALLBACK_USED", self.text)
