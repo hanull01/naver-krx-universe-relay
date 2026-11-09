@@ -12,6 +12,31 @@ from tools.report_contract import (
 
 
 class ReportContractTests(unittest.TestCase):
+    def test_current_breadth_and_krx_technical_market_are_separate(self):
+        generated = "2026-11-09T10:00:00+09:00"
+        current = {
+            "generatedAt": generated,
+            "breadth": {"TOTAL": {"stockCount": 2771, "advancers": 996, "decliners": 1541, "unchanged": 234}},
+            "fullMarket": {"tradingDate": "20261109", "qualityStatus": "WARNING", "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"]},
+        }
+        evidence = self.evidence("20261106")
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": [{"code": "KOSPI", "close": 3000, "sourceTime": generated}, {"code": "KOSDAQ", "close": 900, "sourceTime": generated}]},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261106", "tradingDateEvidence": evidence, "authoritativeCount": 3953, "markets": {"TOTAL": {"advancers": 611, "decliners": 3142, "unchanged": 200, "aboveMA20Count": 744, "aboveMA20EligibleCount": 3923, "pctAboveMA20": 18.96}}}},
+            breadth={"generatedAt": generated, "fullMarket": {}},
+            quality={"generatedAt": generated, "tradingDateEvidence": evidence, "observedDate": "20261109", "currentSnapshotGeneratedAt": generated, "currentSnapshotSource": "NAVER_SEPARATE", "collectionQualityStatus": "COMPLETE_RECONCILIATION_PENDING", "historicalIndicatorSource": "KRX", "historicalGenerationId": "gen_20261106_1794185533300691000", "historicalTargetDate": "20261106", "historicalReceiptStatus": "VERIFIED", "historicalLineageStatus": "VERIFIED", "historicalInstrumentCount": 3953},
+            industries={"generatedAt": generated, "industries": []}, themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []}, v2_history={"observations": []}, leaders={},
+            current_market_observation=current,
+            historical_technical_market={"breadth": {"advancers": 611, "decliners": 3142, "unchanged": 200}, "metrics": {"aboveMA20": {"count": 744, "eligibleCount": 3923, "pct": 18.96}}, "authoritativeCount": 3953},
+        )
+        self.assertEqual(contract["currentMarketObservation"]["totalCount"], 2771)
+        self.assertEqual(contract["currentMarketObservation"]["breadth"]["advancers"], 996)
+        self.assertEqual(contract["historicalTechnicalMarket"]["instrumentCount"], 3953)
+        self.assertEqual(contract["historicalTechnicalMarket"]["targetDate"], "20261106")
+        self.assertEqual(contract["historicalTechnicalMarket"]["generationId"], "gen_20261106_1794185533300691000")
+        self.assertEqual(contract["historicalTechnicalMarket"]["metrics"]["aboveMA20"]["count"], 744)
+
     def test_market_trading_value_is_not_a_required_render_field(self):
         self.assertNotIn(
             "fullMarket.marketTradingValue.KOSPI.value",

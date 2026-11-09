@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -241,7 +242,11 @@ def validated_group_source(payload, kind, report_date, peer_generated_at=None):
     key = "industries" if kind == "industry" else "themes"
     rows = payload.get(key) or []
     generated_at = payload.get("generatedAt")
-    observed_date = payload.get("tradingDate") or payload.get("asOf") or payload.get("sourceTradingDate")
+    observed_date = (
+        payload.get("tradingDate") or payload.get("asOf")
+        or payload.get("sourceTradingDate") or payload.get("sourceDate")
+        or payload.get("observationDate")
+    )
     if not observed_date and kind == "theme":
         for row in rows:
             for stock in (row.get("stocks") or []) if isinstance(row, dict) else []:
@@ -328,11 +333,15 @@ def date_alignment(
     """
     report_compact = compact_date(report_date)
     observed_compact = compact_date(observed_date)
+    historical_snapshot_date = compact_date(
+        full_market.get("snapshotDate") or full_market.get("asOfDate")
+    )
     separate_sources = (
         str(historical_source or "").upper() == "KRX"
         and str(current_snapshot_source or "").upper() == "NAVER_SEPARATE"
         and bool(observed_compact)
-        and observed_compact != report_compact
+        and bool(historical_snapshot_date)
+        and historical_snapshot_date != observed_compact
     )
     index_expected_date = observed_compact if separate_sources else report_compact
     full_market_available = full_market.get("status") == "AVAILABLE"
@@ -403,11 +412,15 @@ def date_alignment(
     for label, dates in observed.items():
         if label == "INDEX_SOURCE_DATE":
             continue
-        if dates and report_compact and any(date != report_compact for date in dates):
+        expected_date = historical_snapshot_date if separate_sources else report_compact
+        if dates and expected_date and any(date != expected_date for date in dates):
             result["mismatches"].append(f"REPORT_VS_{label}")
     present = [date for dates in observed.values() for date in dates]
-    if present and len(set(present)) > 1 and not separate_sources:
-        result["mismatches"].append("SOURCE_DATE_MISMATCH")
+    if present:
+        allowed_dates = ({observed_compact, historical_snapshot_date}
+                         if separate_sources else {report_compact})
+        if any(date not in allowed_dates for date in present):
+            result["mismatches"].append("SOURCE_DATE_MISMATCH")
     if result["fullMarketSnapshotDateStatus"] == "INCONSISTENT":
         result["mismatches"].append("FULL_MARKET_TRADING_DATE_INCONSISTENT")
     result["dateAlignmentMissingEvidence"] = list(result["missingEvidence"])
@@ -1824,13 +1837,25 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     published_quality = optional_json(MONITORING_PATH / "latest-quality.json", {})
     published_industries = optional_json(MONITORING_PATH / "latest-industries.json", {})
     published_themes = optional_json(MONITORING_PATH / "latest-theme-signals.json", {})
+    breadth_full_market = published_breadth.get("fullMarket") if isinstance(published_breadth, Mapping) else {}
+    breadth_full_market = breadth_full_market if isinstance(breadth_full_market, Mapping) else {}
+    current_observation_date = compact_date(
+        breadth_full_market.get("tradingDate")
+        or published_breadth.get("tradingDate")
+        or published_breadth.get("observationDate")
+        or published_breadth.get("sourceDate")
+        or published_quality.get("observationDate")
+        or published_quality.get("sourceDate")
+        or quote_observed_date
+    )
+    group_observation_date = current_observation_date or report_input_date
     published_industries = validated_group_source(
-        published_industries, "industry", report_input_date
+        published_industries, "industry", group_observation_date
     )
     published_themes = validated_group_source(
         published_themes,
         "theme",
-        report_input_date,
+        group_observation_date,
         published_industries.get("generatedAt"),
     )
     published_leaders = optional_json(MONITORING_PATH / "latest-leaders.json", {})
@@ -1844,7 +1869,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "industries": {"status": "UNAVAILABLE", "top": []},
         "industryMembership": {"status": "UNAVAILABLE"},
     })
-    market_snapshot = validate_market_snapshot_for_report(market_snapshot, report_input_date)
+    market_snapshot = validate_market_snapshot_for_report(market_snapshot, group_observation_date)
 
     group_states = technical_inputs["groupStates"]
 
@@ -1971,7 +1996,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     report_date = as_of or datetime.now(KST).date().isoformat()
     if staging_input_dir:
         full_market = full_market_from_derived_projection(
-            technical_inputs.get("derivedProjection"), report_date
+            technical_inputs.get("derivedProjection"),
+            technical_inputs.get("metadata", {}).get("targetDate") or report_date,
         )
     else:
         full_market = full_market_evidence(report_date)
@@ -2122,16 +2148,24 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         kiwoom_performance = None
     v2_changes = compare_v2_changes(shadow_history)
     technical_candidate_section = next_session_candidates(rows, report_date)
+    # The report contract's trading-date evidence belongs to the current
+    # monitoring snapshot.  Historical KRX technical metadata is merged into
+    # the quality payload below, but must never replace the published current
+    # session evidence with the KRX target date.
     contract_summary = published_summary
     contract_breadth = published_breadth
     contract_quality = published_quality
     contract_leaders = published_leaders
+    historical_technical_market = None
     if technical_inputs["metadata"].get("historicalIndicatorSource") == "KRX":
         # The KRX generation is authoritative for historical indicators and
         # market breadth in this isolated path.  NAVER current observations,
         # industries, themes, and research remain separate inputs.
         krx_projection = technical_inputs["derivedProjection"] or {}
-        krx_full_market = krx_projection.get("fullMarket") or {}
+        krx_full_market = dict(krx_projection.get("fullMarket") or {})
+        krx_counts = (technical_inputs.get("technicals") or {}).get("counts") or {}
+        krx_full_market.setdefault("instrumentCount", krx_counts.get("instrumentCount"))
+        krx_full_market.setdefault("authoritativeCount", krx_counts.get("instrumentCount"))
         krx_lineage = technical_inputs["metadata"].get("historicalLineage") or {}
         krx_technicals = technical_inputs.get("analysisTechnicals") or {}
         krx_states = technical_inputs.get("analysisStates") or {}
@@ -2142,8 +2176,15 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         krx_regular_unavailable = krx_states.get("regularSessionUnavailableCodes") or []
         krx_current_missing = quotes.get("missingCodes") or []
         current_snapshot = technical_inputs["metadata"].get("currentSnapshot") or {}
+        current_breadth_full_market = published_breadth.get("fullMarket") if isinstance(published_breadth, Mapping) else {}
+        current_breadth_full_market = current_breadth_full_market if isinstance(current_breadth_full_market, Mapping) else {}
         observed_date = (
-            current_snapshot.get("observedDate")
+            current_breadth_full_market.get("tradingDate")
+            or published_breadth.get("observationDate")
+            or published_breadth.get("sourceDate")
+            or published_quality.get("observationDate")
+            or published_quality.get("sourceDate")
+            or current_snapshot.get("observedDate")
             or current_snapshot.get("tradingDate")
             or current_snapshot.get("asOfDate")
         )
@@ -2151,11 +2192,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             current_snapshot.get("observedAt")
             or current_snapshot.get("generatedAt")
             or quotes.get("generatedAt")
+            or published_breadth.get("generatedAt")
         )
-        contract_summary = {"fullMarket": krx_full_market}
-        contract_breadth = {"fullMarket": {}}
-        contract_quality = {
-            "tradingDate": technical_inputs["metadata"].get("targetDate"),
+        historical_quality = {
             "baselineAsOfDate": technical_inputs["metadata"].get("targetDate"),
             "collectionQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
             "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
@@ -2182,7 +2221,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             "entityCount": technical_inputs["metadata"].get("entityCount"),
             "instrumentCount": technical_inputs["metadata"].get("instrumentCount"),
         }
-        contract_leaders = {"fullMarketLeaders": krx_full_market.get("leaders", [])}
+        contract_quality = {**published_quality, **historical_quality}
+        historical_technical_market = krx_full_market
     report_contract = build_report_contract(
         indices=indices,
         summary=contract_summary,
@@ -2203,6 +2243,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         v2_changes=v2_changes,
         session_context=session_context,
         registered_universe=registered_projection,
+        current_market_observation=published_breadth,
+        historical_technical_market=historical_technical_market,
         v1_groups={
             "sectors": dynamic_universe.get("sectors") or [],
             "themes": dynamic_universe.get("themes") or [],

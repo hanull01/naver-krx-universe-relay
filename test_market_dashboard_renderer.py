@@ -32,6 +32,32 @@ def report_fixture():
             "sourceQualityStatus": "SOURCE_OBSERVED",
             "tradingDateEvidence": {"tradingDate": "20261029", "status": "VERIFIED"},
             "sourceGenerations": {"market": generated, "v2": generated},
+            "observationDate": "2026-10-30",
+            "observationDateStatus": "VERIFIED",
+            "currentMarketObservation": {
+                "status": "AVAILABLE",
+                "source": "NAVER_CURRENT_SNAPSHOT",
+                "observedDate": "2026-10-30",
+                "sourceTime": "2026-10-30T10:00:00+09:00",
+                "scope": "STOCK_ONLY",
+                "totalCount": 2771,
+                "breadth": {"advancers": 996, "decliners": 1541, "unchanged": 234},
+                "qualityStatus": "WARNING",
+                "qualityWarnings": ["UNIVERSE_COMPOSITION_CHANGED"],
+            },
+            "historicalTechnicalMarket": {
+                "status": "AVAILABLE",
+                "source": "KRX",
+                "targetDate": "2026-11-06",
+                "generationId": "gen_20261106_1794185533300691000",
+                "scope": "STOCK_ETF",
+                "instrumentCount": 3953,
+                "metrics": {
+                    "aboveMA20": {"count": 10, "eligibleCount": 100, "pct": 10.0},
+                    "aboveMA60": {"count": 20, "eligibleCount": 100, "pct": 20.0},
+                    "aboveMA120": {"count": 30, "eligibleCount": 100, "pct": 30.0},
+                },
+            },
             "fullMarket": {
                 "totalCount": 2767,
                 "breadth": {"advancers": 400, "decliners": 2205, "unchanged": 162},
@@ -85,7 +111,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
 
     def test_decline_ratio_is_arithmetic_not_a_fixed_display_value(self):
         model = build_dashboard_model(report_fixture())
-        self.assertEqual(model["fullMarket"]["declineRatio"], 79.69)
+        self.assertEqual(model["fullMarket"]["declineRatio"], 55.61)
         market = model["fullMarket"]
         self.assertEqual(market["advancers"] + market["decliners"] + market["unchanged"], market["total"])
 
@@ -94,7 +120,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "79.69%", "삼성E&A", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER_CURRENT_SNAPSHOT", "KRX", "삼성E&A", "59,800원", "확인 대기"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -259,10 +285,17 @@ class MarketDashboardRendererTests(unittest.TestCase):
         intraday = [{"name": "KOSPI", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}, {"name": "KOSDAQ", "marketStatus": "OPEN", "session": "INTRADAY_SESSION"}]
         mixed = [post[0], intraday[1]]
         unknown = [{"name": "KOSPI"}, {"name": "KOSDAQ"}]
-        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": post}})["indexSessionLabel"], "장후 관측")
-        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": intraday}})["indexSessionLabel"], "장중 관측")
-        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": mixed}})["indexSessionLabel"], "시장별 세션 상이")
-        self.assertEqual(build_dashboard_model({"reportContract": {"fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}}, "indices": unknown}})["indexSessionLabel"], "세션 확인 대기")
+        def session_report(rows):
+            return {"reportContract": {
+                "currentMarketObservation": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}},
+                "historicalTechnicalMarket": {"metrics": {}},
+                "fullMarket": {"totalCount": 1, "breadth": {"advancers": 0, "decliners": 0, "unchanged": 1}},
+                "indices": rows,
+            }}
+        self.assertEqual(build_dashboard_model(session_report(post))["indexSessionLabel"], "장후 관측")
+        self.assertEqual(build_dashboard_model(session_report(intraday))["indexSessionLabel"], "장중 관측")
+        self.assertEqual(build_dashboard_model(session_report(mixed))["indexSessionLabel"], "시장별 세션 상이")
+        self.assertEqual(build_dashboard_model(session_report(unknown))["indexSessionLabel"], "세션 확인 대기")
 
     def test_preopen_report_keeps_prior_session_reference_in_both_outputs(self):
         report = report_fixture()
@@ -300,7 +333,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
 
     def test_breadth_arithmetic_uses_contract_counts_for_other_sessions(self):
         report = report_fixture()
-        report["reportContract"]["fullMarket"]["breadth"] = {
+        report["reportContract"]["currentMarketObservation"]["totalCount"] = 2767
+        report["reportContract"]["currentMarketObservation"]["breadth"] = {
             "advancers": 705, "decliners": 1833, "unchanged": 229,
         }
         model = build_dashboard_model(report)
@@ -311,12 +345,24 @@ class MarketDashboardRendererTests(unittest.TestCase):
 
     def test_bad_1813_sample_is_recomputed_and_not_reused_as_a_fixed_ratio(self):
         report = report_fixture()
-        report["reportContract"]["fullMarket"]["breadth"] = {
+        report["reportContract"]["currentMarketObservation"]["totalCount"] = 2767
+        report["reportContract"]["currentMarketObservation"]["breadth"] = {
             "advancers": 717, "decliners": 1813, "unchanged": 237,
         }
         html = html_lib.unescape(render_dashboard_html(report))
         self.assertIn("65.52%", html)
         self.assertNotIn("79.69%", html)
+
+    def test_current_market_observation_never_falls_back_to_krx_breadth(self):
+        report = report_fixture()
+        report["reportContract"]["currentMarketObservation"] = {
+            "status": "UNAVAILABLE",
+            "source": "NAVER_CURRENT_SNAPSHOT",
+            "breadth": {},
+            "totalCount": None,
+        }
+        with self.assertRaisesRegex(TemplateUnavailable, "CURRENT_MARKET_OBSERVATION_UNAVAILABLE"):
+            build_dashboard_model(report)
 
     def test_html_classes_are_from_approved_structure(self):
         html = render_dashboard_html(report_fixture())
@@ -423,6 +469,26 @@ class MarketDashboardRendererTests(unittest.TestCase):
         model = build_dashboard_model(report)
         self.assertEqual(len(model["v1Industries"]), 5)
         self.assertEqual(len(model["v1Themes"]), 5)
+
+    def test_current_group_observation_survives_historical_krx_date(self):
+        report = report_fixture()
+        report["reportContract"]["asOf"] = "2026-11-06"
+        report["reportContract"]["observationDate"] = "2026-11-09"
+        report["reportContract"]["relativeStrengthTop5"] = {
+            "status": "AVAILABLE",
+            "tradingDate": "20261106",
+            "observationDate": "20261109",
+            "industries": {"top5": [{
+                "rank": 1, "id": "i-current", "name": "현재 업종",
+                "relativeStrength": 2.0, "breadthPct": 60.0,
+                "sourceTradingDate": "20261109", "eligibility": "ELIGIBLE",
+            }]},
+            "themes": {"top5": []},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertIn("현재 업종", html)
+        self.assertIn("현재 업종", markdown)
 
     def test_research_analysis_is_user_section_and_missing_research_is_explicit(self):
         report = report_fixture()

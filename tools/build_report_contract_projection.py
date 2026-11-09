@@ -301,6 +301,16 @@ def build_report_contract_projection(
             round(krx_observed_count * 100 / krx_instrument_count, 6)
             if isinstance(krx_instrument_count, int) and krx_instrument_count > 0 else None
         )
+    full_market_projection = {
+        **_market_summary(state_rows, technical_rows, target),
+        "quality": quality_summary,
+        "artifacts": {
+            name: {key: value for key, value in ref.items() if key != "path"}
+            | {"path": str(Path(ref["path"]).name)}
+            for name, ref in artifacts.items()
+        },
+    }
+    historical_source = quality_summary.get("historicalIndicatorSource") or technicals.get("historicalIndicatorSource") or "UNAVAILABLE"
     contract = {
         "schemaVersion": "market-report-contract-v1",
         "status": quality.get("status", "PARTIAL"),
@@ -328,20 +338,37 @@ def build_report_contract_projection(
             "fullMarketManifest": "manifest.json",
             "fullMarketDetails": "technicals.json,states.json",
             "fullMarketProvenance": "provenance.json",
+            "historicalTechnicalMarket": "reportContract.historicalTechnicalMarket",
             "registeredUniverse": "registered-universe-technicals.json,registered-universe-states.json",
             "groupStates": "group-states.json",
             "rollingHistory": "rolling-history-manifest.json",
             "currentSnapshot": "SEPARATE_NOT_INCLUDED",
         },
-        "fullMarket": {
-            **_market_summary(state_rows, technical_rows, target),
-            "quality": quality_summary,
-            "artifacts": {
-                name: {key: value for key, value in ref.items() if key != "path"}
-                | {"path": str(Path(ref["path"]).name)}
-                for name, ref in artifacts.items()
-            },
+        "currentMarketObservation": {
+            "status": "UNAVAILABLE",
+            "source": "NAVER_CURRENT_SNAPSHOT",
+            "observedDate": None,
+            "sourceTime": None,
+            "scope": "STOCK_ONLY",
+            "totalCount": None,
+            "breadth": {"advancers": None, "decliners": None, "unchanged": None},
+            "qualityStatus": "SEPARATE_NOT_INCLUDED",
+            "qualityWarnings": [],
+            "reason": "CURRENT_SNAPSHOT_IS_NOT_BACKFILL_DERIVATIVE",
         },
+        "historicalTechnicalMarket": {
+            "status": "AVAILABLE" if full_market_projection.get("metrics") else "UNAVAILABLE",
+            "source": historical_source,
+            "targetDate": quality_summary.get("historicalTargetDate") or target,
+            "generationId": quality_summary.get("historicalGenerationId") or technicals.get("generationId"),
+            "scope": "STOCK_ETF",
+            "instrumentCount": quality_summary.get("historicalInstrumentCount") or len(technical_rows),
+            "breadth": full_market_projection.get("breadth") or {},
+            "metrics": full_market_projection.get("metrics") or {},
+            "qualityStatus": quality_summary.get("status") or "UNAVAILABLE",
+            "qualityWarnings": [],
+        },
+        "fullMarket": full_market_projection,
         "registeredUniverse": _registered_projection(root, technicals, states, universe),
         "groupStates": groups,
         "currentSnapshot": {

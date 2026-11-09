@@ -5,7 +5,10 @@
 ## Supported datasets
 
 - Rankings: seven top-20 KRX/ALL snapshots.
-- Industries: the full category list, stopping at the first empty PAGE_INDEX page.
+- Industries: the full category list selected by the validated endpoint resolver.
+  The PC cursor endpoint is primary, the mobile sectors endpoint is a fallback,
+  and the legacy PAGE_INDEX endpoint is diagnostic-only. HTTP, schema, date,
+  duplicate, pagination, and completeness failures remain explicit `ERROR`.
 - Investor flow: `FOREIGNER` and `ORGANIZATION`, `DAY` period, top-20 buy and sell lists.
 
 Theme collection is **DISABLED_PENDING_RESEARCH_GATE**. The observed theme-list duplicate means production code must not call a theme endpoint yet.
@@ -23,7 +26,11 @@ Every root records `generatedAt` (collector time in KST), `source: "NAVER"`, and
 
 Normalized rows use `code`/`name` and parsed numeric values without unit conversion. Each row also retains the complete NAVER source row in `source`. Investor `accTradeVolume` and `accTradeAmount` retain their original names: buy/sell direction is represented only by the parent container, because field semantics remain partial.
 
-Industry identifiers use NAVER `no`, never list position. Industry and member lists use `startIdx` as a PAGE_INDEX and terminate on an empty array. Ranking `startIdx` is an offset. Investor `startIdx` is a PAGE_INDEX; its full end condition is not currently available because the endpoint returns no total metadata.
+Industry identifiers use NAVER `code`/`no`, never list position. The current
+industry and membership endpoints use a cursor with `hasNext=false` termination;
+the legacy fallback retains `startIdx`/empty-array termination. Ranking `startIdx`
+is an offset. Investor `startIdx` is a PAGE_INDEX; its full end condition is
+not currently available because the endpoint returns no total metadata.
 
 ## CLI
 
