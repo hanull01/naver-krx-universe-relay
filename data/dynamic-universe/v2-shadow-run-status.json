@@ -1,6 +1,6 @@
 {
   "status": "OK",
-  "observedAt": "2026-11-09T07:36:30.730005+00:00",
+  "observedAt": "2026-11-09T08:32:00.627328+00:00",
   "tradingDate": "2026-11-09",
   "summary": {
     "industries": {
@@ -32,8 +32,8 @@
       "sourceCommitStatus": "UNAVAILABLE",
       "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
       "tradingDate": "20261109",
-      "calculationGeneration": "2026-11-09T07:36:22.812569+00:00",
-      "inputSnapshotSha256": "5328a49941587a7f751f90ed80a503fb765f3a5d81aff9b499c532ba6309761c",
+      "calculationGeneration": "2026-11-09T08:31:51.555015+00:00",
+      "inputSnapshotSha256": "b83a0bd59e30ab19566be7cbe3c1c7b4983590d1d8264a006abe7a7e5a45e12a",
       "resultSha256": null,
       "historySha256": null,
       "files": [
@@ -41,9 +41,9 @@
           "kind": "industries",
           "path": "data/monitoring/latest-industries.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "9ce584751c4ebf0cf918939d45fd1a94ccacecc6cc06ef223f62b1a27b406d22",
-          "bytes": 107618,
-          "generatedAt": "2026-11-09T07:36:22.812569+00:00",
+          "sha256": "05c2f2c8ca5d06eeb3d0fbdc5e88a19aee1b45ef138ae46b6200a84d4a327198",
+          "bytes": 107770,
+          "generatedAt": "2026-11-09T08:31:51.555015+00:00",
           "tradingDate": "20261109",
           "generationStatus": "ALIGNED",
           "dateStatus": "ALIGNED"
@@ -52,9 +52,9 @@
           "kind": "themes",
           "path": "data/monitoring/latest-theme-signals.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "79433bf93fdc7b3f900a5d366ee2db2fd675779b670d355492dc0bc76a1ac48c",
-          "bytes": 10274749,
-          "generatedAt": "2026-11-09T07:36:22.812569+00:00",
+          "sha256": "cd2f6d56907f55c80c1e990a9eaaa86a317b8b0c18bbc206945c15ecee4b3457",
+          "bytes": 10275407,
+          "generatedAt": "2026-11-09T08:31:51.555015+00:00",
           "tradingDate": null,
           "generationStatus": "ALIGNED",
           "dateStatus": "UNAVAILABLE"
@@ -63,9 +63,9 @@
           "kind": "v1Universe",
           "path": "data/dynamic-universe/latest.json",
           "status": "OBSERVED_HASH_ONLY",
-          "sha256": "2a24c019347959959b925db25b09d6380e5aa699fa06a40d548de4fe2cbcd17b",
+          "sha256": "7633aab335beac1860f272a335072f875eeb271fe899906f00f5bee8a282267a",
           "bytes": 151104,
-          "generatedAt": "2026-11-09T07:36:25.170635+00:00",
+          "generatedAt": "2026-11-09T08:31:54.365833+00:00",
           "tradingDate": null,
           "generationStatus": "NOT_REQUIRED",
           "dateStatus": "UNAVAILABLE"
@@ -74,5 +74,5 @@
     },
     "baselineFreshnessStatus": "BASELINE_STALE"
   },
-  "observationCount": 139
+  "observationCount": 140
 }
