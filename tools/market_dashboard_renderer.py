@@ -491,11 +491,26 @@ def _compact_relative_top5(contract: Mapping[str, Any], key: str) -> list[Mappin
     section = relative.get(key) or {}
     if str(relative.get("status") or "").upper() in {"UNAVAILABLE", "FAILED", "INVALID"}:
         return []
-    if _compact_normalized_date(relative.get("tradingDate")) != _compact_normalized_date(contract.get("asOf")):
+    historical_date = _compact_normalized_date(relative.get("tradingDate"))
+    contract_date = _compact_normalized_date(contract.get("asOf"))
+    observation_date = _compact_normalized_date(contract.get("observationDate"))
+    relative_observation_date = _compact_normalized_date(relative.get("observationDate"))
+    rows = [row for row in (section.get("top5") or []) if isinstance(row, Mapping)]
+    row_observation_dates = {
+        _compact_normalized_date(row.get("sourceTradingDate"))
+        for row in rows
+        if row.get("sourceTradingDate")
+    }
+    same_historical_date = historical_date and historical_date == contract_date
+    same_current_observation = observation_date and (
+        relative_observation_date == observation_date
+        or observation_date in row_observation_dates
+    )
+    if not (same_historical_date or same_current_observation):
         return []
     return [
-        row for row in (section.get("top5") or [])
-        if isinstance(row, Mapping) and _compact_row_available(row) and row.get("eligibility", "ELIGIBLE") == "ELIGIBLE"
+        row for row in rows
+        if _compact_row_available(row) and row.get("eligibility", "ELIGIBLE") == "ELIGIBLE"
     ][:5]
 
 
@@ -645,13 +660,19 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
     if not isinstance(contract, Mapping):
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE")
     full_market = contract.get("fullMarket") or {}
-    breadth = full_market.get("breadth") or {}
-    total = _num(full_market.get("totalCount"))
-    advancers = _num(breadth.get("advancers"))
-    decliners = _num(breadth.get("decliners"))
-    unchanged = _num(breadth.get("unchanged"))
+    current_observation = contract.get("currentMarketObservation")
+    if not isinstance(current_observation, Mapping):
+        raise TemplateUnavailable("CURRENT_MARKET_OBSERVATION_UNAVAILABLE")
+    current_breadth = current_observation.get("breadth") or {}
+    total = _num(current_observation.get("totalCount"))
+    advancers = _num(current_breadth.get("advancers"))
+    decliners = _num(current_breadth.get("decliners"))
+    unchanged = _num(current_breadth.get("unchanged"))
     if None in (total, advancers, decliners, unchanged) or advancers + decliners + unchanged != total:
-        raise TemplateUnavailable("CONTRACT_UNAVAILABLE:BREADTH_ARITHMETIC_MISMATCH")
+        raise TemplateUnavailable("CURRENT_MARKET_OBSERVATION_UNAVAILABLE:BREADTH_ARITHMETIC_MISMATCH")
+    historical_technical = contract.get("historicalTechnicalMarket") or {}
+    if not isinstance(historical_technical, Mapping):
+        historical_technical = {}
     v2 = contract.get("v2") or {}
     rendering = contract.get("rendering") or {}
     status = _text(contract.get("status"), "PARTIAL")
@@ -678,6 +699,8 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "writtenAt": _compact_kst(report.get("writtenAt") or report.get("generatedAt") or contract.get("observedAt")),
         "observedAt": _compact_kst(contract.get("observedAt") or report.get("generatedAt")),
         "tradingDateStatus": _display_status(contract.get("tradingDateStatus")),
+        "observationDate": _compact_date(contract.get("observationDate") or contract.get("observedDate")),
+        "observationDateStatus": _display_status(contract.get("observationDateStatus")),
         "status": status,
         "statusLabel": _display_status(status),
         "quality": quality,
@@ -686,13 +709,28 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "indices": list(contract.get("indices") or []),
         "indexSessionLabel": _index_session_summary(list(contract.get("indices") or [])),
         "sessionContext": contract.get("sessionContext") or {"mode": "NOT_PREOPEN"},
+        "currentMarketObservation": {
+            "source": _text(current_observation.get("source"), "확인 불가"),
+            "observedDate": _compact_date(current_observation.get("observedDate")),
+            "sourceTime": _compact_kst(current_observation.get("sourceTime")),
+            "scope": _text(current_observation.get("scope"), "확인 불가"),
+            "qualityStatus": _display_status(current_observation.get("qualityStatus")),
+            "qualityWarnings": list(current_observation.get("qualityWarnings") or []),
+        },
+        "historicalTechnicalMarket": {
+            "source": _text(historical_technical.get("source"), "확인 불가"),
+            "targetDate": _compact_date(historical_technical.get("targetDate")),
+            "scope": _text(historical_technical.get("scope"), "확인 불가"),
+            "instrumentCount": _num(historical_technical.get("instrumentCount")),
+            "metrics": historical_technical.get("metrics") or {},
+        },
         "fullMarket": {
             "total": total,
             "advancers": advancers,
             "decliners": decliners,
             "unchanged": unchanged,
             "declineRatio": round(decliners / total * 100, 2) if total else None,
-            "metrics": full_market.get("metrics") or {},
+            "metrics": historical_technical.get("metrics") or {},
         },
         "marketSnapshot": contract.get("marketSnapshot") or {
             "status": "UNAVAILABLE",
@@ -908,10 +946,20 @@ def _compact_conclusions(model: Mapping[str, Any]) -> list[str]:
 
 def _compact_market_html(model: Mapping[str, Any]) -> str:
     market = model["fullMarket"]
+    current = model["currentMarketObservation"]
+    historical = model["historicalTechnicalMarket"]
     total = market["total"]
-    metrics = market["metrics"]
+    metrics = historical["metrics"]
+    historical_count = historical["instrumentCount"]
+    historical_count_label = (
+        f"{historical_count:,}"
+        if isinstance(historical_count, (int, float)) and not isinstance(historical_count, bool)
+        else _escape(historical_count)
+    )
     metric_html = "".join(_metric_line(label, metrics.get(key) or {}) for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")))
-    return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article></div><div class="grid two"><article class="card"><h3>시장 확산</h3><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율</h3>{metric_html}</article></div>'
+    current_meta = f'원천 {_escape(current["source"])} · 관측일 {_escape(current["observedDate"])} · 범위 {_escape(current["scope"])} · 품질 {_escape(current["qualityStatus"])}'
+    historical_meta = f'원천 {_escape(historical["source"])} · 기준일 {_escape(historical["targetDate"])} · 범위 {_escape(historical["scope"])} · 대상 {historical_count_label}종목'
+    return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article></div><div class="grid two"><article class="card"><h3>시장 확산 <span class="tag">NAVER 현재시장 관측</span></h3><p class="muted tiny">{current_meta}</p><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율 <span class="tag">KRX 기술지표</span></h3><p class="muted tiny">{historical_meta}</p>{metric_html}</article></div>'
 
 
 def _compact_html(
@@ -948,7 +996,7 @@ def _compact_html(
     )
     status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>부분 자료 포함</b> · {_escape(model["reason"])}</div>'
     conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
-    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 관측일 {_escape(model["observationDateStatus"])} · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
     return (
         output
         .replace("MARKET / DASHBOARD", "국내증시")
@@ -983,13 +1031,13 @@ def _compact_markdown(
     lines = [
         f"# 국내증시 시장 모니터링 — {model['asOf']}",
         "",
-        "| 기준일 | 기준시각 | 시장 세션 | 거래일 상태 |",
-        "| --- | --- | --- | --- |",
-        f"| {model['asOf']} | {model['observedAt']} | {model['indexSessionLabel']} | {model['tradingDateStatus']} |",
+        "| 기준일 | 기준시각 | 시장 세션 | 관측일 상태 | 거래일 상태 |",
+        "| --- | --- | --- | --- | --- |",
+        f"| {model['asOf']} | {model['observedAt']} | {model['indexSessionLabel']} | {model['observationDateStatus']} | {model['tradingDateStatus']} |",
     ]
     if model["status"].upper() != "AVAILABLE":
         lines += ["", f"> 안내: {_display_status(model['status'])} — {model['reason']}"]
-    lines += ["", "## 1. 시장 대시보드", ""]
+    lines += ["", "## 1. 시장 대시보드", "", f"시장 세션: {model['indexSessionLabel']}"]
     if (model.get("sessionContext") or {}).get("mode") == "PREOPEN":
         observation = model["sessionContext"].get("observation") or {}
         previous = model["sessionContext"].get("previousTradingDay") or {}
@@ -1021,12 +1069,20 @@ def _compact_markdown(
             _pct(row.get("changeRate")) if available else "확인 불가",
         ))
     lines += _markdown_table(("지수", "현재값", "전일 대비", "등락률"), index_rows)
-    lines += ["", "### 시장 확산"]
+    current = model["currentMarketObservation"]
+    historical = model["historicalTechnicalMarket"]
+    historical_count = historical["instrumentCount"]
+    historical_count_label = (
+        f"{historical_count:,}"
+        if isinstance(historical_count, (int, float)) and not isinstance(historical_count, bool)
+        else _escape(historical_count)
+    )
+    lines += ["", "### 시장 확산", f"원천: {current['source']} · 관측일: {current['observedDate']} · 범위: {current['scope']} · 대상: {market['total']:,}종목 · 품질: {current['qualityStatus']}"]
     lines += _markdown_table(("상승", "하락", "보합", "하락 비율"), [(
         f"{market['advancers']:,}", f"{market['decliners']:,}", f"{market['unchanged']:,}",
         _plain_pct(market["declineRatio"]),
     )])
-    lines += ["", "### 이동평균 상회율"]
+    lines += ["", "### 이동평균 상회율", f"원천: {historical['source']} · 기준일: {historical['targetDate']} · 범위: {historical['scope']} · 대상: {historical_count_label}종목"]
     lines += _markdown_table(("MA20", "MA60", "MA120"), [tuple(
         _metric_line_value(market["metrics"].get(key) or {})
         for key in ("aboveMA20", "aboveMA60", "aboveMA120")
@@ -1112,8 +1168,8 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
     part2_md, part2_html = markdown_section("## 2. 주도 업종·테마"), html_section("part2")
     part3_md, part3_html = markdown_section("## 3. 관심종목·키움 후보"), html_section("part3")
 
-    required = [model["asOf"], model["tradingDateStatus"], model["indexSessionLabel"], f"{model['fullMarket']['advancers']:,}", f"{model['fullMarket']['decliners']:,}", f"{model['fullMarket']['unchanged']:,}"]
-    required += [_metric_line_value(model["fullMarket"]["metrics"].get(key) or {}) for key in ("aboveMA20", "aboveMA60", "aboveMA120")]
+    required = [model["asOf"], model["tradingDateStatus"], model["observationDateStatus"], model["indexSessionLabel"], f"{model['fullMarket']['advancers']:,}", f"{model['fullMarket']['decliners']:,}", f"{model['fullMarket']['unchanged']:,}"]
+    required += [_metric_line_value(model["historicalTechnicalMarket"]["metrics"].get(key) or {}) for key in ("aboveMA20", "aboveMA60", "aboveMA120")]
     for value in required:
         if value and (str(value) not in markdown_text or str(value) not in plain):
             issues.append(f"CORE_VALUE_MISSING:{value}")
@@ -1163,7 +1219,7 @@ def validate_rendered_files(markdown_path: Path, html_path: Path, model: Mapping
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
     left = _compact_model(markdown_report)
     right = _compact_model(html_report)
-    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "status", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v1Themes", "v2Industries", "v2Themes", "researchAnalysis", "interests", "kiwoom") if left.get(key) != right.get(key)]
+    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "observationDateStatus", "status", "currentMarketObservation", "historicalTechnicalMarket", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v1Themes", "v2Industries", "v2Themes", "researchAnalysis", "interests", "kiwoom") if left.get(key) != right.get(key)]
 
 
 def _compact_session_context_html(model: Mapping[str, Any]) -> str:

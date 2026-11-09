@@ -84,12 +84,11 @@ def render_current_observation(
     display_contract = dict(contract)
     if observation_date:
         display_contract["asOf"] = observation_date
-        display_contract["tradingDateStatus"] = observation_status
         display_contract["tradingDateEvidence"] = observation_evidence
 
-    full_market = display_contract.get("fullMarket") or {}
-    breadth = full_market.get("breadth") or {}
-    total = full_market.get("totalCount")
+    current_market = display_contract.get("currentMarketObservation") or {}
+    breadth = current_market.get("breadth") or {}
+    total = current_market.get("totalCount")
     values = [breadth.get(key) for key in ("advancers", "decliners", "unchanged")]
     if not isinstance(total, int) or total <= 0 or any(not isinstance(value, int) for value in values):
         raise TemplateUnavailable("CURRENT_OBSERVATION_MARKET_SOURCE_UNAVAILABLE")
@@ -158,7 +157,8 @@ def render_current_observation(
         "reportType": "current_observation",
         "session": _session(indices),
         "tradingDate": observation_date or display_contract.get("asOf"),
-        "tradingDateStatus": observation_status,
+        "tradingDateStatus": display_contract.get("tradingDateStatus") or "UNAVAILABLE",
+        "observationDateStatus": observation_status,
         "sourceTime": _source_time(display_contract, indices),
         "reportContractPath": repo_path(contract_path),
         "reportContractSha256": sha256_bytes(contract_bytes),

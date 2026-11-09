@@ -1,7 +1,8 @@
 """Read-only NAVER domestic market snapshots.
 
 This collector is independent of relay.py and the configured stock Universe.
-It deliberately excludes theme APIs until their pagination contract is revalidated.
+Industry and theme endpoints are selected only after live schema, pagination,
+duplicate, and date validation.
 """
 import argparse
 import json
@@ -33,6 +34,56 @@ MAX_CATEGORY_PAGES = 20
 MAX_MEMBER_PAGES = 100
 MEMBERSHIP_TTL_HOURS = 24
 TLS_CONTEXT = ssl.create_default_context(cafile=certifi.where()) if certifi else None
+
+# Candidate endpoints are ordered by the live browser evidence collected on
+# 2026-11-09.  The legacy page-index endpoint remains only as a last-resort
+# diagnostic candidate; a successful HTTP response is not enough to select it.
+SECTOR_ENDPOINT_REGISTRY = {
+    'industry': (
+        {
+            'name': 'pc_v2_industry_cursor',
+            'path': '/api/stockSecurity/rankings/v2/domestic/industries',
+            'adapter': 'PC_CURSOR',
+            'params': {'sortType': 'changeRate', 'size': 100, 'period': 'daily'},
+        },
+        {
+            'name': 'mobile_front_api_industry_cursor',
+            'path': '/front-api/stock/sectors/all',
+            'adapter': 'MOBILE_SECTORS',
+            'params': {'sectorType': 'upjong', 'businessDayCategory': 'daily',
+                       'pageSize': 50, 'sectorSortType': 'CHANGE_RATE',
+                       'nationType': 'domestic'},
+        },
+        {
+            'name': 'legacy_upjong_page_index',
+            'path': '/api/domestic/market/upjong/list',
+            'adapter': 'LEGACY_PAGE_INDEX',
+            'params': {'pageSize': PAGE_SIZE, 'sortType': 'changeRate'},
+        },
+    ),
+    'theme': (
+        {
+            'name': 'pc_v2_theme_cursor',
+            'path': '/api/stockSecurity/rankings/v2/domestic/themes',
+            'adapter': 'PC_CURSOR',
+            'params': {'sortType': 'changeRate', 'size': 100, 'period': 'daily'},
+        },
+        {
+            'name': 'mobile_front_api_theme_cursor',
+            'path': '/front-api/stock/sectors/all',
+            'adapter': 'MOBILE_SECTORS',
+            'params': {'sectorType': 'theme', 'businessDayCategory': 'daily',
+                       'pageSize': 50, 'sectorSortType': 'CHANGE_RATE',
+                       'nationType': 'domestic'},
+        },
+        {
+            'name': 'legacy_theme_page_index',
+            'path': '/api/domestic/market/theme/list',
+            'adapter': 'LEGACY_PAGE_INDEX',
+            'params': {'pageSize': PAGE_SIZE, 'sortType': 'changeRate'},
+        },
+    ),
+}
 
 RANKINGS = {
     'market_cap': 'marketSum',
@@ -212,6 +263,156 @@ def normalize_category(row):
     }
 
 
+def endpoint_registry(kind=None):
+    """Return the sanitized candidate registry for diagnostics and tests."""
+    if kind is None:
+        return {key: endpoint_registry(key) for key in SECTOR_ENDPOINT_REGISTRY}
+    if kind not in SECTOR_ENDPOINT_REGISTRY:
+        raise ValueError(f'unsupported sector kind: {kind}')
+    return [dict(candidate, params=dict(candidate['params']))
+            for candidate in SECTOR_ENDPOINT_REGISTRY[kind]]
+
+
+def _normalize_sector_row(row, *, kind, adapter):
+    if not isinstance(row, dict):
+        raise MarketApiError(f'{kind} row is not an object')
+    if adapter == 'PC_CURSOR':
+        require_fields(row, ('code', 'name', 'updatedAt'), f'{kind} ranking')
+        return {
+            'id': str(row['code']), 'name': row['name'],
+            'totalStocks': sum(numeric(row.get(key)) or 0 for key in ('risingCount', 'fallingCount', 'unchangedCount')),
+            'risingStocks': numeric(row.get('risingCount')),
+            'fallingStocks': numeric(row.get('fallingCount')),
+            'changeRate': numeric(row.get('changeRate')),
+            'totalVolume': numeric(row.get('totalTradingVolume')),
+            'totalTradingValue': numeric(row.get('totalTradingValue')),
+            'totalMarketCap': numeric(row.get('totalMarketCap')),
+            'leadingItem': None,
+            'sourceTime': row.get('updatedAt'),
+            'source': dict(row),
+        }
+    require_fields(row, ('code', 'name'), f'{kind} mobile sector')
+    return {
+        'id': str(row['code']), 'name': row['name'],
+        'totalStocks': sum(numeric(row.get(key)) or 0 for key in ('risingCount', 'fallingCount', 'unchangedCount')),
+        'risingStocks': numeric(row.get('risingCount')),
+        'fallingStocks': numeric(row.get('fallingCount')),
+        'changeRate': numeric(row.get('changeRate')),
+        'totalVolume': None, 'totalTradingValue': None, 'totalMarketCap': None,
+        'leadingItem': None,
+        'sourceTime': row.get('updatedAt'),
+        'source': dict(row),
+    }
+
+
+def _sector_page(payload, *, kind, adapter):
+    if adapter == 'PC_CURSOR':
+        if not isinstance(payload, dict) or not isinstance(payload.get('items'), list) or not isinstance(payload.get('hasNext'), bool):
+            raise MarketApiError(f'{kind} PC response missing items/hasNext contract')
+        return payload['items'], payload['hasNext'], payload.get('cursor'), 'ITEMS'
+    if adapter == 'MOBILE_SECTORS':
+        result = payload.get('result') if isinstance(payload, dict) else None
+        if not isinstance(payload, dict) or payload.get('isSuccess') is not True or not isinstance(result, dict):
+            raise MarketApiError(f'{kind} mobile response missing isSuccess/result contract')
+        if not isinstance(result.get('sectors'), list) or not isinstance(result.get('hasNext'), bool):
+            raise MarketApiError(f'{kind} mobile response missing sectors/hasNext contract')
+        return result['sectors'], result['hasNext'], result.get('cursor'), 'SECTORS'
+    if not isinstance(payload, list):
+        raise MarketApiError(f'{kind} legacy response is not an array')
+    return payload, bool(payload), None, 'LEGACY_ARRAY'
+
+
+def _validate_sector_dates(rows, clock):
+    source_times = {str(row.get('sourceTime'))[:10] for row in rows if row.get('sourceTime')}
+    if len(source_times) > 1:
+        raise MarketApiError('sector source dates are inconsistent')
+    if source_times:
+        observed_date = next(iter(source_times))
+        clock_date = str(clock())[:10]
+        if observed_date != clock_date:
+            raise MarketApiError(f'sector source date mismatch: {observed_date} != {clock_date}')
+        return observed_date, 'SOURCE_TIMESTAMP'
+    return str(clock())[:10], 'BUSINESS_DAY_CATEGORY_DAILY'
+
+
+def _collect_sector_candidate(candidate, kind, fetcher, clock, max_pages):
+    rows, seen_ids, seen_cursors = [], set(), set()
+    cursor = None
+    page_diagnostics = []
+    for page_index in range(max_pages):
+        params = dict(candidate['params'])
+        if candidate['adapter'] == 'LEGACY_PAGE_INDEX':
+            params['startIdx'] = page_index
+        elif cursor is not None:
+            params['cursor'] = cursor
+        payload = fetcher(candidate['path'], params, dict if candidate['adapter'] != 'LEGACY_PAGE_INDEX' else list)
+        page_rows, has_next, next_cursor, shape = _sector_page(payload, kind=kind, adapter=candidate['adapter'])
+        if page_index == 0 and not page_rows:
+            raise MarketApiError(f'{kind} endpoint returned zero rows')
+        normalized = [_normalize_sector_row(row, kind=kind, adapter=candidate['adapter']) for row in page_rows]
+        ids = [row['id'] for row in normalized]
+        duplicate = seen_ids.intersection(ids)
+        page_diagnostics.append({'page': page_index, 'count': len(ids), 'shape': shape,
+                                 'hasNext': has_next, 'cursorPresent': bool(next_cursor),
+                                 'duplicateCount': len(duplicate)})
+        if duplicate or len(ids) != len(set(ids)):
+            raise MarketApiError(f'{kind} endpoint duplicate id: {sorted(duplicate or set(ids))[:3]}')
+        seen_ids.update(ids)
+        rows.extend(normalized)
+        if not has_next:
+            target_date, date_evidence = _validate_sector_dates(rows, clock)
+            return {'rows': rows, 'targetDate': target_date, 'dateEvidence': date_evidence,
+                    'pageDiagnostics': page_diagnostics,
+                    'pagination': {'type': 'CURSOR' if candidate['adapter'] != 'LEGACY_PAGE_INDEX' else 'PAGE_INDEX',
+                                   'parameter': 'cursor' if candidate['adapter'] != 'LEGACY_PAGE_INDEX' else 'startIdx',
+                                   'endCondition': 'HAS_NEXT_FALSE' if candidate['adapter'] != 'LEGACY_PAGE_INDEX' else 'EMPTY_ARRAY',
+                                   'pagesFetched': len(page_diagnostics)}}
+        if candidate['adapter'] == 'LEGACY_PAGE_INDEX':
+            continue
+        if not isinstance(next_cursor, str) or not next_cursor:
+            raise MarketApiError(f'{kind} endpoint hasNext without cursor')
+        if next_cursor in seen_cursors:
+            raise MarketApiError(f'{kind} endpoint cursor repeated')
+        seen_cursors.add(next_cursor)
+        cursor = next_cursor
+    raise MarketApiError(f'{kind} endpoint max pages reached: {max_pages}')
+
+
+def collect_sector_rankings(kind, fetcher=fetch_json, clock=generated_at, max_pages=MAX_CATEGORY_PAGES):
+    """Select the first live-validated sector endpoint without stale fallback."""
+    if kind not in SECTOR_ENDPOINT_REGISTRY:
+        raise ValueError(f'unsupported sector kind: {kind}')
+    diagnostics = []
+    for candidate in SECTOR_ENDPOINT_REGISTRY[kind]:
+        diagnostic = {'name': candidate['name'], 'path': candidate['path'],
+                      'adapter': candidate['adapter'], 'status': 'ERROR'}
+        try:
+            collected = _collect_sector_candidate(candidate, kind, fetcher, clock, max_pages)
+            diagnostic.update({'status': 'OK', 'selected': True,
+                               'targetDate': collected['targetDate'],
+                               'dateEvidence': collected['dateEvidence'],
+                               'pagination': collected['pagination'],
+                               'pageDiagnostics': collected['pageDiagnostics']})
+            diagnostics.append(diagnostic)
+            return {'generatedAt': clock(), 'source': 'NAVER', 'status': 'OK',
+                    'endpoint': candidate['name'], 'targetDate': collected['targetDate'],
+                    'sourceDate': collected['targetDate'],
+                    'dateEvidence': collected['dateEvidence'],
+                    'pagination': collected['pagination'],
+                    'endpointDiagnostics': diagnostics,
+                    'count': len(collected['rows']),
+                    'industries' if kind == 'industry' else 'themes': collected['rows']}
+        except Exception as exc:
+            diagnostic.update({'error': error_payload(exc), 'selected': False})
+            diagnostics.append(diagnostic)
+    return {'generatedAt': clock(), 'source': 'NAVER', 'status': 'ERROR',
+            'endpoint': None, 'endpointDiagnostics': diagnostics, 'count': 0,
+            'sourceDate': None,
+            'industries' if kind == 'industry' else 'themes': [],
+            'error': {'type': 'EndpointResolutionError',
+                      'message': f'no validated {kind} endpoint succeeded'}}
+
+
 def status_from(entries):
     statuses = [entry.get('status') for entry in entries]
     if statuses and all(status == 'OK' for status in statuses):
@@ -245,7 +446,7 @@ def collect_rankings(fetcher=fetch_json, clock=generated_at):
             'rankings': results}
 
 
-def collect_industries(fetcher=fetch_json, clock=generated_at, max_pages=MAX_CATEGORY_PAGES):
+def _collect_industries_legacy(fetcher=fetch_json, clock=generated_at, max_pages=MAX_CATEGORY_PAGES):
     categories, seen_ids, seen_pages = [], set(), set()
     error = None
     finished = False
@@ -282,6 +483,12 @@ def collect_industries(fetcher=fetch_json, clock=generated_at, max_pages=MAX_CAT
     if error:
         payload['error'] = error
     return payload
+
+
+def collect_industries(fetcher=fetch_json, clock=generated_at, max_pages=MAX_CATEGORY_PAGES):
+    if fetcher is fetch_json:
+        return collect_sector_rankings('industry', fetcher, clock, max_pages)
+    return _collect_industries_legacy(fetcher, clock, max_pages)
 
 
 def fetch_industry_info(category_no, fetcher=fetch_json):
@@ -419,7 +626,13 @@ def build_manifest(rankings, industries, investors, clock=generated_at):
     return {'generatedAt': clock(), 'source': 'NAVER', 'status': status_from(entries),
             'datasets': {
                 'rankings': {'status': rankings['status'], 'path': 'data/market/rankings.json'},
-                'industries': {'status': industries['status'], 'path': 'data/market/industries.json'},
+                'industries': {
+                    'status': industries['status'], 'path': 'data/market/industries.json',
+                    'source': industries.get('source'), 'endpoint': industries.get('endpoint'),
+                    'sourceDate': industries.get('sourceDate') or industries.get('targetDate'),
+                    'count': industries.get('count', 0),
+                    'pagination': industries.get('pagination'),
+                },
                 'investorFlow': {'status': investors['status'], 'path': 'data/market/investor-flow.json'},
                 'themes': {'status': 'DISABLED_PENDING_RESEARCH_GATE'},
             }}
@@ -458,6 +671,16 @@ def collect_all(fetcher=fetch_json, clock=generated_at, output_dir=MARKET_DIR, n
 
 def collect_industry_membership(fetcher=fetch_json, clock=generated_at):
     industries = collect_industries(fetcher, clock)
+    if industries.get('status') != 'OK' or not industries.get('industries'):
+        return {'generatedAt': clock(), 'source': 'NAVER', 'status': 'ERROR',
+                'sourceDate': industries.get('sourceDate') or industries.get('targetDate'),
+                'sourceEndpoint': industries.get('endpoint'),
+                'sourceIndustryCount': industries.get('count', 0),
+                'sourceDiagnostics': industries.get('endpointDiagnostics') or industries.get('error'),
+                'cachePolicy': {'ttlHours': MEMBERSHIP_TTL_HOURS, 'refreshMode': 'IF_STALE'},
+                'industryCount': 0, 'membershipCount': 0, 'industries': [], 'byCode': {},
+                'error': {'type': 'IndustrySourceError',
+                          'message': 'industry source is not complete; membership not collected'}}
     rows, by_code = [], {}
     for industry in industries['industries']:
         members = collect_industry_members(industry['id'], fetcher, clock,
@@ -469,6 +692,10 @@ def collect_industry_membership(fetcher=fetch_json, clock=generated_at):
             by_code.setdefault(member['code'], []).append({'id': industry['id'], 'name': industry['name']})
     status = status_from([industries] + rows)
     return {'generatedAt': clock(), 'source': 'NAVER', 'status': status,
+            'sourceDate': industries.get('sourceDate') or industries.get('targetDate'),
+            'sourceEndpoint': industries.get('endpoint'),
+            'sourceIndustryCount': industries.get('count', 0),
+            'sourcePagination': industries.get('pagination'),
             'cachePolicy': {'ttlHours': MEMBERSHIP_TTL_HOURS, 'refreshMode': 'IF_STALE'},
             'industryCount': len(rows), 'membershipCount': sum(row['memberCount'] for row in rows),
             'industries': rows, 'byCode': by_code}

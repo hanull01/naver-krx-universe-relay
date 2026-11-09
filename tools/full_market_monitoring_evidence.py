@@ -770,8 +770,28 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     if discovery.get("monitoringDate") == str(summary["generatedAt"])[:10]:
         tracked_codes = discovery.get("symbols") or []
     tracked_signals = signal_subset(features, tracked_codes)
+    industry_source_count = len(industries.get("industries") or [])
+    industry_membership_count = len(membership.get("industries") or [])
+    industry_source_status = str(industries.get("status") or "ERROR")
+    industry_membership_status = str(membership.get("status") or "ERROR")
+    industry_complete = bool(
+        industry_source_status == "OK"
+        and industry_membership_status == "OK"
+        and industry_source_count > 0
+        and industry_source_count == industry_membership_count
+        and len(industry_rows) == industry_membership_count
+    )
+    if industry_complete:
+        industry_publication_status = "OK"
+    elif industry_source_status == "ERROR" or industry_membership_status == "ERROR" or industry_source_count == 0:
+        industry_publication_status = "ERROR"
+    else:
+        industry_publication_status = "PARTIAL"
     evidence = {
-        "latest-breadth.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
+        "latest-breadth.json": {"generatedAt": summary["generatedAt"], "source": "NAVER_CURRENT_SNAPSHOT",
+                                  "observationDate": today, "sourceDate": today,
+                                  "sourceTime": current_snapshot.get("generatedAt"),
+                                  "scope": "AUTHORITATIVE_FULL_MARKET",
                                   "fullMarket": full_market, "breadth": breadth_data,
                                   "monitoredUniverse": publication_context.get("monitoredUniverse")},
         "latest-stock-signals.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
@@ -780,11 +800,20 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                       "trackedDiscoveryCoverage": sum(str(code) in {str(row.get("code")) for row in tracked_signals}
                                                                        for code in tracked_codes)},
         "latest-theme-signals.json": build_theme_signals(summary["generatedAt"], features, theme_membership),
-        "latest-industries.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
+        "latest-industries.json": {"generatedAt": summary["generatedAt"], "source": "NAVER",
+                                     "status": industry_publication_status,
+                                     "scope": "AUTHORITATIVE_FULL_MARKET",
+                                     "observationDate": today,
+                                     "sourceDate": industries.get("sourceDate") or industries.get("targetDate") or trading_date_result.get("tradingDate"),
+                                     "endpoint": industries.get("endpoint"),
                                      "tradingDate": trading_date_result.get("tradingDate"),
                                      "tradingDateEvidence": trading_date_result, "quality": quality,
+                                     "sourceStatus": industry_source_status,
+                                     "membershipStatus": industry_membership_status,
+                                     "sourceCount": industry_source_count,
+                                     "membershipIndustryCount": industry_membership_count,
                                      "membershipSourceStatus": membership.get("status"),
-                                     "sourceIndustryCount": len(industries.get("industries", [])),
+                                     "sourceIndustryCount": industry_source_count,
                                      "aggregationUsableIndustryCount": len(industry_rows), "industries": industry_rows},
         "latest-leaders.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET",
                                 "leaderChanges": compare_leaders(previous_summary, leader_rows),
@@ -793,7 +822,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 # Compatibility alias; this is never a 42-stock list.
                                 "candidates": leader_rows},
         "latest-changes.json": compare_breadth(previous_summary, summary),
-        "latest-quality.json": {"generatedAt": summary["generatedAt"], "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
+        "latest-quality.json": {"generatedAt": summary["generatedAt"], "source": "NAVER_CURRENT_SNAPSHOT",
+                                "observationDate": today, "sourceDate": today,
+                                "sourceTime": current_snapshot.get("generatedAt"),
+                                "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                                 "tradingDate": trading_date_result.get("tradingDate"), "tradingDateEvidence": trading_date_result,
                                 "currentCount": len(current_codes), "currentCoveragePct": pct(len(current_codes), current_snapshot["expectedCount"]),
                                 # Deprecated compatibility alias: this is the

@@ -17,6 +17,12 @@ from typing import Any
 REQUIRED_RENDER_FIELDS = (
     "asOf",
     "observedAt",
+    "currentMarketObservation.breadth.advancers",
+    "currentMarketObservation.breadth.decliners",
+    "currentMarketObservation.breadth.unchanged",
+    "historicalTechnicalMarket.metrics.aboveMA20.count",
+    "historicalTechnicalMarket.metrics.aboveMA60.count",
+    "historicalTechnicalMarket.metrics.aboveMA120.count",
     "fullMarket.breadth.advancers",
     "fullMarket.breadth.decliners",
     "fullMarket.breadth.unchanged",
@@ -374,6 +380,41 @@ def _historical_lineage(
     }
 
 
+def _current_market_observation(
+    source: Mapping[str, Any] | None,
+    quality: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build current NAVER breadth without a historical fallback."""
+    source = source if isinstance(source, Mapping) else {}
+    breadth_root = source.get("breadth") if isinstance(source.get("breadth"), Mapping) else {}
+    total = breadth_root.get("TOTAL") if isinstance(breadth_root.get("TOTAL"), Mapping) else {}
+    full_market = source.get("fullMarket") if isinstance(source.get("fullMarket"), Mapping) else {}
+    total_count = total.get("stockCount") if total.get("stockCount") is not None else total.get("validCount")
+    if total_count is None:
+        total_count = full_market.get("authoritativeCount")
+    values = {key: total.get(key) for key in ("advancers", "decliners", "unchanged")}
+    complete = (
+        isinstance(total_count, int) and not isinstance(total_count, bool) and total_count > 0
+        and all(isinstance(value, int) and not isinstance(value, bool) for value in values.values())
+        and sum(values.values()) == total_count
+    )
+    warnings = full_market.get("qualityWarnings")
+    if not isinstance(warnings, list):
+        warnings = []
+    return {
+        "status": "AVAILABLE" if complete else "UNAVAILABLE",
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "observedDate": quality.get("observedDate") or quality.get("currentSnapshotDate") or full_market.get("tradingDate"),
+        "sourceTime": quality.get("currentSnapshotGeneratedAt") or source.get("generatedAt") or quality.get("generatedAt"),
+        "scope": "STOCK_ONLY",
+        "totalCount": total_count if complete else None,
+        "breadth": values if complete else {"advancers": None, "decliners": None, "unchanged": None},
+        "qualityStatus": full_market.get("qualityStatus") or quality.get("currentSnapshotQualityStatus") or "UNAVAILABLE",
+        "qualityWarnings": warnings,
+        "reason": None if complete else "CURRENT_BREADTH_UNAVAILABLE",
+    }
+
+
 
 _GROUP_SUMMARY_FIELDS = (
     "id", "name", "kind", "status", "v1Status", "v2Status",
@@ -631,6 +672,22 @@ def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _group_observation_date(row: Mapping[str, Any]) -> str | None:
+    """Find a current NAVER group date without treating it as a KRX date."""
+    for key in ("observationDate", "observedDate", "sourceTradingDate", "tradingDate"):
+        value = row.get(key)
+        if value:
+            return str(value).replace("-", "")[:8]
+    for stock in row.get("stocks") or []:
+        if not isinstance(stock, Mapping):
+            continue
+        for key in ("temporaryCurrentBarDate", "observationDate", "observedDate", "sourceTradingDate", "tradingDate"):
+            value = stock.get(key)
+            if value:
+                return str(value).replace("-", "")[:8]
+    return None
+
+
 def _history_rankings(history: Mapping[str, Any], kind: str) -> tuple[list[str], dict[str, dict[str, int]], dict[str, dict[str, Mapping[str, Any]]]]:
     by_date: dict[str, list[Mapping[str, Any]]] = {}
     for observation in history.get("observations") or []:
@@ -667,12 +724,14 @@ def build_relative_strength_tracking(
     v2_history: Mapping[str, Any],
     trading_date: Any,
     source_commit: Any,
+    observation_date: Any = None,
 ) -> dict[str, Any]:
     """Create an independent TOP-5 observation layer; V1/V2 states stay intact."""
     result: dict[str, Any] = {
         "schemaVersion": "relative-strength-top5-v1",
         "status": "AVAILABLE",
         "tradingDate": trading_date,
+        "observationDate": observation_date,
         "sourceCommit": source_commit,
         "sourceCommitStatus": "VERIFIED" if source_commit else "UNVERIFIED",
         "sourcePaths": {
@@ -778,6 +837,7 @@ def build_relative_strength_tracking(
                 "consecutiveTop5TradingDays": consecutive,
                 "sourceGeneration": source.get("generatedAt"),
                 "sourceCommit": source_commit,
+                "sourceTradingDate": _group_observation_date(row),
             })
         active = []
         for row in (list(v2_latest.get("industries" if kind == "industry" else "themes") or [])):
@@ -1084,6 +1144,8 @@ def build_report_contract(
     registered_universe: Mapping[str, Any] | None = None,
     v1_groups: Mapping[str, Any] | None = None,
     market_snapshot: Mapping[str, Any] | None = None,
+    current_market_observation: Mapping[str, Any] | None = None,
+    historical_technical_market: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -1184,6 +1246,48 @@ def build_report_contract(
             "pct": total.get(pct),
         }
 
+    current_observation = _current_market_observation(
+        current_market_observation if current_market_observation is not None else breadth,
+        quality,
+    )
+    historical_source = historical_technical_market if isinstance(historical_technical_market, Mapping) else full_market
+
+    def historical_metric(name: str, count: str, eligible: str, pct: str) -> dict[str, Any]:
+        supplied = historical_source.get("metrics")
+        if not isinstance(supplied, Mapping):
+            supplied = historical_source.get("breadth")
+        supplied_metric = supplied.get(name) if isinstance(supplied, Mapping) else None
+        return dict(supplied_metric) if isinstance(supplied_metric, Mapping) else metric(name, count, eligible, pct)
+
+    historical_metrics = {
+        "aboveMA20": historical_metric("aboveMA20", "aboveMA20Count", "aboveMA20EligibleCount", "pctAboveMA20"),
+        "aboveMA60": historical_metric("aboveMA60", "aboveMA60Count", "aboveMA60EligibleCount", "pctAboveMA60"),
+        "aboveMA120": historical_metric("aboveMA120", "aboveMA120Count", "aboveMA120EligibleCount", "pctAboveMA120"),
+        "breakout20": historical_metric("breakout20", "breakout20Count", "breakout20EligibleCount", "pctBreakout20"),
+        "breakout60": historical_metric("breakout60", "breakout60Count", "breakout60EligibleCount", "pctBreakout60"),
+        "volumeAbove20DayAverage": historical_metric("volumeAbove20DayAverage", "volumeAbove20DayAverageCount", "volumeAbove20DayAverageEligibleCount", "pctVolumeAbove20DayAverage"),
+    }
+    historical_total = ((historical_source.get("markets") or {}).get("TOTAL")
+                        or historical_source.get("breadth") or total)
+    historical_source_name = historical_lineage.get("source") or "UNAVAILABLE"
+    historical_technical = {
+        "status": "AVAILABLE" if any(isinstance(item.get("count"), int) for item in historical_metrics.values()) else "UNAVAILABLE",
+        "source": historical_source_name,
+        "targetDate": historical_lineage.get("targetDate") or trading_date,
+        "generationId": historical_lineage.get("generationId"),
+        "scope": "STOCK_ETF" if historical_source_name == "KRX" else (historical_source.get("scope") or "FULL_MARKET"),
+        "instrumentCount": (
+            historical_lineage.get("instrumentCount")
+            or historical_source.get("instrumentCount")
+            or historical_source.get("authoritativeCount")
+            or historical_total.get("directionEligibleCount")
+        ),
+        "breadth": {key: historical_total.get(key) for key in ("advancers", "decliners", "unchanged")},
+        "metrics": historical_metrics,
+        "qualityStatus": quality.get("sourceQualityStatus") or quality.get("collectionQualityStatus") or historical_source.get("qualityStatus") or "UNAVAILABLE",
+        "qualityWarnings": historical_source.get("qualityWarnings") or [],
+    }
+
     source_by_kind = {
         "industry": {
             str(row.get("id")): row for row in (industries.get("industries") or [])
@@ -1259,6 +1363,7 @@ def build_report_contract(
         v2_history=v2_history,
         trading_date=trading_date,
         source_commit=v2_source_commit,
+        observation_date=observed_date,
     )
     v1_industries = _compact_v1_rows(
         v1_groups, "industry", relative_strength_tracking["industries"]["top5"], trading_date
@@ -1380,6 +1485,8 @@ def build_report_contract(
         },
         "sourceBindings": {
             "reportContract": "data/monitoring/latest-report-contract.json",
+            "currentMarketObservation": "data/monitoring/latest-breadth.json#breadth.TOTAL",
+            "historicalTechnicalMarket": "reportContract.historicalTechnicalMarket",
             "markdownReport": "data/reports/latest.md",
             "htmlReport": "data/reports/latest.html",
             "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
@@ -1397,6 +1504,8 @@ def build_report_contract(
             "forbidCandidateMixing": True,
             "historicalAndPreMarketMustRemainSeparate": True,
         },
+        "currentMarketObservation": current_observation,
+        "historicalTechnicalMarket": historical_technical,
         "indices": indices.get("indices") or [],
         "marketSnapshot": market_snapshot,
         "fullMarket": {
