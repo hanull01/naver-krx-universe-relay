@@ -887,7 +887,7 @@ def full_market_evidence(as_of=None, root=MONITORING_PATH):
 
 
 def full_market_from_derived_projection(projection, target_date):
-    """Expose derived market summaries without promoting them to FINAL."""
+    """Expose a verified staged KRX historical projection to the report."""
     if not isinstance(projection, dict):
         return {"status": "UNAVAILABLE", "reason": "DERIVED_PROJECTION_MISSING"}
     target = str(target_date or "").replace("-", "")
@@ -896,12 +896,23 @@ def full_market_from_derived_projection(projection, target_date):
     summary = projection.get("fullMarket") or {}
     quality = summary.get("quality") or {}
     return {
-        "status": "AVAILABLE" if projection.get("status") in {"AVAILABLE", "PARTIAL"} else "UNAVAILABLE",
+        # A legacy PARTIAL projection is not a usable KRX input. The producer
+        # must emit an AVAILABLE projection after receipt/generation checks.
+        "status": "AVAILABLE" if projection.get("status") == "AVAILABLE" else "UNAVAILABLE",
         "asOfDate": target,
         "snapshotDate": target,
         "snapshotDateStatus": "DERIVED_TARGET_DATE",
         "sourceQualityStatus": projection.get("sourceQualityStatus", "PARTIAL"),
         "qualityStatus": projection.get("status", "PARTIAL"),
+        "historicalIndicatorSource": projection.get("historicalIndicatorSource", "KRX"),
+        "historicalLineageStatus": projection.get("historicalLineageStatus", "UNAVAILABLE"),
+        "historicalReceiptStatus": projection.get("historicalReceiptStatus", "UNAVAILABLE"),
+        "generationId": projection.get("generationId"),
+        "historicalGenerationId": projection.get("historicalGenerationId") or projection.get("generationId"),
+        "historicalTargetDate": projection.get("historicalTargetDate") or target,
+        "instrumentCount": summary.get("instrumentCount") or (quality.get("instrumentCount") if isinstance(quality, dict) else None),
+        "scope": summary.get("scope") or "STOCK_ETF",
+        "currentSnapshotSource": projection.get("currentSnapshotSource", "NAVER_SEPARATE"),
         "quality": quality,
         "breadth": summary.get("breadth") or {},
         "leaders": summary.get("leaders") or [],
@@ -910,7 +921,7 @@ def full_market_from_derived_projection(projection, target_date):
         "maBasisDateEvidence": summary.get("maBasisDateEvidence") or {},
         "generatedAt": projection.get("observedAt"),
         "sourceTime": None,
-        "reason": "DERIVED_SOURCE_OBSERVED_NOT_FINAL",
+        "reason": "DERIVED_KRX_PROJECTION",
         "derivedProjection": projection,
     }
 
@@ -1392,13 +1403,22 @@ def full_market_summary(full_market, alignment):
         and snapshot_status == "VERIFIED_EXPLICIT"
         and bool(full_market.get("snapshotDate"))
     )
-    if verified:
+    staged_krx = (
+        evidence_status == "AVAILABLE"
+        and alignment_is_valid
+        and snapshot_status == "DERIVED_TARGET_DATE"
+        and full_market.get("historicalIndicatorSource") == "KRX"
+        and full_market.get("historicalLineageStatus") == "VERIFIED"
+        and full_market.get("historicalReceiptStatus") == "VERIFIED"
+        and bool(full_market.get("snapshotDate"))
+    )
+    if verified or staged_krx:
         status = "AVAILABLE"
         reason = None
     elif evidence_status == "AVAILABLE":
         status = "PARTIAL"
         reason = (
-            "DERIVED_KRX_PROJECTION_NOT_FINAL"
+            "DERIVED_KRX_LINEAGE_UNVERIFIED"
             if snapshot_status == "DERIVED_TARGET_DATE"
             else "DATE_ALIGNMENT_NOT_VERIFIED"
         )
@@ -2311,15 +2331,6 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     if coverage_state == "EMPTY_CONFIGURED_UNIVERSE" or not alignment_is_valid:
         report_status = "PARTIAL"
         status_reason = "DATE_ALIGNMENT_UNVERIFIED"
-    elif (
-        technical_metadata.get("historicalIndicatorSource") == "KRX"
-        and (technical_inputs.get("derivedProjection") or {}).get("status") == "PARTIAL"
-    ):
-        # The date roles are valid, but the staged M10 projection is not a
-        # final production generation. Keep this PARTIAL explicit rather than
-        # misreporting it as a date or coverage failure.
-        report_status = "PARTIAL"
-        status_reason = "KRX_STAGED_PROJECTION_NOT_FINAL"
     monitored_scope = (
         "MONITORED_UNIVERSE_EMPTY" if not enabled
         else "MONITORED_UNIVERSE_CONFIGURED"
