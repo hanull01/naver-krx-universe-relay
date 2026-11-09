@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "itemCode": "001740",
   "itemName": "SK네트웍스",
-  "reportCount": 7,
-  "latestReportNid": "96713",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 9,
+  "latestReportNid": "97900",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "96713",
-    "writeDate": "2026-10-14",
+    "nid": "97900",
+    "writeDate": "2026-11-09",
     "brokerName": "하나증권",
-    "title": "일회성 비용으로 단기 실적 부진 전망",
+    "title": "일회성 비용 제외하면 견조한 실적",
     "goalPrice": 10000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 3
+        "positive": 2,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
         "원가": 1
@@ -27,6 +27,8 @@
     }
   },
   "reportNids": [
+    "97900",
+    "97843",
     "96713",
     "96302",
     "95710",

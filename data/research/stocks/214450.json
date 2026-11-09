@@ -2,33 +2,42 @@
   "schemaVersion": 1,
   "itemCode": "214450",
   "itemName": "파마리서치",
-  "reportCount": 24,
-  "latestReportNid": "97562",
-  "latestWriteDate": "2026-11-04",
+  "reportCount": 32,
+  "latestReportNid": "97905",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97562",
-    "writeDate": "2026-11-04",
-    "brokerName": "한국IR협의회",
-    "title": "연어앤비욘",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97905",
+    "writeDate": "2026-11-09",
+    "brokerName": "교보증권",
+    "title": "3Q26 Review: 바닥은 지나가고 있다",
+    "goalPrice": 530000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 10,
-        "negative": 2
+        "positive": 15,
+        "negative": 1
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 1,
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 1,
+        "미국": 3,
+        "원가": 2,
         "수요": 1,
-        "중국": 1
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97905",
+    "97893",
+    "97878",
+    "97874",
+    "97866",
+    "97863",
+    "97861",
+    "97831",
     "97562",
     "97250",
     "97234",

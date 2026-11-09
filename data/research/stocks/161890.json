@@ -2,34 +2,43 @@
   "schemaVersion": 1,
   "itemCode": "161890",
   "itemName": "한국콜마",
-  "reportCount": 32,
-  "latestReportNid": "97826",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 39,
+  "latestReportNid": "97911",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97826",
-    "writeDate": "2026-11-06",
-    "brokerName": "한화투자증권",
-    "title": "계절성을 넘어선 수요",
-    "goalPrice": 160000,
+    "nid": "97911",
+    "writeDate": "2026-11-09",
+    "brokerName": "교보증권",
+    "title": "4분기 한국 매출액 성장률 주목",
+    "goalPrice": 170000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 5
+        "positive": 16,
+        "negative": 6
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 4,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "중국": 2,
+        "수요": 3,
         "미국": 1,
-        "수주": 1,
-        "재고": 1
+        "원가": 1,
+        "자동차": 1,
+        "재고": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "97911",
+    "97899",
+    "97895",
+    "97889",
+    "97867",
+    "97848",
+    "97845",
     "97826",
     "96893",
     "96704",

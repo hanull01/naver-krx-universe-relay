@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "247540",
   "itemName": "에코프로비엠",
-  "reportCount": 27,
-  "latestReportNid": "97825",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 28,
+  "latestReportNid": "97833",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97825",
-    "writeDate": "2026-11-06",
-    "brokerName": "신한투자증권",
-    "title": "헝가리 가동 본격화, 회복의 출발점",
-    "goalPrice": 120000,
-    "normalizedOpinion": "BUY",
+    "nid": "97833",
+    "writeDate": "2026-11-09",
+    "brokerName": "iM증권",
+    "title": "양극재 출하 부진 지속",
+    "goalPrice": 90000,
+    "normalizedOpinion": "HOLD",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 6,
+        "negative": 7
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 3,
-        "원가": 1,
-        "자동차": 1
+        "수요": 4,
+        "자동차": 3,
+        "환율": 2,
+        "가격": 1,
+        "미국": 1,
+        "배터리": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97833",
     "97825",
     "97813",
     "97771",

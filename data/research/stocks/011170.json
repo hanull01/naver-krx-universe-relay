@@ -2,29 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "011170",
   "itemName": "롯데케미칼",
-  "reportCount": 11,
-  "latestReportNid": "95357",
-  "latestWriteDate": "2026-08-10",
+  "reportCount": 14,
+  "latestReportNid": "97873",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "95357",
-    "writeDate": "2026-08-10",
-    "brokerName": "유안타증권",
-    "title": "다시, 2027년까지 인내가 필요하다!",
-    "goalPrice": 134000,
+    "nid": "97873",
+    "writeDate": "2026-11-09",
+    "brokerName": "신한투자증권",
+    "title": "구조개편 이후, 우려보다 기대를",
+    "goalPrice": 73000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "수요": 1
+      }
     }
   },
   "reportNids": [
+    "97873",
+    "97865",
+    "97841",
     "95357",
     "95336",
     "95321",

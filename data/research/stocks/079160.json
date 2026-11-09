@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "079160",
   "itemName": "CJ CGV",
-  "reportCount": 5,
-  "latestReportNid": "97034",
-  "latestWriteDate": "2026-10-26",
+  "reportCount": 6,
+  "latestReportNid": "97882",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97034",
-    "writeDate": "2026-10-26",
-    "brokerName": "신한투자증권",
-    "title": "3Q26 호실적과 계속 봐야하는 이유",
-    "goalPrice": 6300,
+    "nid": "97882",
+    "writeDate": "2026-11-09",
+    "brokerName": "대신증권",
+    "title": "CGV가 보여줄 극장의 미래",
+    "goalPrice": 8500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 1,
         "negative": 0
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UP",
+      "topics": {
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "97882",
     "97034",
     "96085",
     "95350",

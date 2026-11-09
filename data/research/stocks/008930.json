@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "008930",
   "itemName": "한미사이언스",
-  "reportCount": 1,
-  "latestReportNid": "96245",
-  "latestWriteDate": "2026-09-21",
+  "reportCount": 2,
+  "latestReportNid": "97835",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "96245",
-    "writeDate": "2026-09-21",
+    "nid": "97835",
+    "writeDate": "2026-11-09",
     "brokerName": "iM증권",
-    "title": "컨트롤타워 프리미엄 가치 및 자체사업 성장성",
+    "title": "상업화, 기술수출, 자체사업 등으로 성장성 부각",
     "goalPrice": null,
     "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 15,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "방산": 3,
+        "미국": 2,
+        "가격": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "97835",
     "96245"
   ]
 }

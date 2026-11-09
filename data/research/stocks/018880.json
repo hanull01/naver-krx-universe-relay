@@ -2,33 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "018880",
   "itemName": "한온시스템",
-  "reportCount": 27,
-  "latestReportNid": "97822",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 28,
+  "latestReportNid": "97887",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97822",
-    "writeDate": "2026-11-06",
-    "brokerName": "하나증권",
-    "title": "원가는 해냈고, 이제 수주의 차례",
-    "goalPrice": 3900,
-    "normalizedOpinion": "HOLD",
+    "nid": "97887",
+    "writeDate": "2026-11-09",
+    "brokerName": "대신증권",
+    "title": "어제는 방어, 이제는 성장",
+    "goalPrice": 5400,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 13,
-        "negative": 4
+        "positive": 4,
+        "negative": 5
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "UP",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "수주": 4,
-        "원가": 4,
-        "환율": 1
+        "원가": 2
       }
     }
   },
   "reportNids": [
+    "97887",
     "97822",
     "97803",
     "97795",

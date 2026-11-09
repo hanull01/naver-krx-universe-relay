@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "021240",
   "itemName": "코웨이",
-  "reportCount": 8,
-  "latestReportNid": "96802",
-  "latestWriteDate": "2026-10-16",
+  "reportCount": 10,
+  "latestReportNid": "97916",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "96802",
-    "writeDate": "2026-10-16",
+    "nid": "97916",
+    "writeDate": "2026-11-09",
     "brokerName": "한화투자증권",
-    "title": "3Q26 Preview : 멈추지 않는 해외법인 성장",
-    "goalPrice": 160000,
+    "title": "3Q26 Review : 국내와 해외의 엇갈린 실적",
+    "goalPrice": 150000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 4
+        "positive": 10,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 3,
-        "환율": 2,
+        "가격": 2,
+        "미국": 2,
+        "원가": 2,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97916",
+    "97847",
     "96802",
     "95371",
     "95305",

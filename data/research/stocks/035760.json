@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "035760",
   "itemName": "CJ ENM",
-  "reportCount": 19,
-  "latestReportNid": "97816",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 21,
+  "latestReportNid": "97883",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97816",
-    "writeDate": "2026-11-06",
-    "brokerName": "하나증권",
-    "title": "오래 기다려 온 TV광고의 턴어라운드 확인!",
-    "goalPrice": 56000,
+    "nid": "97883",
+    "writeDate": "2026-11-09",
+    "brokerName": "대신증권",
+    "title": "본업의 회복 시그널",
+    "goalPrice": 60000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 1
+        "positive": 3,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UP",
-      "topics": {}
+      "topics": {
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "97883",
+    "97840",
     "97816",
     "97800",
     "97783",

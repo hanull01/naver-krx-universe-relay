@@ -2,31 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "282330",
   "itemName": "BGF리테일",
-  "reportCount": 34,
-  "latestReportNid": "97824",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 35,
+  "latestReportNid": "97875",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97824",
-    "writeDate": "2026-11-06",
-    "brokerName": "하나증권",
-    "title": "너무 낮은 성장률",
-    "goalPrice": 170000,
-    "normalizedOpinion": "HOLD",
+    "nid": "97875",
+    "writeDate": "2026-11-09",
+    "brokerName": "대신증권",
+    "title": "드러난 숫자 보다 좋은 내용",
+    "goalPrice": 200000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 1
+        "positive": 4,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "원가": 1
-      }
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {}
     }
   },
   "reportNids": [
+    "97875",
     "97824",
     "97802",
     "97798",

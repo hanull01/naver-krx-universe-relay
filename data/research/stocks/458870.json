@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "458870",
   "itemName": "씨어스",
-  "reportCount": 11,
-  "latestReportNid": "96679",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 12,
+  "latestReportNid": "97868",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "96679",
-    "writeDate": "2026-10-14",
-    "brokerName": "미래에셋증권",
-    "title": "국내를 평정한 이상, 이제 다음은 세계무대다.",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "97868",
+    "writeDate": "2026-11-09",
+    "brokerName": "IBK투자증권",
+    "title": "눈높이는 낮추고, 확인은 4분기부터",
+    "goalPrice": 19000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 1
+        "positive": 1,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 2,
-        "금리": 2
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97868",
     "96679",
     "96275",
     "95782",

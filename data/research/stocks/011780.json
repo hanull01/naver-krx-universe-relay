@@ -2,32 +2,40 @@
   "schemaVersion": 1,
   "itemCode": "011780",
   "itemName": "금호석유화학",
-  "reportCount": 13,
-  "latestReportNid": "95370",
-  "latestWriteDate": "2026-08-10",
+  "reportCount": 16,
+  "latestReportNid": "97870",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "95370",
-    "writeDate": "2026-08-10",
-    "brokerName": "하나증권",
-    "title": "실적 변동성 크지만 사이클은 회복 국면",
-    "goalPrice": 180000,
+    "nid": "97870",
+    "writeDate": "2026-11-09",
+    "brokerName": "유진투자증권",
+    "title": "3Q 적자가 4Q 흑자로",
+    "goalPrice": 177000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 1
+        "positive": 8,
+        "negative": 11
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "가격": 4,
-        "원가": 2
+        "가격": 5,
+        "원가": 5,
+        "자동차": 2,
+        "방산": 1,
+        "수요": 1,
+        "재고": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97870",
+    "97869",
+    "97864",
     "95370",
     "95310",
     "95304",

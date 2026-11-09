@@ -2,31 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "251270",
   "itemName": "넷마블",
-  "reportCount": 26,
-  "latestReportNid": "97821",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 28,
+  "latestReportNid": "97891",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "97821",
-    "writeDate": "2026-11-06",
-    "brokerName": "하나증권",
-    "title": "시간이 필요하다",
-    "goalPrice": 42000,
+    "nid": "97891",
+    "writeDate": "2026-11-09",
+    "brokerName": "유안타증권",
+    "title": "신작 가시성 확보가 회복의 조건",
+    "goalPrice": 46000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 2,
+        "negative": 6
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "원가": 2
       }
     }
   },
   "reportNids": [
+    "97891",
+    "97837",
     "97821",
     "97794",
     "97763",

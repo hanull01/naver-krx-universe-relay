@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "490470",
   "itemName": "세미파이브",
-  "reportCount": 1,
-  "latestReportNid": "95893",
-  "latestWriteDate": "2026-08-27",
+  "reportCount": 2,
+  "latestReportNid": "97851",
+  "latestWriteDate": "2026-11-09",
   "latest": {
-    "nid": "95893",
-    "writeDate": "2026-08-27",
-    "brokerName": "신한투자증권",
-    "title": "양산으로 증명되는 경쟁력",
-    "goalPrice": 23000,
+    "nid": "97851",
+    "writeDate": "2026-11-09",
+    "brokerName": "키움증권",
+    "title": "수주 먼저 도착, 실적은 배송 중",
+    "goalPrice": 20000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 4
+        "positive": 8,
+        "negative": 3
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 3,
-        "수주": 1
+        "수주": 7,
+        "환율": 2
       }
     }
   },
   "reportNids": [
+    "97851",
     "95893"
   ]
 }
