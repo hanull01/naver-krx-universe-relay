@@ -63,9 +63,9 @@ class KrxSyncReceiptTests(unittest.TestCase):
 
     def test_actual_m10_shape_is_validated(self):
         result = validate_m10_staging(self.root, expected_date="2026-11-02")
-        self.assertEqual(result["status"], "VALIDATED_NOT_CONNECTED")
+        self.assertEqual(result["status"], "VALIDATED_STAGED_INPUT")
         self.assertEqual(result["entityCount"], 1)
-        self.assertFalse(result["reportInputReady"])
+        self.assertTrue(result["reportInputReady"])
 
     def test_mapping_keeps_krx_regular_session_and_no_current_quote(self):
         mapped = map_m10_entity(self.entity())
@@ -95,7 +95,7 @@ class KrxSyncReceiptTests(unittest.TestCase):
     def test_verified_stage_feeds_existing_report_adapter_without_current_quotes(self):
         output = self.root / "report-stage"
         result = stage_m10_report_inputs(self.root, output)
-        self.assertEqual(result["status"], "STAGED_NOT_CONNECTED")
+        self.assertEqual(result["status"], "STAGED_REPORT_INPUT_READY")
         technicals_payload = json.loads((output / "technicals.json").read_text())
         self.assertEqual(technicals_payload["historicalPriority"], "PRIMARY")
         self.assertFalse(technicals_payload["historicalFallbackAllowed"])
@@ -113,7 +113,13 @@ class KrxSyncReceiptTests(unittest.TestCase):
         self.assertEqual(loaded["targetDate"], "20261102")
         self.assertEqual(len(loaded["technicals"]), 1)
         projection = json.loads((output / "report-contract-projection.json").read_text())
+        self.assertEqual(projection["status"], "AVAILABLE")
+        self.assertEqual(projection["generationId"], "gen_20261102_test")
+        self.assertEqual(projection["historicalTargetDate"], "20261102")
+        self.assertEqual(projection["historicalLineageStatus"], "VERIFIED")
         full_market = projection["fullMarket"]
+        self.assertEqual(full_market["status"], "AVAILABLE")
+        self.assertEqual(full_market["sourceQualityStatus"], "KRX_M10_STAGED")
         self.assertEqual(full_market["maBasisDates"], ["20261102"])
         self.assertEqual(full_market["maBasisDateEvidence"]["status"], "VERIFIED")
         self.assertEqual(

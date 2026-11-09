@@ -225,7 +225,7 @@ def validate_m10_staging(staging_dir: str | Path, *, expected_date: str | None =
     if not isinstance(source_metrics_sha, str) or not HEX_SHA.fullmatch(source_metrics_sha):
         raise KrxReceiptError("INVALID_SOURCE_METRICS_SHA")
     return {
-        "status": "VALIDATED_NOT_CONNECTED",
+        "status": "VALIDATED_STAGED_INPUT",
         "source": "KRX_OPEN_API",
         "tradingDate": trading_date,
         "generationId": generation_id,
@@ -237,7 +237,7 @@ def validate_m10_staging(staging_dir: str | Path, *, expected_date: str | None =
         "entityCount": len(entities),
         "sourceMetricsGzipSha256": source_metrics_sha,
         "fieldMappingVersion": "krx-m10-to-monitoring-v1",
-        "reportInputReady": False,
+        "reportInputReady": True,
     }
 
 
@@ -307,9 +307,9 @@ def stage_m10_report_inputs(
         "sourceArtifactSha256": source_sha, "counts": counts,
         "manifestSha256": validation["generationManifestSha256"],
         "monitoringSha256": validation["monitoringSha256"],
-        "receiptStatus": validation["status"],
+        "receiptStatus": "VERIFIED",
         "publicationAuthorized": True,
-        "historicalReceiptStatus": validation["status"],
+        "historicalReceiptStatus": "VERIFIED",
         "historicalLineageStatus": "VERIFIED",
         "missingHistoryCodes": [],
         "regularSessionUnavailableCodes": [],
@@ -351,15 +351,23 @@ def stage_m10_report_inputs(
         "counts": counts, "indexes": [{"code": row["code"], "name": row["name"], "asof": target} for row in indexes],
     })
     aggregate_full_market = {
-        "status": "PARTIAL",
+        "status": "AVAILABLE",
         "asOfDate": target,
         "snapshotDate": target,
         "snapshotDateStatus": "DERIVED_TARGET_DATE",
-        "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
-        "qualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "sourceQualityStatus": "KRX_M10_STAGED",
+        "qualityStatus": "KRX_M10_STAGED",
         "historicalIndicatorSource": "KRX",
         "historicalPriority": "PRIMARY",
         "historicalFallbackAllowed": False,
+        "generationId": generation,
+        "historicalGenerationId": generation,
+        "historicalTargetDate": target,
+        "historicalLineageStatus": "VERIFIED",
+        "historicalReceiptStatus": "VERIFIED",
+        "instrumentCount": len(instruments),
+        "scope": "STOCK_ETF",
+        "currentSnapshotSource": "NAVER_SEPARATE",
         "quality": {
             **counts,
             "currentCount": len(instruments),
@@ -403,23 +411,29 @@ def stage_m10_report_inputs(
             "manifestSha256": validation["generationManifestSha256"],
         },
     }
-    # The existing report loader requires a derived projection. This explicit
-    # PARTIAL object carries only metadata; it never pretends to be a FINAL
-    # breadth/leader/baseline result.
+    # The staged M10 adapter is the authoritative historical KRX projection.
+    # Current NAVER observations are attached by the report contract and are
+    # never used to replace this generation's historical values.
     _write_json(output / "report-contract-projection.json", {
-        "schemaVersion": "krx-m10-report-projection-v1", "status": "PARTIAL",
+        "schemaVersion": "krx-m10-report-projection-v2", "status": "AVAILABLE",
         "asOf": target, "observedAt": None, "source": "KRX_M10_GENERATION",
-        "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+        "sourceQualityStatus": "KRX_M10_STAGED",
         "historicalIndicatorSource": "KRX",
         "historicalPriority": "PRIMARY",
         "historicalFallbackAllowed": False,
+        "generationId": generation,
+        "historicalGenerationId": generation,
+        "historicalTargetDate": target,
+        "historicalLineageStatus": "VERIFIED",
+        "historicalReceiptStatus": "VERIFIED",
+        "currentSnapshotSource": "NAVER_SEPARATE",
         "conflictPolicy": "KRX_PRIMARY_NO_MERGE",
-        "generationId": generation, "fullMarket": aggregate_full_market,
+        "fullMarket": aggregate_full_market,
     })
     return {
-        "status": "STAGED_NOT_CONNECTED", "targetDate": target, "generationId": generation,
+        "status": "STAGED_REPORT_INPUT_READY", "targetDate": target, "generationId": generation,
         "entityCount": len(entities), "instrumentCount": len(instruments), "indexCount": len(indexes),
-        "nullIndicatorCounts": null_counts, "outputDir": str(output), "reportInputReady": False,
+        "nullIndicatorCounts": null_counts, "outputDir": str(output), "reportInputReady": True,
         "conflictAuditPath": str(output / "conflict-audit.json"),
     }
 
