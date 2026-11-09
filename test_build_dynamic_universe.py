@@ -1,6 +1,7 @@
 import unittest
 
 from tools.build_dynamic_universe import input_evidence, usable_industry_rows, verified_trading_date
+from dynamic_universe_manager import build_management_result
 
 
 class IndustryEvidenceTests(unittest.TestCase):
@@ -21,6 +22,47 @@ class IndustryEvidenceTests(unittest.TestCase):
         })
         self.assertEqual(status, "PARTIAL_WITH_COVERAGE")
         self.assertEqual(len(rows), 1)
+
+    def test_current_observation_rows_survive_without_krx_derived_metrics(self):
+        row = self.row(
+            relativeStrengthVsMarket=None,
+            officialChangeRateRelativeStrength=2.5,
+            pctAboveMA20=None,
+            pctVolumeAbove20DayAverage=None,
+            leaders=[{"code": "005930", "name": "삼성전자", "sourceDate": "20261109"}],
+        )
+        rows, status = usable_industry_rows({
+            "quality": {"sourceStatus": "OK", "industryEvidenceUsable": "FULL"},
+            "industries": [row],
+        })
+        self.assertEqual(status, "FULL")
+        self.assertEqual([item["id"] for item in rows], ["261"])
+
+    def test_operating_sector_evaluation_receives_industry_rows(self):
+        row = self.row(
+            officialChangeRateRelativeStrength=2.5,
+            leaders=[{"code": "005930", "name": "삼성전자", "assetType": "STOCK", "sourceDate": "20261109"}],
+        )
+        result = build_management_result(
+            {"tradingDate": "20261109", "industries": {
+                "qualityStatus": "FULL",
+                "quality": {"sourceStatus": "OK", "industryEvidenceUsable": "FULL"},
+                "industries": [row],
+            }, "themes": {"status": "UNAVAILABLE"}},
+            {}, policy={
+                "activationConfirmations": 2, "removalConfirmations": 2,
+                "watchConfirmations": 1, "leaderLimitPerGroup": 3,
+                "collectionLimit": 120,
+                "sector": {"minimumScore": 60, "minimumRelativeStrength": 0,
+                           "minimumAdvancerPct": 50, "minimumTurnoverConcentrationPct": 0,
+                           "minimumPctAboveMA20": 50, "minimumLeaderCount": 1},
+                "theme": {"minimumScore": 60, "requireVerifiedMembership": True},
+                "leader": {"minimumScore": 60, "minimumPersistence": 1},
+            }, asset_registry={"assets": [{"code": "005930", "assetType": "STOCK"}]},
+        )
+        self.assertEqual(len(result["sectors"]), 1)
+        self.assertEqual(result["sectors"][0]["id"], "261")
+        self.assertEqual(result["industryEvidence"]["analyzedIndustryCount"], 1)
 
     def test_incomplete_rows_are_rejected(self):
         rows, status = usable_industry_rows({

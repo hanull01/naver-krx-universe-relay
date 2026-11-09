@@ -558,6 +558,17 @@ def _compact_leaders(row: Mapping[str, Any]) -> str:
     return ", ".join(values) if values else "주도주 자료 없음"
 
 
+def _compact_group_lineage(rows: list[Mapping[str, Any]]) -> str:
+    """Render the current-observation binding shared by HTML and Markdown."""
+    row = next((item for item in rows if isinstance(item, Mapping)), {})
+    source = _text(row.get("leaderSource") or row.get("source"), "확인 대기")
+    source_date = _compact_date(row.get("sourceDate") or row.get("leaderObservationDate"))
+    observation_date = _compact_date(row.get("observationDate") or row.get("leaderObservationDate"))
+    scope = _text(row.get("leaderScope") or row.get("scope"), "확인 대기")
+    status = _display_status(row.get("leaderEvidenceStatus"), "확인 대기")
+    return f"원천: {source} · 원천일: {source_date} · 관측일: {observation_date} · 범위: {scope} · 주도주 품질: {status}"
+
+
 def _snapshot_rank_rows(model: Mapping[str, Any], name: str) -> list[Mapping[str, Any]]:
     snapshot = model.get("marketSnapshot") or {}
     rankings = snapshot.get("rankings") or {}
@@ -823,6 +834,7 @@ def _compact_rank_cards(rows: list[Mapping[str, Any]], label: str) -> str:
             f'<div>{_escape(_plain_pct(breadth))}<small>상승 비율</small></div>'
             f'<div>{_escape(str(row.get("memberCount") or "확인 불가"))}<small>구성 종목</small></div>'
             f'<div style="grid-column:1 / -1;overflow-wrap:anywhere">{_escape(_compact_leaders(row))}<small>대표 주도주 최대 3개</small></div>'
+            f'<div style="grid-column:1 / -1;overflow-wrap:anywhere"><small>{_escape(_compact_group_lineage([row]))}</small></div>'
             '</div></div>'
         )
     return "".join(cards) or f'<div class="industry-item"><strong>{_escape(label)} 자료 없음</strong><p>검증된 현재 거래일 자료를 확인 대기 중입니다.</p></div>'
@@ -833,7 +845,7 @@ def _compact_v1_cards(rows: list[Mapping[str, Any]], label: str) -> str:
     if not rows:
         return f'<div class="industry-item"><strong>운영 선정 {label} 자료 없음</strong><p>현재 거래일의 검증된 운영 선정 상태가 없습니다.</p></div>'
     return "".join(
-        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>운영 선정 상태 · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>'
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>운영 선정 상태 · 대표 주도주 {_escape(_compact_leaders(row))}<br><small>{_escape(_compact_group_lineage([row]))}</small></p></div>'
         for row in rows[:5]
     )
 
@@ -1090,6 +1102,7 @@ def _compact_markdown(
     lines += _compact_snapshot_markdown(model)
     lines += ["", "### 핵심 결론", ""] + [f"- {item}" for item in _compact_conclusions(model)]
     lines += ["", "## 2. 주도 업종·테마", "", "### 업종 상대강도 TOP 5"]
+    lines += [_compact_group_lineage(model["relativeIndustries"])]
     industry_rows = [(
         row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
         _plain_pct(row.get("breadthPct")), _compact_leaders(row),
@@ -1097,6 +1110,7 @@ def _compact_markdown(
     ) for row in model["relativeIndustries"]]
     lines += _markdown_table(("순위", "업종", "상대강도", "상승 비율", "대표 주도주", "상태"), industry_rows or [("-", "자료 없음", "-", "-", "-", "확인 대기")])
     lines += ["", "### 테마 상대강도 TOP 5"]
+    lines += [_compact_group_lineage(model["relativeThemes"])]
     theme_rows = [(
         row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
         _plain_pct(row.get("breadthPct")), _compact_leaders(row),
@@ -1104,11 +1118,13 @@ def _compact_markdown(
     ) for row in model["relativeThemes"]]
     lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "자료 없음", "-", "-", "-", "확인 대기")])
     lines += ["", "### 운영 관심 업종"]
+    lines += [_compact_group_lineage(model["v1Industries"])]
     v1_industry_rows = [(
         row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
     ) for row in model["v1Industries"] if _compact_row_available(row)]
     lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_industry_rows or [("자료 없음", "확인 대기", "-")])
     lines += ["", "### 운영 관심 테마"]
+    lines += [_compact_group_lineage(model["v1Themes"])]
     v1_theme_rows = [(
         row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
     ) for row in model["v1Themes"] if _compact_row_available(row)]

@@ -766,6 +766,52 @@ class EvidenceTests(unittest.TestCase):
         self.assertIn(row["breadthConcentration"], ("BROAD", "NARROW", "WEAK"))
         self.assertIn("relativeStrengthVsMarket", row)
 
+    def test_industry_leaders_use_same_day_current_snapshot_and_limit_three(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 3,
+                    "coverageCount": 3, "attemptCount": 1, "duplicateCodes": [],
+                    "missingCodes": [], "stocks": [
+                        current("A", price=130, localDate="20261001", changeRate=9.0),
+                        current("B", price=120, localDate="20261001", changeRate=8.0),
+                        current("C", price=110, localDate="20261001", changeRate=7.0),
+                    ]}
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "업종"}],
+                      "diagnostics": {}}
+        membership = {"status": "OK", "industries": [{
+            "id": "1", "name": "업종", "status": "OK",
+            "members": [{"code": code} for code in ("A", "B", "C", "MISSING")],
+        }]}
+        with tempfile.TemporaryDirectory() as directory:
+            built, _ = evidence.build_evidence(
+                snapshot, Path(directory), industries, membership, today="20261001"
+            )
+        row = built["latest-industries.json"]["industries"][0]
+        self.assertEqual([item["code"] for item in row["leaderCandidates"]], ["A", "B", "C"])
+        self.assertEqual(row["leaderEvidenceStatus"], "AVAILABLE")
+        self.assertEqual(row["leaderSource"], "NAVER_CURRENT_SNAPSHOT")
+        self.assertEqual(row["leaderObservationDate"], "20261001")
+        self.assertEqual(row["leaderScope"], "STOCK_ONLY")
+        self.assertNotIn("MISSING", {item["code"] for item in row["leaderCandidates"]})
+
+    def test_industry_leaders_reject_stale_current_member_observation(self):
+        snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
+                    "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [],
+                    "missingCodes": [], "stocks": [
+                        current("A", localDate="20260930", changeRate=9.0),
+                    ]}
+        industries = {"status": "OK", "industries": [{"id": "1", "name": "업종"}],
+                      "diagnostics": {}}
+        membership = {"status": "OK", "industries": [{
+            "id": "1", "name": "업종", "status": "OK", "members": [{"code": "A"}],
+        }]}
+        feature = evidence.feature_row(snapshot["stocks"][0], [], "20261001")
+        feature["temporaryCurrentBarDate"] = "20260930"
+        _, rows = evidence.aggregate_industries(
+            [feature], industries, membership, observation_date="20261001"
+        )
+        row = rows[0]
+        self.assertEqual(row["leaderCandidates"], [])
+        self.assertEqual(row["leaderEvidenceStatus"], "UNAVAILABLE_NO_CURRENT_SNAPSHOT")
+
     def test_empty_industry_aggregation_is_not_full(self):
         snapshot = {"status": "SUCCESS", "generatedAt": "t", "expectedCount": 1,
                     "coverageCount": 1, "attemptCount": 1, "duplicateCodes": [],
