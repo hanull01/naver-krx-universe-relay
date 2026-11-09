@@ -530,6 +530,16 @@ def _compact_v1_rows(
             "score": row.get("score"),
             "tradingDate": row.get("lastObservedTradingDate") or trading_date,
             "leaders": _compact_group_leaders(relative.get("leaderCandidates") or relative.get("leaders") or []),
+            "leaderCandidates": _compact_group_leaders(relative.get("leaderCandidates") or relative.get("leaders") or []),
+            "leaderEvidenceStatus": relative.get("leaderEvidenceStatus") or "UNAVAILABLE_NO_CURRENT_SNAPSHOT",
+            "leaderSource": relative.get("leaderSource") or "NAVER_CURRENT_SNAPSHOT",
+            "leaderObservationDate": relative.get("leaderObservationDate") or relative.get("observationDate") or trading_date,
+            "leaderScope": relative.get("leaderScope") or relative.get("scope") or "STOCK_ONLY",
+            "leaderMissingReason": relative.get("leaderMissingReason"),
+            "source": relative.get("source") or "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": relative.get("sourceDate") or relative.get("sourceTradingDate") or trading_date,
+            "observationDate": relative.get("observationDate") or relative.get("sourceTradingDate") or trading_date,
+            "scope": relative.get("scope") or "STOCK_ONLY",
         })
     rows.sort(key=lambda item: (-float(item["score"]) if isinstance(item.get("score"), (int, float)) else 1e9, str(item.get("id") or "")))
     return rows[:5]
@@ -688,6 +698,11 @@ def _group_observation_date(row: Mapping[str, Any]) -> str | None:
     return None
 
 
+def _compact_normalized_date(value: Any) -> str | None:
+    text = str(value or "").replace("-", "").replace("/", "")[:8]
+    return text if len(text) == 8 and text.isdigit() else None
+
+
 def _history_rankings(history: Mapping[str, Any], kind: str) -> tuple[list[str], dict[str, dict[str, int]], dict[str, dict[str, Mapping[str, Any]]]]:
     by_date: dict[str, list[Mapping[str, Any]]] = {}
     for observation in history.get("observations") or []:
@@ -714,6 +729,59 @@ def _history_rankings(history: Mapping[str, Any], kind: str) -> tuple[list[str],
         ranks[date] = {str(row.get("id")): index for index, row in enumerate(eligible, 1) if row.get("id") is not None}
         rows_by_date[date] = {str(row.get("id")): row for row in rows if row.get("id") is not None}
     return dates, ranks, rows_by_date
+
+
+def _current_group_leader_binding(
+    row: Mapping[str, Any], kind: str, observation_date: Any
+) -> dict[str, Any]:
+    """Bind group leaders to the same-day NAVER observation only."""
+    expected_date = _compact_normalized_date(observation_date)
+    source_date = _group_observation_date(row)
+    if expected_date and source_date and source_date != expected_date:
+        status = "UNAVAILABLE_DATE_MISMATCH"
+        candidates = []
+        reason = "SOURCE_DATE_MISMATCH"
+    elif kind == "industry":
+        raw_candidates = [candidate for candidate in (row.get("leaders") or [])
+                          if isinstance(candidate, Mapping)]
+        candidates = [candidate for candidate in raw_candidates if (
+            not expected_date
+            or _compact_normalized_date(
+                candidate.get("sourceDate") or candidate.get("observationDate")
+                or candidate.get("temporaryCurrentBarDate")
+            ) in {None, expected_date}
+        )]
+        if candidates:
+            status = "AVAILABLE"
+            reason = None
+        elif raw_candidates and expected_date:
+            status = "UNAVAILABLE_DATE_MISMATCH"
+            reason = "LEADER_DATE_MISMATCH"
+        else:
+            status = "UNAVAILABLE_NO_CURRENT_SNAPSHOT"
+            reason = "NO_CURRENT_LEADER_CANDIDATES"
+    else:
+        candidates = [stock for stock in (row.get("stocks") or [])
+                      if isinstance(stock, Mapping)
+                      and stock.get("currentPrice") is not None
+                      and stock.get("changeRate") is not None
+                      and (
+                          stock.get("derivedMetricsUsable", True) is True
+                          or not expected_date
+                          or _group_observation_date({"stocks": [stock]}) == expected_date
+                      )]
+        candidates = sorted(candidates, key=_leader_sort_key, reverse=True)[:3]
+        status = "AVAILABLE" if candidates else "UNAVAILABLE_NO_CURRENT_SNAPSHOT"
+        reason = None if candidates else "NO_CURRENT_LEADER_CANDIDATES"
+    return {
+        "status": status,
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "sourceDate": source_date or expected_date,
+        "observationDate": expected_date or source_date,
+        "scope": "STOCK_ONLY",
+        "missingReason": reason,
+        "candidates": _compact_group_leaders(candidates),
+    }
 
 
 def build_relative_strength_tracking(
@@ -803,16 +871,7 @@ def build_relative_strength_tracking(
                     consecutive += 1
                 else:
                     break
-            source_leaders = row.get("leaders")
-            if kind == "theme" and not source_leaders:
-                source_leaders = sorted(
-                    [stock for stock in (row.get("stocks") or []) if isinstance(stock, Mapping)],
-                    key=lambda stock: (
-                        -float(stock.get("changeRate") or -1e9),
-                        -float(stock.get("accumulatedTradingValue") or 0),
-                        str(stock.get("code") or ""),
-                    ),
-                )[:3]
+            leader_binding = _current_group_leader_binding(row, kind, observation_date)
             top5.append({
                 "rank": rank,
                 "id": row.get("id"),
@@ -829,7 +888,16 @@ def build_relative_strength_tracking(
                 "dataQuality": v2.get("dataQuality") or row.get("qualityStatus") or row.get("dataQuality") or "AVAILABLE",
                 "score": v2.get("score"),
                 "persistenceDays": v2.get("persistenceDays"),
-                "leaderCandidates": _compact_group_leaders(source_leaders),
+                "leaderCandidates": leader_binding["candidates"],
+                "leaderEvidenceStatus": leader_binding["status"],
+                "leaderSource": leader_binding["source"],
+                "leaderObservationDate": leader_binding["observationDate"],
+                "leaderScope": leader_binding["scope"],
+                "leaderMissingReason": leader_binding["missingReason"],
+                "source": "NAVER_CURRENT_SNAPSHOT",
+                "sourceDate": leader_binding["sourceDate"],
+                "observationDate": leader_binding["observationDate"],
+                "scope": "STOCK_ONLY",
                 "rankBefore": prior_rank,
                 "rankChange": (prior_rank - rank) if prior_rank is not None else None,
                 "changeClass": change_class,
@@ -954,14 +1022,25 @@ def _leader_evidence(
     kind: str,
     expected_generation: Any,
     source_commit: Any,
+    observation_date: Any = None,
 ) -> dict[str, Any]:
+    source_path = (
+        "data/monitoring/latest-industries.json#industries[].leaders"
+        if kind == "industry" else
+        "data/monitoring/latest-theme-signals.json#themes[].stocks"
+    )
+    expected_observation_date = _compact_normalized_date(observation_date)
     if not isinstance(source_row, Mapping):
         return {
             "status": "UNAVAILABLE_MEMBERSHIP_SOURCE",
-            "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
-            if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+            "sourcePath": source_path,
             "sourceGeneration": None,
             "sourceCommit": source_commit,
+            "source": "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": None,
+            "observationDate": expected_observation_date,
+            "scope": "STOCK_ONLY",
+            "missingReason": "NO_CURRENT_MEMBERSHIP",
             "candidates": [],
         }
     source_generation = source_row.get("generatedAt")
@@ -972,34 +1051,82 @@ def _leader_evidence(
     if not expected_generation or source_generation != expected_generation:
         return {
             "status": "UNAVAILABLE_SOURCE_GENERATION_MISMATCH",
-            "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
-            if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+            "sourcePath": source_path,
             "sourceGeneration": source_generation,
             "sourceCommit": source_commit,
+            "source": "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": _group_observation_date(source_row),
+            "observationDate": expected_observation_date,
+            "scope": "STOCK_ONLY",
+            "missingReason": "SOURCE_GENERATION_MISMATCH",
+            "candidates": [],
+        }
+    source_date = _group_observation_date(source_row)
+    if expected_observation_date and source_date and source_date != expected_observation_date:
+        return {
+            "status": "UNAVAILABLE_DATE_MISMATCH",
+            "sourcePath": source_path,
+            "sourceGeneration": source_generation,
+            "sourceCommit": source_commit,
+            "source": "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": source_date,
+            "observationDate": expected_observation_date,
+            "scope": "STOCK_ONLY",
+            "missingReason": "SOURCE_DATE_MISMATCH",
             "candidates": [],
         }
     if kind == "industry":
-        candidates = list(source_row.get("leaders") or [])[:3]
+        candidates = [row for row in (source_row.get("leaders") or [])
+                      if isinstance(row, Mapping)][:3]
     else:
         candidates = [
             stock for stock in (source_row.get("stocks") or [])
             if isinstance(stock, Mapping)
-            and stock.get("derivedMetricsUsable", True) is True
+            and stock.get("currentPrice") is not None
+            and stock.get("changeRate") is not None
+            and (
+                stock.get("derivedMetricsUsable", True) is True
+                or not expected_observation_date
+                or _group_observation_date({"stocks": [stock]}) == expected_observation_date
+            )
         ]
         candidates = sorted(candidates, key=_leader_sort_key, reverse=True)[:3]
+    candidate_dates = {
+        _compact_normalized_date(
+            row.get("sourceDate") or row.get("observationDate")
+            or row.get("temporaryCurrentBarDate")
+        )
+        for row in candidates
+        if isinstance(row, Mapping)
+    }
+    if expected_observation_date and candidate_dates and candidate_dates != {expected_observation_date}:
+        candidates = [
+            row for row in candidates
+            if _compact_normalized_date(
+                row.get("sourceDate") or row.get("observationDate")
+                or row.get("temporaryCurrentBarDate")
+            ) in {None, expected_observation_date}
+        ]
     compact = [_compact_leader(row) for row in candidates if isinstance(row, Mapping)]
     if not compact:
-        status = "AVAILABLE_ZERO"
+        status = "UNAVAILABLE_NO_CURRENT_SNAPSHOT"
+        missing_reason = "NO_CURRENT_LEADER_CANDIDATES"
     elif source_commit:
         status = "AVAILABLE"
+        missing_reason = None
     else:
         status = "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"
+        missing_reason = None
     return {
         "status": status,
-        "sourcePath": "data/monitoring/latest-industries.json#industries[].leaders"
-        if kind == "industry" else "data/monitoring/latest-theme-signals.json#themes[].stocks",
+        "sourcePath": source_path,
         "sourceGeneration": source_generation,
         "sourceCommit": source_commit,
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "sourceDate": source_date or expected_observation_date,
+        "observationDate": expected_observation_date or source_date,
+        "scope": "STOCK_ONLY",
+        "missingReason": missing_reason,
         "candidates": compact,
     }
 
@@ -1334,12 +1461,17 @@ def build_report_contract(
                 kind=kind,
                 expected_generation=v2_latest.get("generatedAt"),
                 source_commit=v2_source_commit,
+                observation_date=observation_date,
             )
             item["leaderCandidates"] = leader_evidence["candidates"]
             # Preserve the prior compact key for readers that already consume
             # V2 rows; the explicit name is preferred by new renderers.
             item["leaders"] = item["leaderCandidates"]
             item["leaderEvidenceStatus"] = leader_evidence["status"]
+            item["leaderSource"] = leader_evidence.get("source")
+            item["leaderObservationDate"] = leader_evidence.get("observationDate")
+            item["leaderScope"] = leader_evidence.get("scope")
+            item["leaderMissingReason"] = leader_evidence.get("missingReason")
             item["leaderEvidence"] = {
                 key: value for key, value in leader_evidence.items() if key != "candidates"
             }

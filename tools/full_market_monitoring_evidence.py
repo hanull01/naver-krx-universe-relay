@@ -301,7 +301,21 @@ def industry_quality(industries, previous_good=None):
             "newSincePrevious": diagnostics.get("newSincePrevious", [])}
 
 
-def aggregate_industries(features, industries, membership, previous_good=None):
+def _current_leader_sort_key(item):
+    """Use the established current-observation leader ordering only."""
+    try:
+        change_rate = float(item.get("changeRate"))
+    except (TypeError, ValueError):
+        change_rate = -9999.0
+    try:
+        volume_ratio = float(item.get("current_volume_ratio_20"))
+    except (TypeError, ValueError):
+        volume_ratio = -1.0
+    return change_rate, item.get("breakout_20_intraday") is True, volume_ratio
+
+
+def aggregate_industries(features, industries, membership, previous_good=None,
+                         observation_date=None):
     by_code = {row["code"]: row for row in features}
     quality = industry_quality(industries, previous_good)
     baseline_stale = any(row.get("baselineFreshnessStatus") == BASELINE_STALE for row in features)
@@ -334,10 +348,54 @@ def aggregate_industries(features, industries, membership, previous_good=None):
                     if isinstance(item.get("accumulatedTradingValue"), (int, float))]
         top_turnover = sorted(turnover, reverse=True)[:3]
         ma5_valid = [item for item in derived_valid if item.get("ma5") is not None and item.get("currentPrice") is not None]
-        leaders = sorted(derived_valid, key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
-                                                   item["current_volume_ratio_20"] or -1), reverse=True)[:3]
+        # Group leaders are a current NAVER observation.  They must remain
+        # available when the KRX-derived baseline is stale; using
+        # ``derived_valid`` here incorrectly turned every group into an empty
+        # leader list.  Membership is already intersected with ``by_code``,
+        # so absent current-snapshot members are excluded.
+        expected_observation_date = str(observation_date or "").replace("-", "")
+        current_leader_pool = [item for item in valid
+                               if item.get("currentPrice") is not None
+                               and item.get("changeRate") is not None
+                               and item.get("historyAdjustmentStatus") != STATUS_UNVERIFIED
+                               and (
+                                   not expected_observation_date
+                                   or str(item.get("temporaryCurrentBarDate") or "").replace("-", "")
+                                   == expected_observation_date
+                               )]
+        leaders = sorted(current_leader_pool, key=_current_leader_sort_key,
+                         reverse=True)[:3]
+        if leaders:
+            leader_evidence_status = "AVAILABLE"
+            leader_missing_reason = None
+        elif not members:
+            leader_evidence_status = "UNAVAILABLE_NO_CURRENT_MEMBERSHIP"
+            leader_missing_reason = "NO_CURRENT_SNAPSHOT_MEMBERS"
+        elif not current_leader_pool:
+            leader_evidence_status = "UNAVAILABLE_NO_CURRENT_SNAPSHOT"
+            leader_missing_reason = "NO_CURRENT_PRICE_OR_CHANGE_RATE"
+        else:
+            leader_evidence_status = "UNAVAILABLE"
+            leader_missing_reason = "NO_VALID_CURRENT_LEADER"
+        leader_rows = [{
+            key: item.get(key) for key in (
+                "code", "name", "market", "currentPrice", "changeRate",
+                "accumulatedTradingValue", "dist_high_20",
+                "current_volume_ratio_20", "above_ma20", "above_ma60",
+                "breakout_20_intraday",
+            )
+        } for item in leaders]
+        for candidate in leader_rows:
+            candidate.update({
+                "source": "NAVER_CURRENT_SNAPSHOT",
+                "sourceDate": observation_date,
+                "observationDate": observation_date,
+                "scope": "STOCK_ONLY",
+            })
         result.append({
             "id": group.get("id"), "name": group.get("name"), "memberCount": len(members),
+            "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": observation_date,
+            "observationDate": observation_date, "scope": "STOCK_ONLY",
             "featureValidMemberCount": len(feature_valid), "closeValidMemberCount": len(valid),
             "derivedFeatureValidMemberCount": len([item for item in derived_valid if item["traded_bar"]]),
             "historyAdjustmentUnverifiedCount": sum(
@@ -389,7 +447,13 @@ def aggregate_industries(features, industries, membership, previous_good=None):
                 "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
             },
             "persistence": {"status": "UNAVAILABLE_NO_GROUP_HISTORY", "availableTradingDays": 1},
-            "leaders": [{key: item.get(key) for key in ("code", "name", "changeRate", "dist_high_20", "current_volume_ratio_20", "above_ma20", "breakout_20_intraday")} for item in leaders],
+            "leaders": leader_rows,
+            "leaderCandidates": leader_rows,
+            "leaderEvidenceStatus": leader_evidence_status,
+            "leaderSource": "NAVER_CURRENT_SNAPSHOT",
+            "leaderObservationDate": observation_date,
+            "leaderScope": "STOCK_ONLY",
+            "leaderMissingReason": leader_missing_reason,
             "industrySourcePresent": str(group.get("id")) in source,
         })
         if baseline_stale:
@@ -721,7 +785,10 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     summary.update({key: publication_context[key] for key in (
         "session", "publicationStatus", "monitoredUniverse", "universeCrossCheck",
     ) if key in publication_context})
-    quality, industry_rows = aggregate_industries(features, industries, membership, previous_good_industries)
+    quality, industry_rows = aggregate_industries(
+        features, industries, membership, previous_good_industries,
+        observation_date=today,
+    )
     leaders = sorted([item for item in features if derived_metrics_usable(item)],
                      key=lambda item: (item["changeRate"] or -9999, item["breakout_20_intraday"] is True,
                                        item["current_volume_ratio_20"] or -1), reverse=True)[:30]

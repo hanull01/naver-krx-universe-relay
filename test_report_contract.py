@@ -3,6 +3,7 @@ import unittest
 
 from tools.report_contract import (
     build_report_contract,
+    build_relative_strength_tracking,
     REQUIRED_RENDER_FIELDS,
     classify_contract_transport_response,
     validate_contract_payload,
@@ -238,6 +239,8 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual([row["name"] for row in industry["leaderCandidates"]], ["상위업종주", "두번째주", "세번째주"])
         self.assertEqual(industry["leaders"], industry["leaderCandidates"])
         self.assertEqual(industry["leaderEvidenceStatus"], "AVAILABLE_UNVERIFIED_SOURCE_COMMIT")
+        self.assertEqual(industry["leaderSource"], "NAVER_CURRENT_SNAPSHOT")
+        self.assertEqual(industry["leaderObservationDate"], "20261029")
         self.assertEqual([row["name"] for row in theme["leaderCandidates"]], ["테마상위", "테마차상위", "테마하위"])
         self.assertEqual(contract["v2"]["history"]["availableTradingDays"], 7)
         self.assertTrue(contract["v2"]["history"]["sameDayDeduplicated"])
@@ -509,6 +512,33 @@ class ReportContractTests(unittest.TestCase):
         row = contract["relativeStrengthTop5"]["industries"]["top5"][0]
         self.assertEqual(row["relativeStrength"], 0.0)
         self.assertEqual(row["eligibility"], "ELIGIBLE")
+
+    def test_theme_leaders_use_current_observation_when_krx_derived_metrics_are_stale(self):
+        tracking = build_relative_strength_tracking(
+            industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": [{
+                "id": "T1", "name": "당일 테마", "memberCount": 2,
+                "metrics": {"officialChangeRateRelativeStrength": 2.0,
+                             "averageReturn1D": 1.0, "advancerPct": 50.0,
+                             "derivedValidQuoteCount": 0},
+                "stocks": [
+                    {"code": "1", "name": "현재 주도", "currentPrice": 100,
+                     "changeRate": 5.0, "derivedMetricsUsable": False,
+                     "temporaryCurrentBarDate": "20261109"},
+                    {"code": "2", "name": "오래된 주도", "currentPrice": 90,
+                     "changeRate": 99.0, "derivedMetricsUsable": False,
+                     "temporaryCurrentBarDate": "20261106"},
+                ],
+            }]},
+            v2_latest={"industries": [], "themes": []},
+            v2_history={"observations": []}, trading_date="20261109",
+            source_commit=None, observation_date="20261109",
+        )
+        row = tracking["themes"]["top5"][0]
+        self.assertEqual([item["code"] for item in row["leaderCandidates"]], ["1"])
+        self.assertEqual(row["leaderEvidenceStatus"], "AVAILABLE")
+        self.assertEqual(row["leaderSource"], "NAVER_CURRENT_SNAPSHOT")
+        self.assertEqual(row["leaderObservationDate"], "20261109")
 
     def test_current_relative_strength_survives_missing_derived_feature_count(self):
         common = {"generatedAt": "2026-10-30T10:00:00+09:00"}

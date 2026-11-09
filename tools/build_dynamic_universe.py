@@ -11,9 +11,9 @@ sys.path.insert(0, str(ROOT))
 import dynamic_universe_manager as manager
 import theme_research
 
-REQUIRED_INDUSTRY_FIELDS = (
-    "advancePct", "relativeStrengthVsMarket", "pctAboveMA20",
-    "pctVolumeAbove20DayAverage",
+CURRENT_INDUSTRY_FIELDS = ("advancePct",)
+CURRENT_OR_HISTORICAL_STRENGTH_FIELDS = (
+    "officialChangeRateRelativeStrength", "relativeStrengthVsMarket",
 )
 
 
@@ -30,7 +30,15 @@ def usable_industry_rows(payload):
                 or not isinstance(row.get("featureValidMemberCount"), int)
                 or row.get("featureValidMemberCount") <= 0):
             continue
-        if any(not isinstance(row.get(field), (int, float)) for field in REQUIRED_INDUSTRY_FIELDS):
+        if any(not isinstance(row.get(field), (int, float))
+               for field in CURRENT_INDUSTRY_FIELDS):
+            continue
+        # Current NAVER breadth and official change-rate relative strength are
+        # sufficient for the V1 evaluation input.  KRX-derived MA and
+        # historical-return fields may be unavailable while the current
+        # observation is still valid; they must not erase the group itself.
+        if not any(isinstance(row.get(field), (int, float))
+                   for field in CURRENT_OR_HISTORICAL_STRENGTH_FIELDS):
             continue
         if not isinstance(row.get("leaders"), list):
             continue
