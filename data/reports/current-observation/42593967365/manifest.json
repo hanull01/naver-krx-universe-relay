@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "current-observation-manifest-v1",
+  "reportType": "current_observation",
+  "session": "POST_MARKET",
+  "tradingDate": "20261109",
+  "tradingDateStatus": "VERIFIED",
+  "observationDateStatus": "VERIFIED",
+  "sourceTime": "2026-11-09T16:15:00+09:00",
+  "reportContractPath": "latest-report-contract.json",
+  "reportContractSha256": "8fc54eb21625b94afb944a61e3b012420ef7d76109e0bf00e6d51ee7a66bed75",
+  "reportContractGeneratedAt": "2026-11-09T18:31:12.303659+09:00",
+  "workflowRunId": "42593967365",
+  "executionHead": "08027244973c3cb038e1a2401a738e49183821e8",
+  "markdownPath": "report.md",
+  "htmlPath": "report.html",
+  "manifestPath": "manifest.json",
+  "markdownSha256": "162b43025f837a5ef3b399b543051d27c3aaaeba20d47a7f02ed5f8cf1a75487",
+  "htmlSha256": "9f2dc4c2e46381f3df3104a9c834bfc2a8791e80ba3deb90ff6bda7cf2c7cf04",
+  "reportStatus": "AVAILABLE",
+  "currentObservationAllowed": true,
+  "finalPending": true,
+  "baselineStale": true
+}
