@@ -30,7 +30,8 @@ SNAPSHOT_KEYS = {
 }
 SNAPSHOT_OPTIONAL_KEYS = {
     "candidate_details", "publisher_version", "artifact_status",
-    "publication_status", "candidate_completeness",
+    "publication_status", "candidate_completeness", "generated_at",
+    "producer_commit", "producer_status",
 }
 PUBLISHED_KEYS = {
     "schemaVersion", "status", "monitoringDate", "selectionDate", "source",
@@ -39,7 +40,9 @@ PUBLISHED_KEYS = {
 }
 PUBLISHED_OPTIONAL_KEYS = {
     "candidateDetails", "publisherVersion", "artifactStatus",
-    "publicationStatus", "candidateCompleteness",
+    "publicationStatus", "candidateCompleteness", "generatedAt",
+    "producerCommit", "producerStatus", "enrichmentStatus",
+    "schemaTransition", "artifactIdentity", "originalGeneratedAt",
 }
 SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
 KST = ZoneInfo("Asia/Seoul")
@@ -186,7 +189,133 @@ def published_payload(snapshot, calendar_path=None):
         payload["candidateCompleteness"] = snapshot["candidate_completeness"]
     if snapshot.get("publisher_version"):
         payload["publisherVersion"] = snapshot["publisher_version"]
+    payload["generatedAt"] = snapshot.get("generated_at") or snapshot["synced_at"]
+    if snapshot.get("producer_commit"):
+        payload["producerCommit"] = snapshot["producer_commit"]
+    if snapshot.get("producer_status"):
+        payload["producerStatus"] = snapshot["producer_status"]
     return payload
+
+
+def _is_missing_detail_value(value):
+    return value in (None, "", "UNAVAILABLE", "NOT_PROVIDED", [], {})
+
+
+def _detail_score(details):
+    if not isinstance(details, list):
+        return 0
+
+    def score(value):
+        if _is_missing_detail_value(value):
+            return 0
+        if isinstance(value, dict):
+            return sum(score(item) for item in value.values())
+        if isinstance(value, list):
+            return sum(score(item) for item in value)
+        return 1
+
+    return sum(score(row) for row in details)
+
+
+def _merge_detail_values(previous, incoming):
+    """Merge an enrichment row while rejecting concrete value changes."""
+    if isinstance(previous, dict) and isinstance(incoming, dict):
+        merged = dict(incoming)
+        for key, old_value in previous.items():
+            if key not in incoming:
+                merged[key] = old_value
+                continue
+            merged[key] = _merge_detail_values(old_value, incoming[key])
+        return merged
+    if _is_missing_detail_value(previous):
+        return incoming
+    if _is_missing_detail_value(incoming):
+        return previous
+    if previous != incoming:
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_VALUE_CONFLICT")
+    return previous
+
+
+def _validate_enrichment_identity(existing, incoming):
+    for key in ("monitoringDate", "selectionDate", "source", "sourceGroup",
+                "groupId", "sourceSha256"):
+        if existing.get(key) != incoming.get(key):
+            raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_IDENTITY_CONFLICT")
+    old_symbols = existing.get("symbols")
+    new_symbols = incoming.get("symbols")
+    if (not isinstance(old_symbols, list) or not isinstance(new_symbols, list)
+            or len(old_symbols) != len(new_symbols)
+            or set(old_symbols) != set(new_symbols)):
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_SYMBOL_SET_CONFLICT")
+
+
+def _enrich_published_snapshot(existing, incoming):
+    """Safely upgrade one same-identity symbol-only publication."""
+    _validate_enrichment_identity(existing, incoming)
+    old_details = existing.get("candidateDetails")
+    new_details = incoming.get("candidateDetails")
+    if not isinstance(new_details, list) or not new_details:
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_DETAILS_REQUIRED")
+    if len(new_details) != len(existing["symbols"]):
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_DETAILS_INVALID")
+
+    # Shared publication metadata is immutable.  generatedAt, producerCommit,
+    # and completeness are lineage/enrichment metadata and may be introduced by
+    # the detailed producer, but concrete prior values may not be rewritten.
+    for key in ("status", "candidateCount", "validation", "artifactStatus",
+                "publicationStatus", "candidateCompleteness", "producerStatus"):
+        if key in existing and key in incoming and existing[key] != incoming[key]:
+            raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_VALUE_CONFLICT")
+
+    incoming_by_symbol = {row.get("symbol"): row for row in new_details}
+    if set(incoming_by_symbol) != set(existing["symbols"]):
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_SYMBOL_SET_CONFLICT")
+    merged_details = [
+        _merge_detail_values(old_row, incoming_by_symbol[symbol])
+        for symbol, old_row in (
+            ((row.get("symbol"), row) for row in (old_details or []))
+        )
+    ] if old_details else [incoming_by_symbol[symbol] for symbol in existing["symbols"]]
+    if old_details and _detail_score(new_details) <= _detail_score(old_details):
+        if merged_details == old_details:
+            return existing, "IDEMPOTENT"
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_ENRICHMENT_NOT_MORE_DETAILED")
+
+    enriched = {**existing, **incoming}
+    # The original publication identity and creation time remain authoritative.
+    for key in ("schemaVersion", "status", "monitoringDate", "selectionDate",
+                "source", "sourceGroup", "groupId", "syncedAt", "candidateCount",
+                "symbols", "sourceSha256", "validation"):
+        enriched[key] = existing[key]
+    enriched["candidateDetails"] = merged_details
+    enriched["generatedAt"] = incoming.get("generatedAt") or incoming.get("syncedAt")
+    enriched["enrichmentStatus"] = "ENRICHED"
+    original_generated = existing.get("generatedAt") or existing.get("syncedAt")
+    enriched["originalGeneratedAt"] = original_generated
+    enriched["artifactIdentity"] = {
+        "monitoringDate": existing["monitoringDate"],
+        "selectionDate": existing["selectionDate"],
+        "source": existing["source"],
+        "sourceSha256": existing["sourceSha256"],
+        "symbols": list(existing["symbols"]),
+        "originalGeneratedAt": original_generated,
+    }
+    enriched["schemaTransition"] = {
+        "from": "SYMBOL_ONLY",
+        "to": "CANDIDATE_DETAILS",
+        "status": "ENRICHED",
+        "sourceSha256": existing["sourceSha256"],
+        "originalGeneratedAt": original_generated,
+        "enrichedGeneratedAt": enriched["generatedAt"],
+        "producerCommit": incoming.get("producerCommit"),
+    }
+    return enriched, "ENRICHED"
+
+
+def _merge_publication(existing, incoming):
+    if existing.get("sourceSha256") != incoming.get("sourceSha256"):
+        raise DiscoveryError("PUBLISHED_SNAPSHOT_CONFLICT")
+    return _enrich_published_snapshot(existing, incoming)
 
 
 def atomic_json(path, payload):
@@ -216,20 +345,29 @@ def publish_snapshot(snapshot_path, output_dir=DISCOVERY_DIR, calendar_path=None
     latest = output_dir / "latest.json"
     if dated.exists():
         existing = load_json(dated)
-        if existing.get("sourceSha256") != payload["sourceSha256"]:
-            raise DiscoveryError("PUBLISHED_SNAPSHOT_CONFLICT")
-        result = "IDEMPOTENT"
+        dated_payload, result = _merge_publication(existing, payload)
     else:
-        atomic_json(dated, payload)
-        result = "CREATED"
+        dated_payload, result = payload, "CREATED"
     try:
         current = load_json(latest) if latest.exists() else None
     except (OSError, ValueError):
         raise DiscoveryError("LATEST_INVALID")
-    if current is None or current.get("monitoringDate", "") <= payload["monitoringDate"]:
-        if current != payload:
-            atomic_json(latest, payload)
-    return {"status": payload["status"], "result": result, "dated": str(dated), "latest": str(latest)}
+    latest_payload = current
+    latest_result = "UNCHANGED"
+    if current is None:
+        latest_payload, latest_result = payload, "CREATED"
+    elif current.get("monitoringDate", "") < payload["monitoringDate"]:
+        latest_payload, latest_result = dated_payload, "UPDATED"
+    elif current.get("monitoringDate", "") == payload["monitoringDate"]:
+        latest_payload, latest_result = _merge_publication(current, payload)
+    if result in {"CREATED", "ENRICHED"}:
+        atomic_json(dated, dated_payload)
+    if latest_payload is not None and latest_payload != current:
+        atomic_json(latest, latest_payload)
+    return {
+        "status": payload["status"], "result": result,
+        "latestResult": latest_result, "dated": str(dated), "latest": str(latest),
+    }
 
 
 def discovery_status(as_of, path=None):

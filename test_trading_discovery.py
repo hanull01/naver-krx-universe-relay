@@ -35,6 +35,43 @@ def calendar(path):
     return path
 
 
+def legacy(payload):
+    result = json.loads(json.dumps(payload))
+    result.pop("candidate_details", None)
+    return result
+
+
+def detailed_nine_candidate_snapshot():
+    symbols = [
+        "007660", "0197X0", "043260", "051910", "058470",
+        "353200", "364980", "373220", "455850",
+    ]
+    payload = snapshot(symbols)
+    payload["generated_at"] = "2026-10-11T21:01:03+09:00"
+    payload["producer_commit"] = "producer-commit-20261011"
+    payload["candidate_completeness"] = {
+        "selection": {"status": "AVAILABLE", "available": 9, "total": 9},
+        "technicalIndicators": {"status": "AVAILABLE", "available": 9, "total": 9},
+        "conditionDetails": {"status": "AVAILABLE", "available": 9, "total": 9},
+        "quote": {"status": "PARTIAL", "available": 7, "total": 9},
+    }
+    payload["candidate_details"] = []
+    for index, symbol in enumerate(symbols):
+        quoted = index < 7
+        payload["candidate_details"].append({
+            "symbol": symbol,
+            "name": f"candidate-{index}",
+            "selectionValue": 100 + index,
+            "technicalIndicators": {"ma5": 95 + index, "ma20": 90 + index},
+            "conditionDetails": {"matched": True, "conditionId": "CONDITION:0"},
+            "currentPrice": 200 + index if quoted else None,
+            "quoteStatus": "AVAILABLE" if quoted else "UNAVAILABLE",
+            "failureReason": None if quoted else "HTTP_429",
+            "detailStatus": "AVAILABLE",
+        })
+    return payload
+
+
 class TradingDiscoveryTests(unittest.TestCase):
     def test_candidate_details_are_preserved_and_aligned(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -81,6 +118,104 @@ class TradingDiscoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(td.DiscoveryError, "CONFLICT"):
                 td.publish_snapshot(two, root / "out", cal)
             self.assertEqual((root / "out/2026-10-12.json").read_bytes(), before)
+
+    def test_symbol_only_artifact_is_safely_enriched_and_latest_matches(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            old = legacy(detailed_nine_candidate_snapshot())
+            new = detailed_nine_candidate_snapshot()
+            old["synced_at"] = "2026-10-11T21:00:57+09:00"
+            old["source_sha256"] = td.source_hash(old)
+            new["source_sha256"] = td.source_hash(new)
+            old_path, new_path = root / "old.json", root / "new.json"
+            old_path.write_text(json.dumps(old), encoding="utf-8")
+            new_path.write_text(json.dumps(new), encoding="utf-8")
+            out = root / "out"
+            cal = calendar(root / "calendar.json")
+
+            td.publish_snapshot(old_path, out, cal)
+            result = td.publish_snapshot(new_path, out, cal)
+            dated = json.loads((out / "2026-10-12.json").read_text())
+            latest = json.loads((out / "latest.json").read_text())
+            self.assertEqual(result["result"], "ENRICHED")
+            self.assertEqual(dated, latest)
+            self.assertEqual(len(dated["candidateDetails"]), 9)
+            self.assertEqual(dated["sourceSha256"], old["source_sha256"])
+            self.assertEqual(dated["syncedAt"], old["synced_at"])
+            self.assertEqual(dated["generatedAt"], new["generated_at"])
+            self.assertEqual(dated["originalGeneratedAt"], old["generated_at"])
+            self.assertEqual(dated["producerCommit"], new["producer_commit"])
+            self.assertEqual(dated["enrichmentStatus"], "ENRICHED")
+            self.assertEqual(dated["schemaTransition"]["from"], "SYMBOL_ONLY")
+            self.assertEqual(dated["schemaTransition"]["to"], "CANDIDATE_DETAILS")
+            self.assertEqual(dated["candidateDetails"][-1]["failureReason"], "HTTP_429")
+            self.assertEqual(dated["candidateCompleteness"]["quote"],
+                             {"status": "PARTIAL", "available": 7, "total": 9})
+            self.assertEqual(sum(row["quoteStatus"] == "AVAILABLE"
+                                 for row in dated["candidateDetails"]), 7)
+            self.assertEqual(sum(row["failureReason"] == "HTTP_429"
+                                 for row in dated["candidateDetails"]), 2)
+            self.assertEqual(td.discovery_status("2026-10-12", out / "latest.json")["status"], "AVAILABLE")
+
+    def test_enrichment_blocks_symbol_set_change_even_if_hash_is_reused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            old = legacy(snapshot(["005930", "000660"]))
+            new = snapshot(["005930", "000660"])
+            old_path, new_path = root / "old.json", root / "new.json"
+            old_path.write_text(json.dumps(old), encoding="utf-8")
+            new_path.write_text(json.dumps(new), encoding="utf-8")
+            out = root / "out"; td.publish_snapshot(old_path, out, cal)
+            existing = json.loads((out / "2026-10-12.json").read_text())
+            existing["symbols"] = ["005930", "035420"]
+            (out / "2026-10-12.json").write_text(json.dumps(existing), encoding="utf-8")
+            with self.assertRaisesRegex(td.DiscoveryError, "SYMBOL_SET_CONFLICT"):
+                td.publish_snapshot(new_path, out, cal)
+
+    def test_enrichment_blocks_source_or_date_identity_change(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            old = legacy(snapshot(["005930"]))
+            new = snapshot(["005930"])
+            old_path, new_path = root / "old.json", root / "new.json"
+            old_path.write_text(json.dumps(old), encoding="utf-8")
+            new_path.write_text(json.dumps(new), encoding="utf-8")
+            out = root / "out"; td.publish_snapshot(old_path, out, cal)
+            existing = json.loads((out / "2026-10-12.json").read_text())
+            existing["source"] = "KIWOOM_CONDITION_SEARCH"
+            (out / "2026-10-12.json").write_text(json.dumps(existing), encoding="utf-8")
+            with self.assertRaisesRegex(td.DiscoveryError, "IDENTITY_CONFLICT"):
+                td.publish_snapshot(new_path, out, cal)
+
+            existing["source"] = "KIWOOM_WATCHLIST"
+            existing["selectionDate"] = "2026-10-08"
+            (out / "2026-10-12.json").write_text(json.dumps(existing), encoding="utf-8")
+            with self.assertRaisesRegex(td.DiscoveryError, "IDENTITY_CONFLICT"):
+                td.publish_snapshot(new_path, out, cal)
+
+    def test_enrichment_blocks_detail_value_conflict_and_symbol_only_upgrade(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); cal = calendar(root / "calendar.json")
+            old = legacy(snapshot(["005930"]))
+            new = snapshot(["005930"])
+            old_path, new_path = root / "old.json", root / "new.json"
+            old_path.write_text(json.dumps(old), encoding="utf-8")
+            new_path.write_text(json.dumps(new), encoding="utf-8")
+            out = root / "out"; td.publish_snapshot(old_path, out, cal)
+            with self.assertRaisesRegex(td.DiscoveryError, "DETAILS_REQUIRED"):
+                td.publish_snapshot(old_path, out, cal)
+
+            detailed = snapshot(["005930"])
+            detailed["candidate_details"][0]["selectionValue"] = 101
+            detailed_path = root / "detailed.json"
+            detailed_path.write_text(json.dumps(detailed), encoding="utf-8")
+            td.publish_snapshot(detailed_path, out, cal)
+            conflict = snapshot(["005930"])
+            conflict["candidate_details"][0]["selectionValue"] = 999
+            conflict_path = root / "conflict.json"
+            conflict_path.write_text(json.dumps(conflict), encoding="utf-8")
+            with self.assertRaisesRegex(td.DiscoveryError, "VALUE_CONFLICT"):
+                td.publish_snapshot(conflict_path, out, cal)
 
     def test_empty_is_available_empty(self):
         with tempfile.TemporaryDirectory() as directory:
