@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "status": "AVAILABLE",
-  "monitoringDate": "2026-11-11",
-  "selectionDate": "2026-11-10",
+  "monitoringDate": "2026-11-12",
+  "selectionDate": "2026-11-11",
   "source": "KIWOOM_CONDITION_SEARCH",
   "sourceGroup": "장종료후 단타후보군 탐색",
   "groupId": "CONDITION:0",
-  "syncedAt": "2026-11-10T21:00:01+09:00",
+  "syncedAt": "2026-11-11T00:44:27+09:00",
   "candidateCount": 9,
   "symbols": [
     "003230",
@@ -19,10 +19,599 @@
     "180640",
     "443670"
   ],
-  "sourceSha256": "5d465a600774c30811be0cca5d043954069cbbab76146f2b3bb58acbe1a325ec",
+  "sourceSha256": "888173becf94b0544fefcc9d442e248497bd6859bb70b7bab48e06534dbdbb54",
   "validation": {
     "status": "VALID",
     "calendarSource": "KRX_OFFICIAL",
     "immutable": true
-  }
+  },
+  "candidateDetails": [
+    {
+      "symbol": "003230",
+      "name": "삼양식품",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "001189000",
+          "11": "000037000",
+          "12": "00000321",
+          "13": "0000049885",
+          "16": "001160000",
+          "17": "001209000",
+          "18": "001138000"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "001189000",
+        "11": "000037000",
+        "12": "00000321",
+        "13": "0000049885",
+        "16": "001160000",
+        "17": "001209000",
+        "18": "001138000"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "003490",
+      "name": "대한항공",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000032600",
+          "11": "000003500",
+          "12": "00001203",
+          "13": "0009114789",
+          "16": "000030250",
+          "17": "000032800",
+          "18": "000030100"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000032600",
+        "11": "000003500",
+        "12": "00001203",
+        "13": "0009114789",
+        "16": "000030250",
+        "17": "000032800",
+        "18": "000030100"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "017670",
+      "name": "SK텔레콤",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000081900",
+          "11": "000004500",
+          "12": "00000581",
+          "13": "0001452207",
+          "16": "000079800",
+          "17": "000083000",
+          "18": "000079700"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000081900",
+        "11": "000004500",
+        "12": "00000581",
+        "13": "0001452207",
+        "16": "000079800",
+        "17": "000083000",
+        "18": "000079700"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "018260",
+      "name": "삼성에스디에스",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000231500",
+          "11": "000015000",
+          "12": "00000693",
+          "13": "0000380572",
+          "16": "000223000",
+          "17": "000239000",
+          "18": "000222000"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000231500",
+        "11": "000015000",
+        "12": "00000693",
+        "13": "0000380572",
+        "16": "000223000",
+        "17": "000239000",
+        "18": "000222000"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "028050",
+      "name": "삼성E&A",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000063900",
+          "11": "000003300",
+          "12": "00000545",
+          "13": "0002065957",
+          "16": "000062400",
+          "17": "000065300",
+          "18": "000062400"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000063900",
+        "11": "000003300",
+        "12": "00000545",
+        "13": "0002065957",
+        "16": "000062400",
+        "17": "000065300",
+        "18": "000062400"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "035420",
+      "name": "NAVER",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000192300",
+          "11": "000005200",
+          "12": "00000278",
+          "13": "0001193206",
+          "16": "000190500",
+          "17": "000197300",
+          "18": "000190500"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000192300",
+        "11": "000005200",
+        "12": "00000278",
+        "13": "0001193206",
+        "16": "000190500",
+        "17": "000197300",
+        "18": "000190500"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "128940",
+      "name": "한미약품",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000489000",
+          "11": "000014000",
+          "12": "00000295",
+          "13": "0000123222",
+          "16": "000468000",
+          "17": "000493500",
+          "18": "000467500"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000489000",
+        "11": "000014000",
+        "12": "00000295",
+        "13": "0000123222",
+        "16": "000468000",
+        "17": "000493500",
+        "18": "000467500"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "180640",
+      "name": "한진칼",
+      "market": "KOSPI",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000236500",
+          "11": "000029000",
+          "12": "00001398",
+          "13": "0001286776",
+          "16": "000214000",
+          "17": "000245000",
+          "18": "000209500"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000236500",
+        "11": "000029000",
+        "12": "00001398",
+        "13": "0001286776",
+        "16": "000214000",
+        "17": "000245000",
+        "18": "000209500"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    },
+    {
+      "symbol": "443670",
+      "name": "에스피소프트",
+      "market": "KOSDAQ",
+      "selectionDate": "2026-11-11",
+      "monitoringDate": "2026-11-12",
+      "selectionValue": "UNAVAILABLE",
+      "technicalIndicators": "UNAVAILABLE",
+      "conditionDetails": {
+        "conditionName": "장종료후 단타후보군 탐색",
+        "conditionId": "0",
+        "matched": true,
+        "result": "MATCHED",
+        "pages": 1,
+        "sourceValues": {
+          "10": "000006110",
+          "11": "000000760",
+          "12": "00001421",
+          "13": "0015468928",
+          "16": "000005450",
+          "17": "000006290",
+          "18": "000005210"
+        },
+        "sourceValueStatus": "AVAILABLE"
+      },
+      "conditionName": "장종료후 단타후보군 탐색",
+      "conditionSequence": "0",
+      "conditionResult": true,
+      "discoveredAt": "2026-11-11T00:44:27+09:00",
+      "sourceValues": {
+        "10": "000006110",
+        "11": "000000760",
+        "12": "00001421",
+        "13": "0015468928",
+        "16": "000005450",
+        "17": "000006290",
+        "18": "000005210"
+      },
+      "sourceValueStatus": "AVAILABLE",
+      "source": "KIWOOM_CONDITION_SEARCH",
+      "generatedAt": "2026-11-11T00:44:27+09:00",
+      "failureReason": [
+        "SELECTION_VALUE_UNAVAILABLE",
+        "TECHNICAL_INDICATORS_UNAVAILABLE"
+      ],
+      "candidateCompleteness": {
+        "status": "PARTIAL",
+        "missingFields": [
+          "selectionValue",
+          "technicalIndicators"
+        ],
+        "fields": {
+          "symbol": true,
+          "name": true,
+          "market": true,
+          "selectionValue": false,
+          "technicalIndicators": false,
+          "conditionDetails": true,
+          "source": true,
+          "generatedAt": true,
+          "monitoringDate": true
+        }
+      },
+      "publicationStatus": "PARTIAL"
+    }
+  ],
+  "publisherVersion": "kiwoom-condition-report-ready-v1",
+  "generatedAt": "2026-11-11T00:44:27+09:00"
 }
