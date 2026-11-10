@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "196170",
   "itemName": "알테오젠",
-  "reportCount": 23,
-  "latestReportNid": "97609",
-  "latestWriteDate": "2026-11-04",
+  "reportCount": 26,
+  "latestReportNid": "97941",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "97609",
-    "writeDate": "2026-11-04",
+    "nid": "97941",
+    "writeDate": "2026-11-10",
     "brokerName": "대신증권",
-    "title": "Qlex 판매 확대와 신규 계약 효과 확인",
+    "title": "IRA 약가협상 규정 확정, SC 플랫폼 영향은 선별적",
     "goalPrice": 450000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 0,
+        "negative": 1
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNCHANGED",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "가격": 4,
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "97941",
+    "97933",
+    "97931",
     "97609",
     "97596",
     "96777",

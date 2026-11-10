@@ -2,33 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "089590",
   "itemName": "제주항공",
-  "reportCount": 9,
-  "latestReportNid": "97604",
-  "latestWriteDate": "2026-11-04",
+  "reportCount": 10,
+  "latestReportNid": "97956",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "97604",
-    "writeDate": "2026-11-04",
+    "nid": "97956",
+    "writeDate": "2026-11-10",
     "brokerName": "한화투자증권",
-    "title": "체질 개선 환율 유류비 서프라이즈",
-    "goalPrice": 7500,
+    "title": "NDR 후기: 가장 탄력적인 모델",
+    "goalPrice": 9000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 4
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
-        "자동차": 1,
-        "환율": 1
+        "수요": 5,
+        "원가": 3,
+        "중국": 2
       }
     }
   },
   "reportNids": [
+    "97956",
     "97604",
     "97591",
     "97580",

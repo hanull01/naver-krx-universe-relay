@@ -2,32 +2,31 @@
   "schemaVersion": 1,
   "itemCode": "051600",
   "itemName": "한전KPS",
-  "reportCount": 12,
-  "latestReportNid": "96903",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 14,
+  "latestReportNid": "97948",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "96903",
-    "writeDate": "2026-10-21",
-    "brokerName": "대신증권",
-    "title": "다운사이클의 출구가 멀지 않았다.",
-    "goalPrice": 57000,
+    "nid": "97948",
+    "writeDate": "2026-11-10",
+    "brokerName": "하나증권",
+    "title": "낮은 실적 가시성. 2027년 일부 개선 기대",
+    "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 2
+        "positive": 1,
+        "negative": 7
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 5,
       "targetPriceMentionDirection": "DOWN",
-      "topics": {
-        "원전": 2,
-        "미국": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "97948",
+    "97930",
     "96903",
     "96435",
     "95428",

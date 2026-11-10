@@ -2,31 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "000150",
   "itemName": "두산",
-  "reportCount": 29,
-  "latestReportNid": "96824",
-  "latestWriteDate": "2026-10-19",
+  "reportCount": 33,
+  "latestReportNid": "97953",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "96824",
-    "writeDate": "2026-10-19",
-    "brokerName": "대신증권",
-    "title": "흔들리지 않는 성장",
-    "goalPrice": 1970000,
-    "normalizedOpinion": "BUY",
+    "nid": "97953",
+    "writeDate": "2026-11-10",
+    "brokerName": "DS투자증권",
+    "title": "내용도 규모도 최고인 실적, 변심한 건 시장뿐",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 3,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "자동차": 1
+        "환율": 5,
+        "가격": 3,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97953",
+    "97952",
+    "97951",
+    "97942",
     "96824",
     "96762",
     "96334",

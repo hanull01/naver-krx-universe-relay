@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "052690",
   "itemName": "한전기술",
-  "reportCount": 12,
-  "latestReportNid": "96761",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 16,
+  "latestReportNid": "97949",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "96761",
-    "writeDate": "2026-10-15",
-    "brokerName": "삼성증권",
-    "title": "K-원전의 시작점",
-    "goalPrice": 160000,
+    "nid": "97949",
+    "writeDate": "2026-11-10",
+    "brokerName": "하나증권",
+    "title": "외화환산손실로 순이익 적자전환",
+    "goalPrice": 140000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 9,
-        "negative": 0
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "원전": 16,
-        "수주": 6,
-        "미국": 3
+        "원전": 2,
+        "수주": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "97949",
+    "97938",
+    "97936",
+    "97927",
     "96761",
     "96126",
     "96117",

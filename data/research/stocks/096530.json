@@ -2,19 +2,19 @@
   "schemaVersion": 1,
   "itemCode": "096530",
   "itemName": "씨젠",
-  "reportCount": 4,
-  "latestReportNid": "97107",
-  "latestWriteDate": "2026-10-28",
+  "reportCount": 5,
+  "latestReportNid": "97928",
+  "latestWriteDate": "2026-11-10",
   "latest": {
-    "nid": "97107",
-    "writeDate": "2026-10-28",
+    "nid": "97928",
+    "writeDate": "2026-11-10",
     "brokerName": "IBK투자증권",
-    "title": "Perfect Turnaround!",
-    "goalPrice": 44000,
+    "title": "이익보다 성장에 투자할 2027년",
+    "goalPrice": 33000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 1,
         "negative": 1
       },
       "earningsTextDirection": "MIXED",
@@ -22,11 +22,14 @@
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1
+        "원가": 3,
+        "환율": 3,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "97928",
     "97107",
     "95334",
     "95048",
