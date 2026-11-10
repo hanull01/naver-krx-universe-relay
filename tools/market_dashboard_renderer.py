@@ -104,7 +104,11 @@ def _snapshot_price(value: Any) -> str:
 
 
 def _candidate_technical_text(row: Mapping[str, Any]) -> str:
-    metrics = row.get("technicalMetrics") if isinstance(row.get("technicalMetrics"), Mapping) else {}
+    metrics = row.get("candidateTechnicalIndicators")
+    if not isinstance(metrics, Mapping):
+        detail = row.get("candidateDetail")
+        metrics = detail.get("technicalIndicators") if isinstance(detail, Mapping) else {}
+    metrics = metrics if isinstance(metrics, Mapping) else {}
     parts = []
     for label, key in (("MA5", "ma5"), ("MA20", "ma20"), ("MA60", "ma60")):
         if metrics.get(key) is not None:
@@ -880,14 +884,20 @@ def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
     if not rows:
         return '<article class="stock"><h4>키움 후보 자료 없음</h4><p>확인된 후보가 없습니다.</p></article>'
     def condition_text(row):
-        if row.get("conditionResult") is True:
+        details = row.get("candidateConditionDetails")
+        if not isinstance(details, Mapping):
+            detail = row.get("candidateDetail")
+            details = detail.get("conditionDetails") if isinstance(detail, Mapping) else {}
+        if details.get("matched") is True or row.get("conditionResult") is True:
             return "조건검색 충족"
-        if row.get("conditionResult") is False:
+        if details.get("matched") is False or row.get("conditionResult") is False:
             return "조건검색 미충족"
-        value = row.get("conditionStatus")
-        return "조건검색 결과 미게시" if value in (None, "", "UNAVAILABLE") else _display_status(value)
+        reason = row.get("candidateFailureReason") or []
+        if isinstance(reason, list) and reason:
+            return "조건 상세 자료 없음 · " + str(reason[0])
+        return "조건 상세 자료 없음"
     return "".join(
-        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName") or "이름 확인 대기")}</h4></div><div class="stock-stats"><div class="stock-stat"><small>기준값</small><strong>{_escape(_price(row.get("selectionPrice")))}</strong></div><div class="stock-stat"><small>현재가</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>20일 이동평균</small><strong>{_escape(_price(row.get("ma20")))}</strong></div><div class="stock-stat"><small>60일 이동평균</small><strong>{_escape(_price(row.get("ma60")))}</strong></div><div class="stock-stat"><small>기술 지표</small><strong>{_escape(_candidate_technical_text(row))}</strong></div><div class="stock-stat"><small>조건 충족 여부</small><strong>{_escape(condition_text(row))}</strong></div></div></article>'
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("candidateDetailStatus") or row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName") or "이름 확인 대기")}</h4></div><div class="stock-stats"><div class="stock-stat"><small>기준값</small><strong>{_escape(_price(row.get("candidateSelectionValue")))}</strong></div><div class="stock-stat"><small>현재가</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>기술 지표</small><strong>{_escape(_candidate_technical_text(row))}</strong></div><div class="stock-stat"><small>조건 충족 여부</small><strong>{_escape(condition_text(row))}</strong></div><div class="stock-stat"><small>실패 원인</small><strong>{_escape(", ".join(row.get("candidateFailureReason") or []) or "없음")}</strong></div></div></article>'
         for row in rows
     )
 
@@ -913,13 +923,14 @@ def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, .
     rows = model["kiwoom"].get("stocks") or []
     result = []
     for row in rows:
-        selection_price = _first(row, "selectionPrice", "referencePrice", "selectedPrice")
-        metrics = row.get("technicalMetrics") if isinstance(row.get("technicalMetrics"), Mapping) else {}
+        selection_price = row.get("candidateSelectionValue")
         technical = _candidate_technical_text(row)
-        condition_value = row.get("conditionStatus")
-        condition = ("조건검색 충족" if row.get("conditionResult") is True else
-                     "조건검색 미충족" if row.get("conditionResult") is False else
-                     "조건검색 결과 미게시" if condition_value in (None, "", "UNAVAILABLE") else _display_status(condition_value))
+        details = row.get("candidateConditionDetails")
+        if not isinstance(details, Mapping):
+            details = {}
+        condition = ("조건검색 충족" if details.get("matched") is True or row.get("conditionResult") is True else
+                     "조건검색 미충족" if details.get("matched") is False or row.get("conditionResult") is False else
+                     "조건 상세 자료 없음")
         next_check = _first(row, "nextCheck", "nextObservation", "nextAction") or "다음 관찰에서 확인"
         result.append((
             _text(row.get("itemName"), "이름 확인 대기"),

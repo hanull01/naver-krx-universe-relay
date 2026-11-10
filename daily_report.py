@@ -1848,10 +1848,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     lookup = {"networkCalls": 0, "requestedSymbols": [], "datas": [], "errors": []}
     published_supplemental = trading_discovery.supplemental_quotes_status(
         discovery, quotes.get("sourceTime"), discovery_quotes_source_path(report_date))
-    supplemental_quotes = {"datas": [
-        {**row, "_discoveryAdditionalLookup": True}
-        for row in published_supplemental.get("datas", [])
-    ]}
+    supplemental_quotes = {
+        "datas": [
+            {**row, "_discoveryAdditionalLookup": True}
+            for row in published_supplemental.get("datas", [])
+        ],
+        "candidateStatuses": published_supplemental.get("candidateStatuses") or [],
+        "quoteCompleteness": published_supplemental.get("quoteCompleteness"),
+    }
     if fetch_discovery_missing and discovery.get("status") == "AVAILABLE":
         existing_codes = set(quote_idx) | set(trading_discovery._index(full_market_signals))
         existing_codes |= set(trading_discovery._index(supplemental_quotes))
@@ -1875,6 +1879,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     discovery_quotes = {
         **quotes,
         "datas": list(quotes.get("datas") or []) + supplemental_quotes["datas"],
+        "candidateStatuses": supplemental_quotes.get("candidateStatuses") or [],
+        "quoteCompleteness": supplemental_quotes.get("quoteCompleteness"),
     }
     krx_lineage = technical_inputs["metadata"].get("historicalLineage") or {}
     krx_source = {

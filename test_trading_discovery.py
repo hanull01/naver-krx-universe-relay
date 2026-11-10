@@ -20,6 +20,12 @@ def snapshot(symbols=None, monitoring="2026-10-12", source="KIWOOM_WATCHLIST"):
         "validation": {"status": "VALID", "calendar_source": "KRX_OFFICIAL", "immutable": True},
     }
     payload["source_sha256"] = td.source_hash(payload)
+    payload["candidate_details"] = [
+        {"symbol": code, "conditionDetails": {"matched": True},
+         "selectionValue": 100, "technicalIndicators": {"ma20": 100},
+         "currentPrice": None, "detailStatus": "PARTIAL"}
+        for code in symbols
+    ]
     return payload
 
 
