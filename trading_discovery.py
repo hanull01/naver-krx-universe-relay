@@ -28,13 +28,19 @@ SNAPSHOT_KEYS = {
     "source_group", "group_id", "synced_at", "candidate_count", "symbols",
     "source_sha256", "validation",
 }
-SNAPSHOT_OPTIONAL_KEYS = {"candidate_details", "publisher_version"}
+SNAPSHOT_OPTIONAL_KEYS = {
+    "candidate_details", "publisher_version", "artifact_status",
+    "publication_status", "candidate_completeness",
+}
 PUBLISHED_KEYS = {
     "schemaVersion", "status", "monitoringDate", "selectionDate", "source",
     "sourceGroup", "groupId", "syncedAt", "candidateCount", "symbols",
     "sourceSha256", "validation",
 }
-PUBLISHED_OPTIONAL_KEYS = {"candidateDetails", "publisherVersion"}
+PUBLISHED_OPTIONAL_KEYS = {
+    "candidateDetails", "publisherVersion", "artifactStatus",
+    "publicationStatus", "candidateCompleteness",
+}
 SENSITIVE_KEY = re.compile(r"(?:token|secret|password|account|authorization|app.?key)", re.I)
 KST = ZoneInfo("Asia/Seoul")
 SOURCE_CONTRACTS = {
@@ -172,6 +178,12 @@ def published_payload(snapshot, calendar_path=None):
     }
     if "candidate_details" in snapshot:
         payload["candidateDetails"] = snapshot["candidate_details"]
+    if snapshot.get("artifact_status") is not None:
+        payload["artifactStatus"] = snapshot["artifact_status"]
+    if snapshot.get("publication_status") is not None:
+        payload["publicationStatus"] = snapshot["publication_status"]
+    if snapshot.get("candidate_completeness") is not None:
+        payload["candidateCompleteness"] = snapshot["candidate_completeness"]
     if snapshot.get("publisher_version"):
         payload["publisherVersion"] = snapshot["publisher_version"]
     return payload
@@ -266,6 +278,12 @@ def discovery_status(as_of, path=None):
                 or any(not isinstance(row, dict) or row.get("symbol") != code
                        for row, code in zip(details, symbols))):
             return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_DETAILS_INVALID"})
+    if symbols and details is None:
+        return with_source({**payload, "status": "PARTIAL", "reason": "CANDIDATE_DETAILS_MISSING"})
+    if payload.get("artifactStatus") not in (None, "AVAILABLE", "PARTIAL"):
+        return with_source({**payload, "status": "INVALID", "reason": "ARTIFACT_STATUS_INVALID"})
+    if payload.get("publicationStatus") not in (None, "AVAILABLE", "PARTIAL"):
+        return with_source({**payload, "status": "INVALID", "reason": "PUBLICATION_STATUS_INVALID"})
     expected = "AVAILABLE" if symbols else "AVAILABLE_EMPTY"
     if payload.get("status") != expected or payload.get("validation", {}).get("status") != "VALID":
         return with_source({**payload, "status": "INVALID", "reason": "SNAPSHOT_VALIDATION_INVALID"})
@@ -425,6 +443,12 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         for row in (discovery.get("candidateDetails") or [])
         if isinstance(row, dict) and row.get("symbol")
     }
+    quote_statuses = {
+        str(row.get("symbol")): row
+        for row in (quotes.get("candidateStatuses") or [])
+        if isinstance(row, dict) and row.get("symbol")
+    } if isinstance(quotes, dict) else {}
+    projected_details = []
     rows = []
     for raw_code in discovery["symbols"]:
         code = normalize_item_code(raw_code)
@@ -485,13 +509,49 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         }
         detail = candidate_details.get(code) or {}
         row.update({
-            "conditionName": detail.get("conditionName"),
-            "conditionSequence": detail.get("conditionSequence"),
-            "conditionResult": detail.get("conditionResult"),
+            "conditionName": (detail.get("conditionDetails") or {}).get("conditionName")
+            or detail.get("conditionName"),
+            "conditionSequence": (detail.get("conditionDetails") or {}).get("conditionId")
+            or detail.get("conditionSequence"),
+            "conditionResult": (detail.get("conditionDetails") or {}).get("matched")
+            if detail.get("conditionDetails") else detail.get("conditionResult"),
             "conditionDiscoveredAt": detail.get("discoveredAt"),
-            "conditionSourceValues": detail.get("sourceValues") or {},
-            "conditionSourceValueStatus": detail.get("sourceValueStatus") or "NOT_PROVIDED",
+            "conditionSourceValues": (detail.get("conditionDetails") or {}).get("sourceValues")
+            or detail.get("sourceValues") or {},
+            "conditionSourceValueStatus": (detail.get("conditionDetails") or {}).get("sourceValuesStatus")
+            or detail.get("sourceValueStatus") or "NOT_PROVIDED",
         })
+        quote_status = quote_statuses.get(code) or {}
+        candidate_copy = dict(detail)
+        candidate_copy.setdefault("symbol", code)
+        candidate_copy["currentPrice"] = (
+            row.get("price") if quote_status.get("quoteStatus") == "AVAILABLE"
+            else candidate_copy.get("currentPrice")
+        )
+        if quote_status:
+            candidate_copy["quoteRequested"] = quote_status.get("quoteRequested")
+            candidate_copy["quoteRequestTime"] = quote_status.get("quoteRequestTime")
+            candidate_copy["quoteStatus"] = quote_status.get("quoteStatus")
+            candidate_copy["quoteGeneratedAt"] = quote_status.get("generatedAt")
+            if quote_status.get("failureReason"):
+                prior_failures = candidate_copy.get("failureReason") or []
+                if isinstance(prior_failures, str):
+                    prior_failures = [prior_failures]
+                candidate_copy["failureReason"] = list(dict.fromkeys(
+                    [*prior_failures, quote_status["failureReason"]]
+                ))
+        projected_details.append(candidate_copy)
+        row["candidateDetail"] = candidate_copy
+        row["candidateSelectionValue"] = candidate_copy.get("selectionValue")
+        row["candidatePreviousClose"] = candidate_copy.get("previousClose")
+        row["candidateTechnicalIndicators"] = candidate_copy.get("technicalIndicators") or {}
+        row["candidateConditionDetails"] = candidate_copy.get("conditionDetails") or {}
+        row["candidateSelectionStatus"] = candidate_copy.get("selectionStatus") or "UNAVAILABLE"
+        row["candidateQuoteStatus"] = candidate_copy.get("quoteStatus") or "UNAVAILABLE"
+        row["candidateDetailStatus"] = candidate_copy.get("detailStatus") or "UNAVAILABLE"
+        row["candidateFailureReason"] = candidate_copy.get("failureReason") or []
+        row["candidateSource"] = candidate_copy.get("source")
+        row["candidateGeneratedAt"] = candidate_copy.get("generatedAt")
         if krx_mode:
             row["unavailableReason"] = None if aligned and technical else krx_status["reason"]
         observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
@@ -512,8 +572,15 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         rows.append(row)
     available = sum(row["dataStatus"] == "AVAILABLE" for row in rows)
     partial = sum(row["dataStatus"] == "PARTIAL" for row in rows)
+    candidate_status = discovery.get("status")
+    completeness = discovery.get("candidateCompleteness") or {}
+    quote_completeness = quotes.get("quoteCompleteness") if isinstance(quotes, dict) else {}
+    if (completeness.get("status") == "PARTIAL"
+            or isinstance(quote_completeness, dict)
+            and quote_completeness.get("status") == "PARTIAL"):
+        candidate_status = "PARTIAL"
     return {
-        "title": "키움 전일후보군 — 당일 추적", **discovery,
+        "title": "키움 전일후보군 — 당일 추적", **discovery, "status": candidate_status,
         "asOf": as_of, "observedCount": available + partial,
         "missingCount": len(rows) - available - partial, "stocks": rows,
         "metrics": {"vwap": "UNAVAILABLE", "intradayHighLow": "UNAVAILABLE"},
@@ -521,6 +588,10 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                                for key in ("status", "reason", "sourceDate")
                                if selection_snapshot.get(key) is not None},
         "technicalProvenance": krx_status,
+        "candidateDetails": projected_details,
+        "candidateCompleteness": discovery.get("candidateCompleteness"),
+        "artifactStatus": discovery.get("artifactStatus"),
+        "publicationStatus": discovery.get("publicationStatus"),
     }
 
 
@@ -578,7 +649,11 @@ SUPPLEMENTAL_QUOTE_KEYS = set(SUPPLEMENTAL_QUOTE_FIELDS)
 SUPPLEMENTAL_KEYS = {
     "schemaVersion", "status", "monitoringDate", "candidateSourceSha256",
     "marketSourceTime", "generatedAt", "source", "requestedCount", "quoteCount",
-    "missingSymbols", "errors", "datas",
+    "missingSymbols", "errors", "datas", "candidateStatuses", "quoteCompleteness",
+}
+SUPPLEMENTAL_CANDIDATE_STATUS_KEYS = {
+    "symbol", "quoteRequested", "quoteRequestTime", "currentPrice",
+    "quoteStatus", "failureReason", "generatedAt", "source",
 }
 
 
@@ -615,17 +690,24 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         raise DiscoveryError("MARKET_QUOTES_NOT_READY")
     if source_date != monitoring_date and now.astimezone(KST).time() >= time(9, 0):
         raise DiscoveryError("MARKET_QUOTES_DATE_MISMATCH")
-    existing = set(_index(quotes)) | current_signal_codes(full_market_signals, monitoring_date)
+    # The candidate artifact is the authoritative request set.  Existing
+    # market quotes and full-market signals are evidence, not a reason to
+    # suppress a candidate request.
+    candidate_symbols = list(dict.fromkeys(discovery.get("symbols", [])))
+    request_clock = clock or (lambda: datetime.now(KST))
+    request_time_value = request_clock()
+    request_time = (request_time_value.isoformat()
+                    if hasattr(request_time_value, "isoformat") else str(request_time_value))
     result = fetch_naver_missing_quotes(
-        discovery.get("symbols", []), existing, limit=limit, fetcher=fetcher,
+        candidate_symbols, set(), limit=limit, fetcher=fetcher,
         normalizer=normalizer, clock=clock)
     rows = [supplemental_quote_row(row) for row in result["datas"]]
-    returned = {row["itemCode"] for row in rows}
-    missing = [code for code in result["requestedSymbols"] if code not in returned]
+    returned = {row.get("itemCode") for row in rows}
+    missing = [code for code in candidate_symbols if code not in returned]
     errors = list(result["errors"])
     errors.extend({"itemCode": code, "reason": "QUOTE_MISSING"} for code in missing
                   if not any(error.get("itemCode") == code for error in errors))
-    if not result["requestedSymbols"]:
+    if not candidate_symbols:
         status = "AVAILABLE_EMPTY"
     elif not rows:
         status = "UNAVAILABLE"
@@ -635,18 +717,44 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         status = "AVAILABLE"
     now_value = now
     generated_at = now_value.isoformat() if hasattr(now_value, "isoformat") else str(now_value)
+    error_by_code = {
+        error.get("itemCode"): error.get("reason", "QUOTE_ERROR")
+        for error in errors if isinstance(error, dict) and error.get("itemCode")
+    }
+    row_by_code = {row.get("itemCode"): row for row in rows}
+    candidate_statuses = []
+    for symbol in candidate_symbols:
+        row = row_by_code.get(symbol)
+        candidate_statuses.append({
+            "symbol": symbol,
+            "quoteRequested": True,
+            "quoteRequestTime": request_time,
+            "currentPrice": row.get("closePrice") if row else None,
+            "quoteStatus": "AVAILABLE" if row else "UNAVAILABLE",
+            "failureReason": None if row else error_by_code.get(symbol, "QUOTE_MISSING"),
+            "generatedAt": generated_at,
+            "source": "NAVER_KRX",
+        })
     return {
         "schemaVersion": 1, "status": status, "monitoringDate": monitoring_date,
         "candidateSourceSha256": discovery.get("sourceSha256"),
         "marketSourceTime": market_source_time, "generatedAt": generated_at,
-        "source": "NAVER_KRX", "requestedCount": len(result["requestedSymbols"]),
+        "source": "NAVER_KRX", "requestedCount": len(candidate_symbols),
         "quoteCount": len(rows), "missingSymbols": missing, "errors": errors,
-        "datas": rows, "networkCalls": result["networkCalls"],
+        "datas": rows, "candidateStatuses": candidate_statuses,
+        "quoteCompleteness": {
+            "status": "AVAILABLE" if len(rows) == len(candidate_symbols) else (
+                "AVAILABLE_EMPTY" if not candidate_symbols else "PARTIAL"),
+            "available": len(rows), "total": len(candidate_symbols),
+        },
+        "networkCalls": result["networkCalls"],
     }
 
 
 def validate_supplemental_quotes(payload, discovery, market_source_time):
-    if not isinstance(payload, dict) or set(payload) != SUPPLEMENTAL_KEYS:
+    if (not isinstance(payload, dict)
+            or not SUPPLEMENTAL_KEYS.issubset(payload)
+            or set(payload) - SUPPLEMENTAL_KEYS not in (set(), {"networkCalls"})):
         raise DiscoveryError("SUPPLEMENTAL_SCHEMA_INVALID")
     if (payload.get("schemaVersion") != 1 or payload.get("source") != "NAVER_KRX"
             or payload.get("monitoringDate") != discovery.get("monitoringDate")
@@ -659,6 +767,11 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
     rows = payload.get("datas")
     if not isinstance(rows, list) or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_QUOTE_KEYS for row in rows):
         raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
+    candidate_statuses = payload.get("candidateStatuses")
+    if (not isinstance(candidate_statuses, list)
+            or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_CANDIDATE_STATUS_KEYS
+                   for row in candidate_statuses)):
+        raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_STATUS_INVALID")
     codes = [row.get("itemCode") for row in rows]
     try:
         monitoring_day = datetime.fromisoformat(str(payload.get("monitoringDate"))).date()
@@ -672,13 +785,28 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
         if row_day != monitoring_day:
             raise DiscoveryError("SUPPLEMENTAL_QUOTE_DATE_MISMATCH")
     missing = payload.get("missingSymbols")
-    if (len(codes) != len(set(codes)) or any(code not in discovery.get("symbols", []) for code in codes)
+    expected_symbols = list(dict.fromkeys(discovery.get("symbols", [])))
+    status_codes = [row.get("symbol") for row in candidate_statuses]
+    completeness = payload.get("quoteCompleteness")
+    if (len(codes) != len(set(codes)) or any(code not in expected_symbols for code in codes)
             or payload.get("quoteCount") != len(rows)
             or not isinstance(payload.get("requestedCount"), int)
             or not isinstance(missing, list) or len(missing) != len(set(missing))
-            or any(code not in discovery.get("symbols", []) for code in missing)
-            or set(codes) & set(missing) or not isinstance(payload.get("errors"), list)):
+            or payload.get("requestedCount") != len(expected_symbols)
+            or set(status_codes) != set(expected_symbols)
+            or len(status_codes) != len(set(status_codes))
+            or any(code not in expected_symbols for code in missing)
+            or set(codes) & set(missing) or not isinstance(payload.get("errors"), list)
+            or not isinstance(completeness, dict)
+            or completeness.get("available") != len(rows)
+            or completeness.get("total") != len(expected_symbols)
+            or completeness.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY", "PARTIAL"}):
         raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
+    for candidate in candidate_statuses:
+        if candidate.get("quoteRequested") is not True:
+            raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_NOT_REQUESTED")
+        if candidate.get("quoteStatus") == "AVAILABLE" and candidate.get("currentPrice") is None:
+            raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_QUOTE_MISSING")
     return payload
 
 

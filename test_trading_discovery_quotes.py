@@ -34,6 +34,13 @@ def discovery(symbols=None):
         "group_id": payload["groupId"], "selection_date": payload["selectionDate"],
         "symbols": payload["symbols"],
     })
+    payload["candidateDetails"] = [
+        {"symbol": code, "selectionValue": 100,
+         "technicalIndicators": {"ma20": 100},
+         "conditionDetails": {"matched": True},
+         "detailStatus": "PARTIAL"}
+        for code in symbols
+    ]
     return payload
 
 
@@ -62,7 +69,7 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
         self.assertEqual(td.source_hash(material),
                          "09616de26156b84977af7c1f7c4b1710364ddc5a12a43a1efe1235da3d141aa8")
 
-    def test_reuses_four_core_one_signal_and_fetches_only_four_once(self):
+    def test_requests_every_candidate_even_when_market_evidence_exists(self):
         core = ["007660", "058470", "353200", "373220"]
         quotes = quotes_payload([quote(code) for code in core])
         signals = {"generatedAt": "2026-10-12T01:00:01+00:00",
@@ -75,10 +82,11 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
             discovery(), quotes, signals, fetcher=fetcher,
             normalizer=lambda row, _now: row,
             clock=lambda: datetime(2026, 10, 12, 10, 1, tzinfo=KST))
-        self.assertEqual(calls, [["0197X0", "051910", "364980", "455850"]])
+        self.assertEqual(calls, [discovery()["symbols"]])
         self.assertEqual(result["networkCalls"], 1)
         self.assertEqual(result["status"], "AVAILABLE")
-        self.assertEqual(result["quoteCount"], 4)
+        self.assertEqual(result["quoteCount"], 9)
+        self.assertEqual(result["requestedCount"], 9)
 
     def test_partial_and_total_failure_are_explicit(self):
         quotes = quotes_payload([])
@@ -96,15 +104,34 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
             clock=lambda: datetime(2026, 10, 12, 10, 1, tzinfo=KST))
         self.assertEqual(failed["status"], "UNAVAILABLE")
 
-    def test_zero_candidates_and_all_reused_make_zero_network_calls(self):
+    def test_six_of_six_quote_fixture_is_available(self):
+        symbols = ["053800", "064400", "128940", "180640", "251340", "252670"]
+        result = td.build_supplemental_quotes(
+            discovery(symbols), quotes_payload([]), {},
+            fetcher=lambda codes: {"datas": [quote(code) for code in codes]},
+            normalizer=lambda row, _now: row,
+            clock=lambda: datetime(2026, 10, 12, 10, 1, tzinfo=KST),
+        )
+        self.assertEqual(result["requestedCount"], 6)
+        self.assertEqual(result["quoteCount"], 6)
+        self.assertEqual(result["status"], "AVAILABLE")
+        self.assertEqual(result["quoteCompleteness"], {"status": "AVAILABLE", "available": 6, "total": 6})
+
+    def test_zero_candidates_make_zero_network_calls_but_candidates_are_requested(self):
         now = lambda: datetime(2026, 10, 12, 10, 1, tzinfo=KST)
-        for candidate, rows in ((discovery([]), []), (discovery(["007660"]), [quote("007660")])):
-            result = td.build_supplemental_quotes(
-                candidate, quotes_payload(rows), {},
-                fetcher=lambda _: self.fail("network called"),
-                normalizer=lambda row, _now: row, clock=now)
-            self.assertEqual(result["networkCalls"], 0)
-            self.assertEqual(result["status"], "AVAILABLE_EMPTY")
+        result = td.build_supplemental_quotes(
+            discovery([]), quotes_payload([]), {},
+            fetcher=lambda _: self.fail("network called"),
+            normalizer=lambda row, _now: row, clock=now)
+        self.assertEqual(result["networkCalls"], 0)
+        self.assertEqual(result["status"], "AVAILABLE_EMPTY")
+        calls = []
+        result = td.build_supplemental_quotes(
+            discovery(["007660"]), quotes_payload([quote("007660")]), {},
+            fetcher=lambda codes: calls.append(codes) or {"datas": [quote(code) for code in codes]},
+            normalizer=lambda row, _now: row, clock=now)
+        self.assertEqual(calls, [["007660"]])
+        self.assertEqual(result["status"], "AVAILABLE")
 
     def test_stale_signal_is_not_reused(self):
         calls = []
@@ -134,6 +161,12 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
             "marketSourceTime": "2026-10-16T09:25:00+09:00", "generatedAt": "2026-10-16T09:25:01+09:00",
             "source": "NAVER_KRX", "requestedCount": 1, "quoteCount": 1,
             "missingSymbols": [], "errors": [],
+            "candidateStatuses": [{"symbol": "251340", "quoteRequested": True,
+                "quoteRequestTime": "2026-10-16T09:25:00+09:00", "currentPrice": 100,
+                "quoteStatus": "AVAILABLE", "failureReason": None,
+                "generatedAt": "2026-10-16T09:25:01+09:00", "source": "NAVER_KRX"}],
+            "quoteCompleteness": {"status": "AVAILABLE", "available": 1, "total": 1},
+            "networkCalls": 1,
             "datas": [{**quote("251340"), "sourceTime": "2026-10-15T15:30:00+09:00"}]}
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "latest.json"; path.write_text(json.dumps(payload), encoding="utf-8")

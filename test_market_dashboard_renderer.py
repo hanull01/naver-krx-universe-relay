@@ -538,9 +538,12 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["kiwoomCandidates"] = {"stocks": [{
             "itemCode": "003490", "itemName": "대한항공", "selectionPrice": 29050,
             "price": 30300, "ma20": 27952.5, "ma60": 28420,
-            "technicalMetrics": {"ma5": 28070, "ma20": 27952.5, "ma60": 28420,
-                                  "volumeRatio20": 1.1, "breakout20": "confirmed"},
-            "conditionStatus": "UNAVAILABLE", "status": "PARTIAL",
+            "candidateSelectionValue": 29050,
+            "candidateTechnicalIndicators": {"ma5": 28070, "ma20": 27952.5,
+                                               "ma60": 28420, "volumeRatio20": 1.1},
+            "candidateConditionDetails": {},
+            "candidateFailureReason": ["CONDITION_DETAILS_UNAVAILABLE"],
+            "candidateDetailStatus": "PARTIAL", "status": "PARTIAL",
         }]}
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
@@ -550,7 +553,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("30,300원", output)
             self.assertIn("27,952원", output)
             self.assertIn("28,420원", output)
-            self.assertIn("조건검색 결과 미게시", output)
+            self.assertIn("조건 상세 자료 없음", output)
             self.assertNotIn("003490", output)
 
     def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):

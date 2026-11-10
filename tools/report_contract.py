@@ -1678,6 +1678,7 @@ def build_report_contract(
                     or (research or {}).get("generatedAt")
                 ) if isinstance(research, Mapping) else None,
                 "generatedAt": (research or {}).get("generatedAt") if isinstance(research, Mapping) else None,
+                "slotLineage": (research or {}).get("slotLineage") if isinstance(research, Mapping) else [],
                 "analysis": research_analysis,
             },
             "investorFlow": {
@@ -1716,6 +1717,10 @@ def build_report_contract(
             "sourceCandidateCount": kiwoom_candidates.get("candidateCount"),
             "performanceStatus": compact_kiwoom_performance.get("status"),
             "technicalProvenance": kiwoom_candidates.get("technicalProvenance"),
+            "candidateDetails": kiwoom_candidates.get("candidateDetails") or [],
+            "candidateCompleteness": kiwoom_candidates.get("candidateCompleteness"),
+            "artifactStatus": kiwoom_candidates.get("artifactStatus"),
+            "publicationStatus": kiwoom_candidates.get("publicationStatus"),
         },
         "kiwoomPerformance": compact_kiwoom_performance,
         "rendering": {

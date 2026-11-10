@@ -37,6 +37,23 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             "group_id": payload["groupId"], "selection_date": payload["selectionDate"],
             "symbols": payload["symbols"],
         })
+        if symbols:
+            payload["candidateDetails"] = [
+                {"symbol": code, "selectionValue": 100,
+                 "technicalIndicators": {"ma20": 100},
+                 "conditionDetails": {"matched": True},
+                 "detailStatus": "PARTIAL"}
+                for code in symbols
+            ]
+            payload["artifactStatus"] = "PARTIAL"
+            payload["publicationStatus"] = "PARTIAL"
+            payload["candidateCompleteness"] = {
+                "status": "PARTIAL", "candidateCount": len(symbols),
+                "selectionValue": {"available": len(symbols), "total": len(symbols)},
+                "technicalIndicators": {"available": len(symbols), "total": len(symbols)},
+                "conditionDetails": {"available": len(symbols), "total": len(symbols)},
+                "currentPrice": {"available": 0, "total": len(symbols)},
+            }
         return payload
 
     def build(self, discovery_path):
@@ -103,7 +120,7 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
             report = self.build(discovery)
             self.assertEqual(report["status"], "PARTIAL")
             section = report["kiwoomPreviousCandidates"]
-            self.assertEqual(section["status"], "AVAILABLE")
+            self.assertEqual(section["status"], "PARTIAL")
             self.assertEqual(section["missingCount"], 1)
             self.assertEqual(section["stocks"][1]["dataStatus"], "UNAVAILABLE")
 
@@ -187,6 +204,11 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                 "marketSourceTime": market_source_time,
                 "generatedAt": "2026-10-08T20:00:01+09:00", "source": "NAVER_KRX",
                 "requestedCount": 1, "quoteCount": 1, "missingSymbols": [], "errors": [],
+                "candidateStatuses": [{"symbol": "999999", "quoteRequested": True,
+                    "quoteRequestTime": "2026-10-08T20:00:00+09:00", "currentPrice": 10,
+                    "quoteStatus": "AVAILABLE", "failureReason": None,
+                    "generatedAt": "2026-10-08T20:00:01+09:00", "source": "NAVER_KRX"}],
+                "quoteCompleteness": {"status": "AVAILABLE", "available": 1, "total": 1},
                 "datas": [row],
             }
             supplemental.write_text(json.dumps(payload), encoding="utf-8")
@@ -213,7 +235,12 @@ class ReportTradingDiscoveryIntegrationTests(unittest.TestCase):
                 "marketSourceTime": "2026-10-08T09:00:00+09:00",
                 "generatedAt": "2026-10-08T09:00:01+09:00", "source": "NAVER_KRX",
                 "requestedCount": 0, "quoteCount": 0, "missingSymbols": ["999999"],
-                "errors": [], "datas": [],
+                "errors": [], "candidateStatuses": [{"symbol": "999999", "quoteRequested": True,
+                    "quoteRequestTime": "2026-10-08T09:00:00+09:00", "currentPrice": None,
+                    "quoteStatus": "UNAVAILABLE", "failureReason": "QUOTE_MISSING",
+                    "generatedAt": "2026-10-08T09:00:01+09:00", "source": "NAVER_KRX"}],
+                "quoteCompleteness": {"status": "PARTIAL", "available": 0, "total": 1},
+                "datas": [],
             }
             supplemental.write_text(json.dumps(payload), encoding="utf-8")
             with patch.multiple(daily_report, TRADING_DISCOVERY_PATH=discovery,
