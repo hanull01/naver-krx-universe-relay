@@ -53,18 +53,17 @@ class SafePublisherTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
-    def test_success_remote_verification_and_repeat_noop(self):
+    def test_legacy_symbol_only_repeat_is_blocked(self):
         first = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
         self.assertEqual(first["publishStatus"], "PUSHED")
         self.assertEqual(set(first["stagedFiles"]), {
             "data/trading-discovery/2026-10-12.json", "data/trading-discovery/latest.json"})
-        second = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
-        self.assertEqual(second["publishStatus"], "NOOP")
-        self.assertIsNone(second["commitSha"])
+        with self.assertRaisesRegex(td.DiscoveryError, "DETAILS_REQUIRED"):
+            publisher.safe_publish(self.snapshot, self.calendar, self.repo)
         raw = git(self.repo, "show", "origin/main:data/trading-discovery/2026-10-12.json")
         self.assertEqual(json.loads(raw)["sourceSha256"], json.loads(self.snapshot.read_text())["source_sha256"])
 
-    def test_condition_search_success_and_repeat_noop(self):
+    def test_condition_search_legacy_repeat_is_blocked(self):
         payload = json.loads(self.snapshot.read_text())
         payload.update({"source": "KIWOOM_CONDITION_SEARCH",
                         "source_group": "장종료후 단타후보군 탐색",
@@ -73,9 +72,9 @@ class SafePublisherTests(unittest.TestCase):
         payload["source_sha256"] = td.source_hash(payload)
         self.snapshot.write_text(json.dumps(payload), encoding="utf-8")
         first = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
-        second = publisher.safe_publish(self.snapshot, self.calendar, self.repo)
         self.assertEqual(first["publishStatus"], "PUSHED")
-        self.assertEqual(second["publishStatus"], "NOOP")
+        with self.assertRaisesRegex(td.DiscoveryError, "DETAILS_REQUIRED"):
+            publisher.safe_publish(self.snapshot, self.calendar, self.repo)
         raw = git(self.repo, "show", "origin/main:data/trading-discovery/2026-10-12.json")
         self.assertEqual(json.loads(raw)["symbols"], ["0197X0"])
 
