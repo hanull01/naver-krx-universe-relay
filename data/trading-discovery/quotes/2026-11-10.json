@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "AVAILABLE",
+  "monitoringDate": "2026-11-10",
+  "candidateSourceSha256": "ff81bbaec9eb12f3bab751c01754cc950a23971d472acfecf530c01b45eb4b44",
+  "marketSourceTime": "2026-11-10T09:31:00.670361+09:00",
+  "generatedAt": "2026-11-10T09:32:05.232871+09:00",
+  "source": "NAVER_KRX",
+  "requestedCount": 2,
+  "quoteCount": 2,
+  "missingSymbols": [],
+  "errors": [],
+  "datas": [
+    {
+      "itemCode": "251340",
+      "stockName": "KODEX 코스닥150선물인버스",
+      "closePrice": 3035,
+      "fluctuationsRatio": -4.56,
+      "accumulatedTradingVolume": 11896280,
+      "accumulatedTradingValue": 35819000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-11-10T09:32:05.838689+09:00",
+      "marketStatus": "OPEN",
+      "session": "REGULAR",
+      "priceBasis": "KRX_REGULAR",
+      "fresh": true,
+      "status": "ok"
+    },
+    {
+      "itemCode": "252670",
+      "stockName": "KODEX 200선물인버스2X",
+      "closePrice": 114,
+      "fluctuationsRatio": -10.94,
+      "accumulatedTradingVolume": 1443911597,
+      "accumulatedTradingValue": 163262000000,
+      "source": "NAVER_KRX",
+      "sourceTime": "2026-11-10T09:32:05.838698+09:00",
+      "marketStatus": "OPEN",
+      "session": "REGULAR",
+      "priceBasis": "KRX_REGULAR",
+      "fresh": true,
+      "status": "ok"
+    }
+  ]
+}
