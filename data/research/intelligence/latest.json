@@ -3,11 +3,11 @@
   "version": "research-intelligence-batch-v1",
   "asOf": "2026-11-10",
   "universeSource": "config/universe.json",
-  "enabledStockCount": 1,
+  "enabledStockCount": 3,
   "statusCounts": {
-    "OK": 1
+    "OK": 3
   },
-  "rankingEligibleCount": 1,
+  "rankingEligibleCount": 3,
   "stocks": [
     {
       "itemCode": "005930",
@@ -43,10 +43,160 @@
           "ratio": 1.03
         }
       ]
+    },
+    {
+      "itemCode": "000660",
+      "itemName": "SK하이닉스",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 84,
+      "brokerCount": 15,
+      "recentReportCount": 16,
+      "previousReportCount": 5,
+      "recentTargetMean": 3346000,
+      "previousTargetMean": 3340000,
+      "recentTargetMedian": 3200000,
+      "recentTargetStdev": 492366,
+      "targetMeanChangePct": 0.18,
+      "targetDispersionChangePct": 7.34,
+      "revisionUp": 24,
+      "revisionDown": 8,
+      "risingTopics": [
+        {
+          "topic": "메모리",
+          "delta": 0.125,
+          "ratio": null
+        },
+        {
+          "topic": "환율",
+          "delta": 0.1,
+          "ratio": 1.25
+        },
+        {
+          "topic": "HBM",
+          "delta": 0.062,
+          "ratio": null
+        },
+        {
+          "topic": "메모리 가격",
+          "delta": 0.062,
+          "ratio": null
+        },
+        {
+          "topic": "사이클",
+          "delta": 0.062,
+          "ratio": null
+        }
+      ]
+    },
+    {
+      "itemCode": "298040",
+      "itemName": "효성중공업",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 42,
+      "brokerCount": 10,
+      "recentReportCount": 11,
+      "previousReportCount": 3,
+      "recentTargetMean": 3554545,
+      "previousTargetMean": 4433333,
+      "recentTargetMedian": 3500000,
+      "recentTargetStdev": 715241,
+      "targetMeanChangePct": -19.82,
+      "targetDispersionChangePct": 70.7,
+      "revisionUp": 5,
+      "revisionDown": 14,
+      "risingTopics": [
+        {
+          "topic": "원가",
+          "delta": 0.727,
+          "ratio": null
+        },
+        {
+          "topic": "환율",
+          "delta": 0.545,
+          "ratio": null
+        }
+      ]
     }
   ],
   "rankings": {
     "researchAttentionIncrease": [
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 16,
+        "previousReportCount": 5,
+        "recentTargetMean": 3346000,
+        "previousTargetMean": 3340000,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 492366,
+        "targetMeanChangePct": 0.18,
+        "targetDispersionChangePct": 7.34,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.125,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.1,
+            "ratio": 1.25
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.062,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 11,
+        "previousReportCount": 3,
+        "recentTargetMean": 3554545,
+        "previousTargetMean": 4433333,
+        "recentTargetMedian": 3500000,
+        "recentTargetStdev": 715241,
+        "targetMeanChangePct": -19.82,
+        "targetDispersionChangePct": 70.7,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.727,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.545,
+            "ratio": null
+          }
+        ]
+      },
       {
         "itemCode": "005930",
         "itemName": "삼성전자",
@@ -85,6 +235,51 @@
     ],
     "targetMeanChange": [
       {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 16,
+        "previousReportCount": 5,
+        "recentTargetMean": 3346000,
+        "previousTargetMean": 3340000,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 492366,
+        "targetMeanChangePct": 0.18,
+        "targetDispersionChangePct": 7.34,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.125,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.1,
+            "ratio": 1.25
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.062,
+            "ratio": null
+          }
+        ]
+      },
+      {
         "itemCode": "005930",
         "itemName": "삼성전자",
         "status": "OK",
@@ -118,9 +313,114 @@
             "ratio": 1.03
           }
         ]
+      },
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 11,
+        "previousReportCount": 3,
+        "recentTargetMean": 3554545,
+        "previousTargetMean": 4433333,
+        "recentTargetMedian": 3500000,
+        "recentTargetStdev": 715241,
+        "targetMeanChangePct": -19.82,
+        "targetDispersionChangePct": 70.7,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.727,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.545,
+            "ratio": null
+          }
+        ]
       }
     ],
     "targetDispersionIncrease": [
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 11,
+        "previousReportCount": 3,
+        "recentTargetMean": 3554545,
+        "previousTargetMean": 4433333,
+        "recentTargetMedian": 3500000,
+        "recentTargetStdev": 715241,
+        "targetMeanChangePct": -19.82,
+        "targetDispersionChangePct": 70.7,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.727,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.545,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 16,
+        "previousReportCount": 5,
+        "recentTargetMean": 3346000,
+        "previousTargetMean": 3340000,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 492366,
+        "targetMeanChangePct": 0.18,
+        "targetDispersionChangePct": 7.34,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.125,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.1,
+            "ratio": 1.25
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.062,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.062,
+            "ratio": null
+          }
+        ]
+      },
       {
         "itemCode": "005930",
         "itemName": "삼성전자",

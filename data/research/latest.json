@@ -1,9 +1,81 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-10T12:21:51.467898+09:00",
-  "reportCount": 6875,
+  "generatedAt": "2026-11-10T19:22:07.625110+09:00",
+  "reportCount": 6877,
   "stockCount": 1063,
   "latest": [
+    {
+      "nid": "97958",
+      "writeDate": "2026-11-10",
+      "itemCode": "181710",
+      "itemName": "NHN",
+      "title": "목표주가 재상향, 최선호주 유지",
+      "brokerCode": "16",
+      "brokerName": "한화투자증권",
+      "goalPrice": 93000,
+      "opinionText": "Buy",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1912,
+      "contentLength": 415,
+      "contentSha256": "d779619285ffbded7249b1c7dfaf89f0cf90262ebab75f23b2625001f2a38f68",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 4,
+          "negative": 2
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "AI": 1,
+          "원가": 1
+        }
+      },
+      "previousSameBrokerNid": "96569",
+      "goalPriceChange": {
+        "from": 87000,
+        "to": 93000,
+        "amount": 6000,
+        "pct": 6.9
+      },
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
+    {
+      "nid": "97957",
+      "writeDate": "2026-11-10",
+      "itemCode": "009420",
+      "itemName": "한올바이오파마",
+      "title": "아이메로프루바트 임상 2상 결과 발표",
+      "brokerCode": "56",
+      "brokerName": "미래에셋증권",
+      "goalPrice": 71000,
+      "opinionText": "매수",
+      "opinionType": "buy",
+      "normalizedOpinion": "BUY",
+      "readCount": 1185,
+      "contentLength": 626,
+      "contentSha256": "33ce99a2dc316b79e51f43eb0562db3521bfca35ab879c881433cad81e6ecc83",
+      "analysis": {
+        "textSignalBalance": {
+          "positive": 0,
+          "negative": 0
+        },
+        "earningsTextDirection": "UNKNOWN",
+        "earningsPositiveSignalCount": 0,
+        "earningsNegativeSignalCount": 0,
+        "targetPriceMentionDirection": "UNKNOWN",
+        "topics": {
+          "AI": 2
+        }
+      },
+      "previousSameBrokerNid": "93205",
+      "goalPriceChange": null,
+      "opinionChange": null,
+      "goalPriceChangeLarge": false
+    },
     {
       "nid": "97956",
       "writeDate": "2026-11-10",
@@ -16,7 +88,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 272,
+      "readCount": 1471,
       "contentLength": 735,
       "contentSha256": "f0a09855405b95025926e8fb58497fc8934c0378377dedf8952209c3ef115ef6",
       "analysis": {
@@ -56,7 +128,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 292,
+      "readCount": 1498,
       "contentLength": 449,
       "contentSha256": "74aeba3830a3798ecac01acc1fa82b9449788b86843d3a3cdd9105fab327717f",
       "analysis": {
@@ -92,7 +164,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 242,
+      "readCount": 1315,
       "contentLength": 430,
       "contentSha256": "a0c5be086af666b5823d8d67390e4f6940921eac7d51b6c636b372c4923d8625",
       "analysis": {
@@ -131,7 +203,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 354,
+      "readCount": 1763,
       "contentLength": 397,
       "contentSha256": "76b3a07650509845a757c2d486d2f0cc1989053e3401f2987aa7ceeebf82b716",
       "analysis": {
@@ -169,7 +241,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 324,
+      "readCount": 1648,
       "contentLength": 444,
       "contentSha256": "8fd27a934da7c45a1acede686d348ace52f6fa78ecde6ef31d8736ec1b3a3cb2",
       "analysis": {
@@ -209,7 +281,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 312,
+      "readCount": 1534,
       "contentLength": 412,
       "contentSha256": "e37f49cb255996f5883099986406580ca7169197b1d30a6308aa35a60141d1bf",
       "analysis": {
@@ -253,7 +325,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 275,
+      "readCount": 1301,
       "contentLength": 251,
       "contentSha256": "f77967a7cde58274d4c59167a7b1cb1370b0f634b734fd20875af666632d68ac",
       "analysis": {
@@ -286,7 +358,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 297,
+      "readCount": 1432,
       "contentLength": 335,
       "contentSha256": "60b9a980501934afbdee605c3880fe68cd7c0d1a446ee9866357533dd70b5089",
       "analysis": {
@@ -326,7 +398,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 320,
+      "readCount": 1455,
       "contentLength": 277,
       "contentSha256": "3938bc63d37b47ae193cf8c2acb63cfaabf0c5b340cbc49a8496d39374d6e881",
       "analysis": {
@@ -362,7 +434,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 317,
+      "readCount": 1389,
       "contentLength": 351,
       "contentSha256": "fbdd210b2944ec417f0e0d8c1df7d54a13f48052477e3bcc845f8f00f5670d4d",
       "analysis": {
@@ -393,7 +465,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 358,
+      "readCount": 1613,
       "contentLength": 375,
       "contentSha256": "6c07c35516ea92444a82b36fb1731c31f4581b139771148fd392141adb1a9e60",
       "analysis": {
@@ -434,7 +506,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 332,
+      "readCount": 1395,
       "contentLength": 509,
       "contentSha256": "2abe42b86bc6fa53c8c0597ee8d563b139f607c8bcfbf53ff08f7940d0339453",
       "analysis": {
@@ -473,7 +545,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 261,
+      "readCount": 891,
       "contentLength": 289,
       "contentSha256": "43a88674ec49eccf1a2d7d559ee7f46b418f00195570353256c6c225b74c3270",
       "analysis": {
@@ -507,7 +579,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 339,
+      "readCount": 1079,
       "contentLength": 405,
       "contentSha256": "ed8d13b1e7cfbf033601945c0104123be7d582701bba02e149e94b7eee3c6932",
       "analysis": {
@@ -538,7 +610,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 471,
+      "readCount": 1628,
       "contentLength": 357,
       "contentSha256": "02d5012cdc4e293723ffdfd7e515a976aa14c231ee2f1a78d1b1c5b80bb805cb",
       "analysis": {
@@ -576,7 +648,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2504,
+      "readCount": 4197,
       "contentLength": 508,
       "contentSha256": "b62fb631f34b645bcdb09332b76bb2214d23d6298bf9aa75a71572f6a0616827",
       "analysis": {
@@ -610,7 +682,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 466,
+      "readCount": 1450,
       "contentLength": 1307,
       "contentSha256": "01d212dd777e94e386b8ab4070e4cbac1db1cf73c520dcebc500e8796b156e53",
       "analysis": {
@@ -644,7 +716,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 465,
+      "readCount": 1454,
       "contentLength": 824,
       "contentSha256": "a5b4b6b83dab0ad89ece3a9cd2094a86196468ed0b31ad9666fa0715e3aad7f7",
       "analysis": {
@@ -680,7 +752,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 494,
+      "readCount": 1475,
       "contentLength": 1566,
       "contentSha256": "719f6cad17f97d4ba19f2b77257a951c45073260ec22596fe7168fbf6a7f506d",
       "analysis": {
@@ -723,7 +795,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 746,
+      "readCount": 2046,
       "contentLength": 543,
       "contentSha256": "f6cfd5e9b35e86813dcdc39f63767d1b7f51e2b5bc499e8843e2ef3b6b022e64",
       "analysis": {
@@ -761,7 +833,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 486,
+      "readCount": 1440,
       "contentLength": 406,
       "contentSha256": "43564078084173be4f0b343319568915de1c930f3544a1487f7b752a08b6ca16",
       "analysis": {
@@ -802,7 +874,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 474,
+      "readCount": 1398,
       "contentLength": 1554,
       "contentSha256": "005725622ae22197ee3c1780ec6fdc235c5564535836736f0f3c541760b6543d",
       "analysis": {
@@ -841,7 +913,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 565,
+      "readCount": 1519,
       "contentLength": 1549,
       "contentSha256": "d2d5cc565a8420306240c347bd8cf8245278a9c6a64d30b73ee786db93d2aea8",
       "analysis": {
@@ -881,7 +953,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 830,
+      "readCount": 1744,
       "contentLength": 323,
       "contentSha256": "1b543ef4b6bcdc0a80c6d4b20d35c9bcfdc72b8cc8f8e19f60cfc418250a94bf",
       "analysis": {
@@ -914,14 +986,14 @@
       "writeDate": "2026-11-10",
       "itemCode": "009420",
       "itemName": "한올바이오파마",
-      "title": "난치성 류마티스 성공, GD로 이어간다",
+      "title": "난치성 류마티스 성공, GD로 이어진다",
       "brokerCode": "21",
       "brokerName": "신한투자증권",
       "goalPrice": 110000,
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 907,
+      "readCount": 2059,
       "contentLength": 252,
       "contentSha256": "30a13c756d66284b4359c99adacf1cca59e58e7ad5590e2a35b17c35798ea1b8",
       "analysis": {
@@ -959,7 +1031,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1424,
+      "readCount": 2712,
       "contentLength": 240,
       "contentSha256": "aca0395ebd040f881c723f4c6e0e4159dc84df69bbef8a92625aabb67675d441",
       "analysis": {
@@ -995,7 +1067,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 703,
+      "readCount": 1717,
       "contentLength": 1414,
       "contentSha256": "4636a5af97b67c830928a92c956b598d41e8a50ccb8645a7ef420d3a90edb74e",
       "analysis": {
@@ -1035,7 +1107,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 437,
+      "readCount": 1030,
       "contentLength": 471,
       "contentSha256": "adc8d92c94106d0ca0bbd4cb4efc4e9ea85506c9fcbe200f70d348e3431240a0",
       "analysis": {
@@ -1071,7 +1143,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 470,
+      "readCount": 997,
       "contentLength": 386,
       "contentSha256": "21a380089701f08a65b190deeebd27f35c8b347784de34f40b9a6c01695bdd8f",
       "analysis": {
@@ -1111,7 +1183,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 706,
+      "readCount": 1298,
       "contentLength": 518,
       "contentSha256": "607df147ab474e50d4d650d7d39d3ef735f0f3fb128104ee0635cded59cde0b7",
       "analysis": {
@@ -1149,7 +1221,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 598,
+      "readCount": 1044,
       "contentLength": 191,
       "contentSha256": "33f260854201d2fd3454d5cdd7520e5353c98364b5254e590a82bd593dfb6ccb",
       "analysis": {
@@ -1187,7 +1259,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 673,
+      "readCount": 1120,
       "contentLength": 709,
       "contentSha256": "8110df148b2cd70acf0fdadb9ab84d8943a4c2681955b7b4d2a44eaf6f3e117d",
       "analysis": {
@@ -1228,7 +1300,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 643,
+      "readCount": 1083,
       "contentLength": 489,
       "contentSha256": "c7a870675ccf50490170dd38db7c2918ec5485891ecc29e5b19fdaaedc215422",
       "analysis": {
@@ -1264,7 +1336,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 648,
+      "readCount": 1135,
       "contentLength": 391,
       "contentSha256": "18f7c4665b4a26a2acc9078b601c5e37b1f438c9d7e46a794927cdb6f94eab61",
       "analysis": {
@@ -1299,7 +1371,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 589,
+      "readCount": 1043,
       "contentLength": 819,
       "contentSha256": "510f0166ed22ce458cdd6a0a4c0244d7c035510f57c1afea4f2e48cf9fdb6f5e",
       "analysis": {
@@ -1339,7 +1411,7 @@
       "opinionText": "중립",
       "opinionType": "neutral",
       "normalizedOpinion": "HOLD",
-      "readCount": 3192,
+      "readCount": 3395,
       "contentLength": 379,
       "contentSha256": "1e6b57c011f065c7231917e06f187accf72c009147b68e43c3808cc03c049edc",
       "analysis": {
@@ -1379,7 +1451,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3414,
+      "readCount": 3610,
       "contentLength": 401,
       "contentSha256": "2c9c39b48da1c48494c8fdca6c25443e18da50f94d3fc4d017ea91bed75d3030",
       "analysis": {
@@ -1415,7 +1487,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3549,
+      "readCount": 3791,
       "contentLength": 543,
       "contentSha256": "ffc8e49f83283f3cb5fc14b3f8756a4bbefd7caf47aa6d18714c2a6465d3ca25",
       "analysis": {
@@ -1455,7 +1527,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3388,
+      "readCount": 3578,
       "contentLength": 343,
       "contentSha256": "f824d674e22acdcc0fe6297b3b63b4e96ecacf0e647dd8d28905d10d5076d103",
       "analysis": {
@@ -1488,7 +1560,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2965,
+      "readCount": 3128,
       "contentLength": 682,
       "contentSha256": "79575800e14276ca7569bfe31ec62a945ec55401a8b536aee4b5a7e812dcc164",
       "analysis": {
@@ -1527,7 +1599,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2939,
+      "readCount": 3081,
       "contentLength": 901,
       "contentSha256": "59cdbf3b4bbf1033498a9d015cefd560ada3b22885cf95ebb9d3de7880511073",
       "analysis": {
@@ -1568,7 +1640,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3096,
+      "readCount": 3269,
       "contentLength": 348,
       "contentSha256": "bc199c422db3ea87cc195a09472c9def640bd027a980809009103d6461c4dcaf",
       "analysis": {
@@ -1607,7 +1679,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3924,
+      "readCount": 4205,
       "contentLength": 372,
       "contentSha256": "7573e642fdd653f68c8d05ccae6fd1f11ce6b316084a6b582af2121c89edce56",
       "analysis": {
@@ -1647,7 +1719,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2930,
+      "readCount": 3072,
       "contentLength": 404,
       "contentSha256": "af3fe71df8c0af494df64184620ae4ef294f4b0376f21996e3e0bf373a78b040",
       "analysis": {
@@ -1680,7 +1752,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2874,
+      "readCount": 3013,
       "contentLength": 1039,
       "contentSha256": "1fc5a03fde5baa1ad8dd23be5c035f5681d83cb14b0321ef4affd61bcbf6e86e",
       "analysis": {
@@ -1719,7 +1791,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3085,
+      "readCount": 3257,
       "contentLength": 957,
       "contentSha256": "baea9680ada13fe3f19aca1125afc9a808286e06309ac216c51d1e3562f3e1c0",
       "analysis": {
@@ -1757,7 +1829,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2941,
+      "readCount": 3081,
       "contentLength": 945,
       "contentSha256": "521fcf4731ab6df7de8dc5f0a9d67acd682117e54289be4da5ccccf8c4573a81",
       "analysis": {
@@ -1794,7 +1866,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2763,
+      "readCount": 2889,
       "contentLength": 833,
       "contentSha256": "5538495dd4e79ede80165175b433cdf178f11b380d5e1c1da5cf4b97cbd401f4",
       "analysis": {
@@ -1835,7 +1907,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2691,
+      "readCount": 2815,
       "contentLength": 812,
       "contentSha256": "5262bcd1aef056e79647ad8c5dc558083bc9ce44c5fedada2c6d24ca2fe0db48",
       "analysis": {
@@ -1873,7 +1945,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3017,
+      "readCount": 3179,
       "contentLength": 321,
       "contentSha256": "4b2a750fc46a0829cad6cf50c25b776103d7ecc87cfe9ba27e74dcb152bc02b7",
       "analysis": {
@@ -1906,7 +1978,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3071,
+      "readCount": 3226,
       "contentLength": 314,
       "contentSha256": "488fb0e390b5465e107977536ecd890b1691e67e1e51a210f20cdd7433c64cd9",
       "analysis": {
@@ -1947,7 +2019,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3066,
+      "readCount": 3281,
       "contentLength": 648,
       "contentSha256": "63480a1e0714c157452f1b90fb13e3afd54a03f889a6dbded1e53bec71eb093b",
       "analysis": {
@@ -1983,7 +2055,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2680,
+      "readCount": 2805,
       "contentLength": 515,
       "contentSha256": "21cb57e6e3d01606d357e26174142de7293872bdab81502cef74e7fbaaece397",
       "analysis": {
@@ -2014,7 +2086,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3132,
+      "readCount": 3340,
       "contentLength": 769,
       "contentSha256": "a902c0e703641d746f6439f59c29830825f1c5a5a2290a9f9fb2aafbcc724cdf",
       "analysis": {
@@ -2052,7 +2124,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2906,
+      "readCount": 3076,
       "contentLength": 170,
       "contentSha256": "611f44100eea30b1770222d1a0f1c57fd8e0cc8b2ee53da9721e03c1367bada3",
       "analysis": {
@@ -2083,7 +2155,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2582,
+      "readCount": 2705,
       "contentLength": 363,
       "contentSha256": "5b37007318e0f96d7db1518119aff4f4d39b5704fc3afc8a465ff8ff5cde304c",
       "analysis": {
@@ -2118,7 +2190,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2599,
+      "readCount": 2724,
       "contentLength": 248,
       "contentSha256": "6f8199f88fddda57fe47c44f27c34f8271af7f841e4445c2ffc2ed4470fe6152",
       "analysis": {
@@ -2151,7 +2223,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2647,
+      "readCount": 2800,
       "contentLength": 476,
       "contentSha256": "d878472527fe6c417e71eefecb0737905011ab3d630cc5105c079f62b72bccaf",
       "analysis": {
@@ -2191,7 +2263,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2544,
+      "readCount": 2623,
       "contentLength": 401,
       "contentSha256": "a44c47b79f8229c5c27dcb7e5d31349bca2d6ef2f9f820e9edb1bb80844db2b9",
       "analysis": {
@@ -2228,7 +2300,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2601,
+      "readCount": 2706,
       "contentLength": 581,
       "contentSha256": "74a166462275456cbdfc27ea008b9c84893a45f4d426cbb384c6515eebcab05c",
       "analysis": {
@@ -2270,7 +2342,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2495,
+      "readCount": 2557,
       "contentLength": 595,
       "contentSha256": "9659c60e875c42cdba1cd41075694ef64fe36ac5a04f699b694da021faaf58d1",
       "analysis": {
@@ -2312,7 +2384,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2575,
+      "readCount": 2665,
       "contentLength": 603,
       "contentSha256": "54e82ffa61a6c91eb32ac376f7d6e9e326e93aedf9b1e70221e8179b71f04b16",
       "analysis": {
@@ -2355,7 +2427,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2872,
+      "readCount": 2996,
       "contentLength": 504,
       "contentSha256": "3e99383859dc6bb07767f7012ed18cd83deae0624e1e1beca04ef67998d6d1a8",
       "analysis": {
@@ -2389,7 +2461,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2631,
+      "readCount": 2734,
       "contentLength": 563,
       "contentSha256": "844f9bedafb3c3b5c4660777d09d169ff63a0d3f2d9c26194d0abb5d12275f8f",
       "analysis": {
@@ -2430,7 +2502,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2588,
+      "readCount": 2670,
       "contentLength": 429,
       "contentSha256": "40262ddb6e1b732a6adcd3531c3feba0e5027ec84601e843f981e2212e3755d8",
       "analysis": {
@@ -2468,7 +2540,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1261,
+      "readCount": 1340,
       "contentLength": 514,
       "contentSha256": "243e9747b9c9bea09ed20d850c8230a34727cbd5891437144b5124b8191d936c",
       "analysis": {
@@ -2506,7 +2578,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1517,
+      "readCount": 1634,
       "contentLength": 391,
       "contentSha256": "34ac9bd54dc670a1b50f22170ed8dc1f530cdcc19c0db4ac58ab421c8298d9f4",
       "analysis": {
@@ -2545,7 +2617,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1140,
+      "readCount": 1221,
       "contentLength": 1534,
       "contentSha256": "211b7f0c07581785ef3a7db0bd903771d0e7a98af1950352632ce112a07eaf99",
       "analysis": {
@@ -2582,7 +2654,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2108,
+      "readCount": 2359,
       "contentLength": 240,
       "contentSha256": "f5fc92de861c47eb3897ad76557f4f98ef5de2b2146e7f250028e683b8f6d1a2",
       "analysis": {
@@ -2615,7 +2687,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1546,
+      "readCount": 1673,
       "contentLength": 309,
       "contentSha256": "8f42dcb4dc5b12f5da9bbc1126ad70f8b73e3f327d724013142218ba081de088",
       "analysis": {
@@ -2648,7 +2720,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1384,
+      "readCount": 1492,
       "contentLength": 414,
       "contentSha256": "abfd4478bc96f45de1e81d98d9ce4c3a3daabcb877680a96117a792b5faa43b4",
       "analysis": {
@@ -2683,7 +2755,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1352,
+      "readCount": 1438,
       "contentLength": 118,
       "contentSha256": "0374cfbef6748599e5255d3c5b9c61f0d04ea1f895407146a774c1e49a8c351d",
       "analysis": {
@@ -2714,7 +2786,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1854,
+      "readCount": 2019,
       "contentLength": 276,
       "contentSha256": "bcb854c2245c126c9936c77280c6bf9bbda6f0a819908469f81f60d5a99e7bdb",
       "analysis": {
@@ -2748,7 +2820,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1263,
+      "readCount": 1398,
       "contentLength": 290,
       "contentSha256": "54301a404010960ff12510eae8903700942a7a723995f1a832655ed2605be654",
       "analysis": {
@@ -2781,7 +2853,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1217,
+      "readCount": 1303,
       "contentLength": 176,
       "contentSha256": "9176557f629a046146542e109766c0f0f2567bf28ef5a4241edf0bcebc333157",
       "analysis": {
@@ -2819,7 +2891,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1138,
+      "readCount": 1218,
       "contentLength": 424,
       "contentSha256": "c0d3b43c85b19ed967a2af55b5355b6d03b4e25cde0539c62a79c9049809b26a",
       "analysis": {
@@ -2858,7 +2930,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3001,
+      "readCount": 3286,
       "contentLength": 162,
       "contentSha256": "ae1e68f975acdb06c85458a4e4c2abd7aa9fd6cc607108e49b89086f6c6abe7f",
       "analysis": {
@@ -2889,7 +2961,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1274,
+      "readCount": 1374,
       "contentLength": 290,
       "contentSha256": "7ff764e650aff5d775106c89faefc2289a764cf3c71e332a18736f01e2bb72bb",
       "analysis": {
@@ -2927,7 +2999,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1269,
+      "readCount": 1363,
       "contentLength": 330,
       "contentSha256": "47026a1c25cc01518d37f92bbc5634409f3271656f1b56676c7ffdaf7261128b",
       "analysis": {
@@ -2965,7 +3037,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1189,
+      "readCount": 1262,
       "contentLength": 299,
       "contentSha256": "a82faa305e197071934272c6c99b5de1e0bd79136547ad19b449491892d8f9cc",
       "analysis": {
@@ -3001,7 +3073,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1175,
+      "readCount": 1231,
       "contentLength": 399,
       "contentSha256": "0ab565591c84800aae7c67b7ad6d7203b2764802e594b9639c55e60fd99a1e22",
       "analysis": {
@@ -3037,7 +3109,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1184,
+      "readCount": 1248,
       "contentLength": 328,
       "contentSha256": "e118be1310cc1f15dd3ce8f29064a8402b551d0276fb19a6b6f82e93d43fd154",
       "analysis": {
@@ -3068,7 +3140,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1326,
+      "readCount": 1410,
       "contentLength": 296,
       "contentSha256": "efdd21e06a6dc807e0e5de9e8d7e72c26af8cf0ad2de49a4dbe6dd97b081f792",
       "analysis": {
@@ -3107,7 +3179,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1391,
+      "readCount": 1487,
       "contentLength": 199,
       "contentSha256": "2d74cf3ff400f91d06b66536658c546b46e5d56248d9c8ce98ecd1ae6e2b621b",
       "analysis": {
@@ -3145,7 +3217,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1251,
+      "readCount": 1317,
       "contentLength": 342,
       "contentSha256": "96ac85f7ba08b65de448e75e4b53c9cc319efffdb3aef5f410774c3977805ae4",
       "analysis": {
@@ -3178,7 +3250,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1144,
+      "readCount": 1200,
       "contentLength": 1059,
       "contentSha256": "2871c328d97b607a9484b3e148ae208488f014a8d543c99438f459d1a9b3b111",
       "analysis": {
@@ -3218,7 +3290,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1293,
+      "readCount": 1375,
       "contentLength": 1381,
       "contentSha256": "842bc1ba0fef039ee54976896e3aec6c64d30e14bdcef7f1088ab64428d185dd",
       "analysis": {
@@ -3257,7 +3329,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1177,
+      "readCount": 1237,
       "contentLength": 212,
       "contentSha256": "0dd1a5be32e410e8e3aceccd159aafc25efad572d0404306b25e553511354e2d",
       "analysis": {
@@ -3296,7 +3368,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1594,
+      "readCount": 1710,
       "contentLength": 319,
       "contentSha256": "00b8d61d360af2d944a5167a803e52b298beb94a033d77e9e0cee342a8035bf7",
       "analysis": {
@@ -3336,7 +3408,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1325,
+      "readCount": 1425,
       "contentLength": 259,
       "contentSha256": "e643d1db58c23a0d6a6b9c0ab33aac6906012d1064aa4f25af5185147d124c18",
       "analysis": {
@@ -3374,7 +3446,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1203,
+      "readCount": 1279,
       "contentLength": 51,
       "contentSha256": "511df6e863a8a05a3b20ffad0cc8747a659891dab190949eb2d837909835b973",
       "analysis": {
@@ -3412,7 +3484,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1268,
+      "readCount": 1345,
       "contentLength": 1474,
       "contentSha256": "112520bf30ed18823285a1a5c24e26d47abfdc64d98fed6baca36a9db87a55c4",
       "analysis": {
@@ -3455,7 +3527,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1207,
+      "readCount": 1261,
       "contentLength": 412,
       "contentSha256": "843e9cbf21a225f49ec4a2bfa41eb413aca1ef32c5e8b207d12d823cc44df3de",
       "analysis": {
@@ -3496,7 +3568,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1227,
+      "readCount": 1293,
       "contentLength": 1545,
       "contentSha256": "7fc5698fffd2dbb3c787cff1d2f0a8722747672f203b92cf305e77877fa12b14",
       "analysis": {
@@ -3537,7 +3609,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1471,
+      "readCount": 1529,
       "contentLength": 1279,
       "contentSha256": "b6671ad07b7f7f34e61666c4b0f182db23b48437ed64def5975a634e494542ea",
       "analysis": {
@@ -3578,7 +3650,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1096,
+      "readCount": 1157,
       "contentLength": 419,
       "contentSha256": "87f195f7a06ab15b2a914c0b014fea2ec86cbf3265076225753646dac05c8e70",
       "analysis": {
@@ -3618,7 +3690,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1667,
+      "readCount": 1815,
       "contentLength": 362,
       "contentSha256": "662c570902798cdab529e368c57c7a50b680f3008c1f5edf63a8b0c3fcc74f21",
       "analysis": {
@@ -3659,7 +3731,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1389,
+      "readCount": 1449,
       "contentLength": 142,
       "contentSha256": "ae9017376d7a74c15ab2cdea3c1f5ac65bd71d5271c7cfd62d0a56111071c70d",
       "analysis": {
@@ -3697,7 +3769,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1086,
+      "readCount": 1143,
       "contentLength": 67,
       "contentSha256": "632604eb320d9e7541b5ac06ec351d943553b5772dbc407ac8b9e216ddfe3efe",
       "analysis": {
@@ -3728,7 +3800,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1081,
+      "readCount": 1129,
       "contentLength": 1525,
       "contentSha256": "e6bca5ebd172d9c98b07a0322905c13883755ea45b366113ad5d9cd4dd98b6b8",
       "analysis": {
@@ -3770,7 +3842,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1327,
+      "readCount": 1419,
       "contentLength": 519,
       "contentSha256": "78f35d8e2a90788a283b64f6c2eaf56a183906fdc763af94fc8dbcaad8236f12",
       "analysis": {
@@ -3809,7 +3881,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1293,
+      "readCount": 1354,
       "contentLength": 449,
       "contentSha256": "492d9577e05c7efb348a1afbd6ef94878e90c955aa94cf400431fa07b259520e",
       "analysis": {
@@ -3847,7 +3919,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1293,
+      "readCount": 1356,
       "contentLength": 1599,
       "contentSha256": "0b109b7e34cbca9805d1f1988642e0e6daf5f0cd9338a9f956d51361ebc7e6c7",
       "analysis": {
@@ -3890,7 +3962,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1234,
+      "readCount": 1287,
       "contentLength": 563,
       "contentSha256": "bdd4af1fb7c55fe73a43dc23c16e47bf7ce5f30a634de4eaaa9acd841cfeeb65",
       "analysis": {
@@ -3927,7 +3999,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1279,
+      "readCount": 1331,
       "contentLength": 690,
       "contentSha256": "cc4e89b747dce22f1fce00f4dd0c82de9dd76a33b6181b7bcf36197e23205073",
       "analysis": {
@@ -3964,7 +4036,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1394,
+      "readCount": 1475,
       "contentLength": 403,
       "contentSha256": "6cb0f82f1611bcb75dfb366598963fe49c43d88be5ccad12360df8c8bae377bf",
       "analysis": {
@@ -3998,7 +4070,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1189,
+      "readCount": 1240,
       "contentLength": 208,
       "contentSha256": "466a3aaafc489e7561cba14613b5185874f89ebdfb5399ba48ef838e066c309e",
       "analysis": {
@@ -4037,7 +4109,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1201,
+      "readCount": 1254,
       "contentLength": 1305,
       "contentSha256": "d655666066ba7c2dd8cbb35e78921a5b9bd692f6145286aa1b9fa7051b1749b2",
       "analysis": {
@@ -4074,7 +4146,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1242,
+      "readCount": 1294,
       "contentLength": 495,
       "contentSha256": "fa756045ae0a78ddcc2736d74de71eef89db8f10047925bd2e1bc3ebf1f2d99e",
       "analysis": {
@@ -4109,7 +4181,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1227,
+      "readCount": 1286,
       "contentLength": 135,
       "contentSha256": "f0b37c17829b4c667c9e969047aacf628e6f451d71a56244571bb65450c3e0ea",
       "analysis": {
@@ -4145,7 +4217,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1179,
+      "readCount": 1223,
       "contentLength": 126,
       "contentSha256": "15068508cc2523a7a6638fe3b0c1a10b03aca50ac436e82300831f1daee15d97",
       "analysis": {
@@ -4178,7 +4250,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1155,
+      "readCount": 1204,
       "contentLength": 134,
       "contentSha256": "7b06e3be9cda96b61e3514028c3dcfadf0f669d9737645398e5cc56ed9a97705",
       "analysis": {
@@ -4213,7 +4285,7 @@
       "opinionText": "UnderPerform",
       "opinionType": "sell",
       "normalizedOpinion": "OTHER",
-      "readCount": 1205,
+      "readCount": 1294,
       "contentLength": 274,
       "contentSha256": "15e9c5e78aab488f90cc3efe863d1db33d62590e970fa4a7602dde59c1a2384f",
       "analysis": {
@@ -4247,7 +4319,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1209,
+      "readCount": 1260,
       "contentLength": 99,
       "contentSha256": "80dc3b95a833d3a325a935d0b8789c349ac04635eb86a40f15040e0cfdc166fd",
       "analysis": {
@@ -4281,7 +4353,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1257,
+      "readCount": 1330,
       "contentLength": 721,
       "contentSha256": "766501ec192c14f96ceaa2db6e2ffce006eba2b1344db39bb16016f0ccb72735",
       "analysis": {
@@ -4316,7 +4388,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1191,
+      "readCount": 1256,
       "contentLength": 558,
       "contentSha256": "30771c1679d5aaabfa4b7a02435f9361d534a070008b8b57aae366f2b40768b8",
       "analysis": {
@@ -4358,7 +4430,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1120,
+      "readCount": 1194,
       "contentLength": 717,
       "contentSha256": "6def15fdefdc87f746b5ae377c2c97e49a075d6372e61e5ea4711948f990ceb3",
       "analysis": {
@@ -4397,7 +4469,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1179,
+      "readCount": 1239,
       "contentLength": 550,
       "contentSha256": "9ca85ca2a6668ac582899da02ffd9d27fba63a800aba355b6aedb8dbbd0f569e",
       "analysis": {
@@ -4431,7 +4503,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1175,
+      "readCount": 1224,
       "contentLength": 502,
       "contentSha256": "736b0557a58afd6841ba7142ed2df00075d7fda5c7c519a64f737aa726826c03",
       "analysis": {
@@ -4462,7 +4534,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1148,
+      "readCount": 1235,
       "contentLength": 182,
       "contentSha256": "50514bde7b7179141435499ac331c92bda425bb76206fb52fcf09f8a12c47591",
       "analysis": {
@@ -4501,7 +4573,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1159,
+      "readCount": 1212,
       "contentLength": 532,
       "contentSha256": "1efb1b7b1e318d1b59cf027b33bff83b079af7903fb51bd4c4f35a8e1578eb93",
       "analysis": {
@@ -4539,7 +4611,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1281,
+      "readCount": 1334,
       "contentLength": 1422,
       "contentSha256": "c1c13f34026f118d7d95e24e4e2a8a1f85a6682a2c8e7e7a644b3c2207b4ed59",
       "analysis": {
@@ -4575,7 +4647,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1645,
+      "readCount": 1738,
       "contentLength": 586,
       "contentSha256": "974976e350b89349ee3f8b986ba849f74690b8c5619a42248cf15372321ea328",
       "analysis": {
@@ -4618,7 +4690,7 @@
       "opinionText": "Hold",
       "opinionType": "neutral",
       "normalizedOpinion": "HOLD",
-      "readCount": 2049,
+      "readCount": 2169,
       "contentLength": 544,
       "contentSha256": "9afe0379d07205f21bbd9544d5d4c24eecb1c68336ea331d613e562b4a0d61b7",
       "analysis": {
@@ -4662,7 +4734,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1268,
+      "readCount": 1309,
       "contentLength": 654,
       "contentSha256": "bdeb26335d9de224d0e62671381ff9fa2c8d88628961da1e4f4c68f82d9c3782",
       "analysis": {
@@ -4696,7 +4768,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1354,
+      "readCount": 1414,
       "contentLength": 685,
       "contentSha256": "606866fe0a3cf06a03319b36a2c9a694f9d02d8311187bc8993fedb0b16fe2b2",
       "analysis": {
@@ -4735,7 +4807,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1170,
+      "readCount": 1216,
       "contentLength": 350,
       "contentSha256": "92abcb835b1938552f6a348730420f9a0999a7186f17a7e044d951be757670c1",
       "analysis": {
@@ -4773,7 +4845,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1666,
+      "readCount": 1777,
       "contentLength": 158,
       "contentSha256": "702105256dad7d241033050f5ebcdab3cf39d5a547d2f6750ecd9cfa7b225b61",
       "analysis": {
@@ -4809,7 +4881,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1078,
+      "readCount": 1119,
       "contentLength": 395,
       "contentSha256": "5b8e2dd7e8c769de5af1ea28cd02ee98f9bb22af1d3ce8fd6fc76d574472cb26",
       "analysis": {
@@ -4843,7 +4915,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1203,
+      "readCount": 1246,
       "contentLength": 587,
       "contentSha256": "c97df551c2ccc3e16eeb842ea6d5b3949f049ae9555156a70a99aa1b9d13e898",
       "analysis": {
@@ -4877,7 +4949,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7580,
+      "readCount": 7614,
       "contentLength": 555,
       "contentSha256": "3d567adeaf5b44c27326d200849d95386569a0a10170087e597a973099a25392",
       "analysis": {
@@ -4918,7 +4990,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7939,
+      "readCount": 8010,
       "contentLength": 218,
       "contentSha256": "ddd36956509423021a1ce446d707fdc7c5670e16590702c25ae86a90cfcac109",
       "analysis": {
@@ -4958,7 +5030,7 @@
       "opinionText": "Neutral",
       "opinionType": "neutral",
       "normalizedOpinion": "HOLD",
-      "readCount": 7130,
+      "readCount": 7172,
       "contentLength": 532,
       "contentSha256": "af683728628f77495879e195bb319270e3c0f3e36d72ec73b1839bbf00ab4bbf",
       "analysis": {
@@ -4999,7 +5071,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8109,
+      "readCount": 8222,
       "contentLength": 624,
       "contentSha256": "671be6275dea71706790bfc62100f0682f27fe5d049512f8fc096d3b2655c6ad",
       "analysis": {
@@ -5033,7 +5105,7 @@
       "opinionText": "Neutral",
       "opinionType": "neutral",
       "normalizedOpinion": "HOLD",
-      "readCount": 7669,
+      "readCount": 7720,
       "contentLength": 716,
       "contentSha256": "ea1a2e1ae327cb04279b71bbd2a349d763be64226770960aec44731ac88c0dfc",
       "analysis": {
@@ -5068,7 +5140,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6932,
+      "readCount": 6967,
       "contentLength": 391,
       "contentSha256": "8ce2deae21a6bfb5c64c27ec0a935fc86b7af9601ff45ca79c93ae58652b0151",
       "analysis": {
@@ -5106,7 +5178,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 14295,
+      "readCount": 14381,
       "contentLength": 493,
       "contentSha256": "f9b29571772f77cafd37d9ebd9c6e218499a58b597f8633342c92bf51c8bcf2c",
       "analysis": {
@@ -5139,7 +5211,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6714,
+      "readCount": 6747,
       "contentLength": 437,
       "contentSha256": "356207812933e39e520811658ff30c0b1d99cb9c4a60769b5ec77056c2096395",
       "analysis": {
@@ -5174,7 +5246,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7618,
+      "readCount": 7811,
       "contentLength": 735,
       "contentSha256": "231df2740238a94ae9b17ac33c1b51d7ac2bd8d6594a7d48adc4d110d7afe158",
       "analysis": {
@@ -5208,7 +5280,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3476,
+      "readCount": 3561,
       "contentLength": 493,
       "contentSha256": "ad6d1f0ed7e31d80c3bd46ecbc2d9c2dce88493bebcd214745b01a85de5951b2",
       "analysis": {
@@ -5241,7 +5313,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6896,
+      "readCount": 6937,
       "contentLength": 421,
       "contentSha256": "31fa32888c302fa25870543bddfa7b6390daebfd8df4c7c3d74b5d28089f3fa5",
       "analysis": {
@@ -5277,7 +5349,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6828,
+      "readCount": 6864,
       "contentLength": 274,
       "contentSha256": "7380bff878b036c4b6a8c1cb34bba59daa9c15b0c9898c4dfe02a38b3bfbde50",
       "analysis": {
@@ -5315,7 +5387,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7840,
+      "readCount": 7899,
       "contentLength": 1066,
       "contentSha256": "9acaacffcb603115e1b1cab7091b74bfae7a7419fce028d7234b7adb4450e4f6",
       "analysis": {
@@ -5353,7 +5425,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7431,
+      "readCount": 7498,
       "contentLength": 350,
       "contentSha256": "4cfc0161f16180c0fea349f15f48bf2cd615700e47f4f324b4df1e709f4e9557",
       "analysis": {
@@ -5394,7 +5466,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8162,
+      "readCount": 8217,
       "contentLength": 359,
       "contentSha256": "6336846ea57dec574178aa69663f6b4bed4beff657a573f5eaa712a9cf0fa13f",
       "analysis": {
@@ -5436,7 +5508,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7113,
+      "readCount": 7190,
       "contentLength": 374,
       "contentSha256": "c101de322a423a2ec05e6974b3ba3b02dc0ec40879da62a9c12c77914a273fea",
       "analysis": {
@@ -5476,7 +5548,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 7009,
+      "readCount": 7134,
       "contentLength": 419,
       "contentSha256": "694d2c832afd02990058f12a98e23c9e735ddf770d71ea08215d49b0be4fc274",
       "analysis": {
@@ -5512,7 +5584,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 6559,
+      "readCount": 6587,
       "contentLength": 448,
       "contentSha256": "2b29a184054cb981707ac2166bd40866fc8afee324632aa5db7ece54410dc84a",
       "analysis": {
@@ -5545,7 +5617,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6885,
+      "readCount": 6985,
       "contentLength": 485,
       "contentSha256": "5127aeaddc23b638ad64de4752f5037b9af51b2fe0cc7450b427aa1231e9350b",
       "analysis": {
@@ -5579,7 +5651,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3085,
+      "readCount": 3139,
       "contentLength": 68,
       "contentSha256": "b31d2cc91b0a68cd0f6c3093269268d2cb49918539a24f8a278cf6025edc9463",
       "analysis": {
@@ -5610,7 +5682,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6742,
+      "readCount": 6818,
       "contentLength": 644,
       "contentSha256": "74587b938bec7abd30dee2edb5d6f7b9b5610b4fbf64ddffe44ace54c37f2ca7",
       "analysis": {
@@ -5645,7 +5717,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 16728,
+      "readCount": 17287,
       "contentLength": 1690,
       "contentSha256": "aab16547272b9b190b613ad1ecef3c2c61d4ed7646247ec0629e858f96b4c253",
       "analysis": {
@@ -5687,7 +5759,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6534,
+      "readCount": 6643,
       "contentLength": 786,
       "contentSha256": "187d6ad8b9da1b0bd2bace8f399c693ea562b7ac3b128ecc765da46612c28356",
       "analysis": {
@@ -5723,7 +5795,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6555,
+      "readCount": 6596,
       "contentLength": 829,
       "contentSha256": "3efbb4067504493e88285596fb48002997811d7e113fa2708c353855352eeee9",
       "analysis": {
@@ -5763,7 +5835,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6351,
+      "readCount": 6389,
       "contentLength": 535,
       "contentSha256": "399bf4531a3a88df5e5cb9a23fcf5fc87ee3b21a9e303ba46dca510cb6e4a2c1",
       "analysis": {
@@ -5802,7 +5874,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8737,
+      "readCount": 8811,
       "contentLength": 523,
       "contentSha256": "7c24337586d7dafcf4dc4da77f2fbc28160d13d0593d1778d7507414864f461f",
       "analysis": {
@@ -5841,7 +5913,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6224,
+      "readCount": 6257,
       "contentLength": 290,
       "contentSha256": "54301a404010960ff12510eae8903700942a7a723995f1a832655ed2605be654",
       "analysis": {
@@ -5879,7 +5951,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6781,
+      "readCount": 6816,
       "contentLength": 276,
       "contentSha256": "bcb854c2245c126c9936c77280c6bf9bbda6f0a819908469f81f60d5a99e7bdb",
       "analysis": {
@@ -5913,7 +5985,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6130,
+      "readCount": 6165,
       "contentLength": 639,
       "contentSha256": "fe994fd8a3624658d301a68745d350b51893e5221954c1c7115604ecaf844b23",
       "analysis": {
@@ -5949,7 +6021,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 6120,
+      "readCount": 6152,
       "contentLength": 118,
       "contentSha256": "0374cfbef6748599e5255d3c5b9c61f0d04ea1f895407146a774c1e49a8c351d",
       "analysis": {
@@ -5980,7 +6052,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2022,
+      "readCount": 2064,
       "contentLength": 414,
       "contentSha256": "abfd4478bc96f45de1e81d98d9ce4c3a3daabcb877680a96117a792b5faa43b4",
       "analysis": {
@@ -6015,7 +6087,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1850,
+      "readCount": 1885,
       "contentLength": 309,
       "contentSha256": "8f42dcb4dc5b12f5da9bbc1126ad70f8b73e3f327d724013142218ba081de088",
       "analysis": {
@@ -6053,7 +6125,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1695,
+      "readCount": 1726,
       "contentLength": 264,
       "contentSha256": "68272e0cf81a312d232132973b25c891e6dda4a5e64437c5337cebbb753a10ee",
       "analysis": {
@@ -6091,7 +6163,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3789,
+      "readCount": 3853,
       "contentLength": 240,
       "contentSha256": "f5fc92de861c47eb3897ad76557f4f98ef5de2b2146e7f250028e683b8f6d1a2",
       "analysis": {
@@ -6129,7 +6201,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 8805,
+      "readCount": 8841,
       "contentLength": 336,
       "contentSha256": "1835eb5e6044f8e990ddc8e862799383ab4250acdc0aabe214f10c2073341436",
       "analysis": {
@@ -6162,7 +6234,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3717,
+      "readCount": 3777,
       "contentLength": 328,
       "contentSha256": "af88a51386d094aa58f9a56fe408ed5acff1e5a3a94ffaff08d7f2608403b6e6",
       "analysis": {
@@ -6200,7 +6272,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1861,
+      "readCount": 1915,
       "contentLength": 311,
       "contentSha256": "603dfa6c6377d7f105c5462be55152646d4137291ade7e407b6e2036d3bdae4a",
       "analysis": {
@@ -6234,7 +6306,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2008,
+      "readCount": 2071,
       "contentLength": 239,
       "contentSha256": "a4d6bf3c7b82a22a220919a7305829a4bb847d785c2ee688460161fb71d36859",
       "analysis": {
@@ -6269,7 +6341,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2906,
+      "readCount": 3022,
       "contentLength": 98,
       "contentSha256": "5661c14d2952f2065576f5951cc57f4a27df64e63ca6747e603120ba3005b908",
       "analysis": {
@@ -6309,7 +6381,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2333,
+      "readCount": 2372,
       "contentLength": 402,
       "contentSha256": "81c5262e3e61e00dc0b92b3845592d67a2ea4310de7416fe301e15e856a2fb89",
       "analysis": {
@@ -6351,7 +6423,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2231,
+      "readCount": 2266,
       "contentLength": 229,
       "contentSha256": "859d5b4f4109951b2cb185cf6409e1629bdecfcfc9e8367f5251ecb5b4944228",
       "analysis": {
@@ -6391,7 +6463,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1622,
+      "readCount": 1656,
       "contentLength": 362,
       "contentSha256": "e5e50c58912d94dca60f4011d10eef7746c813e15d7b7398a12270404afdeb18",
       "analysis": {
@@ -6430,7 +6502,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1618,
+      "readCount": 1657,
       "contentLength": 1207,
       "contentSha256": "dc98bd3045709f730042ad5a96afb7cc0996487c7e55918d7ce91cae6af7fda2",
       "analysis": {
@@ -6465,7 +6537,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1677,
+      "readCount": 1711,
       "contentLength": 1326,
       "contentSha256": "208eb16c147ac86de05a9994f24b6c3d31c88dbe1ccd036348c0c0d7f0cd18ea",
       "analysis": {
@@ -6503,7 +6575,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 3683,
+      "readCount": 3740,
       "contentLength": 272,
       "contentSha256": "057427da95f12fd69d7d43ead951e265109e453a9a4161d3f67da5813193ee3a",
       "analysis": {
@@ -6541,7 +6613,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1569,
+      "readCount": 1601,
       "contentLength": 372,
       "contentSha256": "6bfd281e4760b772bb88cc6dca6b4008a5421802499798ad22b1cc15c49bb402",
       "analysis": {
@@ -6577,7 +6649,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1873,
+      "readCount": 1909,
       "contentLength": 1489,
       "contentSha256": "dac9b57b29f8ea9cf55a25e379570b4e9f92b39054c4ee7df9efabe52e6b67e2",
       "analysis": {
@@ -6616,7 +6688,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1635,
+      "readCount": 1661,
       "contentLength": 671,
       "contentSha256": "113de9e0dd921f2dd443071b27699420201f80cdf1d104de5e6003dc407d618b",
       "analysis": {
@@ -6658,7 +6730,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2200,
+      "readCount": 2238,
       "contentLength": 330,
       "contentSha256": "3109788d7174f25bcf2e46b02fc2669eaf98a20884bdbfaa28bccc335ad8d9a7",
       "analysis": {
@@ -6692,7 +6764,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1975,
+      "readCount": 2025,
       "contentLength": 1545,
       "contentSha256": "ae46a8fec1ea3e43dd52df916227ba8fd81b5dbf461273e92e9496c1a7154e2a",
       "analysis": {
@@ -6733,7 +6805,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2046,
+      "readCount": 2114,
       "contentLength": 345,
       "contentSha256": "1975964abc89d4b4cd2348fc320ba7d0b89f69ac0d7528692cc82ea5eee5bf9a",
       "analysis": {
@@ -6772,7 +6844,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1677,
+      "readCount": 1697,
       "contentLength": 108,
       "contentSha256": "b2b28460877320597ae48cb89a6b6385d2e32d0a1ef35eb67d0316322684aae5",
       "analysis": {
@@ -6803,7 +6875,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1887,
+      "readCount": 1919,
       "contentLength": 709,
       "contentSha256": "b5e3549d18743ed18b8c6ed9565523279f9a1f30fe2ee4f749153d1488e33a95",
       "analysis": {
@@ -6843,7 +6915,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1688,
+      "readCount": 1711,
       "contentLength": 1079,
       "contentSha256": "59a722cdd6fdb62a3738b38aa358f5445ac93c80e9905616df52df6b3d458313",
       "analysis": {
@@ -6880,7 +6952,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1943,
+      "readCount": 1985,
       "contentLength": 1223,
       "contentSha256": "65456332ca2df8a7184c2af77d3bcf5f5dd76674bd9ebd0ddd2c3e2eb48c6431",
       "analysis": {
@@ -6923,7 +6995,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2342,
+      "readCount": 2401,
       "contentLength": 1364,
       "contentSha256": "a8a3bd9524b7ec1752b665937951d9e4de423e1f93d168194291f3cb6b2414fd",
       "analysis": {
@@ -6968,7 +7040,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2009,
+      "readCount": 2068,
       "contentLength": 195,
       "contentSha256": "b014d10292827e8ebe0edeb29255fad785c1a95a9aec41e54e58df8925a9e5a8",
       "analysis": {
@@ -7001,7 +7073,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2837,
+      "readCount": 2888,
       "contentLength": 1534,
       "contentSha256": "c726b51c8e8f62a9970136b6973ab629fd7e2cb94b0a26e5fb79cae5f42124f0",
       "analysis": {
@@ -7043,7 +7115,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2427,
+      "readCount": 2505,
       "contentLength": 214,
       "contentSha256": "62b0255509925795ccf5f5d85e3485926f2e008aaf62ccf61d6b5f3e29beb8e2",
       "analysis": {
@@ -7082,7 +7154,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1991,
+      "readCount": 2032,
       "contentLength": 1541,
       "contentSha256": "954611f0f29e5a2d53eb68d0c967cacc1dbe761d1890ae5ab331d714796f18a2",
       "analysis": {
@@ -7124,7 +7196,7 @@
       "opinionText": "매수",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1557,
+      "readCount": 1584,
       "contentLength": 106,
       "contentSha256": "8715c6cfdb0181c00696292aabd2039d7b16c00c017d2bd0d7810fab4c936b78",
       "analysis": {
@@ -7162,7 +7234,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1937,
+      "readCount": 1968,
       "contentLength": 365,
       "contentSha256": "7a2000e4b973631cf9fa9d51dc753fd0c985f53c92ca450022f51991ac1edfcd",
       "analysis": {
@@ -7203,7 +7275,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1715,
+      "readCount": 1760,
       "contentLength": 304,
       "contentSha256": "b28b85f5295c1285c7e4c406a0afc724b5f446dc2ebd1f72c3f0128f76784b73",
       "analysis": {
@@ -7236,7 +7308,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1430,
+      "readCount": 1456,
       "contentLength": 1499,
       "contentSha256": "e51eb37556fc0a2e95fca307285f9cdffb1ef2d0a973b929bcfc4dd951cd94d7",
       "analysis": {
@@ -7276,7 +7348,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 2922,
+      "readCount": 2956,
       "contentLength": 1376,
       "contentSha256": "15763de74374dd6b7ff4abd70bb527d2f6edab06802d50cf377c57e0fc2d2d84",
       "analysis": {
@@ -7316,7 +7388,7 @@
       "opinionText": "없음",
       "opinionType": "neutral",
       "normalizedOpinion": "NONE",
-      "readCount": 1527,
+      "readCount": 1569,
       "contentLength": 355,
       "contentSha256": "006dbfe14e44b30df4f730a0c434232edfb251dbaeb21981a560de960e5f5e86",
       "analysis": {
@@ -7356,7 +7428,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1343,
+      "readCount": 1358,
       "contentLength": 1281,
       "contentSha256": "7958a03068b4d907e2cc3bce62f000b957a3c1605e74810c5ae8fc3ff3b6da1b",
       "analysis": {
@@ -7391,7 +7463,7 @@
       "opinionText": "Buy",
       "opinionType": "buy",
       "normalizedOpinion": "BUY",
-      "readCount": 1402,
+      "readCount": 1426,
       "contentLength": 489,
       "contentSha256": "4647cfa2f883606d58aa2d31260258f689ab69569f89f6274118104343b5fcb7",
       "analysis": {
@@ -7409,82 +7481,6 @@
       },
       "previousSameBrokerNid": "95125",
       "goalPriceChange": null,
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "97758",
-      "writeDate": "2026-11-06",
-      "itemCode": "071050",
-      "itemName": "한국금융지주",
-      "title": "3Q26 Review: 운용 중심으로 부진한 실적 시현",
-      "brokerCode": "61",
-      "brokerName": "iM증권",
-      "goalPrice": 198000,
-      "opinionText": "Buy",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 2222,
-      "contentLength": 1297,
-      "contentSha256": "5295391c12adc9350306642bd923dea9d8d398e708901a6e9bf65c52a4ce707e",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 2,
-          "negative": 14
-        },
-        "earningsTextDirection": "DOWN",
-        "earningsPositiveSignalCount": 2,
-        "earningsNegativeSignalCount": 6,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "금리": 2
-        }
-      },
-      "previousSameBrokerNid": "95211",
-      "goalPriceChange": {
-        "from": 284000,
-        "to": 198000,
-        "amount": -86000,
-        "pct": -30.28
-      },
-      "opinionChange": null,
-      "goalPriceChangeLarge": false
-    },
-    {
-      "nid": "97757",
-      "writeDate": "2026-11-06",
-      "itemCode": "071050",
-      "itemName": "한국금융지주",
-      "title": "3Q26 Review: 감익 예상은 했지만, 환율까지 억까해",
-      "brokerCode": "64",
-      "brokerName": "SK증권",
-      "goalPrice": 274000,
-      "opinionText": "매수",
-      "opinionType": "buy",
-      "normalizedOpinion": "BUY",
-      "readCount": 2228,
-      "contentLength": 175,
-      "contentSha256": "218df7305b091780575e495aab62c1f124e041690d24a323f94cc5a35062b623",
-      "analysis": {
-        "textSignalBalance": {
-          "positive": 0,
-          "negative": 3
-        },
-        "earningsTextDirection": "UNKNOWN",
-        "earningsPositiveSignalCount": 0,
-        "earningsNegativeSignalCount": 0,
-        "targetPriceMentionDirection": "UNKNOWN",
-        "topics": {
-          "환율": 1
-        }
-      },
-      "previousSameBrokerNid": "95209",
-      "goalPriceChange": {
-        "from": 410000,
-        "to": 274000,
-        "amount": -136000,
-        "pct": -33.17
-      },
       "opinionChange": null,
       "goalPriceChangeLarge": false
     }
