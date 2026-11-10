@@ -16,7 +16,6 @@ def load(name):
 
 guard = load("history_adjustment_guard")
 evidence = load("full_market_monitoring_evidence")
-baseline = load("daily_monitoring_baseline")
 v2 = load("dynamic_universe_v2_shadow")
 CASES = json.loads((ROOT / "tests" / "fixtures" / "corporate_action_price_cases.json").read_text())
 
@@ -84,18 +83,6 @@ class HistoryAdjustmentGuardTests(unittest.TestCase):
         self.assertEqual(feature["changeRate"], -9.26)
         self.assertIsNone(feature["ret_1d"])
         self.assertIsNone(feature["ma20"])
-
-    def test_compact_baseline_path_applies_the_same_guard(self):
-        case = CASES["es_energy"]
-        rows = [history(f"202610{day:02d}", 583) for day in range(1, 22)]
-        stock = baseline.baseline_stock({"code": case["code"], "name": "에스에너지",
-                                         "market": "KOSDAQ"}, rows)
-        feature = baseline.feature_row_from_baseline(
-            current(case, "KOSDAQ", "에스에너지"), stock, "20261028"
-        )
-        self.assertEqual(feature["historyAdjustmentStatus"], guard.STATUS_UNVERIFIED)
-        self.assertFalse(feature["derivedMetricsUsable"])
-        self.assertIsNone(feature["ret_1d"])
 
     def test_industry_and_theme_a_b_exclude_quarantined_return_but_keep_official_rate(self):
         es = evidence.feature_row(current(CASES["es_energy"], "KOSDAQ", "에스에너지"),

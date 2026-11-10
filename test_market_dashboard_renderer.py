@@ -432,21 +432,31 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("부분 테마", html)
         self.assertIn("부분 테마", markdown)
 
-    def test_baseline_stale_current_relative_group_remains_visible(self):
+    def test_current_group_is_visible_when_only_legacy_persistence_is_stale(self):
         report = report_fixture()
+        report["reportContract"]["asOf"] = "2026-11-09"
+        report["reportContract"]["observationDate"] = "20261109"
         report["reportContract"]["relativeStrengthTop5"] = {
-            "status": "AVAILABLE", "tradingDate": "20261029",
+            "status": "AVAILABLE", "tradingDate": "20261109",
+            "observationDate": "20261109",
             "industries": {"top5": [{
-                "rank": 1, "id": "i-stale", "name": "당일 업종",
-                "relativeStrength": 1.2, "breadthPct": 55.0,
-                "dataQuality": "BASELINE_STALE", "leaderCandidates": [],
+                "rank": 1, "id": "i-current", "name": "현재 업종",
+                "relativeStrength": 2.0, "breadthPct": 60.0,
+                "dataQuality": "BASELINE_STALE",
+                "leaderCandidates": [{"name": "현재 주도주"}],
+                "leaderEvidenceStatus": "AVAILABLE",
+                "leaderSource": "NAVER_CURRENT_SNAPSHOT",
+                "leaderObservationDate": "20261109",
+                "leaderScope": "STOCK_ONLY",
+                "sourceTradingDate": "20261109", "eligibility": "ELIGIBLE",
             }]},
             "themes": {"top5": []},
         }
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
-        self.assertIn("당일 업종", html)
-        self.assertIn("당일 업종", markdown)
+        for output in (html, markdown):
+            self.assertIn("현재 업종", output)
+            self.assertIn("현재 주도주", output)
 
     def test_v1_operating_groups_are_separate_limited_and_exclude_removed(self):
         report = report_fixture()
@@ -523,7 +533,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("전일 장마감 후 조건검색 결과 자료 없음", markdown)
         self.assertNotIn("조건검색 실패", markdown)
 
-    def test_kiwoom_candidate_renders_krx_baseline_and_indicators_without_code(self):
+    def test_kiwoom_candidate_renders_selection_and_indicators_without_code(self):
         report = report_fixture()
         report["reportContract"]["kiwoomCandidates"] = {"stocks": [{
             "itemCode": "003490", "itemName": "대한항공", "selectionPrice": 29050,

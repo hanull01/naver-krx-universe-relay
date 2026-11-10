@@ -331,9 +331,8 @@ def build_report_contract_projection(
             "fallbackAllowed": quality.get("historicalFallbackAllowed", technicals.get("historicalFallbackAllowed", False)),
             "currentSnapshotSource": quality.get("currentSnapshotSource") or technicals.get("currentSnapshotSource") or "NAVER_SEPARATE",
         },
-        "tradingDateStatus": "SOURCE_OBSERVED",
+        "tradingDateStatus": quality.get("tradingDateStatus", "UNAVAILABLE"),
         "sourceQualityStatus": quality.get("status", "PARTIAL"),
-        "finalityStatus": "SOURCE_OBSERVED",
         "sourceBindings": {
             "fullMarketManifest": "manifest.json",
             "fullMarketDetails": "technicals.json,states.json",

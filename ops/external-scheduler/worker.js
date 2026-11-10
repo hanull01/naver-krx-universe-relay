@@ -23,8 +23,6 @@ export function planForCron(cron) {
 export function planForKey(key) {
   const plans = {
     refresh: { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
-    "refresh-final": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
-    "refresh-intraday": { slot: "08:30-20:30", key, ...WORKFLOWS.refresh, inputs: {} },
     "backfill-derived": { slot: "07:00", key, ...WORKFLOWS.backfill, inputs: { dry_run: "false", publish: "true" } },
     research: { slot: "research", key, ...WORKFLOWS.research, inputs: {} },
   };
@@ -239,7 +237,7 @@ export async function recheckRun(env, slotKey, plan, options = {}) {
   }, { expectedDate: details.expectedDate });
   const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
     ? "RUN_STARTED"
-    : (result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status);
+    : (result.publicationStatus === "PUBLISHED" ? "PUBLISHED" : result.status);
   await setState(env, slotKey, state, { ...details, ...result });
   return { slotKey, workflow: plan.workflow, ...result };
 }
@@ -352,7 +350,7 @@ export default {
         const result = { ...runResult, scheduledTime: event.scheduledTime };
         const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
           ? "RUN_STARTED"
-          : (result.status === "FINAL_PUBLICATION_VERIFIED" || result.status === "PUBLISHED" ? "PUBLISHED" : result.status);
+          : (result.publicationStatus === "PUBLISHED" ? "PUBLISHED" : result.status);
         stage = "SAVE_RESULT";
         await setState(env, slotKey, state, result);
         console.log(JSON.stringify(result));

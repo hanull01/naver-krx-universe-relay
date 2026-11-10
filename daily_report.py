@@ -15,7 +15,7 @@ from tools.market_dashboard_renderer import (
 )
 from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
 from tools.v2_source_provenance import build_source_provenance
-from tools.kiwoom_performance import build_kiwoom_performance, load_monitoring_daily_prices
+from tools.kiwoom_performance import build_kiwoom_performance, load_naver_daily_prices
 from tools.v2_change_analysis import compare_v2_changes
 from tools.full_market_technical_adapter import build_report_input as build_staged_technical_input
 from tools.market_snapshot_projection import validate_for_report as validate_market_snapshot_for_report
@@ -25,7 +25,6 @@ KST = ZoneInfo("Asia/Seoul")
 STATUS_LABELS = {
     "AVAILABLE": "확인 가능",
     "AVAILABLE_EMPTY": "확인 가능(대상 없음)",
-    "AVAILABLE_WITH_BASELINE_WARNING": "확인 가능(기준선 경고)",
     "OK": "정상",
     "SUCCESS": "성공",
     "PARTIAL": "부분 확인",
@@ -155,7 +154,6 @@ TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.
 DEFAULT_TRADING_DISCOVERY_PATH = TRADING_DISCOVERY_PATH
 DEFAULT_TRADING_DISCOVERY_QUOTES_PATH = TRADING_DISCOVERY_QUOTES_PATH
 FULL_MARKET_SIGNALS_PATH = MONITORING_PATH / "latest-stock-signals.json"
-MONITORING_BASELINE_PATH = DATA / "monitoring-baseline" / "latest.json"
 MARKET_INDICES_PATH = DATA / "market" / "indices.json"
 MARKET_SNAPSHOT_PROJECTION_PATH = DATA / "market" / "report-snapshot-projection.json"
 MARKET_UNIVERSE_PATH = DATA / "market-universe" / "all-assets.json"
@@ -163,16 +161,6 @@ DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
 V2_SHADOW_HISTORY_PATH = DATA / "dynamic-universe" / "v2-shadow-history.json"
 V2_SHADOW_STATUS_PATH = DATA / "dynamic-universe" / "v2-shadow-run-status.json"
-FULL_MARKET_FILES = (
-    "latest-breadth.json",
-    "latest-stock-signals.json",
-    "latest-industries.json",
-    "latest-leaders.json",
-    "latest-theme-signals.json",
-    "latest-changes.json",
-    "latest-quality.json",
-    "latest-summary.json",
-)
 
 
 def compact_date(value):
@@ -287,34 +275,6 @@ def _explicit_dates(payload, keys):
     return [date for key in keys if (date := compact_date(payload.get(key)))]
 
 
-def full_market_date_evidence(payloads):
-    """Extract explicit session and MA dates; generatedAt is never a date source."""
-    session_keys = ("tradingDate", "tradeDate", "marketDate", "snapshotTradingDate")
-    session_dates = []
-    for name in ("latest-quality.json", "latest-breadth.json", "latest-industries.json", "latest-summary.json"):
-        payload = payloads.get(name) or {}
-        session_dates.extend(_explicit_dates(payload, session_keys))
-        session_dates.extend(_explicit_dates(payload.get("fullMarket"), session_keys))
-
-    ma_dates = []
-    for row in (payloads.get("latest-leaders.json", {}).get("fullMarketLeaders") or []):
-        evidence = row.get("technicalEvidence") if isinstance(row, dict) else {}
-        ma_dates.extend(_explicit_dates(evidence, ("lastConfirmedDailyDate", "maBasisDate")))
-
-    unique_session = sorted(set(session_dates))
-    unique_ma = sorted(set(ma_dates))
-    return {
-        "snapshotDate": unique_session[0] if len(unique_session) == 1 else None,
-        "snapshotDates": unique_session,
-        "maBasisDates": unique_ma,
-        "snapshotDateStatus": (
-            "VERIFIED_EXPLICIT" if len(unique_session) == 1
-            else "MISSING" if not unique_session
-            else "INCONSISTENT"
-        ),
-    }
-
-
 def date_alignment(
     report_date,
     indices,
@@ -356,7 +316,7 @@ def date_alignment(
         "reportTradingDate": report_compact,
         "historicalAsOfDate": report_compact,
         "observedDate": observed_compact,
-        "baselineDate": compact_date(full_market.get("asOfDate")),
+        "historicalInputDate": compact_date(full_market.get("asOfDate")),
         "indexSourceDates": [],
         "fullMarketSnapshotDate": full_market.get("snapshotDate"),
         "fullMarketSnapshotDateStatus": full_market.get("snapshotDateStatus", "MISSING"),
@@ -431,13 +391,12 @@ def date_alignment(
     return result
 
 
-def build_preopen_session_context(report_date, indices, baseline, reports_root=None):
+def build_preopen_session_context(report_date, indices, previous_date=None, reports_root=None):
     """Keep a pre-open observation separate from the prior confirmed session.
 
     The current index snapshot is useful as an observation, but it is not a
-    trading-day close.  The prior session is loaded only from the explicit
-    baseline date and its dated report; no calendar-day or ``latest.json``
-    fallback is allowed.
+    trading-day close. The prior session is loaded only from the explicit KRX
+    historical target date and its dated report.
     """
     rows = [row for row in (indices.get("indices") or []) if isinstance(row, dict)]
     current_date = compact_date(report_date)
@@ -464,7 +423,10 @@ def build_preopen_session_context(report_date, indices, baseline, reports_root=N
         observation["status"] = "UNAVAILABLE"
         observation["reason"] = "PREOPEN_SOURCE_DATE_MISMATCH"
 
-    previous_date = compact_date((baseline or {}).get("asOfDate"))
+    if isinstance(previous_date, dict):
+        # Compatibility for isolated callers of the retired helper contract.
+        previous_date = previous_date.get("asOfDate")
+    previous_date = compact_date(previous_date)
     context = {
         "mode": "PREOPEN",
         "status": "PARTIAL",
@@ -528,7 +490,7 @@ def build_preopen_session_context(report_date, indices, baseline, reports_root=N
         "tradingDate": previous_date,
         "source": source_path,
         "generatedAt": previous_report.get("generatedAt"),
-        "verificationStatus": "VERIFIED_PRIOR_SESSION_SOURCE_OBSERVED",
+        "verificationStatus": "VERIFIED_PRIOR_SESSION_REFERENCE",
         "indices": previous_indices,
         "fullMarket": {
             "totalCount": previous_full_market.get("totalCount"),
@@ -808,84 +770,6 @@ def registered_universe_projection(enabled, rows):
     }
 
 
-def full_market_evidence(as_of=None, root=MONITORING_PATH):
-    """Read full-market evidence only when its publication contract is valid.
-
-    This is deliberately separate from the monitored-universe inputs.  A
-    missing, stale, partial, or mismatched evidence set is unavailable; no
-    monitored-universe value is promoted as a full-market estimate.
-    """
-    root = Path(root)
-    try:
-        payloads = {name: load_json(root / name) for name in FULL_MARKET_FILES}
-    except (OSError, ValueError, json.JSONDecodeError):
-        return {"status": "UNAVAILABLE", "reason": "MISSING_EVIDENCE_FILE"}
-
-    quality = payloads["latest-quality.json"]
-    expected_date = str(as_of or "").replace("-", "")
-    baseline_date = str(quality.get("baselineAsOfDate") or "")
-    if quality.get("publicationStatus") not in ("FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING"):
-        return {"status": "UNAVAILABLE", "reason": "QUALITY_NOT_FINAL"}
-    date_evidence = full_market_date_evidence(payloads)
-    if expected_date and baseline_date != expected_date:
-        snapshot_date = date_evidence.get("snapshotDate")
-        if (quality.get("baselineFreshnessStatus") != "VALID_PREVIOUS_TRADING_DAY"
-                or snapshot_date != expected_date):
-            return {"status": "UNAVAILABLE", "reason": "BASELINE_DATE_MISMATCH"}
-    if quality.get("currentCount") != quality.get("authoritativeCount"):
-        return {"status": "UNAVAILABLE", "reason": "CURRENT_COVERAGE_INVALID"}
-    if quality.get("currentCoveragePct") != 100.0:
-        return {"status": "UNAVAILABLE", "reason": "CURRENT_COVERAGE_INVALID"}
-    if quality.get("duplicateCodes") or quality.get("missingCurrentCodes"):
-        return {"status": "UNAVAILABLE", "reason": "CURRENT_QUALITY_INVALID"}
-
-    generated = {payload.get("generatedAt") for payload in payloads.values()
-                 if payload.get("generatedAt")}
-    if len(generated) > 1:
-        return {"status": "UNAVAILABLE", "reason": "EVIDENCE_GENERATED_AT_MISMATCH"}
-    breadth = payloads["latest-breadth.json"].get("breadth")
-    if not isinstance(breadth, dict) or not isinstance(breadth.get("TOTAL"), dict):
-        return {"status": "UNAVAILABLE", "reason": "BREADTH_SCHEMA_INVALID"}
-
-    total = breadth["TOTAL"]
-    leaders = payloads["latest-leaders.json"]
-    summary = payloads["latest-summary.json"]
-    return {
-        "status": "AVAILABLE",
-        "asOfDate": baseline_date,
-        "generatedAt": next(iter(generated), None),
-        "sourceTime": quality.get("currentSnapshotGeneratedAt"),
-        "snapshotDate": date_evidence.get("snapshotDate"),
-        "snapshotDates": date_evidence.get("snapshotDates", []),
-        "snapshotDateStatus": date_evidence.get("snapshotDateStatus"),
-        "maBasisDates": date_evidence.get("maBasisDates", []),
-        "sourceQualityStatus": quality.get("sourceQualityStatus"),
-        "quality": quality,
-        "qualityStatus": quality.get("collectionQualityStatus", "UNKNOWN"),
-        "breadth": {
-            "advancers": total.get("advancers"),
-            "decliners": total.get("decliners"),
-            "unchanged": total.get("unchanged"),
-            "aboveMA20": {"count": total.get("aboveMA20Count"), "eligibleCount": total.get("aboveMA20EligibleCount"), "pct": total.get("pctAboveMA20")},
-            "aboveMA60": {"count": total.get("aboveMA60Count"), "eligibleCount": total.get("aboveMA60EligibleCount"), "pct": total.get("pctAboveMA60")},
-            "aboveMA120": {"count": total.get("aboveMA120Count"), "eligibleCount": total.get("aboveMA120EligibleCount"), "pct": total.get("pctAboveMA120")},
-            "breakout20": {"count": total.get("breakout20Count"), "eligibleCount": total.get("breakout20EligibleCount"), "pct": total.get("pctBreakout20")},
-            "breakout60": {"count": total.get("breakout60Count"), "eligibleCount": total.get("breakout60EligibleCount"), "pct": total.get("pctBreakout60")},
-            "near52wHigh": {"count": total.get("near52WeekHighCount"),
-                            "eligibleCount": total.get("near52WeekHighEligibleCount"),
-                            "pct": total.get("pctNear52WeekHigh")},
-            "volumeAbove20DayAverage": {"count": total.get("volumeAbove20DayAverageCount"),
-                                         "eligibleCount": total.get("volumeAbove20DayAverageEligibleCount"),
-                                         "pct": total.get("pctVolumeAbove20DayAverage")},
-            "medianReturn1D": total.get("medianReturn1D"),
-        },
-        "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates", []),
-        "industries": payloads["latest-industries.json"].get("industries", []),
-        "changes": payloads["latest-changes.json"],
-        "monitoredUniverse": summary.get("monitoredUniverse", {}),
-    }
-
-
 def full_market_from_derived_projection(projection, target_date):
     """Expose a verified staged KRX historical projection to the report."""
     if not isinstance(projection, dict):
@@ -924,112 +808,6 @@ def full_market_from_derived_projection(projection, target_date):
         "reason": "DERIVED_KRX_PROJECTION",
         "derivedProjection": projection,
     }
-
-
-def resolve_report_trading_date(monitoring_root=MONITORING_PATH,
-                                baseline_path=MONITORING_BASELINE_PATH,
-                                requested_date=None):
-    """Resolve an already-published trading date without using wall-clock date.
-
-    The report must not infer yesterday/weekends or use a baseline date as the
-    current session.  A published full-market artifact must carry explicit,
-    verified session-date evidence; the baseline is checked separately.
-    """
-    try:
-        quality = load_json(Path(monitoring_root) / "latest-quality.json")
-        summary = load_json(Path(monitoring_root) / "latest-summary.json")
-        baseline = load_json(baseline_path)
-    except (OSError, ValueError, json.JSONDecodeError):
-        return {"status": "WAIT", "reason": "TRADING_DATE_MATERIAL_UNAVAILABLE"}
-
-    def compact(value):
-        text = str(value or "").replace("-", "")
-        return text if len(text) == 8 and text.isdigit() else None
-
-    quality_date = compact(quality.get("tradingDate"))
-    summary_full_market = summary.get("fullMarket") if isinstance(summary, dict) else {}
-    summary_date = compact(summary_full_market.get("tradingDate"))
-    evidence = summary_full_market.get("tradingDateEvidence") or {}
-    evidence_reason = evidence.get("reason")
-    baseline_date = compact(baseline.get("asOfDate"))
-    requested = compact(requested_date) if requested_date else None
-    if not summary_date or evidence_reason not in {
-        "VERIFIED_CANONICAL_SESSION",
-        "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-        "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
-    }:
-        return {"status": "WAIT", "reason": "TRADING_DATE_EVIDENCE_UNAVAILABLE",
-                "publishedDate": summary_date, "evidenceReason": evidence_reason,
-                "baselineDate": baseline_date}
-    if baseline_date != summary_date:
-        return {"status": "WAIT", "reason": "BASELINE_DATE_MISMATCH",
-                "publishedDate": summary_date, "baselineDate": baseline_date}
-    if baseline.get("historyStatus") not in (None, "OK", "SOURCE_OBSERVED"):
-        return {"status": "WAIT", "reason": "BASELINE_NOT_READY",
-                "historyStatus": baseline.get("historyStatus")}
-    if (baseline.get("historyStatus") == "SOURCE_OBSERVED"
-            and baseline.get("sourceQualityStatus") != "SOURCE_OBSERVED"):
-        return {"status": "WAIT", "reason": "BASELINE_SOURCE_QUALITY_UNAVAILABLE",
-                "sourceQualityStatus": baseline.get("sourceQualityStatus")}
-
-    publication_statuses = {
-        quality.get("publicationStatus"), summary.get("publicationStatus")
-    }
-    if "COMPLETE_RECONCILIATION_PENDING" in publication_statuses:
-        authoritative = summary_full_market.get("authoritativeCount")
-        expected = summary_full_market.get("expectedCount", authoritative)
-        coverage = summary_full_market.get("coverageCount", authoritative)
-        baseline_exact = (
-            baseline.get("count") == baseline.get("authoritativeCount") == authoritative
-            and baseline.get("coveragePct") == 100.0
-        )
-        canonical_exact = (
-            evidence_reason == "VERIFIED_CANONICAL_SESSION"
-            and not evidence.get("missingCanonicalCodes")
-            and not evidence.get("invalidCanonicalCodes")
-        )
-        final_exact = (
-            evidence_reason == "VERIFIED_MONITORING_DAILY_FINAL_SESSION"
-            and evidence.get("diagnosticStatus") == "VERIFIED"
-            and not evidence.get("missingFinalCodes")
-            and not evidence.get("unexpectedFinalCodes")
-            and not evidence.get("invalidFinalCodes")
-        )
-        source_observed_exact = (
-            evidence_reason == "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
-            and evidence.get("status") == "SOURCE_OBSERVED"
-            and not evidence.get("missingFinalCodes")
-            and not evidence.get("unexpectedFinalCodes")
-            and not evidence.get("invalidFinalCodes")
-            and baseline.get("historyStatus") == "SOURCE_OBSERVED"
-            and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
-        )
-        if not (
-            isinstance(authoritative, int) and authoritative > 0
-            and expected == authoritative == coverage
-            and baseline_exact and (canonical_exact or final_exact or source_observed_exact)
-        ):
-            return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
-                    "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-                    "evidenceReason": evidence_reason}
-    if quality_date and quality_date != summary_date:
-        return {"status": "WAIT", "reason": "TRADING_DATE_MISMATCH",
-                "qualityDate": quality_date, "publishedDate": summary_date,
-                "baselineDate": baseline_date}
-    if requested and requested != summary_date:
-        return {"status": "WAIT", "reason": "REQUESTED_DATE_MISMATCH",
-                "requestedDate": requested, "availableDate": summary_date}
-    if (quality.get("publicationStatus") not in ("FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING")
-            or summary.get("publicationStatus") not in (None, "FINAL", "SUCCESS", "COMPLETE_RECONCILIATION_PENDING")):
-        return {"status": "WAIT", "reason": "QUALITY_NOT_PUBLISHED",
-                "publicationStatus": quality.get("publicationStatus")}
-    return {"status": "READY", "tradingDate": f"{summary_date[:4]}-{summary_date[4:6]}-{summary_date[6:]}",
-            "source": "monitoring-full-market-evidence-and-baseline",
-            "baselineDate": baseline_date,
-            "tradingDateEvidenceReason": evidence_reason,
-            "sourceQualityStatus": baseline.get("sourceQualityStatus"),
-            "qualityGeneratedAt": quality.get("generatedAt"),
-            "baselineGeneratedAt": baseline.get("generatedAt")}
 
 
 def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shadow_status):
@@ -1443,7 +1221,7 @@ def full_market_summary(full_market, alignment):
         "alignmentStatus": alignment_status,
         "reason": reason,
         "tradingDate": full_market.get("snapshotDate"),
-        "baselineDate": full_market.get("asOfDate"),
+        "historicalInputDate": full_market.get("asOfDate"),
         "snapshotDateStatus": snapshot_status,
         "sourceTime": full_market.get("sourceTime") if (verified or derived_summary) else None,
         "generatedAt": full_market.get("generatedAt") if (verified or derived_summary) else None,
@@ -2014,13 +1792,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     )
 
     report_date = as_of or datetime.now(KST).date().isoformat()
-    if staging_input_dir:
-        full_market = full_market_from_derived_projection(
-            technical_inputs.get("derivedProjection"),
-            technical_inputs.get("metadata", {}).get("targetDate") or report_date,
-        )
-    else:
-        full_market = full_market_evidence(report_date)
+    full_market = full_market_from_derived_projection(
+        technical_inputs.get("derivedProjection"),
+        technical_inputs.get("metadata", {}).get("targetDate") or report_date,
+    )
     technical_metadata = technical_inputs.get("metadata") or {}
     current_metadata = technical_metadata.get("currentSnapshot") or {}
     alignment = date_alignment(
@@ -2058,12 +1833,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         theme_signals = load_json(MONITORING_PATH / "latest-theme-signals.json")
     except (OSError, ValueError, json.JSONDecodeError):
         theme_signals = {"status": "UNAVAILABLE", "themes": []}
-    try:
-        monitoring_baseline = load_json(MONITORING_BASELINE_PATH)
-    except (OSError, ValueError, json.JSONDecodeError):
-        monitoring_baseline = {}
+    previous_trading_date = (
+        technical_metadata.get("historicalTargetDate")
+        or technical_metadata.get("targetDate")
+    )
     session_context = build_preopen_session_context(
-        report_date, indices, monitoring_baseline
+        report_date, indices, previous_trading_date
     )
     # Kiwoom candidates are sourced from the immutable trading-discovery
     # artifact.  Do not depend on the retired report JSON history for prior
@@ -2151,11 +1926,10 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "publishedReason": published_supplemental.get("reason"),
     }
     registered_projection = registered_universe_projection(enabled, rows)
-    # Performance is read-only and date-bound.  Existing monitoring-daily
-    # files are used; SOURCE_OBSERVED rows remain pending rather than being
-    # promoted to confirmed closes.
+    # Performance is read-only and date-bound. Candidate snapshots and the
+    # NAVER daily cache are the only price inputs.
     if discovery.get("status") == "AVAILABLE" and discovery.get("symbols"):
-        kiwoom_prices, kiwoom_trading_dates = load_monitoring_daily_prices(
+        kiwoom_prices, kiwoom_trading_dates = load_naver_daily_prices(
             ROOT, discovery.get("symbols")
         )
         kiwoom_performance = build_kiwoom_performance(
@@ -2215,9 +1989,9 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             or published_breadth.get("generatedAt")
         )
         historical_quality = {
-            "baselineAsOfDate": technical_inputs["metadata"].get("targetDate"),
-            "collectionQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
-            "sourceQualityStatus": "KRX_M10_STAGED_NOT_FINAL",
+            "historicalTargetDate": technical_inputs["metadata"].get("targetDate"),
+            "collectionQualityStatus": "KRX_M10_STAGED_AVAILABLE",
+            "sourceQualityStatus": "KRX_M10_STAGED_AVAILABLE",
             "currentCount": krx_full_market.get("quality", {}).get("currentCount"),
             "authoritativeCount": krx_full_market.get("quality", {}).get("authoritativeCount"),
             "historicalIndicatorSource": "KRX",

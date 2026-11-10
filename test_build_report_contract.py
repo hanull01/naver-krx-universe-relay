@@ -20,8 +20,9 @@ class BuildReportContractTests(unittest.TestCase):
         evidence = {
             "tradingDate": "20261028",
             "status": "VERIFIED",
-            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-            "finalConfirmed": True,
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+
             "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -39,8 +40,9 @@ class BuildReportContractTests(unittest.TestCase):
         evidence = {
             "tradingDate": "20261028",
             "status": "VERIFIED",
-            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-            "finalConfirmed": True,
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+
             "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -71,7 +73,7 @@ class BuildReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": generated,
             "missingCanonicalCodes": [f"{index:06d}" for index in range(2769)],
             "invalidCanonicalCodes": {f"{index:06d}": "INVALID" for index in range(116)},
@@ -110,11 +112,17 @@ class BuildReportContractTests(unittest.TestCase):
             with patch.object(builder, "load_json", side_effect=[
                 {"generatedAt": "2026-10-28T10:00:00+00:00", "tradingDateEvidence": {
                     "tradingDate": "20261028", "status": "VERIFIED",
-                    "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                    "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+                    "evidenceClass": "INTRADAY_SESSION",
+
+                    "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
                 }},
                 {"generatedAt": "2026-10-28T10:00:00+00:00", "fullMarket": {"tradingDateEvidence": {
                     "tradingDate": "20261028", "status": "VERIFIED",
-                    "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
+                    "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+                    "evidenceClass": "INTRADAY_SESSION",
+
+                    "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
                 }}},
             ]), patch.object(builder, "build_report", return_value={
                 "reportContract": {
@@ -136,7 +144,7 @@ class BuildReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": "2026-10-28T10:09:19.432387+00:00",
         }
         quality = {"generatedAt": evidence["collectionGeneratedAt"], "tradingDateEvidence": evidence}
@@ -154,7 +162,6 @@ class BuildReportContractTests(unittest.TestCase):
                 self.assertEqual(builder.main(), 0)
             contract = json.loads(output.read_text())
             self.assertEqual(contract["asOf"], "20261028")
-            self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
     def test_post_market_snapshot_evidence_allows_non_final_contract(self):
         evidence = {
@@ -162,7 +169,7 @@ class BuildReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "POST_MARKET_SNAPSHOT",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": "2026-10-28T11:40:00+00:00",
         }
         quality = {"generatedAt": evidence["collectionGeneratedAt"], "tradingDateEvidence": evidence}
@@ -182,45 +189,13 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(contract["asOf"], "20261028")
             self.assertEqual(contract["tradingDateEvidence"]["evidenceClass"], "POST_MARKET_SNAPSHOT")
 
-    def test_source_observed_final_date_builds_partial_contract_without_html(self):
-        evidence = {
-            "tradingDate": "20261028",
-            "status": "SOURCE_OBSERVED",
-            "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
-            "evidenceClass": "SOURCE_OBSERVED",
-        }
-        quality = {"generatedAt": "2026-10-28T11:40:00+00:00", "tradingDateEvidence": evidence}
-        summary = {
-            "generatedAt": "2026-10-28T11:40:00+00:00",
-            "fullMarket": {"tradingDateEvidence": evidence},
-        }
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "latest-report-contract.json"
-            def load(path):
-                return quality if str(path).endswith("latest-quality.json") else summary
-            with patch.object(builder, "load_json", side_effect=load), \
-                 patch.object(builder, "build_report", return_value={
-                     "reportContract": {
-                         "schemaVersion": "market-report-contract-v1",
-                         "status": "PARTIAL",
-                         "asOf": "20261028",
-                         "observedAt": "2026-10-28T11:40:00+00:00",
-                         "tradingDateStatus": "SOURCE_OBSERVED",
-                         "rendering": {"status": "RENDERABLE", "reason": "PARTIAL_DATA_RETAINED"},
-                     }
-                 }), \
-                 patch("sys.argv", ["build_report_contract.py", "--output", str(output)]):
-                self.assertEqual(builder.main(), 0)
-            contract = json.loads(output.read_text())
-            self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
-
     def test_intraday_evidence_requires_matching_collection_timestamp(self):
         evidence = {
             "tradingDate": "20261028",
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": "2026-10-28T10:08:00+00:00",
         }
         quality = {"generatedAt": "2026-10-28T10:09:00+00:00", "tradingDateEvidence": evidence}
@@ -243,7 +218,7 @@ class BuildReportContractTests(unittest.TestCase):
             self.assertEqual(json.loads(output.read_text())["asOf"], "20261027")
 
     def test_mismatched_same_run_dates_are_rejected(self):
-        quality = {"generatedAt": "2026-10-28T10:00:00+00:00", "tradingDateEvidence": {"tradingDate": "20261028", "status": "VERIFIED", "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT", "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False}}
+        quality = {"generatedAt": "2026-10-28T10:00:00+00:00", "tradingDateEvidence": {"tradingDate": "20261028", "status": "VERIFIED", "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT", "evidenceClass": "INTRADAY_SESSION", }}
         summary = {"generatedAt": "2026-10-28T10:00:00+00:00", "fullMarket": {"tradingDateEvidence": {"tradingDate": "20261027", "status": "VERIFIED", "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION"}}}
         with patch.object(builder, "load_json", side_effect=[quality, summary]), \
              patch("sys.argv", ["build_report_contract.py"]):
@@ -257,7 +232,7 @@ class BuildReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": "2026-10-28T10:00:00+00:00",
         }
         with tempfile.TemporaryDirectory() as directory:

@@ -295,7 +295,6 @@ def _provenance(root: Path, code: str, meta: Mapping[str, Any], rows: list[dict[
         "sourceDateRange": meta.get("sourceDateRange"),
         "sourceAsOfDate": rows[-1]["date"] if rows else None,
         "sourceStatus": "OBSERVED" if rows else "NO_DAILY_BAR",
-        "finalityStatus": "SOURCE_OBSERVED" if rows else "UNAVAILABLE",
         "targetDate": target,
     }
 

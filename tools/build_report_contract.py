@@ -17,14 +17,11 @@ from tools.report_contract import (
 )
 
 
-FINAL_EVIDENCE_REASONS = {
+CANONICAL_EVIDENCE_REASONS = {
     "VERIFIED_CANONICAL_SESSION",
-    "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-    "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
 }
 INTRADAY_EVIDENCE_REASON = "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT"
-SOURCE_OBSERVED_EVIDENCE_REASON = "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
 
 
 def _serialize_contract(contract: dict) -> bytes:
@@ -118,15 +115,10 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
     trading_date = next(iter(dates))
 
     reasons = {e.get("reason") for e in candidates}
-    accepted_reasons = FINAL_EVIDENCE_REASONS | {INTRADAY_EVIDENCE_REASON}
+    accepted_reasons = CANONICAL_EVIDENCE_REASONS | {INTRADAY_EVIDENCE_REASON}
     valid = reasons & accepted_reasons
     statuses = {e.get("status") for e in candidates}
-    if reasons == {SOURCE_OBSERVED_EVIDENCE_REASON}:
-        if statuses != {"SOURCE_OBSERVED"} or any(
-                e.get("evidenceClass") != "SOURCE_OBSERVED" for e in candidates
-        ):
-            raise SystemExit("TRADING_DATE_UNAVAILABLE")
-    elif (not valid or not reasons.issubset(accepted_reasons)
+    if (not valid or not reasons.issubset(accepted_reasons)
           or any(e.get("status") != "VERIFIED" for e in candidates)):
         raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
@@ -136,11 +128,8 @@ def _trading_date_evidence(quality: dict, summary: dict) -> tuple[str, dict]:
         if reasons != {INTRADAY_EVIDENCE_REASON}:
             raise SystemExit("TRADING_DATE_UNAVAILABLE")
         intraday_candidates = [e for e in candidates if e.get("reason") == INTRADAY_EVIDENCE_REASON]
-        if any(
-            e.get("evidenceClass") not in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"}
-            or e.get("finalConfirmed") is not False
-            for e in intraday_candidates
-        ):
+        if any(e.get("evidenceClass") not in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"}
+               for e in intraday_candidates):
             raise SystemExit("TRADING_DATE_UNAVAILABLE")
 
     generated_at = quality.get("generatedAt")

@@ -133,8 +133,8 @@ KRX data sink.
 | Report path | Current input owner | KRX generation status | NAVER input retained |
 | --- | --- | --- | --- |
 | `daily_report.py` with `--staging-input-dir` | staged KRX technicals/states plus separate current snapshot | connected in isolated QA | current quotes, research, themes |
-| `refresh.yml` / `run_full_market_monitoring.py` | NAVER current snapshot, baseline, industry/theme evidence | not connected to M10 | yes |
-| `refresh-monitoring-daily.yml` | NAVER daily rolling state and baseline | not connected to M10 | yes |
+| `refresh.yml` / `run_full_market_monitoring.py` | verified KRX staged receipt/manifest/generation plus NAVER current snapshot | connected to staged M10 input | yes |
+| `refresh-monitoring-daily.yml` | retired legacy record; disabled and not scheduled | none | no |
 | `refresh-market-snapshots.yml` | NAVER indices, market and membership snapshots | not connected to M10 | yes |
 | `refresh-research.yml` | NAVER research intelligence and theme membership | not connected to M10 | yes |
 | `backfill-derived.yml` | existing NAVER-derived rolling input | separate legacy path | yes |

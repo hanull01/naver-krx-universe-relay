@@ -345,7 +345,6 @@ class RollingHistoryDailyLoader:
             "targetDate": f"{self.target_date[:4]}-{self.target_date[4:6]}-{self.target_date[6:]}",
             "sourceTime": source_time,
             "source": "FULL_MARKET_DERIVED_ROLLING_HISTORY",
-            "finalityStatus": "SOURCE_OBSERVED",
             "fallbackUsed": False,
         }
         self._cache[code] = result

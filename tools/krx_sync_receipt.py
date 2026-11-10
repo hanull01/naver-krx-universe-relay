@@ -251,7 +251,7 @@ def stage_m10_report_inputs(
 
     This is a local, authenticated-receipt staging operation only. It writes
     a compact adapter input directory and never updates a GitHub workflow,
-    production report, baseline, or public repository artifact.
+    production report or public repository artifact.
     """
     validation = validate_m10_staging(staging_dir, expected_date=expected_date)
     staging = Path(staging_dir).resolve(strict=True)
@@ -375,7 +375,6 @@ def stage_m10_report_inputs(
         },
         "authoritativeCount": len(instruments),
         "tradingDate": target,
-        "baselineAsOfDate": target,
         "breadth": aggregates["markets"]["TOTAL"],
         "leaders": aggregates["markets"]["TOTAL"]["leaderCandidates"],
         "markets": aggregates["markets"],

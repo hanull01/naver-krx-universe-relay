@@ -60,8 +60,6 @@ class ReadyMailTests(unittest.TestCase):
             'htmlSha256': digest(html),
             'reportStatus': 'AVAILABLE',
             'currentObservationAllowed': True,
-            'finalPending': True,
-            'baselineStale': False,
         }), encoding='utf-8')
         return manifest
     def test_valid_payload_uses_legacy_signal_body(self):
@@ -194,7 +192,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-29', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'evidenceClass': 'INTRADAY_SESSION',
             'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -217,7 +215,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-28', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'evidenceClass': 'INTRADAY_SESSION',
             'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -231,7 +229,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-29', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+            'evidenceClass': 'INTRADAY_SESSION',
             'collectionGeneratedAt': '2026-09-29T10:38:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -244,7 +242,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-29', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'UNKNOWN_SESSION', 'finalConfirmed': False,
+            'evidenceClass': 'UNKNOWN_SESSION',
             'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -257,7 +255,7 @@ class ReadyMailTests(unittest.TestCase):
         evidence = {
             'tradingDate': '2026-09-29', 'status': 'VERIFIED',
             'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-            'evidenceClass': 'POST_MARKET_SNAPSHOT', 'finalConfirmed': False,
+            'evidenceClass': 'POST_MARKET_SNAPSHOT',
             'collectionGeneratedAt': '2026-09-29T20:40:00+09:00',
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -267,56 +265,6 @@ class ReadyMailTests(unittest.TestCase):
             result = ready.validate_full_market_publication(summary, quality, current=self.current)
         self.assertEqual(result['tradingDate'], '2026-09-29')
         self.assertEqual(result['tradingDateStatus'], 'VERIFIED')
-        self.assertFalse(evidence['finalConfirmed'])
-
-    def test_source_observed_final_date_is_not_downgraded_to_unavailable(self):
-        evidence = {
-            'tradingDate': '2026-09-29', 'status': 'SOURCE_OBSERVED',
-            'reason': 'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE',
-            'evidenceClass': 'SOURCE_OBSERVED',
-        }
-        with tempfile.TemporaryDirectory() as directory:
-            summary, quality = self._write_full_market_evidence(
-                Path(directory), quality_evidence=evidence)
-            result = ready.validate_full_market_publication(
-                summary, quality, current=self.current)
-        self.assertEqual(result['tradingDate'], '2026-09-29')
-        self.assertEqual(result['tradingDateStatus'], 'SOURCE_OBSERVED')
-        self.assertEqual(
-            result['tradingDateEvidenceReason'],
-            'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE',
-        )
-
-    def test_source_observed_date_with_wrong_evidence_class_stays_unavailable(self):
-        evidence = {
-            'tradingDate': '2026-09-29', 'status': 'SOURCE_OBSERVED',
-            'reason': 'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE',
-            'evidenceClass': 'INTRADAY_SESSION',
-        }
-        with tempfile.TemporaryDirectory() as directory:
-            summary, quality = self._write_full_market_evidence(
-                Path(directory), quality_evidence=evidence)
-            result = ready.validate_full_market_publication(
-                summary, quality, current=self.current)
-        self.assertIsNone(result['tradingDate'])
-        self.assertEqual(result['tradingDateStatus'], 'UNAVAILABLE')
-
-    def test_source_observed_date_with_stale_quality_generation_stays_unavailable(self):
-        evidence = {
-            'tradingDate': '2026-09-29', 'status': 'SOURCE_OBSERVED',
-            'reason': 'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE',
-            'evidenceClass': 'SOURCE_OBSERVED',
-        }
-        with tempfile.TemporaryDirectory() as directory:
-            summary, quality = self._write_full_market_evidence(
-                Path(directory), quality_evidence=evidence)
-            quality_payload = json.loads(quality.read_text())
-            quality_payload['generatedAt'] = '2026-09-29T10:38:00+09:00'
-            quality.write_text(json.dumps(quality_payload), encoding='utf-8')
-            result = ready.validate_full_market_publication(
-                summary, quality, current=self.current)
-        self.assertIsNone(result['tradingDate'])
-        self.assertEqual(result['tradingDateEvidenceReason'], 'TRADING_DATE_EVIDENCE_STALE')
 
     def test_same_commit_is_not_signaled_twice(self):
         FakeSMTP.messages=[]
@@ -356,7 +304,7 @@ class ReadyMailTests(unittest.TestCase):
             evidence = {
                 'tradingDate': '2026-09-29', 'status': 'VERIFIED',
                 'reason': 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT',
-                'evidenceClass': 'INTRADAY_SESSION', 'finalConfirmed': False,
+                'evidenceClass': 'INTRADAY_SESSION',
                 'collectionGeneratedAt': '2026-09-29T10:39:00+09:00',
             }
             payload = {

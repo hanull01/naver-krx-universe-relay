@@ -10,9 +10,6 @@ import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from tools.monitoring_daily_state_update import decode_stock
-
-
 HORIZONS = (1, 3, 5)
 VERIFIED_QUALITY = {"VERIFIED", "VALIDATED", "FINAL", "VERIFIED_FINAL"}
 
@@ -35,8 +32,6 @@ def _row_quality(row: Mapping[str, Any], file_quality: str | None = None) -> str
     if explicit:
         return str(explicit)
     source_status = str(row.get("source_status") or "").upper()
-    if source_status in {"OBSERVED", "SOURCE_OBSERVED"}:
-        return "SOURCE_OBSERVED"
     if source_status in {"VERIFIED", "VALIDATED", "FINAL", "VERIFIED_FINAL"}:
         return source_status
     return "UNAVAILABLE"
@@ -66,46 +61,45 @@ def _eligible_close(row: Mapping[str, Any] | None, file_quality: str | None = No
     return close, "VERIFIED_FINAL_CLOSE"
 
 
-def load_monitoring_daily_prices(root: Path, codes: Iterable[str] | None = None) -> tuple[dict[str, dict[str, dict[str, Any]]], list[str]]:
-    """Decode the existing COLUMN_ARRAY_V1 files without writing or fetching."""
+def load_naver_daily_prices(root: Path, codes: Iterable[str] | None = None) -> tuple[dict[str, dict[str, dict[str, Any]]], list[str]]:
+    """Load date-bound NAVER daily cache rows without retired rolling state.
+
+    The cache is only a price input.  Corporate-action and official-calendar
+    evidence remain explicit requirements in ``build_kiwoom_performance``;
+    missing evidence therefore stays UNAVAILABLE instead of being promoted.
+    """
     wanted = {str(code) for code in codes} if codes is not None else None
     result: dict[str, dict[str, dict[str, Any]]] = {}
     dates: set[str] = set()
-    for market in ("kospi", "kosdaq"):
-        path = Path(root) / "data" / "monitoring-daily" / f"{market}.json"
+    for path in (Path(root) / "data" / "daily").glob("*.json"):
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError, json.JSONDecodeError):
             continue
-        file_quality = payload.get("sourceQualityStatus")
-        for stock in payload.get("stocks") or []:
-            code = str(stock.get("code") or "")
-            if not code or (wanted is not None and code not in wanted):
+        code = str(payload.get("itemCode") or path.stem)
+        if not code or (wanted is not None and code not in wanted):
+            continue
+        rows = result.setdefault(code, {})
+        for source_row in payload.get("datas") or []:
+            if not isinstance(source_row, Mapping):
                 continue
-            rows = result.setdefault(code, {})
-            try:
-                decoded = decode_stock(stock)
-            except (TypeError, ValueError, KeyError):
+            date = _date(source_row.get("date"))
+            if not date:
                 continue
-            for decoded_row in decoded:
-                date = _date(decoded_row.get("date"))
-                if not date:
-                    continue
-                dates.add(date)
-                row = dict(decoded_row)
-                row["date"] = date
-                # Keep the file-level quality only as provenance metadata.
-                # _row_quality intentionally ignores it when the decoded row
-                # has no per-date verification evidence.
-                row["fileSourceQualityStatus"] = file_quality
-                rows[date] = row
+            dates.add(date)
+            row = dict(source_row)
+            row["date"] = date
+            row["priceSource"] = "NAVER_DAILY_CACHE"
+            row["fileSourceQualityStatus"] = payload.get("status")
+            rows[date] = row
     return result, sorted(dates)
 
 
 def _measurement(row: Mapping[str, Any] | None, date: str) -> dict[str, Any]:
     value, reason = _eligible_close(row)
     item = {"date": date, "close": value, "status": "AVAILABLE" if value is not None else "UNAVAILABLE",
-            "reason": None if value is not None else reason, "priceSource": "MONITORING_DAILY"}
+            "reason": None if value is not None else reason,
+            "priceSource": row.get("priceSource", "DATE_BOUND_PRICE_INPUT") if isinstance(row, Mapping) else "DATE_BOUND_PRICE_INPUT"}
     return item
 
 

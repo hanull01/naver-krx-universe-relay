@@ -20,7 +20,7 @@ class CurrentObservationReportTests(unittest.TestCase):
             "tradingDate": "20261029",
             "status": "SOURCE_OBSERVED",
             "evidenceClass": "SOURCE_OBSERVED",
-            "finalConfirmed": False,
+
         }
         contract["observationDate"] = "20261030"
         contract["observationDateStatus"] = "VERIFIED"
@@ -28,7 +28,7 @@ class CurrentObservationReportTests(unittest.TestCase):
             "tradingDate": "20261030",
             "status": "VERIFIED",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
         }
         for row in contract["indices"]:
             row["sourceTime"] = "2026-10-30T10:00:00+09:00"
@@ -58,7 +58,8 @@ class CurrentObservationReportTests(unittest.TestCase):
             self.assertEqual(manifest["tradingDate"], "20261030")
             self.assertEqual(manifest["tradingDateStatus"], "SOURCE_OBSERVED")
             self.assertEqual(manifest["observationDateStatus"], "VERIFIED")
-            self.assertTrue(manifest["finalPending"])
+            self.assertNotIn("finalPending", manifest)
+            self.assertNotIn("baselineStale", manifest)
             self.assertNotIn("contractHtmlAllowed", manifest)
             for field, filename in (("markdownSha256", "report.md"), ("htmlSha256", "report.html")):
                 self.assertEqual(
@@ -76,7 +77,7 @@ class CurrentObservationReportTests(unittest.TestCase):
             "tradingDate": "20261029",
             "status": "SOURCE_OBSERVED",
             "evidenceClass": "SOURCE_OBSERVED",
-            "finalConfirmed": False,
+
         }
         contract["observationDate"] = "20261030"
         contract["observationDateStatus"] = "VERIFIED"
@@ -84,7 +85,7 @@ class CurrentObservationReportTests(unittest.TestCase):
             "tradingDate": "20261030",
             "status": "VERIFIED",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
         }
         for row in contract["indices"]:
             row["sourceTime"] = "2026-10-30T10:00:00+09:00"

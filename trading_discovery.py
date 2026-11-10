@@ -359,7 +359,7 @@ def _krx_source_status(source, technicals, states, expected_date):
     }
 
 
-def krx_selection_baseline(discovery, technicals, states):
+def krx_selection_snapshot(discovery, technicals, states):
     """Project selection-day close and indicators from one aligned KRX generation."""
     selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
     if not selection_date or not _krx_payloads_aligned(technicals, states, selection_date):
@@ -397,7 +397,7 @@ def krx_selection_baseline(discovery, technicals, states):
 
 
 def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
-            previous=None, final_baseline=None, name_lookup=None,
+            previous=None, name_lookup=None,
             historical_technicals=None, historical_states=None, krx_source=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
@@ -405,9 +405,8 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     source_technicals = historical_technicals if historical_technicals is not None else technicals
     source_states = historical_states if historical_states is not None else states
     expected_selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
-    # Candidate analysis is KRX-generation-only.  ``final_baseline`` and
-    # full-market signals remain separate report inputs and are never a
-    # substitute for the selected KRX generation.
+    # Candidate analysis is KRX-generation-only. Full-market signals remain a
+    # separate report input and are never a substitute for the selected KRX generation.
     krx_mode = True
     krx_status = _krx_source_status(
         krx_source, source_technicals, source_states, expected_selection_date
@@ -417,8 +416,8 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     )
     tidx = _index(source_technicals) if aligned else {}
     sidx = _index(source_states) if aligned else {}
-    baseline = krx_selection_baseline(discovery, source_technicals, source_states)
-    bidx = _index(baseline)
+    selection_snapshot = krx_selection_snapshot(discovery, source_technicals, source_states)
+    selection_index = _index(selection_snapshot)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     candidate_details = {
@@ -436,7 +435,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                                    or quote.get("fresh") is False))
         if rejected_quote:
             quote = None
-        final = bidx.get(code)
+        selection = selection_index.get(code)
         market = quote or {}
         technical = technical or {}
         state = state or {}
@@ -462,8 +461,8 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "volumeRatio20": technical.get("volumeRatio20"),
             "breakout20": current.get("breakout20"),
             "pullbackState": current.get("pullbackState"),
-            "selectionPrice": final.get("lastClose") if final else None,
-            "selectionDate": final.get("sourceDate") if final else expected_selection_date,
+            "selectionPrice": selection.get("lastClose") if selection else None,
+            "selectionDate": selection.get("sourceDate") if selection else expected_selection_date,
             "conditionStatus": current.get("conditionStatus") or state.get("conditionStatus") or "UNAVAILABLE",
             "nextCheck": "다음 관찰에서 현재값과 조건 충족 여부를 확인",
             "technicalMetrics": {
@@ -477,12 +476,12 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
                        else "MONITORED_UNIVERSE" if quote
                        else None),
-            "priceSourceDate": final.get("sourceDate") if final and not quote else None,
+            "priceSourceDate": selection.get("sourceDate") if selection and not quote else None,
             "priceSourceTime": market.get("sourceTime"),
             "priceBasis": market.get("priceBasis"),
             "rejectedQuoteReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
-            "unavailableReason": ("NO_VERIFIED_FINAL_SOURCE"
-                                  if rejected_quote and not final else None),
+            "unavailableReason": ("NO_VERIFIED_SELECTION_SNAPSHOT"
+                                  if rejected_quote and not selection else None),
         }
         detail = candidate_details.get(code) or {}
         row.update({
@@ -518,7 +517,9 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         "asOf": as_of, "observedCount": available + partial,
         "missingCount": len(rows) - available - partial, "stocks": rows,
         "metrics": {"vwap": "UNAVAILABLE", "intradayHighLow": "UNAVAILABLE"},
-        "finalBaseline": {key: baseline.get(key) for key in ("status", "reason", "sourceDate") if baseline.get(key) is not None},
+        "selectionSnapshot": {key: selection_snapshot.get(key)
+                               for key in ("status", "reason", "sourceDate")
+                               if selection_snapshot.get(key) is not None},
         "technicalProvenance": krx_status,
     }
 
