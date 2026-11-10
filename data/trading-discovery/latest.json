@@ -89,7 +89,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 1189000,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "003490",
@@ -154,7 +157,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 32600,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "017670",
@@ -219,7 +225,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 81900,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "018260",
@@ -284,7 +293,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 231500,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "028050",
@@ -349,7 +361,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 63900,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "035420",
@@ -414,7 +429,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 192300,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "128940",
@@ -479,7 +497,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 489000,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "180640",
@@ -544,7 +565,10 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 236500,
+      "quoteStatus": "AVAILABLE"
     },
     {
       "symbol": "443670",
@@ -609,9 +633,67 @@
           "monitoringDate": true
         }
       },
-      "publicationStatus": "PARTIAL"
+      "publicationStatus": "PARTIAL",
+      "quoteRequested": true,
+      "currentPrice": 6110,
+      "quoteStatus": "AVAILABLE"
     }
   ],
   "publisherVersion": "kiwoom-condition-report-ready-v1",
-  "generatedAt": "2026-11-11T00:44:27+09:00"
+  "generatedAt": "2026-11-11T00:44:36+09:00",
+  "artifactStatus": "PARTIAL",
+  "publicationStatus": "PARTIAL",
+  "candidateCompleteness": {
+    "selection": {
+      "status": "UNAVAILABLE",
+      "available": 0,
+      "total": 9
+    },
+    "technicalIndicators": {
+      "status": "UNAVAILABLE",
+      "available": 0,
+      "total": 9
+    },
+    "conditionDetails": {
+      "status": "AVAILABLE",
+      "available": 9,
+      "total": 9
+    },
+    "quote": {
+      "status": "AVAILABLE",
+      "available": 9,
+      "total": 9
+    }
+  },
+  "producerCommit": "5327464b2a224fa21657c964513d3d82f74f97ba",
+  "producerStatus": "PARTIAL",
+  "enrichmentStatus": "ENRICHED",
+  "originalGeneratedAt": "2026-11-11T00:44:27+09:00",
+  "artifactIdentity": {
+    "monitoringDate": "2026-11-12",
+    "selectionDate": "2026-11-11",
+    "source": "KIWOOM_CONDITION_SEARCH",
+    "sourceSha256": "888173becf94b0544fefcc9d442e248497bd6859bb70b7bab48e06534dbdbb54",
+    "symbols": [
+      "003230",
+      "003490",
+      "017670",
+      "018260",
+      "028050",
+      "035420",
+      "128940",
+      "180640",
+      "443670"
+    ],
+    "originalGeneratedAt": "2026-11-11T00:44:27+09:00"
+  },
+  "schemaTransition": {
+    "from": "SYMBOL_ONLY",
+    "to": "CANDIDATE_DETAILS",
+    "status": "ENRICHED",
+    "sourceSha256": "888173becf94b0544fefcc9d442e248497bd6859bb70b7bab48e06534dbdbb54",
+    "originalGeneratedAt": "2026-11-11T00:44:27+09:00",
+    "enrichedGeneratedAt": "2026-11-11T00:44:36+09:00",
+    "producerCommit": "5327464b2a224fa21657c964513d3d82f74f97ba"
+  }
 }
