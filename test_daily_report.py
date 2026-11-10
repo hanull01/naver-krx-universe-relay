@@ -187,21 +187,6 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(context["observation"]["reason"], "PREOPEN_GENERATION_DATE_MISMATCH")
             self.assertEqual(context["previousTradingDay"]["status"], "AVAILABLE")
 
-    def test_resolve_report_trading_date_rejects_intraday_session_evidence(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); monitoring = root / "monitoring"; monitoring.mkdir()
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261028", "publicationStatus": "SUCCESS"}), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "fullMarket": {"tradingDate": "20261028", "tradingDateEvidence": {
-                    "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-                    "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False}}}), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({"asOfDate": "20261028", "historyStatus": "OK"}), encoding="utf-8")
-            result = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(result["status"], "WAIT")
-            self.assertEqual(result["reason"], "TRADING_DATE_EVIDENCE_UNAVAILABLE")
-
     def test_full_market_summary_requires_verified_alignment(self):
         available = daily_report.full_market_summary(
             verified_full_market(), {"status": "OK"}
@@ -235,159 +220,6 @@ class DailyReportTests(unittest.TestCase):
         self.assertIsNone(summary["industries"][0]["tradingValue"]["total"])
         self.assertEqual(summary["leaders"][0]["technicalEvidence"]["status"], "UNAVAILABLE")
 
-    def test_resolve_report_trading_date_requires_matching_published_material(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261016", "publicationStatus": "SUCCESS",
-                "generatedAt": "q",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "fullMarket": {
-                    "tradingDate": "20261016",
-                    "tradingDateEvidence": {"reason": "VERIFIED_CANONICAL_SESSION"},
-                },
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({
-                "asOfDate": "20261016", "historyStatus": "OK", "generatedAt": "b",
-            }), encoding="utf-8")
-            got = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(got["status"], "READY")
-            self.assertEqual(got["tradingDate"], "2026-10-16")
-            self.assertEqual(daily_report.resolve_report_trading_date(
-                monitoring, baseline, "2026-10-17")["reason"], "REQUESTED_DATE_MISMATCH")
-
-    def test_pending_composition_is_blocked_without_exact_final_evidence(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261026",
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-                "fullMarket": {
-                    "tradingDate": "20261026", "authoritativeCount": 2766,
-                    "expectedCount": 2766, "coverageCount": 2766,
-                    "tradingDateEvidence": {
-                        "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-                        "diagnosticStatus": "UNVERIFIED",
-                    },
-                },
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({
-                "asOfDate": "20261026", "historyStatus": "OK",
-                "count": 2766, "authoritativeCount": 2766, "coveragePct": 100.0,
-            }), encoding="utf-8")
-            result = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(result["status"], "WAIT")
-            self.assertEqual(result["reason"], "QUALITY_NOT_PUBLISHED")
-
-    def test_pending_composition_is_allowed_only_with_exact_final_evidence(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            evidence = {
-                "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-                "diagnosticStatus": "VERIFIED", "missingFinalCodes": [],
-                "unexpectedFinalCodes": [], "invalidFinalCodes": {},
-            }
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261026",
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-                "fullMarket": {
-                    "tradingDate": "20261026", "authoritativeCount": 2766,
-                    "expectedCount": 2766, "coverageCount": 2766,
-                    "tradingDateEvidence": evidence,
-                },
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({
-                "asOfDate": "20261026", "historyStatus": "OK",
-                "count": 2766, "authoritativeCount": 2766, "coveragePct": 100.0,
-            }), encoding="utf-8")
-            result = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(result["status"], "READY")
-            self.assertEqual(result["tradingDate"], "2026-10-26")
-
-    def test_source_observed_final_is_ready_with_distinct_quality_status(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            evidence = {
-                "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
-                "status": "SOURCE_OBSERVED",
-                "missingFinalCodes": [], "unexpectedFinalCodes": [],
-                "invalidFinalCodes": {},
-            }
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261026",
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "publicationStatus": "COMPLETE_RECONCILIATION_PENDING",
-                "fullMarket": {
-                    "tradingDate": "20261026", "authoritativeCount": 2764,
-                    "expectedCount": 2764, "coverageCount": 2764,
-                    "tradingDateEvidence": evidence,
-                },
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({
-                "asOfDate": "20261026", "historyStatus": "SOURCE_OBSERVED",
-                "sourceQualityStatus": "SOURCE_OBSERVED",
-                "count": 2764, "authoritativeCount": 2764, "coveragePct": 100.0,
-            }), encoding="utf-8")
-            result = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(result["status"], "READY")
-            self.assertEqual(result["sourceQualityStatus"], "SOURCE_OBSERVED")
-
-    def test_resolve_report_trading_date_does_not_promote_old_baseline(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261015", "publicationStatus": "SUCCESS",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "fullMarket": {"tradingDate": None, "tradingDateEvidence": {
-                    "reason": "INSUFFICIENT_TRADING_DATE_EVIDENCE"
-                }}
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({"asOfDate": "20261016", "historyStatus": "OK"}), encoding="utf-8")
-            result = daily_report.resolve_report_trading_date(monitoring, baseline)
-            self.assertEqual(result["status"], "WAIT")
-            self.assertEqual(result["reason"], "TRADING_DATE_EVIDENCE_UNAVAILABLE")
-
-    def test_resolve_report_trading_date_rejects_mismatch_or_missing(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            monitoring = root / "monitoring"
-            monitoring.mkdir()
-            (monitoring / "latest-quality.json").write_text(json.dumps({
-                "tradingDate": "20261015", "publicationStatus": "SUCCESS",
-            }), encoding="utf-8")
-            (monitoring / "latest-summary.json").write_text(json.dumps({
-                "fullMarket": {"tradingDate": "20261016", "tradingDateEvidence": {
-                    "reason": "VERIFIED_CANONICAL_SESSION"
-                }}
-            }), encoding="utf-8")
-            baseline = root / "baseline.json"
-            baseline.write_text(json.dumps({"asOfDate": "20261015", "historyStatus": "OK"}), encoding="utf-8")
-            self.assertEqual(daily_report.resolve_report_trading_date(monitoring, baseline)["reason"], "BASELINE_DATE_MISMATCH")
     def test_shadow_comparison_keeps_v1_and_v2_separate(self):
         dynamic = {
             "sectors": [{"id": "s1", "status": "ACTIVE"}],
@@ -411,119 +243,6 @@ class DailyReportTests(unittest.TestCase):
         }, {"status": "OK", "tradingDate": "2026-10-16"})
         self.assertEqual(got["v2Shadow"]["history"]["uniqueTradingDates"], ["2026-10-16"])
         self.assertEqual(got["observationSources"]["uiObservationCount"], None)
-
-    def test_full_market_evidence_requires_final_same_day_complete_set(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            names = daily_report.FULL_MARKET_FILES
-            for name in names:
-                (root / name).write_text(json.dumps({"generatedAt": "2026-10-02T16:20:00+09:00"}), encoding="utf-8")
-            quality = {
-                "generatedAt": "2026-10-02T16:20:00+09:00", "baselineAsOfDate": "20261002",
-                "publicationStatus": "FINAL", "authoritativeCount": 2768,
-                "currentCount": 2768, "currentCoveragePct": 100.0,
-                "duplicateCodes": [], "missingCurrentCodes": [],
-            }
-            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
-            breadth = {"TOTAL": {"advancers": 1, "decliners": 2, "unchanged": 3}}
-            (root / "latest-breadth.json").write_text(json.dumps({"generatedAt": quality["generatedAt"], "breadth": breadth}), encoding="utf-8")
-            (root / "latest-summary.json").write_text(json.dumps({
-                "generatedAt": quality["generatedAt"],
-                "monitoredUniverse": {
-                    "current": {"aboveMA20Count": 22},
-                    "regularSession": {"status": "AVAILABLE", "aboveMA20Count": 21},
-                },
-            }), encoding="utf-8")
-            got = daily_report.full_market_evidence("2026-10-02", root)
-            self.assertEqual(got["status"], "AVAILABLE")
-            self.assertEqual(got["breadth"]["advancers"], 1)
-            self.assertEqual(got["monitoredUniverse"]["current"]["aboveMA20Count"], 22)
-            self.assertEqual(got["monitoredUniverse"]["regularSession"]["aboveMA20Count"], 21)
-
-    def test_full_market_evidence_rejects_stale_or_incomplete_quality(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for name in daily_report.FULL_MARKET_FILES:
-                (root / name).write_text(json.dumps({"generatedAt": "t"}), encoding="utf-8")
-            (root / "latest-quality.json").write_text(json.dumps({
-                "publicationStatus": "FINAL", "baselineAsOfDate": "20261001",
-                "authoritativeCount": 2768, "currentCount": 2767,
-                "currentCoveragePct": 99.96,
-            }), encoding="utf-8")
-            got = daily_report.full_market_evidence("2026-10-02", root)
-            self.assertEqual(got["status"], "UNAVAILABLE")
-            self.assertIn(got["reason"], {"BASELINE_DATE_MISMATCH", "CURRENT_COVERAGE_INVALID"})
-
-    def test_full_market_evidence_accepts_previous_session_baseline_with_current_snapshot(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            generated = "2026-10-12T10:00:00+09:00"
-            for name in daily_report.FULL_MARKET_FILES:
-                (root / name).write_text(json.dumps({"generatedAt": generated}), encoding="utf-8")
-            quality = {
-                "generatedAt": generated, "baselineAsOfDate": "20261008",
-                "tradingDate": "20261012",
-                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
-                "currentSnapshotGeneratedAt": generated, "publicationStatus": "SUCCESS",
-                "authoritativeCount": 2767, "currentCount": 2767,
-                "currentCoveragePct": 100.0, "duplicateCodes": [], "missingCurrentCodes": [],
-            }
-            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
-            (root / "latest-breadth.json").write_text(json.dumps({
-                "generatedAt": generated,
-                "breadth": {"TOTAL": {"advancers": 1, "decliners": 1, "unchanged": 0}},
-            }), encoding="utf-8")
-            self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
-                             "AVAILABLE")
-            quality["currentSnapshotGeneratedAt"] = "2026-10-08T10:00:00+09:00"
-            quality["tradingDate"] = "20261008"
-            (root / "latest-quality.json").write_text(json.dumps(quality), encoding="utf-8")
-            self.assertEqual(daily_report.full_market_evidence("2026-10-12", root)["status"],
-                             "UNAVAILABLE")
-
-    def test_full_market_evidence_does_not_infer_trading_date_from_generated_at(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for name in daily_report.FULL_MARKET_FILES:
-                (root / name).write_text(json.dumps({"generatedAt": "2026-10-12T10:00:00+09:00"}), encoding="utf-8")
-            (root / "latest-quality.json").write_text(json.dumps({
-                "baselineAsOfDate": "20261008",
-                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
-                "currentSnapshotGeneratedAt": "2026-10-12T10:00:00+09:00",
-                "publicationStatus": "SUCCESS", "authoritativeCount": 1,
-                "currentCount": 1, "currentCoveragePct": 100.0,
-                "duplicateCodes": [], "missingCurrentCodes": [],
-            }), encoding="utf-8")
-            self.assertEqual(
-                daily_report.full_market_evidence("2026-10-12", root)["reason"],
-                "BASELINE_DATE_MISMATCH",
-            )
-
-    def test_full_market_evidence_reads_verified_date_from_published_scope(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            generated = "2026-10-15T20:00:00+09:00"
-            for name in daily_report.FULL_MARKET_FILES:
-                (root / name).write_text(json.dumps({"generatedAt": generated}), encoding="utf-8")
-            (root / "latest-quality.json").write_text(json.dumps({
-                "generatedAt": generated, "baselineAsOfDate": "20261014",
-                "baselineFreshnessStatus": "VALID_PREVIOUS_TRADING_DAY",
-                "publicationStatus": "SUCCESS", "authoritativeCount": 1,
-                "currentCount": 1, "currentCoveragePct": 100.0,
-                "duplicateCodes": [], "missingCurrentCodes": [],
-            }), encoding="utf-8")
-            (root / "latest-breadth.json").write_text(json.dumps({
-                "generatedAt": generated,
-                "breadth": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}},
-                "fullMarket": {
-                    "tradingDate": "20261015",
-                    "tradingDateEvidence": {"reason": "VERIFIED_CANONICAL_SESSION"},
-                },
-            }), encoding="utf-8")
-            got = daily_report.full_market_evidence("2026-10-15", root)
-            self.assertEqual(got["status"], "AVAILABLE")
-            self.assertEqual(got["snapshotDate"], "20261015")
-            self.assertEqual(got["snapshotDateStatus"], "VERIFIED_EXPLICIT")
 
     def test_quote_summary(self):
         row = {
@@ -921,8 +640,8 @@ class DailyReportTests(unittest.TestCase):
             self.assertEqual(report["dateAlignment"]["status"], "UNAVAILABLE")
             self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "UNAVAILABLE")
             self.assertIsNone(report["marketSummary"]["fullMarket"]["breadth"])
-            self.assertIn(report["dateAlignment"]["fullMarketReason"],
-                          {"MISSING_EVIDENCE_FILE", "BASELINE_DATE_MISMATCH"})
+            self.assertEqual(report["dateAlignment"]["fullMarketReason"],
+                             "DERIVED_PROJECTION_MISSING")
             report["dateAlignment"] = {
                 "status": "UNAVAILABLE", "fullMarketStatus": "UNAVAILABLE",
                 "fullMarketReason": "MISSING_EVIDENCE_FILE", "reportTradingDate": "2026-10-06",
@@ -968,7 +687,7 @@ class DailyReportTests(unittest.TestCase):
                     TECHNICALS_PATH=root / "technicals.json", STATES_PATH=root / "states.json",
                     RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
                     MONITORING_PATH=root / "missing-monitoring"), \
-                    patch.object(daily_report, "full_market_evidence", return_value=verified_full_market()), \
+                    patch.object(daily_report, "full_market_from_derived_projection", return_value=verified_full_market()), \
                     patch.object(daily_report, "date_alignment", return_value={"status": "OK"}):
                 report = daily_report.build_report("2026-10-06")
             self.assertEqual(report["coverageStatus"], "EMPTY_CONFIGURED_UNIVERSE")
@@ -1130,7 +849,7 @@ class DailyReportTests(unittest.TestCase):
                     RESEARCH_PATH=root / "research.json", GROUP_STATES_PATH=root / "missing-groups.json",
                     MONITORING_PATH=root / "missing-monitoring"), \
                     patch.object(daily_report, "date_alignment", return_value={"status": "OK"}), \
-                    patch.object(daily_report, "full_market_evidence", return_value=verified_full_market()):
+                    patch.object(daily_report, "full_market_from_derived_projection", return_value=verified_full_market()):
                 report = daily_report.build_report("2026-10-06")
             self.assertEqual(report["status"], "OK")
             self.assertEqual(report["marketSummary"]["fullMarket"]["status"], "AVAILABLE")
@@ -1207,7 +926,7 @@ class DailyReportTests(unittest.TestCase):
             "EMPTY_CONFIGURED_UNIVERSE",
         )
 
-    def test_date_alignment_keeps_baseline_and_current_sources_separate(self):
+    def test_date_alignment_keeps_historical_and_current_sources_separate(self):
         got = daily_report.date_alignment(
             "2026-10-16",
             {"indices": [{"sourceTime": "2026-10-23T20:15:00+09:00"}]},

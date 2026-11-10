@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -25,12 +25,10 @@ import full_market_monitoring_evidence as evidence
 import naver_full_market_current as current_collector
 
 
-BASELINE_FILE = ROOT / "data/monitoring-baseline/latest.json"
 OUTPUT_DIR = ROOT / "data/monitoring"
 UNIVERSE_CONFIG = ROOT / "config/universe.json"
 RELAY_QUOTES_FILE = ROOT / "data/quotes.json"
 RELAY_STATES_FILE = ROOT / "data/states.json"
-MONITORING_DAILY_DIR = ROOT / "data/monitoring-daily"
 KST = ZoneInfo("Asia/Seoul")
 
 
@@ -266,92 +264,6 @@ def session_at(now):
     return "CLOSED"
 
 
-def previous_open_day(target, market_day_check=krx_market_day.market_day):
-    for offset in range(1, 12):
-        candidate = target - timedelta(days=offset)
-        is_open, _ = market_day_check(candidate)
-        if is_open:
-            return candidate
-    raise RuntimeError("previous KRX trading day unavailable")
-
-
-def baseline_freshness(baseline, now, market_day_check=krx_market_day.market_day):
-    if not baseline:
-        return False, "BASELINE_UNAVAILABLE", None
-    history_status = baseline.get("historyStatus")
-    source_observed = (
-        history_status == "SOURCE_OBSERVED"
-        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
-    )
-    if history_status not in {"OK", "SOURCE_OBSERVED"} or (
-            history_status == "SOURCE_OBSERVED" and not source_observed):
-        return False, "BASELINE_UNAVAILABLE", None
-    try:
-        today = now.date(); is_open, reason = market_day_check(today)
-        if not is_open:
-            return False, reason, None
-        previous = previous_open_day(today, market_day_check).strftime("%Y%m%d")
-    except Exception:
-        return False, "KRX_CALENDAR_UNAVAILABLE", None
-    as_of = str(baseline.get("asOfDate") or "")
-    if baseline.get("count") != baseline.get("authoritativeCount") or baseline.get("coveragePct") != 100.0:
-        return False, "BASELINE_COVERAGE_INVALID", previous
-    session = session_at(now)
-    # The prior valid baseline is the input for intraday analysis and for the
-    # 20:30 snapshot. The current-day baseline is generated only after that
-    # snapshot has been validated and appended.
-    if as_of == previous:
-        return True, (
-            "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED"
-            if source_observed else "VALID_PREVIOUS_TRADING_DAY"
-        ), previous
-    # 15:30 regular close and the 20:00 after-market close are separate
-    # states.  A same-day baseline is FINAL only after the latter.
-    if as_of == today.strftime("%Y%m%d") and session == "CLOSED":
-        return True, (
-            "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"
-            if source_observed else "VALID_CURRENT_DAY_FINAL"
-        ), previous
-    if as_of == today.strftime("%Y%m%d"):
-        return False, "BASELINE_CURRENT_DAY_BEFORE_FINAL_SESSION", previous
-    return False, "BASELINE_STALE", previous
-
-
-def baseline_readiness(baseline, target_date):
-    """Validate the scalar daily baseline publication contract.
-
-    Rolling KOSPI/KOSDAQ state files may have their own publicationStatus;
-    this compact scalar baseline intentionally does not.  Its authoritative
-    readiness is expressed by the fields produced by daily_monitoring_baseline.
-    """
-    target = str(target_date).replace("-", "")
-    if not isinstance(baseline, dict):
-        return False, "BASELINE_UNAVAILABLE"
-    if baseline.get("asOfDate") != target:
-        return False, "BASELINE_DATE_MISMATCH"
-    if baseline.get("historyStatus") != "OK":
-        return False, "BASELINE_HISTORY_INVALID"
-    if baseline.get("count") != baseline.get("authoritativeCount"):
-        return False, "BASELINE_COVERAGE_INVALID"
-    if baseline.get("coveragePct") != 100.0:
-        return False, "BASELINE_COVERAGE_INVALID"
-    diagnostics = baseline.get("refreshDiagnostics") or {}
-    if diagnostics.get("missingCodes"):
-        return False, "BASELINE_MISSING_CODES"
-    if diagnostics.get("extraCodes"):
-        return False, "BASELINE_EXTRA_CODES"
-    if diagnostics.get("targetDate") and str(diagnostics["targetDate"]).replace("-", "") != target:
-        return False, "BASELINE_DIAGNOSTIC_DATE_MISMATCH"
-    return True, "READY"
-
-
-def collection_readiness(baseline, now=None, market_day_check=krx_market_day.market_day):
-    """Apply the collector's session-aware baseline policy before network I/O."""
-    now = now or datetime.now(KST)
-    fresh, reason, previous = baseline_freshness(baseline, now, market_day_check)
-    return fresh, "READY" if fresh else reason, previous
-
-
 def snapshot_is_publishable(current):
     """Accept complete collection with pending Universe reconciliation only."""
     publishable_statuses = {"SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"}
@@ -371,16 +283,9 @@ def snapshot_is_publishable(current):
     )
 
 
-def intraday_trading_date_evidence(current, now, freshness_status,
+def intraday_trading_date_evidence(current, now,
                                    market_day_check=krx_market_day.market_day):
-    """Build non-final date evidence from the validated intraday snapshot.
-
-    ``freshness_status`` is the result of ``baseline_freshness``; for an open
-    KRX day it proves that the calendar check succeeded without making the
-    wall-clock date the source of truth.  PRE is valid for identifying the
-    KRX trading day and current snapshot, but it is never daily-bar or final
-    close confirmation.
-    """
+    """Build date evidence from the validated current snapshot and calendar."""
     session = session_at(now)
     evidence_class = (
         "POST_MARKET_SNAPSHOT" if session == "CLOSED" else "INTRADAY_SESSION"
@@ -388,33 +293,23 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     base = {
         "tradingDate": None, "status": "UNAVAILABLE",
         "reason": "INTRADAY_TRADING_DATE_EVIDENCE_UNAVAILABLE",
-        "evidenceClass": evidence_class, "finalConfirmed": False,
+        "evidenceClass": evidence_class,
     }
     if not isinstance(current, dict):
         return {**base, "reason": "CURRENT_SNAPSHOT_UNAVAILABLE"}
     target = now.date()
-    calendar_verified_statuses = {
-        "VALID_PREVIOUS_TRADING_DAY", "VALID_PREVIOUS_TRADING_DAY_SOURCE_OBSERVED",
-        "VALID_CURRENT_DAY_FINAL", "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
-        "BASELINE_STALE",
-    }
-    if freshness_status not in calendar_verified_statuses:
-        if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
-            return {**base, "reason": freshness_status}
-        try:
-            is_open, calendar_reason = market_day_check(target)
-        except Exception:
-            return {**base, "reason": "KRX_CALENDAR_UNAVAILABLE"}
-        if not is_open:
-            return {**base, "reason": calendar_reason}
+    try:
+        is_open, calendar_reason = market_day_check(target)
+    except Exception:
+        return {**base, "reason": "KRX_CALENDAR_UNAVAILABLE"}
+    if not is_open:
+        return {**base, "reason": calendar_reason}
     # After 20:00 the current snapshot still identifies the KRX trading day
     # when the calendar and every collection timestamp agree.  Keep it as a
     # non-final post-market observation; final daily-bar validation remains a
     # separate contract.
     if session not in {"PRE", "REGULAR", "REGULAR_CLOSED", "AFTER", "CLOSED"}:
         return {**base, "reason": "OUTSIDE_INTRADAY_SESSION"}
-    if freshness_status in {"WEEKEND", "KRX_HOLIDAY", "KRX_CALENDAR_UNAVAILABLE"}:
-        return {**base, "reason": freshness_status}
     if not snapshot_is_publishable(current):
         return {**base, "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
     target_date = target.strftime("%Y%m%d")
@@ -435,7 +330,7 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     return {
         "tradingDate": target_date, "status": "VERIFIED",
         "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-        "evidenceClass": evidence_class, "finalConfirmed": False,
+        "evidenceClass": evidence_class,
         "source": "KRX_CALENDAR_AND_NAVER_CURRENT_SNAPSHOT",
         "observedDateCounts": {target_date: current.get("coverageCount", 0)},
         "collectionGeneratedAt": current.get("generatedAt"),
@@ -443,13 +338,18 @@ def intraday_trading_date_evidence(current, now, freshness_status,
     }
 
 
-def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_file=None,
+def run(now=None, output_dir=OUTPUT_DIR, current_file=None,
         no_write=False, market_day_check=krx_market_day.market_day, collector=current_collector.collect_snapshot,
         universe_file=UNIVERSE_CONFIG, relay_quotes_file=RELAY_QUOTES_FILE,
-        relay_states_file=RELAY_STATES_FILE, monitoring_daily_dir=MONITORING_DAILY_DIR,
-        allow_source_observed_final=False, source_observed_date=None,
+        relay_states_file=RELAY_STATES_FILE,
         krx_resolution_file=None, krx_input_dir=None):
+    """Collect current NAVER evidence against a verified KRX input.
+
+    Production callers must provide the immutable staged KRX input.
+    """
     now = now or datetime.now(KST)
+    if not krx_input_dir:
+        return {"status": "NOT_PUBLISHED", "reason": "KRX_INPUT_REQUIRED"}
     krx_resolution = None
     if krx_resolution_file:
         krx_resolution = load_json(krx_resolution_file)
@@ -482,31 +382,9 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         krx_resolution = dict(krx_resolution or input_resolution)
         krx_resolution["inputMode"] = "DIRECT_KRX_REPORT_INPUT"
         krx_resolution["inputArtifacts"] = list(required)
-    baseline = load_json(baseline_file) or {}
-    source_observed_requested = bool(
-        allow_source_observed_final
-        and baseline.get("historyStatus") == "SOURCE_OBSERVED"
-        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
-        and source_observed_date
-        and str(source_observed_date).replace("-", "") == now.strftime("%Y%m%d")
-        and str(baseline.get("asOfDate") or "").replace("-", "")
-        == str(source_observed_date).replace("-", "")
-    )
-    if source_observed_requested:
-        fresh, freshness_status, expected_previous_date = baseline_freshness(baseline, now, market_day_check)
-        source_observed_recovery = fresh and freshness_status == "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED"
-    else:
-        source_observed_recovery = False
-        fresh, freshness_status, expected_previous_date = baseline_freshness(baseline, now, market_day_check)
-    # A stale prior baseline is still a valid comparison input for a new
-    # full-market snapshot.  Do not let the freshness warning create a
-    # collection deadlock; the resulting evidence records the warning and
-    # must not be treated as a current-day baseline.
-    if not fresh and freshness_status != "BASELINE_STALE":
-        if krx_input_dir and freshness_status == "BASELINE_UNAVAILABLE":
-            freshness_status = "KRX_PRIMARY_NO_BASELINE"
-        else:
-            return {"status": "NOT_PUBLISHED", "reason": freshness_status}
+    # The immutable KRX receipt and staged artifacts are the only historical
+    # input for this production path.  A current NAVER snapshot identifies the
+    # observation date; it is never promoted to a historical close or FINAL.
     current = load_json(current_file) if current_file else collector()
     if not snapshot_is_publishable(current):
         return {"status": "NOT_PUBLISHED", "reason": "CURRENT_SNAPSHOT_INCOMPLETE"}
@@ -517,8 +395,9 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
     cross_check = cross_check_universe_snapshot(universe_subset, relay_quotes_file)
     monitored = monitored_universe_summary(universe_subset, relay_quotes_file, relay_states_file)
     context = {
-        "baselineAsOfDate": baseline.get("asOfDate"), "baselineGeneratedAt": baseline.get("generatedAt"),
-        "baselineCoverage": baseline.get("coveragePct"), "baselineFreshnessStatus": freshness_status,
+        "historicalTargetDate": (krx_resolution or {}).get("targetDate"),
+        "historicalGenerationId": (krx_resolution or {}).get("sourceGeneration"),
+        "historicalLineageStatus": (krx_resolution or {}).get("receiptStatus"),
         # These deliberately name distinct clocks.  A delayed full-market
         # collection must not be mistaken for the relay quote's source time.
         "currentSnapshotGeneratedAt": current.get("generatedAt"), "currentCoverage": current.get("coverageCount"),
@@ -541,57 +420,44 @@ def run(now=None, baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR, current_fi
         "krxReceiptStatus": (krx_resolution or {}).get("receiptStatus"),
         "krxEntityCount": (krx_resolution or {}).get("entityCount"),
         "krxInstrumentCount": (krx_resolution or {}).get("instrumentCount"),
-        "historicalSource": (krx_resolution or {}).get("historicalSource", "NAVER_LEGACY"),
+        "historicalSource": (krx_resolution or {}).get("historicalSource", "KRX"),
         "currentSnapshotSource": (krx_resolution or {}).get("currentSnapshotSource", "NAVER"),
         "krxInputMode": (krx_resolution or {}).get("inputMode"),
         "krxInputArtifacts": (krx_resolution or {}).get("inputArtifacts"),
     }
-    if freshness_status == "BASELINE_STALE":
-        context["expectedPreviousTradingDate"] = expected_previous_date
-    context["intradayTradingDateEvidence"] = intraday_trading_date_evidence(
-        current, now, freshness_status, market_day_check
-    )
+    context["intradayTradingDateEvidence"] = intraday_trading_date_evidence(current, now, market_day_check)
     industries = evidence.load_json(evidence.MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
     membership = evidence.load_json(evidence.MARKET_DIR / "industry-membership.json", {"status": "UNUSABLE", "industries": []})
     theme_membership = evidence.load_json(evidence.THEME_MEMBERSHIP_FILE, {"status": "UNUSABLE", "themes": []})
     previous_good = evidence.load_json(evidence.MARKET_DIR / "industries-latest-ok.json")
     previous = evidence.load_json(Path(output_dir) / "latest-summary.json") or {}
     previous["previousLeaders"] = (evidence.load_json(Path(output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
-    evidence_today = (str(source_observed_date).replace("-", "")
-                      if source_observed_recovery else now.strftime("%Y%m%d"))
     payloads, _ = evidence.build_evidence(
         current, industries=industries, membership=membership, previous_summary=previous,
-        today=evidence_today, previous_good_industries=previous_good,
-        baseline=baseline, publication_context=context, theme_membership=theme_membership,
-        monitoring_daily_dir=monitoring_daily_dir,
-        allow_source_observed_final=source_observed_recovery,
+        today=now.strftime("%Y%m%d"), previous_good_industries=previous_good,
+        publication_context=context, theme_membership=theme_membership,
     )
     sizes = {} if no_write else evidence.write_evidence(payloads, output_dir)
-    return {"status": "SUCCESS", "baselineAsOfDate": baseline["asOfDate"],
-            "baselineFreshnessStatus": freshness_status, "currentCount": current["coverageCount"],
+    return {"status": "SUCCESS", "historicalTargetDate": (krx_resolution or {}).get("targetDate"),
+            "historicalGenerationId": (krx_resolution or {}).get("sourceGeneration"),
+            "currentCount": current["coverageCount"],
             "session": context["session"], "files": sizes,
             "totalBytes": sum(sizes.values()) if sizes else sum(len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) for value in payloads.values())}
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--baseline-file", default=str(BASELINE_FILE))
     parser.add_argument("--output-dir", default=str(OUTPUT_DIR))
     parser.add_argument("--current-file")
     parser.add_argument("--relay-quotes-file", default=str(RELAY_QUOTES_FILE))
     parser.add_argument("--relay-states-file", default=str(RELAY_STATES_FILE))
-    parser.add_argument("--monitoring-daily-dir", default=str(MONITORING_DAILY_DIR))
-    parser.add_argument("--allow-source-observed-final", action="store_true")
-    parser.add_argument("--source-observed-date")
     parser.add_argument("--no-write", action="store_true")
     parser.add_argument("--krx-resolution")
     parser.add_argument("--krx-input-dir")
     args = parser.parse_args()
-    result = run(baseline_file=args.baseline_file, output_dir=args.output_dir, current_file=args.current_file,
+    result = run(output_dir=args.output_dir, current_file=args.current_file,
                  relay_quotes_file=args.relay_quotes_file, relay_states_file=args.relay_states_file,
-                 monitoring_daily_dir=args.monitoring_daily_dir,
-                 allow_source_observed_final=args.allow_source_observed_final,
-                 source_observed_date=args.source_observed_date, no_write=args.no_write,
+                 no_write=args.no_write,
                  krx_resolution_file=args.krx_resolution, krx_input_dir=args.krx_input_dir)
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["status"] == "SUCCESS" else 2

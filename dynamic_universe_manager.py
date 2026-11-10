@@ -179,7 +179,7 @@ def _trading_date(context):
         value = _normalize_trading_date((context or {}).get(key))
         if value:
             return value
-    for block_name in ("fullMarket", "baseline", "evidence"):
+    for block_name in ("fullMarket", "evidence"):
         block = (context or {}).get(block_name) or {}
         for key in ("tradingDate", "tradeDate", "marketDate"):
             value = _normalize_trading_date(block.get(key))
@@ -416,7 +416,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
             "policy": policy, "load": {"limit": limit, "count": len(memberships),
             "limitExceededByProtectedSources": max(0, len(memberships) - limit)},
             "safety": {"productionUniverseMutated": False, "userWatchlistsMutated": False,
-            "legacyBaselinePreserved": True, "deduplicateCollectionBy": "itemCode"}}
+            "deduplicateCollectionBy": "itemCode"}}
 
 
 def publish_result(result, result_path, state_path=None, history_path=None):

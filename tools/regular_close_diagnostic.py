@@ -2,8 +2,7 @@
 
 This module is intentionally not imported by the production relay.  It stores
 only diagnostic records under ``data/daily-regular-diagnostic`` when called
-explicitly, so existing FINAL/Baseline and technical calculation paths remain
-unchanged.
+explicitly; it is not part of the production report input path.
 """
 
 from __future__ import annotations

@@ -37,12 +37,9 @@ REQUIRED_RENDER_FIELDS = (
 
 TRADING_DATE_EVIDENCE_REASONS = {
     "VERIFIED_CANONICAL_SESSION",
-    "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-    "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
     "VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC",
     "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
 }
-SOURCE_OBSERVED_TRADING_DATE_REASON = "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE"
 
 # GitHub Contents API does not return inline content for large blobs. Keep
 # the Work-facing contract below that transport limit while preserving the
@@ -279,7 +276,6 @@ def _valid_trading_date_evidence(
     if reason == "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT":
         return (
             evidence.get("evidenceClass") in {"INTRADAY_SESSION", "POST_MARKET_SNAPSHOT"}
-            and evidence.get("finalConfirmed") is False
             and isinstance(observed_at, str)
             and evidence.get("collectionGeneratedAt") == observed_at
         )
@@ -643,9 +639,9 @@ def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
         coverage = metrics.get("coveragePct")
     missing_codes = row.get("missingCodes")
     quality = row.get("dataQuality") or row.get("qualityStatus") or metrics.get("dataQuality")
-    # BASELINE_STALE quarantines derived/persistence metrics, but the current
+    # Missing derived history affects only persistence metrics; the current
     # NAVER group observation remains usable when its own date and membership
-    # evidence are valid. It must not erase today's relative-strength rows.
+    # evidence are valid.
     explicit_invalid = quality in {"UNAVAILABLE", "MISMATCH", "ERROR"}
     if kind == "industry":
         derived = row.get("derivedFeatureValidMemberCount")
@@ -930,7 +926,6 @@ _TRADING_DATE_EVIDENCE_SCALARS = (
     "status",
     "reason",
     "evidenceClass",
-    "finalConfirmed",
     "collectionGeneratedAt",
     "sourceTime",
     "diagnosticStatus",
@@ -1298,21 +1293,6 @@ def build_report_contract(
         or full_market.get("qualityStatus")
         or "UNAVAILABLE"
     )
-    baseline_status = (
-        quality.get("baselineFreshnessStatus")
-        or summary.get("baselineFreshnessStatus")
-        or full_market.get("baselineFreshnessStatus")
-    )
-    baseline_as_of = (
-        quality.get("baselineAsOfDate")
-        or summary.get("baselineAsOfDate")
-        or full_market.get("baselineAsOfDate")
-    )
-    expected_previous = (
-        quality.get("expectedPreviousTradingDate")
-        or summary.get("expectedPreviousTradingDate")
-        or full_market.get("expectedPreviousTradingDate")
-    )
     historical_lineage = _historical_lineage(quality, full_market)
     observed_date = (
         quality.get("observedDate")
@@ -1361,7 +1341,6 @@ def build_report_contract(
             else "CURRENT_SNAPSHOT_DATE_EVIDENCE_INVALID"
         ),
         "evidenceClass": "INTRADAY_SESSION",
-        "finalConfirmed": False,
         "source": "NAVER_CURRENT_SNAPSHOT",
         "collectionGeneratedAt": observed_at,
     }
@@ -1563,16 +1542,8 @@ def build_report_contract(
     trading_date_evidence_valid = _valid_trading_date_evidence(
         evidence, trading_date, generation
     )
-    source_observed_date = (
-        isinstance(evidence, Mapping)
-        and evidence.get("status") == "SOURCE_OBSERVED"
-        and evidence.get("reason") == SOURCE_OBSERVED_TRADING_DATE_REASON
-        and evidence.get("evidenceClass") == "SOURCE_OBSERVED"
-        and str(evidence.get("tradingDate") or "") == str(trading_date or "")
-    )
     trading_date_status = (
         "VERIFIED" if trading_date_evidence_valid
-        else "SOURCE_OBSERVED" if source_observed_date
         else "UNAVAILABLE_TRADING_DATE_NULL" if not trading_date
         else "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID"
     )
@@ -1758,34 +1729,10 @@ def build_report_contract(
             ),
         },
     }
-    if baseline_status == "BASELINE_STALE":
-        baseline_generation = (
-            quality.get("baselineGenerationId")
-            or summary.get("baselineGenerationId")
-            or full_market.get("baselineGenerationId")
-        )
-        generation_match = (
-            baseline_generation is not None
-            and baseline_generation == historical_lineage.get("generationId")
-        )
-        if expected_previous and baseline_as_of and str(expected_previous).replace("-", "") != str(baseline_as_of).replace("-", ""):
-            baseline_reason = "BASELINE_DATE_MISMATCH"
-        elif baseline_generation and not generation_match:
-            baseline_reason = "BASELINE_GENERATION_MISMATCH"
-        else:
-            baseline_reason = "BASELINE_STALE"
-        contract["baseline"] = {
-            "asOfDate": baseline_as_of,
-            "expectedPreviousTradingDate": expected_previous,
-            "freshnessStatus": baseline_status,
-            "dateMismatch": True,
-            "reason": baseline_reason,
-            "baselineGenerationId": baseline_generation,
-            "historicalGenerationId": historical_lineage.get("generationId"),
-            "generationMatch": generation_match,
-            "derivedMetricsStatus": "UNAVAILABLE",
-            "derivedMetricsReason": "BASELINE_STALE",
-        }
+    # Retired monitoring lifecycle state is intentionally absent from the
+    # canonical contract. Historical KRX lineage is carried by
+    # ``historicalTechnicalMarket`` and current observations by
+    # ``currentMarketObservation``.
     return contract
 
 

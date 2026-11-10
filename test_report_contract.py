@@ -52,8 +52,10 @@ class ReportContractTests(unittest.TestCase):
         return {
             "tradingDate": date,
             "status": "VERIFIED",
-            "reason": "VERIFIED_MONITORING_DAILY_FINAL_SESSION",
-            "finalConfirmed": True,
+            "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
+            "evidenceClass": "INTRADAY_SESSION",
+
+            "collectionGeneratedAt": f"{date[:4]}-{date[4:6]}-{date[6:]}T10:09:19+00:00",
         }
 
     def test_contract_transport_empty_inline_content_is_not_called_empty_file(self):
@@ -185,7 +187,7 @@ class ReportContractTests(unittest.TestCase):
         evidence = {
             "tradingDate": "20261029", "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-            "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+            "evidenceClass": "INTRADAY_SESSION",
             "collectionGeneratedAt": generated,
         }
         industry_source = {
@@ -299,7 +301,7 @@ class ReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "POST_MARKET_SNAPSHOT",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": generated,
         }
         common = {"generatedAt": generated}
@@ -315,7 +317,6 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["status"], "PARTIAL")
         self.assertEqual(contract["tradingDateStatus"], "VERIFIED")
         self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
-        self.assertFalse(contract["tradingDateEvidence"]["finalConfirmed"])
 
     def test_kiwoom_candidates_are_separate_from_technical_candidates(self):
         discovery = {
@@ -423,7 +424,7 @@ class ReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": generated,
             "missingCanonicalCodes": [f"{index:06d}" for index in range(2769)],
             "invalidCanonicalCodes": {f"{index:06d}": "NORMAL_EMPTY_DAILY" for index in range(116)},
@@ -616,31 +617,6 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["tradingDateStatus"], "UNAVAILABLE_TRADING_DATE_EVIDENCE_INVALID")
         self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
 
-    def test_source_observed_final_date_is_partial_and_renderable(self):
-        evidence = {
-            "tradingDate": "20261028",
-            "status": "SOURCE_OBSERVED",
-            "reason": "SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE",
-            "evidenceClass": "SOURCE_OBSERVED",
-        }
-        contract = build_report_contract(
-            indices={"generatedAt": "g", "indices": []},
-            summary={"generatedAt": "g", "fullMarket": {
-                "tradingDate": "20261028", "tradingDateEvidence": evidence,
-                "markets": {"TOTAL": {}},
-            }},
-            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
-            quality={"generatedAt": "g", "tradingDateEvidence": evidence},
-            industries={"generatedAt": "g", "industries": []},
-            themes={"generatedAt": "g", "themes": []},
-            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
-            v2_history={"observations": []}, leaders={},
-        )
-        self.assertEqual(contract["status"], "PARTIAL")
-        self.assertEqual(contract["tradingDateStatus"], "SOURCE_OBSERVED")
-        self.assertEqual(contract["rendering"]["status"], "RENDERABLE")
-        self.assertEqual(contract["rendering"]["reason"], "PARTIAL_DATA_RETAINED")
-
     def test_null_trading_date_disables_html(self):
         contract = build_report_contract(
             indices={"generatedAt": "g", "indices": []},
@@ -691,67 +667,6 @@ class ReportContractTests(unittest.TestCase):
         bad = {**good, "fullMarket": {**good["fullMarket"], "metrics": {"breakout20": {"count": 80}}}}
         self.assertEqual(validate_rendered_models(good, bad), ["fullMarket.metrics.breakout20.count"])
 
-    def test_stale_baseline_is_explicit_and_contract_is_partial(self):
-        contract = build_report_contract(
-            indices={"generatedAt": "t", "indices": []},
-            summary={"generatedAt": "t", "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261027", "fullMarket": {"tradingDate": "20261029"}},
-            breadth={"generatedAt": "t", "fullMarket": {"marketTradingValue": {}}},
-            quality={"generatedAt": "t", "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261027"},
-            industries={"generatedAt": "t", "industries": []},
-            themes={"generatedAt": "t", "themes": []},
-            v2_latest={"industries": [], "themes": []}, v2_history={"observations": []},
-            leaders={},
-        )
-        self.assertEqual(contract["status"], "PARTIAL")
-        self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
-        self.assertTrue(contract["baseline"]["dateMismatch"])
-
-    def test_stale_baseline_does_not_block_a_valid_current_contract(self):
-        generated = "2026-10-29T10:00:00+09:00"
-        contract = build_report_contract(
-            indices={"generatedAt": generated, "indices": [
-                {"code": "KOSPI", "close": 2500, "sourceTime": generated},
-                {"code": "KOSDAQ", "close": 800, "sourceTime": generated},
-            ]},
-            summary={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261028", "fullMarket": {
-                         "tradingDate": "20261029",
-                         "tradingDateEvidence": self.evidence("20261029"),
-                         "markets": {"TOTAL": {"advancers": 1, "decliners": 0, "unchanged": 0}},
-                     }},
-            breadth={"generatedAt": generated, "fullMarket": {}},
-            quality={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261028", "observedDate": "20261029",
-                     "tradingDateEvidence": self.evidence("20261029")},
-            industries={"generatedAt": generated, "industries": []},
-            themes={"generatedAt": generated, "themes": []},
-            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
-            v2_history={"observations": []}, leaders={},
-        )
-        self.assertEqual(contract["status"], "AVAILABLE")
-        self.assertEqual(contract["baseline"]["freshnessStatus"], "BASELINE_STALE")
-        self.assertEqual(contract["baseline"]["derivedMetricsStatus"], "UNAVAILABLE")
-        self.assertEqual(contract["rendering"]["reason"], "CONFIRMED_CONTRACT")
-
-    def test_stale_baseline_records_date_reason_without_blocking_current_data(self):
-        generated = "2026-10-29T10:00:00+09:00"
-        contract = build_report_contract(
-            indices={"generatedAt": generated, "indices": []},
-            summary={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261027", "fullMarket": {
-                         "tradingDate": "20261029", "tradingDateEvidence": self.evidence("20261029")}},
-            breadth={"generatedAt": generated, "fullMarket": {}},
-            quality={"generatedAt": generated, "baselineFreshnessStatus": "BASELINE_STALE",
-                     "baselineAsOfDate": "20261027", "expectedPreviousTradingDate": "20261028",
-                     "tradingDateEvidence": self.evidence("20261029")},
-            industries={"generatedAt": generated, "industries": []},
-            themes={"generatedAt": generated, "themes": []},
-            v2_latest={"industries": [], "themes": []}, v2_history={"observations": []}, leaders={},
-        )
-        self.assertEqual(contract["baseline"]["reason"], "BASELINE_DATE_MISMATCH")
-
     def test_registered_universe_projection_keeps_current_and_historical_values(self):
         source = {
             "status": "AVAILABLE", "registeredCount": 1,
@@ -776,7 +691,7 @@ class ReportContractTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": generated,
         }
         contract = build_report_contract(
@@ -806,7 +721,7 @@ class ReportContractTests(unittest.TestCase):
         evidence = {
             "tradingDate": "20261103", "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-            "evidenceClass": "POST_MARKET_SNAPSHOT", "finalConfirmed": False,
+            "evidenceClass": "POST_MARKET_SNAPSHOT",
             "collectionGeneratedAt": generated,
         }
         contract = build_report_contract(
@@ -844,7 +759,7 @@ class ReportContractTests(unittest.TestCase):
         evidence = {
             "tradingDate": "20261103", "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
-            "evidenceClass": "INTRADAY_SESSION", "finalConfirmed": False,
+            "evidenceClass": "INTRADAY_SESSION",
             "collectionGeneratedAt": generated,
         }
         candidates = [

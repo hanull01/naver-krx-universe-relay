@@ -142,16 +142,6 @@ def render_current_observation(
             return path.relative_to(ROOT).as_posix()
         except ValueError:
             return path.name
-    baseline = display_contract.get("baseline") or {}
-    baseline_stale = (
-        baseline.get("freshnessStatus") == "BASELINE_STALE"
-        or display_contract.get("baselineFreshnessStatus") == "BASELINE_STALE"
-    )
-    final_pending = (
-        display_contract.get("status") != "AVAILABLE"
-        or observation_status != "VERIFIED"
-        or observation_evidence.get("finalConfirmed") is False
-    )
     manifest = {
         "schemaVersion": "current-observation-manifest-v1",
         "reportType": "current_observation",
@@ -172,8 +162,6 @@ def render_current_observation(
         "htmlSha256": sha256_file(html_path),
         "reportStatus": display_contract.get("status"),
         "currentObservationAllowed": True,
-        "finalPending": final_pending,
-        "baselineStale": baseline_stale,
     }
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

@@ -63,11 +63,7 @@ class KrxReportResolverTests(unittest.TestCase):
 
     def test_workflows_use_the_common_resolver_and_private_secret(self):
         root = Path(__file__).parent / ".github" / "workflows"
-        names = (
-            "refresh.yml",
-            "refresh-monitoring-daily.yml",
-            "refresh-research.yml",
-        )
+        names = ("refresh.yml", "refresh-research.yml")
         for name in names:
             text = (root / name).read_text(encoding="utf-8")
             self.assertIn("./.github/actions/resolve-krx-generation", text, name)
@@ -81,7 +77,7 @@ class KrxReportResolverTests(unittest.TestCase):
 
     def test_refresh_paths_allow_current_generation_resolution_without_inputs(self):
         root = Path(__file__).parent / ".github" / "workflows"
-        for name in ("refresh.yml", "refresh-research.yml", "refresh-monitoring-daily.yml"):
+        for name in ("refresh.yml", "refresh-research.yml"):
             text = (root / name).read_text(encoding="utf-8")
             self.assertIn("require-expected-date: false", text, name)
             self.assertIn("require-generation-id: false", text, name)

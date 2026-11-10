@@ -108,7 +108,6 @@ jobs:
           python -m py_compile \
             relay.py test_relay.py krx_market_day.py test_krx_market_day.py \
             tools/naver_full_market_current.py \
-            tools/daily_monitoring_baseline.py \
             tools/full_market_monitoring_evidence.py \
             tools/run_full_market_monitoring.py \
             tools/collect_trading_discovery_quotes.py \
@@ -121,8 +120,6 @@ jobs:
             test_naver_full_market_current.py \
             test_market_snapshot_projection.py \
             test_full_market_monitoring_evidence.py \
-            test_daily_monitoring_baseline.py \
-            test_monitoring_production.py \
             test_trading_discovery_quotes.py -v
 
       - name: Resolve approved KRX generation
@@ -294,7 +291,6 @@ jobs:
         shell: bash
         run: |
           set +e
-          target_date=$(TZ=Asia/Seoul date +%Y%m%d)
           last_published_at=$(python3 - <<'PY'
           import json
           from pathlib import Path
@@ -306,36 +302,7 @@ jobs:
           PY
           )
           echo "last_published_at=${last_published_at}" >> "$GITHUB_OUTPUT"
-          readiness=$(python3 - <<'PY'
-          import json, sys
-          from datetime import datetime
-          from pathlib import Path
-          from zoneinfo import ZoneInfo
-          sys.path.insert(0, "tools")
-          from run_full_market_monitoring import collection_readiness
-          try:
-              baseline = json.loads(Path("data/monitoring-baseline/latest.json").read_text(encoding="utf-8"))
-          except (OSError, ValueError, json.JSONDecodeError):
-              print("KRX_PRIMARY_NO_BASELINE")
-              raise SystemExit
-          now = datetime.now(ZoneInfo("Asia/Seoul"))
-          print(collection_readiness(baseline, now)[1])
-          PY
-          )
-          echo "baseline targetDate=${target_date} readiness=${readiness}"
-          if [ "$readiness" != "READY" ] && [ "$readiness" != "BASELINE_STALE" ] && [ "$readiness" != "KRX_PRIMARY_NO_BASELINE" ]; then
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "exit_code=0" >> "$GITHUB_OUTPUT"
-            echo "market_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
-            echo "failure_reason=${readiness}" >> "$GITHUB_OUTPUT"
-            echo "Full-market evidence skipped: ${readiness}; preserving prior evidence."
-            exit 0
-          fi
           echo "ready=true" >> "$GITHUB_OUTPUT"
-          if [ "$readiness" = "BASELINE_STALE" ]; then
-            echo "market_status=AVAILABLE_WITH_BASELINE_WARNING" >> "$GITHUB_OUTPUT"
-            echo "::warning::Baseline is stale; collecting a fresh snapshot and preserving the prior baseline until a validated update is published."
-          fi
           # The complete NAVER STOCK snapshot is runner-temporary only.  It is
           # collected once, structurally validated by the collector, then
           # reused by the intraday evidence path without another API call.
@@ -399,10 +366,10 @@ jobs:
           finished_at=$(python3 -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="microseconds"))')
           echo "collection_finished_at=${finished_at}" >> "$GITHUB_OUTPUT"
           if [ "$index_exit_code" -eq 0 ]; then
-            echo "final_date_evidence_status=INTRADAY_INDEX_SNAPSHOT" >> "$GITHUB_OUTPUT"
+            echo "trading_date_evidence_status=INTRADAY_INDEX_SNAPSHOT" >> "$GITHUB_OUTPUT"
             echo "target_date=$(TZ=Asia/Seoul date +%Y%m%d)" >> "$GITHUB_OUTPUT"
           else
-            echo "final_date_evidence_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
+            echo "trading_date_evidence_status=UNAVAILABLE" >> "$GITHUB_OUTPUT"
             echo "target_date=" >> "$GITHUB_OUTPUT"
           fi
 
@@ -600,8 +567,7 @@ jobs:
             data/group-states.json data/group-states-lite.json
 
           # Current-observation Markdown/HTML and their manifest are produced
-          # from the just-built report contract.  They are independent of the
-          # FINAL/Baseline gate and are therefore retained for intraday runs.
+          # from the just-built report contract.
           if [ "${{ steps.observation_report.outputs.status }}" = "SUCCESS" ]; then
             git add \
               "${{ steps.observation_report.outputs.markdown_path }}" \
@@ -658,7 +624,7 @@ jobs:
             echo "Evidence files are not eligible for publish; preserving prior evidence. Core 42-stock data remains publishable."
           fi
 
-          echo "Intraday refresh does not publish daily rolling history; preserving monitoring-daily files."
+          echo "Intraday refresh does not publish retired daily rolling history."
 
           if [ "${{ steps.discovery_quotes.outputs.exit_code }}" = "0" ]; then
             git add -- data/trading-discovery/quotes
@@ -749,7 +715,6 @@ jobs:
             echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Refresh NAVER market data"
-            # FINAL daily history is intentionally outside this intraday writer.
             if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
               echo "::error::Unexpected unstaged or untracked files remain before data synchronization; preserving production data."
               git status --short

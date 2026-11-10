@@ -42,7 +42,6 @@ USER_STATUS_LABELS = {
     "AVAILABLE_EMPTY": "확인 가능(대상 없음)",
     "UNAVAILABLE": "확인 불가",
     "VERIFIED": "검증됨",
-    "SOURCE_OBSERVED": "관측값",
     "DISCOVERED": "발견",
     "REMOVED": "제외",
     "MAINTAINED": "유지",
@@ -68,7 +67,6 @@ USER_STATUS_LABELS = {
     "RANK_DOWN": "순위 하락",
     "EXITED": "이탈",
     "COMPARISON_UNAVAILABLE": "비교 불가",
-    "BASELINE_STALE": "부분 자료",
     "OK": "확인 가능",
     "SUCCESS": "확인 가능",
 }
@@ -443,7 +441,7 @@ def _compact_normalized_date(value: Any) -> str | None:
 def _compact_row_available(row: Mapping[str, Any]) -> bool:
     values = (
         row.get("status"), row.get("dataStatus"), row.get("qualityStatus"),
-        row.get("dataQuality"), row.get("membershipStatus"),
+        row.get("membershipStatus"),
         row.get("sourceCommitStatus"), row.get("sourceProvenanceStatus"),
         row.get("eligibility"),
     )
@@ -452,10 +450,6 @@ def _compact_row_available(row: Mapping[str, Any]) -> bool:
         if value in (None, ""):
             continue
         normalized = str(value).upper()
-        # A stale baseline only removes derived persistence metrics. It does
-        # not invalidate a same-day NAVER relative-strength observation.
-        if normalized == "BASELINE_STALE":
-            continue
         if any(token in normalized for token in blocked):
             return False
     return True
@@ -689,14 +683,13 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
     status = _text(contract.get("status"), "PARTIAL")
     quality = _text(contract.get("sourceQualityStatus"), "확인 대기")
     reason = _text(rendering.get("reason"), quality if status != "AVAILABLE" else "확인된 계약 자료")
-    if "HTML_BLOCKED" in reason or reason in {"SOURCE_OBSERVED_PARTIAL_HTML_BLOCKED", "BASELINE_STALE_HTML_BLOCKED", "CONTRACT_UNAVAILABLE_HTML_BLOCKED"}:
+    if "HTML_BLOCKED" in reason or reason in {"CONTRACT_UNAVAILABLE_HTML_BLOCKED"}:
         reason = "부분 자료를 포함한 현재 관측"
     else:
         reason = {
             "PARTIAL_DATA_RETAINED": "부분 자료를 포함한 관측 보고서",
             "CONFIRMED_CONTRACT": "검증된 계약 자료",
             "TRADING_DATE_UNAVAILABLE": "거래일 자료 확인 대기",
-            "BASELINE_STALE": "부분 자료를 포함한 현재 관측",
         }.get(reason, "선택 자료 일부 확인 대기" if status != "AVAILABLE" else "확인된 계약 자료")
     relative_industries = _compact_relative_top5(contract, "industries")
     relative_themes = _compact_relative_top5(contract, "themes")
@@ -920,7 +913,7 @@ def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, .
     rows = model["kiwoom"].get("stocks") or []
     result = []
     for row in rows:
-        baseline = _first(row, "selectionPrice", "baselinePrice", "referencePrice", "selectedPrice")
+        selection_price = _first(row, "selectionPrice", "referencePrice", "selectedPrice")
         metrics = row.get("technicalMetrics") if isinstance(row.get("technicalMetrics"), Mapping) else {}
         technical = _candidate_technical_text(row)
         condition_value = row.get("conditionStatus")
@@ -930,7 +923,7 @@ def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, .
         next_check = _first(row, "nextCheck", "nextObservation", "nextAction") or "다음 관찰에서 확인"
         result.append((
             _text(row.get("itemName"), "이름 확인 대기"),
-            _price(baseline),
+            _price(selection_price),
             _price(_first(row, "price", "currentPrice")),
             technical,
             condition,

@@ -19,10 +19,9 @@ FULL_MARKET_QUALITY_PATH = ROOT / 'data/monitoring/latest-quality.json'
 SUBJECT_PREFIX = 'MARKET_DATA_READY'
 VERIFIED_TRADING_DATE_REASONS = {
     'VERIFIED_CANONICAL_SESSION',
-    'VERIFIED_MONITORING_DAILY_FINAL_SESSION',
+    'VERIFIED_NAVER_LOCAL_DATE_DIAGNOSTIC',
 }
 INTRADAY_TRADING_DATE_REASON = 'VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT'
-SOURCE_OBSERVED_TRADING_DATE_REASON = 'SOURCE_OBSERVED_MONITORING_DAILY_FINAL_DATE'
 
 class ReadyValidationError(ValueError):
     """The just-produced quote payload is not safe to signal downstream."""
@@ -44,16 +43,8 @@ def _validated_full_market_trading_date(full_market, quality, generated_at):
         return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_MISMATCH'
     reasons = {e.get('reason') for e in candidates}
     statuses = {e.get('status') for e in candidates}
-    if reasons == {SOURCE_OBSERVED_TRADING_DATE_REASON}:
-        if statuses != {'SOURCE_OBSERVED'} or any(
-                e.get('evidenceClass') != 'SOURCE_OBSERVED' for e in candidates
-        ):
-            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
-        if quality.get('generatedAt') != generated_at:
-            return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
-        return trading_date, 'SOURCE_OBSERVED', SOURCE_OBSERVED_TRADING_DATE_REASON
     if any(e.get('status') != 'VERIFIED' for e in candidates):
-        return None, 'UNAVAILABLE', reason
+        return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
     if INTRADAY_TRADING_DATE_REASON in reasons:
         if reasons != {INTRADAY_TRADING_DATE_REASON}:
             return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
@@ -62,8 +53,7 @@ def _validated_full_market_trading_date(full_market, quality, generated_at):
         for evidence in candidates:
             if evidence.get('collectionGeneratedAt') != generated_at:
                 return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_STALE'
-            if (evidence.get('evidenceClass') not in {'INTRADAY_SESSION', 'POST_MARKET_SNAPSHOT'}
-                    or evidence.get('finalConfirmed') is not False):
+            if evidence.get('evidenceClass') not in {'INTRADAY_SESSION', 'POST_MARKET_SNAPSHOT'}:
                 return None, 'UNAVAILABLE', 'TRADING_DATE_EVIDENCE_INVALID'
         return trading_date, 'VERIFIED', INTRADAY_TRADING_DATE_REASON
     if not reasons or not reasons.issubset(VERIFIED_TRADING_DATE_REASONS):
@@ -338,8 +328,6 @@ def ready_message(metadata, env):
         f'currentObservation.htmlSha256={observation.get("htmlSha256", "UNAVAILABLE")}',
         f'currentObservation.reportStatus={observation.get("reportStatus", "UNAVAILABLE")}',
         f'currentObservation.tradingDateStatus={observation.get("tradingDateStatus", "UNAVAILABLE")}',
-        f'currentObservation.finalPending={observation.get("finalPending", "UNAVAILABLE")}',
-        f'currentObservation.baselineStale={observation.get("baselineStale", "UNAVAILABLE")}',
         f'currentObservation.reason={observation.get("reason", "none")}',
     ])
     for key in ('liveCount', 'noAfterTradeCount'):

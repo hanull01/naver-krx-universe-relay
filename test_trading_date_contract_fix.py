@@ -35,7 +35,7 @@ class TradingDateContractFixTests(unittest.TestCase):
             "status": "VERIFIED",
             "reason": "VERIFIED_KRX_TRADING_DAY_AND_CURRENT_SNAPSHOT",
             "evidenceClass": "INTRADAY_SESSION",
-            "finalConfirmed": False,
+
             "collectionGeneratedAt": generated,
         }
         total = {"stockCount": 2771, "advancers": 1291, "decliners": 1270, "unchanged": 210}

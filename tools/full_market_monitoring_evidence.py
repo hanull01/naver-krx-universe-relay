@@ -15,23 +15,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import naver_full_market_current as current_collector
-import daily_monitoring_baseline as baseline_builder
 import trading_date_evidence
 try:
     from tools.history_adjustment_guard import (
-        DERIVED_METRIC_FIELDS, STATUS_UNVERIFIED, apply_to_feature,
+        STATUS_UNVERIFIED, apply_to_feature,
         derived_metrics_usable, detect,
     )
 except ModuleNotFoundError:  # direct tools/ script invocation
     from history_adjustment_guard import (
-        DERIVED_METRIC_FIELDS, STATUS_UNVERIFIED, apply_to_feature,
+        STATUS_UNVERIFIED, apply_to_feature,
         derived_metrics_usable, detect,
     )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 HISTORY_DIR = ROOT / "data/naver-history/canonical/daily"
-MONITORING_DAILY_DIR = ROOT / "data/monitoring-daily"
 MARKET_DIR = ROOT / "data/market"
 MONITORING_DIR = ROOT / "data/monitoring"
 THEME_MEMBERSHIP_FILE = ROOT / "data/research/theme-membership/latest.json"
@@ -73,64 +71,6 @@ def number(value):
 
 def pct(numerator, denominator):
     return round(numerator * 100 / denominator, 4) if denominator else None
-
-
-BASELINE_STALE = "BASELINE_STALE"
-
-
-def quarantine_stale_baseline_feature(feature, publication_context):
-    """Keep the independent quote while blocking stale-history derivatives."""
-    result = dict(feature)
-    if (publication_context or {}).get("baselineFreshnessStatus") != BASELINE_STALE:
-        return result
-    result.update({
-        "baselineFreshnessStatus": BASELINE_STALE,
-        "baselineAsOfDate": publication_context.get("baselineAsOfDate"),
-        "baselineExpectedPreviousTradingDate": publication_context.get("expectedPreviousTradingDate"),
-        "derivedMetricsUsable": False,
-        "derivedMetricsStatus": "UNAVAILABLE",
-        "derivedMetricsReason": BASELINE_STALE,
-    })
-    for key in DERIVED_METRIC_FIELDS:
-        result[key] = None
-    return result
-
-
-def quarantine_incomplete_baseline_feature(feature, stock, baseline_as_of_date):
-    """Block derived metrics when a per-symbol baseline bar is incomplete.
-
-    The baseline may be valid for the market as a whole while an individual
-    symbol has no bar for that date (or has an invalid OHLCV row).  In that
-    case the independent current quote remains usable, but a return based on
-    the prior available close must not be presented as a one-day return.
-    Missing legacy fields are intentionally treated as unknown so older test
-    fixtures and composition-change rows continue to fail open.
-    """
-    result = dict(feature)
-    stock = stock or {}
-    expected = str(baseline_as_of_date or "").replace("-", "")
-    observed = str(stock.get("lastTradingDate") or "").replace("-", "")
-    reasons = []
-    if expected and observed and expected != observed:
-        reasons.append("LATEST_VALID_BAR_DATE_MISMATCH")
-    validity_keys = ("closeValid", "ohlcValid", "volumeValid")
-    observed_validity = [key for key in validity_keys if key in stock]
-    if observed_validity and any(stock.get(key) is not True for key in observed_validity):
-        reasons.append("LATEST_BAR_INVALID")
-    if not reasons:
-        return result
-    result.update({
-        "baselineDailyBarStatus": "INCOMPLETE",
-        "baselineDailyBarReason": ",".join(reasons),
-        "baselineDailyBarDate": observed or None,
-        "baselineDailyBarExpectedDate": expected or None,
-        "derivedMetricsUsable": False,
-        "derivedMetricsStatus": "UNAVAILABLE",
-        "derivedMetricsReason": "BASELINE_DAILY_BAR_INCOMPLETE",
-    })
-    for key in DERIVED_METRIC_FIELDS:
-        result[key] = None
-    return result
 
 
 def mean(values):
@@ -318,13 +258,6 @@ def aggregate_industries(features, industries, membership, previous_good=None,
                          observation_date=None):
     by_code = {row["code"]: row for row in features}
     quality = industry_quality(industries, previous_good)
-    baseline_stale = any(row.get("baselineFreshnessStatus") == BASELINE_STALE for row in features)
-    if baseline_stale:
-        quality.update({
-            "baselineFreshnessStatus": BASELINE_STALE,
-            "derivedMetricsStatus": "UNAVAILABLE",
-            "derivedMetricsReason": BASELINE_STALE,
-        })
     source = {str(row.get("id")): row for row in industries.get("industries", [])}
     result = []
     market_returns = [item["ret_1d"] for item in features
@@ -348,11 +281,9 @@ def aggregate_industries(features, industries, membership, previous_good=None,
                     if isinstance(item.get("accumulatedTradingValue"), (int, float))]
         top_turnover = sorted(turnover, reverse=True)[:3]
         ma5_valid = [item for item in derived_valid if item.get("ma5") is not None and item.get("currentPrice") is not None]
-        # Group leaders are a current NAVER observation.  They must remain
-        # available when the KRX-derived baseline is stale; using
-        # ``derived_valid`` here incorrectly turned every group into an empty
-        # leader list.  Membership is already intersected with ``by_code``,
-        # so absent current-snapshot members are excluded.
+        # Group leaders are a current NAVER observation.  Membership is
+        # intersected with the current snapshot, so absent members are
+        # excluded without consulting historical state.
         expected_observation_date = str(observation_date or "").replace("-", "")
         current_leader_pool = [item for item in valid
                                if item.get("currentPrice") is not None
@@ -404,7 +335,7 @@ def aggregate_industries(features, industries, membership, previous_good=None,
             "advancers": sum((item["changeRate"] or 0) > 0 for item in valid),
             "decliners": sum((item["changeRate"] or 0) < 0 for item in valid), "avgReturn1D": mean(returns),
             "medianReturn1D": median(returns), "avgReturn5D": mean([
-                item["ret_5d"] for item in (derived_valid if baseline_stale else valid)
+                item["ret_5d"] for item in valid
                 if item["ret_5d"] is not None
             ]),
             "advancePct": pct(sum((item.get("changeRate") or 0) > 0 for item in valid), len(valid)),
@@ -442,7 +373,7 @@ def aggregate_industries(features, industries, membership, previous_good=None,
             "tradingValue": {
                 "total": sum(turnover) if turnover else None,
                 "availableCount": len(turnover),
-                "coveragePct": pct(len(turnover), len(derived_valid) if baseline_stale else len(valid)),
+                "coveragePct": pct(len(turnover), len(valid)),
                 "top3ConcentrationPct": (sum(top_turnover) * 100 / sum(turnover)) if turnover and sum(turnover) else None,
                 "comparisonStatus": "UNAVAILABLE_NO_HISTORY",
             },
@@ -456,13 +387,6 @@ def aggregate_industries(features, industries, membership, previous_good=None,
             "leaderMissingReason": leader_missing_reason,
             "industrySourcePresent": str(group.get("id")) in source,
         })
-        if baseline_stale:
-            result[-1].update({
-                "baselineFreshnessStatus": BASELINE_STALE,
-                "derivedMetricsStatus": "UNAVAILABLE",
-                "derivedMetricsReason": BASELINE_STALE,
-                "persistence": {"status": BASELINE_STALE, "availableTradingDays": 0},
-            })
     source_count = len(source)
     membership_count = len(membership.get("industries") or [])
     quality["aggregationUsableIndustryCount"] = len(result)
@@ -561,121 +485,13 @@ def signal_subset(features, required_codes=None):
 
 
 def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, membership=None,
-                   previous_summary=None, today=None, previous_good_industries=None, baseline=None,
-                   publication_context=None, theme_membership=None,
-                   monitoring_daily_dir=MONITORING_DAILY_DIR,
-                   allow_source_observed_final=False):
+                   previous_summary=None, today=None, previous_good_industries=None,
+                   publication_context=None, theme_membership=None):
     if current_snapshot.get("status") not in ("SUCCESS", "SUCCESS_WITH_WARNING", "COMPLETE_RECONCILIATION_PENDING"):
         raise ValueError("current snapshot is not publishable")
     today = today or KST_DATE()
-    source_observed_final = bool(
-        allow_source_observed_final
-        and baseline is not None
-        and baseline.get("historyStatus") == "SOURCE_OBSERVED"
-        and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
-    )
-    if baseline is not None:
-        source_observed_baseline = (
-            baseline.get("historyStatus") == "SOURCE_OBSERVED"
-            and baseline.get("sourceQualityStatus") == "SOURCE_OBSERVED"
-        )
-        if baseline.get("historyStatus") != "OK" and not source_observed_baseline:
-            raise ValueError("baseline history is not OK")
-        publication_context = publication_context or {}
-        as_of = str(baseline.get("asOfDate") or "")
-        overlay = today == as_of
-        if as_of and today < as_of:
-            raise ValueError("current date must be after baseline asOfDate")
-        allowed_overlay_statuses = {"VALID_CURRENT_DAY_FINAL"}
-        if source_observed_final:
-            allowed_overlay_statuses.update({
-                "VALID_CURRENT_DAY_SOURCE_OBSERVED",
-                "VALID_CURRENT_DAY_FINAL_SOURCE_OBSERVED",
-            })
-        if overlay and publication_context.get("baselineFreshnessStatus") not in allowed_overlay_statuses:
-            raise ValueError("same-day baseline requires validated final-session overlay")
-        by_code = {row["code"]: row for row in baseline.get("stocks", [])}
-        missing = [row["code"] for row in current_snapshot["stocks"] if row["code"] not in by_code]
-        # A complete NAVER snapshot is the authoritative active-set observation
-        # for this run.  A non-empty previous baseline may legitimately lack
-        # newly observed codes (listing, transfer, or composition changes), but
-        # an empty baseline or an incomplete snapshot must remain fatal.
-        universe = load_json(UNIVERSE_FILE, {}) or {}
-        lifecycle = (universe.get("metadata", {}) or {}).get("lifecycle", {}) or {}
-        lifecycle_new = {
-            str(event.get("code")): event for event in lifecycle.get("events", [])
-            if event.get("type") == "NEW_LISTING"
-            and str(event.get("effectiveDate", "")).replace("-", "") == str(today).replace("-", "")
-            and event.get("sourceVerified") is True
-        }
-        snapshot_status = current_snapshot.get("status")
-        collection_status = current_snapshot.get("collectionStatus", "SUCCESS")
-        missing_codes = [str(code) for code in current_snapshot.get("missingCodes", [])]
-        current_code_set = {str(row.get("code")) for row in current_snapshot.get("stocks", [])}
-        pending_quality_ok = (
-            snapshot_status != "COMPLETE_RECONCILIATION_PENDING"
-            or current_snapshot.get("qualityStatus") == "WARNING"
-        )
-        # missingCodes can describe a valid no-quote/suspended member when the
-        # collector completed the authoritative NAVER list.  Structural
-        # diagnostics remain hard gates, and the missing codes must belong to
-        # that current list; this does not permit page loss or corrupted data.
-        attempt_diagnostics = current_snapshot.get("attemptDiagnostics") or []
-        structurally_complete = (
-            current_snapshot.get("count", len(current_snapshot.get("stocks", [])))
-            == current_snapshot.get("expectedCount", len(current_snapshot.get("stocks", [])))
-            or (
-                snapshot_status == "COMPLETE_RECONCILIATION_PENDING"
-                and collection_status == "SUCCESS"
-                and current_snapshot.get("qualityStatus") == "WARNING"
-                and bool(attempt_diagnostics)
-                and attempt_diagnostics[-1].get("structurallyValid") is True
-            )
-        )
-        structural_ok = (
-            structurally_complete
-            and not current_snapshot.get("duplicateCodes")
-            and not current_snapshot.get("pageMissingCodes")
-            and not current_snapshot.get("structuralErrors")
-            and not current_snapshot.get("corruptCodes")
-            and all(code not in current_code_set for code in missing_codes)
-        )
-        composition_change = bool(
-            baseline.get("stocks")
-            and snapshot_status in {"SUCCESS", "COMPLETE_RECONCILIATION_PENDING"}
-            and collection_status == "SUCCESS"
-            and pending_quality_ok
-            and structural_ok
-        )
-        allowed_missing = [code for code in missing if code in lifecycle_new]
-        if composition_change:
-            allowed_missing = missing
-            publication_context.setdefault("baselineDiagnostics", {})[
-                "unverifiedCompositionChangeCodes"
-            ] = sorted(code for code in missing if code not in lifecycle_new)
-        unexpected_missing = [code for code in missing if code not in allowed_missing]
-        if unexpected_missing:
-            raise ValueError(f"baseline missing {len(unexpected_missing)} current codes: {unexpected_missing}")
-        if allowed_missing:
-            publication_context.setdefault("baselineDiagnostics", {})["newListingHistoryInsufficient"] = sorted(allowed_missing)
-        features = []
-        for row in current_snapshot["stocks"]:
-            stock = by_code.get(row["code"], {"code": row["code"], "name": row.get("name"),
-                                                "market": row.get("market"), "returnBases": {},
-                                                "rollingHighs": {}, "rollingHighCounts": {},
-                                                "volumeState20": {}, "previousMa20": None,
-                                                "previousMa60": None})
-            feature = baseline_builder.feature_row_from_baseline(
-                row, stock, today, overlay=overlay)
-            features.append(quarantine_incomplete_baseline_feature(
-                feature, stock, baseline.get("asOfDate")))
-    else:
-        features = [feature_row(row, read_history(row["code"], history_dir, today), today)
-                    for row in current_snapshot["stocks"]]
-    # A fresh quote may still be published when yesterday's baseline is stale,
-    # but no history-derived feature may be presented as a valid observation.
-    features = [quarantine_stale_baseline_feature(row, publication_context)
-                for row in features]
+    features = [feature_row(row, read_history(row["code"], history_dir, today), today)
+                for row in current_snapshot["stocks"]]
     history_codes = {path.stem for path in Path(history_dir).glob("*.jsonl")}
     current_codes = {row["code"] for row in current_snapshot["stocks"]}
     theme_membership = theme_membership or {"status": "UNUSABLE", "themes": []}
@@ -700,51 +516,8 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate"),
         current_snapshot=current_snapshot
     )
-    # Canonical history remains the primary contract.  When it is not yet
-    # available, reuse the existing rolling FINAL state only as a separately
-    # named source after validating its exact date and complete current set.
-    current_codes = {str(row.get("code")) for row in current_snapshot.get("stocks", []) if row.get("code")}
-    canonical_fully_absent = bool(current_codes) and all(
-        not (Path(history_dir) / (code + ".jsonl")).is_file() for code in current_codes
-    )
-    if trading_date_result.get("tradingDate") is None and source_observed_final:
-        source_codes = [row.get("code") for row in (baseline or {}).get("stocks", [])]
-        source_by_market = {}
-        for row in (baseline or {}).get("stocks", []):
-            source_by_market.setdefault(str(row.get("market") or ""), []).append(row.get("code"))
-        source_result = trading_date_evidence.verify_source_observed_monitoring_daily_final(
-            monitoring_daily_dir, source_codes, session_date=(baseline or {}).get("asOfDate"),
-            expected_by_market=source_by_market,
-        )
-        if source_result.get("tradingDate") is not None:
-            trading_date_result = source_result
-        else:
-            trading_date_result = {**trading_date_result, "sourceObservedEvidence": source_result}
-    if trading_date_result.get("tradingDate") is None and canonical_fully_absent:
-        final_result = trading_date_evidence.verify_monitoring_daily_final(
-            monitoring_daily_dir,
-            [row.get("code") for row in current_snapshot.get("stocks", [])],
-            session_date=current_snapshot.get("tradingDate") or current_snapshot.get("tradeDate"),
-            current_snapshot=current_snapshot,
-        )
-        if final_result.get("tradingDate") is not None:
-            trading_date_result = final_result
-        else:
-            trading_date_result = {
-                **trading_date_result,
-                "secondaryEvidence": final_result,
-            }
-    if trading_date_result.get("tradingDate") is None:
-        local_date_result = trading_date_evidence.verify_local_date_diagnostic(
-            Path(monitoring_daily_dir) / "trading-session-diagnostic.json",
-            current_codes,
-            expected_date=today,
-        )
-        if local_date_result.get("tradingDate") is not None:
-            trading_date_result = local_date_result
-        else:
-            trading_date_result = {**trading_date_result,
-                                   "localDateDiagnostic": local_date_result}
+    # If canonical evidence is unavailable, the report remains unavailable;
+    # no retired rolling state or local diagnostic is consulted.
     if trading_date_result.get("tradingDate") is None:
         intraday_result = publication_context.get("intradayTradingDateEvidence") or {}
         if intraday_result.get("status") == "VERIFIED":
@@ -761,7 +534,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
     }
     full_market = {"scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                    "markets": breadth_data, "qualityStatus": current_snapshot.get("qualityStatus", collection_quality),
-                   "sourceQualityStatus": (baseline or {}).get("sourceQualityStatus") if source_observed_final else None,
+                   "sourceQualityStatus": None,
                    "expectedCount": current_snapshot.get("expectedCount"),
                    "coverageCount": current_snapshot.get("coverageCount"),
                    "missingCodes": current_snapshot.get("missingCodes", []),
@@ -815,7 +588,7 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         elif missing:
             evidence_reason = "MISSING_CONFIRMED_DAILY_FEATURE"
         else:
-            evidence_reason = "CONFIRMED_DAILY_BASELINE"
+            evidence_reason = "CONFIRMED_HISTORICAL_FEATURE"
         row["technicalEvidence"] = {
             "status": "AVAILABLE" if confirmed and not missing else "UNAVAILABLE",
             "reason": evidence_reason,
@@ -827,10 +600,6 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
             "ma5": item.get("ma5"), "ma20": item.get("ma20"), "ma60": item.get("ma60"),
         }
         leader_rows.append(row)
-    baseline_count = baseline.get("count") if baseline else None
-    baseline_authoritative = baseline.get("authoritativeCount") if baseline else None
-    baseline_coverage = baseline.get("coveragePct") if baseline else None
-    baseline_history_status = baseline.get("historyStatus") if baseline else None
     canonical_coverage = pct(len(current_codes & history_codes), current_snapshot["expectedCount"])
     tracked_codes = []
     discovery = load_json(ROOT / "data/trading-discovery/latest.json", {}) or {}
@@ -895,15 +664,11 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
                                 "scope": "AUTHORITATIVE_FULL_MARKET", "authoritativeCount": current_snapshot["expectedCount"],
                                 "tradingDate": trading_date_result.get("tradingDate"), "tradingDateEvidence": trading_date_result,
                                 "currentCount": len(current_codes), "currentCoveragePct": pct(len(current_codes), current_snapshot["expectedCount"]),
-                                # Deprecated compatibility alias: this is the
-                                # canonical file diagnostic, never baseline coverage.
+                                # Compatibility alias for the canonical history
+                                # file diagnostic; it is not a publication gate.
                                 "historyCoveragePct": canonical_coverage,
                                 "historyCoverageSource": "CANONICAL_HISTORY_FILES_DEPRECATED_ALIAS",
-                                "productionBaselineCoveragePct": baseline_coverage,
-                                "productionBaselineCount": baseline_count,
-                                "productionBaselineAuthoritativeCount": baseline_authoritative,
-                                "productionBaselineHistoryStatus": baseline_history_status,
-                                "sourceQualityStatus": (baseline or {}).get("sourceQualityStatus") if source_observed_final else None,
+                                "sourceQualityStatus": None,
                                 "canonicalHistoryFileCoveragePct": canonical_coverage,
                                 "duplicateCodes": current_snapshot.get("duplicateCodes", []), "missingCurrentCodes": current_snapshot.get("missingCodes", []),
                                 "missingHistoryCodes": sorted(current_codes - history_codes),
@@ -925,12 +690,6 @@ def build_evidence(current_snapshot, history_dir=HISTORY_DIR, industries=None, m
         "latest-summary.json": summary,
     }
     evidence["latest-quality.json"].update(publication_context)
-    if publication_context.get("baselineFreshnessStatus") == BASELINE_STALE:
-        evidence["latest-quality.json"].update({
-            "expectedPreviousTradingDate": publication_context.get("expectedPreviousTradingDate"),
-            "derivedMetricsStatus": "UNAVAILABLE",
-            "derivedMetricsReason": BASELINE_STALE,
-        })
     return evidence, features
 
 
@@ -942,7 +701,6 @@ def build_theme_signals(generated_at, features, theme_membership):
         return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "UNAVAILABLE",
                 "sourceStatus": theme_membership.get("status", "UNUSABLE"), "themes": []}
     output = []
-    baseline_stale = any(row.get("baselineFreshnessStatus") == BASELINE_STALE for row in features)
     market_change_rates = [row.get("changeRate") for row in features
                            if row.get("close_valid") and row.get("changeRate") is not None]
     market_change_average = mean(market_change_rates)
@@ -1000,24 +758,11 @@ def build_theme_signals(generated_at, features, theme_membership):
             },
             "persistence": {"status": "UNAVAILABLE_NO_GROUP_HISTORY", "availableTradingDays": 1},
         }
-        if baseline_stale:
-            theme_metrics.update({
-                "baselineFreshnessStatus": BASELINE_STALE,
-                "derivedMetricsStatus": "UNAVAILABLE",
-                "derivedMetricsReason": BASELINE_STALE,
-                "persistence": {"status": BASELINE_STALE, "availableTradingDays": 0},
-            })
         theme_row = {"id": str(theme.get("id")), "name": theme.get("name"),
                      "membershipStatus": theme.get("status"), "memberCount": len(unique_codes),
                      "featureCount": len(stocks), "coveragePct": round(len(stocks) * 100 / len(unique_codes), 4) if unique_codes else None,
                      "missingCodes": [code for code in unique_codes if code not in rows_by_code],
                      "metrics": theme_metrics, "stocks": stocks}
-        if baseline_stale:
-            theme_row.update({
-                "baselineFreshnessStatus": BASELINE_STALE,
-                "derivedMetricsStatus": "UNAVAILABLE",
-                "derivedMetricsReason": BASELINE_STALE,
-            })
         output.append(theme_row)
     return {"generatedAt": generated_at, "scope": "VERIFIED_THEME_MEMBERS", "status": "OK",
             "sourceStatus": theme_membership.get("status"), "themeCount": len(output), "themes": output}
@@ -1037,8 +782,6 @@ def main():
     parser.add_argument("--output-dir", default=str(MONITORING_DIR))
     parser.add_argument("--no-write", action="store_true")
     parser.add_argument("--current-file")
-    parser.add_argument("--history-mode", choices=("canonical", "baseline"), default="canonical")
-    parser.add_argument("--baseline-file", default=str(ROOT / "data/monitoring-baseline/latest.json"))
     args = parser.parse_args()
     current = load_json(args.current_file) if args.current_file else current_collector.collect_snapshot(UNIVERSE_FILE)
     industries = load_json(MARKET_DIR / "industries.json", {"status": "UNUSABLE", "industries": []})
@@ -1047,10 +790,9 @@ def main():
     previous_good_industries = load_json(MARKET_DIR / "industries-latest-ok.json")
     previous = load_json(Path(args.output_dir) / "latest-summary.json") or {}
     previous["previousLeaders"] = (load_json(Path(args.output_dir) / "latest-leaders.json") or {}).get("fullMarketLeaders", [])
-    baseline = load_json(args.baseline_file) if args.history_mode == "baseline" else None
     evidence, _ = build_evidence(
         current, HISTORY_DIR, industries, membership, previous,
-        previous_good_industries=previous_good_industries, baseline=baseline,
+        previous_good_industries=previous_good_industries,
         theme_membership=theme_membership,
     )
     sizes = write_evidence(evidence, args.output_dir) if not args.no_write else {name: len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) for name, payload in evidence.items()}

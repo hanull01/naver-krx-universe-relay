@@ -90,12 +90,6 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
         v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
-        quality_path = root / "data/monitoring/latest-quality.json"
-        quality = json.loads(quality_path.read_text()) if quality_path.is_file() else {}
-        baseline_status = quality.get("baselineFreshnessStatus")
-        if baseline_status:
-            ind["baselineFreshnessStatus"] = baseline_status
-            theme["baselineFreshnessStatus"] = baseline_status
         trading_date = trading_date or _infer_trading_date(ind, theme)
         history_context = _history_context(root, trading_date)
         ind = _enrich_persistence(ind, "industries", history_context)
@@ -116,8 +110,6 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
             "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
         }
         result["inputEvidence"]["sourceProvenance"] = build_source_provenance(root, result=result)
-        if baseline_status == "BASELINE_STALE":
-            result["inputEvidence"]["baselineFreshnessStatus"] = baseline_status
         result["summary"] = summarize(result)
         (root / "data/dynamic-universe/v2-shadow-latest.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2) + "\n")
