@@ -37,6 +37,12 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["historicalTechnicalMarket"]["targetDate"], "20261106")
         self.assertEqual(contract["historicalTechnicalMarket"]["generationId"], "gen_20261106_1794185533300691000")
         self.assertEqual(contract["historicalTechnicalMarket"]["metrics"]["aboveMA20"]["count"], 744)
+        self.assertEqual(contract["sourceBindings"]["markdownReport"], "data/reports/latest.md")
+        self.assertEqual(
+            contract["sourceBindings"]["markdownReportWriter"],
+            "tools/market_dashboard_renderer.py#render_contract_views",
+        )
+        self.assertEqual(contract["sourceBindings"]["htmlReport"], "data/reports/latest.html")
 
     def test_market_trading_value_is_not_a_required_render_field(self):
         self.assertNotIn(
