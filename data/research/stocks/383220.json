@@ -2,34 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "383220",
   "itemName": "F&F",
-  "reportCount": 18,
-  "latestReportNid": "96864",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 21,
+  "latestReportNid": "98018",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "96864",
-    "writeDate": "2026-10-20",
-    "brokerName": "SK증권",
-    "title": "중국 실적 눈높이 하향",
-    "goalPrice": 94000,
+    "nid": "98018",
+    "writeDate": "2026-11-11",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Review : 새로운 활력이 필요해",
+    "goalPrice": 95000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 2
+        "positive": 7,
+        "negative": 7
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 1,
+        "원가": 1,
         "자동차": 1,
         "재고": 1,
-        "중국": 1,
-        "환율": 1
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "98018",
+    "97992",
+    "97980",
     "96864",
     "95014",
     "94968",

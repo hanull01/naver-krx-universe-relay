@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "018260",
   "itemName": "삼성에스디에스",
-  "reportCount": 29,
-  "latestReportNid": "97373",
-  "latestWriteDate": "2026-10-30",
+  "reportCount": 30,
+  "latestReportNid": "97999",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "97373",
-    "writeDate": "2026-10-30",
-    "brokerName": "하나증권",
-    "title": "AX와 RX, 클라우드 수혜 기대",
-    "goalPrice": 240000,
+    "nid": "97999",
+    "writeDate": "2026-11-11",
+    "brokerName": "대신증권",
+    "title": "물 들어오는 AI 전환, 노 젓는 속도를 지켜봐",
+    "goalPrice": 320000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 0
+        "positive": 4,
+        "negative": 3
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "AI": 4,
+        "금리": 1
+      }
     }
   },
   "reportNids": [
+    "97999",
     "97373",
     "97372",
     "97352",

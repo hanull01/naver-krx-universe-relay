@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "071320",
   "itemName": "지역난방공사",
-  "reportCount": 5,
-  "latestReportNid": "95427",
-  "latestWriteDate": "2026-08-11",
+  "reportCount": 8,
+  "latestReportNid": "98006",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "95427",
-    "writeDate": "2026-08-11",
+    "nid": "98006",
+    "writeDate": "2026-11-11",
     "brokerName": "하나증권",
-    "title": "만약 연간 감익이 아니라면",
-    "goalPrice": 140000,
+    "title": "전력판매 감소와 SMP 하락의 이중고",
+    "goalPrice": 110000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 2
+        "positive": 3,
+        "negative": 4
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNCHANGED",
+      "earningsNegativeSignalCount": 2,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "가격": 2
+        "가격": 1
       }
     }
   },
   "reportNids": [
+    "98006",
+    "97978",
+    "97977",
     "95427",
     "95412",
     "95404",

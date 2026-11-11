@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "000100",
   "itemName": "유한양행",
-  "reportCount": 12,
-  "latestReportNid": "97260",
-  "latestWriteDate": "2026-10-29",
+  "reportCount": 13,
+  "latestReportNid": "97974",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "97260",
-    "writeDate": "2026-10-29",
-    "brokerName": "미래에셋증권",
-    "title": "레이저티닙 로열티 성장 더디나, 기술이전 기대",
-    "goalPrice": 130000,
+    "nid": "97974",
+    "writeDate": "2026-11-11",
+    "brokerName": "iM증권",
+    "title": "기다림은 유한하다",
+    "goalPrice": 120000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 6
+        "positive": 12,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 3,
       "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 3,
-        "자동차": 2
+        "중국": 2,
+        "미국": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "97974",
     "97260",
     "97190",
     "96784",

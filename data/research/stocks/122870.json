@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "122870",
   "itemName": "와이지엔터테인먼트",
-  "reportCount": 33,
-  "latestReportNid": "97947",
-  "latestWriteDate": "2026-11-10",
+  "reportCount": 34,
+  "latestReportNid": "97975",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "97947",
-    "writeDate": "2026-11-10",
-    "brokerName": "하나증권",
-    "title": "내년 상반기에 향후 3년이 결정된다",
-    "goalPrice": 63000,
+    "nid": "97975",
+    "writeDate": "2026-11-11",
+    "brokerName": "iM증권",
+    "title": "기존 IP에 신인 모멘텀을 더할 때",
+    "goalPrice": 60000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 13,
+        "negative": 2
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "원가": 2,
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "97975",
     "97947",
     "97940",
     "97939",

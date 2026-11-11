@@ -2,31 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "086900",
   "itemName": "메디톡스",
-  "reportCount": 1,
-  "latestReportNid": "95780",
-  "latestWriteDate": "2026-08-20",
+  "reportCount": 3,
+  "latestReportNid": "97976",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "95780",
-    "writeDate": "2026-08-20",
-    "brokerName": "키움증권",
-    "title": "긍정의 사고, 매출액 방어 성공, 마진은 아쉽다",
-    "goalPrice": 70000,
-    "normalizedOpinion": "MARKETPERFORM",
+    "nid": "97976",
+    "writeDate": "2026-11-11",
+    "brokerName": "유진투자증권",
+    "title": "3Q26 Review: 체질 개선 중",
+    "goalPrice": 100000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 17,
+        "negative": 10
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 12,
+      "earningsNegativeSignalCount": 5,
+      "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
-        "수요": 1
+        "원가": 8,
+        "자동차": 2,
+        "중국": 2,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "97976",
+    "97968",
     "95780"
   ]
 }

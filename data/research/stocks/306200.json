@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "306200",
   "itemName": "세아제강",
-  "reportCount": 10,
-  "latestReportNid": "97819",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 11,
+  "latestReportNid": "98023",
+  "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "97819",
-    "writeDate": "2026-11-06",
-    "brokerName": "하나증권",
-    "title": "3분기는 부진했지만 수출 중심으로 회복될 것",
-    "goalPrice": 200000,
+    "nid": "98023",
+    "writeDate": "2026-11-11",
+    "brokerName": "한화투자증권",
+    "title": "3분기는 환율과 원가 시차로 컨센서스 하회, 4분기 회복 전망",
+    "goalPrice": 174000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 2,
-        "negative": 8
+        "negative": 3
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 6,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 4,
+        "환율": 6,
+        "가격": 4,
+        "원가": 2,
         "미국": 1,
-        "원가": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98023",
     "97819",
     "97649",
     "97012",
