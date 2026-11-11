@@ -2,32 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "009240",
   "itemName": "한샘",
-  "reportCount": 6,
-  "latestReportNid": "98000",
+  "reportCount": 7,
+  "latestReportNid": "98029",
   "latestWriteDate": "2026-11-11",
   "latest": {
-    "nid": "98000",
+    "nid": "98029",
     "writeDate": "2026-11-11",
-    "brokerName": "미래에셋증권",
-    "title": "일회성 비용 등으로 부진했던 실적",
-    "goalPrice": 51000,
-    "normalizedOpinion": "BUY",
+    "brokerName": "신한투자증권",
+    "title": "업황 부진을 못 벗어나는 중",
+    "goalPrice": 40000,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 6
+        "positive": 3,
+        "negative": 2
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 5,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1,
-        "자동차": 1
+        "금리": 1,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "98029",
     "98000",
     "95670",
     "95480",
