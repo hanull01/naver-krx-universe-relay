@@ -102,7 +102,10 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
             fetcher=lambda _codes: (_ for _ in ()).throw(OSError("offline")),
             normalizer=lambda row, _now: row,
             clock=lambda: datetime(2026, 10, 12, 10, 1, tzinfo=KST))
-        self.assertEqual(failed["status"], "UNAVAILABLE")
+        self.assertEqual(failed["status"], "PARTIAL")
+        self.assertEqual(failed["quoteCount"], 0)
+        self.assertEqual(failed["requestedCount"], 1)
+        self.assertEqual(failed["candidateStatuses"][0]["failureReason"], "OSError")
 
     def test_six_of_six_quote_fixture_is_available(self):
         symbols = ["053800", "064400", "128940", "180640", "251340", "252670"]
@@ -210,7 +213,7 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
             d = root / "discovery.json"; d.write_text(json.dumps(discovery(["0197X0"])))
             q = root / "quotes.json"; q.write_text(json.dumps(quotes_payload([])))
             s = root / "signals.json"; s.write_text("{}")
-            with self.assertRaisesRegex(td.DiscoveryError, "COLLECTION_UNAVAILABLE"):
+            with self.assertRaisesRegex(td.DiscoveryError, "LATEST_QUOTE_ARTIFACT_INVALID"):
                 collector.collect(d, q, s, output,
                                   fetcher=lambda _: (_ for _ in ()).throw(OSError("offline")),
                                   normalizer=lambda row, _now: row)

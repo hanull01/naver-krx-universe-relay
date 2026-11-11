@@ -23,25 +23,37 @@ def collect(discovery_path, quotes_path, signals_path, output_dir, *,
     except (OSError, ValueError, AttributeError):
         raise td.DiscoveryError("DISCOVERY_NOT_AVAILABLE")
     discovery = td.discovery_status(monitoring_date, discovery_path)
-    signals = td.load_json(signals_path) if Path(signals_path).exists() else {}
-    latest = output_dir / "latest.json"
-    if latest.exists():
+    dated = output_dir / f"{monitoring_date}.json"
+    if dated.exists():
         try:
-            existing = td.validate_supplemental_quotes(
-                td.load_json(latest), discovery, market_source_time)
-            return {"result": "NOOP", "networkCalls": 0, **existing}
-        except (OSError, ValueError, td.DiscoveryError):
-            pass
+            existing = td.load_json(dated)
+        except (OSError, ValueError):
+            existing = None
+        existing_hash = existing.get("sourceHash", existing.get("candidateSourceSha256")) if isinstance(existing, dict) else None
+        if (isinstance(existing, dict)
+                and existing_hash == discovery.get("sourceSha256")
+                and existing.get("marketSourceTime") == market_source_time):
+            return {"result": "NOOP", "publicationResult": "IDEMPOTENT",
+                    "networkCalls": 0, "status": existing.get("status"),
+                    "dated": str(dated), "latest": str(output_dir / "latest.json")}
+    if fetcher is None or normalizer is None:
+        # The workflow's normal path uses the existing NAVER quote client.
+        # Tests and dry-runs inject both functions, so they never make a live
+        # request accidentally.
+        import relay
+        fetcher = fetcher or (lambda codes: relay.fetch(relay.QUOTE_URL + ",".join(codes)))
+        normalizer = normalizer or relay.normalize_quote
+    signals = td.load_json(signals_path) if Path(signals_path).exists() else {}
     payload = td.build_supplemental_quotes(
         discovery, quotes, signals, fetcher=fetcher, normalizer=normalizer, clock=clock)
     network_calls = payload.pop("networkCalls")
-    if payload["status"] == "UNAVAILABLE":
-        raise td.DiscoveryError("SUPPLEMENTAL_COLLECTION_UNAVAILABLE")
-    dated = output_dir / f"{payload['monitoringDate']}.json"
-    td.atomic_json(dated, payload)
-    td.atomic_json(latest, payload)
-    return {"result": "PUBLISHED", "networkCalls": network_calls,
-            "dated": str(dated), "latest": str(latest), **payload}
+    publication = td.publish_supplemental_quote_artifact(
+        payload, discovery, output_dir
+    )
+    legacy_result = "NOOP" if publication.get("result") in {"IDEMPOTENT", "PROTECTED_IDENTITY_CONFLICT"} else "PUBLISHED"
+    return {**publication, **payload, "result": legacy_result,
+            "publicationResult": publication.get("result"),
+            "networkCalls": network_calls}
 
 
 def main():

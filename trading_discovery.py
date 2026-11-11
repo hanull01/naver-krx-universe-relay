@@ -13,7 +13,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from urllib.parse import quote
 
@@ -22,6 +22,10 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parent
 DISCOVERY_DIR = ROOT / "data" / "trading-discovery"
 DISCOVERY_QUOTES_DIR = DISCOVERY_DIR / "quotes"
+KIS_OFFICIAL_SNAPSHOT_ROOT = Path(os.getenv(
+    "KIS_CANDIDATE_SNAPSHOT_ROOT",
+    "/Users/hanull/MigrationFrozen_20261107/KIS_Trading/data/candidate-snapshots",
+))
 SYMBOL = re.compile(r"(?=.*\d)[0-9A-Z]{6}")
 SNAPSHOT_KEYS = {
     "schema_version", "status", "selection_date", "monitoring_date", "source",
@@ -61,6 +65,60 @@ class DiscoveryError(ValueError):
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def official_snapshot_path(monitoring_date, root=None):
+    """Return the exact immutable KIS snapshot path for one report date.
+
+    The resolver intentionally constructs a dated filename.  It never scans
+    the directory or falls back to ``latest.json``/another date.
+    """
+    try:
+        normalized = date.fromisoformat(str(monitoring_date)).isoformat()
+    except (TypeError, ValueError) as exc:
+        raise DiscoveryError("SNAPSHOT_MONITORING_DATE_INVALID") from exc
+    root_path = Path(root) if root is not None else KIS_OFFICIAL_SNAPSHOT_ROOT
+    return root_path / f"{normalized}.json"
+
+def load_official_snapshot(path, *, expected_monitoring_date=None,
+                           calendar_path=None):
+    """Read and validate one official KIS snapshot without modifying it."""
+    path = Path(path)
+    if path.name == "latest.json" or not re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", path.name):
+        raise DiscoveryError("SNAPSHOT_NON_IMMUTABLE_PATH")
+    try:
+        path_date = date.fromisoformat(path.stem).isoformat()
+    except ValueError as exc:
+        raise DiscoveryError("SNAPSHOT_MONITORING_DATE_INVALID") from exc
+    if expected_monitoring_date is not None:
+        try:
+            expected = date.fromisoformat(str(expected_monitoring_date)).isoformat()
+        except (TypeError, ValueError) as exc:
+            raise DiscoveryError("SNAPSHOT_MONITORING_DATE_INVALID") from exc
+        if path_date != expected:
+            raise DiscoveryError("SNAPSHOT_PATH_DATE_MISMATCH")
+    try:
+        snapshot = load_json(path)
+    except FileNotFoundError as exc:
+        raise DiscoveryError("SNAPSHOT_MISSING") from exc
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise DiscoveryError("SNAPSHOT_UNREADABLE") from exc
+    validate_snapshot(snapshot, calendar_path)
+    if snapshot.get("monitoring_date") != path_date:
+        raise DiscoveryError("SNAPSHOT_PATH_DATE_MISMATCH")
+    if expected_monitoring_date is not None and snapshot.get("monitoring_date") != expected:
+        raise DiscoveryError("SNAPSHOT_MONITORING_DATE_MISMATCH")
+    return snapshot
+
+
+def load_official_snapshot_for_date(monitoring_date, *, root=None,
+                                    calendar_path=None):
+    """Load exactly ``root/YYYY-MM-DD.json``; no prior-date fallback."""
+    path = official_snapshot_path(monitoring_date, root=root)
+    return load_official_snapshot(
+        path, expected_monitoring_date=monitoring_date,
+        calendar_path=calendar_path,
+    )
 
 
 def source_hash(payload):
@@ -370,6 +428,116 @@ def publish_snapshot(snapshot_path, output_dir=DISCOVERY_DIR, calendar_path=None
     }
 
 
+def publish_supplemental_quote_artifact(payload, discovery, output_dir=DISCOVERY_QUOTES_DIR):
+    """Write a date-bound quote artifact without unsafe identity replacement."""
+    validate_supplemental_quotes(payload, discovery, payload.get("marketSourceTime"))
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    dated = output_dir / f"{payload['monitoringDate']}.json"
+    latest = output_dir / "latest.json"
+    identity = (payload.get("monitoringDate"), payload.get("sourceHash"))
+
+    def read_existing(path, label):
+        if not path.exists():
+            return None
+        try:
+            existing = load_json(path)
+            legacy_keys = SUPPLEMENTAL_KEYS - {"sourceHash", "paper_only"}
+            if (not isinstance(existing, dict)
+                    or not legacy_keys.issubset(existing)
+                    or existing.get("schemaVersion") != 1
+                    or existing.get("source") != "NAVER_KRX"
+                    or existing.get("sourceHash", existing.get("candidateSourceSha256"))
+                    != existing.get("candidateSourceSha256")):
+                raise DiscoveryError("SUPPLEMENTAL_SCHEMA_INVALID")
+            return existing
+        except (OSError, ValueError, json.JSONDecodeError, DiscoveryError) as exc:
+            raise DiscoveryError(f"{label}_INVALID") from exc
+
+    existing_dated = read_existing(dated, "DATED_QUOTE_ARTIFACT")
+    if existing_dated is not None:
+        if (existing_dated.get("monitoringDate"),
+                existing_dated.get("sourceHash", existing_dated.get("candidateSourceSha256"))) != identity:
+            return {
+                "status": "PROTECTED_EXISTING", "result": "REJECTED_IDENTITY_CONFLICT",
+                "dated": str(dated), "latest": str(latest), "latestResult": "UNCHANGED",
+            }
+        dated_result = "IDEMPOTENT" if existing_dated == payload else "UPDATED"
+    else:
+        dated_result = "CREATED"
+    if dated_result != "IDEMPOTENT":
+        atomic_json(dated, payload)
+
+    existing_latest = read_existing(latest, "LATEST_QUOTE_ARTIFACT")
+    latest_result = "UNCHANGED"
+    if existing_latest is None and not latest.exists():
+        atomic_json(latest, payload)
+        latest_result = "CREATED"
+    elif existing_latest is not None:
+        latest_identity = (
+            existing_latest.get("monitoringDate"),
+            existing_latest.get("sourceHash", existing_latest.get("candidateSourceSha256")),
+        )
+        if latest_identity == identity:
+            latest_result = "IDEMPOTENT" if existing_latest == payload else "UPDATED"
+            if latest_result == "UPDATED":
+                atomic_json(latest, payload)
+        else:
+            # A different date/source hash is never silently promoted to the
+            # latest pointer.  The dated result remains available for the
+            # exact report date and the previous pointer is preserved.
+            latest_result = "PROTECTED_IDENTITY_CONFLICT"
+    return {
+        "status": payload["status"], "result": dated_result,
+        "latestResult": latest_result, "dated": str(dated), "latest": str(latest),
+    }
+
+
+def prepare_official_candidate_delivery(snapshot_path, quotes, calendar_path, *,
+                                        expected_monitoring_date=None,
+                                        fetcher=None, normalizer=None, clock=None):
+    """Build validated relay and quote payloads from one KIS snapshot."""
+    snapshot = load_official_snapshot(
+        snapshot_path,
+        expected_monitoring_date=expected_monitoring_date,
+        calendar_path=calendar_path,
+    )
+    discovery = published_payload(snapshot, calendar_path)
+    quote_payload = build_supplemental_quotes(
+        discovery, quotes, {}, fetcher=fetcher, normalizer=normalizer, clock=clock,
+    )
+    validate_supplemental_quotes(
+        quote_payload, discovery, quote_payload.get("marketSourceTime")
+    )
+    return {"snapshot": snapshot, "discovery": discovery, "quotes": quote_payload}
+
+
+def consume_official_snapshot(snapshot_path, quotes, calendar_path, *,
+                              discovery_output_dir=DISCOVERY_DIR,
+                              quote_output_dir=DISCOVERY_QUOTES_DIR,
+                              expected_monitoring_date=None,
+                              fetcher=None, normalizer=None, clock=None):
+    """Consume one official KIS snapshot and publish only same-lineage files."""
+    prepared = prepare_official_candidate_delivery(
+        snapshot_path, quotes, calendar_path,
+        expected_monitoring_date=expected_monitoring_date,
+        fetcher=fetcher, normalizer=normalizer, clock=clock,
+    )
+    candidate_result = publish_snapshot(
+        snapshot_path, discovery_output_dir, calendar_path,
+    )
+    quote_result = publish_supplemental_quote_artifact(
+        prepared["quotes"], prepared["discovery"], quote_output_dir,
+    )
+    return {
+        "status": prepared["quotes"]["status"],
+        "monitoringDate": prepared["discovery"]["monitoringDate"],
+        "sourceHash": prepared["discovery"]["sourceSha256"],
+        "candidate": candidate_result,
+        "quotes": quote_result,
+    }
+
+
 def discovery_status(as_of, path=None):
     # The report date is authoritative for production reads.  In particular,
     # do not let a later ``latest.json`` (for the next monitoring session)
@@ -534,6 +702,8 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             candidate_copy["quoteRequestTime"] = quote_status.get("quoteRequestTime")
             candidate_copy["quoteStatus"] = quote_status.get("quoteStatus")
             candidate_copy["quoteGeneratedAt"] = quote_status.get("generatedAt")
+            candidate_copy["sourceHash"] = quote_status.get("sourceHash") or discovery.get("sourceSha256")
+            candidate_copy["paper_only"] = quote_status.get("paper_only", True)
             if quote_status.get("failureReason"):
                 candidate_copy["failureReason"] = list(dict.fromkeys(
                     [*candidate_copy["failureReason"], quote_status["failureReason"]]
@@ -574,7 +744,7 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
             "nextCheck": "다음 관찰에서 현재값과 조건 충족 여부를 확인",
             "technicalMetrics": {}, "technicalSourceDate": None,
             "technicalGenerationId": None, "technicalReceiptStatus": None,
-            "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
+            "source": ("DISCOVERY_NAVER_LOOKUP" if quote_status or (quote and quote.get("_discoveryAdditionalLookup"))
                        else "MONITORED_UNIVERSE" if quote
                        else None),
             "priceSourceDate": None,
@@ -655,13 +825,18 @@ def fetch_missing_quotes(symbols, existing_codes, fetcher, normalizer, clock, li
     try:
         payload = fetcher(missing)
     except Exception as exc:
+        reason = type(exc).__name__
         return {
             "networkCalls": 1, "requestedSymbols": missing, "datas": [],
-            "errors": [{"reason": type(exc).__name__}],
+            "errors": [{"itemCode": code, "reason": reason} for code in missing],
         }
     source_rows = payload.get("datas") if isinstance(payload, dict) else None
     if not isinstance(source_rows, list):
-        return {"networkCalls": 1, "requestedSymbols": missing, "datas": [], "errors": [{"reason": "RESPONSE_SCHEMA_INVALID"}]}
+        return {
+            "networkCalls": 1, "requestedSymbols": missing, "datas": [],
+            "errors": [{"itemCode": code, "reason": "RESPONSE_SCHEMA_INVALID"}
+                        for code in missing],
+        }
     rows, errors = [], []
     for source in source_rows:
         code = source.get("itemCode") if isinstance(source, dict) else None
@@ -699,12 +874,14 @@ SUPPLEMENTAL_QUOTE_FIELDS = (
 SUPPLEMENTAL_QUOTE_KEYS = set(SUPPLEMENTAL_QUOTE_FIELDS)
 SUPPLEMENTAL_KEYS = {
     "schemaVersion", "status", "monitoringDate", "candidateSourceSha256",
-    "marketSourceTime", "generatedAt", "source", "requestedCount", "quoteCount",
+    "sourceHash", "marketSourceTime", "generatedAt", "source", "requestedCount", "quoteCount",
     "missingSymbols", "errors", "datas", "candidateStatuses", "quoteCompleteness",
+    "paper_only",
 }
 SUPPLEMENTAL_CANDIDATE_STATUS_KEYS = {
     "symbol", "quoteRequested", "quoteRequestTime", "currentPrice",
-    "quoteStatus", "failureReason", "generatedAt", "source",
+    "quoteStatus", "failureReason", "generatedAt", "source", "sourceHash",
+    "paper_only",
 }
 
 
@@ -744,7 +921,11 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
     # The candidate artifact is the authoritative request set.  Existing
     # market quotes and full-market signals are evidence, not a reason to
     # suppress a candidate request.
-    candidate_symbols = list(dict.fromkeys(discovery.get("symbols", [])))
+    raw_symbols = discovery.get("symbols", [])
+    if (not isinstance(raw_symbols, list)
+            or len(raw_symbols) != len(set(raw_symbols))):
+        raise DiscoveryError("DISCOVERY_SYMBOLS_INVALID")
+    candidate_symbols = list(raw_symbols)
     request_clock = clock or (lambda: datetime.now(KST))
     request_time_value = request_clock()
     request_time = (request_time_value.isoformat()
@@ -753,6 +934,9 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         candidate_symbols, set(), limit=limit, fetcher=fetcher,
         normalizer=normalizer, clock=clock)
     rows = [supplemental_quote_row(row) for row in result["datas"]]
+    returned_codes = [row.get("itemCode") for row in rows]
+    if len(returned_codes) != len(set(returned_codes)):
+        raise DiscoveryError("QUOTE_RESPONSE_DUPLICATE_SYMBOL")
     returned = {row.get("itemCode") for row in rows}
     missing = [code for code in candidate_symbols if code not in returned]
     errors = list(result["errors"])
@@ -761,7 +945,7 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
     if not candidate_symbols:
         status = "AVAILABLE_EMPTY"
     elif not rows:
-        status = "UNAVAILABLE"
+        status = "PARTIAL"
     elif missing or errors:
         status = "PARTIAL"
     else:
@@ -785,12 +969,16 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
             "failureReason": None if row else error_by_code.get(symbol, "QUOTE_MISSING"),
             "generatedAt": generated_at,
             "source": "NAVER_KRX",
+            "sourceHash": discovery.get("sourceSha256"),
+            "paper_only": True,
         })
     return {
         "schemaVersion": 1, "status": status, "monitoringDate": monitoring_date,
         "candidateSourceSha256": discovery.get("sourceSha256"),
+        "sourceHash": discovery.get("sourceSha256"),
         "marketSourceTime": market_source_time, "generatedAt": generated_at,
-        "source": "NAVER_KRX", "requestedCount": len(candidate_symbols),
+        "source": "NAVER_KRX", "paper_only": True,
+        "requestedCount": len(candidate_symbols),
         "quoteCount": len(rows), "missingSymbols": missing, "errors": errors,
         "datas": rows, "candidateStatuses": candidate_statuses,
         "quoteCompleteness": {
@@ -803,13 +991,16 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
 
 
 def validate_supplemental_quotes(payload, discovery, market_source_time):
+    required_keys = SUPPLEMENTAL_KEYS - {"sourceHash", "paper_only"}
     if (not isinstance(payload, dict)
-            or not SUPPLEMENTAL_KEYS.issubset(payload)
+            or not required_keys.issubset(payload)
             or set(payload) - SUPPLEMENTAL_KEYS not in (set(), {"networkCalls"})):
         raise DiscoveryError("SUPPLEMENTAL_SCHEMA_INVALID")
     if (payload.get("schemaVersion") != 1 or payload.get("source") != "NAVER_KRX"
             or payload.get("monitoringDate") != discovery.get("monitoringDate")
-            or payload.get("candidateSourceSha256") != discovery.get("sourceSha256")):
+            or payload.get("candidateSourceSha256") != discovery.get("sourceSha256")
+            or payload.get("sourceHash", discovery.get("sourceSha256")) != discovery.get("sourceSha256")
+            or payload.get("paper_only", True) is not True):
         raise DiscoveryError("SUPPLEMENTAL_CONTRACT_MISMATCH")
     if payload.get("marketSourceTime") != market_source_time:
         raise DiscoveryError("SUPPLEMENTAL_MARKET_TIME_MISMATCH")
@@ -819,8 +1010,11 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
     if not isinstance(rows, list) or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_QUOTE_KEYS for row in rows):
         raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
     candidate_statuses = payload.get("candidateStatuses")
+    required_status_keys = SUPPLEMENTAL_CANDIDATE_STATUS_KEYS - {"sourceHash", "paper_only"}
     if (not isinstance(candidate_statuses, list)
-            or any(not isinstance(row, dict) or set(row) != SUPPLEMENTAL_CANDIDATE_STATUS_KEYS
+            or any(not isinstance(row, dict)
+                   or not required_status_keys.issubset(row)
+                   or set(row) - SUPPLEMENTAL_CANDIDATE_STATUS_KEYS
                    for row in candidate_statuses)):
         raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_STATUS_INVALID")
     codes = [row.get("itemCode") for row in rows]
@@ -856,6 +1050,10 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
     for candidate in candidate_statuses:
         if candidate.get("quoteRequested") is not True:
             raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_NOT_REQUESTED")
+        if candidate.get("sourceHash", discovery.get("sourceSha256")) != discovery.get("sourceSha256"):
+            raise DiscoveryError("SUPPLEMENTAL_SOURCE_HASH_MISMATCH")
+        if candidate.get("paper_only", True) is not True:
+            raise DiscoveryError("SUPPLEMENTAL_PAPER_ONLY_REQUIRED")
         if candidate.get("quoteStatus") == "AVAILABLE" and candidate.get("currentPrice") is None:
             raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_QUOTE_MISSING")
     return payload

@@ -221,17 +221,20 @@ def compact_kiwoom_candidate_rows(
         failures = list(dict.fromkeys(failures))
         if not detail:
             failures.append("CANDIDATE_DETAILS_UNAVAILABLE")
+        if detail.get("selectionValue") in (None, "", "UNAVAILABLE"):
+            failures.append("SELECTION_VALUE_UNAVAILABLE")
         if not technical:
             failures.append("TECHNICAL_INDICATORS_UNAVAILABLE")
         if not conditions:
             failures.append("CONDITION_DETAILS_UNAVAILABLE")
         failures = list(dict.fromkeys(failures))
         parts = sum((
+            detail.get("selectionValue") not in (None, "", "UNAVAILABLE"),
             detail.get("currentPrice") is not None or row.get("price") is not None,
             bool(technical),
             bool(conditions),
         ))
-        status = "AVAILABLE" if parts == 3 else "PARTIAL" if parts else "UNAVAILABLE"
+        status = "AVAILABLE" if parts == 4 else "PARTIAL" if parts else "UNAVAILABLE"
         item = {
             key: row.get(key)
             for key in (
@@ -254,6 +257,8 @@ def compact_kiwoom_candidate_rows(
         item["candidateFailureReason"] = failures
         item["candidateSource"] = detail.get("source")
         item["candidateGeneratedAt"] = detail.get("generatedAt")
+        item["candidateSourceHash"] = detail.get("sourceHash")
+        item["candidatePaperOnly"] = detail.get("paper_only")
         item["technicalStatus"] = "AVAILABLE" if technical else "UNAVAILABLE"
         item["dataStatus"] = status
         item["status"] = status
