@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.hanull.monitoring-kis-candidate-handoff</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3.13</string>
+		<string>-u</string>
+		<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay/tools/run_kis_candidate_handoff.py</string>
+		<string>--snapshot-root</string>
+		<string>/Users/hanull/MigrationFrozen_20261107/KIS_Trading/data/candidate-snapshots</string>
+		<string>--calendar</string>
+		<string>/Users/hanull/MigrationFrozen_20261107/KIS_Trading/data/intraday/trading-days.json</string>
+		<string>--quotes</string>
+		<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay/data/quotes.json</string>
+		<string>--repository</string>
+		<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay</string>
+		<string>--state-dir</string>
+		<string>/Users/hanull/Library/Application Support/Hanull/monitoring-kis-candidate-handoff</string>
+		<string>--allow-network</string>
+	</array>
+	<key>WatchPaths</key>
+	<array>
+		<string>/Users/hanull/MigrationFrozen_20261107/KIS_Trading/data/candidate-snapshots</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay</string>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>ThrottleInterval</key>
+	<integer>30</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay/logs/monitoring-kis-candidate-handoff.stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/hanull/MigrationFrozen_20261107/naver-krx-universe-relay/logs/monitoring-kis-candidate-handoff.stderr.log</string>
+</dict>
+</plist>

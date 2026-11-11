@@ -45,9 +45,16 @@ snapshot 자체는 GitHub에 게시하지 않는다.
 
 기존 `tools/on_trading_discovery_snapshot.py`와
 `tools/publish_trading_discovery.py`는 KIS LaunchAgent가 사용하는 구형 후보
-publisher로 유지하며 이 handoff에서 호출하지 않는다. 새 publisher는 LaunchAgent
-또는 Cloudflare에 연결되지 않으며, 21:00 이후 producer가 넘긴 정확한 파일을
-승인된 호출자가 한 번 실행하는 구조다.
+publisher로 유지하며 이 handoff에서 호출하지 않는다. 모니터링 소유 호출자
+템플릿은 `ops/launchd/com.hanull.monitoring-kis-candidate-handoff.plist`이며,
+snapshot 디렉터리의 파일 변경을 `WatchPaths`로 감지한다. 고정 21:30 예약이
+없고 `RunAtLoad=false`이므로, 새 날짜 파일이 안정화된 뒤에만 one-shot으로
+실행된다. 실제 등록·재시작은 별도 승인 후 수행한다.
+
+호출자는 정확한 날짜 파일만 선택하고, 최근 안정화된 파일이 없으면
+`WAITING_SNAPSHOT`으로 종료한다. 같은 날짜·source hash가 state 또는 게시
+artifact에 이미 기록되어 있으면 quote 요청 없이 `IDEMPOTENT`로 종료한다.
+실행 상태는 운영 저장소 밖의 state 디렉터리에 기록하며 snapshot은 쓰지 않는다.
 
 `refresh.yml`은 로컬 snapshot을 찾지 않는다. GitHub에 이미 게시된
 `data/trading-discovery` artifact를 report contract 입력으로 소비한다.
