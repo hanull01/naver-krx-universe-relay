@@ -461,119 +461,19 @@ def _index(payload, keys=("itemCode", "code", "itemcode")):
     return result
 
 
-def _payload_date(payload):
-    if not isinstance(payload, dict):
-        return None
-    return normalize_item_code(payload.get("asOfDate") or payload.get("targetDate") or payload.get("historicalTargetDate"))
-
-
-def _payload_generation(payload):
-    if not isinstance(payload, dict):
-        return None
-    return payload.get("generationId") or payload.get("sourceGeneration") or payload.get("historicalGenerationId")
-
-
-def _krx_payloads_aligned(technicals, states, expected_date):
-    dates = [_payload_date(value) for value in (technicals, states)]
-    generations = [_payload_generation(value) for value in (technicals, states)]
-    if any(value is None or value != expected_date for value in dates):
-        return False
-    if any(value in (None, "") for value in generations):
-        return False
-    return len(set(generations)) == 1
-
-
-def _krx_source_status(source, technicals, states, expected_date):
-    """Validate the KRX generation lineage without accepting a legacy fallback."""
-    generation = _payload_generation(technicals)
-    state_generation = _payload_generation(states)
-    source = source if isinstance(source, dict) else {}
-    source_generation = source.get("generationId") or source.get("sourceGeneration")
-    source_date = str(source.get("targetDate") or "").replace("-", "") or None
-    source_sha = source.get("sourceSha256") or source.get("manifestSha256")
-    receipt = str(source.get("receiptStatus") or "UNAVAILABLE").upper()
-    publication_authorized = source.get("publicationAuthorized")
-    metadata_valid = (
-        (not source or source.get("status") == "VERIFIED")
-        and (not source_generation or source_generation == generation == state_generation)
-        and (not source_date or source_date == expected_date)
-        and (not source or bool(source.get("sourcePath")))
-        and (not source or bool(source_sha))
-        and (not source or receipt == "VERIFIED")
-        and (not source or publication_authorized in (None, True))
-    )
-    aligned = metadata_valid and _krx_payloads_aligned(technicals, states, expected_date)
-    return {
-        "status": "VERIFIED" if aligned else "UNAVAILABLE",
-        "reason": "VERIFIED_KRX_GENERATION" if aligned else "KRX_GENERATION_OR_DATE_MISMATCH",
-        "generationId": generation if aligned else source_generation,
-        "targetDate": expected_date if aligned else source_date,
-        "sourcePath": source.get("sourcePath"),
-        "sourceSha256": source_sha,
-        "receiptStatus": receipt,
-        "publicationAuthorized": publication_authorized,
-    }
-
-
-def krx_selection_snapshot(discovery, technicals, states):
-    """Project selection-day close and indicators from one aligned KRX generation."""
-    selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
-    if not selection_date or not _krx_payloads_aligned(technicals, states, selection_date):
-        return {"status": "UNAVAILABLE", "reason": "KRX_GENERATION_OR_DATE_MISMATCH", "stocks": []}
-    tidx, sidx = _index(technicals), _index(states)
-    generation = _payload_generation(technicals) or _payload_generation(states)
-    rows = []
-    for raw_code in discovery.get("symbols") or []:
-        code = normalize_item_code(raw_code)
-        technical = tidx.get(code, {})
-        state = sidx.get(code, {})
-        merged = {**state, **technical}
-        close = next((merged.get(key) for key in ("close", "closePrice", "lastClose", "price", "currentPrice")
-                      if merged.get(key) is not None), None)
-        if close is None and not any(merged.get(key) is not None for key in ("ma5", "ma20", "ma60", "volumeRatio20", "breakout20", "pullbackState")):
-            continue
-        rows.append({
-            "code": code,
-            "name": merged.get("stockName") or merged.get("itemName") or merged.get("name"),
-            "lastTradingDate": selection_date,
-            "lastClose": close,
-            "closeValid": close is not None,
-            "ohlcValid": close is not None,
-            "ma5": merged.get("ma5"), "ma20": merged.get("ma20"), "ma60": merged.get("ma60"),
-            "volumeRatio20": merged.get("volumeRatio20"),
-            "breakout20": merged.get("breakout20"),
-            "pullbackState": merged.get("pullbackState"),
-            "trend": merged.get("trend") or merged.get("trendStatus"),
-            "sourceDate": selection_date,
-            "generationId": generation,
-            "priceBasis": "VERIFIED_KRX_GENERATION",
-        })
-    return {"status": "AVAILABLE" if rows else "UNAVAILABLE", "sourceDate": selection_date,
-            "generationId": generation, "stocks": rows}
-
-
 def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=None,
             previous=None, name_lookup=None,
             historical_technicals=None, historical_states=None, krx_source=None):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         return {"title": "키움 전일후보군 — 당일 추적", **discovery, "stocks": []}
     qidx = _index(quotes)
-    source_technicals = historical_technicals if historical_technicals is not None else technicals
-    source_states = historical_states if historical_states is not None else states
     expected_selection_date = str(discovery.get("selectionDate") or "").replace("-", "")
-    # Candidate analysis is KRX-generation-only. Full-market signals remain a
-    # separate report input and are never a substitute for the selected KRX generation.
-    krx_mode = True
-    krx_status = _krx_source_status(
-        krx_source, source_technicals, source_states, expected_selection_date
-    ) if krx_mode else None
-    aligned = krx_status["status"] == "VERIFIED" if krx_mode else _krx_payloads_aligned(
-        source_technicals, source_states, expected_selection_date
-    )
-    tidx = _index(source_technicals) if aligned else {}
-    sidx = _index(source_states) if aligned else {}
-    selection_snapshot = krx_selection_snapshot(discovery, source_technicals, source_states)
-    selection_index = _index(selection_snapshot)
+    # Kiwoom candidate details are an independent artifact.  KRX historical
+    # technicals/states are deliberately ignored here; they belong only to the
+    # market technical section of the report and must never become candidate
+    # indicators or selection values.
+    _ = (technicals, states, full_market_signals, historical_technicals,
+         historical_states, krx_source)
     previous_rows = _index(previous or {}, keys=("itemCode",))
     name_lookup = name_lookup if isinstance(name_lookup, dict) else {}
     candidate_details = {
@@ -590,22 +490,71 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
     rows = []
     for raw_code in discovery["symbols"]:
         code = normalize_item_code(raw_code)
-        quote, technical, state = qidx.get(code), tidx.get(code), sidx.get(code)
+        quote = qidx.get(code)
         identity_quote = quote
         rejected_quote = bool(quote and quote.get("_discoveryAdditionalLookup")
                               and (quote.get("status") not in (None, "ok")
                                    or quote.get("fresh") is False))
         if rejected_quote:
             quote = None
-        selection = selection_index.get(code)
         market = quote or {}
-        technical = technical or {}
-        state = state or {}
-        current = state.get("current") if isinstance(state.get("current"), dict) else state
+        detail = candidate_details.get(code) or {}
+        quote_status = quote_statuses.get(code) or {}
+        candidate_copy = dict(detail)
+        candidate_copy.setdefault("symbol", code)
+        candidate_technical = candidate_copy.get("technicalIndicators")
+        if not isinstance(candidate_technical, dict):
+            candidate_technical = {}
+        candidate_conditions = candidate_copy.get("conditionDetails")
+        if not isinstance(candidate_conditions, dict):
+            candidate_conditions = {}
+        failures = candidate_copy.get("failureReason") or []
+        if isinstance(failures, str):
+            failures = [failures]
+        failures = list(dict.fromkeys(failures))
+        if not detail:
+            failures.append("CANDIDATE_DETAILS_UNAVAILABLE")
+        if not candidate_technical:
+            failures.append("TECHNICAL_INDICATORS_UNAVAILABLE")
+        if not candidate_conditions:
+            failures.append("CONDITION_DETAILS_UNAVAILABLE")
+        candidate_copy["failureReason"] = list(dict.fromkeys(failures))
+        detail_current_price = candidate_copy.get("currentPrice")
+        quote_price = market.get("closePrice", market.get("currentPrice", market.get("lastClose")))
+        if quote_status.get("quoteStatus") == "AVAILABLE" or (quote and not quote_status):
+            candidate_copy["currentPrice"] = (
+                quote_status.get("currentPrice")
+                if quote_status.get("currentPrice") is not None
+                else detail_current_price if detail_current_price is not None else quote_price
+            )
+        else:
+            candidate_copy["currentPrice"] = detail_current_price
+        if quote_status:
+            candidate_copy["quoteRequested"] = quote_status.get("quoteRequested")
+            candidate_copy["quoteRequestTime"] = quote_status.get("quoteRequestTime")
+            candidate_copy["quoteStatus"] = quote_status.get("quoteStatus")
+            candidate_copy["quoteGeneratedAt"] = quote_status.get("generatedAt")
+            if quote_status.get("failureReason"):
+                candidate_copy["failureReason"] = list(dict.fromkeys(
+                    [*candidate_copy["failureReason"], quote_status["failureReason"]]
+                ))
+        current_price = candidate_copy.get("currentPrice")
+        has_quote = current_price is not None
+        has_technical = bool(candidate_technical)
+        has_conditions = bool(candidate_conditions)
+        if not has_quote:
+            failures = list(dict.fromkeys([*failures, "QUOTE_UNAVAILABLE"]))
+            candidate_copy["failureReason"] = failures
+        available_parts = sum((has_quote, has_technical, has_conditions))
+        candidate_data_status = (
+            "UNAVAILABLE" if not has_quote
+            else "AVAILABLE" if available_parts == 3
+            else "PARTIAL"
+        )
         row = {
             "itemCode": code,
             "itemName": (market.get("stockName") or market.get("name")
-                         or technical.get("stockName")
+                         or detail.get("name")
                          or (identity_quote or {}).get("stockName")
                          or name_lookup.get(code)),
             "itemNameSource": (
@@ -613,91 +562,55 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
                 else "VERIFIED_NAME_LOOKUP" if name_lookup.get(code)
                 else None
             ),
-            "price": market.get("closePrice", market.get("currentPrice", market.get("lastClose"))),
+            "price": current_price,
             "changeRate": market.get("fluctuationsRatio", market.get("changeRate")),
             "volume": market.get("accumulatedTradingVolume"),
             "tradingValue": market.get("accumulatedTradingValue"),
-            "ma5": technical.get("ma5"),
-            "ma20": technical.get("ma20"),
-            "ma60": technical.get("ma60"),
-            "volumeRatio20": technical.get("volumeRatio20"),
-            "breakout20": current.get("breakout20"),
-            "pullbackState": current.get("pullbackState"),
-            "selectionPrice": selection.get("lastClose") if selection else None,
-            "selectionDate": selection.get("sourceDate") if selection else expected_selection_date,
-            "conditionStatus": current.get("conditionStatus") or state.get("conditionStatus") or "UNAVAILABLE",
+            "ma5": None, "ma20": None, "ma60": None,
+            "volumeRatio20": None, "breakout20": None, "pullbackState": None,
+            "selectionPrice": None,
+            "selectionDate": expected_selection_date,
+            "conditionStatus": candidate_conditions.get("matched", "UNAVAILABLE"),
             "nextCheck": "다음 관찰에서 현재값과 조건 충족 여부를 확인",
-            "technicalMetrics": {
-                key: technical.get(key)
-                for key in ("ma5", "ma20", "ma60", "volumeRatio20", "breakout20", "pullbackState", "trend")
-                if technical.get(key) is not None
-            },
-            "technicalSourceDate": expected_selection_date if technical else None,
-            "technicalGenerationId": _payload_generation(source_technicals) if technical else None,
-            "technicalReceiptStatus": krx_status.get("receiptStatus") if krx_status else None,
+            "technicalMetrics": {}, "technicalSourceDate": None,
+            "technicalGenerationId": None, "technicalReceiptStatus": None,
             "source": ("DISCOVERY_NAVER_LOOKUP" if quote and quote.get("_discoveryAdditionalLookup")
                        else "MONITORED_UNIVERSE" if quote
                        else None),
-            "priceSourceDate": selection.get("sourceDate") if selection and not quote else None,
+            "priceSourceDate": None,
             "priceSourceTime": market.get("sourceTime"),
             "priceBasis": market.get("priceBasis"),
             "rejectedQuoteReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
-            "unavailableReason": ("NO_VERIFIED_SELECTION_SNAPSHOT"
-                                  if rejected_quote and not selection else None),
+            "unavailableReason": "STALE_OR_UNVERIFIED_QUOTE" if rejected_quote else None,
         }
-        detail = candidate_details.get(code) or {}
         row.update({
-            "conditionName": (detail.get("conditionDetails") or {}).get("conditionName")
+            "conditionName": candidate_conditions.get("conditionName")
             or detail.get("conditionName"),
-            "conditionSequence": (detail.get("conditionDetails") or {}).get("conditionId")
+            "conditionSequence": candidate_conditions.get("conditionId")
             or detail.get("conditionSequence"),
-            "conditionResult": (detail.get("conditionDetails") or {}).get("matched")
-            if detail.get("conditionDetails") else detail.get("conditionResult"),
+            "conditionResult": candidate_conditions.get("matched", detail.get("conditionResult")),
             "conditionDiscoveredAt": detail.get("discoveredAt"),
-            "conditionSourceValues": (detail.get("conditionDetails") or {}).get("sourceValues")
+            "conditionSourceValues": candidate_conditions.get("sourceValues")
             or detail.get("sourceValues") or {},
-            "conditionSourceValueStatus": (detail.get("conditionDetails") or {}).get("sourceValuesStatus")
+            "conditionSourceValueStatus": candidate_conditions.get("sourceValuesStatus")
             or detail.get("sourceValueStatus") or "NOT_PROVIDED",
         })
-        quote_status = quote_statuses.get(code) or {}
-        candidate_copy = dict(detail)
-        candidate_copy.setdefault("symbol", code)
-        candidate_copy["currentPrice"] = (
-            row.get("price") if quote_status.get("quoteStatus") == "AVAILABLE"
-            else candidate_copy.get("currentPrice")
-        )
-        if quote_status:
-            candidate_copy["quoteRequested"] = quote_status.get("quoteRequested")
-            candidate_copy["quoteRequestTime"] = quote_status.get("quoteRequestTime")
-            candidate_copy["quoteStatus"] = quote_status.get("quoteStatus")
-            candidate_copy["quoteGeneratedAt"] = quote_status.get("generatedAt")
-            if quote_status.get("failureReason"):
-                prior_failures = candidate_copy.get("failureReason") or []
-                if isinstance(prior_failures, str):
-                    prior_failures = [prior_failures]
-                candidate_copy["failureReason"] = list(dict.fromkeys(
-                    [*prior_failures, quote_status["failureReason"]]
-                ))
         projected_details.append(candidate_copy)
         row["candidateDetail"] = candidate_copy
         row["candidateSelectionValue"] = candidate_copy.get("selectionValue")
         row["candidatePreviousClose"] = candidate_copy.get("previousClose")
-        row["candidateTechnicalIndicators"] = candidate_copy.get("technicalIndicators") or {}
-        row["candidateConditionDetails"] = candidate_copy.get("conditionDetails") or {}
+        row["candidateTechnicalIndicators"] = candidate_technical
+        row["candidateConditionDetails"] = candidate_conditions
         row["candidateSelectionStatus"] = candidate_copy.get("selectionStatus") or "UNAVAILABLE"
         row["candidateQuoteStatus"] = candidate_copy.get("quoteStatus") or "UNAVAILABLE"
         row["candidateDetailStatus"] = candidate_copy.get("detailStatus") or "UNAVAILABLE"
         row["candidateFailureReason"] = candidate_copy.get("failureReason") or []
         row["candidateSource"] = candidate_copy.get("source")
         row["candidateGeneratedAt"] = candidate_copy.get("generatedAt")
-        if krx_mode:
-            row["unavailableReason"] = None if aligned and technical else krx_status["reason"]
-        observed = [row[key] for key in ("price", "changeRate", "volume", "tradingValue", "ma5", "ma20", "ma60")]
-        row["dataStatus"] = "AVAILABLE" if all(value is not None for value in observed) else "PARTIAL" if any(value is not None for value in observed) else "UNAVAILABLE"
+        row["unavailableReason"] = None if candidate_data_status != "UNAVAILABLE" else candidate_copy["failureReason"][0]
+        row["dataStatus"] = candidate_data_status
         row["priceStatus"] = "AVAILABLE" if row["price"] is not None else "UNAVAILABLE"
-        row["technicalStatus"] = ("AVAILABLE" if all(row[key] is not None for key in ("ma5", "ma20", "ma60"))
-                                  else "PARTIAL" if any(row[key] is not None for key in ("ma5", "ma20", "ma60"))
-                                  else "UNAVAILABLE")
+        row["technicalStatus"] = "AVAILABLE" if has_technical else "UNAVAILABLE"
         row["analysisStatus"] = row["dataStatus"]
         row["status"] = row["dataStatus"]
         prior = previous_rows.get(code, {})
@@ -722,10 +635,10 @@ def analyze(as_of, discovery, quotes, technicals, states, full_market_signals=No
         "asOf": as_of, "observedCount": available + partial,
         "missingCount": len(rows) - available - partial, "stocks": rows,
         "metrics": {"vwap": "UNAVAILABLE", "intradayHighLow": "UNAVAILABLE"},
-        "selectionSnapshot": {key: selection_snapshot.get(key)
-                               for key in ("status", "reason", "sourceDate")
-                               if selection_snapshot.get(key) is not None},
-        "technicalProvenance": krx_status,
+        "selectionSnapshot": {
+            "status": "NESTED_CANDIDATE_DETAILS_ONLY",
+            "sourceDate": expected_selection_date,
+        },
         "candidateDetails": projected_details,
         "candidateCompleteness": discovery.get("candidateCompleteness"),
         "artifactStatus": discovery.get("artifactStatus"),

@@ -188,6 +188,82 @@ def compact_candidate_rows(rows: list[Mapping[str, Any]] | None, limit: int = 10
     return compact
 
 
+def compact_kiwoom_candidate_rows(
+    rows: list[Mapping[str, Any]] | None,
+    candidate_details: list[Mapping[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    """Project Kiwoom rows without allowing KRX market metrics to leak in.
+
+    ``candidateDetails.technicalIndicators`` is the only authority for a
+    Kiwoom candidate's technical values.  Historical KRX fields that may be
+    present in an older producer row are intentionally discarded.
+    """
+    details_by_code = {
+        str(detail.get("symbol")): detail
+        for detail in candidate_details or []
+        if isinstance(detail, Mapping) and detail.get("symbol")
+    }
+    projected: list[dict[str, Any]] = []
+    for row in rows or []:
+        if not isinstance(row, Mapping):
+            continue
+        code = str(row.get("itemCode") or row.get("symbol") or "")
+        detail = details_by_code.get(code)
+        if not isinstance(detail, Mapping):
+            detail = row.get("candidateDetail") if isinstance(row.get("candidateDetail"), Mapping) else {}
+        technical = detail.get("technicalIndicators")
+        technical = dict(technical) if isinstance(technical, Mapping) else {}
+        conditions = detail.get("conditionDetails")
+        conditions = dict(conditions) if isinstance(conditions, Mapping) else {}
+        failures = detail.get("failureReason") or row.get("candidateFailureReason") or []
+        if isinstance(failures, str):
+            failures = [failures]
+        failures = list(dict.fromkeys(failures))
+        if not detail:
+            failures.append("CANDIDATE_DETAILS_UNAVAILABLE")
+        if not technical:
+            failures.append("TECHNICAL_INDICATORS_UNAVAILABLE")
+        if not conditions:
+            failures.append("CONDITION_DETAILS_UNAVAILABLE")
+        failures = list(dict.fromkeys(failures))
+        parts = sum((
+            detail.get("currentPrice") is not None or row.get("price") is not None,
+            bool(technical),
+            bool(conditions),
+        ))
+        status = "AVAILABLE" if parts == 3 else "PARTIAL" if parts else "UNAVAILABLE"
+        item = {
+            key: row.get(key)
+            for key in (
+                "rank", "itemCode", "itemName", "itemNameSource", "price", "changeRate",
+                "volume", "tradingValue", "priceStatus", "status", "dataStatus",
+                "analysisStatus", "nextCheck", "conditionName", "conditionSequence",
+                "conditionResult", "conditionDiscoveredAt", "conditionSourceValues",
+                "conditionSourceValueStatus",
+            )
+            if row.get(key) not in (None, "", [])
+        }
+        item["itemCode"] = code
+        item["candidateSelectionValue"] = detail.get("selectionValue")
+        item["candidatePreviousClose"] = detail.get("previousClose")
+        item["candidateTechnicalIndicators"] = technical
+        item["candidateConditionDetails"] = conditions
+        item["candidateSelectionStatus"] = detail.get("selectionStatus") or "UNAVAILABLE"
+        item["candidateQuoteStatus"] = detail.get("quoteStatus") or "UNAVAILABLE"
+        item["candidateDetailStatus"] = detail.get("detailStatus") or status
+        item["candidateFailureReason"] = failures
+        item["candidateSource"] = detail.get("source")
+        item["candidateGeneratedAt"] = detail.get("generatedAt")
+        item["technicalStatus"] = "AVAILABLE" if technical else "UNAVAILABLE"
+        item["dataStatus"] = status
+        item["status"] = status
+        return_item_price = detail.get("currentPrice")
+        if return_item_price is not None:
+            item["price"] = return_item_price
+        projected.append(item)
+    return projected
+
+
 def classify_contract_transport_response(response: Any) -> dict[str, Any]:
     """Distinguish an API inline-content limitation from an empty file."""
     if not isinstance(response, Mapping):
@@ -1522,7 +1598,10 @@ def build_report_contract(
     compact_technical_candidates = compact_candidate_rows(technical_candidates)
     kiwoom_candidates = kiwoom_candidates if isinstance(kiwoom_candidates, Mapping) else {}
     kiwoom_symbols = list(kiwoom_candidates.get("symbols") or [])
-    kiwoom_stocks = list(kiwoom_candidates.get("stocks") or [])
+    kiwoom_details = list(kiwoom_candidates.get("candidateDetails") or [])
+    kiwoom_stocks = compact_kiwoom_candidate_rows(
+        kiwoom_candidates.get("stocks") or [], kiwoom_details
+    )
     kiwoom_codes = [row.get("itemCode") for row in kiwoom_stocks if isinstance(row, Mapping)]
     kiwoom_name_map = {
         str(row.get("itemCode")): row.get("itemName")
@@ -1716,8 +1795,7 @@ def build_report_contract(
             "sourceValidation": source_validation if isinstance(source_validation, Mapping) else None,
             "sourceCandidateCount": kiwoom_candidates.get("candidateCount"),
             "performanceStatus": compact_kiwoom_performance.get("status"),
-            "technicalProvenance": kiwoom_candidates.get("technicalProvenance"),
-            "candidateDetails": kiwoom_candidates.get("candidateDetails") or [],
+            "candidateDetails": kiwoom_details,
             "candidateCompleteness": kiwoom_candidates.get("candidateCompleteness"),
             "artifactStatus": kiwoom_candidates.get("artifactStatus"),
             "publicationStatus": kiwoom_candidates.get("publicationStatus"),
@@ -1773,6 +1851,11 @@ def validate_kiwoom_candidate_binding(
     for row in stocks:
         if not isinstance(row, Mapping) or not row.get("itemCode"):
             errors.append("KIWOOM_CODE_NAME_MAPPING_INVALID")
+        elif any(row.get(key) not in (None, "", {}, []) for key in (
+            "ma5", "ma20", "ma60", "volumeRatio20", "technicalMetrics",
+            "technicalSourceDate", "technicalGenerationId", "technicalReceiptStatus",
+        )):
+            errors.append("KIWOOM_KRX_TECHNICAL_MIX")
         elif isinstance((discovery.get("validation") if isinstance(discovery, Mapping) else None), Mapping) and isinstance(discovery.get("validation", {}).get("codeNameBindings"), Mapping) and discovery["validation"]["codeNameBindings"].get(str(row.get("itemCode"))) != row.get("itemName"):
             errors.append("KIWOOM_CODE_NAME_MISMATCH")
     if len(set(codes)) != len(codes):

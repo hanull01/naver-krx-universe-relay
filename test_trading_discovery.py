@@ -320,7 +320,7 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertEqual([row["source"] for row in result["stocks"]],
                          ["MONITORED_UNIVERSE", None, None])
         self.assertIsNone(result["stocks"][1]["price"])
-        self.assertEqual(result["stocks"][1]["technicalStatus"], "UNAVAILABLE")
+        self.assertEqual(result["stocks"][1]["technicalStatus"], "AVAILABLE")
         self.assertEqual(result["stocks"][-1]["dataStatus"], "UNAVAILABLE")
         self.assertEqual(result["metrics"]["vwap"], "UNAVAILABLE")
 
@@ -336,16 +336,17 @@ class TradingDiscoveryTests(unittest.TestCase):
         self.assertIsNone(row["price"])
         self.assertEqual(row["dataStatus"], "UNAVAILABLE")
 
-    def test_krx_provenance_is_recorded_and_generation_mismatch_stays_unavailable(self):
+    def test_krx_input_never_becomes_kiwoom_candidate_technical_provenance(self):
         discovery = td.published_payload(snapshot(["005930"]))
         technicals = {"generationId": "g1", "targetDate": "20261009", "datas": [{"itemCode": "005930", "ma5": 1, "ma20": 2, "ma60": 3}]}
         states = {"generationId": "g1", "targetDate": "20261009", "datas": [{"itemCode": "005930", "state": {"breakout20": "confirmed"}}]}
         source = {"status": "VERIFIED", "generationId": "g2", "targetDate": "20261009", "sourcePath": "data/technicals.json", "manifestSha256": "a" * 64, "receiptStatus": "VERIFIED"}
         result = td.analyze("2026-10-12", discovery, {}, technicals, states, full_market_signals={"stocks": [{"code": "005930", "ma20": 99}]}, krx_source=source)
         row = result["stocks"][0]
-        self.assertEqual(result["technicalProvenance"]["status"], "UNAVAILABLE")
+        self.assertNotIn("technicalProvenance", result)
+        self.assertEqual(row["candidateTechnicalIndicators"], {"ma20": 100})
         self.assertIsNone(row["ma20"])
-        self.assertEqual(row["unavailableReason"], "KRX_GENERATION_OR_DATE_MISMATCH")
+        self.assertIsNone(row["technicalSourceDate"])
 
     def test_previous_report_change(self):
         discovery = td.published_payload(snapshot(["005930"]))
@@ -355,7 +356,7 @@ class TradingDiscoveryTests(unittest.TestCase):
         row = td.analyze("2026-10-12", discovery, quote, {}, {}, previous=previous)["stocks"][0]
         self.assertEqual(row["previousReportChange"]["price"], 10)
 
-    def test_krx_generation_connects_selection_close_and_nested_indicators(self):
+    def test_nested_candidate_indicators_win_over_krx_input(self):
         discovery = td.published_payload(snapshot(["003490"]))
         technicals = {
             "generationId": "krx-20261009", "asOfDate": "20261009",
@@ -370,12 +371,13 @@ class TradingDiscoveryTests(unittest.TestCase):
         result = td.analyze("2026-10-12", discovery, {}, technicals, states,
                             historical_technicals=technicals, historical_states=states)
         row = result["stocks"][0]
-        self.assertEqual(row["selectionPrice"], 29050)
-        self.assertEqual(row["ma20"], 27952.5)
-        self.assertEqual(row["ma60"], 28420)
-        self.assertEqual(row["volumeRatio20"], 1.1)
-        self.assertEqual(row["breakout20"], "confirmed")
-        self.assertEqual(row["technicalSourceDate"], "20261009")
+        self.assertIsNone(row["selectionPrice"])
+        self.assertEqual(row["candidateTechnicalIndicators"], {"ma20": 100})
+        self.assertIsNone(row["ma20"])
+        self.assertIsNone(row["ma60"])
+        self.assertIsNone(row["volumeRatio20"])
+        self.assertIsNone(row["breakout20"])
+        self.assertIsNone(row["technicalSourceDate"])
 
     def test_krx_generation_mismatch_does_not_leak_indicators(self):
         discovery = td.published_payload(snapshot(["003490"]))
@@ -385,8 +387,25 @@ class TradingDiscoveryTests(unittest.TestCase):
                   "datas": [{"itemCode": "003490", "state": {"breakout20": "confirmed"}}]}
         result = td.analyze("2026-10-12", discovery, {}, {}, {},
                             historical_technicals=technicals, historical_states=states)
-        self.assertEqual(result["stocks"][0]["technicalStatus"], "UNAVAILABLE")
+        self.assertEqual(result["stocks"][0]["technicalStatus"], "AVAILABLE")
+        self.assertEqual(result["stocks"][0]["candidateTechnicalIndicators"], {"ma20": 100})
+        self.assertIsNone(result["stocks"][0]["ma20"])
         self.assertIsNone(result["stocks"][0]["selectionPrice"])
+
+    def test_missing_candidate_details_does_not_fallback_to_krx_technicals(self):
+        discovery = td.published_payload(snapshot(["003490"]))
+        discovery.pop("candidateDetails", None)
+        result = td.analyze(
+            "2026-10-12", discovery, {},
+            {"datas": [{"itemCode": "003490", "ma20": 999}]},
+            {"datas": [{"itemCode": "003490", "state": {"breakout20": "confirmed"}}]},
+        )
+        row = result["stocks"][0]
+        self.assertEqual(row["technicalStatus"], "UNAVAILABLE")
+        self.assertEqual(row["candidateTechnicalIndicators"], {})
+        self.assertIn("CANDIDATE_DETAILS_UNAVAILABLE", row["candidateFailureReason"])
+        self.assertIn("TECHNICAL_INDICATORS_UNAVAILABLE", row["candidateFailureReason"])
+        self.assertIsNone(row["ma20"])
 
     def test_bounded_fetch_requests_only_missing_once(self):
         calls = []

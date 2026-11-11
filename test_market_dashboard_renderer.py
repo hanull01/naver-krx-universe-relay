@@ -537,7 +537,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["kiwoomCandidates"] = {"stocks": [{
             "itemCode": "003490", "itemName": "대한항공", "selectionPrice": 29050,
-            "price": 30300, "ma20": 27952.5, "ma60": 28420,
+            "price": 30300, "ma20": 99999, "ma60": 88888,
             "candidateSelectionValue": 29050,
             "candidateTechnicalIndicators": {"ma5": 28070, "ma20": 27952.5,
                                                "ma60": 28420, "volumeRatio20": 1.1},
@@ -554,6 +554,9 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("27,952원", output)
             self.assertIn("28,420원", output)
             self.assertIn("조건 상세 자료 없음", output)
+            self.assertNotIn("조건검색 결과 미게시", output)
+            self.assertNotIn("99,999원", output)
+            self.assertNotIn("88,888원", output)
             self.assertNotIn("003490", output)
 
     def test_index_code_and_korean_name_are_normalized_in_both_outputs(self):
