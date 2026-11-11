@@ -115,19 +115,17 @@ class SafePublisherTests(unittest.TestCase):
         self.assertNotIn("[MARKET_DATA_READY]", mail)
         self.assertNotIn("trading-discovery", mail)
 
-    def test_supplemental_collection_is_optional_and_does_not_change_mail_gate(self):
+    def test_refresh_does_not_run_the_retired_supplemental_writer(self):
         workflow = (Path(__file__).parent / ".github/workflows/refresh.yml").read_text(encoding="utf-8")
-        self.assertIn("id: discovery_quotes", workflow)
-        optional = workflow[workflow.index("id: discovery_quotes"):]
-        self.assertIn("continue-on-error: true", optional[:500])
-        self.assertIn("timeout-minutes: 2", optional[:500])
-        self.assertIn("exit 0", optional)
+        self.assertNotIn("id: discovery_quotes", workflow)
+        self.assertNotIn("tools/collect_trading_discovery_quotes.py", workflow)
+        self.assertNotIn("steps.discovery_quotes", workflow)
         mail = workflow[workflow.index("id: ready_email"):]
         self.assertIn("steps.collect.outputs.exit_code == '0'", mail[:600])
         self.assertIn("steps.full_market.outputs.exit_code == '0'", mail[:800])
         self.assertIn("FULL_MARKET_STATUS", mail)
         self.assertIn("steps.publish.outputs.published == 'true'", mail)
-        self.assertNotIn("steps.discovery_quotes", mail[:600])
+        self.assertNotIn("data/trading-discovery/quotes", mail[:600])
 
 
 if __name__ == "__main__":
