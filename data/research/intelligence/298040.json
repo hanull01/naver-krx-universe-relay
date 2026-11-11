@@ -3,7 +3,7 @@
   "rankingEligible": true,
   "itemCode": "298040",
   "itemName": "효성중공업",
-  "asOf": "2026-11-11",
+  "asOf": "2026-11-12",
   "dateRange": {
     "from": "2026-04-07",
     "to": "2026-11-02"
@@ -12,74 +12,79 @@
   "brokerCount": 10,
   "recentVsPrevious": {
     "recent": {
-      "from": "2026-10-12",
-      "to": "2026-11-11",
-      "reportCount": 11,
+      "from": "2026-10-13",
+      "to": "2026-11-12",
+      "reportCount": 10,
       "brokerCount": 7,
       "targetPrice": {
-        "count": 11,
+        "count": 10,
         "min": 2500000,
-        "max": 4500000,
-        "mean": 3554545,
-        "median": 3500000,
-        "stdev": 715241,
-        "range": 2000000
+        "max": 4400000,
+        "mean": 3460000,
+        "median": 3450000,
+        "stdev": 681469,
+        "range": 1900000
       },
       "earningsDirection": {
-        "DOWN": 5,
         "UNKNOWN": 2,
+        "DOWN": 4,
         "UP": 3,
         "MIXED": 1
       },
       "textSignal": {
         "positive": 25,
-        "negative": 21,
-        "net": 4,
-        "netPerReport": 0.364
+        "negative": 20,
+        "net": 5,
+        "netPerReport": 0.5
       },
       "topics": {
         "원가": {
           "count": 8,
-          "perReport": 0.727
+          "perReport": 0.8
         },
         "환율": {
-          "count": 6,
-          "perReport": 0.545
+          "count": 5,
+          "perReport": 0.5
         },
         "수요": {
           "count": 1,
-          "perReport": 0.091
+          "perReport": 0.1
         }
       }
     },
     "previous": {
-      "from": "2026-09-12",
-      "to": "2026-10-11",
-      "reportCount": 3,
-      "brokerCount": 3,
+      "from": "2026-09-13",
+      "to": "2026-10-12",
+      "reportCount": 4,
+      "brokerCount": 4,
       "targetPrice": {
-        "count": 3,
+        "count": 4,
         "min": 4000000,
         "max": 5000000,
-        "mean": 4433333,
-        "median": 4300000,
-        "stdev": 418994,
+        "mean": 4450000,
+        "median": 4400000,
+        "stdev": 364005,
         "range": 1000000
       },
       "earningsDirection": {
         "UP": 2,
-        "MIXED": 1
+        "MIXED": 1,
+        "DOWN": 1
       },
       "textSignal": {
         "positive": 6,
-        "negative": 3,
-        "net": 3,
-        "netPerReport": 1.0
+        "negative": 4,
+        "net": 2,
+        "netPerReport": 0.5
       },
       "topics": {
         "수요": {
           "count": 1,
-          "perReport": 0.333
+          "perReport": 0.25
+        },
+        "환율": {
+          "count": 1,
+          "perReport": 0.25
         }
       }
     },
@@ -87,37 +92,37 @@
       {
         "topic": "원가",
         "currentCount": 8,
-        "currentPerReport": 0.727,
+        "currentPerReport": 0.8,
         "previousCount": 0,
         "previousPerReport": 0,
-        "perReportDelta": 0.727,
+        "perReportDelta": 0.8,
         "ratio": null
       },
       {
         "topic": "환율",
-        "currentCount": 6,
-        "currentPerReport": 0.545,
-        "previousCount": 0,
-        "previousPerReport": 0,
-        "perReportDelta": 0.545,
-        "ratio": null
+        "currentCount": 5,
+        "currentPerReport": 0.5,
+        "previousCount": 1,
+        "previousPerReport": 0.25,
+        "perReportDelta": 0.25,
+        "ratio": 2.0
       },
       {
         "topic": "수요",
         "currentCount": 1,
-        "currentPerReport": 0.091,
+        "currentPerReport": 0.1,
         "previousCount": 1,
-        "previousPerReport": 0.333,
-        "perReportDelta": -0.242,
-        "ratio": 0.27
+        "previousPerReport": 0.25,
+        "perReportDelta": -0.15,
+        "ratio": 0.4
       }
     ]
   },
   "comparison": {
-    "reportCountChange": 8,
-    "targetMeanChangePct": -19.82,
-    "targetMedianChangePct": -18.6,
-    "targetDispersionChangePct": 70.7
+    "reportCountChange": 6,
+    "targetMeanChangePct": -22.25,
+    "targetMedianChangePct": -21.59,
+    "targetDispersionChangePct": 87.21
   },
   "goalPriceRevisions": {
     "total": 19,

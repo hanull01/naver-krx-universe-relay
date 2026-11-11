@@ -1,7 +1,7 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-11-11",
+  "asOf": "2026-11-12",
   "universeSource": "config/universe.json",
   "enabledStockCount": 3,
   "statusCounts": {
@@ -16,31 +16,21 @@
       "rankingEligible": true,
       "reportCount": 95,
       "brokerCount": 14,
-      "recentReportCount": 16,
-      "previousReportCount": 11,
-      "recentTargetMean": 491429,
-      "previousTargetMean": 507273,
+      "recentReportCount": 11,
+      "previousReportCount": 16,
+      "recentTargetMean": 485000,
+      "previousTargetMean": 507333,
       "recentTargetMedian": 490000,
-      "recentTargetStdev": 85009,
-      "targetMeanChangePct": -3.12,
-      "targetDispersionChangePct": 0.3,
+      "recentTargetStdev": 96670,
+      "targetMeanChangePct": -4.4,
+      "targetDispersionChangePct": 28.2,
       "revisionUp": 24,
       "revisionDown": 7,
       "risingTopics": [
         {
-          "topic": "DRAM",
-          "delta": 0.125,
-          "ratio": null
-        },
-        {
           "topic": "주주환원",
-          "delta": 0.062,
+          "delta": 0.091,
           "ratio": null
-        },
-        {
-          "topic": "메모리",
-          "delta": 0.006,
-          "ratio": 1.03
         }
       ]
     },
@@ -51,40 +41,40 @@
       "rankingEligible": true,
       "reportCount": 84,
       "brokerCount": 15,
-      "recentReportCount": 16,
-      "previousReportCount": 5,
-      "recentTargetMean": 3346000,
-      "previousTargetMean": 3340000,
+      "recentReportCount": 15,
+      "previousReportCount": 6,
+      "recentTargetMean": 3299286,
+      "previousTargetMean": 3450000,
       "recentTargetMedian": 3200000,
-      "recentTargetStdev": 492366,
-      "targetMeanChangePct": 0.18,
-      "targetDispersionChangePct": 7.34,
+      "recentTargetStdev": 476452,
+      "targetMeanChangePct": -4.37,
+      "targetDispersionChangePct": -1.89,
       "revisionUp": 24,
       "revisionDown": 8,
       "risingTopics": [
         {
           "topic": "메모리",
-          "delta": 0.125,
+          "delta": 0.133,
           "ratio": null
         },
         {
-          "topic": "환율",
-          "delta": 0.1,
-          "ratio": 1.25
-        },
-        {
           "topic": "HBM",
-          "delta": 0.062,
+          "delta": 0.067,
           "ratio": null
         },
         {
           "topic": "메모리 가격",
-          "delta": 0.062,
+          "delta": 0.067,
           "ratio": null
         },
         {
           "topic": "사이클",
-          "delta": 0.062,
+          "delta": 0.067,
+          "ratio": null
+        },
+        {
+          "topic": "주주환원",
+          "delta": 0.067,
           "ratio": null
         }
       ]
@@ -96,26 +86,26 @@
       "rankingEligible": true,
       "reportCount": 42,
       "brokerCount": 10,
-      "recentReportCount": 11,
-      "previousReportCount": 3,
-      "recentTargetMean": 3554545,
-      "previousTargetMean": 4433333,
-      "recentTargetMedian": 3500000,
-      "recentTargetStdev": 715241,
-      "targetMeanChangePct": -19.82,
-      "targetDispersionChangePct": 70.7,
+      "recentReportCount": 10,
+      "previousReportCount": 4,
+      "recentTargetMean": 3460000,
+      "previousTargetMean": 4450000,
+      "recentTargetMedian": 3450000,
+      "recentTargetStdev": 681469,
+      "targetMeanChangePct": -22.25,
+      "targetDispersionChangePct": 87.21,
       "revisionUp": 5,
       "revisionDown": 14,
       "risingTopics": [
         {
           "topic": "원가",
-          "delta": 0.727,
+          "delta": 0.8,
           "ratio": null
         },
         {
           "topic": "환율",
-          "delta": 0.545,
-          "ratio": null
+          "delta": 0.25,
+          "ratio": 2.0
         }
       ]
     }
@@ -129,40 +119,40 @@
         "rankingEligible": true,
         "reportCount": 84,
         "brokerCount": 15,
-        "recentReportCount": 16,
-        "previousReportCount": 5,
-        "recentTargetMean": 3346000,
-        "previousTargetMean": 3340000,
+        "recentReportCount": 15,
+        "previousReportCount": 6,
+        "recentTargetMean": 3299286,
+        "previousTargetMean": 3450000,
         "recentTargetMedian": 3200000,
-        "recentTargetStdev": 492366,
-        "targetMeanChangePct": 0.18,
-        "targetDispersionChangePct": 7.34,
+        "recentTargetStdev": 476452,
+        "targetMeanChangePct": -4.37,
+        "targetDispersionChangePct": -1.89,
         "revisionUp": 24,
         "revisionDown": 8,
         "risingTopics": [
           {
             "topic": "메모리",
-            "delta": 0.125,
+            "delta": 0.133,
             "ratio": null
           },
           {
-            "topic": "환율",
-            "delta": 0.1,
-            "ratio": 1.25
-          },
-          {
             "topic": "HBM",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "메모리 가격",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "사이클",
-            "delta": 0.062,
+            "delta": 0.067,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.067,
             "ratio": null
           }
         ]
@@ -174,26 +164,26 @@
         "rankingEligible": true,
         "reportCount": 42,
         "brokerCount": 10,
-        "recentReportCount": 11,
-        "previousReportCount": 3,
-        "recentTargetMean": 3554545,
-        "previousTargetMean": 4433333,
-        "recentTargetMedian": 3500000,
-        "recentTargetStdev": 715241,
-        "targetMeanChangePct": -19.82,
-        "targetDispersionChangePct": 70.7,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
         "revisionUp": 5,
         "revisionDown": 14,
         "risingTopics": [
           {
             "topic": "원가",
-            "delta": 0.727,
+            "delta": 0.8,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.545,
-            "ratio": null
+            "delta": 0.25,
+            "ratio": 2.0
           }
         ]
       },
@@ -204,31 +194,21 @@
         "rankingEligible": true,
         "reportCount": 95,
         "brokerCount": 14,
-        "recentReportCount": 16,
-        "previousReportCount": 11,
-        "recentTargetMean": 491429,
-        "previousTargetMean": 507273,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
         "recentTargetMedian": 490000,
-        "recentTargetStdev": 85009,
-        "targetMeanChangePct": -3.12,
-        "targetDispersionChangePct": 0.3,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
         "revisionUp": 24,
         "revisionDown": 7,
         "risingTopics": [
           {
-            "topic": "DRAM",
-            "delta": 0.125,
-            "ratio": null
-          },
-          {
             "topic": "주주환원",
-            "delta": 0.062,
+            "delta": 0.091,
             "ratio": null
-          },
-          {
-            "topic": "메모리",
-            "delta": 0.006,
-            "ratio": 1.03
           }
         ]
       }
@@ -241,40 +221,40 @@
         "rankingEligible": true,
         "reportCount": 84,
         "brokerCount": 15,
-        "recentReportCount": 16,
-        "previousReportCount": 5,
-        "recentTargetMean": 3346000,
-        "previousTargetMean": 3340000,
+        "recentReportCount": 15,
+        "previousReportCount": 6,
+        "recentTargetMean": 3299286,
+        "previousTargetMean": 3450000,
         "recentTargetMedian": 3200000,
-        "recentTargetStdev": 492366,
-        "targetMeanChangePct": 0.18,
-        "targetDispersionChangePct": 7.34,
+        "recentTargetStdev": 476452,
+        "targetMeanChangePct": -4.37,
+        "targetDispersionChangePct": -1.89,
         "revisionUp": 24,
         "revisionDown": 8,
         "risingTopics": [
           {
             "topic": "메모리",
-            "delta": 0.125,
+            "delta": 0.133,
             "ratio": null
           },
           {
-            "topic": "환율",
-            "delta": 0.1,
-            "ratio": 1.25
-          },
-          {
             "topic": "HBM",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "메모리 가격",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "사이클",
-            "delta": 0.062,
+            "delta": 0.067,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.067,
             "ratio": null
           }
         ]
@@ -286,31 +266,21 @@
         "rankingEligible": true,
         "reportCount": 95,
         "brokerCount": 14,
-        "recentReportCount": 16,
-        "previousReportCount": 11,
-        "recentTargetMean": 491429,
-        "previousTargetMean": 507273,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
         "recentTargetMedian": 490000,
-        "recentTargetStdev": 85009,
-        "targetMeanChangePct": -3.12,
-        "targetDispersionChangePct": 0.3,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
         "revisionUp": 24,
         "revisionDown": 7,
         "risingTopics": [
           {
-            "topic": "DRAM",
-            "delta": 0.125,
-            "ratio": null
-          },
-          {
             "topic": "주주환원",
-            "delta": 0.062,
+            "delta": 0.091,
             "ratio": null
-          },
-          {
-            "topic": "메모리",
-            "delta": 0.006,
-            "ratio": 1.03
           }
         ]
       },
@@ -321,26 +291,26 @@
         "rankingEligible": true,
         "reportCount": 42,
         "brokerCount": 10,
-        "recentReportCount": 11,
-        "previousReportCount": 3,
-        "recentTargetMean": 3554545,
-        "previousTargetMean": 4433333,
-        "recentTargetMedian": 3500000,
-        "recentTargetStdev": 715241,
-        "targetMeanChangePct": -19.82,
-        "targetDispersionChangePct": 70.7,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
         "revisionUp": 5,
         "revisionDown": 14,
         "risingTopics": [
           {
             "topic": "원가",
-            "delta": 0.727,
+            "delta": 0.8,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.545,
-            "ratio": null
+            "delta": 0.25,
+            "ratio": 2.0
           }
         ]
       }
@@ -353,25 +323,50 @@
         "rankingEligible": true,
         "reportCount": 42,
         "brokerCount": 10,
-        "recentReportCount": 11,
-        "previousReportCount": 3,
-        "recentTargetMean": 3554545,
-        "previousTargetMean": 4433333,
-        "recentTargetMedian": 3500000,
-        "recentTargetStdev": 715241,
-        "targetMeanChangePct": -19.82,
-        "targetDispersionChangePct": 70.7,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
         "revisionUp": 5,
         "revisionDown": 14,
         "risingTopics": [
           {
             "topic": "원가",
-            "delta": 0.727,
+            "delta": 0.8,
             "ratio": null
           },
           {
             "topic": "환율",
-            "delta": 0.545,
+            "delta": 0.25,
+            "ratio": 2.0
+          }
+        ]
+      },
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 95,
+        "brokerCount": 14,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
+        "revisionUp": 24,
+        "revisionDown": 7,
+        "risingTopics": [
+          {
+            "topic": "주주환원",
+            "delta": 0.091,
             "ratio": null
           }
         ]
@@ -383,76 +378,41 @@
         "rankingEligible": true,
         "reportCount": 84,
         "brokerCount": 15,
-        "recentReportCount": 16,
-        "previousReportCount": 5,
-        "recentTargetMean": 3346000,
-        "previousTargetMean": 3340000,
+        "recentReportCount": 15,
+        "previousReportCount": 6,
+        "recentTargetMean": 3299286,
+        "previousTargetMean": 3450000,
         "recentTargetMedian": 3200000,
-        "recentTargetStdev": 492366,
-        "targetMeanChangePct": 0.18,
-        "targetDispersionChangePct": 7.34,
+        "recentTargetStdev": 476452,
+        "targetMeanChangePct": -4.37,
+        "targetDispersionChangePct": -1.89,
         "revisionUp": 24,
         "revisionDown": 8,
         "risingTopics": [
           {
             "topic": "메모리",
-            "delta": 0.125,
+            "delta": 0.133,
             "ratio": null
           },
           {
-            "topic": "환율",
-            "delta": 0.1,
-            "ratio": 1.25
-          },
-          {
             "topic": "HBM",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "메모리 가격",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "사이클",
-            "delta": 0.062,
-            "ratio": null
-          }
-        ]
-      },
-      {
-        "itemCode": "005930",
-        "itemName": "삼성전자",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 95,
-        "brokerCount": 14,
-        "recentReportCount": 16,
-        "previousReportCount": 11,
-        "recentTargetMean": 491429,
-        "previousTargetMean": 507273,
-        "recentTargetMedian": 490000,
-        "recentTargetStdev": 85009,
-        "targetMeanChangePct": -3.12,
-        "targetDispersionChangePct": 0.3,
-        "revisionUp": 24,
-        "revisionDown": 7,
-        "risingTopics": [
-          {
-            "topic": "DRAM",
-            "delta": 0.125,
+            "delta": 0.067,
             "ratio": null
           },
           {
             "topic": "주주환원",
-            "delta": 0.062,
+            "delta": 0.067,
             "ratio": null
-          },
-          {
-            "topic": "메모리",
-            "delta": 0.006,
-            "ratio": 1.03
           }
         ]
       }
