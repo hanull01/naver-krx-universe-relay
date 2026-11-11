@@ -432,7 +432,7 @@ class TradingDiscoveryTests(unittest.TestCase):
             ["999999"], set(), fail, lambda row, now: row, lambda: "now")
         self.assertEqual(result["networkCalls"], 1)
         self.assertEqual(result["requestedSymbols"], ["999999"])
-        self.assertEqual(result["errors"], [{"reason": "OSError"}])
+        self.assertEqual(result["errors"], [{"itemCode": "999999", "reason": "OSError"}])
 
     def test_hash_count_duplicate_date_and_sensitive_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
