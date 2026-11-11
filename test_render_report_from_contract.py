@@ -1,11 +1,13 @@
 import hashlib
 import html as html_lib
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
 from test_market_dashboard_renderer import report_fixture
 from tools.market_dashboard_renderer import TemplateUnavailable, render_contract_views
+from tools.render_current_observation import render_current_observation
 
 
 class ContractOnlyReportRenderingTests(unittest.TestCase):
@@ -67,6 +69,53 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
             )
             self.assertEqual(result["htmlStatus"], "AVAILABLE")
             self.assertTrue(Path(result["datedHtml"]).exists())
+
+    def test_current_observation_and_latest_views_share_one_contract_and_replace_stale_markdown(self):
+        contract = report_fixture()["reportContract"]
+        contract["asOf"] = contract["observationDate"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract_path = root / "latest-report-contract.json"
+            contract_path.write_text(json.dumps(contract, ensure_ascii=False), encoding="utf-8")
+            latest_dir = root / "latest"
+            latest_dir.mkdir()
+            (latest_dir / "latest.md").write_text("STALE_MARKDOWN", encoding="utf-8")
+
+            latest = render_contract_views(
+                contract, latest_dir, allow_current_observation=True
+            )
+            observation = render_current_observation(
+                contract_path,
+                root / "current-observation" / "run-1",
+                run_id="run-1",
+                head_sha="a" * 40,
+            )
+
+            self.assertEqual(
+                Path(latest["markdown"]).read_bytes(),
+                root.joinpath("current-observation", "run-1", "report.md").read_bytes(),
+            )
+            self.assertEqual(
+                Path(latest["html"]).read_bytes(),
+                root.joinpath("current-observation", "run-1", "report.html").read_bytes(),
+            )
+            self.assertEqual(
+                Path(latest["markdown"]).read_bytes(),
+                Path(latest["datedMarkdown"]).read_bytes(),
+            )
+            self.assertNotIn(
+                "STALE_MARKDOWN", Path(latest["markdown"]).read_text(encoding="utf-8")
+            )
+            self.assertEqual(observation["status"], "SUCCESS")
+
+    def test_failed_contract_view_does_not_consume_or_replace_stale_markdown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            latest = output / "latest.md"
+            latest.write_text("STALE_MARKDOWN", encoding="utf-8")
+            with self.assertRaises(TemplateUnavailable):
+                render_contract_views({}, output)
+            self.assertEqual(latest.read_text(encoding="utf-8"), "STALE_MARKDOWN")
 
 
 if __name__ == "__main__":

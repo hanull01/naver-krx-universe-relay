@@ -1670,7 +1670,11 @@ def build_report_contract(
             "currentMarketObservation": "data/monitoring/latest-breadth.json#breadth.TOTAL",
             "historicalTechnicalMarket": "reportContract.historicalTechnicalMarket",
             "markdownReport": "data/reports/latest.md",
+            "markdownReportWriter": "tools/market_dashboard_renderer.py#render_contract_views",
             "htmlReport": "data/reports/latest.html",
+            "htmlReportWriter": "tools/market_dashboard_renderer.py#render_contract_views",
+            "currentObservationMarkdown": "data/reports/current-observation/<workflowRunId>/report.md",
+            "currentObservationHtml": "data/reports/current-observation/<workflowRunId>/report.html",
             "kiwoomCandidates": kiwoom_source_path or "UNAVAILABLE",
             "technicalCandidates": {
                 "path": "data/monitoring/latest-report-contract.json#technicalCandidates",

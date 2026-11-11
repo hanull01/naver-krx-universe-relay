@@ -46,6 +46,20 @@ class RefreshIntradayWorkflowContractTests(unittest.TestCase):
         self.assertIn("MARKET_DATA_READY", self.text)
         self.assertIn("data/monitoring/latest-report-contract.json", self.text)
 
+    def test_markdown_latest_pointer_is_published_from_the_validated_contract_view(self):
+        for marker in (
+            "datedMarkdown",
+            "latest_markdown_source_path",
+            "data/reports/latest.md",
+            "markdown_published=$markdown_publish_eligible",
+            "steps.publish.outputs.markdown_published == 'true'",
+        ):
+            self.assertIn(marker, self.text)
+        self.assertIn(
+            "preserving prior latest.md without consuming it",
+            self.text,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
