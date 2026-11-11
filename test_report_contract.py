@@ -354,7 +354,46 @@ class ReportContractTests(unittest.TestCase):
         )
         self.assertEqual(contract["technicalCandidates"][0]["itemCode"], "028050")
         self.assertEqual(contract["kiwoomCandidates"]["symbols"], discovery["symbols"])
-        self.assertEqual(contract["kiwoomCandidates"]["technicalProvenance"]["generationId"], "gen_20261028")
+        self.assertNotIn("technicalProvenance", contract["kiwoomCandidates"])
+        for row in contract["kiwoomCandidates"]["stocks"]:
+            self.assertNotIn("ma20", row)
+            self.assertEqual(row["candidateTechnicalIndicators"], {})
+            self.assertIn("TECHNICAL_INDICATORS_UNAVAILABLE", row["candidateFailureReason"])
+        self.assertEqual(validate_kiwoom_candidate_binding(discovery, contract), [])
+
+    def test_kiwoom_contract_uses_nested_candidate_details_not_krx_rows(self):
+        discovery = {
+            "status": "AVAILABLE", "selectionDate": "2026-10-28",
+            "monitoringDate": "2026-10-29", "sourceSha256": "a" * 64,
+            "symbols": ["005930"], "candidateCount": 1,
+            "validation": {"status": "VALID", "calendarSource": "KRX_OFFICIAL",
+                            "immutable": True, "codeNameBindings": {"005930": "삼성전자"}},
+        }
+        details = [{
+            "symbol": "005930", "name": "삼성전자", "selectionValue": 71000,
+            "technicalIndicators": {"ma20": 70500},
+            "conditionDetails": {"matched": True}, "currentPrice": 71200,
+            "selectionStatus": "AVAILABLE", "quoteStatus": "AVAILABLE",
+            "detailStatus": "AVAILABLE", "source": "KIWOOM_CONDITION_SEARCH",
+            "generatedAt": "2026-10-29T09:00:00+09:00",
+        }]
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261028", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            kiwoom_candidates={**discovery, "sourceCandidateCount": 1,
+                               "candidateDetails": details,
+                               "stocks": [{"itemCode": "005930", "itemName": "삼성전자",
+                                           "ma20": 999, "candidateDetail": details[0]}]},
+        )
+        row = contract["kiwoomCandidates"]["stocks"][0]
+        self.assertEqual(row["candidateTechnicalIndicators"], {"ma20": 70500})
+        self.assertEqual(row["candidateSelectionValue"], 71000)
+        self.assertNotIn("ma20", row)
         self.assertEqual(validate_kiwoom_candidate_binding(discovery, contract), [])
 
     def test_kiwoom_candidate_outside_source_fails_binding(self):

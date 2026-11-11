@@ -1882,25 +1882,11 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         "candidateStatuses": supplemental_quotes.get("candidateStatuses") or [],
         "quoteCompleteness": supplemental_quotes.get("quoteCompleteness"),
     }
-    krx_lineage = technical_inputs["metadata"].get("historicalLineage") or {}
-    krx_source = {
-        "status": krx_lineage.get("status") or ("VERIFIED" if technical_inputs["metadata"].get("receiptStatus") == "VERIFIED" else "UNAVAILABLE"),
-        "generationId": krx_lineage.get("generationId") or technical_inputs["metadata"].get("sourceGeneration"),
-        "targetDate": krx_lineage.get("targetDate") or technical_inputs["metadata"].get("targetDate"),
-        "sourcePath": technical_inputs["metadata"].get("sourcePath") or "staging/technicals.json",
-        "manifestSha256": technical_inputs["metadata"].get("manifestSha256"),
-        "sourceSha256": technical_inputs["metadata"].get("monitoringSha256"),
-        "receiptStatus": krx_lineage.get("receiptStatus") or technical_inputs["metadata"].get("receiptStatus", "UNAVAILABLE"),
-        "publicationAuthorized": technical_inputs["metadata"].get("publicationAuthorized"),
-    }
     kiwoom_section = trading_discovery.analyze(
         report_date, discovery, discovery_quotes,
         analysis_technicals, analysis_states,
         full_market_signals, previous_discovery,
         name_lookup=discovery_name_lookup,
-        historical_technicals=analysis_technicals,
-        historical_states=analysis_states,
-        krx_source=krx_source,
     )
     leader_by_code = {
         str(row.get("code")): row for row in full_market.get("leaders", [])
