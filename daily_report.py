@@ -177,8 +177,26 @@ def compact_date(value):
     return text
 
 
-def _unavailable_research(reason):
-    return {"status": "UNAVAILABLE", "asOf": None, "stocks": [], "unavailableReason": reason}
+def _unavailable_research(reason, *, report_date=None, research_slot=None, artifact_path=None):
+    """Return an explicit missing-input result without consulting ``latest``."""
+    report_slot = str(os.environ.get("REPORT_SLOT") or "").strip() or None
+    lineage = {
+        "researchSlot": research_slot,
+        "reportSlot": report_slot,
+        "expectedAt": None,
+        "artifactPath": artifact_path,
+        "producerStatus": None,
+        "artifactStatus": "MISSING" if reason.endswith("MISSING") else None,
+        "freshnessStatus": None,
+        "failureReason": reason,
+        "consumedByReport": False,
+        "checkedAt": None,
+    }
+    lineage = {key: value for key, value in lineage.items() if value not in (None, "")}
+    return {
+        "status": "UNAVAILABLE", "asOf": None, "stocks": [],
+        "unavailableReason": reason, "slotLineage": lineage,
+    }
 
 
 def validated_research_for_report(payload, report_date, expected_generation=None):
@@ -199,28 +217,36 @@ def load_research_slot_for_report(report_date, expected_generation=None):
     """Load only the research slot explicitly assigned to this report."""
     slot = str(os.environ.get("REPORT_RESEARCH_SLOT") or "").strip()
     if slot not in {"07:20", "12:20", "19:20"}:
-        return _unavailable_research("RESEARCH_SLOT_REQUIRED")
+        return _unavailable_research("RESEARCH_SLOT_REQUIRED", report_date=report_date)
     compact = compact_date(report_date)
     if not compact:
-        return _unavailable_research("RESEARCH_SLOT_DATE_UNAVAILABLE")
+        return _unavailable_research("RESEARCH_SLOT_DATE_UNAVAILABLE", report_date=report_date, research_slot=slot)
     path = RESEARCH_SLOTS_PATH / f"{compact}-{slot.replace(':', '')}.json"
     try:
         payload = load_json(path)
     except (OSError, ValueError, json.JSONDecodeError):
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_MISSING")
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_MISSING", report_date=report_date, research_slot=slot, artifact_path=str(path))
     if not isinstance(payload, dict):
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED")
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
     if compact_date(payload.get("asOf")) != compact:
-        return _unavailable_research("RESEARCH_SLOT_DATE_MISMATCH")
+        return _unavailable_research("RESEARCH_SLOT_DATE_MISMATCH", report_date=report_date, research_slot=slot, artifact_path=str(path))
     lineage = payload.get("slotLineage")
     if not isinstance(lineage, dict) or lineage.get("researchSlot") != slot:
-        return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING")
+        return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING", report_date=report_date, research_slot=slot, artifact_path=str(path))
     if lineage.get("producerStatus") == "FAILED":
-        return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED")
+        return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
     if lineage.get("artifactStatus") == "FAILED":
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED")
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
     if lineage.get("freshnessStatus") not in {"FRESH", "AVAILABLE", "OK"}:
-        return _unavailable_research("RESEARCH_SLOT_NOT_FRESH")
+        return _unavailable_research("RESEARCH_SLOT_NOT_FRESH", report_date=report_date, research_slot=slot, artifact_path=str(path))
+    payload = dict(payload)
+    payload["slotLineage"] = {
+        **lineage,
+        "researchSlot": slot,
+        "reportSlot": str(os.environ.get("REPORT_SLOT") or "").strip() or None,
+        "artifactPath": lineage.get("artifactPath") or str(path),
+        "consumedByReport": True,
+    }
     validated = validated_research_for_report(payload, report_date, expected_generation)
     if validated.get("status") == "UNAVAILABLE":
         return validated

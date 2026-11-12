@@ -552,6 +552,9 @@ _GROUP_SUMMARY_FIELDS = (
     "qualityStatus", "industrySourcePresent", "featureValidMemberCount",
     "derivedFeatureValidMemberCount", "closeValidMemberCount",
     "historyAdjustmentUnverifiedCount", "missingCodeCount",
+    "source", "sourceDate", "observationDate", "scope", "artifactPath",
+    "producerRunId", "producerStatus", "currentSnapshotStatus",
+    "membershipStatus", "relativeStrengthStatus", "missingReason",
 )
 
 
@@ -628,14 +631,24 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
     default_reason = (
         "INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry" else "THEME_MEMBERSHIP_MISSING"
     )
+    if status in {"FAILED", "ERROR", "INVALID"}:
+        default_reason = "PRODUCER_FAILED"
+    elif member_count is None and not row.get("artifactPath"):
+        default_reason = "INPUT_ARTIFACT_MISSING"
+    elif kind == "theme" and row.get("membershipStatus") in {"MISSING", "UNAVAILABLE"}:
+        default_reason = "THEME_MEMBERSHIP_MISSING"
     item["availability"] = availability(
         status=status,
-        required_data=("업종 구성종목과 현재 관측값" if kind == "industry" else "테마 구성종목과 현재 관측값"),
+        required_data=("업종 구성종목·현재 관측값·상대강도" if kind == "industry" else "테마 구성종목·현재 관측값·상대강도"),
         received=received,
         producer=("NAVER 업종 수집" if kind == "industry" else "NAVER 테마 수집"),
         reason=first_reason(row, "missingReason", "reason", "validationReason", "qualityReason")
         or (default_reason if not received else None),
         next_check_at=row.get("nextCheckAt"),
+        producer_run_id=row.get("producerRunId"),
+        artifact_path=row.get("artifactPath") or item.get("detailSource"),
+        freshness_status=row.get("freshnessStatus"),
+        checked_at=row.get("checkedAt"),
     )
     return item
 
@@ -651,11 +664,24 @@ def _group_collection_availability(
     groups: Mapping[str, Any] | None, kind: str, trading_date: Any
 ) -> dict[str, Any]:
     source_key = "sectors" if kind == "industry" else "themes"
-    rows = [row for row in (groups or {}).get(source_key, []) if isinstance(row, Mapping)]
+    if not isinstance(groups, Mapping):
+        return availability(
+            status="UNAVAILABLE",
+            required_data=("운영 관심 업종과 현재 관측" if kind == "industry" else "운영 관심 테마와 현재 관측"),
+            received=False,
+            producer=("운영 관심 업종 설정·수집" if kind == "industry" else "운영 관심 테마 설정·수집"),
+            reason="INTEREST_GROUP_NOT_CONFIGURED",
+        )
+    rows = [row for row in groups.get(source_key, []) if isinstance(row, Mapping)]
     raw_status = (groups or {}).get("status") or (groups or {}).get("qualityStatus")
     reason = first_reason(groups, "missingReason", "reason", "policyReason", "validationReason")
     if not rows:
-        reason = reason or ("INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry" else "THEME_MEMBERSHIP_MISSING")
+        reason = reason or (
+            "PRODUCER_FAILED" if raw_status in {"FAILED", "ERROR", "INVALID"}
+            else "INPUT_ARTIFACT_MISSING" if groups.get("artifactPath") is None
+            else "INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry"
+            else "THEME_MEMBERSHIP_MISSING"
+        )
     return availability(
         status=raw_status or ("AVAILABLE" if rows else "UNAVAILABLE"),
         required_data=("운영 관심 업종과 현재 관측" if kind == "industry" else "운영 관심 테마와 현재 관측"),
@@ -663,6 +689,10 @@ def _group_collection_availability(
         producer=("운영 관심 업종 설정·수집" if kind == "industry" else "운영 관심 테마 설정·수집"),
         reason=reason,
         next_check_at=(groups or {}).get("nextCheckAt"),
+        producer_run_id=(groups or {}).get("producerRunId"),
+        artifact_path=(groups or {}).get("artifactPath"),
+        freshness_status=(groups or {}).get("freshnessStatus"),
+        checked_at=(groups or {}).get("checkedAt"),
     )
 
 
@@ -714,8 +744,16 @@ def _compact_v1_rows(
                 required_data=("업종 현재 관측과 대표 주도주" if kind == "industry" else "테마 현재 관측과 대표 주도주"),
                 received=bool(relative.get("leaderCandidates") or relative.get("leaders")),
                 producer=("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
-                reason=relative.get("leaderMissingReason"),
+                reason=(
+                    relative.get("leaderMissingReason")
+                    or row.get("missingReason")
+                    or "LEADER_CALCULATION_FAILED"
+                ) if not (relative.get("leaderCandidates") or relative.get("leaders")) else None,
                 next_check_at=relative.get("nextCheckAt"),
+                producer_run_id=relative.get("producerRunId"),
+                artifact_path=relative.get("artifactPath"),
+                freshness_status=relative.get("freshnessStatus"),
+                checked_at=relative.get("checkedAt"),
             ),
         })
     rows.sort(key=lambda item: (-float(item["score"]) if isinstance(item.get("score"), (int, float)) else 1e9, str(item.get("id") or "")))
@@ -731,6 +769,7 @@ def _compact_research_analysis(
     if not isinstance(research, Mapping):
         return {
             "status": "UNAVAILABLE", "asOf": None, "items": [],
+            "slotLineage": {},
             "availability": availability(
                 status="UNAVAILABLE", required_data="리서치 원문과 분석 산출물",
                 received=False, producer="NAVER Research Action",
@@ -753,22 +792,39 @@ def _compact_research_analysis(
         lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
             "status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": [],
+            "slotLineage": dict(lineage),
             "availability": availability(
                 status=research.get("status"), required_data="리서치 원문과 분석 산출물",
                 received=False, producer="NAVER Research Action", reason=reason,
                 next_check_at=lineage.get("nextCheckAt") or lineage.get("expectedAt"),
+                producer_run_id=lineage.get("producerRunId"),
+                artifact_path=lineage.get("artifactPath"),
+                freshness_status=lineage.get("freshnessStatus"),
+                report_slot=lineage.get("reportSlot"),
+                research_slot=lineage.get("researchSlot"),
+                expected_at=lineage.get("expectedAt"),
+                checked_at=lineage.get("checkedAt"),
             ),
         }
     eligible = [row for row in stocks if row.get("rankingEligible") is True]
     if not eligible:
+        lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
             "status": str(research.get("status") or "UNAVAILABLE"),
             "asOf": research.get("asOf"), "items": [],
+            "slotLineage": dict(lineage),
             "availability": availability(
                 status=research.get("status"), required_data="리서치 원문과 분석 산출물",
                 received=False, producer="NAVER Research Action",
                 reason=research.get("unavailableReason") or "RESEARCH_ANALYSIS_MISSING",
                 next_check_at=(research.get("slotLineage") or {}).get("nextCheckAt"),
+                producer_run_id=lineage.get("producerRunId"),
+                artifact_path=lineage.get("artifactPath"),
+                freshness_status=lineage.get("freshnessStatus"),
+                report_slot=lineage.get("reportSlot"),
+                research_slot=lineage.get("researchSlot"),
+                expected_at=lineage.get("expectedAt"),
+                checked_at=lineage.get("checkedAt"),
             ),
         }
 
@@ -811,14 +867,23 @@ def _compact_research_analysis(
             "category": "시장 방향 일치",
             "text": f"{aligned.get('itemName') or aligned.get('itemCode')}가 오늘의 주도 그룹 대표 종목과 리서치 양쪽에서 확인됩니다.",
         })
+    lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
     return {
         "status": str(research.get("status") or "AVAILABLE"),
         "asOf": research.get("asOf"), "items": items[:5],
+        "slotLineage": dict(lineage),
         "availability": availability(
             status=research.get("status") or "AVAILABLE",
             required_data="리서치 원문과 분석 산출물", received=True,
             producer="NAVER Research Action", reason=None,
             next_check_at=(research.get("slotLineage") or {}).get("checkedAt"),
+            producer_run_id=lineage.get("producerRunId"),
+            artifact_path=lineage.get("artifactPath"),
+            freshness_status=lineage.get("freshnessStatus"),
+            report_slot=lineage.get("reportSlot"),
+            research_slot=lineage.get("researchSlot"),
+            expected_at=lineage.get("expectedAt"),
+            checked_at=lineage.get("checkedAt"),
         ),
     }
 

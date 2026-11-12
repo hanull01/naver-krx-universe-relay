@@ -88,16 +88,20 @@ class DailyReportTests(unittest.TestCase):
                 },
             }
             (slot_dir / "20261029-0720.json").write_text(json.dumps(payload), encoding="utf-8")
-            with patch.object(daily_report, "RESEARCH_SLOTS_PATH", slot_dir), patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "07:20"}, clear=False):
+            with patch.object(daily_report, "RESEARCH_SLOTS_PATH", slot_dir), patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "07:20", "REPORT_SLOT": "08:30"}, clear=False):
+                loaded = daily_report.load_research_slot_for_report("2026-10-29", "gen-1")
                 self.assertEqual(
-                    daily_report.load_research_slot_for_report("2026-10-29", "gen-1")["status"],
+                    loaded["status"],
                     "OK",
                 )
+                self.assertEqual(loaded["slotLineage"]["researchSlot"], "07:20")
+                self.assertEqual(loaded["slotLineage"]["reportSlot"], "08:30")
+                self.assertTrue(loaded["slotLineage"]["consumedByReport"])
                 with patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "12:20"}, clear=False):
-                    self.assertEqual(
-                        daily_report.load_research_slot_for_report("2026-10-29", "gen-1")["unavailableReason"],
-                        "RESEARCH_SLOT_ARTIFACT_MISSING",
-                    )
+                    missing = daily_report.load_research_slot_for_report("2026-10-29", "gen-1")
+                    self.assertEqual(missing["unavailableReason"], "RESEARCH_SLOT_ARTIFACT_MISSING")
+                    self.assertEqual(missing["slotLineage"]["researchSlot"], "12:20")
+                    self.assertFalse(missing["slotLineage"]["consumedByReport"])
 
     def test_unavailable_research_does_not_fake_coverage_or_block_report(self):
         report = {

@@ -72,8 +72,9 @@ def _sanitize_user_text(value: str) -> str:
         ("SOURCE_VERIFIED", "원천 검증됨"),
         ("monitoring-daily", "구형 모니터링 경로"),
         ("MONITORING_DAILY_PRE", "구형 모니터링 경로"),
-        ("확인 대기", "다음 확인 예정"),
-        ("검증 대기", "추가 확인 필요"),
+        ("확인 대기", "공급 상태 미수신"),
+        ("검증 대기", "추가 관찰 기능 상태 미수신"),
+        ("검증 중인 후보", "자동 산출 상태"),
         ("확인 가능", "수신됨"),
         ("자료 없음", "미수신"),
     )
@@ -482,14 +483,17 @@ def _compact_v2_verified(contract: Mapping[str, Any], v2: Mapping[str, Any]) -> 
 def _v2_hold_reason(v2: Mapping[str, Any]) -> str:
     reason = str(v2.get("reason") or v2.get("sourceQualityReason") or "").upper()
     labels = {
-        "SOURCE_MISSING": "원천 데이터 미수집",
+        "SOURCE_MISSING": "입력 자료 없음",
         "TRADING_DATE_UNAVAILABLE": "기준일 확인 불가",
         "INSUFFICIENT_MEMBERS": "구성 종목 부족",
-        "SOURCE_UNVERIFIED": "현재 자동 산출 기능이 없습니다.",
+        "SOURCE_UNVERIFIED": "현재 자동 산출 기능이 없습니다(자동 산출 기능 미연결)",
+        "V2_NOT_PRODUCED": "현재 자동 산출 기능이 없습니다(자동 산출 기능 미연결)",
+        "NO_SCHEDULED_COLLECTION": "자료 수집 예정 없음",
+        "DERIVED_ARTIFACT_MISSING": "산출 자료 없음",
         "SOURCE_GENERATION_MISMATCH": "이전 세대 자료와 불일치",
         "SELECTION_NOT_MET": "산출 조건 미충족",
     }
-    return labels.get(reason, "현재 자동 산출 기능이 없습니다.")
+    return labels.get(reason, "현재 자동 산출 기능이 없습니다(자동 산출 기능 미연결)")
 
 
 def _compact_relative_top5(contract: Mapping[str, Any], key: str) -> list[Mapping[str, Any]]:
@@ -577,15 +581,28 @@ def _compact_interest(row: Mapping[str, Any]) -> dict[str, Any]:
         producer="리포트 추세 계산",
         reason=None if trend_value not in (None, "") else "TREND_DATA_MISSING",
     )
-    trend_label = {
-        "ABOVE": "20일 이동평균 상회",
-        "BELOW": "20일 이동평균 하회",
-        "UPTREND": "상승 추세",
-        "DOWNTREND": "하락 추세",
-        "SIDEWAYS": "단기·중기 방향 엇갈림",
-    }.get(str(trend_value or "").upper(), "추세 계산 자료 부족" if trend_value in (None, "") else _display_status(trend_value))
+    def ma_position(value: Any) -> str | None:
+        normalized = str(value or "").upper()
+        if normalized in {"ABOVE", "OVER", "UP", "상회"}:
+            return "ABOVE"
+        if normalized in {"BELOW", "UNDER", "DOWN", "하회"}:
+            return "BELOW"
+        return None
+    ma20_position = ma_position(pick(state, row, keys=("priceVsMA20", "ma20Position")))
+    ma60_position = ma_position(pick(state, row, keys=("priceVsMA60", "ma60Position")))
+    trend_code = str(trend_value or "").upper()
+    if ma20_position and ma60_position and ma20_position != ma60_position:
+        trend_label = "단기·중기 방향 엇갈림"
+    elif ma20_position == "ABOVE" or (not ma20_position and trend_code in {"ABOVE", "UPTREND"}):
+        trend_label = "20일 이동평균 상회"
+    elif ma20_position == "BELOW" or (not ma20_position and trend_code in {"BELOW", "DOWNTREND"}):
+        trend_label = "20일 이동평균 하회"
+    elif trend_code == "SIDEWAYS":
+        trend_label = "단기·중기 방향 엇갈림"
+    else:
+        trend_label = "추세 계산 자료 부족" if trend_value in (None, "") else _display_status(trend_value)
     return {
-        "name": _text(row.get("itemName") or row.get("name"), "이름 확인 대기"),
+        "name": _text(row.get("itemName") or row.get("name"), "이름 수신 필요"),
         "code": _text(row.get("itemCode") or row.get("code"), ""),
         "price": _price(current_value),
         "ma20": _price(ma20_value),
@@ -613,7 +630,10 @@ def _compact_leaders(row: Mapping[str, Any]) -> str:
         _text(item.get('name'), "이름 확인 대기")
         for item in leaders[:3] if isinstance(item, Mapping)
     ]
-    return ", ".join(values) if values else "주도주 자료 없음"
+    if values:
+        return ", ".join(values)
+    reason = row.get("leaderMissingReason") or row.get("missingReason")
+    return _display_reason(reason, "대표 주도주 미수신") if reason else "대표 주도주 미수신"
 
 
 def _availability_text(row: Mapping[str, Any] | None, fallback: str = "원천 자료 확인 필요") -> str:
@@ -624,23 +644,26 @@ def _availability_text(row: Mapping[str, Any] | None, fallback: str = "원천 �
         detail = row
     if not isinstance(detail, Mapping):
         return fallback
-    return (
+    parts = [
         f"필요 자료: {detail.get('requiredData') or '원천 자료'} · "
         f"수신: {'예' if detail.get('received') else '아니오'} · "
         f"공급자: {detail.get('producer') or '확인 필요'} · "
-        f"사유: {detail.get('missingReason') or '정상 수신'} · "
+        f"사유: {_display_reason(detail.get('missingReason'), '정상 수신')} · "
         f"다음 확인: {next_check_label(detail.get('nextCheckAt'))}"
-    )
+    ]
+    if detail.get("researchSlot"):
+        parts.append(f"대상 회차: {detail['researchSlot']} → {detail.get('reportSlot') or '리포트'}")
+    return " · ".join(parts)
 
 
 def _compact_group_lineage(rows: list[Mapping[str, Any]]) -> str:
     """Render the current-observation binding shared by HTML and Markdown."""
     row = next((item for item in rows if isinstance(item, Mapping)), {})
-    source = _text(row.get("leaderSource") or row.get("source"), "확인 대기")
+    source = _text(row.get("leaderSource") or row.get("source"), "원천 미수신")
     source_date = _compact_date(row.get("sourceDate") or row.get("leaderObservationDate"))
     observation_date = _compact_date(row.get("observationDate") or row.get("leaderObservationDate"))
-    scope = _text(row.get("leaderScope") or row.get("scope"), "확인 대기")
-    status = _display_status(row.get("leaderEvidenceStatus"), "확인 대기")
+    scope = _text(row.get("leaderScope") or row.get("scope"), "범위 확인 필요")
+    status = _display_status(row.get("leaderEvidenceStatus"), "주도주 상태 확인 필요")
     return f"원천: {source} · 원천일: {source_date} · 관측일: {observation_date} · 범위: {scope} · 주도주 품질: {status}"
 
 
@@ -940,11 +963,15 @@ def _compact_v1_cards(rows: list[Mapping[str, Any]], label: str, availability_de
 def _compact_research_cards(model: Mapping[str, Any]) -> str:
     research = model.get("researchAnalysis") or {}
     items = research.get("items") or []
+    lineage = research.get("slotLineage") or {}
+    slot_text = ""
+    if lineage.get("researchSlot"):
+        slot_text = f'<p>대상 회차: {_escape(lineage.get("researchSlot"))} → {_escape(lineage.get("reportSlot") or "리포트")}</p>'
     if not items:
         reason = research.get("unavailableReason") or "RESEARCH_SLOT_ARTIFACT_MISSING"
         detail = research.get("availability") or {}
         display_status = research.get("status") if detail.get("received") is True else "UNAVAILABLE"
-        return f'<div class="industry-item"><strong>네이버 리서치 {_escape(_display_status(display_status))}</strong><p>{_escape(_display_reason(reason))}</p><p>{_escape(_availability_text(detail))}</p></div>'
+        return f'<div class="industry-item"><strong>네이버 리서치 {_escape(_display_status(display_status))}</strong>{slot_text}<p>{_escape(_display_reason(reason))}</p><p>{_escape(_availability_text(detail))}</p></div>'
     return "".join(
         f'<div class="industry-item"><div class="industry-head"><strong>{_escape(item.get("category") or "리서치 분석")}</strong></div><p>{_escape(item.get("text") or "분석 내용 미수신")}</p></div>'
         for item in items[:5]
@@ -953,14 +980,14 @@ def _compact_research_cards(model: Mapping[str, Any]) -> str:
 
 def _compact_v2_cards(model: Mapping[str, Any]) -> str:
     if not model["v2Verified"]:
-        return f'<div class="industry-item"><strong>추가 관찰 자료 미수신</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
+        return f'<div class="industry-item"><strong>추가 관찰 업종·테마</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
         for row in group:
             if _compact_row_available(row):
                 score = f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 대기"
                 rows.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("v2Status")))}</span></div><p>점수 {_escape(score)} · 주도주 {_escape(_compact_leaders(row))}</p></div>')
-    return "".join(rows) or '<div class="industry-item"><strong>추가 관찰 자료 미수신</strong><p>현재 자동 산출 기능이 없습니다.</p></div>'
+    return "".join(rows) or '<div class="industry-item"><strong>추가 관찰 업종·테마</strong><p>현재 자동 산출 기능이 없습니다.</p></div>'
 
 
 def _compact_interest_cards(model: Mapping[str, Any]) -> str:
@@ -975,7 +1002,7 @@ def _compact_interest_cards(model: Mapping[str, Any]) -> str:
 def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
     rows = model["kiwoom"].get("stocks") or []
     if not rows:
-        return '<article class="stock"><h4>키움 후보 자료 없음</h4><p>확인된 후보가 없습니다.</p></article>'
+        return '<article class="stock"><h4>키움 후보 미수신</h4><p>조건검색 결과를 수신하지 못했습니다.</p></article>'
     def condition_text(row):
         details = row.get("candidateConditionDetails")
         if not isinstance(details, Mapping):
@@ -987,10 +1014,21 @@ def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
             return "조건검색 미충족"
         reason = row.get("candidateFailureReason") or []
         if isinstance(reason, list) and reason:
-            return "조건 상세 자료 없음 · " + str(reason[0])
-        return "조건 상세 자료 없음"
+            return "조건 상세 미수신 · " + ", ".join(_display_reason(item) for item in reason)
+        return "조건 상세 미수신"
+    def failure_text(row):
+        reasons = row.get("candidateFailureReason") or []
+        if isinstance(reasons, str):
+            reasons = [reasons]
+        return ", ".join(_display_reason(item) for item in reasons) or "없음"
+    def selection_text(row):
+        value = row.get("candidateSelectionValue")
+        return _price(value) if value is not None else "기준값 미수신"
+    def current_text(row):
+        value = _first(row, "price", "currentPrice")
+        return _price(value) if value is not None else "현재가 미수신"
     return "".join(
-        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("candidateDetailStatus") or row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName") or "이름 확인 대기")}</h4></div><div class="stock-stats"><div class="stock-stat"><small>기준값</small><strong>{_escape(_price(row.get("candidateSelectionValue")))}</strong></div><div class="stock-stat"><small>현재가</small><strong>{_escape(_price(_first(row, "price", "currentPrice")))}</strong></div><div class="stock-stat"><small>기술 지표</small><strong>{_escape(_candidate_technical_text(row))}</strong></div><div class="stock-stat"><small>조건 충족 여부</small><strong>{_escape(condition_text(row))}</strong></div><div class="stock-stat"><small>실패 원인</small><strong>{_escape(", ".join(row.get("candidateFailureReason") or []) or "없음")}</strong></div></div></article>'
+        f'<article class="stock"><div class="stock-topline"><span class="stock-role">키움 전일후보군</span><span class="status-chip">{_escape(_display_status(row.get("candidateDetailStatus") or row.get("status") or "관측"))}</span></div><div class="stock-header"><h4>{_escape(row.get("itemName") or "이름 수신 필요")}</h4></div><div class="stock-stats"><div class="stock-stat"><small>기준값</small><strong>{_escape(selection_text(row))}</strong></div><div class="stock-stat"><small>현재가</small><strong>{_escape(current_text(row))}</strong></div><div class="stock-stat"><small>기술 지표</small><strong>{_escape(_candidate_technical_text(row))}</strong></div><div class="stock-stat"><small>조건 충족 여부</small><strong>{_escape(condition_text(row))}</strong></div><div class="stock-stat"><small>실패 원인</small><strong>{_escape(failure_text(row))}</strong></div></div></article>'
         for row in rows
     )
 
@@ -1023,12 +1061,12 @@ def _compact_kiwoom_markdown_rows(model: Mapping[str, Any]) -> list[tuple[Any, .
             details = {}
         condition = ("조건검색 충족" if details.get("matched") is True or row.get("conditionResult") is True else
                      "조건검색 미충족" if details.get("matched") is False or row.get("conditionResult") is False else
-                     "조건 상세 자료 없음")
+                     "조건 상세 미수신")
         next_check = _first(row, "nextCheck", "nextObservation", "nextAction") or "다음 관찰에서 확인"
         result.append((
-            _text(row.get("itemName"), "이름 확인 대기"),
-            _price(selection_price),
-            _price(_first(row, "price", "currentPrice")),
+            _text(row.get("itemName"), "이름 수신 필요"),
+            _price(selection_price) if selection_price is not None else "기준값 미수신",
+            _price(_first(row, "price", "currentPrice")) if _first(row, "price", "currentPrice") is not None else "현재가 미수신",
             technical,
             condition,
             next_check,
@@ -1264,6 +1302,9 @@ def _compact_markdown(
         }
         availability_detail = (model.get("researchAnalysis") or {}).get("availability") or {}
         lines.append(f"리서치: {_display_status((model.get('researchAnalysis') or {}).get('status'))} — {_display_reason(research_reason)}")
+        lineage = (model.get("researchAnalysis") or {}).get("slotLineage") or {}
+        if lineage.get("researchSlot"):
+            lines.append(f"대상 회차: {lineage.get('researchSlot')} → {lineage.get('reportSlot') or '리포트'}")
         lines.append(_availability_text(availability_detail))
     lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
     interest_rows = [

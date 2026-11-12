@@ -413,7 +413,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("70,000원", output)
             self.assertIn("68,000원", output)
             self.assertIn("65,000원", output)
-            self.assertIn("하락 추세" if "하락 추세" in output else "DOWNTREND", output)
+            self.assertIn("20일 이동평균 하회", output)
 
     def test_interest_cards_explain_each_input_and_use_reader_friendly_trend_text(self):
         report = report_fixture()
@@ -647,6 +647,66 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertNotIn(forbidden, markdown)
         self.assertIn("현재 자동 산출 기능이 없습니다", html)
         self.assertIn("현재 자동 산출 기능이 없습니다", markdown)
+
+    def test_user_views_explain_supply_breakpoints_and_research_slot(self):
+        report = report_fixture()
+        report["reportContract"]["v1"] = {
+            "industries": [], "themes": [],
+            "availability": {
+                "industries": {
+                    "status": "NOT_RECEIVED", "received": False,
+                    "requiredData": "운영 관심 업종과 현재 관측",
+                    "producer": "운영 관심 업종 설정·수집",
+                    "missingReason": "PRODUCER_NOT_CONNECTED",
+                    "researchSlot": None,
+                },
+                "themes": {
+                    "status": "NOT_RECEIVED", "received": False,
+                    "requiredData": "운영 관심 테마와 현재 관측",
+                    "producer": "운영 관심 테마 설정·수집",
+                    "missingReason": "SYMBOL_MATCH_FAILED",
+                },
+            },
+        }
+        report["reportContract"]["independentAnalysis"]["research"] = {
+            "status": "UNAVAILABLE",
+            "unavailableReason": "RESEARCH_SLOT_ARTIFACT_MISSING",
+            "slotLineage": {
+                "researchSlot": "12:20", "reportSlot": "13:30",
+                "expectedAt": "2026-11-12T12:20:00+09:00",
+                "producerStatus": "NOT_STARTED",
+                "artifactPath": "data/research/intelligence/slots/20261112-1220.json",
+            },
+            "analysis": {},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("공급 기능이 연결되지 않았습니다", output)
+            self.assertIn("구성종목과 현재 관측 종목을 연결하지 못했습니다", output)
+            self.assertIn("대상 회차: 12:20 → 13:30", output)
+            self.assertNotIn("PRODUCER_NOT_CONNECTED", output)
+            self.assertNotIn("SYMBOL_MATCH_FAILED", output)
+            self.assertNotIn("NOT_STARTED", output)
+
+    def test_interest_missing_trend_uses_specific_user_reason(self):
+        report = report_fixture()
+        report["reportContract"]["registeredUniverse"] = {
+            "status": "PARTIAL", "scope": "REGISTERED_UNIVERSE", "count": 1,
+            "items": [{
+                "itemCode": "005930", "itemName": "삼성전자",
+                "current": {"price": 70000, "status": "AVAILABLE"},
+                "technicals": {"ma20": 68000, "ma60": 65000, "status": "AVAILABLE"},
+                "state": {"status": "UNAVAILABLE", "trend": None,
+                          "failureReason": "TREND_DATA_MISSING"},
+                "status": "PARTIAL",
+            }],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("추세 계산 자료 부족", output)
+            self.assertIn("추세 계산 자료가 수신되지 않았습니다", output)
 
     def test_rendered_views_use_kst_and_hide_lineage_metadata(self):
         report = report_fixture()
