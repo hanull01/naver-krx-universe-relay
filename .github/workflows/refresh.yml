@@ -364,6 +364,30 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Build additional observation supply artifact
+        id: additional_observations
+        if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code == '0' && steps.full_market.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set +e
+          python -m tools.build_additional_observations \
+            --observation-date "$(TZ=Asia/Seoul date +%Y%m%d)" \
+            --run-id "$GITHUB_RUN_ID"
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -eq 0 ] && [ -f data/monitoring/additional-observations.json ]; then
+            status=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('data/monitoring/additional-observations.json').read_text(encoding='utf-8')).get('status', 'PRODUCER_FAILED'))
+          PY
+            )
+            echo "status=$status" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=PRODUCER_FAILED" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
       - name: Collect market indices
         id: indices
         if: steps.market_day.outputs.run == 'true'
@@ -723,6 +747,7 @@ jobs:
               data/monitoring/latest-changes.json \
               data/monitoring/latest-quality.json \
               data/monitoring/latest-summary.json \
+              data/monitoring/additional-observations.json \
               data/dynamic-universe/latest.json \
               data/dynamic-universe/history.json
             if [ "${{ steps.report_contract.outputs.status }}" = "SUCCESS" ] \
