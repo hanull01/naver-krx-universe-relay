@@ -68,6 +68,7 @@ def _metadata(artifact: Mapping[str, Any] | None) -> dict[str, Any]:
         "sourceDate": source.get("sourceDate"),
         "observationDate": source.get("observationDate"),
         "scope": source.get("scope"),
+        "producer": source.get("producer"),
         "producerRunId": source.get("producerRunId"),
         "generatedAt": source.get("generatedAt"),
         "artifactPath": source.get("artifactPath"),
@@ -92,6 +93,8 @@ def _failure_row(target: Mapping[str, Any], metadata: Mapping[str, Any], status:
         "observationDate": metadata.get("observationDate"),
         "scope": metadata.get("scope") or "STOCK_ONLY",
         "producerRunId": metadata.get("producerRunId"),
+        "producer": metadata.get("producer"),
+        "artifactPath": metadata.get("artifactPath"),
         "generatedAt": metadata.get("generatedAt"),
         "id": target["id"],
         "name": target["name"],
@@ -120,10 +123,23 @@ def _project_row(target: Mapping[str, Any], artifact: Mapping[str, Any], row: Ma
     reason = row.get("failureReason") or row.get("reason")
     if expected_date and (source_date != expected_date or observation_date != expected_date):
         status, reason = "UNAVAILABLE", "OBSERVATION_DATE_MISMATCH"
-    elif not leaders and status in {"AVAILABLE", "OK", "SUCCESS"}:
-        status, reason = "UNAVAILABLE", reason or "NO_LEADER_DATA"
-    elif status in {"OK", "SUCCESS"}:
-        status = "AVAILABLE"
+    else:
+        lineage_values = {
+            "source": row.get("source") or metadata.get("source"),
+            "sourceDate": source_date,
+            "observationDate": observation_date,
+            "scope": row.get("scope") or metadata.get("scope"),
+            "producer": row.get("producer") or metadata.get("producer"),
+            "artifactPath": row.get("artifactPath") or metadata.get("artifactPath"),
+            "generatedAt": row.get("generatedAt") or metadata.get("generatedAt"),
+        }
+        missing_lineage = [key for key, value in lineage_values.items() if value in (None, "")]
+        if missing_lineage:
+            status, reason = "UNAVAILABLE", f"ADDITIONAL_LINEAGE_MISSING:{','.join(missing_lineage)}"
+        elif not leaders and status in {"AVAILABLE", "OK", "SUCCESS"}:
+            status, reason = "UNAVAILABLE", reason or "NO_LEADER_DATA"
+        elif status in {"OK", "SUCCESS"}:
+            status = "AVAILABLE"
     return {
         **metadata,
         "id": target["id"],
@@ -133,7 +149,12 @@ def _project_row(target: Mapping[str, Any], artifact: Mapping[str, Any], row: Ma
         "sourceDate": source_date,
         "observationDate": observation_date,
         "scope": row.get("scope") or metadata.get("scope"),
+        "producer": row.get("producer") or metadata.get("producer"),
         "producerRunId": row.get("producerRunId") or metadata.get("producerRunId"),
+        "artifactPath": row.get("artifactPath") or (
+            f"{metadata.get('artifactPath')}#{target['type']}/{target['id']}"
+            if metadata.get("artifactPath") else None
+        ),
         "generatedAt": row.get("generatedAt") or metadata.get("generatedAt"),
         "membershipCount": membership_count,
         "leaderCount": int(leader_count or 0),

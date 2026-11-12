@@ -1001,6 +1001,8 @@ def _additional_status(value: Any) -> str:
 
 
 def _additional_reason(value: Any) -> str:
+    if str(value or "").upper().startswith("ADDITIONAL_LINEAGE_MISSING"):
+        return "원천·날짜·범위·producer lineage가 완전하지 않습니다."
     return {
         "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED": "추가 관찰 대상 설정이 없습니다.",
         "PRODUCER_NOT_RUN": "추가 관찰 producer가 아직 실행되지 않았습니다.",
@@ -1020,6 +1022,27 @@ def _additional_rows(model: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     ]
 
 
+def _additional_lineage(row: Mapping[str, Any]) -> str:
+    parts = [
+        f"원천: {_text(row.get('source'), '확인 불가')}",
+        f"원천일: {_compact_date(row.get('sourceDate'))}",
+        f"관측일: {_compact_date(row.get('observationDate'))}",
+        f"범위: {_text(row.get('scope'), '확인 불가')}",
+        f"producer: {_text(row.get('producer'), '확인 불가')}",
+        f"산출물: {_text(row.get('artifactPath'), '확인 불가')}",
+        f"생성시각: {_text(row.get('generatedAt'), '확인 불가')}",
+    ]
+    if row.get("producerRunId") not in (None, ""):
+        parts.append(f"실행: {row['producerRunId']}")
+    if row.get("selectionRank") not in (None, ""):
+        parts.append(f"선정순위: {row['selectionRank']}")
+    if row.get("selectionReason") not in (None, ""):
+        parts.append(f"선정근거: {row['selectionReason']}")
+    if row.get("failureReason") not in (None, ""):
+        parts.append(f"원인: {_additional_reason(row['failureReason'])}")
+    return " · ".join(parts)
+
+
 def _compact_additional_cards(model: Mapping[str, Any]) -> str:
     additional = model.get("additionalObservations") or {}
     rows = _additional_rows(model)
@@ -1031,19 +1054,14 @@ def _compact_additional_cards(model: Mapping[str, Any]) -> str:
         )
     cards = []
     for row in rows:
-        lineage = (
-            f"원천: {_text(row.get('source'), '확인 불가')} · "
-            f"원천일: {_compact_date(row.get('sourceDate'))} · "
-            f"관측일: {_compact_date(row.get('observationDate'))} · "
-            f"범위: {_text(row.get('scope'), '확인 불가')}"
-        )
+        lineage = _additional_lineage(row)
         cards.append(
             f'<div class="industry-item"><div class="industry-head"><strong>'
             f'{_escape(_text(row.get("type"), "대상"))} · {_escape(_text(row.get("name"), row.get("id")))}'
             f'</strong><span class="status-chip">{_escape(_additional_status(row.get("status")))}</span></div>'
             f'<p>구성종목 {_escape(_text(row.get("membershipCount"), "확인 불가"))}개 · '
             f'대표 주도주 {_escape(_compact_leaders(row))} · 주도주 수 {_escape(_text(row.get("leaderCount"), "0"))}개<br>'
-            f'<small>{_escape(lineage)} · {_escape(_additional_reason(row.get("failureReason")))}</small></p></div>'
+            f'<small>{_escape(lineage)}</small></p></div>'
         )
     return "".join(cards)
 
@@ -1375,7 +1393,7 @@ def _compact_markdown(
             row.get("membershipCount") if row.get("membershipCount") is not None else "확인 불가",
             row.get("leaderCount") if row.get("leaderCount") is not None else 0,
             _compact_leaders(row),
-            f"{_compact_date(row.get('sourceDate'))} / {_compact_date(row.get('observationDate'))} / {_text(row.get('scope'), '확인 불가')} / {_additional_reason(row.get('failureReason'))}",
+            _additional_lineage(row),
         ) for row in additional_rows]
         lines += _markdown_table(("대상", "상태", "구성종목", "주도주 수", "대표 주도주", "원천·기준일·범위·사유"), rows)
     lines += _compact_v2_diagnostic_markdown(model)
@@ -1482,12 +1500,22 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
                         issues.append(f"PART2_V2_LEADER_MISSING:{value}")
     if model["v2Verified"] is False and model["v2HoldReason"] not in markdown_text and model["v2HoldReason"] not in plain:
         issues.append("V2_HOLD_MISSING")
+    def _contains_rendered(value: Any, text: str) -> bool:
+        if value in (None, ""):
+            return True
+        raw = str(value)
+        if raw in text:
+            return True
+        normalized = _compact_normalized_date(value)
+        return bool(normalized and _compact_date(normalized) in text)
+
     for row in _additional_rows(model):
         name = row.get("name") or row.get("id")
         if name and (str(name) not in part2_md or str(name) not in part2_html):
             issues.append(f"PART2_ADDITIONAL_MISSING:{name}")
-        for value in (row.get("source"), row.get("sourceDate"), row.get("observationDate"), row.get("scope")):
-            if value not in (None, "") and (str(value) not in part2_md or str(value) not in part2_html):
+        for field in ("source", "sourceDate", "observationDate", "scope", "producer", "artifactPath", "generatedAt", "producerRunId", "selectionRank", "selectionReason", "failureReason"):
+            value = row.get(field)
+            if value not in (None, "") and (not _contains_rendered(value, part2_md) or not _contains_rendered(value, part2_html)):
                 issues.append(f"PART2_ADDITIONAL_LINEAGE_MISSING:{value}")
     return issues
 

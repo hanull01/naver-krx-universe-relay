@@ -1396,8 +1396,9 @@ def _compact_additional_observation_row(row: Mapping[str, Any]) -> dict[str, Any
         key: row.get(key)
         for key in (
             "id", "name", "type", "source", "sourceDate", "observationDate",
-            "scope", "producerRunId", "generatedAt", "membershipCount",
-            "leaderCount", "status", "failureReason",
+            "scope", "producer", "producerRunId", "artifactPath", "generatedAt",
+            "membershipCount", "leaderCount", "selectionRank", "selectionScore",
+            "selectionReason", "selectionEvidence", "status", "failureReason",
         )
         if row.get(key) is not None
     } | {"leaders": leaders}

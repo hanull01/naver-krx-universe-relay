@@ -2,6 +2,7 @@ import json
 import unittest
 
 from tools.additional_observations import build_additional_observation_projection
+from tools.build_additional_observations import build_artifact
 from tools.market_dashboard_renderer import (
     build_dashboard_model,
     render_dashboard_html,
@@ -26,8 +27,10 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
             "sourceDate": "20261112",
             "observationDate": "20261112",
             "scope": "STOCK_ONLY",
+            "producer": "tools/build_additional_observations.py",
             "producerRunId": "run-additional-1",
             "generatedAt": "2026-11-12T10:00:00+09:00",
+            "artifactPath": "data/monitoring/additional-observations.json",
             "industries": [{
                 "id": "industry-1", "name": "추가 업종", "membershipCount": 12,
                 "leaders": ([{"code": "005930", "name": "삼성전자"}] if industry_leaders else []),
@@ -73,18 +76,40 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
         self.assertEqual(result["status"], "PRODUCER_FAILED")
         self.assertTrue(all(row["failureReason"] == "STALE_ARTIFACT" for row in result["industries"] + result["themes"]))
 
+    def test_missing_row_lineage_is_unavailable_not_promoted(self):
+        artifact = self.artifact()
+        artifact.pop("producer")
+        artifact.pop("artifactPath")
+        result = build_additional_observation_projection(self.config, artifact, observation_date="20261112")
+        self.assertEqual(result["status"], "PARTIAL")
+        self.assertTrue(all(row["status"] == "UNAVAILABLE" for row in result["industries"] + result["themes"]))
+        self.assertTrue(all("ADDITIONAL_LINEAGE_MISSING" in row["failureReason"] for row in result["industries"] + result["themes"]))
+
     def test_renderer_uses_same_contract_projection_for_html_and_markdown(self):
         from test_market_dashboard_renderer import report_fixture
 
         report = report_fixture()
+        artifact = self.artifact()
+        artifact.update({
+            "producer": "tools/build_additional_observations.py",
+            "artifactPath": "data/monitoring/additional-observations.json",
+        })
+        for index, row in enumerate(artifact["industries"] + artifact["themes"], start=1):
+            row.update({
+                "producer": artifact["producer"], "producerRunId": "run-additional-1",
+                "artifactPath": f"{artifact['artifactPath']}#{row['id']}",
+                "selectionRank": index, "selectionReason": "CURRENT_OBSERVATION_RANKING",
+            })
         report["reportContract"]["additionalObservations"] = build_additional_observation_projection(
-            self.config, self.artifact(), observation_date="20261112"
+            self.config, artifact, observation_date="20261112"
         )
         markdown_model = build_dashboard_model(report)
         html_model = build_dashboard_model(report)
         self.assertEqual(validate_renderer_models(report, report), [])
         markdown = render_dashboard_markdown(report)
         html = render_dashboard_html(report)
+        from tools.market_dashboard_renderer import validate_rendered_outputs
+        self.assertEqual(validate_rendered_outputs(markdown, html, markdown_model), [])
         for token in ("추가 업종", "추가 테마", "NAVER_CURRENT_SNAPSHOT", "2026-11-12"):
             self.assertIn(token, markdown)
             self.assertIn(token, html)
@@ -116,6 +141,43 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
         self.assertEqual(row["selectionRank"], 1)
         self.assertEqual(row["selectionScore"], 88.5)
         self.assertEqual(row["selectionEvidence"]["sourceDate"], "20261112")
+
+    def test_auto_selected_rows_preserve_complete_lineage(self):
+        industry_input = {
+            "sourceDate": "20261112", "observationDate": "20261112",
+            "industries": [
+                {"id": f"i-{index}", "name": f"업종 {index}", "relativeStrengthVsMarket": float(10 - index),
+                 "advancePct": 90, "memberCount": 10, "leaders": [{"code": f"00{index:04d}", "name": f"종목 {index}"}]}
+                for index in range(6)
+            ],
+        }
+        theme_input = {
+            "sourceDate": "20261112", "observationDate": "20261112",
+            "themes": [
+                {"id": f"t-{index}", "name": f"테마 {index}", "relativeStrengthVsMarket": float(10 - index),
+                 "metrics": {"relativeStrengthVsMarket": float(10 - index), "advancerPct": 90}, "memberCount": 10,
+                 "stocks": [{"code": f"11{index:04d}", "name": f"테마종목 {index}", "changeRate": 1.0}]}
+                for index in range(6)
+            ],
+        }
+        artifact = build_artifact(
+            config={"autoSelect": True, "industries": [], "themes": []},
+            industry_input=industry_input,
+            theme_input=theme_input,
+            observation_date="20261112",
+            run_id="lineage-run",
+            generated_at="2026-11-12T10:00:00+09:00",
+            config_path="config/additional-observations.json",
+            industry_path="data/monitoring/latest-industries.json",
+            theme_path="data/monitoring/latest-theme-signals.json",
+            artifact_path="data/monitoring/additional-observations.json",
+        )
+        rows = artifact["industries"] + artifact["themes"]
+        self.assertEqual(len(rows), 2)
+        for row in rows:
+            for field in ("source", "sourceDate", "observationDate", "scope", "producer", "artifactPath", "generatedAt", "selectionRank", "selectionReason", "failureReason"):
+                self.assertIn(field, row)
+            self.assertIn("#", row["artifactPath"])
 
 
 if __name__ == "__main__":
