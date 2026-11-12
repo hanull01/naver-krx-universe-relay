@@ -1,3 +1,4 @@
+import unittest
 
 
 class ReportAsOfNormalizationTests(unittest.TestCase):
@@ -112,7 +113,8 @@ class CurrentObservationReportTests(unittest.TestCase):
             "status": "SOURCE_OBSERVED",
             "evidenceClass": "SOURCE_OBSERVED",
 
-        }
+        }import unittest
+
         contract["observationDate"] = "20261030"
         contract["observationDateStatus"] = "VERIFIED"
         contract["observationDateEvidence"] = {
