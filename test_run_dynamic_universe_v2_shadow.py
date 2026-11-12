@@ -4,10 +4,37 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools.run_dynamic_universe_v2_shadow import _enrich_persistence, _history_context, run_once
+from tools.run_dynamic_universe_v2_shadow import (
+    _enrich_persistence,
+    _history_context,
+    normalize_run_status,
+    run_once,
+)
 
 
 class V2RunnerIsolationTests(unittest.TestCase):
+    def test_status_normalization_preserves_success_only_for_matching_generation(self):
+        success = normalize_run_status(
+            {"status": "OK", "generationId": "gen-1"},
+            expected_generation_id="gen-1", run_id="run-1",
+        )
+        mismatch = normalize_run_status(
+            {"status": "OK", "generationId": "gen-old"},
+            expected_generation_id="gen-new", run_id="run-2",
+        )
+        failed = normalize_run_status(
+            {"status": "FAILED", "errorType": "NameError", "error": "quality"},
+            expected_generation_id="gen-new", run_id="run-3",
+        )
+        self.assertEqual(success["status"], "OK")
+        self.assertEqual(success["consumptionStatus"], "CONSUMED")
+        self.assertEqual(mismatch["status"], "GENERATION_MISMATCH")
+        self.assertEqual(mismatch["consumptionStatus"], "NOT_CONSUMED")
+        self.assertEqual(mismatch["failureReason"], "V2_GENERATION_ID_MISMATCH")
+        self.assertEqual(failed["status"], "FAILED")
+        self.assertEqual(failed["producerStatus"], "FAILED")
+        self.assertEqual(failed["consumptionStatus"], "NOT_CONSUMED")
+
     def test_failure_is_recorded_without_raising(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -18,6 +45,7 @@ class V2RunnerIsolationTests(unittest.TestCase):
             self.assertEqual(status["status"], "FAILED")
             self.assertIn("runId", status)
             self.assertIn("generatedAt", status)
+            self.assertTrue(status["failureReason"])
             self.assertFalse((root / "data/dynamic-universe/latest.json").exists())
 
     def _write_inputs(self, root: Path) -> None:

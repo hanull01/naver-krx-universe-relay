@@ -12,7 +12,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 try:
     from tools.dynamic_universe_v2_history import record_current
@@ -85,6 +85,44 @@ def _enrich_persistence(payload: Dict[str, Any], kind: str,
     return payload
 
 
+def normalize_run_status(
+    payload: Mapping[str, Any] | None,
+    *,
+    expected_generation_id: str | None = None,
+    run_id: str | None = None,
+    runner_exit_code: int = 0,
+    generated_at: str | None = None,
+) -> Dict[str, Any]:
+    """Make producer status explicit without promoting an invalid V2 result."""
+    generated_at = generated_at or datetime.now(timezone.utc).isoformat()
+    normalized = dict(payload) if isinstance(payload, Mapping) else {
+        "status": "FAILED",
+        "errorType": "V2_RUNNER_PROCESS_FAILED",
+        "error": f"runner_exit={runner_exit_code}",
+    }
+    raw_status = normalized.get("status") or "FAILED"
+    actual_generation = normalized.get("generationId")
+    effective_status = raw_status
+    reason = normalized.get("failureReason") or normalized.get("error")
+    if raw_status == "OK" and expected_generation_id:
+        if not actual_generation:
+            effective_status = "GENERATION_UNAVAILABLE"
+            reason = "V2_GENERATION_ID_MISSING"
+        elif str(actual_generation) != str(expected_generation_id):
+            effective_status = "GENERATION_MISMATCH"
+            reason = "V2_GENERATION_ID_MISMATCH"
+    normalized["runId"] = normalized.get("runId") or run_id
+    normalized["generatedAt"] = normalized.get("generatedAt") or generated_at
+    normalized["rawStatus"] = raw_status
+    normalized["producerStatus"] = raw_status
+    normalized["status"] = effective_status
+    normalized["expectedGenerationId"] = expected_generation_id
+    normalized["consumptionStatus"] = "CONSUMED" if effective_status == "OK" else "NOT_CONSUMED"
+    normalized["publicationPolicy"] = "PARTIAL_NON_BLOCKING"
+    normalized["failureReason"] = None if effective_status == "OK" else reason or "V2_SHADOW_FAILED"
+    return normalized
+
+
 def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
     status_path = root / "data/dynamic-universe/v2-shadow-run-status.json"
     latest_path = root / "data/dynamic-universe/v2-shadow-latest.json"
@@ -147,7 +185,8 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         outcome = {"runId": run_id, "status": "FAILED", "observedAt": observed_at or generated_at,
                    "generatedAt": generated_at,
                    "tradingDate": trading_date, "errorType": type(exc).__name__,
-                   "error": str(exc)[:240], "generationId": generation_id}
+                   "error": str(exc)[:240], "generationId": generation_id,
+                   "failureReason": f"V2_SHADOW_{type(exc).__name__.upper()}"}
     status_path.parent.mkdir(parents=True, exist_ok=True)
     status_path.write_text(json.dumps(outcome, ensure_ascii=False, indent=2) + "\n")
     return outcome

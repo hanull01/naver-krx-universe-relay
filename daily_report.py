@@ -1023,6 +1023,16 @@ def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shado
         },
         "v2Shadow": {
             "experimental": True,
+            "status": shadow_status.get("status", "UNAVAILABLE"),
+            "producerStatus": shadow_status.get("producerStatus") or shadow_status.get("rawStatus") or shadow_status.get("status", "UNAVAILABLE"),
+            "consumptionStatus": "CONSUMED" if shadow_status.get("status") == "OK" else "NOT_CONSUMED",
+            "publicationPolicy": "PARTIAL_NON_BLOCKING",
+            "runId": shadow_status.get("runId"),
+            "generatedAt": shadow_status.get("generatedAt") or shadow_latest.get("generatedAt"),
+            "generationId": shadow_status.get("generationId"),
+            "expectedGenerationId": shadow_status.get("expectedGenerationId"),
+            "errorType": shadow_status.get("errorType"),
+            "failureReason": shadow_status.get("failureReason") or shadow_status.get("error"),
             "industries": {"total": len(v2_industries), "statusCounts": distribution(v2_industries, "v2Status"), "rows": rows(v2_industries)},
             "themes": {"total": len(v2_themes), "statusCounts": distribution(v2_themes, "v2Status"), "rows": rows(v2_themes)},
             "history": {"recordCount": len(observations), "uniqueTradingDates": unique_dates, "status": shadow_status.get("status", "UNAVAILABLE")},
@@ -2176,6 +2186,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         historical_technical_market=historical_technical_market,
         v1_groups=configured_interest_group_projection(universe),
         market_snapshot=market_snapshot,
+        v2_status=shadow_status,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract

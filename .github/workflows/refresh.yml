@@ -392,9 +392,57 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          # V2 reads the already-generated monitoring snapshot.  Its runner
-          # catches its own errors and never gates V1 or MARKET_DATA_READY.
+          # V2 is report-only.  Its failure is PARTIAL_NON_BLOCKING: it must
+          # be visible in the job summary and contract, but must not gate the
+          # independently valid V1 refresh or MARKET_DATA_READY.
+          set +e
           python tools/run_dynamic_universe_v2_shadow.py
+          runner_code=$?
+          EXPECTED_GENERATION_ID="${{ steps.krx.outputs.krx_generation_id }}" \
+          RUN_ID="$GITHUB_RUN_ID" \
+          RUNNER_CODE="$runner_code" \
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from tools.run_dynamic_universe_v2_shadow import normalize_run_status
+
+          path = Path("data/dynamic-universe/v2-shadow-run-status.json")
+          try:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+          except (OSError, json.JSONDecodeError):
+              payload = None
+          payload = normalize_run_status(
+              payload,
+              expected_generation_id=os.environ.get("EXPECTED_GENERATION_ID") or None,
+              run_id=os.environ["RUN_ID"],
+              runner_exit_code=int(os.environ["RUNNER_CODE"]),
+          )
+          raw_status = payload.get("rawStatus") or "FAILED"
+          expected = os.environ.get("EXPECTED_GENERATION_ID") or None
+          actual = payload.get("generationId")
+          effective = payload["status"]
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary:
+              lines = [
+                  "## V2 shadow observation",
+                  "",
+                  f"- 판정: **{effective}**",
+                  f"- producer 상태: `{raw_status}`",
+                  f"- 소비 상태: `{payload['consumptionStatus']}`",
+                  "- 정책: `PARTIAL_NON_BLOCKING` (V1 리포트는 독립 진행)",
+                  f"- run ID: `{payload.get('runId')}`",
+                  f"- trading date: `{payload.get('tradingDate') or 'UNAVAILABLE'}`",
+                  f"- generation: `{actual or 'UNAVAILABLE'}`",
+                  f"- expected generation: `{expected or 'UNAVAILABLE'}`",
+                  f"- failure reason: `{payload.get('failureReason') or 'NONE'}`",
+                  "",
+              ]
+              with open(summary, "a", encoding="utf-8") as handle:
+                  handle.write("\n".join(lines))
+          PY
           echo "status=$(python3 - <<'PY'
           import json
           from pathlib import Path
@@ -404,6 +452,35 @@ jobs:
               print('FAILED')
           PY
           )" >> "$GITHUB_OUTPUT"
+          echo "run_id=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('runId',''))
+          except Exception:
+              print('')
+          PY
+          )" >> "$GITHUB_OUTPUT"
+          echo "generation_id=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('generationId') or '')
+          except Exception:
+              print('')
+          PY
+          )" >> "$GITHUB_OUTPUT"
+          echo "failure_reason=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              value=json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('failureReason') or ''
+              print(value.replace('\\n',' ')[:240])
+          except Exception:
+              print('V2_SHADOW_STATUS_UNAVAILABLE')
+          PY
+          )" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Build canonical market report contract
         id: report_contract

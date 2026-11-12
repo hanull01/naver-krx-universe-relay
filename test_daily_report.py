@@ -321,6 +321,24 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(latest, {})
         self.assertEqual(history, {})
 
+    def test_v2_shadow_failure_is_explicit_and_non_blocking(self):
+        got = daily_report.shadow_v1_v2_analysis(
+            {}, {}, {}, {
+                "status": "GENERATION_MISMATCH",
+                "producerStatus": "OK",
+                "runId": "run-1",
+                "tradingDate": "20261112",
+                "generationId": "gen-old",
+                "expectedGenerationId": "gen-new",
+                "failureReason": "V2_GENERATION_ID_MISMATCH",
+            },
+        )
+        shadow = got["v2Shadow"]
+        self.assertEqual(shadow["status"], "GENERATION_MISMATCH")
+        self.assertEqual(shadow["consumptionStatus"], "NOT_CONSUMED")
+        self.assertEqual(shadow["publicationPolicy"], "PARTIAL_NON_BLOCKING")
+        self.assertEqual(shadow["failureReason"], "V2_GENERATION_ID_MISMATCH")
+
     def test_quote_summary(self):
         row = {
             "price": 100,

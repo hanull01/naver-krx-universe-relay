@@ -1661,6 +1661,7 @@ def build_report_contract(
     market_snapshot: Mapping[str, Any] | None = None,
     current_market_observation: Mapping[str, Any] | None = None,
     historical_technical_market: Mapping[str, Any] | None = None,
+    v2_status: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -1817,6 +1818,34 @@ def build_report_contract(
             "reason": "SOURCE_PROVENANCE_NOT_SUPPLIED",
         }
     )
+    v2_status = dict(v2_status) if isinstance(v2_status, Mapping) else {}
+    v2_effective_status = v2_status.get("status") or ("OK" if v2_latest else "UNAVAILABLE")
+    v2_producer_status = v2_status.get("producerStatus") or v2_status.get("rawStatus") or v2_effective_status
+    v2_failure_reason = (
+        v2_status.get("failureReason")
+        or v2_status.get("error")
+        or ("V2_STATUS_NOT_SUPPLIED" if not v2_status and not v2_latest else None)
+    )
+    v2_consumption_status = "CONSUMED" if v2_effective_status == "OK" else "NOT_CONSUMED"
+    v2_input_evidence = v2_latest.get("inputEvidence")
+    v2_input_evidence = v2_input_evidence if isinstance(v2_input_evidence, Mapping) else {}
+    v2_generation_id = (
+        v2_status.get("generationId")
+        or v2_input_evidence.get("generationId")
+    )
+    v2_status_summary = {
+        "status": v2_effective_status,
+        "producerStatus": v2_producer_status,
+        "consumptionStatus": v2_consumption_status,
+        "publicationPolicy": "PARTIAL_NON_BLOCKING",
+        "runId": v2_status.get("runId"),
+        "generatedAt": v2_status.get("generatedAt") or v2_latest.get("generatedAt"),
+        "tradingDate": v2_status.get("tradingDate") or v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate"),
+        "generationId": v2_generation_id,
+        "expectedGenerationId": v2_status.get("expectedGenerationId"),
+        "errorType": v2_status.get("errorType"),
+        "failureReason": v2_failure_reason,
+    }
 
     def selected(rows: Any, kind: str) -> list[dict[str, Any]]:
         result = []
@@ -1985,7 +2014,7 @@ def build_report_contract(
         "sourceGenerations": {
             "market": generation,
             "indices": indices.get("generatedAt"),
-            "v2": v2_latest.get("generatedAt"),
+            "v2": v2_status.get("generatedAt") or v2_latest.get("generatedAt"),
             "kiwoom": kiwoom_candidates.get("syncedAt"),
         },
         "sourceBindings": {
@@ -2068,7 +2097,8 @@ def build_report_contract(
         ][:30],
         "registeredUniverse": compact_registered_universe(registered_universe),
         "v2": {
-            "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
+            **v2_status_summary,
+            "tradingDate": v2_status_summary["tradingDate"] or v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
             "sourceQualityStatus": v2_latest.get("inputEvidence", {}).get("sourceQualityStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
             "sourceCommit": v2_latest.get("inputEvidence", {}).get("sourceCommit") if isinstance(v2_latest.get("inputEvidence"), Mapping) else None,
             "sourceCommitStatus": v2_latest.get("inputEvidence", {}).get("sourceCommitStatus") if isinstance(v2_latest.get("inputEvidence"), Mapping) else "UNAVAILABLE",
