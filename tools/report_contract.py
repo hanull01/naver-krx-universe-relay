@@ -14,6 +14,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from tools.report_lineage import contract_id, lineage_from_contract
+from tools.report_user_status import availability, first_reason
 
 
 REQUIRED_RENDER_FIELDS = (
@@ -133,6 +134,48 @@ def compact_registered_universe(
                 if state.get(key) is not None
             },
             "status": row.get("status") or "UNAVAILABLE",
+        }
+        current_value = current.get("price", current.get("currentPrice"))
+        ma20_value = technicals.get("ma20")
+        ma60_value = technicals.get("ma60")
+        trend_value = state.get("trend") or state.get("trendStatus")
+        compact["availability"] = {
+            "current": availability(
+                status=current.get("status") or row.get("status"),
+                required_data="관심종목 현재가",
+                received=current_value is not None,
+                producer="NAVER 현재 관측 수집",
+                reason=first_reason(current, "failureReason", "reason")
+                or (None if current_value is not None else "CURRENT_SNAPSHOT_MISSING"),
+                next_check_at=current.get("nextCheckAt"),
+            ),
+            "ma20": availability(
+                status=technicals.get("status") or row.get("status"),
+                required_data="20일 이동평균",
+                received=ma20_value is not None,
+                producer="KRX historical technical",
+                reason=first_reason(technicals, "failureReason", "reason")
+                or (None if ma20_value is not None else "TECHNICAL_DATA_MISSING"),
+                next_check_at=technicals.get("nextCheckAt"),
+            ),
+            "ma60": availability(
+                status=technicals.get("status") or row.get("status"),
+                required_data="60일 이동평균",
+                received=ma60_value is not None,
+                producer="KRX historical technical",
+                reason=first_reason(technicals, "failureReason", "reason")
+                or (None if ma60_value is not None else "TECHNICAL_DATA_MISSING"),
+                next_check_at=technicals.get("nextCheckAt"),
+            ),
+            "trend": availability(
+                status=state.get("status") or row.get("status"),
+                required_data="현재가와 이동평균 기반 추세",
+                received=trend_value is not None,
+                producer="리포트 추세 계산",
+                reason=first_reason(state, "failureReason", "reason")
+                or (None if trend_value is not None else "TREND_DATA_MISSING"),
+                next_check_at=state.get("nextCheckAt"),
+            ),
         }
         # Preserve the compact metrics shape for older report readers while
         # carrying the current/staged fields needed by the registered card.
@@ -569,6 +612,31 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
         if kind == "industry" else
         "data/monitoring/latest-theme-signals.json#themes[]"
     )
+    status = row.get("status") or row.get("qualityStatus") or row.get("dataQuality")
+    member_count = row.get("memberCount")
+    missing_codes = row.get("missingCodes")
+    member_count_valid = member_count is None or (
+        isinstance(member_count, (int, float))
+        and not isinstance(member_count, bool)
+        and member_count > 0
+    )
+    received = (
+        status not in {"UNAVAILABLE", "FAILED", "INVALID", "ERROR"}
+        and member_count_valid
+        and not (isinstance(missing_codes, list) and missing_codes)
+    )
+    default_reason = (
+        "INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry" else "THEME_MEMBERSHIP_MISSING"
+    )
+    item["availability"] = availability(
+        status=status,
+        required_data=("업종 구성종목과 현재 관측값" if kind == "industry" else "테마 구성종목과 현재 관측값"),
+        received=received,
+        producer=("NAVER 업종 수집" if kind == "industry" else "NAVER 테마 수집"),
+        reason=first_reason(row, "missingReason", "reason", "validationReason", "qualityReason")
+        or (default_reason if not received else None),
+        next_check_at=row.get("nextCheckAt"),
+    )
     return item
 
 
@@ -577,6 +645,25 @@ def _compact_group_rows(rows: Any, kind: str) -> list[dict[str, Any]]:
 
 
 _REPORT_V1_STATUSES = {"ACTIVE", "DISCOVERED", "MAINTAINED", "WATCH"}
+
+
+def _group_collection_availability(
+    groups: Mapping[str, Any] | None, kind: str, trading_date: Any
+) -> dict[str, Any]:
+    source_key = "sectors" if kind == "industry" else "themes"
+    rows = [row for row in (groups or {}).get(source_key, []) if isinstance(row, Mapping)]
+    raw_status = (groups or {}).get("status") or (groups or {}).get("qualityStatus")
+    reason = first_reason(groups, "missingReason", "reason", "policyReason", "validationReason")
+    if not rows:
+        reason = reason or ("INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry" else "THEME_MEMBERSHIP_MISSING")
+    return availability(
+        status=raw_status or ("AVAILABLE" if rows else "UNAVAILABLE"),
+        required_data=("운영 관심 업종과 현재 관측" if kind == "industry" else "운영 관심 테마와 현재 관측"),
+        received=bool(rows),
+        producer=("운영 관심 업종 설정·수집" if kind == "industry" else "운영 관심 테마 설정·수집"),
+        reason=reason,
+        next_check_at=(groups or {}).get("nextCheckAt"),
+    )
 
 
 def _compact_v1_rows(
@@ -622,6 +709,14 @@ def _compact_v1_rows(
             "sourceDate": relative.get("sourceDate") or relative.get("sourceTradingDate") or trading_date,
             "observationDate": relative.get("observationDate") or relative.get("sourceTradingDate") or trading_date,
             "scope": relative.get("scope") or "STOCK_ONLY",
+            "availability": availability(
+                status=relative.get("leaderEvidenceStatus") or row.get("status"),
+                required_data=("업종 현재 관측과 대표 주도주" if kind == "industry" else "테마 현재 관측과 대표 주도주"),
+                received=bool(relative.get("leaderCandidates") or relative.get("leaders")),
+                producer=("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
+                reason=relative.get("leaderMissingReason"),
+                next_check_at=relative.get("nextCheckAt"),
+            ),
         })
     rows.sort(key=lambda item: (-float(item["score"]) if isinstance(item.get("score"), (int, float)) else 1e9, str(item.get("id") or "")))
     return rows[:5]
@@ -634,7 +729,14 @@ def _compact_research_analysis(
 ) -> dict[str, Any]:
     """Summarize the existing research intelligence for the user view."""
     if not isinstance(research, Mapping):
-        return {"status": "UNAVAILABLE", "asOf": None, "items": []}
+        return {
+            "status": "UNAVAILABLE", "asOf": None, "items": [],
+            "availability": availability(
+                status="UNAVAILABLE", required_data="리서치 원문과 분석 산출물",
+                received=False, producer="NAVER Research Action",
+                reason="RESEARCH_SLOT_ARTIFACT_MISSING",
+            ),
+        }
     as_of = str(research.get("asOf") or "").replace("-", "")
     expected = str(trading_date or "").replace("-", "")
     stocks = [row for row in research.get("stocks") or [] if isinstance(row, Mapping)]
@@ -644,10 +746,31 @@ def _compact_research_analysis(
         or research.get("generatedAt")
     )
     if not stocks or (expected and as_of != expected) or not source_generation:
-        return {"status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": []}
+        reason = research.get("unavailableReason") or (
+            "RESEARCH_DATE_MISMATCH" if expected and as_of != expected
+            else "RESEARCH_SLOT_ARTIFACT_MISSING"
+        )
+        lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
+        return {
+            "status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": [],
+            "availability": availability(
+                status=research.get("status"), required_data="리서치 원문과 분석 산출물",
+                received=False, producer="NAVER Research Action", reason=reason,
+                next_check_at=lineage.get("nextCheckAt") or lineage.get("expectedAt"),
+            ),
+        }
     eligible = [row for row in stocks if row.get("rankingEligible") is True]
     if not eligible:
-        return {"status": str(research.get("status") or "UNAVAILABLE"), "asOf": research.get("asOf"), "items": []}
+        return {
+            "status": str(research.get("status") or "UNAVAILABLE"),
+            "asOf": research.get("asOf"), "items": [],
+            "availability": availability(
+                status=research.get("status"), required_data="리서치 원문과 분석 산출물",
+                received=False, producer="NAVER Research Action",
+                reason=research.get("unavailableReason") or "RESEARCH_ANALYSIS_MISSING",
+                next_check_at=(research.get("slotLineage") or {}).get("nextCheckAt"),
+            ),
+        }
 
     items: list[dict[str, Any]] = []
     focus = max(eligible, key=lambda row: (row.get("recentReportCount") or 0, row.get("brokerCount") or 0))
@@ -688,7 +811,16 @@ def _compact_research_analysis(
             "category": "시장 방향 일치",
             "text": f"{aligned.get('itemName') or aligned.get('itemCode')}가 오늘의 주도 그룹 대표 종목과 리서치 양쪽에서 확인됩니다.",
         })
-    return {"status": str(research.get("status") or "AVAILABLE"), "asOf": research.get("asOf"), "items": items[:5]}
+    return {
+        "status": str(research.get("status") or "AVAILABLE"),
+        "asOf": research.get("asOf"), "items": items[:5],
+        "availability": availability(
+            status=research.get("status") or "AVAILABLE",
+            required_data="리서치 원문과 분석 산출물", received=True,
+            producer="NAVER Research Action", reason=None,
+            next_check_at=(research.get("slotLineage") or {}).get("checkedAt"),
+        ),
+    }
 
 
 def _group_metrics(row: Mapping[str, Any], kind: str) -> dict[str, Any]:
@@ -896,6 +1028,14 @@ def build_relative_strength_tracking(
     if not trading_date:
         result["status"] = "PARTIAL"
         result["reason"] = "TRADING_DATE_UNAVAILABLE"
+        for kind, label in (("industries", "업종"), ("themes", "테마")):
+            result[kind]["availability"] = availability(
+                status="UNAVAILABLE", required_data=f"{label} 원천과 관측일",
+                received=False,
+                producer=("NAVER 업종 수집" if kind == "industries" else "NAVER 테마 수집"),
+                reason="TRADING_DATE_UNAVAILABLE",
+                next_check_at=None,
+            )
         return result
     v2_by_key = {
         (str(row.get("kind")), str(row.get("id"))): row
@@ -976,6 +1116,14 @@ def build_relative_strength_tracking(
                 "leaderObservationDate": leader_binding["observationDate"],
                 "leaderScope": leader_binding["scope"],
                 "leaderMissingReason": leader_binding["missingReason"],
+                "leaderAvailability": availability(
+                    status=leader_binding["status"],
+                    required_data=("업종 현재 관측과 대표 주도주" if kind == "industry" else "테마 현재 관측과 대표 주도주"),
+                    received=bool(leader_binding["candidates"]),
+                    producer=("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
+                    reason=leader_binding["missingReason"],
+                    next_check_at=None,
+                ),
                 "source": "NAVER_CURRENT_SNAPSHOT",
                 "sourceDate": leader_binding["sourceDate"],
                 "observationDate": leader_binding["observationDate"],
@@ -1001,7 +1149,15 @@ def build_relative_strength_tracking(
                     prior = prior_rows.get(previous_date, {}).get(group_id, {})
                     exited.append({"id": group_id, "name": prior.get("name"), "rankBefore": prior_rank, "changeClass": "EXITED", "reason": "OUTSIDE_CURRENT_TOP5", "tradingDate": previous_date})
         result["industries" if kind == "industry" else "themes"] = {
-            "top5": top5, "active": active, "exited": exited[:5]
+            "top5": top5, "active": active, "exited": exited[:5],
+            "availability": availability(
+                status="AVAILABLE" if top5 else "UNAVAILABLE",
+                required_data=("업종 상대강도와 현재 관측" if kind == "industry" else "테마 상대강도와 현재 관측"),
+                received=bool(top5),
+                producer=("NAVER 업종 수집" if kind == "industry" else "NAVER 테마 수집"),
+                reason=("SOURCE_MISSING" if not rows else "RELATIVE_STRENGTH_UNAVAILABLE") if not top5 else None,
+                next_check_at=None,
+            ),
         }
     result["observedTradingDates"] = sorted(result["observedTradingDates"])[-7:]
     return result
@@ -1743,6 +1899,10 @@ def build_report_contract(
             "status": "AVAILABLE" if v1_industries or v1_themes else "UNAVAILABLE",
             "industries": v1_industries,
             "themes": v1_themes,
+            "availability": {
+                "industries": _group_collection_availability(v1_groups, "industry", trading_date),
+                "themes": _group_collection_availability(v1_groups, "theme", trading_date),
+            },
         },
         "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
         "registeredUniverse": compact_registered_universe(registered_universe),
@@ -1772,6 +1932,7 @@ def build_report_contract(
                 ) if isinstance(research, Mapping) else None,
                 "generatedAt": (research or {}).get("generatedAt") if isinstance(research, Mapping) else None,
                 "slotLineage": (research or {}).get("slotLineage") if isinstance(research, Mapping) else [],
+                "availability": research_analysis.get("availability") or {},
                 "analysis": research_analysis,
             },
             "investorFlow": {

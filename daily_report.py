@@ -21,18 +21,19 @@ from tools.kiwoom_performance import build_kiwoom_performance, load_naver_daily_
 from tools.v2_change_analysis import compare_v2_changes
 from tools.full_market_technical_adapter import build_report_input as build_staged_technical_input
 from tools.market_snapshot_projection import validate_for_report as validate_market_snapshot_for_report
+from tools.report_user_status import user_status_label
 
 KST = ZoneInfo("Asia/Seoul")
 
 STATUS_LABELS = {
-    "AVAILABLE": "확인 가능",
-    "AVAILABLE_EMPTY": "확인 가능(대상 없음)",
-    "OK": "정상",
-    "SUCCESS": "성공",
-    "PARTIAL": "부분 확인",
-    "UNAVAILABLE": "확인 불가",
+    "AVAILABLE": "수신됨",
+    "AVAILABLE_EMPTY": "수신됨(대상 없음)",
+    "OK": "정상 수신",
+    "SUCCESS": "정상 수신",
+    "PARTIAL": "일부 수신",
+    "UNAVAILABLE": "미수신",
     "UNUSABLE": "사용 불가",
-    "DISABLED_PENDING_RESEARCH_GATE": "연구 검증 대기",
+    "DISABLED_PENDING_RESEARCH_GATE": "현재 자동 산출 기능 없음",
     "MONITORED_UNIVERSE_EMPTY": "관심종목 미설정",
     "MONITORED_UNIVERSE_CONFIGURED": "관심종목 설정됨",
 }
@@ -77,9 +78,7 @@ CANDIDATE_DATE_REASON_LABELS = {
 
 def korean_status(value):
     """Render status labels for readers while retaining raw JSON values."""
-    if value in (None, ""):
-        return "확인 불가"
-    return STATUS_LABELS.get(str(value), str(value))
+    return user_status_label(value)
 
 
 def display_number(value, suffix=""):
