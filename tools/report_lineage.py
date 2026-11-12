@@ -30,6 +30,9 @@ def contract_id(contract: Mapping[str, Any]) -> str:
 
 
 def lineage_from_contract(contract: Mapping[str, Any]) -> dict[str, Any]:
+    explicit = contract.get("reportLineage")
+    if isinstance(explicit, Mapping) and explicit.get("contractId"):
+        return dict(explicit)
     current = contract.get("currentMarketObservation")
     current = current if isinstance(current, Mapping) else {}
     historical = contract.get("historicalTechnicalMarket")

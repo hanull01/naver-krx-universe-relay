@@ -83,6 +83,9 @@ def render_current_observation(
         or {}
     )
     display_contract = dict(contract)
+    canonical_lineage = lineage_from_contract(contract)
+    display_contract["contractId"] = canonical_lineage["contractId"]
+    display_contract["reportLineage"] = canonical_lineage
     if observation_date:
         display_contract["asOf"] = observation_date
         display_contract["tradingDateEvidence"] = observation_evidence
