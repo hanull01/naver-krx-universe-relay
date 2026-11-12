@@ -843,3 +843,33 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["candidates"]["count"], 3953)
         self.assertLessEqual(len(contract["technicalCandidates"]), 100)
         self.assertEqual(contract["historicalLineage"]["generationId"], "gen_scale")
+
+    def test_user_availability_keeps_raw_codes_and_explains_supply(self):
+        generated = "2026-11-06T08:05:00+09:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261106", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": generated, "fullMarket": {}},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            registered_universe={
+                "status": "PARTIAL", "registeredCount": 1,
+                "items": [{
+                    "itemCode": "005930", "stockName": "삼성전자",
+                    "current": {"price": 70000, "status": "AVAILABLE"},
+                    "technicals": {"ma20": None, "ma60": 65000, "status": "PARTIAL",
+                                   "failureReason": "TECHNICAL_DATA_MISSING"},
+                    "state": {"trend": "SIDEWAYS", "status": "PARTIAL"},
+                }],
+            },
+        )
+        availability = contract["registeredUniverse"]["preview"][0]["availability"]
+        self.assertEqual(availability["current"]["producer"], "NAVER 현재 관측 수집")
+        self.assertEqual(availability["ma20"]["requiredData"], "20일 이동평균")
+        self.assertEqual(availability["ma20"]["statusCode"], "PARTIAL")
+        self.assertEqual(availability["ma20"]["reasonCode"], "TECHNICAL_DATA_MISSING")
+        self.assertIn("업종", contract["relativeStrengthTop5"]["industries"]["availability"]["requiredData"])
+        self.assertIn("availability", contract["independentAnalysis"]["research"])

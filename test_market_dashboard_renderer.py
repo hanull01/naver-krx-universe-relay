@@ -120,7 +120,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER_CURRENT_SNAPSHOT", "KRX", "삼성E&A", "59,800원", "확인 대기"):
+        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER_CURRENT_SNAPSHOT", "KRX", "삼성E&A", "59,800원", "현재 자동 산출 기능이 없습니다"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -212,8 +212,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
         self.assertNotIn(">0</td>", html)
-        self.assertIn("자료 없음", html)
-        self.assertIn("자료 없음", markdown)
+        self.assertIn("미수신", html)
+        self.assertIn("미수신", markdown)
 
     def test_saved_output_validation_detects_missing_dynamic_information(self):
         report = report_fixture()
@@ -264,8 +264,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["v2"]["themes"] = []
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
-        self.assertIn("추가 관찰 원천 검증 대기", html_lib.unescape(html))
-        self.assertIn("추가 관찰 원천 검증 대기", markdown)
+        self.assertIn("현재 자동 산출 기능이 없습니다", html_lib.unescape(html))
+        self.assertIn("현재 자동 산출 기능이 없습니다", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
@@ -295,7 +295,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertEqual(build_dashboard_model(session_report(post))["indexSessionLabel"], "장후 관측")
         self.assertEqual(build_dashboard_model(session_report(intraday))["indexSessionLabel"], "장중 관측")
         self.assertEqual(build_dashboard_model(session_report(mixed))["indexSessionLabel"], "시장별 세션 상이")
-        self.assertEqual(build_dashboard_model(session_report(unknown))["indexSessionLabel"], "세션 확인 대기")
+        self.assertEqual(build_dashboard_model(session_report(unknown))["indexSessionLabel"], "세션 확인 필요")
 
     def test_preopen_report_keeps_prior_session_reference_in_both_outputs(self):
         report = report_fixture()
@@ -415,6 +415,29 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("65,000원", output)
             self.assertIn("하락 추세" if "하락 추세" in output else "DOWNTREND", output)
 
+    def test_interest_cards_explain_each_input_and_use_reader_friendly_trend_text(self):
+        report = report_fixture()
+        report["reportContract"]["registeredUniverse"] = {
+            "status": "PARTIAL", "scope": "REGISTERED_UNIVERSE", "count": 1,
+            "items": [{
+                "itemCode": "005930", "itemName": "삼성전자",
+                "current": {"price": 70000, "status": "AVAILABLE"},
+                "technicals": {"ma20": None, "ma60": 65000, "status": "PARTIAL",
+                               "failureReason": "TECHNICAL_DATA_MISSING"},
+                "state": {"status": "PARTIAL", "trend": "SIDEWAYS"},
+                "status": "PARTIAL",
+            }],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("현재가", output)
+            self.assertIn("20일 이동평균", output)
+            self.assertIn("60일 이동평균", output)
+            self.assertIn("단기·중기 방향 엇갈림", output)
+            self.assertIn("필요 자료", output)
+            self.assertIn("공급자", output)
+
     def test_partial_theme_is_visible_but_unavailable_groups_are_not(self):
         report = report_fixture()
         report["reportContract"]["relativeStrengthTop5"] = {
@@ -513,8 +536,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("삼성전자에 리서치가 집중되었습니다.", html)
         self.assertIn("삼성전자에 리서치가 집중되었습니다.", markdown)
         report["reportContract"]["independentAnalysis"]["research"].pop("analysis")
-        self.assertIn("네이버 리서치 자료 없음", html_lib.unescape(render_dashboard_html(report)))
-        self.assertIn("자료 없음", render_dashboard_markdown(report))
+        self.assertIn("네이버 리서치 미수신", html_lib.unescape(render_dashboard_html(report)))
+        self.assertIn("미수신", render_dashboard_markdown(report))
 
     def test_missing_kospi_and_kosdaq_are_reported_individually(self):
         report = report_fixture()
@@ -530,7 +553,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["kiwoomCandidates"] = {"stocks": []}
         markdown = render_dashboard_markdown(report)
-        self.assertIn("전일 장마감 후 조건검색 결과 자료 없음", markdown)
+        self.assertIn("전일 장마감 후 조건검색 결과 미수신", markdown)
         self.assertNotIn("조건검색 실패", markdown)
 
     def test_kiwoom_candidate_renders_selection_and_indicators_without_code(self):
@@ -553,7 +576,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             self.assertIn("30,300원", output)
             self.assertIn("27,952원", output)
             self.assertIn("28,420원", output)
-            self.assertIn("조건 상세 자료 없음", output)
+            self.assertIn("조건 상세 미수신", output)
             self.assertNotIn("조건검색 결과 미게시", output)
             self.assertNotIn("99,999원", output)
             self.assertNotIn("88,888원", output)
@@ -599,7 +622,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
         html = html_lib.unescape(render_dashboard_html(report))
-        self.assertIn("추가 관찰 원천 검증 대기", html)
+        self.assertIn("현재 자동 산출 기능이 없습니다", html)
         self.assertNotIn("91.20", html)
         self.assertNotIn("SK하이닉스(000660)", html)
 
@@ -609,8 +632,21 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = html_lib.unescape(render_dashboard_html(report))
         markdown = render_dashboard_markdown(report)
         for text in (html, markdown):
-            self.assertIn("등록 관심종목 자료 없음", text)
+            self.assertIn("등록 관심종목 미수신", text)
             self.assertNotIn("005930", text)
+
+    def test_user_views_hide_internal_lifecycle_and_explain_missing_sources(self):
+        report = report_fixture()
+        report["reportContract"]["rendering"]["reason"] = "BASELINE_STALE"
+        report["reportContract"]["v2"]["industries"] = []
+        report["reportContract"]["v2"]["themes"] = []
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for forbidden in ("BASELINE_STALE", "FINAL", "확인 대기", "자료 없음", "검증 대기", "확인 가능"):
+            self.assertNotIn(forbidden, html)
+            self.assertNotIn(forbidden, markdown)
+        self.assertIn("현재 자동 산출 기능이 없습니다", html)
+        self.assertIn("현재 자동 산출 기능이 없습니다", markdown)
 
     def test_rendered_views_use_kst_and_hide_lineage_metadata(self):
         report = report_fixture()

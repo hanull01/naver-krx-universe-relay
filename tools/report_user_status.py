@@ -1,0 +1,163 @@
+"""User-facing availability vocabulary for report contracts and renderers.
+
+Raw producer/status codes stay in the contract for lineage and diagnostics.
+Only this module's labels and explanations are suitable for Markdown/HTML.
+"""
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Any
+
+
+USER_STATUS_LABELS = {
+    "AVAILABLE": "수신됨",
+    "AVAILABLE_EMPTY": "수신됨(대상 없음)",
+    "OK": "정상 수신",
+    "SUCCESS": "정상 수신",
+    "PARTIAL": "일부 수신",
+    "UNAVAILABLE": "미수신",
+    "UNUSABLE": "사용 불가",
+    "VERIFIED": "원천 검증됨",
+    "SOURCE_VERIFIED": "원천 검증됨",
+    "SOURCE_OBSERVED": "원천 수신",
+    "DISCOVERED": "수신됨",
+    "REMOVED": "제외됨",
+    "MAINTAINED": "유지됨",
+    "ACTIVE": "활성",
+    "WATCH": "관찰",
+    "UNVERIFIED": "확인 필요",
+    "PENDING": "다음 확인 예정",
+    "WAIT": "다음 확인 예정",
+    "STALE": "최신 자료 아님",
+    "BASELINE_STALE": "이전 자료 최신성 확인 실패",
+    "FINAL": "정규장 확정",
+    "FAILED": "수집 실패",
+    "INVALID": "입력 검증 실패",
+    "INELIGIBLE": "대상 제외",
+    "RENDERABLE": "표시 가능",
+    "DISABLED_PENDING_RESEARCH_GATE": "현재 자동 산출 기능 없음",
+    "MONITORED_UNIVERSE_EMPTY": "관심종목 설정 없음",
+    "MONITORED_UNIVERSE_CONFIGURED": "관심종목 설정됨",
+    "UPTREND": "상승 추세",
+    "DOWNTREND": "하락 추세",
+    "SIDEWAYS": "횡보",
+    "STRENGTHENING": "강화",
+    "WEAKENING": "약화",
+    "PERSISTING": "유지",
+    "NEW": "신규 진입",
+    "NEW_ENTRY": "신규 진입",
+    "RANK_UP": "순위 상승",
+    "RANK_DOWN": "순위 하락",
+    "EXITED": "이탈",
+    "COMPARISON_UNAVAILABLE": "비교 불가",
+}
+
+REASON_LABELS = {
+    "BASELINE_STALE": "이전 날짜 자료가 최신 기준을 충족하지 못했습니다.",
+    "FINAL": "정규장 확정 자료가 필요합니다.",
+    "FINAL_PENDING": "정규장 확정 자료를 아직 받지 못했습니다.",
+    "FINAL_NOT_CONFIRMED": "정규장 확정 여부를 확인할 수 없습니다.",
+    "SOURCE_OBSERVED": "원천은 수신됐지만 필요한 검증 정보가 부족합니다.",
+    "SOURCE_VERIFIED": "원천 검증은 완료됐습니다.",
+    "SOURCE_MISSING": "원천 자료가 수신되지 않았습니다.",
+    "NO_CURRENT_SNAPSHOT": "현재 관측 스냅샷이 수신되지 않았습니다.",
+    "NO_CURRENT_LEADER_CANDIDATES": "현재 관측에서 대표 종목을 찾지 못했습니다.",
+    "LEADER_DATE_MISMATCH": "대표 종목의 관측일이 현재 관측일과 다릅니다.",
+    "SOURCE_DATE_MISMATCH": "원천 기준일이 현재 관측일과 다릅니다.",
+    "GROUP_MEMBERSHIP_INCOMPLETE": "구성종목 목록이 완전하지 않습니다.",
+    "INDUSTRY_MEMBERSHIP_MISSING": "업종 구성종목 자료가 수신되지 않았습니다.",
+    "THEME_MEMBERSHIP_MISSING": "테마 구성종목 자료가 수신되지 않았습니다.",
+    "RELATIVE_STRENGTH_UNAVAILABLE": "상대강도 계산에 필요한 값이 수신되지 않았습니다.",
+    "DERIVED_FEATURES_UNAVAILABLE": "파생 지표 계산 결과가 수신되지 않았습니다.",
+    "TRADING_DATE_UNAVAILABLE": "거래일 자료가 수신되지 않았습니다.",
+    "TRADING_DATE_UNAVAILABLE_EVIDENCE_INVALID": "거래일 증적을 검증하지 못했습니다.",
+    "RESEARCH_SLOT_REQUIRED": "이 리포트에 연결된 리서치 회차가 없습니다.",
+    "RESEARCH_SLOT_ARTIFACT_MISSING": "해당 리서치 회차 산출물이 아직 도착하지 않았습니다.",
+    "RESEARCH_SLOT_PRODUCER_FAILED": "해당 리서치 회차 수집 단계가 실패했습니다.",
+    "RESEARCH_SLOT_ARTIFACT_FAILED": "해당 리서치 회차 산출물 생성이 실패했습니다.",
+    "RESEARCH_SLOT_NOT_FRESH": "해당 리서치 회차 산출물이 최신성 검증을 통과하지 못했습니다.",
+    "RESEARCH_SLOT_DATE_MISMATCH": "해당 리서치 회차의 기준일이 리포트와 다릅니다.",
+    "RESEARCH_SLOT_LINEAGE_MISSING": "해당 리서치 회차의 출처 연결 정보가 없습니다.",
+    "RESEARCH_DATE_MISMATCH": "리서치 자료의 기준일이 리포트와 다릅니다.",
+    "RESEARCH_GENERATION_MISMATCH": "리서치 자료의 생성 세대가 리포트와 다릅니다.",
+    "DISABLED_PENDING_RESEARCH_GATE": "현재 자동 산출 기능이 제공되지 않습니다.",
+    "V2_NOT_PRODUCED": "현재 자동 산출 기능이 없습니다.",
+    "SOURCE_UNVERIFIED": "추가 관찰 자료를 생성하는 원천이 연결되지 않았습니다.",
+    "MISSING_EVIDENCE": "필요한 원천 증적이 수신되지 않았습니다.",
+    "DERIVED_PROJECTION_MISSING": "파생 지표 산출물이 수신되지 않았습니다.",
+    "DERIVED_PROJECTION_DATE_MISMATCH": "파생 지표 기준일이 리포트와 다릅니다.",
+}
+
+
+def _key(value: Any) -> str:
+    return str(value or "").strip().upper()
+
+
+def user_status_label(value: Any, fallback: str = "상태 확인 필요") -> str:
+    """Map raw lifecycle/status codes to reader-facing wording."""
+    if value in (None, ""):
+        return fallback
+    return USER_STATUS_LABELS.get(_key(value), fallback)
+
+
+def user_reason_label(value: Any, fallback: str = "원천 자료 확인 필요") -> str:
+    """Map a raw reason code without exposing implementation vocabulary."""
+    if value in (None, ""):
+        return fallback
+    text = str(value).strip()
+    return REASON_LABELS.get(_key(text), fallback)
+
+
+def next_check_label(value: Any, fallback: str = "다음 정상 수집 후") -> str:
+    if value in (None, ""):
+        return fallback
+    return str(value)
+
+
+def availability(
+    *,
+    status: Any,
+    required_data: str,
+    received: bool | None,
+    producer: str,
+    reason: Any = None,
+    next_check_at: Any = None,
+) -> dict[str, Any]:
+    """Build a stable user-facing availability block.
+
+    ``statusCode`` and ``reasonCode`` retain raw evidence for diagnostics;
+    rendered views should use the other fields.
+    """
+    raw_status = _key(status) or "UNAVAILABLE"
+    if received is None:
+        received = raw_status in {"AVAILABLE", "OK", "SUCCESS", "VERIFIED", "SOURCE_VERIFIED"}
+    if received:
+        display_status = "RECEIVED"
+        display_label = "수신됨"
+    elif raw_status == "PARTIAL":
+        display_status = "PARTIAL"
+        display_label = "일부 수신"
+    else:
+        display_status = "NOT_RECEIVED"
+        display_label = "미수신"
+    return {
+        "status": display_status,
+        "label": display_label,
+        "requiredData": required_data,
+        "received": bool(received),
+        "producer": producer,
+        "missingReason": user_reason_label(reason),
+        "reasonCode": reason,
+        "nextCheckAt": next_check_label(next_check_at),
+        "statusCode": status,
+    }
+
+
+def first_reason(row: Mapping[str, Any] | None, *keys: str) -> Any:
+    if not isinstance(row, Mapping):
+        return None
+    for key in keys:
+        value = row.get(key)
+        if value not in (None, "", [], {}):
+            return value
+    return None
