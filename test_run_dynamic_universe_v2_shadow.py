@@ -35,6 +35,14 @@ class V2RunnerIsolationTests(unittest.TestCase):
         self.assertEqual(failed["producerStatus"], "FAILED")
         self.assertEqual(failed["consumptionStatus"], "NOT_CONSUMED")
 
+    def test_success_without_generation_is_not_consumable(self):
+        normalized = normalize_run_status(
+            {"status": "OK"}, expected_generation_id=None, run_id="run-missing-generation",
+        )
+        self.assertEqual(normalized["status"], "GENERATION_UNAVAILABLE")
+        self.assertEqual(normalized["consumptionStatus"], "NOT_CONSUMED")
+        self.assertEqual(normalized["failureReason"], "V2_GENERATION_ID_MISSING")
+
     def test_failure_is_recorded_without_raising(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -105,6 +113,25 @@ class V2RunnerIsolationTests(unittest.TestCase):
             status = json.loads((root / "data/dynamic-universe/v2-shadow-run-status.json").read_text())
             self.assertEqual(status["errorType"], "RuntimeError")
             self.assertEqual(status["tradingDate"], "2026-11-12")
+
+    def test_write_failure_restores_latest_and_history(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._write_inputs(root)
+            latest = root / "data/dynamic-universe/v2-shadow-latest.json"
+            history = root / "data/dynamic-universe/v2-shadow-history.json"
+            prior_latest = json.dumps({"tradingDate": "2026-11-11", "status": "OK"})
+            prior_history = json.dumps({"observations": [{"tradingDate": "2026-11-11"}]})
+            latest.write_text(prior_latest, encoding="utf-8")
+            history.write_text(prior_history, encoding="utf-8")
+            with patch("tools.run_dynamic_universe_v2_shadow.evaluate_snapshot", return_value={"industries": [], "themes": []}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.summarize", return_value={}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.build_source_provenance", return_value={}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.record_current", side_effect=RuntimeError("history write")):
+                outcome = run_once(root, "2026-11-12", "2026-11-12T01:00:00Z")
+            self.assertEqual(outcome["status"], "FAILED")
+            self.assertEqual(latest.read_text(encoding="utf-8"), prior_latest)
+            self.assertEqual(history.read_text(encoding="utf-8"), prior_history)
 
     def test_existing_history_is_connected_to_persistence(self):
         with tempfile.TemporaryDirectory() as directory:

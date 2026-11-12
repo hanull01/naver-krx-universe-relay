@@ -688,6 +688,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          restore_generated_path() {
+            path="$1"
+            if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+              git restore --source=HEAD --staged --worktree -- "$path"
+            elif [ -e "$path" ]; then
+              rm -f -- "$path"
+            fi
+          }
+
           mkdir -p data/krx/provenance
           cp "${{ steps.krx.outputs.krx_metadata_path }}" data/krx/provenance/refresh.json
           git add data/krx/provenance/refresh.json
@@ -764,7 +773,7 @@ jobs:
 
           if [ -f data/dynamic-universe/v2-shadow-run-status.json ]; then
             git add -- data/dynamic-universe/v2-shadow-run-status.json
-            if [ "$(python3 - <<'PY'
+            v2_status="$(python3 - <<'PY'
           import json
           from pathlib import Path
           try:
@@ -772,21 +781,32 @@ jobs:
           except Exception:
               print('FAILED')
           PY
-          )" = "OK" ]; then
+          )"
+            if [ "$v2_status" = "OK" ]; then
+              if [ ! -f data/dynamic-universe/v2-shadow-latest.json ] || [ ! -f data/dynamic-universe/v2-shadow-history.json ]; then
+                echo "::error::V2 status is OK but latest/history output is incomplete."
+                exit 1
+              fi
               git add -- data/dynamic-universe/v2-shadow-latest.json data/dynamic-universe/v2-shadow-history.json
             else
+              restore_generated_path data/dynamic-universe/v2-shadow-latest.json
+              restore_generated_path data/dynamic-universe/v2-shadow-history.json
               echo "V2 shadow failed; publishing only its run status and preserving prior V2 result/history."
             fi
           fi
 
-          restore_generated_path() {
-            path="$1"
-            if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
-              git restore --source=HEAD --staged --worktree -- "$path"
-            elif [ -e "$path" ]; then
-              rm -f -- "$path"
+          v2_paths=(
+            data/dynamic-universe/v2-shadow-run-status.json
+            data/dynamic-universe/v2-shadow-latest.json
+            data/dynamic-universe/v2-shadow-history.json
+          )
+          for path in "${v2_paths[@]}"; do
+            if [ -n "$(git diff --name-only -- "$path")" ]; then
+              echo "::error::V2 output remains unstaged: $path"
+              git status --short -- "$path"
+              exit 1
             fi
-          }
+          done
 
           # A contract is publishable only when generation succeeded and the
           # surrounding market publication is eligible.  Otherwise restore a
@@ -879,7 +899,15 @@ jobs:
             echo "publication_changed=false" >> "$GITHUB_OUTPUT"
             echo "production_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           else
+            expected_publish_files="$RUNNER_TEMP/expected-publish-files.txt"
+            git diff --cached --name-only | sort > "$expected_publish_files"
             git commit -m "Refresh NAVER market data"
+            actual_commit_files="$RUNNER_TEMP/actual-commit-files.txt"
+            git diff-tree --no-commit-id --name-only -r HEAD | sort > "$actual_commit_files"
+            if ! diff -u "$expected_publish_files" "$actual_commit_files"; then
+              echo "::error::Published commit tree differs from the staged publish file list."
+              exit 1
+            fi
             if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
               echo "::error::Unexpected unstaged or untracked files remain before data synchronization; preserving production data."
               git status --short

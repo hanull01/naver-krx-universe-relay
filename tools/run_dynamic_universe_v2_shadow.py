@@ -104,11 +104,11 @@ def normalize_run_status(
     actual_generation = normalized.get("generationId")
     effective_status = raw_status
     reason = normalized.get("failureReason") or normalized.get("error")
-    if raw_status == "OK" and expected_generation_id:
+    if raw_status == "OK":
         if not actual_generation:
             effective_status = "GENERATION_UNAVAILABLE"
             reason = "V2_GENERATION_ID_MISSING"
-        elif str(actual_generation) != str(expected_generation_id):
+        elif expected_generation_id and str(actual_generation) != str(expected_generation_id):
             effective_status = "GENERATION_MISMATCH"
             reason = "V2_GENERATION_ID_MISMATCH"
     normalized["runId"] = normalized.get("runId") or run_id
@@ -130,6 +130,9 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-v2-shadow-{generated_at.replace(':', '').replace('-', '')}"
     quality: Dict[str, Any] = {}
     generation_id = None
+    prior_latest = latest_path.read_bytes() if latest_path.exists() else None
+    history_path = root / "data/dynamic-universe/v2-shadow-history.json"
+    prior_history = history_path.read_bytes() if history_path.exists() else None
     try:
         ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
@@ -171,17 +174,27 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         }
         result["inputEvidence"]["sourceProvenance"] = build_source_provenance(root, result=result)
         result["summary"] = summarize(result)
+        latest_path.parent.mkdir(parents=True, exist_ok=True)
+        latest_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         # The history is written only after the complete V2 result exists.
         history = record_current(root, trading_date,
                                  result["inputEvidence"]["sourceProvenance"])
-        latest_path.parent.mkdir(parents=True, exist_ok=True)
-        latest_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         outcome = {"runId": run_id, "status": "OK", "observedAt": observed_at or generated_at,
                    "generatedAt": generated_at,
                    "tradingDate": trading_date, "summary": result["summary"],
                    "inputEvidence": result["inputEvidence"],
                    "observationCount": len(history["observations"])}
     except Exception as exc:  # V2 isolation boundary; V1 is not called here.
+        if prior_latest is None:
+            latest_path.unlink(missing_ok=True)
+        else:
+            latest_path.parent.mkdir(parents=True, exist_ok=True)
+            latest_path.write_bytes(prior_latest)
+        if prior_history is None:
+            history_path.unlink(missing_ok=True)
+        else:
+            history_path.parent.mkdir(parents=True, exist_ok=True)
+            history_path.write_bytes(prior_history)
         outcome = {"runId": run_id, "status": "FAILED", "observedAt": observed_at or generated_at,
                    "generatedAt": generated_at,
                    "tradingDate": trading_date, "errorType": type(exc).__name__,
