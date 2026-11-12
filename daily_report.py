@@ -787,6 +787,58 @@ def restrict_staging_current_quotes(quotes, target_date):
     return current
 
 
+def configured_interest_group_projection(universe):
+    """Project only explicitly configured operating interest groups.
+
+    The dynamic-universe artifact contains automatic selection history, not
+    the user's operating interest-group configuration.  Keep those inputs
+    separate so removed/automatic rows cannot masquerade as configured
+    interest groups in the report.
+    """
+    universe = universe if isinstance(universe, dict) else {}
+
+    def rows_for(value):
+        rows = []
+        if isinstance(value, dict):
+            for key, entry in value.items():
+                if isinstance(entry, dict):
+                    row = dict(entry)
+                    row.setdefault("id", str(key))
+                    row.setdefault("name", row.get("label") or str(key))
+                else:
+                    row = {"id": str(key), "name": str(entry or key)}
+                rows.append(row)
+        elif isinstance(value, list):
+            for entry in value:
+                if isinstance(entry, dict) and (entry.get("id") or entry.get("code")):
+                    row = dict(entry)
+                    row.setdefault("id", row.get("code"))
+                    row.setdefault("name", row.get("label") or row.get("id"))
+                    rows.append(row)
+                elif entry not in (None, ""):
+                    rows.append({"id": str(entry), "name": str(entry)})
+        return rows
+
+    sectors = rows_for(universe.get("sectors"))
+    themes = rows_for(universe.get("themes"))
+    configured = bool(sectors or themes)
+    return {
+        "status": "CONFIGURED" if configured else "NOT_CONFIGURED",
+        "configurationStatus": "CONFIGURED" if configured else "NOT_CONFIGURED",
+        "artifactPath": "config/universe.json#sectors,themes",
+        "generatedAt": universe.get("generatedAt"),
+        "sourceDate": universe.get("sourceDate"),
+        "observationDate": universe.get("observationDate"),
+        "scope": "INTEREST_GROUP_CONFIGURATION",
+        "inputCount": len(sectors) + len(themes),
+        "matchedCount": 0,
+        "outputCount": len(sectors) + len(themes),
+        "nextExpectedAt": universe.get("nextExpectedAt"),
+        "sectors": sectors,
+        "themes": themes,
+    }
+
+
 def registered_universe_projection(enabled, rows):
     """Project configured items without mixing current and historical data."""
     by_code = {str(row.get("itemCode")): row for row in rows if row.get("itemCode")}
@@ -798,26 +850,59 @@ def registered_universe_projection(enabled, rows):
         technical = row.get("technical") or {}
         current_state = row.get("currentState") or {}
         state = row.get("state") or {}
+        current_price = market.get("price")
+        ma20 = technical.get("ma20")
+        ma60 = technical.get("ma60")
+
+        def position(price, moving_average):
+            if not isinstance(price, (int, float)) or not isinstance(moving_average, (int, float)):
+                return None
+            if price > moving_average:
+                return "above"
+            if price < moving_average:
+                return "below"
+            return "equal"
+
+        price_vs_ma20 = position(current_price, ma20)
+        price_vs_ma60 = position(current_price, ma60)
+        if price_vs_ma20 and price_vs_ma60:
+            if price_vs_ma20 == price_vs_ma60 == "above":
+                trend = "ABOVE_MA20"
+            elif price_vs_ma20 == price_vs_ma60 == "below":
+                trend = "BELOW_MA20"
+            else:
+                trend = "MIXED_MA20_MA60"
+            trend_status = "AVAILABLE"
+            trend_reason = None
+        else:
+            trend = "UNAVAILABLE_TREND_INPUT"
+            trend_status = "UNAVAILABLE"
+            trend_reason = "UNAVAILABLE_TREND_INPUT"
         items.append({
             "itemCode": code,
             "itemName": item.get("stockName") or row.get("itemName"),
             "current": {
-                "price": market.get("price"),
+                "price": current_price,
                 "changeRate": market.get("changeRate"),
                 "sourceTime": market.get("sourceTime"),
                 "status": "AVAILABLE" if row.get("marketObserved") else "UNAVAILABLE",
             },
             "technicals": {
-                "ma20": technical.get("ma20"),
-                "ma60": technical.get("ma60"),
+                "ma20": ma20,
+                "ma60": ma60,
                 "sourceDate": technical.get("sourceDate"),
                 "status": technical.get("confirmedStatus") or technical.get("status"),
             },
             "state": {
                 "status": current_state.get("status") or state.get("status") or "UNAVAILABLE",
-                "trend": current_state.get("trend") or current_state.get("trendStatus") or state.get("trend") or state.get("trendStatus"),
-                "priceVsMA20": current_state.get("priceVsMA20") or state.get("priceVsMA20"),
-                "priceVsMA60": current_state.get("priceVsMA60") or state.get("priceVsMA60"),
+                "trend": trend,
+                "trendStatus": trend_status,
+                "failureReason": trend_reason,
+                "priceVsMA20": price_vs_ma20 or current_state.get("priceVsMA20") or state.get("priceVsMA20"),
+                "priceVsMA60": price_vs_ma60 or current_state.get("priceVsMA60") or state.get("priceVsMA60"),
+                "maAlignment": "ALIGNED" if price_vs_ma20 and price_vs_ma20 == price_vs_ma60 else "MIXED" if price_vs_ma20 and price_vs_ma60 else None,
+                "trendSource": "NAVER_CURRENT_SNAPSHOT+KRX_HISTORICAL_TECHNICAL" if trend_status == "AVAILABLE" else None,
+                "trendSourceDate": technical.get("sourceDate"),
             },
             "status": "AVAILABLE" if row else "UNAVAILABLE",
         })
@@ -2069,10 +2154,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         registered_universe=registered_projection,
         current_market_observation=published_breadth,
         historical_technical_market=historical_technical_market,
-        v1_groups={
-            "sectors": dynamic_universe.get("sectors") or [],
-            "themes": dynamic_universe.get("themes") or [],
-        },
+        v1_groups=configured_interest_group_projection(universe),
         market_snapshot=market_snapshot,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(

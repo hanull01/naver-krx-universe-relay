@@ -196,6 +196,22 @@ class ResearchIntelligenceTest(unittest.TestCase):
         self.assertEqual(lineage["freshnessStatus"], "FRESH")
         self.assertIn("checkedAt", lineage)
 
+    def test_slot_writer_updates_manifest_beside_supplied_output_directory(self):
+        with TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir) / "data" / "research" / "intelligence"
+            slot_path = rib.write_slot_artifact(
+                output_dir,
+                {"status": "OK", "asOf": "2026-11-12", "stocks": []},
+                as_of="2026-11-12",
+                slot="07:20",
+                generated_at="2026-11-12T07:21:00+09:00",
+            )
+            manifest_path = output_dir.parent / "manifest.json"
+            manifest = __import__("json").loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(slot_path, output_dir / "slots" / "20261112-0720.json")
+            self.assertEqual(manifest["slotLineage"][0]["researchSlot"], "07:20")
+            self.assertEqual(manifest["slotLineage"][0]["artifactPath"], str(slot_path))
+
 
 if __name__ == "__main__":
     unittest.main()

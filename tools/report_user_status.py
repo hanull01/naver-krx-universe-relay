@@ -101,6 +101,7 @@ REASON_LABELS = {
     "CURRENT_SNAPSHOT_MISSING": "현재 관측값이 수신되지 않았습니다.",
     "TECHNICAL_DATA_MISSING": "이동평균 계산 자료가 수신되지 않았습니다.",
     "TREND_DATA_MISSING": "추세 계산 자료가 수신되지 않았습니다.",
+    "UNAVAILABLE_TREND_INPUT": "현재가와 이동평균 중 필요한 자료가 모두 수신되지 않아 추세를 계산할 수 없습니다.",
     "CANDIDATE_DETAILS_UNAVAILABLE": "후보 상세 자료가 수신되지 않았습니다.",
     "SELECTION_VALUE_UNAVAILABLE": "후보 선정 기준값이 수신되지 않았습니다.",
     "TECHNICAL_INDICATORS_UNAVAILABLE": "후보 기술지표가 수신되지 않았습니다.",
@@ -150,6 +151,14 @@ def availability(
     research_slot: Any = None,
     expected_at: Any = None,
     checked_at: Any = None,
+    generated_at: Any = None,
+    source_date: Any = None,
+    observation_date: Any = None,
+    scope: Any = None,
+    input_count: Any = None,
+    matched_count: Any = None,
+    output_count: Any = None,
+    next_expected_at: Any = None,
 ) -> dict[str, Any]:
     """Build a stable user-facing availability block.
 
@@ -189,6 +198,14 @@ def availability(
         ("researchSlot", research_slot),
         ("expectedAt", expected_at),
         ("checkedAt", checked_at),
+        ("generatedAt", generated_at),
+        ("sourceDate", source_date),
+        ("observationDate", observation_date),
+        ("scope", scope),
+        ("inputCount", input_count),
+        ("matchedCount", matched_count),
+        ("outputCount", output_count),
+        ("nextExpectedAt", next_expected_at),
     ):
         if value not in (None, "", [], {}):
             result[key] = value

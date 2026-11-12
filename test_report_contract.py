@@ -2,6 +2,7 @@ import json
 import unittest
 
 from tools.report_contract import (
+    _compact_group_row,
     build_report_contract,
     build_relative_strength_tracking,
     REQUIRED_RENDER_FIELDS,
@@ -13,6 +14,35 @@ from tools.report_contract import (
 
 
 class ReportContractTests(unittest.TestCase):
+    def test_theme_stocks_are_projected_as_current_leader_candidates(self):
+        row = _compact_group_row({
+            "id": "theme-1",
+            "name": "현재 테마",
+            "memberCount": 2,
+            "stocks": [
+                {"code": "005930", "name": "삼성전자", "currentPrice": 70000,
+                 "changeRate": 3.2, "temporaryCurrentBarDate": "20261112"},
+                {"code": "000660", "name": "SK하이닉스", "currentPrice": 120000,
+                 "changeRate": 1.1, "temporaryCurrentBarDate": "20261112"},
+            ],
+        }, "theme")
+        self.assertEqual(row["leaderEvidenceStatus"], "AVAILABLE")
+        self.assertEqual([item["code"] for item in row["leaderCandidates"]], ["005930", "000660"])
+        self.assertEqual(row["leaderSource"], "NAVER_CURRENT_SNAPSHOT")
+        self.assertEqual(row["leaderObservationDate"], "20261112")
+        self.assertEqual(row["leaderScope"], "STOCK_ONLY")
+
+    def test_theme_without_current_prices_preserves_specific_missing_reason(self):
+        row = _compact_group_row({
+            "id": "theme-2",
+            "name": "현재값 없는 테마",
+            "memberCount": 2,
+            "stocks": [{"code": "005930", "name": "삼성전자", "temporaryCurrentBarDate": "20261112"}],
+        }, "theme")
+        self.assertEqual(row["leaderEvidenceStatus"], "UNAVAILABLE_NO_CURRENT_SNAPSHOT")
+        self.assertEqual(row["leaderMissingReason"], "NO_CURRENT_LEADER_CANDIDATES")
+        self.assertEqual(row["availability"]["reasonCode"], "NO_CURRENT_LEADER_CANDIDATES")
+
     def test_current_breadth_and_krx_technical_market_are_separate(self):
         generated = "2026-11-09T10:00:00+09:00"
         current = {
