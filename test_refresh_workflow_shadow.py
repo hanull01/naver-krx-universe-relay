@@ -22,6 +22,11 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         block = WORKFLOW.split("- name: Run V2 shadow observation", 1)[1].split("- name: Collect optional", 1)[0]
         self.assertIn("continue-on-error: true", block)
         self.assertIn("v2-shadow-run-status.json", WORKFLOW)
+        self.assertIn("PARTIAL_NON_BLOCKING", block)
+        self.assertIn("GITHUB_STEP_SUMMARY", block)
+        self.assertIn("normalize_run_status", block)
+        self.assertIn("expected_generation_id", block)
+        self.assertIn('consumptionStatus', block)
 
 
 if __name__ == "__main__":

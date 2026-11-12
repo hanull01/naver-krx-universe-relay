@@ -16,6 +16,35 @@ from tools.build_report_contract import _serialize_contract
 
 
 class ReportContractTests(unittest.TestCase):
+    def test_v2_status_and_failure_lineage_are_preserved_without_consuming_stale_data(self):
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {}},
+            breadth={"generatedAt": "g"},
+            quality={"generatedAt": "g"},
+            industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={},
+            v2_history={"observations": []},
+            leaders={},
+            v2_status={
+                "status": "GENERATION_MISMATCH",
+                "producerStatus": "OK",
+                "runId": "run-1",
+                "generatedAt": "2026-11-12T01:00:00Z",
+                "tradingDate": "20261112",
+                "generationId": "gen-old",
+                "expectedGenerationId": "gen-new",
+                "failureReason": "V2_GENERATION_ID_MISMATCH",
+            },
+        )
+        self.assertEqual(contract["v2"]["status"], "GENERATION_MISMATCH")
+        self.assertEqual(contract["v2"]["consumptionStatus"], "NOT_CONSUMED")
+        self.assertEqual(contract["v2"]["publicationPolicy"], "PARTIAL_NON_BLOCKING")
+        self.assertEqual(contract["v2"]["failureReason"], "V2_GENERATION_ID_MISMATCH")
+        self.assertEqual(contract["v2"]["expectedGenerationId"], "gen-new")
+        self.assertEqual(contract["v2Changes"], [])
+
     def test_theme_stocks_are_projected_as_current_leader_candidates(self):
         row = _compact_group_row({
             "id": "theme-1",
