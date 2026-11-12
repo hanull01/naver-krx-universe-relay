@@ -45,13 +45,14 @@ def parse_args():
     return parser.parse_args()
 
 
-def build_slot_lineage(as_of, slot, generated_at, artifact_path, *, producer_status="SUCCESS", artifact_status="AVAILABLE", failure_reason=None, consumed_by_report=None):
+def build_slot_lineage(as_of, slot, generated_at, artifact_path, *, producer_status="SUCCESS", artifact_status="AVAILABLE", failure_reason=None, consumed_by_report=None, producer_run_id=None):
     expected_at = f"{as_of}T{slot}:00+09:00" if slot else None
     return {
         "researchSlot": slot,
         "expectedAt": expected_at,
         "sourceDate": as_of,
         "generatedAt": generated_at,
+        "producerRunId": producer_run_id or os.environ.get("GITHUB_RUN_ID"),
         "artifactPath": str(artifact_path),
         "artifactStatus": artifact_status,
         "producerStatus": producer_status,
@@ -68,7 +69,13 @@ def write_slot_artifact(output_dir, latest, *, as_of, slot, generated_at, source
     slots_dir = Path(output_dir) / "slots"
     slots_dir.mkdir(parents=True, exist_ok=True)
     slot_path = slots_dir / f"{str(as_of).replace('-', '')}-{slot.replace(':', '')}.json"
-    lineage = build_slot_lineage(as_of, slot, generated_at, slot_path)
+    lineage = build_slot_lineage(
+        as_of,
+        slot,
+        generated_at,
+        slot_path,
+        producer_run_id=os.environ.get("GITHUB_RUN_ID"),
+    )
     payload = dict(latest)
     payload["researchSlot"] = slot
     payload["generatedAt"] = generated_at
@@ -76,7 +83,10 @@ def write_slot_artifact(output_dir, latest, *, as_of, slot, generated_at, source
         payload["sourceGeneration"] = source_generation
     payload["slotLineage"] = lineage
     slot_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    manifest_path = Path("data/research/manifest.json")
+    # Keep the manifest beside the intelligence directory.  Resolving it
+    # from output_dir makes disposable fixtures and production runs update
+    # the same lineage owner without depending on the current working dir.
+    manifest_path = Path(output_dir).parent / "manifest.json"
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
     except (OSError, ValueError, json.JSONDecodeError):

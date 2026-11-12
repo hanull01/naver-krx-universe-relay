@@ -607,9 +607,20 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
     if kind == "theme" and isinstance(row.get("stocks"), list):
         item["stockDetailCount"] = len(row["stocks"])
         item["stockDetailSource"] = "data/monitoring/latest-theme-signals.json#themes[].stocks"
-    leaders = row.get("leaders")
+    leader_binding = _current_group_leader_binding(
+        row,
+        kind,
+        row.get("observationDate") or row.get("sourceDate") or _group_observation_date(row),
+    )
+    leaders = row.get("leaders") or row.get("leaderCandidates") or leader_binding.get("candidates")
     if leaders:
         item["leaders"] = _compact_group_leaders(leaders)
+        item["leaderCandidates"] = item["leaders"]
+    item["leaderEvidenceStatus"] = row.get("leaderEvidenceStatus") or leader_binding.get("status")
+    item["leaderSource"] = row.get("leaderSource") or leader_binding.get("source")
+    item["leaderObservationDate"] = row.get("leaderObservationDate") or leader_binding.get("observationDate")
+    item["leaderScope"] = row.get("leaderScope") or leader_binding.get("scope")
+    item["leaderMissingReason"] = row.get("leaderMissingReason") or leader_binding.get("missingReason")
     item["detailSource"] = (
         "data/monitoring/latest-industries.json#industries[]"
         if kind == "industry" else
@@ -642,13 +653,24 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
         required_data=("업종 구성종목·현재 관측값·상대강도" if kind == "industry" else "테마 구성종목·현재 관측값·상대강도"),
         received=received,
         producer=("NAVER 업종 수집" if kind == "industry" else "NAVER 테마 수집"),
-        reason=first_reason(row, "missingReason", "reason", "validationReason", "qualityReason")
+        reason=first_reason(
+            row, "leaderMissingReason", "missingReason", "reason", "validationReason", "qualityReason"
+        )
+        or leader_binding.get("missingReason")
         or (default_reason if not received else None),
         next_check_at=row.get("nextCheckAt"),
         producer_run_id=row.get("producerRunId"),
         artifact_path=row.get("artifactPath") or item.get("detailSource"),
         freshness_status=row.get("freshnessStatus"),
         checked_at=row.get("checkedAt"),
+        generated_at=row.get("generatedAt"),
+        source_date=row.get("sourceDate"),
+        observation_date=row.get("observationDate"),
+        scope=row.get("scope"),
+        input_count=row.get("inputCount") or row.get("memberCount"),
+        matched_count=row.get("matchedCount") or row.get("featureCount"),
+        output_count=row.get("outputCount") or (len(leaders) if leaders else 0),
+        next_expected_at=row.get("nextExpectedAt"),
     )
     return item
 
@@ -674,6 +696,23 @@ def _group_collection_availability(
         )
     rows = [row for row in groups.get(source_key, []) if isinstance(row, Mapping)]
     raw_status = (groups or {}).get("status") or (groups or {}).get("qualityStatus")
+    if str((groups or {}).get("configurationStatus") or "").upper() == "NOT_CONFIGURED":
+        return availability(
+            status="UNAVAILABLE",
+            required_data=("운영 관심 업종 설정과 현재 관측" if kind == "industry" else "운영 관심 테마 설정과 현재 관측"),
+            received=False,
+            producer=("config/universe.json 관심 업종 설정" if kind == "industry" else "config/universe.json 관심 테마 설정"),
+            reason="INTEREST_GROUP_NOT_CONFIGURED",
+            artifact_path=(groups or {}).get("artifactPath"),
+            generated_at=(groups or {}).get("generatedAt"),
+            source_date=(groups or {}).get("sourceDate"),
+            observation_date=(groups or {}).get("observationDate"),
+            scope="INTEREST_GROUP_CONFIGURATION",
+            input_count=0,
+            matched_count=0,
+            output_count=0,
+            next_expected_at=(groups or {}).get("nextExpectedAt"),
+        )
     reason = first_reason(groups, "missingReason", "reason", "policyReason", "validationReason")
     if not rows:
         reason = reason or (
@@ -693,6 +732,14 @@ def _group_collection_availability(
         artifact_path=(groups or {}).get("artifactPath"),
         freshness_status=(groups or {}).get("freshnessStatus"),
         checked_at=(groups or {}).get("checkedAt"),
+        generated_at=(groups or {}).get("generatedAt"),
+        source_date=(groups or {}).get("sourceDate"),
+        observation_date=(groups or {}).get("observationDate"),
+        scope=(groups or {}).get("scope"),
+        input_count=(groups or {}).get("inputCount"),
+        matched_count=(groups or {}).get("matchedCount"),
+        output_count=(groups or {}).get("outputCount") or len(rows),
+        next_expected_at=(groups or {}).get("nextExpectedAt"),
     )
 
 
@@ -701,6 +748,8 @@ def _compact_v1_rows(
     kind: str,
     relative_rows: list[Mapping[str, Any]],
     trading_date: Any,
+    source_rows: list[Mapping[str, Any]] | None = None,
+    observation_date: Any = None,
 ) -> list[dict[str, Any]]:
     """Project the existing V1 selection without changing its policy."""
     if not isinstance(groups, Mapping):
@@ -709,6 +758,11 @@ def _compact_v1_rows(
     relative_by_id = {
         str(row.get("id")): row
         for row in relative_rows
+        if isinstance(row, Mapping) and row.get("id") is not None
+    }
+    source_by_id = {
+        str(row.get("id")): row
+        for row in source_rows or []
         if isinstance(row, Mapping) and row.get("id") is not None
     }
     expected_date = str(trading_date or "").replace("-", "")
@@ -721,6 +775,34 @@ def _compact_v1_rows(
         if status not in _REPORT_V1_STATUSES or (expected_date and row_date and row_date != expected_date):
             continue
         relative = relative_by_id.get(str(row.get("id")), {})
+        source_row = source_by_id.get(str(row.get("id")), {})
+        source_binding = (
+            _current_group_leader_binding(source_row, kind, observation_date or trading_date)
+            if source_row else {}
+        )
+        candidates = (
+            relative.get("leaderCandidates")
+            or relative.get("leaders")
+            or source_binding.get("candidates")
+            or []
+        )
+        leader_status = (
+            relative.get("leaderEvidenceStatus")
+            or source_binding.get("status")
+            or "UNAVAILABLE_NO_CURRENT_SNAPSHOT"
+        )
+        leader_reason = (
+            relative.get("leaderMissingReason")
+            or source_binding.get("missingReason")
+            or row.get("missingReason")
+        )
+        if not candidates and not leader_reason:
+            if source_row.get("membershipStatus") in {"MISSING", "UNAVAILABLE"} or source_row.get("memberCount") in (0, None):
+                leader_reason = "NO_CURRENT_MEMBERSHIP"
+            elif source_row.get("stocks"):
+                leader_reason = "SYMBOL_MATCH_FAILED"
+            else:
+                leader_reason = "LEADER_CALCULATION_FAILED"
         rows.append({
             "id": row.get("id"),
             "name": row.get("name"),
@@ -728,13 +810,13 @@ def _compact_v1_rows(
             "status": status,
             "score": row.get("score"),
             "tradingDate": row.get("lastObservedTradingDate") or trading_date,
-            "leaders": _compact_group_leaders(relative.get("leaderCandidates") or relative.get("leaders") or []),
-            "leaderCandidates": _compact_group_leaders(relative.get("leaderCandidates") or relative.get("leaders") or []),
-            "leaderEvidenceStatus": relative.get("leaderEvidenceStatus") or "UNAVAILABLE_NO_CURRENT_SNAPSHOT",
-            "leaderSource": relative.get("leaderSource") or "NAVER_CURRENT_SNAPSHOT",
-            "leaderObservationDate": relative.get("leaderObservationDate") or relative.get("observationDate") or trading_date,
-            "leaderScope": relative.get("leaderScope") or relative.get("scope") or "STOCK_ONLY",
-            "leaderMissingReason": relative.get("leaderMissingReason"),
+            "leaders": _compact_group_leaders(candidates),
+            "leaderCandidates": _compact_group_leaders(candidates),
+            "leaderEvidenceStatus": leader_status,
+            "leaderSource": relative.get("leaderSource") or source_binding.get("source") or "NAVER_CURRENT_SNAPSHOT",
+            "leaderObservationDate": relative.get("leaderObservationDate") or source_binding.get("observationDate") or relative.get("observationDate") or trading_date,
+            "leaderScope": relative.get("leaderScope") or source_binding.get("scope") or relative.get("scope") or "STOCK_ONLY",
+            "leaderMissingReason": leader_reason,
             "source": relative.get("source") or "NAVER_CURRENT_SNAPSHOT",
             "sourceDate": relative.get("sourceDate") or relative.get("sourceTradingDate") or trading_date,
             "observationDate": relative.get("observationDate") or relative.get("sourceTradingDate") or trading_date,
@@ -742,18 +824,22 @@ def _compact_v1_rows(
             "availability": availability(
                 status=relative.get("leaderEvidenceStatus") or row.get("status"),
                 required_data=("업종 현재 관측과 대표 주도주" if kind == "industry" else "테마 현재 관측과 대표 주도주"),
-                received=bool(relative.get("leaderCandidates") or relative.get("leaders")),
+                received=bool(candidates),
                 producer=("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
-                reason=(
-                    relative.get("leaderMissingReason")
-                    or row.get("missingReason")
-                    or "LEADER_CALCULATION_FAILED"
-                ) if not (relative.get("leaderCandidates") or relative.get("leaders")) else None,
+                reason=leader_reason if not candidates else None,
                 next_check_at=relative.get("nextCheckAt"),
                 producer_run_id=relative.get("producerRunId"),
                 artifact_path=relative.get("artifactPath"),
                 freshness_status=relative.get("freshnessStatus"),
                 checked_at=relative.get("checkedAt"),
+                generated_at=relative.get("generatedAt") or source_row.get("generatedAt"),
+                source_date=relative.get("sourceDate") or source_row.get("sourceDate"),
+                observation_date=relative.get("observationDate") or source_binding.get("observationDate"),
+                scope=relative.get("scope") or source_binding.get("scope"),
+                input_count=source_row.get("memberCount"),
+                matched_count=source_row.get("featureCount"),
+                output_count=len(candidates),
+                next_expected_at=relative.get("nextExpectedAt") or source_row.get("nextExpectedAt"),
             ),
         })
     rows.sort(key=lambda item: (-float(item["score"]) if isinstance(item.get("score"), (int, float)) else 1e9, str(item.get("id") or "")))
@@ -1784,10 +1870,12 @@ def build_report_contract(
         observation_date=observed_date,
     )
     v1_industries = _compact_v1_rows(
-        v1_groups, "industry", relative_strength_tracking["industries"]["top5"], trading_date
+        v1_groups, "industry", relative_strength_tracking["industries"]["top5"], trading_date,
+        source_rows=industries.get("industries") or [], observation_date=observed_date,
     )
     v1_themes = _compact_v1_rows(
-        v1_groups, "theme", relative_strength_tracking["themes"]["top5"], trading_date
+        v1_groups, "theme", relative_strength_tracking["themes"]["top5"], trading_date,
+        source_rows=themes.get("themes") or [], observation_date=observed_date,
     )
     research_analysis = _compact_research_analysis(
         research, trading_date, relative_strength_tracking

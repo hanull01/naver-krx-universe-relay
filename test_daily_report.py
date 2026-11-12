@@ -45,6 +45,48 @@ def verified_full_market():
 
 
 class DailyReportTests(unittest.TestCase):
+    def test_configured_interest_groups_do_not_promote_dynamic_selection_history(self):
+        projection = daily_report.configured_interest_group_projection({
+            "sectors": {},
+            "themes": {},
+            "generatedAt": "2026-11-12T13:30:00+09:00",
+        })
+        self.assertEqual(projection["configurationStatus"], "NOT_CONFIGURED")
+        self.assertEqual(projection["sectors"], [])
+        self.assertEqual(projection["themes"], [])
+        self.assertEqual(projection["artifactPath"], "config/universe.json#sectors,themes")
+
+    def test_registered_projection_calculates_trend_from_current_and_krx_inputs(self):
+        projection = daily_report.registered_universe_projection(
+            [{"itemCode": "005930", "stockName": "삼성전자"}],
+            [{
+                "itemCode": "005930",
+                "market": {"price": 70000, "sourceTime": "2026-11-12T10:00:00+09:00"},
+                "technical": {"ma20": 68000, "ma60": 72000, "sourceDate": "20261111"},
+                "marketObserved": True,
+            }],
+        )
+        state = projection["items"][0]["state"]
+        self.assertEqual(state["priceVsMA20"], "above")
+        self.assertEqual(state["priceVsMA60"], "below")
+        self.assertEqual(state["trend"], "MIXED_MA20_MA60")
+        self.assertEqual(state["trendStatus"], "AVAILABLE")
+        self.assertEqual(state["trendSourceDate"], "20261111")
+
+    def test_registered_projection_reports_missing_trend_inputs_without_fallback(self):
+        projection = daily_report.registered_universe_projection(
+            [{"itemCode": "005930", "stockName": "삼성전자"}],
+            [{
+                "itemCode": "005930",
+                "market": {"price": 70000, "sourceTime": "2026-11-12T10:00:00+09:00"},
+                "technical": {"ma20": None, "ma60": 72000, "sourceDate": "20261111"},
+                "marketObserved": True,
+            }],
+        )
+        state = projection["items"][0]["state"]
+        self.assertEqual(state["trend"], "UNAVAILABLE_TREND_INPUT")
+        self.assertEqual(state["failureReason"], "UNAVAILABLE_TREND_INPUT")
+
     def test_research_requires_matching_date_and_source_generation(self):
         payload = {
             "status": "OK", "asOf": "2026-10-29", "sourceGeneration": "gen-1",
