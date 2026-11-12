@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "002380",
   "itemName": "KCC",
-  "reportCount": 7,
-  "latestReportNid": "95954",
-  "latestWriteDate": "2026-09-01",
+  "reportCount": 8,
+  "latestReportNid": "98072",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "95954",
-    "writeDate": "2026-09-01",
-    "brokerName": "신한투자증권",
-    "title": "NDR 후기: 실리콘 회복, 주주환원까지",
-    "goalPrice": 750000,
+    "nid": "98072",
+    "writeDate": "2026-11-12",
+    "brokerName": "삼성증권",
+    "title": "3Q26 review - 실리콘 및 도료 부진 영향",
+    "goalPrice": 540000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 1
+        "positive": 1,
+        "negative": 5
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "반도체": 1
+      }
     }
   },
   "reportNids": [
+    "98072",
     "95954",
     "95807",
     "95794",

@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "120110",
   "itemName": "코오롱인더",
-  "reportCount": 7,
-  "latestReportNid": "95703",
-  "latestWriteDate": "2026-08-18",
+  "reportCount": 8,
+  "latestReportNid": "98056",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "95703",
-    "writeDate": "2026-08-18",
-    "brokerName": "유안타증권",
-    "title": "다시 10만원에 도전할 것이다!",
-    "goalPrice": 96000,
+    "nid": "98056",
+    "writeDate": "2026-11-12",
+    "brokerName": "신한투자증권",
+    "title": "본업은 기다림, 성장은 현재진행형",
+    "goalPrice": 60000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 0
+        "positive": 6,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1
+        "수요": 2,
+        "원가": 2,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98056",
     "95703",
     "95372",
     "95320",

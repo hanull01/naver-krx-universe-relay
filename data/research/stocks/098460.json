@@ -2,31 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "098460",
   "itemName": "고영",
-  "reportCount": 15,
-  "latestReportNid": "97677",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 16,
+  "latestReportNid": "98030",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97677",
-    "writeDate": "2026-11-05",
-    "brokerName": "신한투자증권",
-    "title": "환율 노이즈를 넘어선 사상 최대 실적",
-    "goalPrice": 43000,
+    "nid": "98030",
+    "writeDate": "2026-11-12",
+    "brokerName": "미래에셋증권",
+    "title": "실적의 눈높이를 더 올려야할 때",
+    "goalPrice": 52500,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 5,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 1
+        "자동차": 3,
+        "수요": 2,
+        "중국": 2,
+        "AI": 1,
+        "미국": 1
       }
     }
   },
   "reportNids": [
+    "98030",
     "97677",
     "97574",
     "95777",

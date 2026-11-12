@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "462870",
   "itemName": "시프트업",
-  "reportCount": 18,
-  "latestReportNid": "98027",
-  "latestWriteDate": "2026-11-11",
+  "reportCount": 19,
+  "latestReportNid": "98082",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "98027",
-    "writeDate": "2026-11-11",
-    "brokerName": "한화투자증권",
-    "title": "많은 것이 반영된 주가 수준",
-    "goalPrice": 40000,
+    "nid": "98082",
+    "writeDate": "2026-11-12",
+    "brokerName": "SK증권",
+    "title": "하방은 견고, 상승은 신작에 달렸다",
+    "goalPrice": 35000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 1,
+        "negative": 4
       },
-      "earningsTextDirection": "UP",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "원가": 1
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98082",
     "98027",
     "97990",
     "96957",

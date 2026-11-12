@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "036570",
   "itemName": "NC",
-  "reportCount": 31,
-  "latestReportNid": "97644",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 35,
+  "latestReportNid": "98081",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97644",
-    "writeDate": "2026-11-05",
-    "brokerName": "키움증권",
-    "title": "과도기적 단계",
-    "goalPrice": 290000,
+    "nid": "98081",
+    "writeDate": "2026-11-12",
+    "brokerName": "SK증권",
+    "title": "실적은 견조, 주가의 열쇠는 다음 대작",
+    "goalPrice": 300000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 0,
         "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "원가": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "98081",
+    "98068",
+    "98059",
+    "98034",
     "97644",
     "96950",
     "96663",

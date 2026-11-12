@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "356860",
   "itemName": "티엘비",
-  "reportCount": 18,
-  "latestReportNid": "97943",
-  "latestWriteDate": "2026-11-10",
+  "reportCount": 20,
+  "latestReportNid": "98054",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97943",
-    "writeDate": "2026-11-10",
-    "brokerName": "대신증권",
-    "title": "3Q 호조, 4Q 더 좋다",
-    "goalPrice": 60000,
+    "nid": "98054",
+    "writeDate": "2026-11-12",
+    "brokerName": "IBK투자증권",
+    "title": "예상보다 훨씬 더 좋다",
+    "goalPrice": 62000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 1
+        "positive": 4,
+        "negative": 0
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 4,
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "가격": 5,
+        "수요": 1,
+        "원가": 1
+      }
     }
   },
   "reportNids": [
+    "98054",
+    "98044",
     "97943",
     "97906",
     "97778",

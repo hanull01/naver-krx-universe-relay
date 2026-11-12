@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "itemCode": "017670",
   "itemName": "SK텔레콤",
-  "reportCount": 63,
-  "latestReportNid": "97719",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 64,
+  "latestReportNid": "98074",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97719",
-    "writeDate": "2026-11-05",
-    "brokerName": "하나증권",
-    "title": "26년 3분기 컨퍼런스 콜",
-    "goalPrice": 140000,
+    "nid": "98074",
+    "writeDate": "2026-11-12",
+    "brokerName": "삼성증권",
+    "title": "한층 단단해진 이익 체력",
+    "goalPrice": 115000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
+        "positive": 10,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 8,
       "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "AI": 7,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "98074",
     "97719",
     "97718",
     "97703",

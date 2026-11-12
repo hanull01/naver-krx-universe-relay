@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "439260",
   "itemName": "대한조선",
-  "reportCount": 8,
-  "latestReportNid": "96362",
-  "latestWriteDate": "2026-09-29",
+  "reportCount": 9,
+  "latestReportNid": "98069",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "96362",
-    "writeDate": "2026-09-29",
+    "nid": "98069",
+    "writeDate": "2026-11-12",
     "brokerName": "미래에셋증권",
-    "title": "OPM 1등에 필요한 마지막 한 수",
-    "goalPrice": 75000,
+    "title": "딥밸류 구간에서 주주환원 크게 시작",
+    "goalPrice": 60000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 0
+        "positive": 1,
+        "negative": 3
       },
       "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "환율": 7,
+        "원가": 3,
+        "가격": 1,
+        "자동차": 1
+      }
     }
   },
   "reportNids": [
+    "98069",
     "96362",
     "94988",
     "94797",

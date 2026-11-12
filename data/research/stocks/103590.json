@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "103590",
   "itemName": "일진전기",
-  "reportCount": 11,
-  "latestReportNid": "96694",
-  "latestWriteDate": "2026-10-14",
+  "reportCount": 12,
+  "latestReportNid": "98083",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "96694",
-    "writeDate": "2026-10-14",
-    "brokerName": "신한투자증권",
-    "title": "가장 저평가된 전력기기",
-    "goalPrice": 100000,
+    "nid": "98083",
+    "writeDate": "2026-11-12",
+    "brokerName": "미래에셋증권",
+    "title": "시장 점유율 100%",
+    "goalPrice": 120000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 2
+        "positive": 5,
+        "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 2,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 4
+        "수주": 3,
+        "미국": 1,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98083",
     "96694",
     "96497",
     "96479",

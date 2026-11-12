@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "066970",
   "itemName": "엘앤에프",
-  "reportCount": 22,
-  "latestReportNid": "97884",
-  "latestWriteDate": "2026-11-09",
+  "reportCount": 23,
+  "latestReportNid": "98078",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97884",
-    "writeDate": "2026-11-09",
-    "brokerName": "대신증권",
-    "title": "기대와 우려가 공존",
-    "goalPrice": 150000,
+    "nid": "98078",
+    "writeDate": "2026-11-12",
+    "brokerName": "삼성증권",
+    "title": "3Q26 review - LFP 양극재 사업 확장이 긍정적",
+    "goalPrice": 125000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 4,
         "negative": 4
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수요": 1,
-        "자동차": 1
+        "가격": 4,
+        "자동차": 3,
+        "수요": 2,
+        "재고": 2,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98078",
     "97884",
     "97834",
     "97812",

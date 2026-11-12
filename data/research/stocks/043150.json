@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "043150",
   "itemName": "바텍",
-  "reportCount": 4,
-  "latestReportNid": "95482",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 6,
+  "latestReportNid": "98065",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "95482",
-    "writeDate": "2026-08-12",
-    "brokerName": "대신증권",
-    "title": "미국서 보너스 받고, 유럽으로",
-    "goalPrice": 37000,
+    "nid": "98065",
+    "writeDate": "2026-11-12",
+    "brokerName": "유진투자증권",
+    "title": "3Q26P Review: 7분기 연속 매출 성장세 지속",
+    "goalPrice": 24000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
-        "negative": 0
+        "positive": 28,
+        "negative": 7
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
-      "topics": {}
+      "earningsPositiveSignalCount": 18,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "DOWN",
+      "topics": {
+        "자동차": 2,
+        "수요": 1,
+        "원가": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "98065",
+    "98032",
     "95482",
     "95454",
     "92876",

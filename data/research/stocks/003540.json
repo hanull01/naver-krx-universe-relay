@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "003540",
   "itemName": "대신증권",
-  "reportCount": 3,
-  "latestReportNid": "95474",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 4,
+  "latestReportNid": "98055",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "95474",
-    "writeDate": "2026-08-12",
+    "nid": "98055",
+    "writeDate": "2026-11-12",
     "brokerName": "SK증권",
-    "title": "2Q26 Review: 평가이익이 견인한 어닝 서프라이즈",
-    "goalPrice": 40000,
+    "title": "3Q26 Review: 쉽지 않은 하반기가 되겠다",
+    "goalPrice": 30000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 0,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 4,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "topics": {
+        "미국": 1
+      }
     }
   },
   "reportNids": [
+    "98055",
     "95474",
     "94578",
     "93121"

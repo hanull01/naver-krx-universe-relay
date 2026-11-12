@@ -2,32 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "046890",
   "itemName": "서울반도체",
-  "reportCount": 2,
-  "latestReportNid": "95485",
-  "latestWriteDate": "2026-08-12",
+  "reportCount": 3,
+  "latestReportNid": "98087",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "95485",
-    "writeDate": "2026-08-12",
+    "nid": "98087",
+    "writeDate": "2026-11-12",
     "brokerName": "대신증권",
-    "title": "2Q 매출 증가는 긍정적",
+    "title": "경쟁력 확보한 신성장 매출이 필요",
     "goalPrice": 9500,
     "normalizedOpinion": "MARKETPERFORM",
     "analysis": {
       "textSignalBalance": {
-        "positive": 10,
-        "negative": 4
+        "positive": 3,
+        "negative": 11
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 6,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "수요": 1,
-        "중국": 1
+        "환율": 2,
+        "가격": 1,
+        "수요": 1
       }
     }
   },
   "reportNids": [
+    "98087",
     "95485",
     "93974"
   ]

@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "257720",
   "itemName": "실리콘투",
-  "reportCount": 12,
-  "latestReportNid": "96024",
-  "latestWriteDate": "2026-09-07",
+  "reportCount": 14,
+  "latestReportNid": "98061",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "96024",
-    "writeDate": "2026-09-07",
+    "nid": "98061",
+    "writeDate": "2026-11-12",
     "brokerName": "SK증권",
-    "title": "벤더사 역할이 중요해지는 구간",
-    "goalPrice": 62000,
+    "title": "환율에 가려진 외형 성장",
+    "goalPrice": 38000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 0
+        "positive": 7,
+        "negative": 4
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "미국": 4
+        "환율": 3,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98061",
+    "98040",
     "96024",
     "95771",
     "95704",

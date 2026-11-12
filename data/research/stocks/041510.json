@@ -2,29 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "041510",
   "itemName": "에스엠",
-  "reportCount": 36,
-  "latestReportNid": "97709",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 37,
+  "latestReportNid": "98077",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97709",
-    "writeDate": "2026-11-05",
-    "brokerName": "하나증권",
-    "title": "SMTR25의 데뷔를 기다리자",
-    "goalPrice": 110000,
+    "nid": "98077",
+    "writeDate": "2026-11-12",
+    "brokerName": "삼성증권",
+    "title": "익숙한 경쟁력, 새로운 성장의 조화",
+    "goalPrice": 105000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
+        "positive": 8,
         "negative": 4
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
       "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "98077",
     "97709",
     "97697",
     "97676",

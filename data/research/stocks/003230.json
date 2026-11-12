@@ -2,31 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "003230",
   "itemName": "삼양식품",
-  "reportCount": 30,
-  "latestReportNid": "97918",
-  "latestWriteDate": "2026-11-09",
+  "reportCount": 32,
+  "latestReportNid": "98049",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97918",
-    "writeDate": "2026-11-09",
-    "brokerName": "한화투자증권",
-    "title": "모든 변수를 이겨내는 실적",
-    "goalPrice": 1800000,
+    "nid": "98049",
+    "writeDate": "2026-11-12",
+    "brokerName": "신한투자증권",
+    "title": "수요가 증설을 부른다",
+    "goalPrice": 1750000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 3,
-        "negative": 1
+        "positive": 4,
+        "negative": 2
       },
       "earningsTextDirection": "MIXED",
       "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "가격": 1,
+        "중국": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "98049",
+    "98038",
     "97918",
     "97912",
     "97892",

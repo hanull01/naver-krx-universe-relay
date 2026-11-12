@@ -2,33 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "122640",
   "itemName": "예스티",
-  "reportCount": 4,
-  "latestReportNid": "97076",
-  "latestWriteDate": "2026-10-27",
+  "reportCount": 5,
+  "latestReportNid": "98057",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97076",
-    "writeDate": "2026-10-27",
-    "brokerName": "유안타증권",
-    "title": "3Q26 컨센서스 상회 전망",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "98057",
+    "writeDate": "2026-11-12",
+    "brokerName": "신한투자증권",
+    "title": "실적 호조에 수주 기대감까지",
+    "goalPrice": 41000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
+        "positive": 3,
         "negative": 0
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "반도체": 1,
-        "수주": 1
+        "수주": 2
       }
     }
   },
   "reportNids": [
+    "98057",
     "97076",
     "96901",
     "95956",
