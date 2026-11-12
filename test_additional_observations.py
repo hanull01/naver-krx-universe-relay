@@ -42,7 +42,7 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
 
     def test_no_config_is_explicitly_not_configured(self):
         result = build_additional_observation_projection({}, None, observation_date="20261112")
-        self.assertEqual(result["status"], "PRODUCER_NOT_CONFIGURED")
+        self.assertEqual(result["status"], "INPUT_UNAVAILABLE")
         self.assertEqual(result["counts"]["configured"], 0)
 
     def test_config_without_artifact_is_not_yet_run(self):
@@ -99,6 +99,23 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
             observation_date="20261112",
         )
         self.assertLess(len(json.dumps(result, ensure_ascii=False).encode()), 900_000)
+
+    def test_auto_selected_artifact_projection_preserves_selection_lineage(self):
+        artifact = self.artifact()
+        artifact["industries"][0].update({
+            "selectionRank": 1,
+            "selectionScore": 88.5,
+            "selectionReason": "CURRENT_OBSERVATION_RANKING",
+            "selectionEvidence": {"relativeStrength": 2.1, "advancePct": 75.0, "memberCount": 12, "sourceDate": "20261112", "observationDate": "20261112", "source": "NAVER_CURRENT_SNAPSHOT", "scope": "STOCK_ONLY"},
+        })
+        result = build_additional_observation_projection(
+            {"autoSelect": True, "industries": [], "themes": []}, artifact,
+            observation_date="20261112",
+        )
+        row = result["industries"][0]
+        self.assertEqual(row["selectionRank"], 1)
+        self.assertEqual(row["selectionScore"], 88.5)
+        self.assertEqual(row["selectionEvidence"]["sourceDate"], "20261112")
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ class AdditionalObservationProducerTests(unittest.TestCase):
 
     def test_no_configuration_is_explicit(self):
         result = self.build(config={"industries": [], "themes": []})
-        self.assertEqual(result["status"], "PRODUCER_NOT_CONFIGURED")
+        self.assertEqual(result["status"], "NO_ELIGIBLE_TARGETS")
 
     def test_missing_configured_input_is_producer_failed(self):
         result = self.build(config={"industries": [], "themes": [{"id": "t1", "name": "테마1"}]}, theme_input=None)
@@ -60,7 +60,71 @@ class AdditionalObservationProducerTests(unittest.TestCase):
             output = root / "out.json"
             code = main(["--config", str(root / "config.json"), "--industry-input", str(root / "industry.json"), "--theme-input", str(root / "theme.json"), "--output", str(output), "--observation-date", "20261112", "--run-id", "run-cli"])
             self.assertEqual(code, 0)
-            self.assertEqual(json.loads(output.read_text())["status"], "PRODUCER_NOT_CONFIGURED")
+            self.assertEqual(json.loads(output.read_text())["status"], "NO_ELIGIBLE_TARGETS")
+
+    def _auto_inputs(self):
+        industries = []
+        themes = []
+        for index in range(8):
+            value = 10.0 - index
+            industries.append({
+                "id": f"i{index}", "name": f"업종{index}", "memberCount": 10 + index,
+                "featureValidMemberCount": 10 + index, "relativeStrengthVsMarket": value,
+                "advancePct": 60.0 - index, "leaders": [{"code": f"1{index}", "name": f"종목{index}"}],
+                "sourceDate": "20261112", "observationDate": "20261112",
+            })
+            themes.append({
+                "id": f"t{index}", "name": f"테마{index}", "memberCount": 10 + index,
+                "featureCount": 10 + index, "coveragePct": 100.0,
+                "membershipStatus": "OK", "metrics": {
+                    "officialChangeRateRelativeStrength": value, "advancerPct": 60.0 - index,
+                }, "stocks": [{"code": f"2{index}", "name": f"테마종목{index}", "changeRate": 5.0}],
+                "temporaryCurrentBarDate": "20261112",
+            })
+        return (
+            {"sourceDate": "20261112", "observationDate": "20261112", "generatedAt": "2026-11-12T10:00:00+09:00", "industries": industries},
+            {"generatedAt": "2026-11-12T10:00:00+09:00", "themes": themes},
+        )
+
+    def test_empty_configuration_auto_selects_industries_and_themes_independently(self):
+        industry, theme = self._auto_inputs()
+        result = self.build(config={"autoSelect": True, "industries": [], "themes": []}, industry_input=industry, theme_input=theme)
+        self.assertEqual(result["status"], "AVAILABLE")
+        self.assertEqual(len(result["industries"]), 3)
+        self.assertEqual(len(result["themes"]), 3)
+        self.assertTrue(all(row["selectionScore"] is not None for row in result["industries"] + result["themes"]))
+        self.assertTrue(set(row["id"] for row in result["industries"]).isdisjoint({f"i{index}" for index in range(5)}))
+        self.assertTrue(set(row["id"] for row in result["themes"]).isdisjoint({f"t{index}" for index in range(5)}))
+
+    def test_quality_threshold_excludes_small_or_weak_targets(self):
+        industry, theme = self._auto_inputs()
+        industry["industries"] = [{
+            "id": "small", "name": "작은 업종", "memberCount": 2,
+            "featureValidMemberCount": 2, "relativeStrengthVsMarket": 20.0,
+            "advancePct": 99.0, "leaders": [{"code": "1", "name": "A"}],
+            "sourceDate": "20261112", "observationDate": "20261112",
+        }]
+        theme["themes"] = []
+        result = self.build(config={"autoSelect": True, "policy": {"excludeRelativeStrengthTop5": False}, "industries": [], "themes": []}, industry_input=industry, theme_input=theme)
+        self.assertNotIn("small", {row["id"] for row in result["industries"]})
+        self.assertIn("MEMBERSHIP_BELOW_MINIMUM", result["selectionPolicy"]["excluded"]["industries"][0]["reason"])
+
+    def test_missing_leader_is_partial_without_inventing_one(self):
+        industry, theme = self._auto_inputs()
+        industry["industries"][6]["leaders"] = []
+        theme["themes"] = []
+        result = self.build(config={"autoSelect": True, "industries": [], "themes": []}, industry_input=industry, theme_input=theme)
+        selected = next(row for row in result["industries"] if row["id"] == "i6")
+        self.assertEqual(selected["status"], "UNAVAILABLE")
+        self.assertEqual(selected["failureReason"], "NO_LEADER_DATA")
+
+    def test_date_mismatch_and_empty_inputs_are_explicit(self):
+        industry, theme = self._auto_inputs()
+        industry["observationDate"] = "20261111"
+        theme["themes"] = []
+        result = self.build(config={"autoSelect": True, "industries": [], "themes": []}, industry_input=industry, theme_input=theme)
+        self.assertEqual(result["status"], "INPUT_UNAVAILABLE")
+        self.assertIn("INDUSTRY_INPUT_DATE_MISMATCH", result["failureReason"])
 
 
 if __name__ == "__main__":
