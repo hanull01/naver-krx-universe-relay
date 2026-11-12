@@ -1,3 +1,70 @@
+
+
+class ReportAsOfNormalizationTests(unittest.TestCase):
+    def test_accepts_compact_dashed_and_iso_dates(self):
+        from tools.report_lineage import normalize_report_as_of
+        self.assertEqual(normalize_report_as_of("20261112"), "20261112")
+        self.assertEqual(normalize_report_as_of("2026-11-12"), "20261112")
+        self.assertEqual(normalize_report_as_of("2026-11-12T21:13:38+09:00"), "20261112")
+
+    def test_rejects_invalid_date(self):
+        from tools.report_lineage import normalize_report_as_of
+        with self.assertRaisesRegex(ValueError, "REPORT_ASOF_INVALID"):
+            normalize_report_as_of("2026-11-13-not-a-date")
+
+    def test_renderer_display_date_is_accepted(self):
+        from tools.report_lineage import validate_rendered_as_of
+        self.assertEqual(
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"asOf": "2026-11-12", "lineage": {"asOf": "20261112"}},
+                {"asOf": "20261112"},
+            ),
+            "20261112",
+        )
+
+    def test_contract_date_is_preferred_when_manifest_is_display_formatted(self):
+        from tools.report_lineage import validate_rendered_as_of
+        self.assertEqual(
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "2026-11-12"}},
+                {"lineage": {"asOf": "2026-11-12"}},
+                {"asOf": "20261112"},
+            ),
+            "20261112",
+        )
+
+    def test_missing_top_level_renderer_date_is_allowed(self):
+        from tools.report_lineage import validate_rendered_as_of
+        self.assertEqual(
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"lineage": {"asOf": "20261112"}},
+                {"asOf": "20261112"},
+            ),
+            "20261112",
+        )
+
+    def test_mismatched_lineage_or_auxiliary_date_is_rejected(self):
+        from tools.report_lineage import validate_rendered_as_of
+        with self.assertRaisesRegex(ValueError, "REPORT_AS_OF_MISMATCH"):
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"lineage": {"asOf": "20261112"}},
+                {"asOf": "20261111"},
+            )
+        with self.assertRaisesRegex(ValueError, "REPORT_RENDERED_LINEAGE_ASOF_MISMATCH"):
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"lineage": {"asOf": "20261111"}},
+                {"asOf": "20261112"},
+            )
+        with self.assertRaisesRegex(ValueError, "REPORT_RENDER_RESULT_ASOF_MISMATCH"):
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"asOf": "20261111", "lineage": {"asOf": "20261112"}},
+                {"asOf": "20261112"},
+            )
 import hashlib
 import json
 import subprocess
