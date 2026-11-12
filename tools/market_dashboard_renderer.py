@@ -469,6 +469,23 @@ def _compact_row_available(row: Mapping[str, Any]) -> bool:
 
 
 def _compact_v2_verified(contract: Mapping[str, Any], v2: Mapping[str, Any]) -> bool:
+    lineage = v2.get("v2Lineage")
+    if isinstance(lineage, Mapping):
+        source = str(lineage.get("source") or "").upper()
+        status = str(v2.get("status") or lineage.get("status") or "").upper()
+        consumed = str(v2.get("consumptionStatus") or lineage.get("consumptionStatus") or "").upper()
+        expected = _compact_normalized_date(contract.get("observationDate") or contract.get("asOf"))
+        source_date = _compact_normalized_date(lineage.get("sourceDate"))
+        observation_date = _compact_normalized_date(lineage.get("observationDate"))
+        if (
+            status in {"SUCCESS", "OK"}
+            and consumed == "CONSUMED"
+            and source == "NAVER_CURRENT_SNAPSHOT"
+            and lineage.get("v2ObservationId")
+            and lineage.get("sourceHash")
+            and source_date == observation_date == expected
+        ):
+            return True
     source_commit = v2.get("sourceCommit")
     commit_status = str(v2.get("sourceCommitStatus") or "").upper()
     if not source_commit or commit_status not in {"VERIFIED", "AVAILABLE", "OK"}:
@@ -491,6 +508,10 @@ def _v2_hold_reason(v2: Mapping[str, Any]) -> str:
         "NO_SCHEDULED_COLLECTION": "자료 수집 예정 없음",
         "DERIVED_ARTIFACT_MISSING": "산출 자료 없음",
         "SOURCE_GENERATION_MISMATCH": "이전 세대 자료와 불일치",
+        "V2_INPUT_SOURCE_HASH_MISMATCH": "현재 관측 입력 식별자가 일치하지 않습니다.",
+        "V2_INPUT_DATE_MISMATCH": "현재 관측일이 일치하지 않습니다.",
+        "V2_INPUT_UNAVAILABLE": "현재 관측 입력 자료가 수신되지 않았습니다.",
+        "V2_LINEAGE_INCOMPLETE": "현재 관측 산출물의 출처 정보가 완전하지 않습니다.",
         "SELECTION_NOT_MET": "산출 조건 미충족",
     }
     return labels.get(reason, "현재 자동 산출 기능이 없습니다(자동 산출 기능 미연결)")
@@ -860,6 +881,7 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "v2Industries": list(v2.get("industries") or [])[:5] if v2_verified else [],
         "v2Themes": list(v2.get("themes") or [])[:5] if v2_verified else [],
         "v2HoldReason": _v2_hold_reason(v2),
+        "v2Lineage": dict(v2.get("v2Lineage") or {}),
         "additionalObservations": _additional_contract_projection(contract),
         "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
         "kiwoom": contract.get("kiwoomCandidates") or {},
@@ -1095,13 +1117,20 @@ def _compact_v2_diagnostic_cards(model: Mapping[str, Any]) -> str:
     """Keep V2 shadow visible only as a clearly non-operational diagnostic."""
     if not model["v2Verified"]:
         return f'<div class="industry-item"><strong>별도 산출 진단</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
+    lineage = model.get("v2Lineage") or {}
+    lineage_note = (
+        f'<p class="lineage-note">원천 {_escape(_text(lineage.get("source"), "확인 불가"))} · '
+        f'원천일 {_escape(_compact_date(lineage.get("sourceDate")))} · '
+        f'관측일 {_escape(_compact_date(lineage.get("observationDate")))} · '
+        f'관측 ID {_escape(_text(lineage.get("v2ObservationId"), "확인 불가"))}</p>'
+    )
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
         for row in group:
             if _compact_row_available(row):
                 score = f"{row.get('score'):.2f}" if isinstance(row.get('score'), (int, float)) else "확인 불가"
                 rows.append(f'<div class="industry-item"><div class="industry-head"><strong>별도 산출 진단 · {_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">진단 전용</span></div><p>점수 {_escape(score)} · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>')
-    return "".join(rows) or '<div class="industry-item"><strong>별도 산출 진단</strong><p>현재 자동 산출 기능이 없습니다.</p></div>'
+    return lineage_note + ("".join(rows) or '<div class="industry-item"><strong>별도 산출 진단</strong><p>현재 자동 산출 기능이 없습니다.</p></div>')
 
 
 def _compact_v2_diagnostic_markdown(model: Mapping[str, Any]) -> list[str]:
@@ -1109,6 +1138,13 @@ def _compact_v2_diagnostic_markdown(model: Mapping[str, Any]) -> list[str]:
     if not model["v2Verified"]:
         lines.append(model["v2HoldReason"])
         return lines
+    lineage = model.get("v2Lineage") or {}
+    lines.append(
+        f"원천: {lineage.get('source') or '확인 불가'} · "
+        f"원천일: {_compact_date(lineage.get('sourceDate'))} · "
+        f"관측일: {_compact_date(lineage.get('observationDate'))} · "
+        f"관측 ID: {lineage.get('v2ObservationId') or '확인 불가'}"
+    )
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
         for row in group:

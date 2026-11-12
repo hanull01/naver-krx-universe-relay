@@ -304,10 +304,10 @@ def load_research_slot_for_report(report_date, expected_generation=None):
     if not isinstance(lineage, dict) or lineage.get("researchSlot") != slot:
         return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING", report_date=report_date, research_slot=slot,
                                      artifact_path=str(path), status="ARTIFACT_INVALID", lineage=manifest_lineage)
-    if lineage.get("producerStatus") == "FAILED":
+    if str(lineage.get("producerStatus") or "").upper() in {"FAILED", "PRODUCER_FAILED"}:
         return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED", report_date=report_date, research_slot=slot,
                                      artifact_path=str(path), status="PRODUCER_FAILED", lineage=lineage)
-    if lineage.get("artifactStatus") == "FAILED":
+    if str(lineage.get("artifactStatus") or "").upper() in {"FAILED", "INVALID", "ARTIFACT_INVALID"}:
         return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot,
                                      artifact_path=str(path), status="ARTIFACT_INVALID", lineage=lineage)
     if lineage.get("freshnessStatus") not in {"FRESH", "AVAILABLE", "OK"}:
@@ -1043,6 +1043,17 @@ def _usable_v2_shadow_inputs(shadow_latest, shadow_history, shadow_status):
     """Return only a V2 result proven current by its run status artifact."""
     if not isinstance(shadow_status, Mapping) or shadow_status.get("status") not in {"SUCCESS", "OK"}:
         return {}, {}
+    lineage = shadow_status.get("v2Lineage")
+    if not isinstance(lineage, Mapping):
+        lineage = shadow_latest.get("v2Lineage") if isinstance(shadow_latest, Mapping) else None
+    if not isinstance(lineage, Mapping):
+        return {}, {}
+    if lineage.get("source") != "NAVER_CURRENT_SNAPSHOT":
+        return {}, {}
+    if not lineage.get("v2ObservationId") or not lineage.get("sourceHash"):
+        return {}, {}
+    if str(lineage.get("sourceDate")) != str(lineage.get("observationDate")):
+        return {}, {}
     shadow_date = shadow_status.get("tradingDate")
     latest_date = shadow_latest.get("tradingDate") if isinstance(shadow_latest, Mapping) else None
     if shadow_date and latest_date and str(shadow_date) != str(latest_date):
@@ -1109,17 +1120,21 @@ def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shado
             "experimental": True,
             "status": shadow_status.get("status", "UNAVAILABLE"),
             "producerStatus": shadow_status.get("producerStatus") or shadow_status.get("rawStatus") or shadow_status.get("status", "UNAVAILABLE"),
-            "consumptionStatus": "CONSUMED" if shadow_status.get("status") in {"SUCCESS", "OK"} else "NOT_CONSUMED",
+            "consumptionStatus": shadow_status.get("consumptionStatus") or ("CONSUMED" if shadow_status.get("status") in {"SUCCESS", "OK"} else "NOT_CONSUMED"),
             "publicationPolicy": "PARTIAL_NON_BLOCKING",
             "runId": shadow_status.get("runId"),
             "generatedAt": shadow_status.get("generatedAt") or shadow_latest.get("generatedAt"),
-            "generationId": shadow_status.get("generationId"),
-            "expectedGenerationId": shadow_status.get("expectedGenerationId"),
+            "v2Lineage": shadow_status.get("v2Lineage") or shadow_latest.get("v2Lineage") or {},
+            "v2ObservationId": (shadow_status.get("v2Lineage") or {}).get("v2ObservationId"),
+            "source": (shadow_status.get("v2Lineage") or {}).get("source") or "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": (shadow_status.get("v2Lineage") or {}).get("sourceDate"),
+            "observationDate": (shadow_status.get("v2Lineage") or {}).get("observationDate"),
+            "sourceHash": (shadow_status.get("v2Lineage") or {}).get("sourceHash"),
+            "producerRunId": (shadow_status.get("v2Lineage") or {}).get("producerRunId") or shadow_status.get("runId"),
             "errorType": shadow_status.get("errorType"),
             "failureReason": shadow_status.get("failureReason") or shadow_status.get("error"),
             "runStatus": shadow_status.get("runStatus") or shadow_status.get("rawStatus") or shadow_status.get("status"),
             "artifactPath": shadow_status.get("artifactPath") or "data/dynamic-universe/v2-shadow-latest.json",
-            "generationEvidence": shadow_status.get("generationEvidence") or {},
             "industries": {"total": len(v2_industries), "statusCounts": distribution(v2_industries, "v2Status"), "rows": rows(v2_industries)},
             "themes": {"total": len(v2_themes), "statusCounts": distribution(v2_themes, "v2Status"), "rows": rows(v2_themes)},
             "history": {"recordCount": len(observations), "uniqueTradingDates": unique_dates, "status": shadow_status.get("status", "UNAVAILABLE")},

@@ -425,7 +425,6 @@ jobs:
           set +e
           python tools/run_dynamic_universe_v2_shadow.py
           runner_code=$?
-          EXPECTED_GENERATION_ID="${{ steps.krx.outputs.krx_generation_id }}" \
           RUN_ID="$GITHUB_RUN_ID" \
           RUNNER_CODE="$runner_code" \
           python3 - <<'PY'
@@ -441,15 +440,12 @@ jobs:
               payload = None
           payload = normalize_run_status(
               payload,
-              expected_generation_id=os.environ.get("EXPECTED_GENERATION_ID") or None,
               run_id=os.environ["RUN_ID"],
               runner_exit_code=int(os.environ["RUNNER_CODE"]),
           )
           raw_status = payload.get("rawStatus") or "FAILED"
-          expected = os.environ.get("EXPECTED_GENERATION_ID") or None
-          actual = payload.get("generationId")
           effective = payload["status"]
-          evidence = payload.get("generationEvidence") or {}
+          lineage = payload.get("v2Lineage") or {}
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           summary = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -463,13 +459,10 @@ jobs:
                   "- 정책: `PARTIAL_NON_BLOCKING` (V1 리포트는 독립 진행)",
                   f"- run ID: `{payload.get('runId')}`",
                   f"- trading date: `{payload.get('tradingDate') or 'UNAVAILABLE'}`",
-                  f"- generation: `{actual or 'UNAVAILABLE'}`",
-                  f"- expected generation: `{expected or 'UNAVAILABLE'}`",
-                  f"- input path: `{evidence.get('inputPath') or 'UNAVAILABLE'}`",
-                  f"- input manifest: `{evidence.get('inputManifestPath') or 'UNAVAILABLE'}` (present={evidence.get('manifestPresent')})",
-                  f"- CURRENT pointer: `{evidence.get('currentPointerPath') or 'UNAVAILABLE'}` (present={evidence.get('currentPointerPresent')})",
-                  f"- CURRENT manifest: `{evidence.get('currentManifestPath') or 'UNAVAILABLE'}` (present={evidence.get('currentManifestPresent')})",
-                  f"- generation comparable: `{evidence.get('expectedComparable') and evidence.get('currentGenerationComparable')}`",
+                  f"- V2 observation: `{lineage.get('v2ObservationId') or 'UNAVAILABLE'}`",
+                  f"- source: `{lineage.get('source') or 'UNAVAILABLE'}` / `{lineage.get('sourceDate') or 'UNAVAILABLE'}`",
+                  f"- source hash: `{lineage.get('sourceHash') or 'UNAVAILABLE'}`",
+                  f"- input artifact: `{lineage.get('inputArtifactPath') or 'UNAVAILABLE'}`",
                   f"- failure reason: `{payload.get('failureReason') or 'NONE'}`",
                   "",
               ]
@@ -494,11 +487,11 @@ jobs:
               print('')
           PY
           )" >> "$GITHUB_OUTPUT"
-          echo "generation_id=$(python3 - <<'PY'
+          echo "v2_observation_id=$(python3 - <<'PY'
           import json
           from pathlib import Path
           try:
-              print(json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('generationId') or '')
+              print((json.loads(Path('data/dynamic-universe/v2-shadow-run-status.json').read_text()).get('v2Lineage') or {}).get('v2ObservationId') or '')
           except Exception:
               print('')
           PY

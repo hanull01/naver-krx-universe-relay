@@ -54,21 +54,24 @@ class ReportContractTests(unittest.TestCase):
             v2_history={"observations": []},
             leaders={},
             v2_status={
-                "status": "GENERATION_MISMATCH",
-                "producerStatus": "OK",
+                "status": "INPUT_MISMATCH",
+                "producerStatus": "SUCCESS",
                 "runId": "run-1",
                 "generatedAt": "2026-11-12T01:00:00Z",
                 "tradingDate": "20261112",
-                "generationId": "gen-old",
-                "expectedGenerationId": "gen-new",
-                "failureReason": "V2_GENERATION_ID_MISMATCH",
+                "v2Lineage": {
+                    "v2ObservationId": "v2obs-1", "source": "NAVER_CURRENT_SNAPSHOT",
+                    "sourceDate": "20261112", "observationDate": "20261112", "sourceHash": "a" * 64,
+                    "selectionPolicyVersion": "v2-current-observation-20261113",
+                },
+                "failureReason": "V2_INPUT_SOURCE_HASH_MISMATCH",
             },
         )
-        self.assertEqual(contract["v2"]["status"], "GENERATION_MISMATCH")
+        self.assertEqual(contract["v2"]["status"], "INPUT_MISMATCH")
         self.assertEqual(contract["v2"]["consumptionStatus"], "NOT_CONSUMED")
         self.assertEqual(contract["v2"]["publicationPolicy"], "PARTIAL_NON_BLOCKING")
-        self.assertEqual(contract["v2"]["failureReason"], "V2_GENERATION_ID_MISMATCH")
-        self.assertEqual(contract["v2"]["expectedGenerationId"], "gen-new")
+        self.assertEqual(contract["v2"]["failureReason"], "V2_INPUT_SOURCE_HASH_MISMATCH")
+        self.assertEqual(contract["v2"]["v2ObservationId"], "v2obs-1")
         self.assertEqual(contract["v2Changes"], [])
 
     def test_research_artifact_with_explicit_link_failure_is_not_consumed(self):
