@@ -69,6 +69,14 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
         self.assertEqual(complete["status"], "AVAILABLE")
         self.assertEqual(complete["counts"]["available"], 2)
 
+    def test_available_artifact_preserves_top_level_producer_lineage(self):
+        result = build_additional_observation_projection(
+            self.config, self.artifact(), observation_date="20261112"
+        )
+        self.assertEqual(result["status"], "AVAILABLE")
+        self.assertEqual(result["producer"], "tools/build_additional_observations.py")
+        self.assertEqual(result["producerRunId"], "run-additional-1")
+
     def test_old_only_artifact_is_rejected_without_fallback(self):
         old = self.artifact()
         old["sourceDate"] = old["observationDate"] = "20261111"
@@ -116,6 +124,24 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
         self.assertEqual(markdown_model["additionalObservations"], html_model["additionalObservations"])
         self.assertNotIn("PRODUCER_NOT_CONFIGURED", markdown)
         self.assertNotIn("NOT_YET_RUN", html)
+
+    def test_artifact_without_contract_link_is_not_reported_as_unconfigured(self):
+        from test_market_dashboard_renderer import report_fixture
+
+        report = report_fixture()
+        contract = report["reportContract"]
+        contract.pop("additionalObservations", None)
+        contract["sources"] = {"additionalObservations": {
+            "status": "AVAILABLE",
+            "artifactPath": "data/monitoring/additional-observations.json",
+            "sourceDate": "20261112",
+        }}
+        markdown = render_dashboard_markdown(report)
+        html = render_dashboard_html(report)
+        self.assertIn("리포트 연결 실패", markdown)
+        self.assertIn("리포트 연결 실패", html)
+        section = markdown.split("### 추가 관찰 업종·테마", 1)[1].split("#### 별도 산출 진단", 1)[0]
+        self.assertNotIn("자동 산출 기능 미연결", section)
 
     def test_projection_is_compact_for_contract_transport(self):
         result = build_additional_observation_projection(

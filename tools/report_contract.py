@@ -866,6 +866,25 @@ def _compact_research_analysis(
     as_of = str(research.get("asOf") or "").replace("-", "")
     expected = str(trading_date or "").replace("-", "")
     stocks = [row for row in research.get("stocks") or [] if isinstance(row, Mapping)]
+    lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
+    if research_status in {"AVAILABLE", "CONSUMED"} and lineage.get("consumedByReport") is False:
+        return {
+            "status": "REPORT_LINK_FAILED", "asOf": research.get("asOf"), "items": [],
+            "slotLineage": dict(lineage),
+            "availability": availability(
+                status="REPORT_LINK_FAILED", required_data="리서치 원문과 분석 산출물",
+                received=True, producer="NAVER Research Action",
+                reason="RESEARCH_REPORT_LINK_FAILED",
+                next_check_at=lineage.get("nextCheckAt") or lineage.get("expectedAt"),
+                producer_run_id=lineage.get("producerRunId"),
+                artifact_path=lineage.get("artifactPath"),
+                freshness_status=lineage.get("freshnessStatus"),
+                report_slot=lineage.get("reportSlot"),
+                research_slot=lineage.get("researchSlot"),
+                expected_at=lineage.get("expectedAt"),
+                checked_at=lineage.get("checkedAt"),
+            ),
+        }
     source_generation = (
         research.get("sourceGeneration")
         or research.get("generationId")
@@ -875,7 +894,6 @@ def _compact_research_analysis(
             "RESEARCH_DATE_MISMATCH" if expected and as_of != expected
             else "RESEARCH_SLOT_ARTIFACT_MISSING"
         )
-        lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
             "status": research_status, "asOf": research.get("asOf"), "items": [],
             "slotLineage": dict(lineage),
@@ -894,7 +912,6 @@ def _compact_research_analysis(
         }
     eligible = [row for row in stocks if row.get("rankingEligible") is True]
     if not eligible:
-        lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
             "status": research_status,
             "asOf": research.get("asOf"), "items": [],
@@ -953,7 +970,6 @@ def _compact_research_analysis(
             "category": "시장 방향 일치",
             "text": f"{aligned.get('itemName') or aligned.get('itemCode')}가 오늘의 주도 그룹 대표 종목과 리서치 양쪽에서 확인됩니다.",
         })
-    lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
     return {
         "status": str(research.get("status") or "AVAILABLE"),
         "asOf": research.get("asOf"), "items": items[:5],
@@ -1410,7 +1426,7 @@ def _compact_additional_observations(value: Mapping[str, Any] | None) -> dict[st
         key: source.get(key)
         for key in (
             "schemaVersion", "status", "source", "sourceDate", "observationDate",
-            "scope", "producerRunId", "generatedAt", "configPath", "artifactPath",
+            "scope", "producer", "producerRunId", "generatedAt", "configPath", "artifactPath",
             "failureReason",
         )
         if source.get(key) is not None

@@ -4,6 +4,7 @@ import unittest
 from tools.report_contract import (
     _compact_group_row,
     _compact_additional_observations,
+    _compact_research_analysis,
     build_report_contract,
     build_relative_strength_tracking,
     REQUIRED_RENDER_FIELDS,
@@ -69,6 +70,27 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(contract["v2"]["failureReason"], "V2_GENERATION_ID_MISMATCH")
         self.assertEqual(contract["v2"]["expectedGenerationId"], "gen-new")
         self.assertEqual(contract["v2Changes"], [])
+
+    def test_research_artifact_with_explicit_link_failure_is_not_consumed(self):
+        result = _compact_research_analysis(
+            {
+                "status": "AVAILABLE",
+                "asOf": "20261112",
+                "sourceGeneration": "research-gen",
+                "stocks": [],
+                "slotLineage": {
+                    "researchSlot": "12:20",
+                    "reportSlot": "12:30",
+                    "artifactPath": "data/research/intelligence/slots/20261112-1220.json",
+                    "consumedByReport": False,
+                },
+            },
+            "20261112",
+            {"industries": {}, "themes": {}},
+        )
+        self.assertEqual(result["status"], "REPORT_LINK_FAILED")
+        self.assertTrue(result["availability"]["received"])
+        self.assertEqual(result["availability"]["reasonCode"], "RESEARCH_REPORT_LINK_FAILED")
 
     def test_theme_stocks_are_projected_as_current_leader_candidates(self):
         row = _compact_group_row({

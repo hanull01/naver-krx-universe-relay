@@ -128,36 +128,136 @@ def normalize_run_status(
     if not isinstance(evidence, Mapping):
         evidence = {}
     normalized["generationEvidence"] = {
+        **dict(evidence),
         "inputPath": evidence.get("inputPath"),
         "manifestPath": evidence.get("manifestPath"),
+        "inputManifestPath": evidence.get("inputManifestPath") or evidence.get("manifestPath"),
         "manifestPresent": evidence.get("manifestPresent"),
         "generationField": evidence.get("generationField"),
         "generationFieldPresent": evidence.get("generationFieldPresent", bool(actual_generation)),
+        "currentPointerPath": evidence.get("currentPointerPath"),
+        "currentPointerPresent": evidence.get("currentPointerPresent", False),
+        "currentGenerationId": evidence.get("currentGenerationId"),
+        "currentManifestPath": evidence.get("currentManifestPath"),
+        "currentManifestPresent": evidence.get("currentManifestPresent", False),
+        "currentManifestGenerationId": evidence.get("currentManifestGenerationId"),
+        "currentGenerationComparable": evidence.get("currentGenerationComparable", False),
         "expectedComparable": bool(actual_generation and expected_generation_id),
     }
     return normalized
 
 
+def _input_dir(root: Path) -> Path | None:
+    value = os.environ.get("KRX_INPUT_DIR") or os.environ.get("V2_INPUT_DIR")
+    if not value:
+        return None
+    path = Path(value)
+    return path if path.exists() else path
+
+
+def _read_json(path: Path) -> Mapping[str, Any] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return value if isinstance(value, Mapping) else None
+
+
+def _pointer_generation(path: Path) -> str | None:
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if not text:
+        return None
+    try:
+        value = json.loads(text)
+    except json.JSONDecodeError:
+        value = None
+    if isinstance(value, Mapping):
+        for key in ("generationId", "sourceGeneration", "currentGenerationId"):
+            if value.get(key) not in (None, ""):
+                return str(value[key])
+        return None
+    first = text.splitlines()[0].strip()
+    return first or None
+
+
 def _generation_evidence(root: Path, quality: Mapping[str, Any], industry_payload: Mapping[str, Any]) -> Dict[str, Any]:
     """Record where generation was sought; never invent a generation value."""
-    quality_path = root / "data/monitoring/latest-quality.json"
-    manifest_candidates = (
-        root / "data/monitoring/manifest.json",
-        root / "data/monitoring/latest-quality.json",
+    input_dir = _input_dir(root)
+    quality_candidates = tuple(
+        path for path in (
+            input_dir / "latest-quality.json" if input_dir else None,
+            input_dir / "quality.json" if input_dir else None,
+            root / "data/monitoring/latest-quality.json",
+        ) if path is not None
     )
+    quality_path = next((path for path in quality_candidates if path.exists()), quality_candidates[-1])
+    input_manifest_candidates = tuple(
+        path for path in (
+            input_dir / "manifest.json" if input_dir else None,
+            input_dir / "generation-manifest.json" if input_dir else None,
+            root / "data/monitoring/manifest.json",
+            root / "data/monitoring/latest-quality.json",
+        ) if path is not None
+    )
+    manifest_path = next((path for path in input_manifest_candidates if path.exists()), input_manifest_candidates[0])
+    pointer_candidates = tuple(
+        path for path in (
+            Path(os.environ["KRX_CURRENT_PATH"]) if os.environ.get("KRX_CURRENT_PATH") else None,
+            input_dir / "CURRENT" if input_dir else None,
+            root / "data/CURRENT",
+            root / "data/krx/CURRENT",
+            root / "data/krx-m10/CURRENT",
+        ) if path is not None
+    )
+    pointer_path = next((path for path in pointer_candidates if path.exists()), pointer_candidates[0])
+    current_generation = _pointer_generation(pointer_path) if pointer_path.exists() else None
+    current_manifest_candidates = tuple(
+        path for path in (
+            Path(os.environ["KRX_CURRENT_MANIFEST_PATH"]) if os.environ.get("KRX_CURRENT_MANIFEST_PATH") else None,
+            pointer_path.parent / "manifest.json",
+            pointer_path.parent / "generation-manifest.json",
+            input_dir / "manifest.json" if input_dir else None,
+            root / "data/krx/manifest.json",
+        ) if path is not None
+    )
+    current_manifest_path = next(
+        (path for path in current_manifest_candidates if path.exists()),
+        current_manifest_candidates[0],
+    )
+    current_manifest = _read_json(current_manifest_path) if current_manifest_path.exists() else None
+    current_manifest_generation = None
+    if current_manifest:
+        for key in ("generationId", "sourceGeneration", "currentGenerationId"):
+            if current_manifest.get(key) not in (None, ""):
+                current_manifest_generation = str(current_manifest[key])
+                break
     field_names = (
         "historicalGenerationId", "sourceGeneration", "generationId",
     )
     field = next((name for name in field_names if quality.get(name) not in (None, "")), None)
     if field is None:
         field = next((name for name in field_names if industry_payload.get(name) not in (None, "")), None)
-    manifest_path = next((path for path in manifest_candidates if path.exists()), manifest_candidates[0])
+    field_value = quality.get(field) if field else None
+    if field_value in (None, "") and field:
+        field_value = industry_payload.get(field)
     return {
-        "inputPath": str(quality_path),
+        "inputPath": str(input_dir or quality_path),
         "manifestPath": str(manifest_path),
+        "inputManifestPath": str(manifest_path),
         "manifestPresent": manifest_path.exists(),
         "generationField": field,
         "generationFieldPresent": field is not None,
+        "generationId": str(field_value) if field_value not in (None, "") else None,
+        "currentPointerPath": str(pointer_path),
+        "currentPointerPresent": pointer_path.exists(),
+        "currentGenerationId": current_generation,
+        "currentManifestPath": str(current_manifest_path),
+        "currentManifestPresent": current_manifest_path.exists(),
+        "currentManifestGenerationId": current_manifest_generation,
+        "currentGenerationComparable": bool(field_value and (current_generation or current_manifest_generation)),
     }
 
 
@@ -167,13 +267,7 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
     generated_at = datetime.now(timezone.utc).isoformat()
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-v2-shadow-{generated_at.replace(':', '').replace('-', '')}"
     quality: Dict[str, Any] = {}
-    generation_evidence: Dict[str, Any] = {
-        "inputPath": str(root / "data/monitoring/latest-quality.json"),
-        "manifestPath": str(root / "data/monitoring/manifest.json"),
-        "manifestPresent": False,
-        "generationField": None,
-        "generationFieldPresent": False,
-    }
+    generation_evidence: Dict[str, Any] = _generation_evidence(root, {}, {})
     generation_id = None
     prior_latest = latest_path.read_bytes() if latest_path.exists() else None
     history_path = root / "data/dynamic-universe/v2-shadow-history.json"
@@ -183,9 +277,10 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
         v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
         try:
-            loaded_quality = json.loads(
-                (root / "data/monitoring/latest-quality.json").read_text(encoding="utf-8")
-            )
+            quality_path = Path(generation_evidence["inputPath"])
+            if quality_path.is_dir():
+                quality_path = quality_path / "latest-quality.json"
+            loaded_quality = json.loads(quality_path.read_text(encoding="utf-8"))
             if isinstance(loaded_quality, dict):
                 quality = loaded_quality
         except (OSError, json.JSONDecodeError):
