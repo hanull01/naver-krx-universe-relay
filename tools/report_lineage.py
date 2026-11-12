@@ -68,3 +68,35 @@ def lineage_marker(contract: Mapping[str, Any]) -> str:
         "historicalScope": lineage["historical"].get("scope"),
     }, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return f"<!-- report-lineage: {value} -->"
+
+
+def validate_rendered_as_of(
+    manifest: Mapping[str, Any],
+    rendered: Mapping[str, Any],
+    contract: Mapping[str, Any],
+) -> str:
+    """Validate the canonical report date across manifest, renderer, and contract."""
+
+    manifest_lineage = manifest.get("reportLineage")
+    if not isinstance(manifest_lineage, Mapping):
+        raise ValueError("REPORT_MANIFEST_LINEAGE_MISSING")
+    manifest_as_of = manifest_lineage.get("asOf")
+    if not manifest_as_of:
+        raise ValueError("REPORT_MANIFEST_LINEAGE_ASOF_MISSING")
+
+    contract_as_of = contract.get("asOf")
+    if not contract_as_of:
+        raise ValueError("REPORT_CONTRACT_ASOF_MISSING")
+    if manifest_as_of != contract_as_of:
+        raise ValueError("REPORT_AS_OF_MISMATCH")
+
+    rendered_lineage = rendered.get("lineage")
+    if not isinstance(rendered_lineage, Mapping):
+        raise ValueError("REPORT_RENDERED_LINEAGE_MISSING")
+    if rendered_lineage.get("asOf") != manifest_as_of:
+        raise ValueError("REPORT_RENDERED_LINEAGE_ASOF_MISMATCH")
+
+    rendered_as_of = rendered.get("asOf")
+    if rendered_as_of is not None and rendered_as_of != manifest_as_of:
+        raise ValueError("REPORT_RENDER_RESULT_ASOF_MISMATCH")
+    return str(manifest_as_of)

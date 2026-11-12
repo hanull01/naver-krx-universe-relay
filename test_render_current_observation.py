@@ -8,10 +8,33 @@ from pathlib import Path
 
 from test_market_dashboard_renderer import report_fixture
 from tools.render_current_observation import render_current_observation
-from tools.report_lineage import lineage_from_contract
+from tools.report_lineage import lineage_from_contract, validate_rendered_as_of
 
 
 class CurrentObservationReportTests(unittest.TestCase):
+    def test_manifest_lineage_as_of_is_canonical_without_top_level_rendered_as_of(self):
+        manifest = {"reportLineage": {"asOf": "20261112"}}
+        rendered = {"lineage": {"asOf": "20261112"}}
+        contract = {"asOf": "20261112"}
+
+        self.assertEqual(validate_rendered_as_of(manifest, rendered, contract), "20261112")
+
+    def test_manifest_and_contract_as_of_mismatch_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "REPORT_AS_OF_MISMATCH"):
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"lineage": {"asOf": "20261112"}},
+                {"asOf": "20261111"},
+            )
+
+    def test_optional_top_level_rendered_as_of_mismatch_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "REPORT_RENDER_RESULT_ASOF_MISMATCH"):
+            validate_rendered_as_of(
+                {"reportLineage": {"asOf": "20261112"}},
+                {"asOf": "20261111", "lineage": {"asOf": "20261112"}},
+                {"asOf": "20261112"},
+            )
+
     def test_partial_contract_renders_same_generation_markdown_html_and_manifest(self):
         report = report_fixture()
         contract = report["reportContract"]
