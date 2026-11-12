@@ -57,6 +57,11 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         self.assertIn('CURRENT_OBSERVATION_LINEAGE_MISMATCH', WORKFLOW)
         self.assertIn('current_observation_published=', WORKFLOW)
 
+    def test_current_observation_as_of_uses_manifest_lineage(self):
+        self.assertIn("from tools.report_lineage import validate_rendered_as_of", WORKFLOW)
+        self.assertIn("validate_rendered_as_of(manifest, rendered, contract)", WORKFLOW)
+        self.assertNotIn('rendered.get("asOf") != contract.get("asOf")', WORKFLOW)
+
     def test_current_observation_failure_preserves_prior_views_without_git_clean(self):
         self.assertIn("preserve_failed_observation_output()", WORKFLOW)
         self.assertIn("failed-current-observation-${GITHUB_RUN_ID}", WORKFLOW)

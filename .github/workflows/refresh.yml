@@ -769,6 +769,7 @@ jobs:
           import hashlib
           import sys
           from pathlib import Path
+          from tools.report_lineage import validate_rendered_as_of
 
           manifest_path, markdown_path, html_path, rendered_path, contract_path = map(Path, sys.argv[1:])
           manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -794,8 +795,10 @@ jobs:
               text = path.read_text(encoding="utf-8")
               if expected_id not in text:
                   raise SystemExit(f"CURRENT_OBSERVATION_CONTRACT_ID_NOT_RENDERED:{path}")
-          if rendered.get("asOf") != contract.get("asOf"):
-              raise SystemExit("REPORT_AS_OF_MISMATCH")
+          try:
+              validate_rendered_as_of(manifest, rendered, contract)
+          except ValueError as exc:
+              raise SystemExit(str(exc)) from exc
           if rendered.get("lineage", {}).get("current") != expected_lineage.get("current"):
               raise SystemExit("REPORT_CURRENT_LINEAGE_MISMATCH")
           PY
