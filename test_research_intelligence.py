@@ -184,6 +184,18 @@ class ResearchIntelligenceTest(unittest.TestCase):
             self.assertFalse((output_dir / "005930.json").exists())
             self.assertTrue((output_dir / "latest.json").exists())
 
+    def test_slot_lineage_contains_explicit_round_and_freshness_fields(self):
+        lineage = rib.build_slot_lineage(
+            "2026-11-12", "07:20", "2026-11-12T07:21:00+09:00",
+            "data/research/intelligence/slots/20261112-0720.json",
+        )
+        self.assertEqual(lineage["researchSlot"], "07:20")
+        self.assertEqual(lineage["sourceDate"], "2026-11-12")
+        self.assertEqual(lineage["artifactStatus"], "AVAILABLE")
+        self.assertEqual(lineage["producerStatus"], "SUCCESS")
+        self.assertEqual(lineage["freshnessStatus"], "FRESH")
+        self.assertIn("checkedAt", lineage)
+
 
 if __name__ == "__main__":
     unittest.main()

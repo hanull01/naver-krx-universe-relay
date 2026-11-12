@@ -21,6 +21,10 @@ on:
         required: false
         default: true
         type: boolean
+      research_slot:
+        description: Research production slot (07:20, 12:20, or 19:20)
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -104,6 +108,8 @@ jobs:
             --as-of "$(TZ=Asia/Seoul date +%F)" \
             --recent-days 30 \
             --min-recent-reports 3 \
+            --research-slot "${{ inputs.research_slot }}" \
+            --source-generation "${{ steps.krx.outputs.krx_generation_id }}" \
             --output-dir data/research/intelligence
 
       - name: Validate research intelligence
@@ -116,6 +122,17 @@ jobs:
           latest = json.loads(
               (root / "latest.json").read_text(encoding="utf-8")
           )
+          slot = "${{ inputs.research_slot }}"
+          slot_path = root / "slots" / f"{latest['asOf'].replace('-', '')}-{slot.replace(':', '')}.json"
+          assert slot_path.exists(), f"missing slot artifact: {slot_path}"
+          slot_payload = json.loads(slot_path.read_text(encoding="utf-8"))
+          lineage = slot_payload.get("slotLineage") or {}
+          assert lineage.get("researchSlot") == slot
+          assert lineage.get("sourceDate") == latest["asOf"]
+          assert lineage.get("artifactStatus") == "AVAILABLE"
+          assert lineage.get("producerStatus") == "SUCCESS"
+          manifest = json.loads(Path("data/research/manifest.json").read_text(encoding="utf-8"))
+          assert any(row.get("researchSlot") == slot and row.get("sourceDate") == latest["asOf"] for row in manifest.get("slotLineage", []))
 
           enabled = latest["enabledStockCount"]
 

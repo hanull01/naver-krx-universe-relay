@@ -13,6 +13,8 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
+from tools.report_lineage import contract_id, lineage_from_contract
+
 
 REQUIRED_RENDER_FIELDS = (
     "asOf",
@@ -319,6 +321,9 @@ def validate_contract_payload(
         return {"status": "TRADING_DATE_MISMATCH", "sha256": digest}
     if expected_observed_at is not None and contract.get("observedAt") != expected_observed_at:
         return {"status": "OBSERVED_AT_MISMATCH", "sha256": digest}
+    expected_contract_id = contract_id(contract)
+    if contract.get("contractId") not in (None, expected_contract_id):
+        return {"status": "CONTRACT_ID_MISMATCH", "sha256": digest, "expectedContractId": expected_contract_id}
     return {"status": "VALID", "sha256": digest, "contract": contract}
 
 
@@ -1825,6 +1830,8 @@ def build_report_contract(
     # canonical contract. Historical KRX lineage is carried by
     # ``historicalTechnicalMarket`` and current observations by
     # ``currentMarketObservation``.
+    contract["contractId"] = contract_id(contract)
+    contract["reportLineage"] = lineage_from_contract(contract)
     return contract
 
 

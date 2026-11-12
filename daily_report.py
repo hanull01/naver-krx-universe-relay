@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +13,7 @@ from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     render_dashboard_html,
     render_dashboard_markdown,
+    render_contract_views,
 )
 from tools.report_contract import build_report_contract, validate_kiwoom_candidate_binding
 from tools.v2_source_provenance import build_source_provenance
@@ -148,6 +150,7 @@ STATES_PATH = DATA / "states.json"
 GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
 RESEARCH_MANIFEST_PATH = DATA / "research" / "manifest.json"
+RESEARCH_SLOTS_PATH = DATA / "research" / "intelligence" / "slots"
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
@@ -191,6 +194,38 @@ def validated_research_for_report(payload, report_date, expected_generation=None
     if expected_generation and str(source_generation) != str(expected_generation):
         return _unavailable_research("RESEARCH_GENERATION_MISMATCH")
     return payload
+
+
+def load_research_slot_for_report(report_date, expected_generation=None):
+    """Load only the research slot explicitly assigned to this report."""
+    slot = str(os.environ.get("REPORT_RESEARCH_SLOT") or "").strip()
+    if slot not in {"07:20", "12:20", "19:20"}:
+        return _unavailable_research("RESEARCH_SLOT_REQUIRED")
+    compact = compact_date(report_date)
+    if not compact:
+        return _unavailable_research("RESEARCH_SLOT_DATE_UNAVAILABLE")
+    path = RESEARCH_SLOTS_PATH / f"{compact}-{slot.replace(':', '')}.json"
+    try:
+        payload = load_json(path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_MISSING")
+    if not isinstance(payload, dict):
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED")
+    if compact_date(payload.get("asOf")) != compact:
+        return _unavailable_research("RESEARCH_SLOT_DATE_MISMATCH")
+    lineage = payload.get("slotLineage")
+    if not isinstance(lineage, dict) or lineage.get("researchSlot") != slot:
+        return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING")
+    if lineage.get("producerStatus") == "FAILED":
+        return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED")
+    if lineage.get("artifactStatus") == "FAILED":
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED")
+    if lineage.get("freshnessStatus") not in {"FRESH", "AVAILABLE", "OK"}:
+        return _unavailable_research("RESEARCH_SLOT_NOT_FRESH")
+    validated = validated_research_for_report(payload, report_date, expected_generation)
+    if validated.get("status") == "UNAVAILABLE":
+        return validated
+    return validated
 
 
 def validate_research_coverage(report):
@@ -1581,17 +1616,6 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             quotes, technical_inputs["metadata"]["targetDate"]
         )
     report_input_date = as_of or quote_observed_date or technical_inputs["metadata"].get("targetDate")
-    research_payload = load_json(RESEARCH_PATH)
-    try:
-        research_manifest = load_json(RESEARCH_MANIFEST_PATH)
-    except (OSError, ValueError, json.JSONDecodeError):
-        research_manifest = {}
-    research_source_generation = (
-        research_payload.get("sourceGeneration")
-        or research_payload.get("generationId")
-        or research_manifest.get("sourceGeneration")
-        or research_manifest.get("generationId")
-    )
     historical_generation = (
         (technical_inputs.get("metadata") or {}).get("historicalGenerationId")
         or (technical_inputs.get("metadata") or {}).get("sourceGeneration")
@@ -1601,19 +1625,8 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         if (technical_inputs.get("metadata") or {}).get("historicalIndicatorSource") == "KRX"
         else None
     )
-    if research_source_generation and not (
-        research_payload.get("sourceGeneration")
-        or research_payload.get("generationId")
-    ):
-        research_payload = {
-            **research_payload,
-            "sourceGeneration": research_source_generation,
-        }
-    research = validated_research_for_report(
-        research_payload,
-        report_input_date,
-        expected_research_generation,
-    )
+    research_payload = load_research_slot_for_report(report_input_date, expected_research_generation)
+    research = research_payload
     try:
         indices = load_json(MARKET_INDICES_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
@@ -2170,10 +2183,14 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "scope": "REGISTERED_UNIVERSE_PROJECTION" if staging_input_dir else "DEFAULT",
             },
             "researchIntelligence": {
-                "path": "data/research/intelligence/latest.json",
+                "path": (research.get("slotLineage") or {}).get("artifactPath") or "data/research/intelligence/slots/<date>-<slot>.json",
                 "asOf": research.get("asOf"),
                 "status": research.get("status"),
                 "unavailableReason": research.get("unavailableReason"),
+                "generatedAt": research.get("generatedAt"),
+                "producerStatus": (research.get("slotLineage") or {}).get("producerStatus"),
+                "freshnessStatus": (research.get("slotLineage") or {}).get("freshnessStatus"),
+                "checkedAt": (research.get("slotLineage") or {}).get("checkedAt"),
             },
             "indices": {
                 "path": "data/market/indices.json",
@@ -2918,19 +2935,10 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    dated_md = out_dir / f"{report['asOf']}.md"
-    latest_md = out_dir / "latest.md"
-
-    write_markdown(report, dated_md)
-    # Work Markdown and HTML remain sibling views of the same report model.
-    write_work_markdown(report, latest_md)
+    contract = report.get("reportContract") if isinstance(report.get("reportContract"), Mapping) else report
     html_status = "TEMPLATE_UNAVAILABLE"
     try:
-        dated_html = out_dir / f"{report['asOf']}.html"
-        latest_html = out_dir / "latest.html"
-        html = render_dashboard_html(report)
-        dated_html.write_text(html, encoding="utf-8")
-        latest_html.write_text(html, encoding="utf-8")
+        rendered = render_contract_views(contract, out_dir, allow_current_observation=True)
         html_status = "AVAILABLE"
     except TemplateUnavailable as exc:
         print(f"HTML_REPORT={exc}")
@@ -2947,7 +2955,7 @@ def main():
                 "rankingEligibleCount": report[
                     "researchSummary"
                 ]["rankingEligibleCount"],
-                "output": str(latest_md),
+                "output": rendered.get("markdown") if html_status == "AVAILABLE" else str(out_dir / "latest.md"),
                 "htmlStatus": html_status,
             },
             ensure_ascii=False,

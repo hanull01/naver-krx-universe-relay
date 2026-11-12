@@ -35,7 +35,7 @@ test("the daily refresh cron dispatches the unified refresh at 08:30 KST", () =>
   const refresh = resolveScheduledPlan(CONSOLIDATED_CRON, mondayRefresh);
 
   assert.equal(refresh.plan.workflow, "refresh.yml");
-  assert.deepEqual(refresh.plan.inputs, {});
+  assert.deepEqual(refresh.plan.inputs, { research_slot: "07:20", report_slot: "08:30" });
   assert.equal(refresh.plan.slot, "08:30-20:30");
   assert.equal(refresh.plan.key, "refresh");
 });

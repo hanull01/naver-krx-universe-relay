@@ -15,6 +15,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from tools.report_lineage import lineage_from_contract, lineage_marker
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_DIR = ROOT / "report_templates" / "market-dashboard-A-v1.1"
@@ -404,6 +406,10 @@ def render_contract_views(
         "datedMarkdown": str(dated_markdown),
         "datedHtml": str(dated_html),
         "templateTrace": assets["templateTrace"],
+        "contractId": model["contractId"],
+        "lineage": model["reportLineage"],
+        "markdownSha256": hashlib.sha256(markdown_text.encode("utf-8")).hexdigest(),
+        "markdownBytes": len(markdown_text.encode("utf-8")),
         "htmlSha256": hashlib.sha256(html_text.encode("utf-8")).hexdigest(),
         "htmlBytes": len(html_text.encode("utf-8")),
     }
@@ -700,8 +706,11 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
     v2_verified = _compact_v2_verified(contract, v2)
     v1 = contract.get("v1") or {}
     research = (contract.get("independentAnalysis") or {}).get("research") or {}
+    report_lineage = lineage_from_contract(contract)
     return {
         "contract": contract,
+        "contractId": report_lineage["contractId"],
+        "reportLineage": report_lineage,
         "asOf": _compact_date(contract.get("asOf") or report.get("asOf")),
         "asOfRaw": contract.get("asOf") or report.get("asOf"),
         "writtenAt": _compact_kst(report.get("writtenAt") or report.get("generatedAt") or contract.get("observedAt")),
@@ -755,7 +764,12 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "v2HoldReason": _v2_hold_reason(v2),
         "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
         "kiwoom": contract.get("kiwoomCandidates") or {},
-        "researchAnalysis": research.get("analysis") or {"status": research.get("status", "UNAVAILABLE"), "items": []},
+        "researchAnalysis": {
+            **(research.get("analysis") or {}),
+            "status": research.get("status", "UNAVAILABLE"),
+            "unavailableReason": research.get("unavailableReason"),
+            "slotLineage": research.get("slotLineage") or {},
+        },
         "notice": reason,
     }
 
@@ -851,7 +865,16 @@ def _compact_research_cards(model: Mapping[str, Any]) -> str:
     research = model.get("researchAnalysis") or {}
     items = research.get("items") or []
     if not items:
-        return '<div class="industry-item"><strong>네이버 리서치 자료 없음</strong><p>현재 거래일 기준의 분석 가능한 리서치가 없습니다.</p></div>'
+        reason = research.get("unavailableReason") or "RESEARCH_SLOT_ARTIFACT_MISSING"
+        labels = {
+            "RESEARCH_SLOT_REQUIRED": "이 리포트에 지정된 리서치 회차가 없습니다.",
+            "RESEARCH_SLOT_ARTIFACT_MISSING": "해당 회차 산출물이 아직 도착하지 않았습니다.",
+            "RESEARCH_SLOT_PRODUCER_FAILED": "해당 회차 수집 단계가 실패했습니다.",
+            "RESEARCH_SLOT_ARTIFACT_FAILED": "해당 회차 산출물 생성이 실패했습니다.",
+            "RESEARCH_SLOT_NOT_FRESH": "해당 회차 산출물이 최신성 검증을 통과하지 못했습니다.",
+            "RESEARCH_SLOT_DATE_MISMATCH": "해당 회차 산출물의 기준일이 리포트와 다릅니다.",
+        }
+        return f'<div class="industry-item"><strong>네이버 리서치 자료 없음 · {_escape(_display_status(reason))}</strong><p>{_escape(labels.get(reason, reason))}</p></div>'
     return "".join(
         f'<div class="industry-item"><div class="industry-head"><strong>{_escape(item.get("category") or "리서치 분석")}</strong></div><p>{_escape(item.get("text") or "자료 없음")}</p></div>'
         for item in items[:5]
@@ -1012,7 +1035,8 @@ def _compact_html(
     )
     status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>부분 자료 포함</b> · {_escape(model["reason"])}</div>'
     conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
-    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 관측일 {_escape(model["observationDateStatus"])} · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    lineage = model["reportLineage"]
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="report-contract-id" content="{_escape(lineage["contractId"])}"><meta name="report-as-of" content="{_escape(lineage["asOf"])}"><meta name="report-created-at" content="{_escape(lineage["generatedAt"])}"><meta name="report-source" content="{_escape(lineage["source"])}"><meta name="report-scope" content="{_escape(lineage["scope"])}"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><!-- report-lineage: contractId={_escape(lineage["contractId"])};asOf={_escape(lineage["asOf"])};createdAt={_escape(lineage["generatedAt"])};source={_escape(lineage["source"])};scope={_escape(lineage["scope"])} --><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 관측일 {_escape(model["observationDateStatus"])} · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마")}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
     return (
         output
         .replace("MARKET / DASHBOARD", "국내증시")
@@ -1045,6 +1069,7 @@ def _compact_markdown(
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:REQUIRED_RENDER_FIELDS")
     market = model["fullMarket"]
     lines = [
+        lineage_marker(model["contract"]),
         f"# 국내증시 시장 모니터링 — {model['asOf']}",
         "",
         "| 기준일 | 기준시각 | 시장 세션 | 관측일 상태 | 거래일 상태 |",
@@ -1150,7 +1175,16 @@ def _compact_markdown(
             for item in research_items[:5]
         ])
     else:
-        lines.append("자료 없음")
+        research_reason = (model.get("researchAnalysis") or {}).get("unavailableReason") or "RESEARCH_SLOT_ARTIFACT_MISSING"
+        research_labels = {
+            "RESEARCH_SLOT_REQUIRED": "이 리포트에 지정된 리서치 회차가 없습니다.",
+            "RESEARCH_SLOT_ARTIFACT_MISSING": "해당 회차 산출물이 아직 도착하지 않았습니다.",
+            "RESEARCH_SLOT_PRODUCER_FAILED": "해당 회차 수집 단계가 실패했습니다.",
+            "RESEARCH_SLOT_ARTIFACT_FAILED": "해당 회차 산출물 생성이 실패했습니다.",
+            "RESEARCH_SLOT_NOT_FRESH": "해당 회차 산출물이 최신성 검증을 통과하지 못했습니다.",
+            "RESEARCH_SLOT_DATE_MISMATCH": "해당 회차 산출물의 기준일이 리포트와 다릅니다.",
+        }
+        lines.append(f"리서치 자료 없음 — {research_labels.get(research_reason, research_reason)}")
     lines += ["", "## 3. 관심종목·키움 후보", "", "### 관심종목"]
     interest_rows = [
         (row["name"], row["price"], row["ma20"], row["ma60"], row["trend"], row["status"])
@@ -1166,6 +1200,15 @@ def _compact_markdown(
 def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, Any]) -> list[str]:
     plain = html.unescape(html_text)
     issues: list[str] = []
+    lineage = model.get("reportLineage") or {}
+    contract_id_value = str(lineage.get("contractId") or "")
+    if not contract_id_value or contract_id_value not in markdown_text or contract_id_value not in plain:
+        issues.append("REPORT_CONTRACT_ID_MISSING")
+    for value in (lineage.get("asOf"), lineage.get("generatedAt"), lineage.get("source"), lineage.get("scope")):
+        if value not in (None, "") and str(value) not in markdown_text:
+            issues.append(f"MARKDOWN_LINEAGE_MISSING:{value}")
+        if value not in (None, "") and str(value) not in plain:
+            issues.append(f"HTML_LINEAGE_MISSING:{value}")
     for field, token, text in (("MARKDOWN_PART1", "## 1. 시장 대시보드", markdown_text), ("MARKDOWN_PART2", "## 2. 주도 업종·테마", markdown_text), ("MARKDOWN_PART3", "## 3. 관심종목·키움 후보", markdown_text), ("HTML_PART1", 'id="part1"', plain), ("HTML_PART2", 'id="part2"', plain), ("HTML_PART3", 'id="part3"', plain)):
         if token not in text:
             issues.append(f"{field}_MISSING")

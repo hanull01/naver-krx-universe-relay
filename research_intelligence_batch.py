@@ -2,13 +2,16 @@
 
 import argparse
 import json
-from datetime import date, timedelta
+import os
+from datetime import date, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import research_intelligence as ri
 
 
 UNIVERSE_PATH = Path("config/universe.json")
+KST = ZoneInfo("Asia/Seoul")
 
 
 def parse_args():
@@ -37,7 +40,53 @@ def parse_args():
         default="/tmp/research_intelligence_batch",
         help="결과 저장 디렉터리",
     )
+    parser.add_argument("--research-slot", choices=("07:20", "12:20", "19:20"), help="explicit research production slot")
+    parser.add_argument("--source-generation", default=None, help="verified source generation to preserve in lineage")
     return parser.parse_args()
+
+
+def build_slot_lineage(as_of, slot, generated_at, artifact_path, *, producer_status="SUCCESS", artifact_status="AVAILABLE", failure_reason=None, consumed_by_report=None):
+    expected_at = f"{as_of}T{slot}:00+09:00" if slot else None
+    return {
+        "researchSlot": slot,
+        "expectedAt": expected_at,
+        "sourceDate": as_of,
+        "generatedAt": generated_at,
+        "artifactPath": str(artifact_path),
+        "artifactStatus": artifact_status,
+        "producerStatus": producer_status,
+        "freshnessStatus": "FRESH" if artifact_status == "AVAILABLE" else "FAILED",
+        "failureReason": failure_reason,
+        "consumedByReport": consumed_by_report or [],
+        "checkedAt": generated_at,
+    }
+
+
+def write_slot_artifact(output_dir, latest, *, as_of, slot, generated_at, source_generation=None):
+    if not slot:
+        return None
+    slots_dir = Path(output_dir) / "slots"
+    slots_dir.mkdir(parents=True, exist_ok=True)
+    slot_path = slots_dir / f"{str(as_of).replace('-', '')}-{slot.replace(':', '')}.json"
+    lineage = build_slot_lineage(as_of, slot, generated_at, slot_path)
+    payload = dict(latest)
+    payload["researchSlot"] = slot
+    payload["generatedAt"] = generated_at
+    if source_generation:
+        payload["sourceGeneration"] = source_generation
+    payload["slotLineage"] = lineage
+    slot_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest_path = Path("data/research/manifest.json")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
+    except (OSError, ValueError, json.JSONDecodeError):
+        manifest = {}
+    slot_lineage = manifest.get("slotLineage") if isinstance(manifest.get("slotLineage"), list) else []
+    slot_lineage = [row for row in slot_lineage if not (isinstance(row, dict) and row.get("researchSlot") == slot and row.get("sourceDate") == as_of)]
+    manifest["slotLineage"] = slot_lineage + [{**lineage, "artifactPath": str(slot_path)}]
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return slot_path
 
 
 def load_universe():
@@ -457,10 +506,12 @@ def main():
         reverse=True,
     )
 
+    generated_at = datetime.now(KST).isoformat(timespec="seconds")
     latest = {
         "status": "OK",
         "version": "research-intelligence-batch-v1",
         "asOf": as_of.isoformat(),
+        "generatedAt": generated_at,
         "universeSource": str(UNIVERSE_PATH),
         "enabledStockCount": len(stocks),
         "statusCounts": status_counts,
@@ -484,6 +535,8 @@ def main():
                 args.min_recent_reports,
         },
     }
+    if args.source_generation:
+        latest["sourceGeneration"] = args.source_generation
 
     latest_path = output_dir / "latest.json"
 
@@ -498,6 +551,15 @@ def main():
             indent=2,
         )
 
+    slot_path = write_slot_artifact(
+        output_dir,
+        latest,
+        as_of=as_of.isoformat(),
+        slot=args.research_slot,
+        generated_at=generated_at,
+        source_generation=args.source_generation,
+    )
+
     print(
         json.dumps(
             {
@@ -507,6 +569,7 @@ def main():
                 "rankingEligibleCount": len(eligible),
                 "outputDir": str(output_dir),
                 "latest": str(latest_path),
+                "slot": str(slot_path) if slot_path else None,
                 "sample": [
                     {
                         "code": row["itemCode"],
