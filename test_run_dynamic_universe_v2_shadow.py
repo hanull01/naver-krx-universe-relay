@@ -26,7 +26,8 @@ class V2RunnerIsolationTests(unittest.TestCase):
             {"status": "FAILED", "errorType": "NameError", "error": "quality"},
             expected_generation_id="gen-new", run_id="run-3",
         )
-        self.assertEqual(success["status"], "OK")
+        self.assertEqual(success["status"], "SUCCESS")
+        self.assertEqual(success["runStatus"], "OK")
         self.assertEqual(success["consumptionStatus"], "CONSUMED")
         self.assertEqual(mismatch["status"], "GENERATION_MISMATCH")
         self.assertEqual(mismatch["consumptionStatus"], "NOT_CONSUMED")
@@ -80,10 +81,15 @@ class V2RunnerIsolationTests(unittest.TestCase):
                  patch("tools.run_dynamic_universe_v2_shadow.build_source_provenance", return_value={}), \
                  patch("tools.run_dynamic_universe_v2_shadow.record_current", return_value={"observations": []}):
                 outcome = run_once(root, "2026-11-12", "2026-11-12T01:00:00Z")
-            self.assertEqual(outcome["status"], "OK")
+            self.assertEqual(outcome["status"], "SUCCESS")
             evidence = json.loads((root / "data/dynamic-universe/v2-shadow-latest.json").read_text())["inputEvidence"]
             self.assertEqual(evidence["sourceQualityStatus"], "OK")
             self.assertEqual(evidence["generationId"], "gen-test")
+            status = json.loads((root / "data/dynamic-universe/v2-shadow-run-status.json").read_text())
+            self.assertEqual(status["runStatus"], "SUCCESS")
+            self.assertEqual(status["consumptionStatus"], "CONSUMED")
+            self.assertEqual(status["generationEvidence"]["generationField"], "historicalGenerationId")
+            self.assertTrue(status["generationEvidence"]["generationFieldPresent"])
 
     def test_missing_quality_is_explicitly_unavailable(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -94,10 +100,15 @@ class V2RunnerIsolationTests(unittest.TestCase):
                  patch("tools.run_dynamic_universe_v2_shadow.build_source_provenance", return_value={}), \
                  patch("tools.run_dynamic_universe_v2_shadow.record_current", return_value={"observations": []}):
                 outcome = run_once(root, "2026-11-12", "2026-11-12T01:00:00Z")
-            self.assertEqual(outcome["status"], "OK")
+            self.assertEqual(outcome["status"], "GENERATION_UNAVAILABLE")
+            self.assertEqual(outcome["consumptionStatus"], "NOT_CONSUMED")
             evidence = json.loads((root / "data/dynamic-universe/v2-shadow-latest.json").read_text())["inputEvidence"]
             self.assertEqual(evidence["sourceQualityStatus"], "UNAVAILABLE")
             self.assertIsNone(evidence["generationId"])
+            status = json.loads((root / "data/dynamic-universe/v2-shadow-run-status.json").read_text())
+            self.assertEqual(status["status"], "GENERATION_UNAVAILABLE")
+            self.assertEqual(status["consumptionStatus"], "NOT_CONSUMED")
+            self.assertFalse(status["generationEvidence"]["generationFieldPresent"])
 
     def test_failed_run_does_not_reuse_stale_latest(self):
         with tempfile.TemporaryDirectory() as directory:

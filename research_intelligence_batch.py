@@ -13,6 +13,12 @@ import research_intelligence as ri
 UNIVERSE_PATH = Path("config/universe.json")
 KST = ZoneInfo("Asia/Seoul")
 
+RESEARCH_REPORT_SLOTS = {
+    "07:20": "08:30",
+    "12:20": "12:30",
+    "19:20": "19:30",
+}
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -47,8 +53,12 @@ def parse_args():
 
 def build_slot_lineage(as_of, slot, generated_at, artifact_path, *, producer_status="SUCCESS", artifact_status="AVAILABLE", failure_reason=None, consumed_by_report=None, producer_run_id=None):
     expected_at = f"{as_of}T{slot}:00+09:00" if slot else None
+    report_slot = RESEARCH_REPORT_SLOTS.get(slot)
+    next_check_at = f"{as_of}T{report_slot}:00+09:00" if report_slot else None
     return {
         "researchSlot": slot,
+        "reportSlot": report_slot,
+        "recheckReportSlot": "13:30" if slot == "12:20" else None,
         "expectedAt": expected_at,
         "sourceDate": as_of,
         "generatedAt": generated_at,
@@ -59,6 +69,7 @@ def build_slot_lineage(as_of, slot, generated_at, artifact_path, *, producer_sta
         "freshnessStatus": "FRESH" if artifact_status == "AVAILABLE" else "FAILED",
         "failureReason": failure_reason,
         "consumedByReport": consumed_by_report or [],
+        "nextCheckAt": next_check_at,
         "checkedAt": generated_at,
     }
 

@@ -862,25 +862,25 @@ def _compact_research_analysis(
                 reason="RESEARCH_SLOT_ARTIFACT_MISSING",
             ),
         }
+    research_status = str(research.get("status") or "UNAVAILABLE")
     as_of = str(research.get("asOf") or "").replace("-", "")
     expected = str(trading_date or "").replace("-", "")
     stocks = [row for row in research.get("stocks") or [] if isinstance(row, Mapping)]
     source_generation = (
         research.get("sourceGeneration")
         or research.get("generationId")
-        or research.get("generatedAt")
     )
-    if not stocks or (expected and as_of != expected) or not source_generation:
+    if (expected and as_of != expected) or not source_generation:
         reason = research.get("unavailableReason") or (
             "RESEARCH_DATE_MISMATCH" if expected and as_of != expected
             else "RESEARCH_SLOT_ARTIFACT_MISSING"
         )
         lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
-            "status": "UNAVAILABLE", "asOf": research.get("asOf"), "items": [],
+            "status": research_status, "asOf": research.get("asOf"), "items": [],
             "slotLineage": dict(lineage),
             "availability": availability(
-                status=research.get("status"), required_data="리서치 원문과 분석 산출물",
+                status=research_status, required_data="리서치 원문과 분석 산출물",
                 received=False, producer="NAVER Research Action", reason=reason,
                 next_check_at=lineage.get("nextCheckAt") or lineage.get("expectedAt"),
                 producer_run_id=lineage.get("producerRunId"),
@@ -896,11 +896,11 @@ def _compact_research_analysis(
     if not eligible:
         lineage = research.get("slotLineage") if isinstance(research.get("slotLineage"), Mapping) else {}
         return {
-            "status": str(research.get("status") or "UNAVAILABLE"),
+            "status": research_status,
             "asOf": research.get("asOf"), "items": [],
             "slotLineage": dict(lineage),
             "availability": availability(
-                status=research.get("status"), required_data="리서치 원문과 분석 산출물",
+                status=research_status, required_data="리서치 원문과 분석 산출물",
                 received=False, producer="NAVER Research Action",
                 reason=research.get("unavailableReason") or "RESEARCH_ANALYSIS_MISSING",
                 next_check_at=(research.get("slotLineage") or {}).get("nextCheckAt"),
@@ -1868,14 +1868,14 @@ def build_report_contract(
         }
     )
     v2_status = dict(v2_status) if isinstance(v2_status, Mapping) else {}
-    v2_effective_status = v2_status.get("status") or ("OK" if v2_latest else "UNAVAILABLE")
+    v2_effective_status = v2_status.get("status") or ("SUCCESS" if v2_latest else "GENERATION_UNAVAILABLE")
     v2_producer_status = v2_status.get("producerStatus") or v2_status.get("rawStatus") or v2_effective_status
     v2_failure_reason = (
         v2_status.get("failureReason")
         or v2_status.get("error")
         or ("V2_STATUS_NOT_SUPPLIED" if not v2_status and not v2_latest else None)
     )
-    v2_consumption_status = "CONSUMED" if v2_effective_status == "OK" else "NOT_CONSUMED"
+    v2_consumption_status = "CONSUMED" if v2_effective_status in {"SUCCESS", "OK"} else "NOT_CONSUMED"
     v2_input_evidence = v2_latest.get("inputEvidence")
     v2_input_evidence = v2_input_evidence if isinstance(v2_input_evidence, Mapping) else {}
     v2_generation_id = (
@@ -1894,6 +1894,9 @@ def build_report_contract(
         "expectedGenerationId": v2_status.get("expectedGenerationId"),
         "errorType": v2_status.get("errorType"),
         "failureReason": v2_failure_reason,
+        "runStatus": v2_status.get("runStatus") or v2_status.get("rawStatus") or v2_producer_status,
+        "artifactPath": v2_status.get("artifactPath") or "data/dynamic-universe/v2-shadow-latest.json",
+        "generationEvidence": v2_status.get("generationEvidence") or {},
     }
 
     def selected(rows: Any, kind: str) -> list[dict[str, Any]]:

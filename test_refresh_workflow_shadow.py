@@ -36,7 +36,7 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         self.assertIn('git diff-tree --no-commit-id --name-only -r HEAD', WORKFLOW)
         self.assertIn("expected-publish-files.txt", WORKFLOW)
         self.assertIn("actual-commit-files.txt", WORKFLOW)
-        success_block = WORKFLOW.split('if [ "$v2_status" = "OK" ]; then', 1)[1].split("else", 1)[0]
+        success_block = WORKFLOW.split('if [ "$v2_status" = "SUCCESS" ]; then', 1)[1].split("else", 1)[0]
         self.assertIn("v2-shadow-latest.json", success_block)
         self.assertIn("v2-shadow-history.json", success_block)
 

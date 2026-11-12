@@ -877,9 +877,9 @@ jobs:
               print('FAILED')
           PY
           )"
-            if [ "$v2_status" = "OK" ]; then
+            if [ "$v2_status" = "SUCCESS" ]; then
               if [ ! -f data/dynamic-universe/v2-shadow-latest.json ] || [ ! -f data/dynamic-universe/v2-shadow-history.json ]; then
-                echo "::error::V2 status is OK but latest/history output is incomplete."
+                echo "::error::V2 status is SUCCESS but latest/history output is incomplete."
                 exit 1
               fi
               git add -- data/dynamic-universe/v2-shadow-latest.json data/dynamic-universe/v2-shadow-history.json

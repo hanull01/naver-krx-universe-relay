@@ -98,15 +98,15 @@ class DailyReportTests(unittest.TestCase):
         )
         self.assertEqual(
             daily_report.validated_research_for_report(payload, "2026-10-30", "gen-1")["status"],
-            "UNAVAILABLE",
+            "ARTIFACT_INVALID",
         )
         self.assertEqual(
             daily_report.validated_research_for_report(payload, "2026-10-29", "gen-2")["status"],
-            "UNAVAILABLE",
+            "ARTIFACT_INVALID",
         )
         self.assertEqual(
             daily_report.validated_research_for_report({**payload, "sourceGeneration": None}, "2026-10-29")["status"],
-            "UNAVAILABLE",
+            "ARTIFACT_INVALID",
         )
         self.assertEqual(
             daily_report.validated_research_for_report(
@@ -132,10 +132,7 @@ class DailyReportTests(unittest.TestCase):
             (slot_dir / "20261029-0720.json").write_text(json.dumps(payload), encoding="utf-8")
             with patch.object(daily_report, "RESEARCH_SLOTS_PATH", slot_dir), patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "07:20", "REPORT_SLOT": "08:30"}, clear=False):
                 loaded = daily_report.load_research_slot_for_report("2026-10-29", "gen-1")
-                self.assertEqual(
-                    loaded["status"],
-                    "OK",
-                )
+                self.assertEqual(loaded["status"], "CONSUMED")
                 self.assertEqual(loaded["slotLineage"]["researchSlot"], "07:20")
                 self.assertEqual(loaded["slotLineage"]["reportSlot"], "08:30")
                 self.assertTrue(loaded["slotLineage"]["consumedByReport"])
@@ -144,6 +141,59 @@ class DailyReportTests(unittest.TestCase):
                     self.assertEqual(missing["unavailableReason"], "RESEARCH_SLOT_ARTIFACT_MISSING")
                     self.assertEqual(missing["slotLineage"]["researchSlot"], "12:20")
                     self.assertFalse(missing["slotLineage"]["consumedByReport"])
+
+    def test_research_slot_diagnostics_cover_not_due_failure_invalid_and_recheck(self):
+        with tempfile.TemporaryDirectory() as directory:
+            slot_dir = Path(directory)
+            manifest = slot_dir / "manifest.json"
+            manifest.write_text(json.dumps({"slotLineage": []}), encoding="utf-8")
+            with patch.object(daily_report, "RESEARCH_SLOTS_PATH", slot_dir), \
+                 patch.object(daily_report, "RESEARCH_MANIFEST_PATH", manifest), \
+                 patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "07:20", "REPORT_SLOT": "08:30"}, clear=False):
+                not_due = daily_report.load_research_slot_for_report("2099-11-13", "gen-1")
+                self.assertEqual(not_due["status"], "NOT_DUE")
+                self.assertEqual(not_due["unavailableReason"], "RESEARCH_SLOT_NOT_DUE")
+
+                (slot_dir / "20261113-0720.json").write_text("{broken", encoding="utf-8")
+                invalid = daily_report.load_research_slot_for_report("2026-11-13", "gen-1")
+                self.assertEqual(invalid["status"], "ARTIFACT_INVALID")
+
+                mismatch_payload = {
+                    "status": "OK", "asOf": "2026-11-13", "sourceGeneration": "gen-old",
+                    "stocks": [], "slotLineage": {
+                        "researchSlot": "07:20", "artifactStatus": "AVAILABLE",
+                        "producerStatus": "SUCCESS", "freshnessStatus": "FRESH",
+                    },
+                }
+                (slot_dir / "20261113-0720.json").write_text(json.dumps(mismatch_payload), encoding="utf-8")
+                mismatch = daily_report.load_research_slot_for_report("2026-11-13", "gen-1")
+                self.assertEqual(mismatch["status"], "ARTIFACT_INVALID")
+                self.assertEqual(mismatch["unavailableReason"], "RESEARCH_GENERATION_MISMATCH")
+
+                failed_payload = {
+                    "status": "OK", "asOf": "2026-11-13", "sourceGeneration": "gen-1",
+                    "stocks": [], "slotLineage": {
+                        "researchSlot": "07:20", "artifactStatus": "AVAILABLE",
+                        "producerStatus": "FAILED", "freshnessStatus": "FRESH",
+                    },
+                }
+                (slot_dir / "20261113-0720.json").write_text(json.dumps(failed_payload), encoding="utf-8")
+                failed = daily_report.load_research_slot_for_report("2026-11-13", "gen-1")
+                self.assertEqual(failed["status"], "PRODUCER_FAILED")
+
+                recheck_payload = {
+                    "status": "OK", "asOf": "2026-11-12", "sourceGeneration": "gen-1",
+                    "stocks": [], "slotLineage": {
+                        "researchSlot": "12:20", "artifactStatus": "AVAILABLE",
+                        "producerStatus": "SUCCESS", "freshnessStatus": "FRESH",
+                    },
+                }
+                (slot_dir / "20261112-1220.json").write_text(json.dumps(recheck_payload), encoding="utf-8")
+                with patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "", "REPORT_SLOT": "13:30"}, clear=False):
+                    recheck = daily_report.load_research_slot_for_report("2026-11-12", "gen-1")
+                self.assertEqual(recheck["status"], "CONSUMED")
+                self.assertEqual(recheck["slotLineage"]["researchSlot"], "12:20")
+                self.assertEqual(recheck["slotLineage"]["reportSlot"], "13:30")
 
     def test_unavailable_research_does_not_fake_coverage_or_block_report(self):
         report = {
