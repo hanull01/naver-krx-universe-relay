@@ -86,6 +86,27 @@ REASON_LABELS = {
     "MISSING_EVIDENCE": "필요한 원천 증적이 수신되지 않았습니다.",
     "DERIVED_PROJECTION_MISSING": "파생 지표 산출물이 수신되지 않았습니다.",
     "DERIVED_PROJECTION_DATE_MISMATCH": "파생 지표 기준일이 리포트와 다릅니다.",
+    "PRODUCER_NOT_CONNECTED": "공급 기능이 연결되지 않았습니다.",
+    "INPUT_ARTIFACT_MISSING": "필요한 입력 자료가 없습니다.",
+    "PRODUCER_FAILED": "공급 실행이 실패했습니다.",
+    "INTEREST_GROUP_NOT_CONFIGURED": "현재 관심 대상이 설정되지 않았습니다.",
+    "NO_CURRENT_MEMBERSHIP": "현재 관측 구성종목 자료가 없습니다.",
+    "CURRENT_MEMBERSHIP_MISSING": "현재 관측 구성종목 자료가 없습니다.",
+    "SYMBOL_MATCH_FAILED": "구성종목과 현재 관측 종목을 연결하지 못했습니다.",
+    "LEADER_CALCULATION_FAILED": "대표 주도주 계산에 실패했습니다.",
+    "NO_SCHEDULED_COLLECTION": "자료 수집 예정이 없습니다.",
+    "DERIVED_ARTIFACT_MISSING": "산출 자료가 없습니다.",
+    "RESEARCH_ANALYSIS_MISSING": "리서치 분석 산출물이 없습니다.",
+    "CURRENT_BREADTH_UNAVAILABLE": "현재 시장 확산 자료가 없습니다.",
+    "CURRENT_SNAPSHOT_MISSING": "현재 관측값이 수신되지 않았습니다.",
+    "TECHNICAL_DATA_MISSING": "이동평균 계산 자료가 수신되지 않았습니다.",
+    "TREND_DATA_MISSING": "추세 계산 자료가 수신되지 않았습니다.",
+    "CANDIDATE_DETAILS_UNAVAILABLE": "후보 상세 자료가 수신되지 않았습니다.",
+    "SELECTION_VALUE_UNAVAILABLE": "후보 선정 기준값이 수신되지 않았습니다.",
+    "TECHNICAL_INDICATORS_UNAVAILABLE": "후보 기술지표가 수신되지 않았습니다.",
+    "CONDITION_DETAILS_UNAVAILABLE": "조건 상세가 수신되지 않았습니다.",
+    "QUOTE_NOT_REQUESTED": "현재가 요청이 실행되지 않았습니다.",
+    "QUOTE_UNAVAILABLE": "현재가를 수신하지 못했습니다.",
 }
 
 
@@ -122,6 +143,13 @@ def availability(
     producer: str,
     reason: Any = None,
     next_check_at: Any = None,
+    producer_run_id: Any = None,
+    artifact_path: Any = None,
+    freshness_status: Any = None,
+    report_slot: Any = None,
+    research_slot: Any = None,
+    expected_at: Any = None,
+    checked_at: Any = None,
 ) -> dict[str, Any]:
     """Build a stable user-facing availability block.
 
@@ -140,7 +168,7 @@ def availability(
     else:
         display_status = "NOT_RECEIVED"
         display_label = "미수신"
-    return {
+    result = {
         "status": display_status,
         "label": display_label,
         "requiredData": required_data,
@@ -151,6 +179,20 @@ def availability(
         "nextCheckAt": next_check_label(next_check_at),
         "statusCode": status,
     }
+    # Keep lineage facts available to the contract without rendering raw
+    # lifecycle vocabulary in user-facing views.
+    for key, value in (
+        ("producerRunId", producer_run_id),
+        ("artifactPath", artifact_path),
+        ("freshnessStatus", freshness_status),
+        ("reportSlot", report_slot),
+        ("researchSlot", research_slot),
+        ("expectedAt", expected_at),
+        ("checkedAt", checked_at),
+    ):
+        if value not in (None, "", [], {}):
+            result[key] = value
+    return result
 
 
 def first_reason(row: Mapping[str, Any] | None, *keys: str) -> Any:

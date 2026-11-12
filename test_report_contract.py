@@ -873,3 +873,40 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(availability["ma20"]["reasonCode"], "TECHNICAL_DATA_MISSING")
         self.assertIn("업종", contract["relativeStrengthTop5"]["industries"]["availability"]["requiredData"])
         self.assertIn("availability", contract["independentAnalysis"]["research"])
+
+    def test_supply_breakpoints_and_research_slot_lineage_are_preserved(self):
+        generated = "2026-11-12T08:30:00+09:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261112", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": generated, "fullMarket": {}},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={"generatedAt": generated, "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={},
+            v1_groups={
+                "status": "FAILED", "artifactPath": "data/monitoring/latest-interest-groups.json",
+                "producerRunId": "run-interest-1", "sectors": [], "themes": [],
+            },
+            research={
+                "status": "UNAVAILABLE", "asOf": "20261112",
+                "unavailableReason": "RESEARCH_SLOT_ARTIFACT_MISSING",
+                "slotLineage": {
+                    "researchSlot": "12:20", "reportSlot": "13:30",
+                    "expectedAt": "2026-11-12T12:20:00+09:00",
+                    "producerRunId": "research-run-1",
+                    "artifactPath": "data/research/intelligence/slots/20261112-1220.json",
+                    "freshnessStatus": "NOT_DUE", "checkedAt": "2026-11-12T13:30:00+09:00",
+                },
+                "stocks": [],
+            },
+        )
+        industry = contract["v1"]["availability"]["industries"]
+        self.assertEqual(industry["reasonCode"], "PRODUCER_FAILED")
+        self.assertEqual(industry["missingReason"], "공급 실행이 실패했습니다.")
+        self.assertEqual(industry["producerRunId"], "run-interest-1")
+        research = contract["independentAnalysis"]["research"]
+        self.assertEqual(research["slotLineage"]["researchSlot"], "12:20")
+        self.assertEqual(research["analysis"]["availability"]["artifactPath"], "data/research/intelligence/slots/20261112-1220.json")
+        self.assertEqual(research["analysis"]["availability"]["producerRunId"], "research-run-1")
