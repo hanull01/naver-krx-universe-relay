@@ -1381,6 +1381,53 @@ def _compact_trading_date_evidence(evidence: Any) -> dict[str, Any]:
     return compact
 
 
+def _compact_additional_observation_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep one configured additional-observation row in the Work contract."""
+    leaders = [
+        {
+            key: item.get(key)
+            for key in ("code", "symbol", "name", "changeRate", "currentPrice")
+            if item.get(key) is not None
+        }
+        for item in (row.get("leaders") or [])[:3]
+        if isinstance(item, Mapping)
+    ]
+    return {
+        key: row.get(key)
+        for key in (
+            "id", "name", "type", "source", "sourceDate", "observationDate",
+            "scope", "producerRunId", "generatedAt", "membershipCount",
+            "leaderCount", "status", "failureReason",
+        )
+        if row.get(key) is not None
+    } | {"leaders": leaders}
+
+
+def _compact_additional_observations(value: Mapping[str, Any] | None) -> dict[str, Any]:
+    source = dict(value or {})
+    return {
+        key: source.get(key)
+        for key in (
+            "schemaVersion", "status", "source", "sourceDate", "observationDate",
+            "scope", "producerRunId", "generatedAt", "configPath", "artifactPath",
+            "failureReason",
+        )
+        if source.get(key) is not None
+    } | {
+        "industries": [
+            _compact_additional_observation_row(row)
+            for row in (source.get("industries") or [])
+            if isinstance(row, Mapping)
+        ],
+        "themes": [
+            _compact_additional_observation_row(row)
+            for row in (source.get("themes") or [])
+            if isinstance(row, Mapping)
+        ],
+        "counts": dict(source.get("counts") or {}),
+    }
+
+
 def _leader_sort_key(row: Mapping[str, Any]) -> tuple[float, bool, float]:
     rate = row.get("changeRate")
     try:
@@ -1662,6 +1709,7 @@ def build_report_contract(
     current_market_observation: Mapping[str, Any] | None = None,
     historical_technical_market: Mapping[str, Any] | None = None,
     v2_status: Mapping[str, Any] | None = None,
+    additional_observations: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one renderer-neutral model from one published generation.
 
@@ -2039,6 +2087,9 @@ def build_report_contract(
             "marketSnapshotSource": "data/market/report-snapshot-projection.json",
             "v2HistoryDetails": "data/dynamic-universe/v2-shadow-history.json#observations[]",
             "relativeStrengthTop5": "reportContract.relativeStrengthTop5",
+            "additionalObservations": "reportContract.additionalObservations",
+            "additionalObservationConfig": "config/additional-observations.json",
+            "additionalObservationArtifact": "data/monitoring/additional-observations.json",
             "forbidCandidateMixing": True,
             "historicalAndPreMarketMustRemainSeparate": True,
         },
@@ -2112,6 +2163,7 @@ def build_report_contract(
             "changesSource": "reportContract.v2Changes",
         },
         "v2Changes": compact_v2_changes,
+        "additionalObservations": _compact_additional_observations(additional_observations),
         "independentAnalysis": {
             "research": {
                 "status": (research or {}).get("status") if isinstance(research, Mapping) else "UNAVAILABLE",
