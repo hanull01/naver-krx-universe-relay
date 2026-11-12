@@ -31,6 +31,16 @@ def snapshot(root):
     return path, payload
 
 
+def empty_snapshot(root):
+    path, payload = snapshot(root)
+    payload["status"] = "AVAILABLE_EMPTY"
+    payload["candidate_count"] = 0
+    payload["symbols"] = []
+    payload["source_sha256"] = td.source_hash(payload)
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    return path, payload
+
+
 def calendar(root):
     path = Path(root) / "calendar.json"
     path.write_text(json.dumps({"source": "KRX_OFFICIAL", "dates": ["2026-10-12", "2026-10-13"]}), encoding="utf-8")
@@ -104,6 +114,20 @@ class CandidatePublisherTests(unittest.TestCase):
                     source, calendar(root), quotes(root), root,
                     monitoring_date="2026-10-13",
                 )
+
+    def test_empty_snapshot_does_not_require_or_read_previous_quotes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, payload = empty_snapshot(root)
+            result = publisher.safe_publish(
+                source, calendar(root), root / "missing-previous-quotes.json", root,
+                monitoring_date="2026-10-13", dry_run=True,
+            )
+            self.assertEqual(result["publishStatus"], "DRY_RUN")
+            self.assertEqual(result["lineage"]["candidateCount"], 0)
+            self.assertEqual(result["lineage"]["requestedCount"], 0)
+            self.assertEqual(result["lineage"]["quoteCount"], 0)
+            self.assertEqual(result["quotes"]["status"], "AVAILABLE_EMPTY")
 
 
 if __name__ == "__main__":

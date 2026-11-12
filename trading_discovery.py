@@ -373,6 +373,16 @@ def _enrich_published_snapshot(existing, incoming):
 def _merge_publication(existing, incoming):
     if existing.get("sourceSha256") != incoming.get("sourceSha256"):
         raise DiscoveryError("PUBLISHED_SNAPSHOT_CONFLICT")
+    # Empty condition-search results have no candidateDetails to enrich.  A
+    # same-identity empty publication is still safe to compare/update, while
+    # all non-empty legacy publications retain the strict enrichment policy.
+    if (not existing.get("symbols") and not incoming.get("symbols")
+            and existing.get("monitoringDate") == incoming.get("monitoringDate")
+            and existing.get("selectionDate") == incoming.get("selectionDate")
+            and existing.get("source") == incoming.get("source")
+            and existing.get("sourceGroup") == incoming.get("sourceGroup")
+            and existing.get("groupId") == incoming.get("groupId")):
+        return (existing, "IDEMPOTENT") if existing == incoming else (incoming, "UPDATED")
     return _enrich_published_snapshot(existing, incoming)
 
 
@@ -878,6 +888,10 @@ SUPPLEMENTAL_KEYS = {
     "missingSymbols", "errors", "datas", "candidateStatuses", "quoteCompleteness",
     "paper_only",
 }
+SUPPLEMENTAL_OPTIONAL_KEYS = {
+    "conditionSearchStatus", "quoteRequestedCount", "quoteSuccessCount",
+    "quoteFailureCount", "quoteStatus",
+}
 SUPPLEMENTAL_CANDIDATE_STATUS_KEYS = {
     "symbol", "quoteRequested", "quoteRequestTime", "currentPrice",
     "quoteStatus", "failureReason", "generatedAt", "source", "sourceHash",
@@ -906,9 +920,39 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
                               fetcher=None, normalizer=None, clock=None, limit=50):
     if discovery.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY"}:
         raise DiscoveryError("DISCOVERY_NOT_AVAILABLE")
-    monitoring_date = discovery.get("monitoringDate")
-    market_source_time = quotes.get("sourceTime") if isinstance(quotes, dict) else None
     now = (clock or (lambda: datetime.now(KST)))()
+    monitoring_date = discovery.get("monitoringDate")
+    raw_symbols = discovery.get("symbols", [])
+    if (not isinstance(raw_symbols, list)
+            or len(raw_symbols) != len(set(raw_symbols))):
+        raise DiscoveryError("DISCOVERY_SYMBOLS_INVALID")
+    candidate_symbols = list(raw_symbols)
+
+    # An official empty condition-search snapshot is a valid terminal result.
+    # Do not inspect a previous market quote file for this case: it is not part
+    # of the snapshot identity and could create a false date mismatch.
+    if not candidate_symbols:
+        now_value = now
+        generated_at = now_value.isoformat() if hasattr(now_value, "isoformat") else str(now_value)
+        return {
+            "schemaVersion": 1, "status": "AVAILABLE_EMPTY",
+            "monitoringDate": monitoring_date,
+            "candidateSourceSha256": discovery.get("sourceSha256"),
+            "sourceHash": discovery.get("sourceSha256"),
+            "marketSourceTime": None, "generatedAt": generated_at,
+            "source": "NAVER_KRX", "paper_only": True,
+            "conditionSearchStatus": "NO_RESULTS",
+            "quoteStatus": "AVAILABLE_EMPTY",
+            "requestedCount": 0, "quoteRequestedCount": 0,
+            "quoteCount": 0, "quoteSuccessCount": 0,
+            "quoteFailureCount": 0, "missingSymbols": [], "errors": [],
+            "datas": [], "candidateStatuses": [], "networkCalls": 0,
+            "quoteCompleteness": {
+                "status": "AVAILABLE_EMPTY", "available": 0, "total": 0,
+            },
+        }
+
+    market_source_time = quotes.get("sourceTime") if isinstance(quotes, dict) else None
     try:
         source_date = datetime.fromisoformat(str(market_source_time).replace("Z", "+00:00")).astimezone(KST).date().isoformat()
     except (TypeError, ValueError):
@@ -921,11 +965,6 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
     # The candidate artifact is the authoritative request set.  Existing
     # market quotes and full-market signals are evidence, not a reason to
     # suppress a candidate request.
-    raw_symbols = discovery.get("symbols", [])
-    if (not isinstance(raw_symbols, list)
-            or len(raw_symbols) != len(set(raw_symbols))):
-        raise DiscoveryError("DISCOVERY_SYMBOLS_INVALID")
-    candidate_symbols = list(raw_symbols)
     request_clock = clock or (lambda: datetime.now(KST))
     request_time_value = request_clock()
     request_time = (request_time_value.isoformat()
@@ -978,8 +1017,13 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
         "sourceHash": discovery.get("sourceSha256"),
         "marketSourceTime": market_source_time, "generatedAt": generated_at,
         "source": "NAVER_KRX", "paper_only": True,
+        "conditionSearchStatus": "RESULTS",
+        "quoteStatus": status,
         "requestedCount": len(candidate_symbols),
-        "quoteCount": len(rows), "missingSymbols": missing, "errors": errors,
+        "quoteRequestedCount": len(candidate_symbols),
+        "quoteCount": len(rows), "quoteSuccessCount": len(rows),
+        "quoteFailureCount": len(missing),
+        "missingSymbols": missing, "errors": errors,
         "datas": rows, "candidateStatuses": candidate_statuses,
         "quoteCompleteness": {
             "status": "AVAILABLE" if len(rows) == len(candidate_symbols) else (
@@ -992,9 +1036,10 @@ def build_supplemental_quotes(discovery, quotes, full_market_signals, *,
 
 def validate_supplemental_quotes(payload, discovery, market_source_time):
     required_keys = SUPPLEMENTAL_KEYS - {"sourceHash", "paper_only"}
+    allowed_keys = SUPPLEMENTAL_KEYS | SUPPLEMENTAL_OPTIONAL_KEYS
     if (not isinstance(payload, dict)
             or not required_keys.issubset(payload)
-            or set(payload) - SUPPLEMENTAL_KEYS not in (set(), {"networkCalls"})):
+            or set(payload) - allowed_keys not in (set(), {"networkCalls"})):
         raise DiscoveryError("SUPPLEMENTAL_SCHEMA_INVALID")
     if (payload.get("schemaVersion") != 1 or payload.get("source") != "NAVER_KRX"
             or payload.get("monitoringDate") != discovery.get("monitoringDate")
@@ -1047,6 +1092,16 @@ def validate_supplemental_quotes(payload, discovery, market_source_time):
             or completeness.get("total") != len(expected_symbols)
             or completeness.get("status") not in {"AVAILABLE", "AVAILABLE_EMPTY", "PARTIAL"}):
         raise DiscoveryError("SUPPLEMENTAL_QUOTES_INVALID")
+    if not expected_symbols:
+        if (payload.get("conditionSearchStatus") != "NO_RESULTS"
+                or payload.get("quoteStatus") not in {"AVAILABLE_EMPTY", "NO_CANDIDATES"}
+                or payload.get("quoteRequestedCount") != 0
+                or payload.get("quoteSuccessCount") != 0
+                or payload.get("quoteFailureCount") != 0
+                or payload.get("status") != "AVAILABLE_EMPTY"
+                or payload.get("marketSourceTime") is not None):
+            raise DiscoveryError("EMPTY_SNAPSHOT_QUOTE_CONTRACT_INVALID")
+        return payload
     for candidate in candidate_statuses:
         if candidate.get("quoteRequested") is not True:
             raise DiscoveryError("SUPPLEMENTAL_CANDIDATE_NOT_REQUESTED")
