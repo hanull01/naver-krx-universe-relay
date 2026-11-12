@@ -22,6 +22,7 @@ from tools.v2_change_analysis import compare_v2_changes
 from tools.full_market_technical_adapter import build_report_input as build_staged_technical_input
 from tools.market_snapshot_projection import validate_for_report as validate_market_snapshot_for_report
 from tools.report_user_status import user_status_label
+from tools.additional_observations import build_additional_observation_projection
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -163,6 +164,8 @@ DYNAMIC_UNIVERSE_PATH = DATA / "dynamic-universe" / "latest.json"
 V2_SHADOW_LATEST_PATH = DATA / "dynamic-universe" / "v2-shadow-latest.json"
 V2_SHADOW_HISTORY_PATH = DATA / "dynamic-universe" / "v2-shadow-history.json"
 V2_SHADOW_STATUS_PATH = DATA / "dynamic-universe" / "v2-shadow-run-status.json"
+ADDITIONAL_OBSERVATIONS_CONFIG_PATH = ROOT / "config" / "additional-observations.json"
+ADDITIONAL_OBSERVATIONS_ARTIFACT_PATH = MONITORING_PATH / "additional-observations.json"
 
 
 def compact_date(value):
@@ -1800,6 +1803,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         or quote_observed_date
     )
     group_observation_date = current_observation_date or report_input_date
+    additional_observation_config = optional_json(ADDITIONAL_OBSERVATIONS_CONFIG_PATH, {})
+    additional_observation_artifact = optional_json(ADDITIONAL_OBSERVATIONS_ARTIFACT_PATH, {})
+    additional_observations = build_additional_observation_projection(
+        additional_observation_config,
+        additional_observation_artifact,
+        observation_date=group_observation_date,
+        now=quotes.get("generatedAt") or published_breadth.get("generatedAt"),
+        config_path="config/additional-observations.json",
+        artifact_path="data/monitoring/additional-observations.json",
+    )
     published_industries = validated_group_source(
         published_industries, "industry", group_observation_date
     )
@@ -2187,6 +2200,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         v1_groups=configured_interest_group_projection(universe),
         market_snapshot=market_snapshot,
         v2_status=shadow_status,
+        additional_observations=additional_observations,
     )
     kiwoom_contract_errors = validate_kiwoom_candidate_binding(
         discovery, report_contract
@@ -2350,6 +2364,16 @@ def build_report(as_of=None, fetch_discovery_missing=False,
                 "sourceStatus": theme_signals.get("sourceStatus"),
                 "themeCount": theme_signals.get("themeCount", len(theme_analysis)),
             },
+            "additionalObservations": {
+                "configPath": additional_observations.get("configPath"),
+                "artifactPath": additional_observations.get("artifactPath"),
+                "status": additional_observations.get("status"),
+                "source": additional_observations.get("source"),
+                "sourceDate": additional_observations.get("sourceDate"),
+                "observationDate": additional_observations.get("observationDate"),
+                "producerRunId": additional_observations.get("producerRunId"),
+                "generatedAt": additional_observations.get("generatedAt"),
+            },
         },
         "coverage": {
             "enabledStockCount": len(enabled),
@@ -2389,6 +2413,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
             dynamic_universe, shadow_latest, shadow_history, shadow_status
         ),
         "reportContract": report_contract,
+        "additionalObservations": additional_observations,
         "sessionContext": session_context,
         "groupSummary": groups,
         "technicalEvents": technical_events(rows),

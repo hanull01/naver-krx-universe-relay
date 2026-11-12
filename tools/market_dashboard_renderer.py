@@ -860,6 +860,12 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "v2Industries": list(v2.get("industries") or [])[:5] if v2_verified else [],
         "v2Themes": list(v2.get("themes") or [])[:5] if v2_verified else [],
         "v2HoldReason": _v2_hold_reason(v2),
+        "additionalObservations": contract.get("additionalObservations") or {
+            "status": "PRODUCER_NOT_CONFIGURED",
+            "industries": [],
+            "themes": [],
+            "failureReason": "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED",
+        },
         "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
         "kiwoom": contract.get("kiwoomCandidates") or {},
         "researchAnalysis": {
@@ -979,15 +985,98 @@ def _compact_research_cards(model: Mapping[str, Any]) -> str:
 
 
 def _compact_v2_cards(model: Mapping[str, Any]) -> str:
+    return _compact_additional_cards(model) + _compact_v2_diagnostic_cards(model)
+
+
+
+def _additional_status(value: Any) -> str:
+    return {
+        "AVAILABLE": "수신됨",
+        "PARTIAL": "일부 수신",
+        "UNAVAILABLE": "미수신",
+        "PRODUCER_NOT_CONFIGURED": "자동 산출 기능 미연결",
+        "NOT_YET_RUN": "아직 산출되지 않음",
+        "PRODUCER_FAILED": "공급 실행 실패",
+    }.get(str(value or "").upper(), "원천 상태 확인 필요")
+
+
+def _additional_reason(value: Any) -> str:
+    return {
+        "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED": "추가 관찰 대상 설정이 없습니다.",
+        "PRODUCER_NOT_RUN": "추가 관찰 producer가 아직 실행되지 않았습니다.",
+        "STALE_ARTIFACT": "현재 관측일에 해당하는 산출물이 없습니다.",
+        "TARGET_OUTPUT_MISSING": "해당 대상의 산출물이 없습니다.",
+        "NO_LEADER_DATA": "현재 관측에서 대표 주도주를 찾지 못했습니다.",
+        "OBSERVATION_DATE_MISMATCH": "산출물의 관측일이 현재 리포트와 다릅니다.",
+        "ADDITIONAL_OBSERVATION_PARTIAL": "일부 추가 관찰 대상만 수신됐습니다.",
+    }.get(str(value or "").upper(), "원천 자료 확인 필요")
+
+
+def _additional_rows(model: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    additional = model.get("additionalObservations") or {}
+    return [
+        row for row in (additional.get("industries") or []) + (additional.get("themes") or [])
+        if isinstance(row, Mapping)
+    ]
+
+
+def _compact_additional_cards(model: Mapping[str, Any]) -> str:
+    additional = model.get("additionalObservations") or {}
+    rows = _additional_rows(model)
+    if not rows:
+        return (
+            '<div class="industry-item"><strong>추가 관찰 업종·테마</strong>'
+            f'<p>{_escape(_additional_status(additional.get("status")))} · '
+            f'{_escape(_additional_reason(additional.get("failureReason")))}</p></div>'
+        )
+    cards = []
+    for row in rows:
+        lineage = (
+            f"원천: {_text(row.get('source'), '확인 불가')} · "
+            f"원천일: {_compact_date(row.get('sourceDate'))} · "
+            f"관측일: {_compact_date(row.get('observationDate'))} · "
+            f"범위: {_text(row.get('scope'), '확인 불가')}"
+        )
+        cards.append(
+            f'<div class="industry-item"><div class="industry-head"><strong>'
+            f'{_escape(_text(row.get("type"), "대상"))} · {_escape(_text(row.get("name"), row.get("id")))}'
+            f'</strong><span class="status-chip">{_escape(_additional_status(row.get("status")))}</span></div>'
+            f'<p>구성종목 {_escape(_text(row.get("membershipCount"), "확인 불가"))}개 · '
+            f'대표 주도주 {_escape(_compact_leaders(row))} · 주도주 수 {_escape(_text(row.get("leaderCount"), "0"))}개<br>'
+            f'<small>{_escape(lineage)} · {_escape(_additional_reason(row.get("failureReason")))}</small></p></div>'
+        )
+    return "".join(cards)
+
+
+def _compact_v2_diagnostic_cards(model: Mapping[str, Any]) -> str:
+    """Keep V2 shadow visible only as a clearly non-operational diagnostic."""
     if not model["v2Verified"]:
-        return f'<div class="industry-item"><strong>추가 관찰 업종·테마</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
+        return f'<div class="industry-item"><strong>별도 산출 진단</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
         for row in group:
             if _compact_row_available(row):
-                score = f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 대기"
-                rows.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("v2Status")))}</span></div><p>점수 {_escape(score)} · 주도주 {_escape(_compact_leaders(row))}</p></div>')
-    return "".join(rows) or '<div class="industry-item"><strong>추가 관찰 업종·테마</strong><p>현재 자동 산출 기능이 없습니다.</p></div>'
+                score = f"{row.get('score'):.2f}" if isinstance(row.get('score'), (int, float)) else "확인 불가"
+                rows.append(f'<div class="industry-item"><div class="industry-head"><strong>별도 산출 진단 · {_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">진단 전용</span></div><p>점수 {_escape(score)} · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>')
+    return "".join(rows) or '<div class="industry-item"><strong>별도 산출 진단</strong><p>현재 자동 산출 기능이 없습니다.</p></div>'
+
+
+def _compact_v2_diagnostic_markdown(model: Mapping[str, Any]) -> list[str]:
+    lines = ["", "#### 별도 산출 진단(운영 추가 관찰 자료 아님)"]
+    if not model["v2Verified"]:
+        lines.append(model["v2HoldReason"])
+        return lines
+    rows = []
+    for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
+        for row in group:
+            rows.append((
+                f"{label} · {row.get('name') or row.get('id')}",
+                "진단 전용",
+                f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 불가",
+                _compact_leaders(row),
+            ))
+    lines += _markdown_table(("대상", "상태", "점수", "대표 주도주"), rows or [("미수신", "진단 전용", "-", "-")])
+    return lines
 
 
 def _compact_interest_cards(model: Mapping[str, Any]) -> str:
@@ -1275,14 +1364,21 @@ def _compact_markdown(
         lines.append(_availability_text(model.get("v1ThemeAvailability")))
     lines += _markdown_table(("테마", "상태", "대표 주도주"), v1_theme_rows or [("미수신", "수신 상태 확인 필요", "-")])
     lines += ["", "### 추가 관찰 업종·테마"]
-    lines += [model["v2HoldReason"] if not model["v2Verified"] else "검증된 후보 자료를 표시합니다."]
-    if model["v2Verified"]:
-        v2_rows = [(
-            row.get("name") or row.get("id"), _display_status(row.get("v2Status")),
-            f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 대기",
+    additional = model.get("additionalObservations") or {}
+    additional_rows = _additional_rows(model)
+    if not additional_rows:
+        lines.append(f"{_additional_status(additional.get('status'))} — {_additional_reason(additional.get('failureReason'))}")
+    else:
+        rows = [(
+            row.get("name") or row.get("id"),
+            _additional_status(row.get("status")),
+            row.get("membershipCount") if row.get("membershipCount") is not None else "확인 불가",
+            row.get("leaderCount") if row.get("leaderCount") is not None else 0,
             _compact_leaders(row),
-        ) for row in (model["v2Industries"] + model["v2Themes"])[:5]]
-        lines += _markdown_table(("그룹", "상태", "점수", "대표 주도주"), v2_rows or [("미수신", "수신 상태 확인 필요", "-", "-")])
+            f"{_compact_date(row.get('sourceDate'))} / {_compact_date(row.get('observationDate'))} / {_text(row.get('scope'), '확인 불가')} / {_additional_reason(row.get('failureReason'))}",
+        ) for row in additional_rows]
+        lines += _markdown_table(("대상", "상태", "구성종목", "주도주 수", "대표 주도주", "원천·기준일·범위·사유"), rows)
+    lines += _compact_v2_diagnostic_markdown(model)
     lines += ["", "### 네이버 리서치 분석"]
     research_items = (model.get("researchAnalysis") or {}).get("items") or []
     if research_items:
@@ -1386,6 +1482,13 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
                         issues.append(f"PART2_V2_LEADER_MISSING:{value}")
     if model["v2Verified"] is False and model["v2HoldReason"] not in markdown_text and model["v2HoldReason"] not in plain:
         issues.append("V2_HOLD_MISSING")
+    for row in _additional_rows(model):
+        name = row.get("name") or row.get("id")
+        if name and (str(name) not in part2_md or str(name) not in part2_html):
+            issues.append(f"PART2_ADDITIONAL_MISSING:{name}")
+        for value in (row.get("source"), row.get("sourceDate"), row.get("observationDate"), row.get("scope")):
+            if value not in (None, "") and (str(value) not in part2_md or str(value) not in part2_html):
+                issues.append(f"PART2_ADDITIONAL_LINEAGE_MISSING:{value}")
     return issues
 
 
@@ -1410,7 +1513,7 @@ def validate_rendered_files(markdown_path: Path, html_path: Path, model: Mapping
 def validate_renderer_models(markdown_report: Mapping[str, Any], html_report: Mapping[str, Any]) -> list[str]:
     left = _compact_model(markdown_report)
     right = _compact_model(html_report)
-    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "observationDateStatus", "status", "currentMarketObservation", "historicalTechnicalMarket", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v1Themes", "v2Industries", "v2Themes", "researchAnalysis", "interests", "kiwoom") if left.get(key) != right.get(key)]
+    return [key for key in ("asOf", "observedAt", "tradingDateStatus", "observationDateStatus", "status", "currentMarketObservation", "historicalTechnicalMarket", "fullMarket", "relativeIndustries", "relativeThemes", "v1Industries", "v1Themes", "v2Industries", "v2Themes", "additionalObservations", "researchAnalysis", "interests", "kiwoom") if left.get(key) != right.get(key)]
 
 
 def _compact_session_context_html(model: Mapping[str, Any]) -> str:
