@@ -46,6 +46,23 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
             WORKFLOW.index("if [ -f data/dynamic-universe/v2-shadow-run-status.json ]"),
         )
 
+    def test_current_observation_is_atomic_canonical_publish_set(self):
+        self.assertIn('echo "output_dir=$output_dir" >> "$GITHUB_OUTPUT"', WORKFLOW)
+        self.assertIn('observation_run_dir="${{ steps.observation_report.outputs.output_dir }}"', WORKFLOW)
+        self.assertIn('git add -- "$observation_run_dir"', WORKFLOW)
+        self.assertIn('expected_observation_files=', WORKFLOW)
+        self.assertIn('staged_observation_files=', WORKFLOW)
+        self.assertIn('git diff --cached --name-only | sort', WORKFLOW)
+        self.assertIn('git diff-tree --no-commit-id --name-only -r HEAD', WORKFLOW)
+        self.assertIn('CURRENT_OBSERVATION_LINEAGE_MISMATCH', WORKFLOW)
+        self.assertIn('current_observation_published=', WORKFLOW)
+
+    def test_current_observation_failure_preserves_prior_views_without_git_clean(self):
+        self.assertIn("preserve_failed_observation_output()", WORKFLOW)
+        self.assertIn("failed-current-observation-${GITHUB_RUN_ID}", WORKFLOW)
+        self.assertIn('preserve_failed_observation_output "$observation_run_dir"', WORKFLOW)
+        self.assertNotIn("git clean", WORKFLOW)
+
 
 if __name__ == "__main__":
     unittest.main()

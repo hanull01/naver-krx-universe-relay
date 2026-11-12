@@ -8,6 +8,7 @@ from pathlib import Path
 
 from test_market_dashboard_renderer import report_fixture
 from tools.render_current_observation import render_current_observation
+from tools.report_lineage import lineage_from_contract
 
 
 class CurrentObservationReportTests(unittest.TestCase):
@@ -58,6 +59,11 @@ class CurrentObservationReportTests(unittest.TestCase):
             self.assertEqual(manifest["tradingDate"], "20261030")
             self.assertEqual(manifest["tradingDateStatus"], "SOURCE_OBSERVED")
             self.assertEqual(manifest["observationDateStatus"], "VERIFIED")
+            expected_lineage = lineage_from_contract(contract)
+            self.assertEqual(manifest["contractId"], expected_lineage["contractId"])
+            self.assertEqual(manifest["reportLineage"], expected_lineage)
+            self.assertIn(expected_lineage["contractId"], (root / "current-observation" / "123" / "report.md").read_text(encoding="utf-8"))
+            self.assertIn(expected_lineage["contractId"], (root / "current-observation" / "123" / "report.html").read_text(encoding="utf-8"))
             self.assertNotIn("finalPending", manifest)
             self.assertNotIn("baselineStale", manifest)
             self.assertNotIn("contractHtmlAllowed", manifest)
@@ -121,6 +127,9 @@ class CurrentObservationReportTests(unittest.TestCase):
                 self.assertEqual(manifest["tradingDate"], "20261030")
                 self.assertEqual(manifest["tradingDateStatus"], "SOURCE_OBSERVED")
                 self.assertEqual(manifest["observationDateStatus"], "VERIFIED")
+                expected_lineage = lineage_from_contract(contract)
+                self.assertEqual(manifest["contractId"], expected_lineage["contractId"])
+                self.assertEqual(manifest["reportLineage"], expected_lineage)
                 self.assertEqual(manifest["markdownSha256"], hashlib.sha256((output_dir / "report.md").read_bytes()).hexdigest())
                 self.assertEqual(manifest["htmlSha256"], hashlib.sha256((output_dir / "report.html").read_bytes()).hexdigest())
 
