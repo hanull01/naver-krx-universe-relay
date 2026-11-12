@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Mapping
+from datetime import date, datetime
 from typing import Any
 
 
@@ -39,9 +41,6 @@ def lineage_from_contract(contract: Mapping[str, Any]) -> dict[str, Any]:
     historical = historical if isinstance(historical, Mapping) else {}
     return {
         "schemaVersion": "report-lineage-v1",
-        # A current-observation view may change only its display as-of date
-        # while retaining the source contract identity.  Published contracts
-        # are validated separately, so preserve that identity when present.
         "contractId": contract.get("contractId") or contract_id(contract),
         "asOf": contract.get("asOf"),
         "generatedAt": contract.get("observedAt"),
@@ -70,33 +69,45 @@ def lineage_marker(contract: Mapping[str, Any]) -> str:
     return f"<!-- report-lineage: {value} -->"
 
 
-def validate_rendered_as_of(
-    manifest: Mapping[str, Any],
-    rendered: Mapping[str, Any],
-    contract: Mapping[str, Any],
-) -> str:
-    """Validate the canonical report date across manifest, renderer, and contract."""
+def normalize_report_as_of(value: Any) -> str:
+    """Normalize supported report dates to the canonical YYYYMMDD form."""
+    if value is None:
+        raise ValueError("REPORT_ASOF_MISSING")
+    text = str(value).strip()
+    try:
+        if re.fullmatch(r"\d{8}", text):
+            return date.fromisoformat(f"{text[:4]}-{text[4:6]}-{text[6:]}").strftime("%Y%m%d")
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+            return date.fromisoformat(text).strftime("%Y%m%d")
+        iso_text = text[:-1] + "+00:00" if text.endswith("Z") else text
+        return datetime.fromisoformat(iso_text).date().strftime("%Y%m%d")
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("REPORT_ASOF_INVALID") from exc
 
+
+def validate_rendered_as_of(manifest: Mapping[str, Any], rendered: Mapping[str, Any], contract: Mapping[str, Any]) -> str:
+    """Validate the canonical report date across manifest, renderer, and contract."""
     manifest_lineage = manifest.get("reportLineage")
     if not isinstance(manifest_lineage, Mapping):
         raise ValueError("REPORT_MANIFEST_LINEAGE_MISSING")
-    manifest_as_of = manifest_lineage.get("asOf")
-    if not manifest_as_of:
-        raise ValueError("REPORT_MANIFEST_LINEAGE_ASOF_MISSING")
-
-    contract_as_of = contract.get("asOf")
-    if not contract_as_of:
-        raise ValueError("REPORT_CONTRACT_ASOF_MISSING")
-    if manifest_as_of != contract_as_of:
+    manifest_raw_as_of = manifest_lineage.get("asOf")
+    contract_raw_as_of = contract.get("asOf")
+    canonical_raw_as_of = contract_raw_as_of or manifest_raw_as_of
+    if canonical_raw_as_of is None:
+        raise ValueError("REPORT_ASOF_MISSING")
+    canonical_as_of = normalize_report_as_of(canonical_raw_as_of)
+    if manifest_raw_as_of is not None and normalize_report_as_of(manifest_raw_as_of) != canonical_as_of:
         raise ValueError("REPORT_AS_OF_MISMATCH")
-
+    if contract_raw_as_of is not None and normalize_report_as_of(contract_raw_as_of) != canonical_as_of:
+        raise ValueError("REPORT_AS_OF_MISMATCH")
     rendered_lineage = rendered.get("lineage")
     if not isinstance(rendered_lineage, Mapping):
         raise ValueError("REPORT_RENDERED_LINEAGE_MISSING")
-    if rendered_lineage.get("asOf") != manifest_as_of:
+    if rendered_lineage.get("asOf") is None:
+        raise ValueError("REPORT_RENDERED_LINEAGE_ASOF_MISSING")
+    if normalize_report_as_of(rendered_lineage.get("asOf")) != canonical_as_of:
         raise ValueError("REPORT_RENDERED_LINEAGE_ASOF_MISMATCH")
-
     rendered_as_of = rendered.get("asOf")
-    if rendered_as_of is not None and rendered_as_of != manifest_as_of:
+    if rendered_as_of is not None and normalize_report_as_of(rendered_as_of) != canonical_as_of:
         raise ValueError("REPORT_RENDER_RESULT_ASOF_MISMATCH")
-    return str(manifest_as_of)
+    return canonical_as_of
