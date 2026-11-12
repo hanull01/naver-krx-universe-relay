@@ -955,6 +955,20 @@ def full_market_from_derived_projection(projection, target_date):
     }
 
 
+def _usable_v2_shadow_inputs(shadow_latest, shadow_history, shadow_status):
+    """Return only a V2 result proven current by its run status artifact."""
+    if not isinstance(shadow_status, Mapping) or shadow_status.get("status") != "OK":
+        return {}, {}
+    shadow_date = shadow_status.get("tradingDate")
+    latest_date = shadow_latest.get("tradingDate") if isinstance(shadow_latest, Mapping) else None
+    if shadow_date and latest_date and str(shadow_date) != str(latest_date):
+        return {}, {}
+    return (
+        shadow_latest if isinstance(shadow_latest, Mapping) else {},
+        shadow_history if isinstance(shadow_history, Mapping) else {},
+    )
+
+
 def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shadow_status):
     """Build a report-only comparison; never changes V1 or watchlist data."""
     v1_sectors = dynamic_universe.get("sectors") or []
@@ -1753,6 +1767,12 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     shadow_latest = optional_json(V2_SHADOW_LATEST_PATH, {})
     shadow_history = optional_json(V2_SHADOW_HISTORY_PATH, {})
     shadow_status = optional_json(V2_SHADOW_STATUS_PATH, {})
+    # A failed shadow run must not make the previous V2 latest/history look
+    # current.  V1 reporting continues independently with an explicit V2
+    # unavailable state.
+    shadow_latest, shadow_history = _usable_v2_shadow_inputs(
+        shadow_latest, shadow_history, shadow_status
+    )
     published_summary = optional_json(MONITORING_PATH / "latest-summary.json", {})
     published_breadth = optional_json(MONITORING_PATH / "latest-breadth.json", {})
     published_quality = optional_json(MONITORING_PATH / "latest-quality.json", {})

@@ -8,6 +8,7 @@ depend on its exit status.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -86,21 +87,41 @@ def _enrich_persistence(payload: Dict[str, Any], kind: str,
 
 def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
     status_path = root / "data/dynamic-universe/v2-shadow-run-status.json"
+    latest_path = root / "data/dynamic-universe/v2-shadow-latest.json"
+    generated_at = datetime.now(timezone.utc).isoformat()
+    run_id = os.environ.get("GITHUB_RUN_ID") or f"local-v2-shadow-{generated_at.replace(':', '').replace('-', '')}"
+    quality: Dict[str, Any] = {}
+    generation_id = None
     try:
         ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
         theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
         v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
+        try:
+            loaded_quality = json.loads(
+                (root / "data/monitoring/latest-quality.json").read_text(encoding="utf-8")
+            )
+            if isinstance(loaded_quality, dict):
+                quality = loaded_quality
+        except (OSError, json.JSONDecodeError):
+            quality = {}
         trading_date = trading_date or _infer_trading_date(ind, theme)
         history_context = _history_context(root, trading_date)
         ind = _enrich_persistence(ind, "industries", history_context)
         theme = _enrich_persistence(theme, "themes", history_context)
         result = evaluate_snapshot(ind, theme, v1)
-        source_commit = quality.get("sourceCommit") or ind.get("sourceCommit")
         industry_quality = ind.get("quality") if isinstance(ind.get("quality"), dict) else {}
+        source_commit = quality.get("sourceCommit") or ind.get("sourceCommit")
         source_quality = (quality.get("sourceQualityStatus")
                           or quality.get("collectionQualityStatus")
                           or ind.get("sourceQualityStatus")
                           or industry_quality.get("sourceStatus"))
+        generation_id = (
+            quality.get("historicalGenerationId")
+            or quality.get("sourceGeneration")
+            or quality.get("generationId")
+            or ind.get("historicalGenerationId")
+            or ind.get("generationId")
+        )
         if source_quality == "OK" and ind.get("tradingDateEvidence", {}).get("evidenceClass") == "INTRADAY_SESSION":
             source_quality = "INTRADAY_OBSERVED"
         result["inputEvidence"] = {
@@ -108,22 +129,26 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
             "sourceQualityStatus": source_quality or "UNAVAILABLE",
             "sourceCommit": source_commit,
             "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
+            "generationId": generation_id,
         }
         result["inputEvidence"]["sourceProvenance"] = build_source_provenance(root, result=result)
         result["summary"] = summarize(result)
-        (root / "data/dynamic-universe/v2-shadow-latest.json").write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n")
         # The history is written only after the complete V2 result exists.
         history = record_current(root, trading_date,
                                  result["inputEvidence"]["sourceProvenance"])
-        outcome = {"status": "OK", "observedAt": observed_at or datetime.now(timezone.utc).isoformat(),
+        latest_path.parent.mkdir(parents=True, exist_ok=True)
+        latest_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        outcome = {"runId": run_id, "status": "OK", "observedAt": observed_at or generated_at,
+                   "generatedAt": generated_at,
                    "tradingDate": trading_date, "summary": result["summary"],
                    "inputEvidence": result["inputEvidence"],
                    "observationCount": len(history["observations"])}
     except Exception as exc:  # V2 isolation boundary; V1 is not called here.
-        outcome = {"status": "FAILED", "observedAt": observed_at or datetime.now(timezone.utc).isoformat(),
+        outcome = {"runId": run_id, "status": "FAILED", "observedAt": observed_at or generated_at,
+                   "generatedAt": generated_at,
                    "tradingDate": trading_date, "errorType": type(exc).__name__,
-                   "error": str(exc)[:240]}
+                   "error": str(exc)[:240], "generationId": generation_id}
+    status_path.parent.mkdir(parents=True, exist_ok=True)
     status_path.write_text(json.dumps(outcome, ensure_ascii=False, indent=2) + "\n")
     return outcome
 
