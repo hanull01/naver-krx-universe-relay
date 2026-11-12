@@ -104,23 +104,61 @@ def normalize_run_status(
     actual_generation = normalized.get("generationId")
     effective_status = raw_status
     reason = normalized.get("failureReason") or normalized.get("error")
-    if raw_status == "OK":
+    if raw_status in {"OK", "SUCCESS"}:
         if not actual_generation:
             effective_status = "GENERATION_UNAVAILABLE"
             reason = "V2_GENERATION_ID_MISSING"
         elif expected_generation_id and str(actual_generation) != str(expected_generation_id):
             effective_status = "GENERATION_MISMATCH"
             reason = "V2_GENERATION_ID_MISMATCH"
+        else:
+            effective_status = "SUCCESS"
     normalized["runId"] = normalized.get("runId") or run_id
     normalized["generatedAt"] = normalized.get("generatedAt") or generated_at
     normalized["rawStatus"] = raw_status
     normalized["producerStatus"] = raw_status
+    normalized["runStatus"] = raw_status
     normalized["status"] = effective_status
     normalized["expectedGenerationId"] = expected_generation_id
-    normalized["consumptionStatus"] = "CONSUMED" if effective_status == "OK" else "NOT_CONSUMED"
+    normalized["consumptionStatus"] = "CONSUMED" if effective_status == "SUCCESS" else "NOT_CONSUMED"
     normalized["publicationPolicy"] = "PARTIAL_NON_BLOCKING"
-    normalized["failureReason"] = None if effective_status == "OK" else reason or "V2_SHADOW_FAILED"
+    normalized["failureReason"] = None if effective_status == "SUCCESS" else reason or "V2_SHADOW_FAILED"
+    normalized.setdefault("artifactPath", "data/dynamic-universe/v2-shadow-latest.json")
+    evidence = normalized.get("generationEvidence")
+    if not isinstance(evidence, Mapping):
+        evidence = {}
+    normalized["generationEvidence"] = {
+        "inputPath": evidence.get("inputPath"),
+        "manifestPath": evidence.get("manifestPath"),
+        "manifestPresent": evidence.get("manifestPresent"),
+        "generationField": evidence.get("generationField"),
+        "generationFieldPresent": evidence.get("generationFieldPresent", bool(actual_generation)),
+        "expectedComparable": bool(actual_generation and expected_generation_id),
+    }
     return normalized
+
+
+def _generation_evidence(root: Path, quality: Mapping[str, Any], industry_payload: Mapping[str, Any]) -> Dict[str, Any]:
+    """Record where generation was sought; never invent a generation value."""
+    quality_path = root / "data/monitoring/latest-quality.json"
+    manifest_candidates = (
+        root / "data/monitoring/manifest.json",
+        root / "data/monitoring/latest-quality.json",
+    )
+    field_names = (
+        "historicalGenerationId", "sourceGeneration", "generationId",
+    )
+    field = next((name for name in field_names if quality.get(name) not in (None, "")), None)
+    if field is None:
+        field = next((name for name in field_names if industry_payload.get(name) not in (None, "")), None)
+    manifest_path = next((path for path in manifest_candidates if path.exists()), manifest_candidates[0])
+    return {
+        "inputPath": str(quality_path),
+        "manifestPath": str(manifest_path),
+        "manifestPresent": manifest_path.exists(),
+        "generationField": field,
+        "generationFieldPresent": field is not None,
+    }
 
 
 def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
@@ -129,6 +167,13 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
     generated_at = datetime.now(timezone.utc).isoformat()
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-v2-shadow-{generated_at.replace(':', '').replace('-', '')}"
     quality: Dict[str, Any] = {}
+    generation_evidence: Dict[str, Any] = {
+        "inputPath": str(root / "data/monitoring/latest-quality.json"),
+        "manifestPath": str(root / "data/monitoring/manifest.json"),
+        "manifestPresent": False,
+        "generationField": None,
+        "generationFieldPresent": False,
+    }
     generation_id = None
     prior_latest = latest_path.read_bytes() if latest_path.exists() else None
     history_path = root / "data/dynamic-universe/v2-shadow-history.json"
@@ -145,6 +190,7 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
                 quality = loaded_quality
         except (OSError, json.JSONDecodeError):
             quality = {}
+        generation_evidence = _generation_evidence(root, quality, ind)
         trading_date = trading_date or _infer_trading_date(ind, theme)
         history_context = _history_context(root, trading_date)
         ind = _enrich_persistence(ind, "industries", history_context)
@@ -179,10 +225,13 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
         # The history is written only after the complete V2 result exists.
         history = record_current(root, trading_date,
                                  result["inputEvidence"]["sourceProvenance"])
-        outcome = {"runId": run_id, "status": "OK", "observedAt": observed_at or generated_at,
+        outcome = {"runId": run_id, "status": "SUCCESS", "observedAt": observed_at or generated_at,
                    "generatedAt": generated_at,
-                   "tradingDate": trading_date, "summary": result["summary"],
+                   "tradingDate": trading_date, "generationId": generation_id,
+                   "summary": result["summary"],
                    "inputEvidence": result["inputEvidence"],
+                   "generationEvidence": generation_evidence,
+                   "artifactPath": str(latest_path),
                    "observationCount": len(history["observations"])}
     except Exception as exc:  # V2 isolation boundary; V1 is not called here.
         if prior_latest is None:
@@ -199,7 +248,16 @@ def run_once(root: Path, trading_date: str | None, observed_at: str | None = Non
                    "generatedAt": generated_at,
                    "tradingDate": trading_date, "errorType": type(exc).__name__,
                    "error": str(exc)[:240], "generationId": generation_id,
+                   "generationEvidence": generation_evidence,
+                   "artifactPath": str(latest_path),
                    "failureReason": f"V2_SHADOW_{type(exc).__name__.upper()}"}
+    outcome = normalize_run_status(
+        outcome,
+        expected_generation_id=os.environ.get("EXPECTED_GENERATION_ID") or None,
+        run_id=run_id,
+        runner_exit_code=0 if outcome.get("status") in {"OK", "SUCCESS"} else 1,
+        generated_at=generated_at,
+    )
     status_path.parent.mkdir(parents=True, exist_ok=True)
     status_path.write_text(json.dumps(outcome, ensure_ascii=False, indent=2) + "\n")
     return outcome

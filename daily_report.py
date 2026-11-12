@@ -151,6 +151,17 @@ GROUP_STATES_PATH = DATA / "group-states.json"
 RESEARCH_PATH = DATA / "research" / "intelligence" / "latest.json"
 RESEARCH_MANIFEST_PATH = DATA / "research" / "manifest.json"
 RESEARCH_SLOTS_PATH = DATA / "research" / "intelligence" / "slots"
+RESEARCH_SLOT_REPORT_MAP = {
+    "07:20": "08:30",
+    "12:20": "12:30",
+    "19:20": "19:30",
+}
+RESEARCH_REPORT_SLOT_MAP = {
+    "08:30": "07:20",
+    "12:30": "12:20",
+    "13:30": "12:20",
+    "19:30": "19:20",
+}
 MONITORING_PATH = DATA / "monitoring"
 TRADING_DISCOVERY_PATH = DATA / "trading-discovery" / "latest.json"
 TRADING_DISCOVERY_QUOTES_PATH = DATA / "trading-discovery" / "quotes" / "latest.json"
@@ -180,24 +191,51 @@ def compact_date(value):
     return text
 
 
-def _unavailable_research(reason, *, report_date=None, research_slot=None, artifact_path=None):
+def research_slot_for_report(report_slot=None, research_slot=None):
+    """Resolve the exact producer slot without consulting a generic latest file."""
+    slot = str(research_slot or "").strip()
+    if slot in RESEARCH_SLOT_REPORT_MAP:
+        return slot
+    report = str(report_slot or os.environ.get("REPORT_SLOT") or "").strip()
+    return RESEARCH_REPORT_SLOT_MAP.get(report)
+
+
+def _research_expected_at(report_date, slot):
+    compact = compact_date(report_date)
+    if not compact or slot not in RESEARCH_SLOT_REPORT_MAP:
+        return None
+    return f"{compact[:4]}-{compact[4:6]}-{compact[6:]}T{slot}:00+09:00"
+
+
+def _unavailable_research(reason, *, report_date=None, research_slot=None, artifact_path=None,
+                           status=None, lineage=None):
     """Return an explicit missing-input result without consulting ``latest``."""
     report_slot = str(os.environ.get("REPORT_SLOT") or "").strip() or None
+    supplied_lineage = dict(lineage) if isinstance(lineage, Mapping) else {}
+    compact_report = compact_date(report_date)
     lineage = {
         "researchSlot": research_slot,
-        "reportSlot": report_slot,
-        "expectedAt": None,
+        "reportSlot": supplied_lineage.get("reportSlot") or report_slot or RESEARCH_SLOT_REPORT_MAP.get(research_slot),
+        "recheckReportSlot": supplied_lineage.get("recheckReportSlot") or ("13:30" if research_slot == "12:20" else None),
+        "expectedAt": supplied_lineage.get("expectedAt") or _research_expected_at(report_date, research_slot),
         "artifactPath": artifact_path,
-        "producerStatus": None,
-        "artifactStatus": "MISSING" if reason.endswith("MISSING") else None,
-        "freshnessStatus": None,
+        "producerStatus": supplied_lineage.get("producerStatus"),
+        "artifactStatus": supplied_lineage.get("artifactStatus") or ("MISSING" if reason.endswith("MISSING") else None),
+        "freshnessStatus": supplied_lineage.get("freshnessStatus"),
         "failureReason": reason,
         "consumedByReport": False,
-        "checkedAt": None,
+        "checkedAt": supplied_lineage.get("checkedAt"),
+        "generatedAt": supplied_lineage.get("generatedAt"),
+        "producerRunId": supplied_lineage.get("producerRunId"),
+        "sourceDate": supplied_lineage.get("sourceDate") or compact_report,
+        "nextCheckAt": supplied_lineage.get("nextCheckAt") or (
+            f"{compact_report[:4]}-{compact_report[4:6]}-{compact_report[6:]}T13:30:00+09:00"
+            if research_slot == "12:20" and compact_report else _research_expected_at(report_date, research_slot)
+        ),
     }
     lineage = {key: value for key, value in lineage.items() if value not in (None, "")}
     return {
-        "status": "UNAVAILABLE", "asOf": None, "stocks": [],
+        "status": status or "ARTIFACT_MISSING", "asOf": None, "stocks": [],
         "unavailableReason": reason, "slotLineage": lineage,
     }
 
@@ -205,54 +243,97 @@ def _unavailable_research(reason, *, report_date=None, research_slot=None, artif
 def validated_research_for_report(payload, report_date, expected_generation=None):
     """Use research only when its date and source generation are explicit."""
     if not isinstance(payload, dict):
-        return _unavailable_research("RESEARCH_SOURCE_MISSING")
+        return _unavailable_research("RESEARCH_SOURCE_MISSING", status="ARTIFACT_MISSING")
     if compact_date(payload.get("asOf")) != compact_date(report_date):
-        return _unavailable_research("RESEARCH_DATE_MISMATCH")
+        return _unavailable_research("RESEARCH_DATE_MISMATCH", status="ARTIFACT_INVALID")
     source_generation = payload.get("sourceGeneration") or payload.get("generationId")
     if not source_generation:
-        return _unavailable_research("RESEARCH_GENERATION_MISSING")
+        return _unavailable_research("RESEARCH_GENERATION_MISSING", status="ARTIFACT_INVALID")
     if expected_generation and str(source_generation) != str(expected_generation):
-        return _unavailable_research("RESEARCH_GENERATION_MISMATCH")
+        return _unavailable_research("RESEARCH_GENERATION_MISMATCH", status="ARTIFACT_INVALID")
     return payload
 
 
 def load_research_slot_for_report(report_date, expected_generation=None):
     """Load only the research slot explicitly assigned to this report."""
-    slot = str(os.environ.get("REPORT_RESEARCH_SLOT") or "").strip()
+    slot = research_slot_for_report(
+        report_slot=os.environ.get("REPORT_SLOT"),
+        research_slot=os.environ.get("REPORT_RESEARCH_SLOT"),
+    )
     if slot not in {"07:20", "12:20", "19:20"}:
-        return _unavailable_research("RESEARCH_SLOT_REQUIRED", report_date=report_date)
+        return _unavailable_research("RESEARCH_SLOT_REQUIRED", report_date=report_date, status="ARTIFACT_MISSING")
     compact = compact_date(report_date)
     if not compact:
-        return _unavailable_research("RESEARCH_SLOT_DATE_UNAVAILABLE", report_date=report_date, research_slot=slot)
+        return _unavailable_research("RESEARCH_SLOT_DATE_UNAVAILABLE", report_date=report_date, research_slot=slot, status="ARTIFACT_INVALID")
     path = RESEARCH_SLOTS_PATH / f"{compact}-{slot.replace(':', '')}.json"
+    manifest_lineage = {}
+    try:
+        manifest = load_json(RESEARCH_MANIFEST_PATH)
+        rows = (manifest.get("slotLineage") or []) if isinstance(manifest, Mapping) else []
+        manifest_lineage = next((dict(row) for row in rows if isinstance(row, Mapping)
+                                 and row.get("researchSlot") == slot
+                                 and compact_date(row.get("sourceDate")) == compact), {})
+    except (OSError, ValueError, json.JSONDecodeError):
+        manifest_lineage = {}
+    expected_at = _research_expected_at(report_date, slot)
+    now = datetime.now(KST)
+    try:
+        expected_dt = datetime.fromisoformat(expected_at) if expected_at else None
+        not_due = expected_dt is not None and now < expected_dt
+    except ValueError:
+        not_due = False
+    if not_due and not path.exists():
+        return _unavailable_research("RESEARCH_SLOT_NOT_DUE", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="NOT_DUE", lineage=manifest_lineage)
+    if not path.exists():
+        missing_status = "DELAYED" if str(manifest_lineage.get("artifactStatus") or "").upper() in {"PENDING", "DELAYED"} else "ARTIFACT_MISSING"
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_MISSING", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status=missing_status, lineage=manifest_lineage)
     try:
         payload = load_json(path)
     except (OSError, ValueError, json.JSONDecodeError):
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_MISSING", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_INVALID", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=manifest_lineage)
     if not isinstance(payload, dict):
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_INVALID", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=manifest_lineage)
     if compact_date(payload.get("asOf")) != compact:
-        return _unavailable_research("RESEARCH_SLOT_DATE_MISMATCH", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_DATE_MISMATCH", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=payload.get("slotLineage"))
     lineage = payload.get("slotLineage")
     if not isinstance(lineage, dict) or lineage.get("researchSlot") != slot:
-        return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_LINEAGE_MISSING", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=manifest_lineage)
     if lineage.get("producerStatus") == "FAILED":
-        return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_PRODUCER_FAILED", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="PRODUCER_FAILED", lineage=lineage)
     if lineage.get("artifactStatus") == "FAILED":
-        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=lineage)
     if lineage.get("freshnessStatus") not in {"FRESH", "AVAILABLE", "OK"}:
-        return _unavailable_research("RESEARCH_SLOT_NOT_FRESH", report_date=report_date, research_slot=slot, artifact_path=str(path))
+        return _unavailable_research("RESEARCH_SLOT_NOT_FRESH", report_date=report_date, research_slot=slot,
+                                     artifact_path=str(path), status="ARTIFACT_INVALID", lineage=lineage)
     payload = dict(payload)
     payload["slotLineage"] = {
         **lineage,
         "researchSlot": slot,
-        "reportSlot": str(os.environ.get("REPORT_SLOT") or "").strip() or None,
+        "reportSlot": str(os.environ.get("REPORT_SLOT") or "").strip() or RESEARCH_SLOT_REPORT_MAP.get(slot),
         "artifactPath": lineage.get("artifactPath") or str(path),
         "consumedByReport": True,
+        "checkedAt": lineage.get("checkedAt") or datetime.now(KST).isoformat(),
     }
     validated = validated_research_for_report(payload, report_date, expected_generation)
-    if validated.get("status") == "UNAVAILABLE":
+    if validated.get("status") in {
+        "ARTIFACT_MISSING", "ARTIFACT_INVALID", "PRODUCER_FAILED", "DELAYED", "NOT_DUE",
+    }:
         return validated
+    if str(validated.get("status") or "").upper() in {"FAILED", "ERROR"}:
+        return _unavailable_research(
+            "RESEARCH_SLOT_ARTIFACT_FAILED", report_date=report_date, research_slot=slot,
+            artifact_path=str(path), status="ARTIFACT_INVALID", lineage=lineage,
+        )
+    validated = dict(validated)
+    validated["status"] = "CONSUMED"
     return validated
 
 
@@ -960,7 +1041,7 @@ def full_market_from_derived_projection(projection, target_date):
 
 def _usable_v2_shadow_inputs(shadow_latest, shadow_history, shadow_status):
     """Return only a V2 result proven current by its run status artifact."""
-    if not isinstance(shadow_status, Mapping) or shadow_status.get("status") != "OK":
+    if not isinstance(shadow_status, Mapping) or shadow_status.get("status") not in {"SUCCESS", "OK"}:
         return {}, {}
     shadow_date = shadow_status.get("tradingDate")
     latest_date = shadow_latest.get("tradingDate") if isinstance(shadow_latest, Mapping) else None
@@ -1028,7 +1109,7 @@ def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shado
             "experimental": True,
             "status": shadow_status.get("status", "UNAVAILABLE"),
             "producerStatus": shadow_status.get("producerStatus") or shadow_status.get("rawStatus") or shadow_status.get("status", "UNAVAILABLE"),
-            "consumptionStatus": "CONSUMED" if shadow_status.get("status") == "OK" else "NOT_CONSUMED",
+            "consumptionStatus": "CONSUMED" if shadow_status.get("status") in {"SUCCESS", "OK"} else "NOT_CONSUMED",
             "publicationPolicy": "PARTIAL_NON_BLOCKING",
             "runId": shadow_status.get("runId"),
             "generatedAt": shadow_status.get("generatedAt") or shadow_latest.get("generatedAt"),
@@ -1036,6 +1117,9 @@ def shadow_v1_v2_analysis(dynamic_universe, shadow_latest, shadow_history, shado
             "expectedGenerationId": shadow_status.get("expectedGenerationId"),
             "errorType": shadow_status.get("errorType"),
             "failureReason": shadow_status.get("failureReason") or shadow_status.get("error"),
+            "runStatus": shadow_status.get("runStatus") or shadow_status.get("rawStatus") or shadow_status.get("status"),
+            "artifactPath": shadow_status.get("artifactPath") or "data/dynamic-universe/v2-shadow-latest.json",
+            "generationEvidence": shadow_status.get("generationEvidence") or {},
             "industries": {"total": len(v2_industries), "statusCounts": distribution(v2_industries, "v2Status"), "rows": rows(v2_industries)},
             "themes": {"total": len(v2_themes), "statusCounts": distribution(v2_themes, "v2Status"), "rows": rows(v2_themes)},
             "history": {"recordCount": len(observations), "uniqueTradingDates": unique_dates, "status": shadow_status.get("status", "UNAVAILABLE")},
