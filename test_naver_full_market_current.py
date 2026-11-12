@@ -177,6 +177,17 @@ class FullMarketCurrentTests(unittest.TestCase):
             self.assertEqual(
                 json.loads(output.read_text(encoding="utf-8"))["expectedCount"], 4
             )
+            self.assertEqual(
+                json.loads(output.read_text(encoding="utf-8"))["universeDelta"],
+                {
+                    "added": ["999999"],
+                    "removed": ["123456"],
+                    "marketChanged": [],
+                    "nameChanged": [],
+                    "verificationStatus": "PENDING_EXTERNAL_VERIFICATION",
+                    "source": "NAVER_STOCKLIST_CURRENT",
+                },
+            )
             self.assertFalse(diagnostic.exists())
 
     def test_previous_100_current_101_preserves_delta_and_uses_current_scope(self):
