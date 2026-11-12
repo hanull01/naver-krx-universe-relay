@@ -28,6 +28,24 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         self.assertIn("expected_generation_id", block)
         self.assertIn('consumptionStatus', block)
 
+    def test_v2_publish_is_atomic_and_failure_preserves_prior_results(self):
+        self.assertIn("restore_generated_path data/dynamic-universe/v2-shadow-latest.json", WORKFLOW)
+        self.assertIn("restore_generated_path data/dynamic-universe/v2-shadow-history.json", WORKFLOW)
+        self.assertIn("v2_paths=", WORKFLOW)
+        self.assertIn('git diff --name-only -- "$path"', WORKFLOW)
+        self.assertIn('git diff-tree --no-commit-id --name-only -r HEAD', WORKFLOW)
+        self.assertIn("expected-publish-files.txt", WORKFLOW)
+        self.assertIn("actual-commit-files.txt", WORKFLOW)
+        success_block = WORKFLOW.split('if [ "$v2_status" = "OK" ]; then', 1)[1].split("else", 1)[0]
+        self.assertIn("v2-shadow-latest.json", success_block)
+        self.assertIn("v2-shadow-history.json", success_block)
+
+    def test_v2_restore_function_precedes_publish_decision(self):
+        self.assertLess(
+            WORKFLOW.index("restore_generated_path()"),
+            WORKFLOW.index("if [ -f data/dynamic-universe/v2-shadow-run-status.json ]"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
