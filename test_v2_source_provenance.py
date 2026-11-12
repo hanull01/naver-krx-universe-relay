@@ -14,6 +14,8 @@ def write_json(root: Path, relative: str, payload: dict) -> None:
 
 class V2SourceProvenanceTests(unittest.TestCase):
     def base_files(self, root: Path, *, generation="2026-10-29T05:00:00+00:00", date="20261029"):
+        write_json(root, "data/monitoring/latest-breadth.json",
+                   {"generatedAt": generation, "observationDate": date, "fullMarket": {}})
         write_json(root, "data/monitoring/latest-industries.json",
                    {"generatedAt": generation, "tradingDate": date, "industries": []})
         write_json(root, "data/monitoring/latest-theme-signals.json",
@@ -65,6 +67,30 @@ class V2SourceProvenanceTests(unittest.TestCase):
             self.assertEqual(len(provenance["resultSha256"]), 64)
             self.assertEqual(len(provenance["historySha256"]), 64)
             self.assertNotEqual(provenance["resultSha256"], provenance["inputSnapshotSha256"])
+
+    def test_naver_lineage_is_carried_without_krx_generation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = self.base_files(root, generation="2026-11-13T00:00:00+00:00", date="20261113")
+            result.update({
+                "generatedAt": "2026-11-13T00:00:00+00:00",
+                "observationDate": "20261113",
+                "v2Lineage": {
+                    "v2ObservationId": "v2obs-test",
+                    "source": "NAVER_CURRENT_SNAPSHOT",
+                    "sourceDate": "20261113",
+                    "observationDate": "20261113",
+                    "sourceHash": "b" * 64,
+                    "selectionPolicyVersion": "v2-current-observation-20261113",
+                    "producerStatus": "SUCCESS",
+                    "consumptionStatus": "CONSUMED",
+                },
+            })
+            provenance = build_source_provenance(root, result=result)
+            self.assertEqual(provenance["lineage"]["source"], "NAVER_CURRENT_SNAPSHOT")
+            self.assertEqual(provenance["lineage"]["v2ObservationId"], "v2obs-test")
+            self.assertIsNone(provenance["calculationGeneration"])
+            self.assertEqual(provenance["files"][0]["kind"], "breadth")
 
 
 if __name__ == "__main__":

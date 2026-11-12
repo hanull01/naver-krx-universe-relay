@@ -1884,20 +1884,20 @@ def build_report_contract(
         }
     )
     v2_status = dict(v2_status) if isinstance(v2_status, Mapping) else {}
-    v2_effective_status = v2_status.get("status") or ("SUCCESS" if v2_latest else "GENERATION_UNAVAILABLE")
+    v2_lineage = v2_status.get("v2Lineage") if isinstance(v2_status.get("v2Lineage"), Mapping) else None
+    v2_lineage = dict(v2_lineage or (v2_latest.get("v2Lineage") if isinstance(v2_latest.get("v2Lineage"), Mapping) else {}))
+    v2_effective_status = v2_status.get("status") or ("SUCCESS" if v2_latest and v2_lineage else "INPUT_UNAVAILABLE")
     v2_producer_status = v2_status.get("producerStatus") or v2_status.get("rawStatus") or v2_effective_status
     v2_failure_reason = (
         v2_status.get("failureReason")
         or v2_status.get("error")
         or ("V2_STATUS_NOT_SUPPLIED" if not v2_status and not v2_latest else None)
     )
-    v2_consumption_status = "CONSUMED" if v2_effective_status in {"SUCCESS", "OK"} else "NOT_CONSUMED"
+    v2_consumption_status = v2_status.get("consumptionStatus") or v2_lineage.get("consumptionStatus") or (
+        "CONSUMED" if v2_effective_status in {"SUCCESS", "OK"} else "NOT_CONSUMED"
+    )
     v2_input_evidence = v2_latest.get("inputEvidence")
     v2_input_evidence = v2_input_evidence if isinstance(v2_input_evidence, Mapping) else {}
-    v2_generation_id = (
-        v2_status.get("generationId")
-        or v2_input_evidence.get("generationId")
-    )
     v2_status_summary = {
         "status": v2_effective_status,
         "producerStatus": v2_producer_status,
@@ -1906,13 +1906,20 @@ def build_report_contract(
         "runId": v2_status.get("runId"),
         "generatedAt": v2_status.get("generatedAt") or v2_latest.get("generatedAt"),
         "tradingDate": v2_status.get("tradingDate") or v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate"),
-        "generationId": v2_generation_id,
-        "expectedGenerationId": v2_status.get("expectedGenerationId"),
+        "v2ObservationId": v2_lineage.get("v2ObservationId"),
+        "source": v2_lineage.get("source") or "NAVER_CURRENT_SNAPSHOT",
+        "sourceDate": v2_lineage.get("sourceDate"),
+        "observationDate": v2_lineage.get("observationDate"),
+        "sourceHash": v2_lineage.get("sourceHash"),
+        "producerRunId": v2_lineage.get("producerRunId") or v2_status.get("runId"),
+        "inputArtifactPath": v2_lineage.get("inputArtifactPath"),
+        "inputArtifactSha256": v2_lineage.get("inputArtifactSha256"),
+        "selectionPolicyVersion": v2_lineage.get("selectionPolicyVersion"),
         "errorType": v2_status.get("errorType"),
         "failureReason": v2_failure_reason,
         "runStatus": v2_status.get("runStatus") or v2_status.get("rawStatus") or v2_producer_status,
         "artifactPath": v2_status.get("artifactPath") or "data/dynamic-universe/v2-shadow-latest.json",
-        "generationEvidence": v2_status.get("generationEvidence") or {},
+        "v2Lineage": v2_lineage,
     }
 
     def selected(rows: Any, kind: str) -> list[dict[str, Any]]:

@@ -1,12 +1,11 @@
-"""Opt-in one-shot V2 runner.
+"""Run the opt-in V2 observation from the NAVER current snapshot.
 
-It reads the same already-published monitoring snapshot used by V1, but has
-its own output and error status.  It is deliberately not wired into any
-workflow; a caller can invoke it after a successful refresh without making V1
-depend on its exit status.
+V2 is an observation of the current NAVER market snapshot. It is not a
+second KRX projection and never reads KRX CURRENT or generation files.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -17,28 +16,157 @@ from typing import Any, Dict, Mapping
 try:
     from tools.dynamic_universe_v2_history import record_current
     from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
-    from tools.v2_source_provenance import build_source_provenance
-except ModuleNotFoundError:  # direct `python tools/...py` invocation
+except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from tools.dynamic_universe_v2_history import record_current
     from tools.dynamic_universe_v2_shadow import evaluate_snapshot, summarize
-    from tools.v2_source_provenance import build_source_provenance
 
 
-def _infer_trading_date(industry_payload: Dict[str, Any], theme_payload: Dict[str, Any]) -> str:
-    for row in theme_payload.get("themes", []):
-        for stock in row.get("stocks", []) if isinstance(row, dict) else []:
-            value = stock.get("temporaryCurrentBarDate") if isinstance(stock, dict) else None
-            if isinstance(value, str) and len(value) == 8 and value.isdigit():
-                return f"{value[:4]}-{value[4:6]}-{value[6:]}"
-    generated = industry_payload.get("generatedAt") or theme_payload.get("generatedAt")
-    if isinstance(generated, str) and len(generated) >= 10:
-        return generated[:10]
-    raise ValueError("TRADING_DATE_UNAVAILABLE")
+SOURCE = "NAVER_CURRENT_SNAPSHOT"
+SELECTION_POLICY_VERSION = "v2-current-observation-20261113"
+INPUT_FILES = (
+    ("breadth", "data/monitoring/latest-breadth.json"),
+    ("industries", "data/monitoring/latest-industries.json"),
+    ("themes", "data/monitoring/latest-theme-signals.json"),
+)
+
+
+class V2InputError(ValueError):
+    def __init__(self, status: str, reason: str, **details: Any) -> None:
+        super().__init__(reason)
+        self.status = status
+        self.reason = reason
+        self.details = details
+
+
+def _compact_date(value: Any) -> str | None:
+    text = str(value or "").strip().replace("-", "").replace("/", "")
+    if len(text) == 8 and text.isdigit():
+        return text
+    if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+        date = text[:10].replace("-", "")
+        return date if date.isdigit() else None
+    return None
+
+
+def _payload_date(payload: Mapping[str, Any], kind: str) -> str | None:
+    for key in ("observationDate", "sourceDate", "tradingDate", "asOfDate"):
+        value = _compact_date(payload.get(key))
+        if value:
+            return value
+    rows = payload.get("themes" if kind == "themes" else "industries")
+    if isinstance(rows, list):
+        dates: set[str] = set()
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            for candidate in (row, row.get("metrics")):
+                if isinstance(candidate, Mapping):
+                    value = _compact_date(candidate.get("observationDate") or candidate.get("sourceDate"))
+                    if value:
+                        dates.add(value)
+            stocks = row.get("stocks")
+            if isinstance(stocks, list):
+                for stock in stocks:
+                    if isinstance(stock, Mapping):
+                        value = _compact_date(stock.get("temporaryCurrentBarDate") or stock.get("observationDate"))
+                        if value:
+                            dates.add(value)
+        if len(dates) == 1:
+            return next(iter(dates))
+        if len(dates) > 1:
+            raise V2InputError("INPUT_MISMATCH", "V2_INPUT_MULTIPLE_OBSERVATION_DATES", kind=kind)
+    return None
+
+
+def _declared_source_hash(payload: Mapping[str, Any]) -> str | None:
+    for key in ("sourceHash", "sourceSha256", "inputSnapshotSha256", "snapshotHash"):
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+def _sha256(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
+
+
+def v2_observation_id(*, source_date: str, observation_date: str, source_hash: str,
+                     selection_policy_version: str = SELECTION_POLICY_VERSION) -> str:
+    """Return a deterministic identity for one NAVER snapshot input."""
+    canonical = json.dumps({
+        "sourceDate": source_date,
+        "observationDate": observation_date,
+        "sourceHash": source_hash,
+        "selectionPolicyVersion": selection_policy_version,
+    }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "v2obs-" + hashlib.sha256(canonical).hexdigest()[:32]
+
+
+def _read_current_inputs(root: Path, expected_date: str | None) -> tuple[dict[str, Any], dict[str, Any]]:
+    payloads: dict[str, Any] = {}
+    raw_by_kind: dict[str, bytes] = {}
+    paths: dict[str, str] = {}
+    dates: dict[str, str] = {}
+    explicit_hashes: dict[str, str] = {}
+    for kind, relative in INPUT_FILES:
+        path = root / relative
+        try:
+            raw = path.read_bytes()
+            value = json.loads(raw.decode("utf-8"))
+        except FileNotFoundError as exc:
+            raise V2InputError("INPUT_UNAVAILABLE", "V2_INPUT_ARTIFACT_MISSING", inputArtifactPath=relative) from exc
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, TypeError) as exc:
+            raise V2InputError("ARTIFACT_INVALID", "V2_INPUT_ARTIFACT_INVALID", inputArtifactPath=relative) from exc
+        if not isinstance(value, Mapping):
+            raise V2InputError("ARTIFACT_INVALID", "V2_INPUT_ARTIFACT_NOT_OBJECT", inputArtifactPath=relative)
+        payloads[kind] = dict(value)
+        raw_by_kind[kind] = raw
+        paths[kind] = relative
+        date = _payload_date(value, kind)
+        if not date:
+            raise V2InputError("INPUT_UNAVAILABLE", "V2_INPUT_OBSERVATION_DATE_MISSING", inputArtifactPath=relative)
+        dates[kind] = date
+        declared = _declared_source_hash(value)
+        if declared:
+            explicit_hashes[kind] = declared
+
+    unique_dates = set(dates.values())
+    if len(unique_dates) != 1 or (expected_date and next(iter(unique_dates)) != _compact_date(expected_date)):
+        raise V2InputError("INPUT_MISMATCH", "V2_INPUT_SOURCE_DATE_MISMATCH", dates=dates, expectedDate=expected_date)
+    source_date = next(iter(unique_dates))
+    if explicit_hashes and len(set(explicit_hashes.values())) != 1:
+        raise V2InputError("INPUT_MISMATCH", "V2_INPUT_SOURCE_HASH_MISMATCH", hashes=explicit_hashes)
+    source_hash = next(iter(explicit_hashes.values()), None)
+    if not source_hash:
+        source_hash = _sha256(json.dumps(
+            {kind: _sha256(raw_by_kind[kind]) for kind, _ in INPUT_FILES},
+            sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8"))
+    lineage = {
+        "v2ObservationId": v2_observation_id(source_date=source_date, observation_date=source_date, source_hash=source_hash),
+        "source": SOURCE,
+        "sourceDate": source_date,
+        "observationDate": source_date,
+        "sourceHash": source_hash,
+        "generatedAt": None,
+        "producerRunId": None,
+        "artifactPath": "data/dynamic-universe/v2-shadow-latest.json",
+        "inputArtifactPath": paths["breadth"],
+        "inputArtifactSha256": _sha256(raw_by_kind["breadth"]),
+        "selectionPolicyVersion": SELECTION_POLICY_VERSION,
+    }
+    evidence = {
+        "source": SOURCE, "sourceDate": source_date, "observationDate": source_date,
+        "sourceHash": source_hash,
+        "files": [{"kind": kind, "path": paths[kind], "sha256": _sha256(raw_by_kind[kind]), "date": dates[kind]}
+                  for kind, _ in INPUT_FILES],
+    }
+    return payloads, {"lineage": lineage, "inputEvidence": evidence}
 
 
 def _history_context(root: Path, trading_date: str) -> Dict[str, Dict[str, Any]]:
-    """Return prior V2 observations without resetting or inventing metrics."""
+    """Read history for persistence diagnostics, never as current input."""
     path = root / "data/dynamic-universe/v2-shadow-history.json"
     try:
         history = json.loads(path.read_text(encoding="utf-8"))
@@ -63,11 +191,10 @@ def _history_context(root: Path, trading_date: str) -> Dict[str, Dict[str, Any]]
 
 def _enrich_persistence(payload: Dict[str, Any], kind: str,
                         history_context: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
-    """Connect existing shadow history to today's input without changing V1."""
     payload = dict(payload)
     rows = []
-    for row in payload.get(kind, []) if isinstance(payload.get(kind), list) else []:
-        row = dict(row)
+    for source_row in payload.get(kind, []) if isinstance(payload.get(kind), list) else []:
+        row = dict(source_row)
         entry = history_context.get(f"{kind}:{row.get('id')}") or {}
         persistence = dict(row.get("persistence") or {})
         observed_days = len(entry.get("dates") or set())
@@ -85,276 +212,113 @@ def _enrich_persistence(payload: Dict[str, Any], kind: str,
     return payload
 
 
-def normalize_run_status(
-    payload: Mapping[str, Any] | None,
-    *,
-    expected_generation_id: str | None = None,
-    run_id: str | None = None,
-    runner_exit_code: int = 0,
-    generated_at: str | None = None,
-) -> Dict[str, Any]:
-    """Make producer status explicit without promoting an invalid V2 result."""
+def normalize_run_status(payload: Mapping[str, Any] | None, *, run_id: str | None = None,
+                          runner_exit_code: int = 0, generated_at: str | None = None) -> Dict[str, Any]:
     generated_at = generated_at or datetime.now(timezone.utc).isoformat()
     normalized = dict(payload) if isinstance(payload, Mapping) else {
-        "status": "FAILED",
-        "errorType": "V2_RUNNER_PROCESS_FAILED",
-        "error": f"runner_exit={runner_exit_code}",
+        "status": "FAILED", "errorType": "V2_RUNNER_PROCESS_FAILED", "error": f"runner_exit={runner_exit_code}",
     }
-    raw_status = normalized.get("status") or "FAILED"
-    actual_generation = normalized.get("generationId")
-    effective_status = raw_status
+    raw_status = str(normalized.get("status") or "FAILED")
+    lineage = dict(normalized.get("v2Lineage") or {}) if isinstance(normalized.get("v2Lineage"), Mapping) else {}
+    effective = raw_status
     reason = normalized.get("failureReason") or normalized.get("error")
     if raw_status in {"OK", "SUCCESS"}:
-        if not actual_generation:
-            effective_status = "GENERATION_UNAVAILABLE"
-            reason = "V2_GENERATION_ID_MISSING"
-        elif expected_generation_id and str(actual_generation) != str(expected_generation_id):
-            effective_status = "GENERATION_MISMATCH"
-            reason = "V2_GENERATION_ID_MISMATCH"
+        required = ("v2ObservationId", "source", "sourceDate", "observationDate", "sourceHash", "selectionPolicyVersion")
+        if any(not lineage.get(key) for key in required):
+            effective, reason = "INPUT_UNAVAILABLE", "V2_LINEAGE_INCOMPLETE"
         else:
-            effective_status = "SUCCESS"
-    normalized["runId"] = normalized.get("runId") or run_id
-    normalized["generatedAt"] = normalized.get("generatedAt") or generated_at
-    normalized["rawStatus"] = raw_status
-    normalized["producerStatus"] = raw_status
-    normalized["runStatus"] = raw_status
-    normalized["status"] = effective_status
-    normalized["expectedGenerationId"] = expected_generation_id
-    normalized["consumptionStatus"] = "CONSUMED" if effective_status == "SUCCESS" else "NOT_CONSUMED"
-    normalized["publicationPolicy"] = "PARTIAL_NON_BLOCKING"
-    normalized["failureReason"] = None if effective_status == "SUCCESS" else reason or "V2_SHADOW_FAILED"
+            effective = "SUCCESS"
+    normalized.update({
+        "runId": normalized.get("runId") or run_id, "generatedAt": normalized.get("generatedAt") or generated_at,
+        "rawStatus": raw_status, "producerStatus": raw_status, "runStatus": raw_status, "status": effective,
+        "consumptionStatus": "CONSUMED" if effective == "SUCCESS" else "NOT_CONSUMED",
+        "publicationPolicy": "PARTIAL_NON_BLOCKING",
+        "failureReason": None if effective == "SUCCESS" else reason or "V2_SHADOW_FAILED",
+    })
+    if lineage:
+        lineage.update({"generatedAt": lineage.get("generatedAt") or normalized["generatedAt"],
+                        "producerRunId": lineage.get("producerRunId") or normalized["runId"],
+                        "producerStatus": normalized["producerStatus"],
+                        "consumptionStatus": normalized["consumptionStatus"],
+                        "failureReason": normalized["failureReason"]})
+        normalized["v2Lineage"] = lineage
     normalized.setdefault("artifactPath", "data/dynamic-universe/v2-shadow-latest.json")
-    evidence = normalized.get("generationEvidence")
-    if not isinstance(evidence, Mapping):
-        evidence = {}
-    normalized["generationEvidence"] = {
-        **dict(evidence),
-        "inputPath": evidence.get("inputPath"),
-        "manifestPath": evidence.get("manifestPath"),
-        "inputManifestPath": evidence.get("inputManifestPath") or evidence.get("manifestPath"),
-        "manifestPresent": evidence.get("manifestPresent"),
-        "generationField": evidence.get("generationField"),
-        "generationFieldPresent": evidence.get("generationFieldPresent", bool(actual_generation)),
-        "currentPointerPath": evidence.get("currentPointerPath"),
-        "currentPointerPresent": evidence.get("currentPointerPresent", False),
-        "currentGenerationId": evidence.get("currentGenerationId"),
-        "currentManifestPath": evidence.get("currentManifestPath"),
-        "currentManifestPresent": evidence.get("currentManifestPresent", False),
-        "currentManifestGenerationId": evidence.get("currentManifestGenerationId"),
-        "currentGenerationComparable": evidence.get("currentGenerationComparable", False),
-        "expectedComparable": bool(actual_generation and expected_generation_id),
-    }
     return normalized
-
-
-def _input_dir(root: Path) -> Path | None:
-    value = os.environ.get("KRX_INPUT_DIR") or os.environ.get("V2_INPUT_DIR")
-    if not value:
-        return None
-    path = Path(value)
-    return path if path.exists() else path
-
-
-def _read_json(path: Path) -> Mapping[str, Any] | None:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    return value if isinstance(value, Mapping) else None
-
-
-def _pointer_generation(path: Path) -> str | None:
-    try:
-        text = path.read_text(encoding="utf-8").strip()
-    except OSError:
-        return None
-    if not text:
-        return None
-    try:
-        value = json.loads(text)
-    except json.JSONDecodeError:
-        value = None
-    if isinstance(value, Mapping):
-        for key in ("generationId", "sourceGeneration", "currentGenerationId"):
-            if value.get(key) not in (None, ""):
-                return str(value[key])
-        return None
-    first = text.splitlines()[0].strip()
-    return first or None
-
-
-def _generation_evidence(root: Path, quality: Mapping[str, Any], industry_payload: Mapping[str, Any]) -> Dict[str, Any]:
-    """Record where generation was sought; never invent a generation value."""
-    input_dir = _input_dir(root)
-    quality_candidates = tuple(
-        path for path in (
-            input_dir / "latest-quality.json" if input_dir else None,
-            input_dir / "quality.json" if input_dir else None,
-            root / "data/monitoring/latest-quality.json",
-        ) if path is not None
-    )
-    quality_path = next((path for path in quality_candidates if path.exists()), quality_candidates[-1])
-    input_manifest_candidates = tuple(
-        path for path in (
-            input_dir / "manifest.json" if input_dir else None,
-            input_dir / "generation-manifest.json" if input_dir else None,
-            root / "data/monitoring/manifest.json",
-            root / "data/monitoring/latest-quality.json",
-        ) if path is not None
-    )
-    manifest_path = next((path for path in input_manifest_candidates if path.exists()), input_manifest_candidates[0])
-    pointer_candidates = tuple(
-        path for path in (
-            Path(os.environ["KRX_CURRENT_PATH"]) if os.environ.get("KRX_CURRENT_PATH") else None,
-            input_dir / "CURRENT" if input_dir else None,
-            root / "data/CURRENT",
-            root / "data/krx/CURRENT",
-            root / "data/krx-m10/CURRENT",
-        ) if path is not None
-    )
-    pointer_path = next((path for path in pointer_candidates if path.exists()), pointer_candidates[0])
-    current_generation = _pointer_generation(pointer_path) if pointer_path.exists() else None
-    current_manifest_candidates = tuple(
-        path for path in (
-            Path(os.environ["KRX_CURRENT_MANIFEST_PATH"]) if os.environ.get("KRX_CURRENT_MANIFEST_PATH") else None,
-            pointer_path.parent / "manifest.json",
-            pointer_path.parent / "generation-manifest.json",
-            input_dir / "manifest.json" if input_dir else None,
-            root / "data/krx/manifest.json",
-        ) if path is not None
-    )
-    current_manifest_path = next(
-        (path for path in current_manifest_candidates if path.exists()),
-        current_manifest_candidates[0],
-    )
-    current_manifest = _read_json(current_manifest_path) if current_manifest_path.exists() else None
-    current_manifest_generation = None
-    if current_manifest:
-        for key in ("generationId", "sourceGeneration", "currentGenerationId"):
-            if current_manifest.get(key) not in (None, ""):
-                current_manifest_generation = str(current_manifest[key])
-                break
-    field_names = (
-        "historicalGenerationId", "sourceGeneration", "generationId",
-    )
-    field = next((name for name in field_names if quality.get(name) not in (None, "")), None)
-    if field is None:
-        field = next((name for name in field_names if industry_payload.get(name) not in (None, "")), None)
-    field_value = quality.get(field) if field else None
-    if field_value in (None, "") and field:
-        field_value = industry_payload.get(field)
-    return {
-        "inputPath": str(input_dir or quality_path),
-        "manifestPath": str(manifest_path),
-        "inputManifestPath": str(manifest_path),
-        "manifestPresent": manifest_path.exists(),
-        "generationField": field,
-        "generationFieldPresent": field is not None,
-        "generationId": str(field_value) if field_value not in (None, "") else None,
-        "currentPointerPath": str(pointer_path),
-        "currentPointerPresent": pointer_path.exists(),
-        "currentGenerationId": current_generation,
-        "currentManifestPath": str(current_manifest_path),
-        "currentManifestPresent": current_manifest_path.exists(),
-        "currentManifestGenerationId": current_manifest_generation,
-        "currentGenerationComparable": bool(field_value and (current_generation or current_manifest_generation)),
-    }
 
 
 def run_once(root: Path, trading_date: str | None, observed_at: str | None = None) -> Dict[str, Any]:
     status_path = root / "data/dynamic-universe/v2-shadow-run-status.json"
     latest_path = root / "data/dynamic-universe/v2-shadow-latest.json"
+    history_path = root / "data/dynamic-universe/v2-shadow-history.json"
     generated_at = datetime.now(timezone.utc).isoformat()
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-v2-shadow-{generated_at.replace(':', '').replace('-', '')}"
-    quality: Dict[str, Any] = {}
-    generation_evidence: Dict[str, Any] = _generation_evidence(root, {}, {})
-    generation_id = None
     prior_latest = latest_path.read_bytes() if latest_path.exists() else None
-    history_path = root / "data/dynamic-universe/v2-shadow-history.json"
     prior_history = history_path.read_bytes() if history_path.exists() else None
     try:
-        ind = json.loads((root / "data/monitoring/latest-industries.json").read_text())
-        theme = json.loads((root / "data/monitoring/latest-theme-signals.json").read_text())
-        v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text())
+        inputs, context = _read_current_inputs(root, trading_date)
+        source_date = context["lineage"]["sourceDate"]
+        history_context = _history_context(root, source_date)
+        ind = _enrich_persistence(inputs["industries"], "industries", history_context)
+        theme = _enrich_persistence(inputs["themes"], "themes", history_context)
         try:
-            quality_path = Path(generation_evidence["inputPath"])
-            if quality_path.is_dir():
-                quality_path = quality_path / "latest-quality.json"
-            loaded_quality = json.loads(quality_path.read_text(encoding="utf-8"))
-            if isinstance(loaded_quality, dict):
-                quality = loaded_quality
+            v1 = json.loads((root / "data/dynamic-universe/latest.json").read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            quality = {}
-        generation_evidence = _generation_evidence(root, quality, ind)
-        trading_date = trading_date or _infer_trading_date(ind, theme)
-        history_context = _history_context(root, trading_date)
-        ind = _enrich_persistence(ind, "industries", history_context)
-        theme = _enrich_persistence(theme, "themes", history_context)
+            v1 = {"sectors": [], "themes": []}
         result = evaluate_snapshot(ind, theme, v1)
-        industry_quality = ind.get("quality") if isinstance(ind.get("quality"), dict) else {}
-        source_commit = quality.get("sourceCommit") or ind.get("sourceCommit")
-        source_quality = (quality.get("sourceQualityStatus")
-                          or quality.get("collectionQualityStatus")
-                          or ind.get("sourceQualityStatus")
-                          or industry_quality.get("sourceStatus"))
-        generation_id = (
-            quality.get("historicalGenerationId")
-            or quality.get("sourceGeneration")
-            or quality.get("generationId")
-            or ind.get("historicalGenerationId")
-            or ind.get("generationId")
-        )
-        if source_quality == "OK" and ind.get("tradingDateEvidence", {}).get("evidenceClass") == "INTRADAY_SESSION":
-            source_quality = "INTRADAY_OBSERVED"
-        result["inputEvidence"] = {
-            "tradingDate": trading_date,
-            "sourceQualityStatus": source_quality or "UNAVAILABLE",
-            "sourceCommit": source_commit,
-            "sourceCommitStatus": "VERIFIED" if source_commit else "UNAVAILABLE",
-            "generationId": generation_id,
-        }
-        result["inputEvidence"]["sourceProvenance"] = build_source_provenance(root, result=result)
+        lineage = dict(context["lineage"])
+        lineage.update({"generatedAt": generated_at, "producerRunId": run_id, "producerStatus": "SUCCESS",
+                        "consumptionStatus": "CONSUMED", "failureReason": None})
+        result.update({"v2Lineage": lineage, "source": SOURCE, "sourceDate": source_date,
+                       "observationDate": source_date, "inputEvidence": context["inputEvidence"]})
         result["summary"] = summarize(result)
         latest_path.parent.mkdir(parents=True, exist_ok=True)
         latest_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        # The history is written only after the complete V2 result exists.
-        history = record_current(root, trading_date,
-                                 result["inputEvidence"]["sourceProvenance"])
+        history = record_current(root, source_date, {"inputSnapshotSha256": lineage["sourceHash"]})
         outcome = {"runId": run_id, "status": "SUCCESS", "observedAt": observed_at or generated_at,
-                   "generatedAt": generated_at,
-                   "tradingDate": trading_date, "generationId": generation_id,
-                   "summary": result["summary"],
-                   "inputEvidence": result["inputEvidence"],
-                   "generationEvidence": generation_evidence,
-                   "artifactPath": str(latest_path),
-                   "observationCount": len(history["observations"])}
-    except Exception as exc:  # V2 isolation boundary; V1 is not called here.
-        if prior_latest is None:
-            latest_path.unlink(missing_ok=True)
-        else:
+                   "generatedAt": generated_at, "tradingDate": source_date,
+                   "v2ObservationId": lineage["v2ObservationId"], "v2Lineage": lineage,
+                   "summary": result["summary"], "inputEvidence": result["inputEvidence"],
+                   "artifactPath": str(latest_path), "observationCount": len(history["observations"])}
+    except V2InputError as exc:
+        diagnostic_lineage = {
+            "source": SOURCE,
+            "producerRunId": run_id,
+            "artifactPath": "data/dynamic-universe/v2-shadow-latest.json",
+            "selectionPolicyVersion": SELECTION_POLICY_VERSION,
+            "producerStatus": exc.status,
+            "consumptionStatus": "NOT_CONSUMED",
+            "failureReason": exc.reason,
+        }
+        if isinstance(exc.details.get("inputArtifactPath"), str):
+            diagnostic_lineage["inputArtifactPath"] = exc.details["inputArtifactPath"]
+        if isinstance(exc.details.get("dates"), Mapping) and len(set(exc.details["dates"].values())) == 1:
+            diagnostic_lineage["sourceDate"] = next(iter(exc.details["dates"].values()))
+            diagnostic_lineage["observationDate"] = diagnostic_lineage["sourceDate"]
+        outcome = {"runId": run_id, "status": exc.status, "observedAt": observed_at or generated_at,
+                   "generatedAt": generated_at, "tradingDate": trading_date, "errorType": type(exc).__name__,
+                   "error": exc.reason, "failureReason": exc.reason, "inputEvidence": exc.details,
+                   "artifactPath": str(latest_path), "v2Lineage": diagnostic_lineage}
+    except Exception as exc:
+        outcome = {"runId": run_id, "status": "FAILED", "observedAt": observed_at or generated_at,
+                   "generatedAt": generated_at, "tradingDate": trading_date, "errorType": type(exc).__name__,
+                   "error": str(exc)[:240], "failureReason": f"V2_SHADOW_{type(exc).__name__.upper()}",
+                   "artifactPath": str(latest_path)}
+    if outcome.get("status") != "SUCCESS":
+        if prior_latest is not None:
             latest_path.parent.mkdir(parents=True, exist_ok=True)
             latest_path.write_bytes(prior_latest)
-        if prior_history is None:
-            history_path.unlink(missing_ok=True)
-        else:
+        elif latest_path.exists():
+            latest_path.unlink()
+        if prior_history is not None:
             history_path.parent.mkdir(parents=True, exist_ok=True)
             history_path.write_bytes(prior_history)
-        outcome = {"runId": run_id, "status": "FAILED", "observedAt": observed_at or generated_at,
-                   "generatedAt": generated_at,
-                   "tradingDate": trading_date, "errorType": type(exc).__name__,
-                   "error": str(exc)[:240], "generationId": generation_id,
-                   "generationEvidence": generation_evidence,
-                   "artifactPath": str(latest_path),
-                   "failureReason": f"V2_SHADOW_{type(exc).__name__.upper()}"}
-    outcome = normalize_run_status(
-        outcome,
-        expected_generation_id=os.environ.get("EXPECTED_GENERATION_ID") or None,
-        run_id=run_id,
-        runner_exit_code=0 if outcome.get("status") in {"OK", "SUCCESS"} else 1,
-        generated_at=generated_at,
-    )
+        elif history_path.exists():
+            history_path.unlink()
+    outcome = normalize_run_status(outcome, run_id=run_id,
+                                   runner_exit_code=0 if outcome.get("status") == "SUCCESS" else 1,
+                                   generated_at=generated_at)
     status_path.parent.mkdir(parents=True, exist_ok=True)
-    status_path.write_text(json.dumps(outcome, ensure_ascii=False, indent=2) + "\n")
+    status_path.write_text(json.dumps(outcome, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return outcome
 
 

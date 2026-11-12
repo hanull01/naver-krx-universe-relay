@@ -14,6 +14,7 @@ from typing import Any, Mapping
 
 
 SOURCE_FILES = (
+    ("breadth", "data/monitoring/latest-breadth.json"),
     ("industries", "data/monitoring/latest-industries.json"),
     ("themes", "data/monitoring/latest-theme-signals.json"),
     ("v1Universe", "data/dynamic-universe/latest.json"),
@@ -34,7 +35,7 @@ def _compact_date(value: Any) -> str | None:
 
 
 def _payload_date(payload: Mapping[str, Any]) -> str | None:
-    for key in ("tradingDate", "sourceTradingDate", "asOfDate"):
+    for key in ("observationDate", "sourceDate", "tradingDate", "sourceTradingDate", "asOfDate"):
         if (value := _compact_date(payload.get(key))):
             return value
     return None
@@ -93,8 +94,16 @@ def build_source_provenance(root: Path, *, result: Mapping[str, Any] | None = No
     root = Path(root)
     result = result if isinstance(result, Mapping) else {}
     input_evidence = result.get("inputEvidence") if isinstance(result.get("inputEvidence"), Mapping) else {}
+    v2_lineage = result.get("v2Lineage") if isinstance(result.get("v2Lineage"), Mapping) else {}
     expected_generation = result.get("generatedAt") or input_evidence.get("generatedAt")
-    expected_date = _compact_date(result.get("tradingDate") or input_evidence.get("tradingDate"))
+    expected_date = _compact_date(
+        v2_lineage.get("sourceDate")
+        or result.get("observationDate")
+        or result.get("tradingDate")
+        or input_evidence.get("sourceDate")
+        or input_evidence.get("tradingDate")
+    )
+    current_lineage = bool(v2_lineage.get("v2ObservationId"))
     files: list[dict[str, Any]] = []
     valid_count = 0
     mismatch = False
@@ -103,7 +112,7 @@ def build_source_provenance(root: Path, *, result: Mapping[str, Any] | None = No
             root, kind, relative,
             expected_generation=expected_generation,
             expected_date=expected_date,
-            check_generation=kind in {"industries", "themes"},
+            check_generation=(kind in {"industries", "themes"} and not current_lineage),
         )
         files.append(record)
         valid_count += int(valid)
@@ -120,7 +129,7 @@ def build_source_provenance(root: Path, *, result: Mapping[str, Any] | None = No
             files.append(record)
             mismatch = mismatch or record_mismatch
 
-    source_files = [item for item in files if item.get("kind") in {"industries", "themes", "v1Universe"}
+    source_files = [item for item in files if item.get("kind") in {"breadth", "industries", "themes", "v1Universe"}
                     and item.get("sha256")]
     snapshot = [{"path": item["path"], "sha256": item["sha256"]} for item in source_files]
     input_snapshot_sha = sha256_bytes(
@@ -137,6 +146,17 @@ def build_source_provenance(root: Path, *, result: Mapping[str, Any] | None = No
         status = "UNVERIFIED"
     result_record = next((item for item in files if item.get("kind") == "v2Result"), None)
     history_record = next((item for item in files if item.get("kind") == "v2History"), None)
+    result_record = result_record or {}
+    lineage_fields = {
+        key: v2_lineage.get(key)
+        for key in (
+            "v2ObservationId", "source", "sourceDate", "observationDate", "sourceHash",
+            "generatedAt", "producerRunId", "artifactPath", "inputArtifactPath",
+            "inputArtifactSha256", "selectionPolicyVersion", "producerStatus",
+            "consumptionStatus", "failureReason",
+        )
+        if v2_lineage.get(key) is not None
+    }
     return {
         "schemaVersion": "v2-source-provenance-v1",
         "status": status,
@@ -144,7 +164,8 @@ def build_source_provenance(root: Path, *, result: Mapping[str, Any] | None = No
         "sourceCommitStatus": "UNAVAILABLE",
         "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
         "tradingDate": expected_date,
-        "calculationGeneration": expected_generation,
+        "calculationGeneration": None if current_lineage else expected_generation,
+        "lineage": lineage_fields,
         "inputSnapshotSha256": input_snapshot_sha,
         "resultSha256": (result_record or {}).get("sha256"),
         "historySha256": (history_record or {}).get("sha256"),

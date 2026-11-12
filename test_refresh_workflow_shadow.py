@@ -25,7 +25,9 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         self.assertIn("PARTIAL_NON_BLOCKING", block)
         self.assertIn("GITHUB_STEP_SUMMARY", block)
         self.assertIn("normalize_run_status", block)
-        self.assertIn("expected_generation_id", block)
+        self.assertNotIn("expected_generation_id", block)
+        self.assertIn("v2ObservationId", block)
+        self.assertIn("v2Lineage", block)
         self.assertIn('consumptionStatus', block)
 
     def test_v2_publish_is_atomic_and_failure_preserves_prior_results(self):
