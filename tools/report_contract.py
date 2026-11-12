@@ -543,18 +543,13 @@ def _current_market_observation(
 
 _GROUP_SUMMARY_FIELDS = (
     "id", "name", "kind", "status", "v1Status", "v2Status",
-    "membershipStatus", "memberCount", "featureCount", "coveragePct",
+    "membershipStatus", "memberCount", "coveragePct",
     "advancers", "decliners", "unchanged", "advancePct", "avgReturn1D",
-    "averageReturn1D", "medianReturn1D", "relativeStrengthVsMarket",
-    "officialChangeRateRelativeStrength", "pctAboveMA5", "pctAboveMA20",
-    "pctAboveMA60", "pctBreakout20", "pctNear52WeekHigh",
-    "pctVolumeAbove20DayAverage", "volumeIncreasePct", "dataQuality",
-    "qualityStatus", "industrySourcePresent", "featureValidMemberCount",
-    "derivedFeatureValidMemberCount", "closeValidMemberCount",
-    "historyAdjustmentUnverifiedCount", "missingCodeCount",
+    "averageReturn1D", "relativeStrengthVsMarket",
+    "officialChangeRateRelativeStrength", "dataQuality", "qualityStatus",
     "source", "sourceDate", "observationDate", "scope", "artifactPath",
     "producerRunId", "producerStatus", "currentSnapshotStatus",
-    "membershipStatus", "relativeStrengthStatus", "missingReason",
+    "relativeStrengthStatus", "missingReason",
 )
 
 
@@ -563,7 +558,14 @@ def _compact_group_leaders(rows: Any) -> list[dict[str, Any]]:
     for row in rows or []:
         if not isinstance(row, Mapping):
             continue
-        item = _compact_leader(row)
+        # Group rows only need the visible representative identity and the
+        # current movement.  Historical/technical leader diagnostics remain
+        # in the source artifact and are not duplicated into the contract.
+        item = {
+            key: row.get(key)
+            for key in ("code", "name", "market", "currentPrice", "changeRate")
+            if row.get(key) is not None
+        }
         if row.get("itemCode") is not None and item.get("code") is None:
             item["code"] = row.get("itemCode")
         if row.get("itemName") is not None and item.get("name") is None:
@@ -587,20 +589,10 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
             item[field] = value
     if "averageReturn1D" in item and "avgReturn1D" not in item:
         item["avgReturn1D"] = item["averageReturn1D"]
-    trading = metrics.get("tradingValue")
-    if isinstance(trading, Mapping):
-        item["tradingValue"] = {
-            key: trading.get(key)
-            for key in ("total", "availableCount", "coveragePct", "top3ConcentrationPct", "comparisonStatus")
-            if trading.get(key) is not None
-        }
-    persistence = metrics.get("persistence")
-    if isinstance(persistence, Mapping):
-        item["persistence"] = {
-            key: persistence.get(key)
-            for key in ("status", "availableTradingDays")
-            if persistence.get(key) is not None
-        }
+    # Trading-value and persistence detail is not consumed by the canonical
+    # HTML/Markdown projection.  Their source artifacts retain the full
+    # diagnostics; the contract keeps the group counts and availability
+    # lineage below instead of duplicating those arrays/objects.
     missing_codes = row.get("missingCodes")
     if isinstance(missing_codes, list):
         item["missingCodeCount"] = len(missing_codes)
@@ -614,8 +606,7 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
     )
     leaders = row.get("leaders") or row.get("leaderCandidates") or leader_binding.get("candidates")
     if leaders:
-        item["leaders"] = _compact_group_leaders(leaders)
-        item["leaderCandidates"] = item["leaders"]
+        item["leaderCandidates"] = _compact_group_leaders(leaders)
     item["leaderEvidenceStatus"] = row.get("leaderEvidenceStatus") or leader_binding.get("status")
     item["leaderSource"] = row.get("leaderSource") or leader_binding.get("source")
     item["leaderObservationDate"] = row.get("leaderObservationDate") or leader_binding.get("observationDate")
@@ -677,6 +668,15 @@ def _compact_group_row(row: Any, kind: str) -> dict[str, Any]:
 
 def _compact_group_rows(rows: Any, kind: str) -> list[dict[str, Any]]:
     return [item for item in (_compact_group_row(row, kind) for row in rows or []) if item]
+
+
+def _compact_v2_change(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep only the V2 change facts used by the report and its lineage."""
+    fields = (
+        "kind", "id", "name", "officialChangeClass", "status", "v1Status",
+        "v2Status", "reason", "source", "sourceDate", "observationDate", "scope",
+    )
+    return {key: row[key] for key in fields if row.get(key) is not None}
 
 
 _REPORT_V1_STATUSES = {"ACTIVE", "DISCOVERED", "MAINTAINED", "WATCH"}
@@ -1893,7 +1893,11 @@ def build_report_contract(
     # Keep the report contract compact: detailed raw history remains in the
     # dated source files and only the per-candidate horizon results cross the
     # Work boundary.
-    compact_v2_changes = [dict(row) for row in (v2_changes or []) if isinstance(row, Mapping)]
+    compact_v2_changes = [
+        _compact_v2_change(row)
+        for row in (v2_changes or [])
+        if isinstance(row, Mapping)
+    ]
     session_context = dict(session_context) if isinstance(session_context, Mapping) else {
         "mode": "NOT_PREOPEN",
         "status": "NOT_APPLICABLE",
@@ -2057,7 +2061,11 @@ def build_report_contract(
                 "themes": _group_collection_availability(v1_groups, "theme", trading_date),
             },
         },
-        "leaders": leaders.get("fullMarketLeaders") or leaders.get("candidates") or [],
+        "leaders": [
+            _compact_leader(row)
+            for row in (leaders.get("fullMarketLeaders") or leaders.get("candidates") or [])
+            if isinstance(row, Mapping)
+        ][:30],
         "registeredUniverse": compact_registered_universe(registered_universe),
         "v2": {
             "tradingDate": v2_latest.get("tradingDate") or v2_latest.get("sourceTradingDate") or trading_date,
@@ -2091,7 +2099,8 @@ def build_report_contract(
             "investorFlow": {
                 "status": (market_snapshot.get("investorFlow") or {}).get("status", "UNAVAILABLE"),
                 "source": "reportContract.marketSnapshot.investorFlow",
-                "periods": (market_snapshot.get("investorFlow") or {}).get("periods", {}),
+                "periodCount": len((market_snapshot.get("investorFlow") or {}).get("periods", {})),
+                "periodsSource": "reportContract.marketSnapshot.investorFlow.periods",
             },
             "disclosures": {
                 "status": "UNAVAILABLE",

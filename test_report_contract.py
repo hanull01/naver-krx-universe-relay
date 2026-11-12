@@ -10,7 +10,9 @@ from tools.report_contract import (
     validate_contract_payload,
     validate_kiwoom_candidate_binding,
     validate_rendered_models,
+    MAX_WORK_CONTRACT_BYTES,
 )
+from tools.build_report_contract import _serialize_contract
 
 
 class ReportContractTests(unittest.TestCase):
@@ -678,6 +680,27 @@ class ReportContractTests(unittest.TestCase):
         self.assertLess(len(payload), 600_000)
         self.assertNotIn("stocks", contract["themes"][0])
         self.assertEqual(contract["themes"][0]["stockDetailCount"], 10)
+        self.assertLess(len(_serialize_contract(contract)), MAX_WORK_CONTRACT_BYTES)
+
+    def test_large_v2_changes_keep_summary_fields_without_detail_duplication(self):
+        rows = [{
+            "kind": "theme", "id": str(index), "name": f"테마{index}",
+            "officialChangeClass": "RANK_UP", "status": "AVAILABLE",
+            "sourceDate": "20261112", "observationDate": "20261112",
+            "scope": "STOCK_ONLY", "largeDiagnostics": {"raw": "x" * 1000},
+        } for index in range(344)]
+        contract = build_report_contract(
+            indices={"generatedAt": "g", "indices": []},
+            summary={"generatedAt": "g", "fullMarket": {"tradingDate": "20261112", "markets": {"TOTAL": {}}}},
+            breadth={"generatedAt": "g", "fullMarket": {"marketTradingValue": {}}},
+            quality={"generatedAt": "g"}, industries={"generatedAt": "g", "industries": []},
+            themes={"generatedAt": "g", "themes": []},
+            v2_latest={"generatedAt": "g", "industries": [], "themes": []},
+            v2_history={"observations": []}, leaders={}, v2_changes=rows,
+        )
+        self.assertEqual(len(contract["v2Changes"]), 344)
+        self.assertNotIn("largeDiagnostics", contract["v2Changes"][0])
+        self.assertLess(len(_serialize_contract(contract)), MAX_WORK_CONTRACT_BYTES)
 
     def test_trading_date_evidence_is_required_for_verified_status(self):
         contract = build_report_contract(

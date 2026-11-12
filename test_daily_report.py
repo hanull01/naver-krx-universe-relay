@@ -312,6 +312,15 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(got["v2Shadow"]["history"]["uniqueTradingDates"], ["2026-10-16"])
         self.assertEqual(got["observationSources"]["uiObservationCount"], None)
 
+    def test_failed_v2_status_blocks_stale_latest_and_history(self):
+        latest, history = daily_report._usable_v2_shadow_inputs(
+            {"tradingDate": "2026-10-16", "industries": [{"id": "stale"}]},
+            {"observations": [{"tradingDate": "2026-10-16"}]},
+            {"status": "FAILED", "tradingDate": "2026-10-17", "errorType": "NameError"},
+        )
+        self.assertEqual(latest, {})
+        self.assertEqual(history, {})
+
     def test_quote_summary(self):
         row = {
             "price": 100,
