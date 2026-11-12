@@ -3,6 +3,7 @@ import unittest
 
 from tools.report_contract import (
     _compact_group_row,
+    _compact_additional_observations,
     build_report_contract,
     build_relative_strength_tracking,
     REQUIRED_RENDER_FIELDS,
@@ -16,6 +17,30 @@ from tools.build_report_contract import _serialize_contract
 
 
 class ReportContractTests(unittest.TestCase):
+    def test_additional_observation_contract_preserves_row_lineage(self):
+        source = {
+            "status": "AVAILABLE", "source": "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": "20261112", "observationDate": "20261112", "scope": "STOCK_ONLY",
+            "producer": "tools/build_additional_observations.py", "producerRunId": "run-8",
+            "artifactPath": "data/monitoring/additional-observations.json",
+            "generatedAt": "2026-11-12T10:00:00+09:00",
+            "industries": [{
+                "id": "i-1", "name": "추가 업종", "type": "industry",
+                "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": "20261112",
+                "observationDate": "20261112", "scope": "STOCK_ONLY",
+                "producer": "tools/build_additional_observations.py", "producerRunId": "run-8",
+                "artifactPath": "data/monitoring/additional-observations.json#industries/i-1",
+                "generatedAt": "2026-11-12T10:00:00+09:00", "selectionRank": 1,
+                "selectionReason": "CURRENT_OBSERVATION_RANKING", "failureReason": None,
+                "status": "AVAILABLE", "leaders": [],
+            }],
+            "themes": [], "counts": {"configured": 1, "available": 1},
+        }
+        row = _compact_additional_observations(source)["industries"][0]
+        for field in ("producer", "producerRunId", "artifactPath", "selectionRank", "selectionReason", "sourceDate", "observationDate", "scope"):
+            self.assertIn(field, row)
+        self.assertEqual(row["artifactPath"], "data/monitoring/additional-observations.json#industries/i-1")
+
     def test_v2_status_and_failure_lineage_are_preserved_without_consuming_stale_data(self):
         contract = build_report_contract(
             indices={"generatedAt": "g", "indices": []},

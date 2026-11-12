@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 SOURCE = "NAVER_CURRENT_SNAPSHOT"
 SCOPE = "STOCK_ONLY"
 SCHEMA_VERSION = "additional-observations-artifact-v1"
+PRODUCER = "tools/build_additional_observations.py"
 DEFAULT_POLICY = {
     "maxIndustries": 3,
     "maxThemes": 3,
@@ -259,7 +260,7 @@ def _leaders(kind: str, row: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(value) for value in values[:3]]
 
 
-def _row(*, kind: str, target: dict[str, Any], source_row: dict[str, Any] | None, date: str | None, run_id: str, generated_at: str, failure_reason: str | None = None) -> dict[str, Any]:
+def _row(*, kind: str, target: dict[str, Any], source_row: dict[str, Any] | None, date: str | None, run_id: str, generated_at: str, artifact_path: str, failure_reason: str | None = None) -> dict[str, Any]:
     leaders = _leaders(kind, source_row) if source_row else []
     member_count = source_row.get("memberCount") if source_row else None
     if source_row and member_count is None:
@@ -269,12 +270,14 @@ def _row(*, kind: str, target: dict[str, Any], source_row: dict[str, Any] | None
     return {
         "id": target["id"], "name": source_row.get("name") if source_row else target["name"], "type": kind,
         "source": SOURCE, "sourceDate": date, "observationDate": date, "scope": SCOPE,
-        "producerRunId": run_id, "generatedAt": generated_at, "membershipCount": member_count,
+        "producer": PRODUCER, "producerRunId": run_id,
+        "artifactPath": f"{artifact_path}#{kind}s/{target['id']}",
+        "generatedAt": generated_at, "membershipCount": member_count,
         "leaderCount": len(leaders), "leaders": leaders, "status": status, "failureReason": reason,
     }
 
 
-def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | None, theme_input: dict[str, Any] | None, observation_date: str, run_id: str, generated_at: str, config_path: str, industry_path: str, theme_path: str) -> dict[str, Any]:
+def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | None, theme_input: dict[str, Any] | None, observation_date: str, run_id: str, generated_at: str, config_path: str, industry_path: str, theme_path: str, artifact_path: str = "data/monitoring/additional-observations.json") -> dict[str, Any]:
     industries = _targets(config, "industries")
     themes = _targets(config, "themes")
     auto_select = bool(config.get("autoSelect", True))
@@ -309,7 +312,7 @@ def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | N
                 source_row = _find(source_rows, target)
                 rows_by_kind[kind].append(_row(
                     kind=kind, target=target, source_row=source_row, date=observation_date,
-                    run_id=run_id, generated_at=generated_at,
+                    run_id=run_id, generated_at=generated_at, artifact_path=artifact_path,
                     failure_reason=None if source_row else "TARGET_OUTPUT_MISSING",
                 ))
                 rows_by_kind[kind][-1].update({
@@ -330,8 +333,9 @@ def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | N
             "sourceDate": observation_date,
             "observationDate": observation_date,
             "scope": SCOPE,
-            "producerRunId": run_id,
+            "producer": PRODUCER, "producerRunId": run_id,
             "generatedAt": generated_at,
+            "artifactPath": artifact_path,
             "configPath": config_path,
             "inputPaths": {"industries": industry_path, "themes": theme_path},
             "selectionPolicy": {
@@ -353,7 +357,8 @@ def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | N
         return {
             "schemaVersion": SCHEMA_VERSION, "status": "PRODUCER_NOT_CONFIGURED", "source": SOURCE,
             "sourceDate": observation_date, "observationDate": observation_date, "scope": SCOPE,
-            "producerRunId": run_id, "generatedAt": generated_at, "configPath": config_path,
+            "producer": PRODUCER, "producerRunId": run_id, "generatedAt": generated_at,
+            "artifactPath": artifact_path, "configPath": config_path,
             "inputPaths": {"industries": industry_path, "themes": theme_path}, "industries": [], "themes": [],
             "counts": {"configured": 0, "received": 0, "available": 0, "unavailable": 0},
             "failureReason": "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED",
@@ -401,7 +406,7 @@ def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | N
         for target in targets:
             source_row = _find(clean_rows, target) if not kind_error else None
             reason = kind_error
-            rows_by_kind[kind].append(_row(kind=kind, target=target, source_row=source_row, date=observation_date if source_row else None, run_id=run_id, generated_at=generated_at, failure_reason=reason))
+            rows_by_kind[kind].append(_row(kind=kind, target=target, source_row=source_row, date=observation_date if source_row else None, run_id=run_id, generated_at=generated_at, artifact_path=artifact_path, failure_reason=reason))
 
     rows = rows_by_kind["industry"] + rows_by_kind["theme"]
     available = sum(row["status"] == "AVAILABLE" for row in rows)
@@ -412,7 +417,8 @@ def build_artifact(*, config: dict[str, Any], industry_input: dict[str, Any] | N
     return {
         "schemaVersion": SCHEMA_VERSION, "status": status, "source": SOURCE,
         "sourceDate": observation_date, "observationDate": observation_date, "scope": SCOPE,
-        "producerRunId": run_id, "generatedAt": generated_at, "configPath": config_path,
+        "producer": PRODUCER, "producerRunId": run_id, "generatedAt": generated_at,
+        "artifactPath": artifact_path, "configPath": config_path,
         "inputPaths": {"industries": industry_path, "themes": theme_path},
         "industries": rows_by_kind["industry"], "themes": rows_by_kind["theme"],
         "counts": {"configured": len(rows), "received": sum(row["status"] == "AVAILABLE" for row in rows), "available": available, "unavailable": len(rows) - available},
@@ -443,12 +449,13 @@ def main(argv: list[str] | None = None) -> int:
         observation_date = _date(args.observation_date) or _input_date(industry_input, []) or _input_date(theme_input, [])
         if not observation_date:
             raise ValueError("OBSERVATION_DATE_UNAVAILABLE")
-        artifact = build_artifact(config=config, industry_input=industry_input, theme_input=theme_input, observation_date=observation_date, run_id=run_id, generated_at=generated_at, config_path=args.config, industry_path=args.industry_input, theme_path=args.theme_input)
+        artifact = build_artifact(config=config, industry_input=industry_input, theme_input=theme_input, observation_date=observation_date, run_id=run_id, generated_at=generated_at, config_path=args.config, industry_path=args.industry_input, theme_path=args.theme_input, artifact_path=args.output)
     except Exception as exc:
         artifact = {
             "schemaVersion": SCHEMA_VERSION, "status": "PRODUCER_FAILED", "source": SOURCE,
             "sourceDate": _date(args.observation_date), "observationDate": _date(args.observation_date), "scope": SCOPE,
-            "producerRunId": run_id, "generatedAt": generated_at, "configPath": args.config,
+            "producer": PRODUCER, "producerRunId": run_id, "generatedAt": generated_at,
+            "artifactPath": args.output, "configPath": args.config,
             "inputPaths": {"industries": args.industry_input, "themes": args.theme_input},
             "industries": [], "themes": [], "counts": {"configured": 0, "received": 0, "available": 0, "unavailable": 0}, "failureReason": str(exc),
         }
