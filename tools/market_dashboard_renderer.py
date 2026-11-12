@@ -860,12 +860,7 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "v2Industries": list(v2.get("industries") or [])[:5] if v2_verified else [],
         "v2Themes": list(v2.get("themes") or [])[:5] if v2_verified else [],
         "v2HoldReason": _v2_hold_reason(v2),
-        "additionalObservations": contract.get("additionalObservations") or {
-            "status": "PRODUCER_NOT_CONFIGURED",
-            "industries": [],
-            "themes": [],
-            "failureReason": "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED",
-        },
+        "additionalObservations": _additional_contract_projection(contract),
         "interests": [_compact_interest(row) for row in _compact_interest_rows(contract)],
         "kiwoom": contract.get("kiwoomCandidates") or {},
         "researchAnalysis": {
@@ -997,6 +992,10 @@ def _additional_status(value: Any) -> str:
         "PRODUCER_NOT_CONFIGURED": "자동 산출 기능 미연결",
         "NOT_YET_RUN": "아직 산출되지 않음",
         "PRODUCER_FAILED": "공급 실행 실패",
+        "INPUT_UNAVAILABLE": "입력 자료 미수신",
+        "NO_ELIGIBLE_TARGETS": "선정 가능한 대상 없음",
+        "REPORT_LINK_FAILED": "리포트 연결 실패",
+        "CONSUMED": "리포트 반영됨",
     }.get(str(value or "").upper(), "원천 상태 확인 필요")
 
 
@@ -1011,7 +1010,33 @@ def _additional_reason(value: Any) -> str:
         "NO_LEADER_DATA": "현재 관측에서 대표 주도주를 찾지 못했습니다.",
         "OBSERVATION_DATE_MISMATCH": "산출물의 관측일이 현재 리포트와 다릅니다.",
         "ADDITIONAL_OBSERVATION_PARTIAL": "일부 추가 관찰 대상만 수신됐습니다.",
+        "AUTO_SELECTION_INPUT_UNAVAILABLE": "추가 관찰 대상을 선정할 현재 관측 입력이 수신되지 않았습니다.",
+        "NO_QUALIFIED_ADDITIONAL_TARGETS": "현재 관측에서 품질 기준을 충족한 추가 대상이 없습니다.",
+        "ADDITIONAL_OBSERVATION_CONTRACT_LINK_FAILED": "추가 관찰 산출물은 수신됐지만 리포트 연결에 실패했습니다.",
     }.get(str(value or "").upper(), "원천 자료 확인 필요")
+
+
+def _additional_contract_projection(contract: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep the renderer contract-only and distinguish a broken link."""
+    value = contract.get("additionalObservations")
+    if isinstance(value, Mapping):
+        return dict(value)
+    sources = contract.get("sources")
+    source = sources.get("additionalObservations") if isinstance(sources, Mapping) else None
+    if isinstance(source, Mapping) and source.get("status"):
+        projection = dict(source)
+        if source.get("artifactPath") and source.get("status") in {"AVAILABLE", "PARTIAL", "CONSUMED"}:
+            projection["status"] = "REPORT_LINK_FAILED"
+            projection["failureReason"] = "ADDITIONAL_OBSERVATION_CONTRACT_LINK_FAILED"
+        projection.setdefault("industries", [])
+        projection.setdefault("themes", [])
+        return projection
+    return {
+        "status": "PRODUCER_NOT_CONFIGURED",
+        "industries": [],
+        "themes": [],
+        "failureReason": "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED",
+    }
 
 
 def _additional_rows(model: Mapping[str, Any]) -> list[Mapping[str, Any]]:

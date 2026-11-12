@@ -256,6 +256,9 @@ jobs:
         if: steps.market_day.outputs.run == 'true'
         continue-on-error: true
         shell: bash
+        env:
+          KRX_INPUT_DIR: ${{ steps.krx.outputs.krx_report_input_dir }}
+          KRX_GENERATION_ID: ${{ steps.krx.outputs.krx_generation_id }}
         run: |
           set +e
           python -m tools.market_snapshot_projection \
@@ -446,6 +449,7 @@ jobs:
           expected = os.environ.get("EXPECTED_GENERATION_ID") or None
           actual = payload.get("generationId")
           effective = payload["status"]
+          evidence = payload.get("generationEvidence") or {}
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
           summary = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -461,6 +465,11 @@ jobs:
                   f"- trading date: `{payload.get('tradingDate') or 'UNAVAILABLE'}`",
                   f"- generation: `{actual or 'UNAVAILABLE'}`",
                   f"- expected generation: `{expected or 'UNAVAILABLE'}`",
+                  f"- input path: `{evidence.get('inputPath') or 'UNAVAILABLE'}`",
+                  f"- input manifest: `{evidence.get('inputManifestPath') or 'UNAVAILABLE'}` (present={evidence.get('manifestPresent')})",
+                  f"- CURRENT pointer: `{evidence.get('currentPointerPath') or 'UNAVAILABLE'}` (present={evidence.get('currentPointerPresent')})",
+                  f"- CURRENT manifest: `{evidence.get('currentManifestPath') or 'UNAVAILABLE'}` (present={evidence.get('currentManifestPresent')})",
+                  f"- generation comparable: `{evidence.get('expectedComparable') and evidence.get('currentGenerationComparable')}`",
                   f"- failure reason: `{payload.get('failureReason') or 'NONE'}`",
                   "",
               ]

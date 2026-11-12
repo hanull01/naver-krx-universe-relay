@@ -91,6 +91,37 @@ class V2RunnerIsolationTests(unittest.TestCase):
             self.assertEqual(status["generationEvidence"]["generationField"], "historicalGenerationId")
             self.assertTrue(status["generationEvidence"]["generationFieldPresent"])
 
+    def test_generation_evidence_records_input_and_current_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._write_inputs(root)
+            input_dir = root / "staged-krx"
+            input_dir.mkdir()
+            (input_dir / "latest-quality.json").write_text(json.dumps({
+                "historicalGenerationId": "gen-test",
+                "sourceQualityStatus": "OK",
+            }), encoding="utf-8")
+            (input_dir / "manifest.json").write_text(json.dumps({
+                "generationId": "gen-test",
+            }), encoding="utf-8")
+            (input_dir / "CURRENT").write_text("gen-test\n", encoding="utf-8")
+            (input_dir / "generation-manifest.json").write_text(json.dumps({
+                "generationId": "gen-test",
+            }), encoding="utf-8")
+            with patch.dict("os.environ", {"KRX_INPUT_DIR": str(input_dir)}, clear=False), \
+                 patch("tools.run_dynamic_universe_v2_shadow.evaluate_snapshot", return_value={"industries": [], "themes": []}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.summarize", return_value={}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.build_source_provenance", return_value={}), \
+                 patch("tools.run_dynamic_universe_v2_shadow.record_current", return_value={"observations": []}):
+                outcome = run_once(root, "2026-11-12", "2026-11-12T01:00:00Z")
+            evidence = outcome["generationEvidence"]
+            self.assertEqual(evidence["inputManifestPath"], str(input_dir / "manifest.json"))
+            self.assertTrue(evidence["manifestPresent"])
+            self.assertTrue(evidence["currentPointerPresent"])
+            self.assertEqual(evidence["currentGenerationId"], "gen-test")
+            self.assertTrue(evidence["currentManifestPresent"])
+            self.assertTrue(evidence["currentGenerationComparable"])
+
     def test_missing_quality_is_explicitly_unavailable(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
