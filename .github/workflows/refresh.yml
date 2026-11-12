@@ -110,7 +110,9 @@ jobs:
             tools/naver_full_market_current.py \
             tools/full_market_monitoring_evidence.py \
             tools/run_full_market_monitoring.py \
-            tools/collect_trading_discovery_quotes.py \
+            tools/consume_kis_candidate_snapshot.py \
+            tools/publish_kis_candidate_delivery.py \
+            tools/run_kis_candidate_handoff.py \
             tools/derived_input_resolver.py \
             tools/market_snapshot_projection.py \
             trading_discovery.py test_trading_discovery_quotes.py
@@ -120,7 +122,10 @@ jobs:
             test_naver_full_market_current.py \
             test_market_snapshot_projection.py \
             test_full_market_monitoring_evidence.py \
-            test_trading_discovery_quotes.py -v
+            test_trading_discovery_quotes.py \
+            test_kis_candidate_delivery.py \
+            test_kis_candidate_publisher.py \
+            test_kis_candidate_handoff_runner.py -v
 
       - name: Resolve approved KRX generation
         id: krx
@@ -397,6 +402,10 @@ jobs:
         if: steps.full_market.outputs.ready == 'true'
         shell: bash
         run: |
+          # Candidate dated/latest and quote dated/latest artifacts are
+          # pre-published by the monitoring-owned local handoff.  Refresh
+          # consumes them through the report contract and never reads the
+          # Mac mini snapshot or writes candidate artifacts here.
           set +e
           python -m tools.build_report_contract \
             --staging-input-dir "${{ steps.krx.outputs.krx_report_input_dir }}"
@@ -550,22 +559,6 @@ jobs:
           echo "markdown_path=data/reports/$markdown_filename" >> "$GITHUB_OUTPUT"
           echo "Markdown/HTML validation succeeded: html=data/reports/$html_filename markdown=data/reports/$markdown_filename"
 
-      - name: Collect optional Kiwoom discovery quotes
-        id: discovery_quotes
-        if: steps.market_day.outputs.run == 'true'
-        continue-on-error: true
-        timeout-minutes: 2
-        shell: bash
-        run: |
-          set +e
-          python tools/collect_trading_discovery_quotes.py
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          if [ "$code" -ne 0 ]; then
-            echo "::warning::Kiwoom supplemental quote collection failed; core market publication and MARKET_DATA_READY remain eligible."
-          fi
-          exit 0
-
       - name: Preserve full-market failure diagnostic
         if: steps.market_day.outputs.run == 'true' && steps.full_market.outputs.exit_code != '0'
         uses: actions/upload-artifact@v4
@@ -655,12 +648,6 @@ jobs:
           fi
 
           echo "Intraday refresh does not publish retired daily rolling history."
-
-          if [ "${{ steps.discovery_quotes.outputs.exit_code }}" = "0" ]; then
-            git add -- data/trading-discovery/quotes
-          else
-            echo "Kiwoom supplemental quotes are not eligible for this market commit; preserving prior files."
-          fi
 
           if [ -f data/dynamic-universe/v2-shadow-run-status.json ]; then
             git add -- data/dynamic-universe/v2-shadow-run-status.json
