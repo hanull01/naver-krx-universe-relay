@@ -1,7 +1,86 @@
 {
-  "status": "FAILED",
-  "observedAt": "2026-11-12T04:31:36.136139+00:00",
+  "runId": "43200986866",
+  "status": "GENERATION_UNAVAILABLE",
+  "observedAt": "2026-11-12T10:35:28.905998+00:00",
+  "generatedAt": "2026-11-12T10:35:28.905998+00:00",
   "tradingDate": "2026-11-12",
-  "errorType": "NameError",
-  "error": "name 'quality' is not defined"
+  "summary": {
+    "industries": {
+      "count": 79,
+      "v2StatusDistribution": {
+        "WAIT": 79
+      },
+      "v1V2StatusDifferences": 79,
+      "unavailable": 79
+    },
+    "themes": {
+      "count": 265,
+      "v2StatusDistribution": {
+        "WAIT": 265
+      },
+      "v1V2StatusDifferences": 264,
+      "unavailable": 265
+    }
+  },
+  "inputEvidence": {
+    "tradingDate": "2026-11-12",
+    "sourceQualityStatus": "COMPLETE_RECONCILIATION_PENDING",
+    "sourceCommit": null,
+    "sourceCommitStatus": "UNAVAILABLE",
+    "generationId": "gen_20261111_1794438352132244000",
+    "sourceProvenance": {
+      "schemaVersion": "v2-source-provenance-v1",
+      "status": "PARTIAL",
+      "sourceCommit": null,
+      "sourceCommitStatus": "UNAVAILABLE",
+      "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
+      "tradingDate": "20261112",
+      "calculationGeneration": "2026-11-12T10:35:24.601807+00:00",
+      "inputSnapshotSha256": "7711481eed0e2720cfe565d09fe32f3ebc793a79e84b4913f13a5b3bd2f2c736",
+      "resultSha256": null,
+      "historySha256": null,
+      "files": [
+        {
+          "kind": "industries",
+          "path": "data/monitoring/latest-industries.json",
+          "status": "OBSERVED_HASH_ONLY",
+          "sha256": "d05d16947c808841494e0643611474b18950d1dbc540ebd04a5d2e8805108a99",
+          "bytes": 285373,
+          "generatedAt": "2026-11-12T10:35:24.601807+00:00",
+          "tradingDate": "20261112",
+          "generationStatus": "ALIGNED",
+          "dateStatus": "ALIGNED"
+        },
+        {
+          "kind": "themes",
+          "path": "data/monitoring/latest-theme-signals.json",
+          "status": "OBSERVED_HASH_ONLY",
+          "sha256": "d268ed1f8867c82625ecbfce45d7fee67abd82d0fc973129e4b64117e70d73a1",
+          "bytes": 8581702,
+          "generatedAt": "2026-11-12T10:35:24.601807+00:00",
+          "tradingDate": null,
+          "generationStatus": "ALIGNED",
+          "dateStatus": "UNAVAILABLE"
+        },
+        {
+          "kind": "v1Universe",
+          "path": "data/dynamic-universe/latest.json",
+          "status": "OBSERVED_HASH_ONLY",
+          "sha256": "b4f040ce8168e33daf023d8d70f63338ed26db9a43eb3c4eb7188856bbe4b484",
+          "bytes": 193556,
+          "generatedAt": "2026-11-12T10:35:26.648472+00:00",
+          "tradingDate": null,
+          "generationStatus": "NOT_REQUIRED",
+          "dateStatus": "UNAVAILABLE"
+        }
+      ]
+    }
+  },
+  "observationCount": 146,
+  "rawStatus": "OK",
+  "producerStatus": "OK",
+  "expectedGenerationId": "gen_20261111_1794438352132244000",
+  "consumptionStatus": "NOT_CONSUMED",
+  "publicationPolicy": "PARTIAL_NON_BLOCKING",
+  "failureReason": "V2_GENERATION_ID_MISSING"
 }
