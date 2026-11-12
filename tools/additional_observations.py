@@ -39,6 +39,28 @@ def _targets(config: Mapping[str, Any] | None, kind: str) -> list[dict[str, Any]
     return result
 
 
+def _auto_select_enabled(config: Mapping[str, Any] | None) -> bool:
+    return bool(config.get("autoSelect", True)) if isinstance(config, Mapping) else True
+
+
+def _artifact_targets(artifact: Mapping[str, Any] | None, kind: str) -> list[dict[str, Any]]:
+    key = "industries" if kind == "industries" else "themes"
+    rows = artifact.get(key) if isinstance(artifact, Mapping) else []
+    if not isinstance(rows, list):
+        return []
+    result: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        target_id = _target_id(row)
+        if not target_id or target_id in seen:
+            continue
+        seen.add(target_id)
+        result.append({"id": target_id, "name": row.get("name") or target_id, "type": kind})
+    return result
+
+
 def _metadata(artifact: Mapping[str, Any] | None) -> dict[str, Any]:
     source = artifact if isinstance(artifact, Mapping) else {}
     return {
@@ -116,6 +138,10 @@ def _project_row(target: Mapping[str, Any], artifact: Mapping[str, Any], row: Ma
         "membershipCount": membership_count,
         "leaderCount": int(leader_count or 0),
         "leaders": leaders,
+        "selectionRank": row.get("selectionRank"),
+        "selectionScore": row.get("selectionScore"),
+        "selectionReason": row.get("selectionReason"),
+        "selectionEvidence": row.get("selectionEvidence"),
         "status": status,
         "failureReason": reason,
     }
@@ -134,8 +160,39 @@ def build_additional_observation_projection(
     expected = _date(observation_date)
     industries = _targets(config, "industries")
     themes = _targets(config, "themes")
+    auto_select = _auto_select_enabled(config)
+    if auto_select and not industries and not themes:
+        industries = _artifact_targets(artifact, "industries")
+        themes = _artifact_targets(artifact, "themes")
     targets = industries + themes
     if not targets:
+        if auto_select:
+            artifact_status = str((artifact or {}).get("status") or "").upper() if isinstance(artifact, Mapping) else ""
+            if artifact_status == "NO_ELIGIBLE_TARGETS":
+                status = "NO_ELIGIBLE_TARGETS"
+                reason = (artifact or {}).get("failureReason") or "NO_QUALIFIED_ADDITIONAL_TARGETS"
+            elif artifact_status == "PRODUCER_FAILED":
+                status = "PRODUCER_FAILED"
+                reason = (artifact or {}).get("failureReason") or "PRODUCER_FAILED"
+            else:
+                status = "INPUT_UNAVAILABLE"
+                reason = "AUTO_SELECTION_INPUT_UNAVAILABLE"
+            return {
+                "schemaVersion": SCHEMA_VERSION,
+                "status": status,
+                "source": (artifact or {}).get("source") if isinstance(artifact, Mapping) else None,
+                "sourceDate": (artifact or {}).get("sourceDate") if isinstance(artifact, Mapping) else None,
+                "observationDate": expected,
+                "scope": "STOCK_ONLY",
+                "producerRunId": (artifact or {}).get("producerRunId") if isinstance(artifact, Mapping) else None,
+                "generatedAt": (artifact or {}).get("generatedAt") if isinstance(artifact, Mapping) else now,
+                "configPath": config_path,
+                "artifactPath": artifact_path,
+                "industries": [],
+                "themes": [],
+                "counts": {"configured": 0, "received": 0, "available": 0, "unavailable": 0},
+                "failureReason": reason,
+            }
         return {
             "schemaVersion": SCHEMA_VERSION,
             "status": "PRODUCER_NOT_CONFIGURED",
