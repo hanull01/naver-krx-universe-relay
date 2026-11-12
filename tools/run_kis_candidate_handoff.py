@@ -149,6 +149,8 @@ def run_once(snapshot_root, calendar, quotes, repository, *, state_dir=DEFAULT_S
             path, expected_monitoring_date=target_date, calendar_path=calendar,
         )
         source_hash = snapshot["source_sha256"]
+        candidate_count = int(snapshot.get("candidate_count", 0))
+        condition_status = "NO_RESULTS" if candidate_count == 0 else "RESULTS"
         state = _read_state(state_path)
         previous = state["processed"].get(target_date)
         if isinstance(previous, dict) and previous.get("sourceHash") == source_hash:
@@ -158,6 +160,17 @@ def run_once(snapshot_root, calendar, quotes, repository, *, state_dir=DEFAULT_S
                 "sourceHash": source_hash,
                 "snapshot": str(path),
                 "previousStatus": previous.get("status"),
+                "inputSnapshotPath": str(path),
+                "candidateCount": candidate_count,
+                "snapshotStatus": snapshot.get("status"),
+                "conditionSearchStatus": condition_status,
+                "quoteRequestedCount": 0 if candidate_count == 0 else None,
+                "quoteSuccessCount": 0 if candidate_count == 0 else None,
+                "quoteFailureCount": 0 if candidate_count == 0 else None,
+                "statusDetail": "AVAILABLE_EMPTY" if candidate_count == 0 else previous.get("status"),
+                "publisherCalled": False,
+                "publicationStatus": "IDEMPOTENT",
+                "duplicateGuardStatus": "IDEMPOTENT",
             }
 
         try:
@@ -173,6 +186,23 @@ def run_once(snapshot_root, calendar, quotes, repository, *, state_dir=DEFAULT_S
                 "snapshot": str(path),
                 "publisher": result,
                 "checkedAt": datetime.now(KST).isoformat(),
+                "inputSnapshotPath": str(path),
+                "candidateCount": candidate_count,
+                "snapshotStatus": snapshot.get("status"),
+                "conditionSearchStatus": condition_status,
+                "quoteRequestedCount": result.get("lineage", {}).get("requestedCount"),
+                "quoteSuccessCount": result.get("lineage", {}).get("quoteCount"),
+                "quoteFailureCount": (
+                    (result.get("lineage", {}).get("requestedCount") or 0)
+                    - (result.get("lineage", {}).get("quoteCount") or 0)
+                ),
+                "statusDetail": result.get("quotes", {}).get("status"),
+                "publisherCalled": True,
+                "publicationStatus": (
+                    "PUBLISHED" if result.get("publishStatus") == "PUSHED"
+                    else result.get("publishStatus", "UNKNOWN")
+                ),
+                "duplicateGuardStatus": "CREATED",
             }
         except Exception as exc:
             outcome = {
@@ -183,6 +213,17 @@ def run_once(snapshot_root, calendar, quotes, repository, *, state_dir=DEFAULT_S
                 "failureReason": type(exc).__name__,
                 "failureDetail": str(exc),
                 "checkedAt": datetime.now(KST).isoformat(),
+                "inputSnapshotPath": str(path),
+                "candidateCount": candidate_count,
+                "snapshotStatus": snapshot.get("status"),
+                "conditionSearchStatus": condition_status,
+                "quoteRequestedCount": 0 if candidate_count == 0 else None,
+                "quoteSuccessCount": 0 if candidate_count == 0 else None,
+                "quoteFailureCount": 0 if candidate_count == 0 else None,
+                "statusDetail": "AVAILABLE_EMPTY" if candidate_count == 0 else "FAILED",
+                "publisherCalled": True,
+                "publicationStatus": "FAILED",
+                "duplicateGuardStatus": "CREATED",
             }
         if not dry_run:
             state["processed"][target_date] = {
@@ -190,6 +231,18 @@ def run_once(snapshot_root, calendar, quotes, repository, *, state_dir=DEFAULT_S
                 "status": outcome["status"],
                 "failureReason": outcome.get("failureReason"),
                 "checkedAt": outcome["checkedAt"],
+                "inputSnapshotPath": outcome["inputSnapshotPath"],
+                "monitoringDate": target_date,
+                "candidateCount": outcome["candidateCount"],
+                "snapshotStatus": outcome["snapshotStatus"],
+                "conditionSearchStatus": outcome["conditionSearchStatus"],
+                "quoteRequestedCount": outcome["quoteRequestedCount"],
+                "quoteSuccessCount": outcome["quoteSuccessCount"],
+                "quoteFailureCount": outcome["quoteFailureCount"],
+                "statusDetail": outcome["statusDetail"],
+                "publisherCalled": outcome["publisherCalled"],
+                "publicationStatus": outcome["publicationStatus"],
+                "duplicateGuardStatus": outcome["duplicateGuardStatus"],
             }
             _write_state(state_path, state)
         return outcome

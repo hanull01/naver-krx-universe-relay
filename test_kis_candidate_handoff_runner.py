@@ -6,10 +6,12 @@ from pathlib import Path
 
 import trading_discovery as td
 from tools import run_kis_candidate_handoff as runner
+from tools import publish_kis_candidate_delivery as publisher
 
 
-def make_fixture(root, monitoring_date="2026-10-13"):
+def make_fixture(root, monitoring_date="2026-10-13", symbols=None):
     root = Path(root)
+    symbols = ["005930"] if symbols is None else list(symbols)
     snapshot_root = root / "snapshots"
     snapshot_root.mkdir()
     calendar = root / "calendar.json"
@@ -18,12 +20,12 @@ def make_fixture(root, monitoring_date="2026-10-13"):
         "dates": ["2026-10-12", monitoring_date],
     }), encoding="utf-8")
     payload = {
-        "schema_version": 1, "status": "AVAILABLE",
+        "schema_version": 1, "status": "AVAILABLE" if symbols else "AVAILABLE_EMPTY",
         "selection_date": "2026-10-12", "monitoring_date": monitoring_date,
         "source": "KIWOOM_CONDITION_SEARCH",
         "source_group": "장종료후 단타후보군 탐색", "group_id": "CONDITION:0",
-        "synced_at": "2026-10-12T21:00:01+09:00", "candidate_count": 1,
-        "symbols": ["005930"], "source_sha256": "",
+        "synced_at": "2026-10-12T21:00:01+09:00", "candidate_count": len(symbols),
+        "symbols": symbols, "source_sha256": "",
         "validation": {"status": "VALID", "calendar_source": "KRX_OFFICIAL", "immutable": True},
     }
     payload["source_sha256"] = td.source_hash(payload)
@@ -136,6 +138,35 @@ class HandoffRunnerTests(unittest.TestCase):
         self.assertNotIn("StartCalendarInterval", raw)
         self.assertNotIn("trading-console-candidates", raw)
         self.assertIn("--allow-network", raw)
+
+    def test_empty_snapshot_publishes_without_previous_quotes_and_records_audit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot_root, snapshot, calendar, quotes, payload = make_fixture(
+                root, symbols=[]
+            )
+            quotes.unlink()
+            result = runner.run_once(
+                snapshot_root, calendar, quotes, root,
+                state_dir=root / "state", stability_seconds=0,
+                publisher_fn=lambda snapshot_path, calendar_path, quotes_path, repository, **kwargs:
+                    publisher.safe_publish(
+                        snapshot_path, calendar_path, quotes_path, repository,
+                        monitoring_date="2026-10-13", dry_run=True,
+                    ),
+            )
+            self.assertEqual(result["status"], "DRY_RUN")
+            self.assertEqual(result["candidateCount"], 0)
+            self.assertEqual(result["conditionSearchStatus"], "NO_RESULTS")
+            self.assertEqual(result["quoteRequestedCount"], 0)
+            self.assertEqual(result["quoteSuccessCount"], 0)
+            self.assertEqual(result["quoteFailureCount"], 0)
+            self.assertTrue(result["publisherCalled"])
+            self.assertEqual(result["publicationStatus"], "DRY_RUN")
+            state = json.loads((root / "state/state.json").read_text(encoding="utf-8"))
+            audit = state["processed"]["2026-10-13"]
+            self.assertEqual(audit["candidateCount"], 0)
+            self.assertEqual(audit["duplicateGuardStatus"], "CREATED")
 
 
 if __name__ == "__main__":

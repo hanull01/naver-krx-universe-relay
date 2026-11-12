@@ -136,6 +136,32 @@ class SupplementalDiscoveryQuoteTests(unittest.TestCase):
         self.assertEqual(calls, [["007660"]])
         self.assertEqual(result["status"], "AVAILABLE")
 
+    def test_empty_snapshot_does_not_read_or_validate_previous_quotes(self):
+        now = lambda: datetime(2026, 11, 13, 10, 1, tzinfo=KST)
+        old_quotes = quotes_payload([], "2026-11-11T15:30:00+09:00")
+        result = td.build_supplemental_quotes(
+            discovery([]), old_quotes, {},
+            fetcher=lambda _: self.fail("empty snapshot must not request quotes"),
+            normalizer=lambda row, _now: row, clock=now)
+        self.assertEqual(result["status"], "AVAILABLE_EMPTY")
+        self.assertEqual(result["conditionSearchStatus"], "NO_RESULTS")
+        self.assertEqual(result["quoteRequestedCount"], 0)
+        self.assertEqual(result["quoteSuccessCount"], 0)
+        self.assertEqual(result["quoteFailureCount"], 0)
+        self.assertEqual(result["quoteStatus"], "AVAILABLE_EMPTY")
+        self.assertEqual(result["networkCalls"], 0)
+        td.validate_supplemental_quotes(result, discovery([]), None)
+
+    def test_nonempty_snapshot_still_rejects_previous_quote_date(self):
+        candidate = discovery(["251340"])
+        with self.assertRaisesRegex(td.DiscoveryError, "MARKET_QUOTES_DATE_MISMATCH"):
+            td.build_supplemental_quotes(
+                candidate, quotes_payload([], "2026-11-11T15:30:00+09:00"), {},
+                fetcher=lambda _: self.fail("stale source must not be reused"),
+                normalizer=lambda row, _now: row,
+                clock=lambda: datetime(2026, 11, 13, 10, 1, tzinfo=KST),
+            )
+
     def test_stale_signal_is_not_reused(self):
         calls = []
         result = td.build_supplemental_quotes(

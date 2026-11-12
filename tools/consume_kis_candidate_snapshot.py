@@ -40,7 +40,14 @@ def main():
     snapshot = args.snapshot or td.official_snapshot_path(
         args.monitoring_date, root=args.snapshot_root
     )
-    quotes = td.load_json(args.quotes)
+    snapshot_payload = td.load_official_snapshot(
+        snapshot,
+        expected_monitoring_date=args.monitoring_date,
+        calendar_path=args.calendar,
+    )
+    # An empty official snapshot is a valid NO_RESULTS handoff and has no
+    # quote input.  Never read a prior quotes.json in that case.
+    quotes = None if not snapshot_payload.get("symbols") else td.load_json(args.quotes)
     result = td.consume_official_snapshot(
         snapshot, quotes, args.calendar,
         discovery_output_dir=args.output_dir,

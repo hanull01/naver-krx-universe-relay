@@ -117,7 +117,10 @@ def _build_delivery(snapshot_path, calendar_path, quotes_path, *, monitoring_dat
         expected_monitoring_date=monitoring_date,
         calendar_path=calendar_path,
     )
-    quotes = td.load_json(quotes_path)
+    # Empty official snapshots are complete NO_RESULTS inputs.  There is no
+    # quote source to read and, importantly, no previous quotes file may be
+    # consulted as a substitute for this snapshot.
+    quotes = None if not snapshot.get("symbols") else td.load_json(quotes_path)
     result = td.consume_official_snapshot(
         snapshot_path,
         quotes,
@@ -159,7 +162,7 @@ def safe_publish(snapshot_path, calendar_path, quotes_path, repository=ROOT, *,
     """Validate, stage and optionally push one local snapshot handoff."""
     snapshot_path = Path(snapshot_path).resolve()
     calendar_path = Path(calendar_path).resolve()
-    quotes_path = Path(quotes_path).resolve()
+    quotes_path = Path(quotes_path).resolve() if quotes_path is not None else None
     repository = Path(repository).resolve()
     # The source is checked before fetch/worktree creation and is never written.
     td.load_official_snapshot(
@@ -167,7 +170,12 @@ def safe_publish(snapshot_path, calendar_path, quotes_path, repository=ROOT, *,
         expected_monitoring_date=monitoring_date,
         calendar_path=calendar_path,
     )
-    if not quotes_path.is_file():
+    snapshot = td.load_official_snapshot(
+        snapshot_path,
+        expected_monitoring_date=monitoring_date,
+        calendar_path=calendar_path,
+    )
+    if snapshot.get("symbols") and (quotes_path is None or not quotes_path.is_file()):
         raise PublishError("QUOTE_INPUT_MISSING")
     if fetcher is None or normalizer is None:
         if not allow_network and not dry_run:
@@ -243,7 +251,7 @@ def main():
     parser.add_argument("--snapshot", required=True, type=Path)
     parser.add_argument("--monitoring-date", required=True)
     parser.add_argument("--calendar", required=True, type=Path)
-    parser.add_argument("--quotes", required=True, type=Path)
+    parser.add_argument("--quotes", type=Path)
     parser.add_argument("--repository", default=str(ROOT), type=Path)
     parser.add_argument("--remote", default="origin")
     parser.add_argument("--branch", default="main")
