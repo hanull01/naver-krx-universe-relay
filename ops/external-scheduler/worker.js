@@ -42,14 +42,28 @@ export function slotKeyFor(plan, cron, scheduledTime) {
   return `${plan.key}:${kst.year}-${kst.month}-${kst.day}T${kst.hour}:${kst.minute}:${cron}`;
 }
 
+export function researchSlotForHour(hour) {
+  return ({ 7: "07:20", 12: "12:20", 19: "19:20" })[Number(hour)] || null;
+}
+
+export function refreshResearchInputs(hour) {
+  const mapping = {
+    8: { research_slot: "07:20", report_slot: "08:30" },
+    12: { research_slot: "12:20", report_slot: "12:30" },
+    13: { research_slot: "12:20", report_slot: "13:30" },
+    19: { research_slot: "19:20", report_slot: "19:30" },
+  };
+  return mapping[Number(hour)] || {};
+}
+
 export function resolveScheduledPlan(cron, scheduledTime) {
   const kst = kstParts(scheduledTime);
   if (cron === RESEARCH_CRON) {
     if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
     const hour = Number(kst.hour);
     const minute = Number(kst.minute);
-    if (minute === 20 && (hour === 7 || hour === 12 || hour === 19)) {
-      return { plan: planForKey("research"), slotCron: "20 research" };
+    if (minute === 20 && researchSlotForHour(hour)) {
+      return { plan: { ...planForKey("research"), inputs: { research_slot: researchSlotForHour(hour) } }, slotCron: "20 research" };
     }
     return null;
   }
@@ -61,7 +75,7 @@ export function resolveScheduledPlan(cron, scheduledTime) {
   if (kst.weekday === "Sat" || kst.weekday === "Sun") return null;
   const hour = Number(kst.hour);
   const minute = Number(kst.minute);
-  if (minute === 30 && hour >= 8 && hour <= 20) return { plan: planForKey("refresh"), slotCron: "30 refresh" };
+  if (minute === 30 && hour >= 8 && hour <= 20) return { plan: { ...planForKey("refresh"), inputs: refreshResearchInputs(hour) }, slotCron: "30 refresh" };
   return null;
 }
 

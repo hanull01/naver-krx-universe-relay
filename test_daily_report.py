@@ -77,6 +77,28 @@ class DailyReportTests(unittest.TestCase):
             "RESEARCH_SOURCE_MISSING",
         )
 
+    def test_research_slot_loader_rejects_generic_latest_and_accepts_exact_slot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            slot_dir = Path(directory)
+            payload = {
+                "status": "OK", "asOf": "2026-10-29", "sourceGeneration": "gen-1",
+                "stocks": [], "slotLineage": {
+                    "researchSlot": "07:20", "artifactStatus": "AVAILABLE",
+                    "producerStatus": "SUCCESS", "freshnessStatus": "FRESH",
+                },
+            }
+            (slot_dir / "20261029-0720.json").write_text(json.dumps(payload), encoding="utf-8")
+            with patch.object(daily_report, "RESEARCH_SLOTS_PATH", slot_dir), patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "07:20"}, clear=False):
+                self.assertEqual(
+                    daily_report.load_research_slot_for_report("2026-10-29", "gen-1")["status"],
+                    "OK",
+                )
+                with patch.dict("os.environ", {"REPORT_RESEARCH_SLOT": "12:20"}, clear=False):
+                    self.assertEqual(
+                        daily_report.load_research_slot_for_report("2026-10-29", "gen-1")["unavailableReason"],
+                        "RESEARCH_SLOT_ARTIFACT_MISSING",
+                    )
+
     def test_unavailable_research_does_not_fake_coverage_or_block_report(self):
         report = {
             "coverage": {"enabledStockCount": 1, "researchStockCount": 0},
@@ -1199,6 +1221,7 @@ class DailyReportTests(unittest.TestCase):
             with patch.object(daily_report, "build_report", return_value=report), \
                  patch.object(daily_report, "write_markdown"), \
                  patch.object(daily_report, "write_work_markdown"), \
+                 patch.object(daily_report, "render_contract_views", return_value={"markdown": str(Path(directory) / "latest.md")}), \
                  patch.object(daily_report, "render_dashboard_html", return_value="<html></html>"), patch(
                      "sys.argv", ["daily_report.py", "--as-of", "2026-10-16", "--output-dir", directory]
                  ):
@@ -1206,8 +1229,8 @@ class DailyReportTests(unittest.TestCase):
             output = Path(directory)
             self.assertFalse((output / "latest.json").exists())
             self.assertFalse((output / "2026-10-16.json").exists())
-            self.assertTrue((output / "latest.html").exists())
-            self.assertTrue((output / "2026-10-16.html").exists())
+            self.assertFalse((output / "latest.html").exists())
+            self.assertFalse((output / "2026-10-16.html").exists())
 
 
 if __name__ == "__main__":

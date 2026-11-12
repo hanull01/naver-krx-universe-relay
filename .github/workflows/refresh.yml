@@ -21,6 +21,14 @@ on:
         required: false
         default: true
         type: boolean
+      research_slot:
+        description: Exact research slot consumed by this report (07:20, 12:20, or 19:20)
+        required: false
+        type: string
+      report_slot:
+        description: Report slot lineage (for example 08:30 or 13:30)
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -401,6 +409,9 @@ jobs:
         id: report_contract
         if: steps.full_market.outputs.ready == 'true'
         shell: bash
+        env:
+          REPORT_RESEARCH_SLOT: ${{ inputs.research_slot || '' }}
+          REPORT_SLOT: ${{ inputs.report_slot || '' }}
         run: |
           # Candidate dated/latest and quote dated/latest artifacts are
           # pre-published by the monitoring-owned local handoff.  Refresh

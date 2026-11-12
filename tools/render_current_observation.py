@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.file_digest import sha256_bytes, sha256_file
+from tools.report_lineage import lineage_from_contract
 from tools.market_dashboard_renderer import (
     TemplateUnavailable,
     build_dashboard_model,
@@ -153,6 +154,12 @@ def render_current_observation(
         "reportContractPath": repo_path(contract_path),
         "reportContractSha256": sha256_bytes(contract_bytes),
         "reportContractGeneratedAt": observed_at,
+        "contractId": lineage_from_contract(display_contract)["contractId"],
+        "reportLineage": lineage_from_contract(display_contract),
+        "source": (display_contract.get("currentMarketObservation") or {}).get("source"),
+        "scope": (display_contract.get("currentMarketObservation") or {}).get("scope"),
+        "datedReportPath": f"data/reports/{str(display_contract.get('asOf') or observation_date).replace('-', '')[:4]}-{str(display_contract.get('asOf') or observation_date).replace('-', '')[4:6]}-{str(display_contract.get('asOf') or observation_date).replace('-', '')[6:8]}.md",
+        "latestReportPath": "data/reports/latest.md",
         "workflowRunId": run_id,
         "executionHead": head_sha,
         "markdownPath": repo_path(markdown_path),
