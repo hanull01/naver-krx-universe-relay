@@ -12,6 +12,7 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         cls.readme = (ROOT / "README.md").read_text(encoding="utf-8")
         cls.wrangler = (ROOT / "wrangler.toml").read_text(encoding="utf-8")
         cls.refresh_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh.yml").read_text(encoding="utf-8")
+        cls.research_workflow = (ROOT.parent.parent / ".github" / "workflows" / "refresh-research.yml").read_text(encoding="utf-8")
 
     def test_refresh_uses_one_common_path_for_all_market_sessions(self):
         self.assertIn("CONSOLIDATED_CRON", self.worker)
@@ -59,6 +60,18 @@ class ExternalSchedulerContractTests(unittest.TestCase):
         self.assertIn('new_sqlite_classes = ["SlotGate"]', self.wrangler)
         self.assertIn("production-publication-", self.refresh_workflow)
         self.assertIn("Upload production publication provenance", self.refresh_workflow)
+
+    def test_research_dispatch_slot_payload_and_diagnostics_are_explicit(self):
+        self.assertIn("researchSlotForHour", self.worker)
+        self.assertIn('research_slot: researchSlotForHour(hour)', self.worker)
+        self.assertIn("RESEARCH_SLOT_INPUT_MISSING", self.worker)
+        self.assertIn("payloadHasResearchSlot", self.worker)
+        self.assertIn("githubResponseStatus", self.worker)
+        self.assertIn("responseSummary", self.worker)
+        self.assertIn('duplicateExecution: true', self.worker)
+        self.assertIn('status: "DUPLICATE_SLOT"', self.worker)
+        self.assertIn('required: true', self.research_workflow)
+        self.assertIn('research_slot', self.research_workflow)
 
 
 if __name__ == "__main__":
