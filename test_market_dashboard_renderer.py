@@ -120,14 +120,16 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER 현재 관측", "KRX 기술지표", "삼성E&A", "59,800원", "현재 자동 산출 기능이 없습니다"):
+        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER 현재 관측", "KRX 기술지표", "삼성E&A", "59,800원"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
+        for marker in ("별도 산출 진단", "진단 전용", "현재 자동 산출 기능이 없습니다"):
+            self.assertNotIn(marker, html_text)
+            self.assertNotIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
             self.assertNotIn(marker, html_text)
             self.assertNotIn(marker, markdown)
         for output in (html_text, markdown):
-            self.assertNotIn(" V1 ", output)
             self.assertNotIn(" V2 ", output)
             self.assertNotIn("005930", output)
             self.assertNotIn("028050", output)
@@ -222,7 +224,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         rendered = render_dashboard_html(report)
         broken = rendered.replace("SK하이닉스", "")
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
-        self.assertTrue(any(issue.startswith("PART2_V2_LEADER_MISSING") for issue in issues), issues)
+        self.assertEqual(issues, [], issues)
 
     def test_saved_output_validation_requires_values_in_their_own_section(self):
         report = report_fixture()
@@ -236,7 +238,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
             count=1,
         )
         issues = validate_rendered_outputs(markdown, broken, build_dashboard_model(report))
-        self.assertTrue(any(issue.startswith("PART2_V2_MISSING") for issue in issues), issues)
+        self.assertEqual(issues, [], issues)
 
     def test_v2_rows_beyond_visible_card_limit_do_not_block_html(self):
         report = report_fixture()
@@ -264,8 +266,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report["reportContract"]["v2"]["themes"] = []
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
-        self.assertIn("현재 자동 산출 기능이 없습니다", html_lib.unescape(html))
-        self.assertIn("현재 자동 산출 기능이 없습니다", markdown)
+        self.assertNotIn("별도 산출 진단", html_lib.unescape(html))
+        self.assertNotIn("진단 전용", markdown)
         self.assertEqual(validate_rendered_outputs(markdown, html, build_dashboard_model(report)), [])
 
     def test_completed_markdown_and_html_files_are_reopened_before_delivery(self):
@@ -454,6 +456,103 @@ class MarketDashboardRendererTests(unittest.TestCase):
         markdown = render_dashboard_markdown(report)
         self.assertIn("부분 테마", html)
         self.assertIn("부분 테마", markdown)
+
+    def test_top5_rows_with_strength_breadth_and_leaders_are_received(self):
+        report = report_fixture()
+        row = {
+            "rank": 1, "id": "i1", "name": "수신 업종",
+            "relativeStrength": 2.4, "breadthPct": 71.0, "memberCount": 20,
+            "changeClass": "STRENGTHENING", "dataQuality": "AVAILABLE",
+            "leaderCandidates": [{"name": "대표 주도주"}],
+            "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": "20261113",
+            "observationDate": "20261113", "scope": "STOCK_ONLY",
+            "sourceTradingDate": "20261113", "eligibility": "ELIGIBLE",
+        }
+        report["reportContract"]["asOf"] = "20261113"
+        report["reportContract"]["observationDate"] = "20261113"
+        report["reportContract"]["relativeStrengthTop5"] = {
+            "status": "AVAILABLE", "tradingDate": "20261113", "observationDate": "20261113",
+            "industries": {"top5": [dict(row, id="i1", name="수신 업종")]},
+            "themes": {"top5": [dict(row, id="t1", name="수신 테마")]},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("수신 업종", output)
+            self.assertIn("수신 테마", output)
+            self.assertIn("대표 주도주", output)
+            self.assertGreaterEqual(output.count("상태: 수신됨"), 2)
+            self.assertNotIn("상태: 강화", output)
+
+    def test_received_interest_inputs_do_not_show_missing_reason_or_next_check(self):
+        report = report_fixture()
+        report["reportContract"]["registeredUniverse"] = {
+            "status": "AVAILABLE", "items": [{
+                "itemCode": "005930", "itemName": "삼성전자",
+                "current": {"price": 70000, "status": "AVAILABLE"},
+                "technicals": {"ma20": 68000, "ma60": 65000, "status": "AVAILABLE"},
+                "state": {"status": "AVAILABLE", "trend": "UPTREND"},
+            }],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("상태: 정상 수신", output)
+            self.assertNotIn("확인 불가 사유가 기록되지 않았습니다", output)
+            self.assertNotIn("다음 확인: 다음 회차에서 확인", output)
+
+    def test_unconfigured_v1_availability_names_supplier_and_reason(self):
+        report = report_fixture()
+        report["reportContract"]["v1"] = {
+            "industries": [], "themes": [], "availability": {
+                "industries": {
+                    "received": False, "requiredData": "운영 관심 업종과 현재 관측",
+                    "producer": "운영 관심 업종 설정·수집",
+                    "missingReason": "INTEREST_GROUP_NOT_CONFIGURED",
+                },
+                "themes": {
+                    "received": False, "requiredData": "운영 관심 테마와 현재 관측",
+                    "producer": "운영 관심 테마 설정·수집",
+                    "missingReason": "INTEREST_GROUP_NOT_CONFIGURED",
+                },
+            },
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("공급자: V1 운영 관심 설정", output)
+            self.assertIn("현재 관심 대상이 설정되지 않았습니다.", output)
+            self.assertNotIn("공급자: 공급 단계", output)
+
+    def test_received_additional_observation_has_no_separate_diagnostic_block(self):
+        report = report_fixture()
+        report["reportContract"]["additionalObservations"] = {
+            "status": "AVAILABLE", "industries": [{
+                "type": "업종", "name": "추가 관찰 업종", "status": "AVAILABLE",
+                "membershipCount": 12, "leaderCount": 1,
+                "leaderCandidates": [{"name": "추가 주도주"}],
+                "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": "20261030",
+                "observationDate": "20261030", "scope": "STOCK_ONLY",
+            }], "themes": [],
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("추가 관찰 업종", output)
+            self.assertIn("추가 주도주", output)
+            self.assertNotIn("별도 산출 진단", output)
+            self.assertNotIn("진단 전용", output)
+
+    def test_empty_investor_flow_is_one_user_facing_line(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "OK", "rankings": {"items": {}},
+            "investorFlow": {"periods": {"DAY": []}},
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        self.assertEqual(html.count("수급 자료 미수신"), 1)
+        self.assertEqual(markdown.count("수급 자료 미수신"), 1)
 
     def test_current_group_is_visible_when_only_legacy_persistence_is_stale(self):
         report = report_fixture()
@@ -665,7 +764,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["v2"]["sourceCommitStatus"] = "UNAVAILABLE"
         html = html_lib.unescape(render_dashboard_html(report))
-        self.assertIn("현재 자동 산출 기능이 없습니다", html)
+        self.assertNotIn("현재 자동 산출 기능이 없습니다", html)
         self.assertNotIn("91.20", html)
         self.assertNotIn("SK하이닉스(000660)", html)
 
@@ -688,8 +787,8 @@ class MarketDashboardRendererTests(unittest.TestCase):
         for forbidden in ("BASELINE_STALE", "FINAL", "확인 대기", "자료 없음", "검증 대기", "확인 가능"):
             self.assertNotIn(forbidden, html)
             self.assertNotIn(forbidden, markdown)
-        self.assertIn("현재 자동 산출 기능이 없습니다", html)
-        self.assertIn("현재 자동 산출 기능이 없습니다", markdown)
+        self.assertNotIn("현재 자동 산출 기능이 없습니다", html)
+        self.assertNotIn("현재 자동 산출 기능이 없습니다", markdown)
 
     def test_user_views_explain_supply_breakpoints_and_research_slot(self):
         report = report_fixture()

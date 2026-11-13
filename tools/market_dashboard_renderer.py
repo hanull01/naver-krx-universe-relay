@@ -41,6 +41,8 @@ def _text(value: Any, fallback: str = "확인 불가") -> str:
 
 def _source_label(value: Any) -> str:
     text = str(value or "").strip()
+    if "운영 관심" in text and ("설정" in text or "수집" in text):
+        return "V1 운영 관심 설정"
     if "/" in text or "\\" in text or text.startswith("tools."):
         return "공급 단계"
     return {
@@ -708,16 +710,42 @@ def _availability_text(row: Mapping[str, Any] | None, fallback: str = "현재 �
         detail = row
     if not isinstance(detail, Mapping):
         return fallback
-    parts = [
+    received = detail.get("received") is True
+    base = (
         f"필요 자료: {detail.get('requiredData') or '원천 자료'} · "
-        f"수신: {'예' if detail.get('received') else '아니오'} · "
-        f"공급자: {_source_label(detail.get('producer'))} · "
-        f"사유: {_display_reason(detail.get('missingReason'), '정상 수신')} · "
+        f"수신: {'예' if received else '아니오'} · "
+        f"공급자: {_source_label(detail.get('producer'))}"
+    )
+    if received:
+        parts = [base, "상태: 정상 수신"]
+        if detail.get("researchSlot"):
+            parts.append(f"대상 회차: {detail['researchSlot']} → {detail.get('reportSlot') or '리포트'}")
+        return " · ".join(parts)
+    parts = [
+        base,
+        f"사유: {_display_reason(detail.get('missingReason'))} · "
         f"다음 확인: {next_check_label(detail.get('nextCheckAt'))}"
     ]
     if detail.get("researchSlot"):
         parts.append(f"대상 회차: {detail['researchSlot']} → {detail.get('reportSlot') or '리포트'}")
     return " · ".join(parts)
+
+
+def _group_row_status(row: Mapping[str, Any]) -> str:
+    """Use evidence completeness for TOP5 row status, not rank movement."""
+    relative_strength = _num(row.get("relativeStrength"))
+    breadth = _num(row.get("breadthPct"))
+    leaders = row.get("leaderCandidates") or row.get("leaders") or []
+    if relative_strength is not None and breadth is not None and leaders:
+        return "수신됨"
+    if relative_strength is not None or breadth is not None or leaders:
+        return "일부 자료 수신됨"
+    status_code = str(row.get("leaderEvidenceStatus") or row.get("dataQuality") or row.get("status") or "").upper()
+    if status_code in {"PARTIAL", "WARNING"}:
+        return "일부 자료 수신됨"
+    if status_code in {"AVAILABLE", "OK", "VERIFIED", "SOURCE_VERIFIED"}:
+        return "수신됨"
+    return "자료 미수신"
 
 
 def _compact_group_lineage(rows: list[Mapping[str, Any]]) -> str:
@@ -727,16 +755,7 @@ def _compact_group_lineage(rows: list[Mapping[str, Any]]) -> str:
     source_date = _compact_date(row.get("sourceDate") or row.get("leaderObservationDate"))
     observation_date = _compact_date(row.get("observationDate") or row.get("leaderObservationDate"))
     scope = _scope_label(row.get("leaderScope") or row.get("scope"))
-    status_code = str(row.get("leaderEvidenceStatus") or "").upper()
-    leaders = row.get("leaderCandidates") or row.get("leaders") or []
-    if not source or source == "자료 미수신":
-        status = "자료 미수신"
-    elif leaders:
-        status = "수신됨"
-    elif status_code in {"PARTIAL", "WARNING"}:
-        status = "일부 자료 수신됨"
-    else:
-        status = "대표 주도주 자료 없음"
+    status = _group_row_status(row)
     return f"원천: {source} · 원천일: {source_date} · 관측일: {observation_date} · 범위: {scope} · 상태: {status}"
 
 
@@ -762,12 +781,21 @@ def _snapshot_flow_rows(model: Mapping[str, Any]) -> list[tuple[str, str, Mappin
     return rows
 
 
+def _snapshot_flow_evidence_rows(model: Mapping[str, Any]) -> list[tuple[str, str, Mapping[str, Any]]]:
+    return [
+        (investor, direction, row)
+        for investor, direction, row in _snapshot_flow_rows(model)
+        if row.get("amountStatus") in {"AVAILABLE", "SOURCE_ZERO"}
+        and _num(row.get("amount")) is not None
+    ]
+
+
 def _snapshot_flow_date_mismatch(model: Mapping[str, Any]) -> bool:
     flow = (model.get("marketSnapshot") or {}).get("investorFlow") or {}
     if str(flow.get("status") or "").upper() == "DATE_MISMATCH":
         return True
     dates = set()
-    for _, _, row in _snapshot_flow_rows(model):
+    for _, _, row in _snapshot_flow_evidence_rows(model):
         value = row.get("sourceDate") or row.get("asOf") or row.get("tradingDate")
         if value:
             dates.add(_compact_normalized_date(value))
@@ -776,7 +804,7 @@ def _snapshot_flow_date_mismatch(model: Mapping[str, Any]) -> bool:
 
 def _snapshot_flow_date_text(model: Mapping[str, Any]) -> str:
     dates: dict[str, set[str]] = {"외국인": set(), "기관": set()}
-    for investor, _, row in _snapshot_flow_rows(model):
+    for investor, _, row in _snapshot_flow_evidence_rows(model):
         value = row.get("sourceDate") or row.get("asOf") or row.get("tradingDate")
         normalized = _compact_normalized_date(value)
         if normalized:
@@ -838,18 +866,21 @@ def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
             for row in rows
         ) or "<li>자료 없음</li>"
         cards.append(f'<div class="industry-item"><div class="industry-head"><strong>{_escape(label)}</strong></div><ul>{items}</ul></div>')
+    evidence_rows = _snapshot_flow_evidence_rows(model)
     flow_rows = "".join(
         f'<tr><td>{_escape(investor)}</td><td>{_escape(direction)}</td><td>{_escape(row.get("name") or "이름 확인 대기")}</td><td>{_escape(_snapshot_amount(row))}</td></tr>'
-        for investor, direction, row in _snapshot_flow_rows(model)
-        if row.get("amountStatus") in {"AVAILABLE", "SOURCE_ZERO"}
-        and not _snapshot_flow_date_mismatch(model)
+        for investor, direction, row in evidence_rows
+        if not _snapshot_flow_date_mismatch(model)
     )
     if _snapshot_flow_date_mismatch(model):
-        flow_rows = f'<tr><td colspan=4>{_escape(_snapshot_flow_date_text(model))}</td></tr>'
-    flow = (
-        '<table><thead><tr><th>구분</th><th>방향</th><th>종목</th><th>금액</th></tr></thead>'
-        f'<tbody>{flow_rows or "<tr><td colspan=4>자료 없음</td></tr>"}</tbody></table>'
-    )
+        flow = f'<p>{_escape(_snapshot_flow_date_text(model))}</p>'
+    elif not evidence_rows:
+        flow = '<p>수급 자료 미수신</p>'
+    else:
+        flow = (
+            '<table><thead><tr><th>구분</th><th>방향</th><th>종목</th><th>금액</th></tr></thead>'
+            f'<tbody>{flow_rows}</tbody></table>'
+        )
     return '<article class="card"><div class="miniheading"><h3>현재 스냅샷 순위·수급</h3><span class="tag">NAVER 현재가 관측</span></div><div class="industry-cards">' + "".join(cards) + f'</div><h4>외국인·기관 수급 상위</h4>{flow}</article>'
 
 
@@ -864,15 +895,19 @@ def _compact_snapshot_markdown(model: Mapping[str, Any]) -> list[str]:
         for rank, row in enumerate(_snapshot_rank_rows(model, key), start=1):
             ranking_rows.append((label, rank, row.get("name") or "이름 확인 대기", _snapshot_price(row.get("price")), _plain_pct(row.get("changeRate"))))
     lines += _markdown_table(("구분", "순위", "종목", "현재가", "등락률"), ranking_rows or [("자료 없음", "-", "-", "-", "-")])
+    evidence_rows = _snapshot_flow_evidence_rows(model)
     flow_rows = [
         (investor, direction, row.get("name") or "이름 확인 대기", _snapshot_amount(row))
-        for investor, direction, row in _snapshot_flow_rows(model)
-        if row.get("amountStatus") in {"AVAILABLE", "SOURCE_ZERO"}
-        and not _snapshot_flow_date_mismatch(model)
+        for investor, direction, row in evidence_rows
+        if not _snapshot_flow_date_mismatch(model)
     ]
     lines += ["", "#### 외국인·기관 수급 상위"]
-    lines += _markdown_table(("구분", "방향", "종목", "금액"), flow_rows or [("수급 자료 미수신", "-", "-", "-")])
-    lines.append(_snapshot_flow_date_text(model))
+    if _snapshot_flow_date_mismatch(model):
+        lines.append(_snapshot_flow_date_text(model))
+    elif not evidence_rows:
+        lines.append("수급 자료 미수신")
+    else:
+        lines += _markdown_table(("구분", "방향", "종목", "금액"), flow_rows)
     return lines
 
 
@@ -1052,7 +1087,7 @@ def _compact_rank_cards(rows: list[Mapping[str, Any]], label: str, availability_
         breadth = row.get("breadthPct")
         cards.append(
             '<div class="industry-item"><div class="industry-head">'
-            f'<strong>{_escape(row.get("rank") or "")}. {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("changeClass") or "관측"))}</span></div>'
+            f'<strong>{_escape(row.get("rank") or "")}. {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_group_row_status(row))}</span></div>'
             '<div class="industry-numbers">'
             f'<div class="{_change_class(strength)}">{_escape(_pct(strength))}<small>상대강도</small></div>'
             f'<div>{_escape(_plain_pct(breadth))}<small>상승 비율</small></div>'
@@ -1069,7 +1104,7 @@ def _compact_v1_cards(rows: list[Mapping[str, Any]], label: str, availability_de
     if not rows:
         return f'<div class="industry-item"><strong>운영 선정 {label} 미수신</strong><p>{_escape(_availability_text(availability_detail))}</p></div>'
     return "".join(
-        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>V1 운영 관심 목록 · 원천: 운영 관심 {label} 설정 + 당일 NAVER 관측자료 · 대표 주도주 {_escape(_compact_leaders(row))}<br><small>{_escape(_compact_group_lineage([row]))}</small></p></div>'
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>공급자: V1 운영 관심 설정 · 원천: 당일 NAVER 관측자료 · 대표 주도주 {_escape(_compact_leaders(row))}<br><small>{_escape(_compact_group_lineage([row]))}</small></p></div>'
         for row in rows[:5]
     )
 
@@ -1093,7 +1128,7 @@ def _compact_research_cards(model: Mapping[str, Any]) -> str:
 
 
 def _compact_v2_cards(model: Mapping[str, Any]) -> str:
-    return _compact_additional_cards(model) + _compact_v2_diagnostic_cards(model)
+    return _compact_additional_cards(model)
 
 
 
@@ -1200,49 +1235,11 @@ def _compact_additional_cards(model: Mapping[str, Any]) -> str:
 
 
 def _compact_v2_diagnostic_cards(model: Mapping[str, Any]) -> str:
-    """Keep V2 shadow visible only as a clearly non-operational diagnostic."""
-    if not model["v2Verified"]:
-        return f'<div class="industry-item"><strong>별도 산출 진단</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
-    lineage = model.get("v2Lineage") or {}
-    lineage_note = (
-        f'<p class="lineage-note">원천 {_escape(_source_label(lineage.get("source")))} · '
-        f'원천일 {_escape(_compact_date(lineage.get("sourceDate")))} · '
-        f'관측일 {_escape(_compact_date(lineage.get("observationDate")))} · '
-        f'상태 수신됨</p>'
-    )
-    rows = []
-    for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
-        for row in group:
-            if _compact_row_available(row):
-                score = f"{row.get('score'):.2f}" if isinstance(row.get('score'), (int, float)) else "확인 불가"
-                rows.append(f'<div class="industry-item"><div class="industry-head"><strong>별도 산출 진단 · {_escape(label)} · {_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">진단 전용</span></div><p>점수 {_escape(score)} · 대표 주도주 {_escape(_compact_leaders(row))}</p></div>')
-    return lineage_note + ("".join(rows) or '<div class="industry-item"><strong>별도 산출 진단</strong><p>현재 자동 산출 기능이 없습니다.</p></div>')
+    return ""
 
 
 def _compact_v2_diagnostic_markdown(model: Mapping[str, Any]) -> list[str]:
-    lines = ["", "#### 별도 산출 진단(운영 추가 관찰 자료 아님)"]
-    if not model["v2Verified"]:
-        lines.append(model["v2HoldReason"])
-        return lines
-    lineage = model.get("v2Lineage") or {}
-    lines.append(
-        f"원천: {_source_label(lineage.get('source'))} · "
-        f"원천일: {_compact_date(lineage.get('sourceDate'))} · "
-        f"관측일: {_compact_date(lineage.get('observationDate'))} · "
-        f"관측 자료 상태: 수신됨"
-    )
-    rows = []
-    for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
-        for row in group:
-            rows.append((
-                f"{label} · {row.get('name') or row.get('id')}",
-                "진단 전용",
-                f"{row.get('score'):.2f}" if isinstance(row.get("score"), (int, float)) else "확인 불가",
-                _compact_leaders(row),
-            ))
-    lines += _markdown_table(("대상", "상태", "점수", "대표 주도주"), rows or [("미수신", "진단 전용", "-", "-")])
-    return lines
-
+    return []
 
 def _compact_interest_cards(model: Mapping[str, Any]) -> str:
     if not model["interests"]:
@@ -1345,8 +1342,13 @@ def _compact_conclusions(model: Mapping[str, Any]) -> list[str]:
         row = model["relativeThemes"][0]
         result.append(f"테마 상대강도 1위: {row.get('name') or row.get('id')} ({_pct(row.get('relativeStrength'))})")
     result.append(f"시장 확산: 상승 {market['advancers']:,} · 하락 {market['decliners']:,} · 보합 {market['unchanged']:,}")
-    if not model["v2Verified"]:
-        result.append("추가 관찰 자료를 생성하는 자동 기능이 없습니다.")
+    additional = model.get("additionalObservations") or {}
+    additional_status = str(additional.get("status") or "").upper()
+    if not model["v2Verified"] and not _additional_rows(model):
+        if additional_status == "PRODUCER_NOT_CONFIGURED":
+            result.append("추가 관찰 자료: 자동 산출 기능 미연결")
+        elif additional_status not in {"AVAILABLE", "PARTIAL", "CONSUMED"}:
+            result.append("추가 관찰 자료: 현재 수신되지 않음")
     return result[:5]
 
 
@@ -1501,7 +1503,7 @@ def _compact_markdown(
     industry_rows = [(
         row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
         _plain_pct(row.get("breadthPct")), _compact_leaders(row),
-        _display_status(row.get("dataQuality") or row.get("status") or row.get("changeClass")),
+        _group_row_status(row),
     ) for row in model["relativeIndustries"]]
     if not industry_rows:
         lines.append(_availability_text(model.get("relativeIndustryAvailability")))
@@ -1511,12 +1513,13 @@ def _compact_markdown(
     theme_rows = [(
         row.get("rank"), row.get("name") or row.get("id"), _pct(row.get("relativeStrength")),
         _plain_pct(row.get("breadthPct")), _compact_leaders(row),
-        _display_status(row.get("dataQuality") or row.get("status") or row.get("changeClass")),
+        _group_row_status(row),
     ) for row in model["relativeThemes"]]
     if not theme_rows:
         lines.append(_availability_text(model.get("relativeThemeAvailability")))
     lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "자료 미수신", "-", "-", "-", "자료 미수신")])
     lines += ["", "### 운영 관심 업종"]
+    lines.append("공급자: V1 운영 관심 설정")
     lines += [_compact_group_lineage(model["v1Industries"])]
     v1_industry_rows = [(
         row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
@@ -1525,6 +1528,7 @@ def _compact_markdown(
         lines.append(_availability_text(model.get("v1IndustryAvailability")))
     lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_industry_rows or [("운영 관심 업종 미설정", "운영 관심 대상 미설정", "-")])
     lines += ["", "### 운영 관심 테마"]
+    lines.append("공급자: V1 운영 관심 설정")
     lines += [_compact_group_lineage(model["v1Themes"])]
     v1_theme_rows = [(
         row.get("name") or row.get("id"), _display_status(row.get("status")), _compact_leaders(row)
@@ -1632,17 +1636,8 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
         value = _compact_row.get("name") or _compact_row.get("id")
         if value and (str(value) not in part2_md or str(value) not in part2_html):
             issues.append(f"PART2_TOP5_MISSING:{value}")
-    if model["v2Verified"]:
-        for row in model["v2Industries"] + model["v2Themes"]:
-            name = row.get("name") or row.get("id")
-            if name and (str(name) not in part2_md or str(name) not in part2_html):
-                issues.append(f"PART2_V2_MISSING:{name}")
-            for leader in (row.get("leaderCandidates") or row.get("leaders") or [])[:3]:
-                for value in (leader.get("name"), leader.get("code")):
-                    if value and (str(value) not in part2_md or str(value) not in part2_html):
-                        issues.append(f"PART2_V2_LEADER_MISSING:{value}")
-    if model["v2Verified"] is False and model["v2HoldReason"] not in markdown_text and model["v2HoldReason"] not in plain:
-        issues.append("V2_HOLD_MISSING")
+    # V2/shadow diagnostics remain in the internal contract only. They are
+    # deliberately not required in user-facing HTML/Markdown.
     def _contains_rendered(value: Any, text: str) -> bool:
         if value in (None, ""):
             return True
