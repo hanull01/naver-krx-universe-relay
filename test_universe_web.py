@@ -4,6 +4,7 @@ import tempfile
 import time
 import threading
 import unittest
+import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -218,6 +219,27 @@ class UniverseWebTests(unittest.TestCase):
                 while time.time() < deadline and universe_web._sync_state.get("status") == "RUNNING":
                     time.sleep(0.01)
                 self.assertEqual(universe_web._sync_state["status"], "NOOP")
+        finally:
+            universe_web._sync_state = previous
+
+    def test_github_http_error_is_failed_and_not_exposed_to_user_view(self):
+        previous = dict(universe_web._sync_state)
+        universe_web._sync_state = {"status": "NOT_STARTED", "lastAppliedCommit": "old",
+                                    "lastAppliedGeneratedAt": "old", "lastAppliedSha256": "sha",
+                                    "lastCheckedAt": None, "lastSuccessAt": None}
+        try:
+            error = urllib.error.HTTPError("https://api.github.com", 503, "unavailable", {}, None)
+            with patch.object(universe_web.background_sync, "run_result", side_effect=error):
+                universe_web._start_sync("periodic")
+                deadline = time.time() + 3
+                while time.time() < deadline and universe_web._sync_state.get("status") == "RUNNING":
+                    time.sleep(0.01)
+            self.assertEqual(universe_web._sync_state["status"], "FAILED")
+            self.assertEqual(universe_web._sync_state["result"]["errorCode"], "GITHUB_HTTP_ERROR")
+            status, payload = self.request("GET", "/api/automatic")
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["sync"]["status"], "FAILED")
+            self.assertNotIn("GITHUB_HTTP_ERROR", json.dumps(payload, ensure_ascii=False))
         finally:
             universe_web._sync_state = previous
 
