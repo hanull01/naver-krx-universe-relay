@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-13T10:30:48.122408+09:00",
-  "collectionStartedAt": "2026-11-13T10:30:47.084045+09:00",
+  "generatedAt": "2026-11-13T12:30:55.270958+09:00",
+  "collectionStartedAt": "2026-11-13T12:30:54.444300+09:00",
   "source": "NAVER_KRX",
   "count": 3,
   "expectedCount": 3,
@@ -13,24 +13,24 @@
   "fresh": true,
   "errors": [],
   "missingCodes": [],
-  "sourceTime": "2026-11-13T10:30:48.036879+09:00",
-  "sourceTimeLatest": "2026-11-13T10:30:48.036894+09:00",
+  "sourceTime": "2026-11-13T12:30:55.200445+09:00",
+  "sourceTimeLatest": "2026-11-13T12:30:55.200466+09:00",
   "freshnessPolicy": "previous KRX close before 09:00; 600 seconds during regular/after live sessions; same-day KRX close hold 15:30-15:40; same-day after-market final after 20:00",
   "datas": [
     {
       "itemCode": "005930",
       "stockName": "삼성전자",
-      "closePrice": 213750,
-      "compareToPreviousClosePrice": 5750,
-      "fluctuationsRatio": 2.76,
+      "closePrice": 208250,
+      "compareToPreviousClosePrice": 250,
+      "fluctuationsRatio": 0.12,
       "openPrice": 214000,
       "highPrice": 216000,
-      "lowPrice": 212000,
-      "accumulatedTradingVolume": 3551394,
-      "accumulatedTradingValue": 759573000000,
+      "lowPrice": 207500,
+      "accumulatedTradingVolume": 6106489,
+      "accumulatedTradingValue": 1298290000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-13T10:30:48.036879+09:00",
-      "localTradedAt": "2026-11-13T10:30:48.036879+09:00",
+      "sourceTime": "2026-11-13T12:30:55.200445+09:00",
+      "localTradedAt": "2026-11-13T12:30:55.200445+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -41,30 +41,31 @@
       "marketSessionType": "regularMarket",
       "overMarketPriceInfo": {
         "tradingSessionType": "REGULAR_MARKET",
-        "overPrice": "213,500",
-        "localTradedAt": "2026-11-13T10:30:48.036908+09:00"
+        "overPrice": "208,000",
+        "localTradedAt": "2026-11-13T12:30:55.200488+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
       "status": "ok",
       "freshnessReason": "krx_regular_live",
       "session": "REGULAR",
-      "priceBasis": "KRX_REGULAR"
+      "priceBasis": "KRX_REGULAR",
+      "previousBusinessDay": "2026-11-12"
     },
     {
       "itemCode": "000660",
       "stockName": "SK하이닉스",
-      "closePrice": 1288000,
-      "compareToPreviousClosePrice": 34000,
-      "fluctuationsRatio": 2.71,
+      "closePrice": 1242000,
+      "compareToPreviousClosePrice": -12000,
+      "fluctuationsRatio": -0.96,
       "openPrice": 1292000,
       "highPrice": 1317000,
-      "lowPrice": 1278000,
-      "accumulatedTradingVolume": 864955,
-      "accumulatedTradingValue": 1121621000000,
+      "lowPrice": 1240000,
+      "accumulatedTradingVolume": 1465487,
+      "accumulatedTradingValue": 1881138000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-13T10:30:48.036888+09:00",
-      "localTradedAt": "2026-11-13T10:30:48.036888+09:00",
+      "sourceTime": "2026-11-13T12:30:55.200458+09:00",
+      "localTradedAt": "2026-11-13T12:30:55.200458+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -75,30 +76,31 @@
       "marketSessionType": "regularMarket",
       "overMarketPriceInfo": {
         "tradingSessionType": "REGULAR_MARKET",
-        "overPrice": "1,288,000",
-        "localTradedAt": "2026-11-13T10:30:48.036916+09:00"
+        "overPrice": "1,243,000",
+        "localTradedAt": "2026-11-13T12:30:55.200501+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
       "status": "ok",
       "freshnessReason": "krx_regular_live",
       "session": "REGULAR",
-      "priceBasis": "KRX_REGULAR"
+      "priceBasis": "KRX_REGULAR",
+      "previousBusinessDay": "2026-11-12"
     },
     {
       "itemCode": "298040",
       "stockName": "효성중공업",
-      "closePrice": 1863000,
-      "compareToPreviousClosePrice": 26000,
-      "fluctuationsRatio": 1.42,
+      "closePrice": 1836000,
+      "compareToPreviousClosePrice": -1000,
+      "fluctuationsRatio": -0.05,
       "openPrice": 1872000,
       "highPrice": 1908000,
-      "lowPrice": 1832000,
-      "accumulatedTradingVolume": 13220,
-      "accumulatedTradingValue": 24684000000,
+      "lowPrice": 1828000,
+      "accumulatedTradingVolume": 20056,
+      "accumulatedTradingValue": 37347000000,
       "source": "NAVER_KRX",
-      "sourceTime": "2026-11-13T10:30:48.036894+09:00",
-      "localTradedAt": "2026-11-13T10:30:48.036894+09:00",
+      "sourceTime": "2026-11-13T12:30:55.200466+09:00",
+      "localTradedAt": "2026-11-13T12:30:55.200466+09:00",
       "marketStatus": "OPEN",
       "delayTime": 0,
       "stockExchangeType": {
@@ -109,15 +111,16 @@
       "marketSessionType": "regularMarket",
       "overMarketPriceInfo": {
         "tradingSessionType": "REGULAR_MARKET",
-        "overPrice": "1,863,000",
-        "localTradedAt": "2026-11-13T10:30:48.036924+09:00"
+        "overPrice": "1,837,000",
+        "localTradedAt": "2026-11-13T12:30:55.200512+09:00"
       },
       "ageSeconds": 0,
       "fresh": true,
       "status": "ok",
       "freshnessReason": "krx_regular_live",
       "session": "REGULAR",
-      "priceBasis": "KRX_REGULAR"
+      "priceBasis": "KRX_REGULAR",
+      "previousBusinessDay": "2026-11-12"
     }
   ]
 }
