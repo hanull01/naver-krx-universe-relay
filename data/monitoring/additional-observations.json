@@ -6,8 +6,8 @@
   "observationDate": "20261113",
   "scope": "STOCK_ONLY",
   "producer": "tools/build_additional_observations.py",
-  "producerRunId": "43393707481",
-  "generatedAt": "2026-11-13T17:31:42.999614+09:00",
+  "producerRunId": "43401838800",
+  "generatedAt": "2026-11-13T18:31:40.146477+09:00",
   "artifactPath": "data/monitoring/additional-observations.json",
   "configPath": "config/additional-observations.json",
   "inputPaths": {
@@ -29,15 +29,15 @@
       "industries": [
         "278",
         "328",
-        "301",
         "275",
+        "301",
         "279"
       ],
       "themes": [
         "576",
         "556",
         "547",
-        "545",
+        "178",
         "482"
       ]
     },
@@ -46,10 +46,6 @@
         {
           "id": "336",
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
-        },
-        {
-          "id": "310",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "312",
@@ -156,6 +152,10 @@
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
         },
         {
+          "id": "265",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "264",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -181,7 +181,7 @@
         },
         {
           "id": "269",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "327",
@@ -233,10 +233,6 @@
         },
         {
           "id": "272",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "280",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -294,15 +290,7 @@
       ],
       "themes": [
         {
-          "id": "287",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "152",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "422",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -311,6 +299,10 @@
         },
         {
           "id": "405",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "564",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -326,12 +318,12 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "448",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "id": "178",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
-          "id": "545",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "id": "448",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "547",
@@ -370,6 +362,10 @@
           "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
+          "id": "33",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
           "id": "373",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -380,6 +376,14 @@
         {
           "id": "311",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "321",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "112",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "352",
@@ -450,11 +454,11 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "28",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "id": "435",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "324",
+          "id": "28",
           "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
@@ -487,7 +491,7 @@
         },
         {
           "id": "174",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "576",
@@ -500,10 +504,6 @@
         {
           "id": "376",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "398",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "241",
@@ -586,10 +586,6 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "503",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "379",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -599,6 +595,10 @@
         },
         {
           "id": "349",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "385",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -615,6 +615,10 @@
         },
         {
           "id": "113",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "598",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -686,6 +690,10 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "128",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "176",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -698,16 +706,16 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "105",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "483",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "124",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "580",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "139",
@@ -734,16 +742,16 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "302",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "210",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "49",
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
+        },
+        {
+          "id": "317",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "426",
@@ -766,7 +774,7 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "310",
+          "id": "480",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -799,6 +807,10 @@
         },
         {
           "id": "513",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "331",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -846,15 +858,15 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "318",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "397",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "172",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "86",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -866,12 +878,12 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "36",
+          "id": "167",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "167",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "id": "136",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "265",
@@ -930,9 +942,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
+      "producerRunId": "43401838800",
       "artifactPath": "data/monitoring/additional-observations.json#industrys/313",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
       "membershipCount": 19,
       "leaderCount": 3,
       "leaders": [
@@ -940,9 +952,26 @@
           "code": "126880",
           "name": "제이엔케이글로벌",
           "market": "KOSDAQ",
-          "currentPrice": 3350.0,
-          "changeRate": 4.85,
-          "accumulatedTradingValue": 942502000.0,
+          "currentPrice": 3370.0,
+          "changeRate": 5.48,
+          "accumulatedTradingValue": 962092000.0,
+          "dist_high_20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "breakout_20_intraday": null,
+          "source": "NAVER_CURRENT_SNAPSHOT",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
+          "scope": "STOCK_ONLY"
+        },
+        {
+          "code": "002420",
+          "name": "우양피앤엘",
+          "market": "KOSPI",
+          "currentPrice": 4990.0,
+          "changeRate": 3.96,
+          "accumulatedTradingValue": 67000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -969,33 +998,16 @@
           "sourceDate": "20261113",
           "observationDate": "20261113",
           "scope": "STOCK_ONLY"
-        },
-        {
-          "code": "03473K",
-          "name": "SK우",
-          "market": "KOSPI",
-          "currentPrice": 386000.0,
-          "changeRate": 3.35,
-          "accumulatedTradingValue": 928000000.0,
-          "dist_high_20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "breakout_20_intraday": null,
-          "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261113",
-          "observationDate": "20261113",
-          "scope": "STOCK_ONLY"
         }
       ],
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 1,
-      "selectionScore": 81.669369,
+      "selectionScore": 82.533333,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.267601,
-        "advancePct": 84.2105,
+        "relativeStrength": 1.393421,
+        "advancePct": 89.4737,
         "memberCount": 19,
         "weights": {
           "relativeStrength": 0.5,
@@ -1009,27 +1021,27 @@
       }
     },
     {
-      "id": "320",
-      "name": "건축제품",
+      "id": "306",
+      "name": "전기장비",
       "type": "industry",
       "source": "NAVER_CURRENT_SNAPSHOT",
       "sourceDate": "20261113",
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
-      "artifactPath": "data/monitoring/additional-observations.json#industrys/320",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
-      "membershipCount": 11,
+      "producerRunId": "43401838800",
+      "artifactPath": "data/monitoring/additional-observations.json#industrys/306",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "membershipCount": 32,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "060260",
-          "name": "뉴보텍",
+          "code": "024840",
+          "name": "KBI메탈",
           "market": "KOSDAQ",
-          "currentPrice": 673.0,
-          "changeRate": 7.34,
-          "accumulatedTradingValue": 51788000.0,
+          "currentPrice": 4560.0,
+          "changeRate": 24.93,
+          "accumulatedTradingValue": 92439813000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1041,12 +1053,12 @@
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "079000",
-          "name": "와토스코리아",
+          "code": "125020",
+          "name": "티씨머티리얼즈",
           "market": "KOSDAQ",
-          "currentPrice": 3485.0,
-          "changeRate": 5.61,
-          "accumulatedTradingValue": 14355000.0,
+          "currentPrice": 4135.0,
+          "changeRate": 6.99,
+          "accumulatedTradingValue": 2777061000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1058,12 +1070,12 @@
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "005750",
-          "name": "대림바스",
+          "code": "103590",
+          "name": "일진전기",
           "market": "KOSPI",
-          "currentPrice": 4195.0,
-          "changeRate": 3.2,
-          "accumulatedTradingValue": 35000000.0,
+          "currentPrice": 57800.0,
+          "changeRate": 6.45,
+          "accumulatedTradingValue": 27588000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1078,12 +1090,12 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 2,
-      "selectionScore": 71.396776,
+      "selectionScore": 69.253604,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.286836,
-        "advancePct": 72.7273,
-        "memberCount": 11,
+        "relativeStrength": 1.304572,
+        "advancePct": 75.0,
+        "memberCount": 32,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
@@ -1104,9 +1116,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
+      "producerRunId": "43401838800",
       "artifactPath": "data/monitoring/additional-observations.json#industrys/333",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
       "membershipCount": 4,
       "leaderCount": 3,
       "leaders": [
@@ -1114,9 +1126,9 @@
           "code": "017670",
           "name": "SK텔레콤",
           "market": "KOSPI",
-          "currentPrice": 84400.0,
-          "changeRate": 3.56,
-          "accumulatedTradingValue": 80309000000.0,
+          "currentPrice": 84300.0,
+          "changeRate": 3.44,
+          "accumulatedTradingValue": 80734000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1131,9 +1143,9 @@
           "code": "032640",
           "name": "LG유플러스",
           "market": "KOSPI",
-          "currentPrice": 15550.0,
-          "changeRate": 3.19,
-          "accumulatedTradingValue": 9545000000.0,
+          "currentPrice": 15500.0,
+          "changeRate": 2.85,
+          "accumulatedTradingValue": 9552000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1165,10 +1177,10 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 66.249805,
+      "selectionScore": 54.586577,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.148654,
+        "relativeStrength": 1.036447,
         "advancePct": 75.0,
         "memberCount": 4,
         "weights": {
@@ -1185,216 +1197,6 @@
   ],
   "themes": [
     {
-      "id": "178",
-      "name": "전선",
-      "type": "theme",
-      "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261113",
-      "observationDate": "20261113",
-      "scope": "STOCK_ONLY",
-      "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/178",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
-      "membershipCount": 8,
-      "leaderCount": 3,
-      "leaders": [
-        {
-          "code": "024840",
-          "name": "KBI메탈",
-          "market": "KOSDAQ",
-          "currentPrice": 4520.0,
-          "change": 870.0,
-          "changeRate": 23.84,
-          "accumulatedTradingValue": 90135644000.0,
-          "currentHigh": 4740.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
-        {
-          "code": "103590",
-          "name": "일진전기",
-          "market": "KOSPI",
-          "currentPrice": 57600.0,
-          "change": 3300.0,
-          "changeRate": 6.08,
-          "accumulatedTradingValue": 27443000000.0,
-          "currentHigh": 59200.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
-        {
-          "code": "229640",
-          "name": "LS에코에너지",
-          "market": "KOSPI",
-          "currentPrice": 42900.0,
-          "change": 1800.0,
-          "changeRate": 4.38,
-          "accumulatedTradingValue": 7668000000.0,
-          "currentHigh": 44900.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        }
-      ],
-      "status": "AVAILABLE",
-      "failureReason": null,
-      "selectionRank": 1,
-      "selectionScore": 73.588435,
-      "selectionReason": "CURRENT_OBSERVATION_RANKING",
-      "selectionEvidence": {
-        "relativeStrength": 4.397404,
-        "advancePct": 87.5,
-        "memberCount": 8,
-        "weights": {
-          "relativeStrength": 0.5,
-          "advancePct": 0.3,
-          "memberCount": 0.2
-        },
-        "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261113",
-        "observationDate": "20261113",
-        "scope": "STOCK_ONLY"
-      }
-    },
-    {
       "id": "119",
       "name": "창투사",
       "type": "theme",
@@ -1403,9 +1205,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
+      "producerRunId": "43401838800",
       "artifactPath": "data/monitoring/additional-observations.json#themes/119",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
       "membershipCount": 20,
       "leaderCount": 3,
       "leaders": [
@@ -1416,7 +1218,7 @@
           "currentPrice": 8120.0,
           "change": 1870.0,
           "changeRate": 29.92,
-          "accumulatedTradingValue": 30835140000.0,
+          "accumulatedTradingValue": 30972733000.0,
           "currentHigh": 8120.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1457,7 +1259,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1471,10 +1273,10 @@
           "code": "246690",
           "name": "TS인베스트먼트",
           "market": "KOSDAQ",
-          "currentPrice": 1844.0,
-          "change": 289.0,
-          "changeRate": 18.59,
-          "accumulatedTradingValue": 5014389000.0,
+          "currentPrice": 1849.0,
+          "change": 294.0,
+          "changeRate": 18.91,
+          "accumulatedTradingValue": 5052755000.0,
           "currentHigh": 2000.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1515,7 +1317,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1529,10 +1331,10 @@
           "code": "100790",
           "name": "미래에셋벤처투자",
           "market": "KOSDAQ",
-          "currentPrice": 12800.0,
-          "change": 1080.0,
-          "changeRate": 9.22,
-          "accumulatedTradingValue": 6282668000.0,
+          "currentPrice": 12780.0,
+          "change": 1060.0,
+          "changeRate": 9.04,
+          "accumulatedTradingValue": 6363393000.0,
           "currentHigh": 13150.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1573,7 +1375,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1586,11 +1388,11 @@
       ],
       "status": "AVAILABLE",
       "failureReason": null,
-      "selectionRank": 2,
-      "selectionScore": 61.919058,
+      "selectionRank": 1,
+      "selectionScore": 61.648027,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 4.151154,
+        "relativeStrength": 4.225947,
         "advancePct": 70.0,
         "memberCount": 20,
         "weights": {
@@ -1605,18 +1407,18 @@
       }
     },
     {
-      "id": "307",
-      "name": "시스템반도체",
+      "id": "545",
+      "name": "온디바이스 AI",
       "type": "theme",
       "source": "NAVER_CURRENT_SNAPSHOT",
       "sourceDate": "20261113",
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43393707481",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/307",
-      "generatedAt": "2026-11-13T17:31:42.999614+09:00",
-      "membershipCount": 59,
+      "producerRunId": "43401838800",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/545",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "membershipCount": 24,
       "leaderCount": 3,
       "leaders": [
         {
@@ -1626,7 +1428,7 @@
           "currentPrice": 38650.0,
           "change": 8900.0,
           "changeRate": 29.92,
-          "accumulatedTradingValue": 31676667000.0,
+          "accumulatedTradingValue": 31678638000.0,
           "currentHigh": 38650.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1667,65 +1469,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
-        {
-          "code": "303030",
-          "name": "지니틱스",
-          "market": "KOSDAQ",
-          "currentPrice": 982.0,
-          "change": 226.0,
-          "changeRate": 29.89,
-          "accumulatedTradingValue": 183254000.0,
-          "currentHigh": 982.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1783,7 +1527,275 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T08:31:15.172522+00:00",
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "200710",
+          "name": "에이디테크놀로지",
+          "market": "KOSDAQ",
+          "currentPrice": 20200.0,
+          "change": 3370.0,
+          "changeRate": 20.02,
+          "accumulatedTradingValue": 22783500000.0,
+          "currentHigh": 21000.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        }
+      ],
+      "status": "AVAILABLE",
+      "failureReason": null,
+      "selectionRank": 2,
+      "selectionScore": 60.765306,
+      "selectionReason": "CURRENT_OBSERVATION_RANKING",
+      "selectionEvidence": {
+        "relativeStrength": 4.501447,
+        "advancePct": 62.5,
+        "memberCount": 24,
+        "weights": {
+          "relativeStrength": 0.5,
+          "advancePct": 0.3,
+          "memberCount": 0.2
+        },
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
+        "scope": "STOCK_ONLY"
+      }
+    },
+    {
+      "id": "307",
+      "name": "시스템반도체",
+      "type": "theme",
+      "source": "NAVER_CURRENT_SNAPSHOT",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
+      "scope": "STOCK_ONLY",
+      "producer": "tools/build_additional_observations.py",
+      "producerRunId": "43401838800",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/307",
+      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "membershipCount": 59,
+      "leaderCount": 3,
+      "leaders": [
+        {
+          "code": "399720",
+          "name": "가온칩스",
+          "market": "KOSDAQ",
+          "currentPrice": 38650.0,
+          "change": 8900.0,
+          "changeRate": 29.92,
+          "accumulatedTradingValue": 31678638000.0,
+          "currentHigh": 38650.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "303030",
+          "name": "지니틱스",
+          "market": "KOSDAQ",
+          "currentPrice": 982.0,
+          "change": 226.0,
+          "changeRate": 29.89,
+          "accumulatedTradingValue": 183254000.0,
+          "currentHigh": 982.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "394280",
+          "name": "오픈엣지테크놀로지",
+          "market": "KOSDAQ",
+          "currentPrice": 8130.0,
+          "change": 1870.0,
+          "changeRate": 29.87,
+          "accumulatedTradingValue": 79714000.0,
+          "currentHigh": 8130.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1797,10 +1809,10 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 60.909326,
+      "selectionScore": 59.56597,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 3.891027,
+        "relativeStrength": 3.864455,
         "advancePct": 64.4068,
         "memberCount": 59,
         "weights": {
