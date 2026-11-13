@@ -118,7 +118,7 @@ class AdditionalObservationProjectionTests(unittest.TestCase):
         html = render_dashboard_html(report)
         from tools.market_dashboard_renderer import validate_rendered_outputs
         self.assertEqual(validate_rendered_outputs(markdown, html, markdown_model), [])
-        for token in ("추가 업종", "추가 테마", "NAVER_CURRENT_SNAPSHOT", "2026-11-12"):
+        for token in ("추가 업종", "추가 테마", "NAVER 현재 관측", "2026-11-12"):
             self.assertIn(token, markdown)
             self.assertIn(token, html)
         self.assertEqual(markdown_model["additionalObservations"], html_model["additionalObservations"])

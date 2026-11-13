@@ -483,6 +483,7 @@ def _historical_lineage(
         "lineageStatus": lineage_status,
         "entityCount": entity_count,
         "instrumentCount": instrument_count,
+        "stockInstrumentCount": quality.get("historicalStockInstrumentCount") or quality.get("stockInstrumentCount"),
         "observedInstrumentCount": observed_count,
         "historyCoveragePct": coverage,
         "missingHistoryCodes": compact_detail_reference(
@@ -1822,7 +1823,23 @@ def build_report_contract(
         if not isinstance(supplied, Mapping):
             supplied = historical_source.get("breadth")
         supplied_metric = supplied.get(name) if isinstance(supplied, Mapping) else None
-        return dict(supplied_metric) if isinstance(supplied_metric, Mapping) else metric(name, count, eligible, pct)
+        if not isinstance(supplied_metric, Mapping):
+            return metric(name, count, eligible, pct)
+        # Prefer an explicit stock-only aggregate when the staged KRX input
+        # provides one. ETF-inclusive aggregates must not be relabeled as
+        # stock-only merely because the renderer is displaying an MA value.
+        stock_metric = supplied_metric.get("STOCK_ONLY")
+        if isinstance(stock_metric, Mapping):
+            return dict(stock_metric)
+        result = dict(supplied_metric)
+        for source_key, target_key in (
+            ("stockCount", "count"),
+            ("stockEligibleCount", "eligibleCount"),
+            ("stockPct", "pct"),
+        ):
+            if source_key in supplied_metric:
+                result[target_key] = supplied_metric[source_key]
+        return result
 
     historical_metrics = {
         "aboveMA20": historical_metric("aboveMA20", "aboveMA20Count", "aboveMA20EligibleCount", "pctAboveMA20"),
@@ -1840,9 +1857,11 @@ def build_report_contract(
         "source": historical_source_name,
         "targetDate": historical_lineage.get("targetDate") or trading_date,
         "generationId": historical_lineage.get("generationId"),
-        "scope": "STOCK_ETF" if historical_source_name == "KRX" else (historical_source.get("scope") or "FULL_MARKET"),
+        "scope": "STOCK_ONLY" if historical_source_name == "KRX" else (historical_source.get("scope") or "FULL_MARKET"),
         "instrumentCount": (
-            historical_lineage.get("instrumentCount")
+            historical_source.get("stockInstrumentCount")
+            or historical_lineage.get("stockInstrumentCount")
+            or historical_lineage.get("instrumentCount")
             or historical_source.get("instrumentCount")
             or historical_source.get("authoritativeCount")
             or historical_total.get("directionEligibleCount")

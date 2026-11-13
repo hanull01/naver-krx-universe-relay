@@ -11,11 +11,14 @@ from typing import Any
 
 USER_STATUS_LABELS = {
     "AVAILABLE": "수신됨",
-    "AVAILABLE_EMPTY": "수신됨(대상 없음)",
+    "AVAILABLE_EMPTY": "후보 없음",
     "OK": "정상 수신",
     "SUCCESS": "정상 수신",
     "PARTIAL": "일부 수신",
     "UNAVAILABLE": "미수신",
+    "NO_RESULTS": "후보 없음",
+    "PRODUCER_NOT_CONFIGURED": "운영 관심 대상 미설정",
+    "NOT_CONSUMED": "자료 미수신",
     "UNUSABLE": "사용 불가",
     "VERIFIED": "원천 검증됨",
     "SOURCE_VERIFIED": "원천 검증됨",
@@ -135,14 +138,14 @@ def _key(value: Any) -> str:
     return str(value or "").strip().upper()
 
 
-def user_status_label(value: Any, fallback: str = "상태 확인 필요") -> str:
+def user_status_label(value: Any, fallback: str = "현재 자료로 확인 불가") -> str:
     """Map raw lifecycle/status codes to reader-facing wording."""
     if value in (None, ""):
         return fallback
     return USER_STATUS_LABELS.get(_key(value), fallback)
 
 
-def user_reason_label(value: Any, fallback: str = "원천 자료 확인 필요") -> str:
+def user_reason_label(value: Any, fallback: str = "확인 불가 사유가 기록되지 않았습니다.") -> str:
     """Map a raw reason code without exposing implementation vocabulary."""
     if value in (None, ""):
         return fallback
@@ -150,7 +153,7 @@ def user_reason_label(value: Any, fallback: str = "원천 자료 확인 필요")
     return REASON_LABELS.get(_key(text), fallback)
 
 
-def next_check_label(value: Any, fallback: str = "다음 정상 수집 후") -> str:
+def next_check_label(value: Any, fallback: str = "다음 회차에서 확인") -> str:
     if value in (None, ""):
         return fallback
     return str(value)

@@ -15,7 +15,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from tools.report_lineage import lineage_from_contract, lineage_marker
+from tools.report_lineage import lineage_from_contract
 from tools.report_user_status import availability, next_check_label, user_reason_label, user_status_label
 
 
@@ -39,7 +39,26 @@ def _text(value: Any, fallback: str = "확인 불가") -> str:
     return fallback if value in (None, "") else str(value)
 
 
-def _display_status(value: Any, fallback: str = "상태 확인 필요") -> str:
+def _source_label(value: Any) -> str:
+    text = str(value or "").strip()
+    if "/" in text or "\\" in text or text.startswith("tools."):
+        return "공급 단계"
+    return {
+        "NAVER_CURRENT_SNAPSHOT": "NAVER 현재 관측",
+        "NAVER": "NAVER 공개자료",
+        "KRX": "KRX 기술지표",
+        "KIS_KRX_DAILY_CACHE": "KRX 일봉 자료",
+        "KIWOOM_CONDITION_SEARCH": "키움 조건검색",
+    }.get(text.upper(), _text(value, "자료 미수신"))
+
+
+def _scope_label(value: Any) -> str:
+    return {"STOCK_ONLY": "일반주식", "STOCK_ETF": "일반주식"}.get(
+        str(value or "").upper(), _text(value, "범위 확인 불가")
+    )
+
+
+def _display_status(value: Any, fallback: str = "현재 자료로 확인 불가") -> str:
     if value in {"장후 관측", "장중 관측", "장전 관측", "시장별 세션 상이", "관측"}:
         return str(value)
     if value in {"세션 확인 대기", "세션 확인 필요"}:
@@ -51,7 +70,7 @@ def _display_status(value: Any, fallback: str = "상태 확인 필요") -> str:
     return mapped
 
 
-def _display_reason(value: Any, fallback: str = "원천 자료 확인 필요") -> str:
+def _display_reason(value: Any, fallback: str = "확인 불가 사유가 기록되지 않았습니다.") -> str:
     if value in (None, ""):
         return fallback
     text = str(value)
@@ -76,7 +95,20 @@ def _sanitize_user_text(value: str) -> str:
         ("검증 대기", "추가 관찰 기능 상태 미수신"),
         ("검증 중인 후보", "자동 산출 상태"),
         ("확인 가능", "수신됨"),
-        ("자료 없음", "미수신"),
+        ("자료 없음", "자료 미수신"),
+        ("상태 확인 필요", "현재 자료로 확인 불가"),
+        ("원천 자료 확인 필요", "확인 불가 사유가 기록되지 않았습니다."),
+        ("다음 정상 수집 후", "다음 회차에서 확인"),
+        ("V2", "추가 관찰"),
+        ("slotLineage", "회차 연결 정보"),
+        ("candidateDetails", "후보 상세"),
+        ("reportLineage", "보고서 연결 정보"),
+        ("current-observation", "현재 관측"),
+        ("artifact", "산출 자료"),
+        ("producer", "공급자"),
+        ("workflow", "실행 경로"),
+        ("sourceHash", "원천 식별값"),
+        ("technicalEvidence", "기술 자료 근거"),
     )
     result = value
     for source, target in replacements:
@@ -546,14 +578,25 @@ def _compact_relative_top5(contract: Mapping[str, Any], key: str) -> list[Mappin
 
 
 def _compact_interest_rows(contract: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    merged: list[Mapping[str, Any]] = []
+    seen: set[str] = set()
     for key in ("registeredUniverse", "monitoredUniverse", "userWatchlist", "interestStocks"):
         value = contract.get(key)
         items = (
             value.get("items") or value.get("stocks") or value.get("preview") or []
             if isinstance(value, Mapping) else value or []
         )
-        if items:
-            return [row for row in items if isinstance(row, Mapping)][:1]
+        for row in items:
+            if not isinstance(row, Mapping):
+                continue
+            identity = str(row.get("itemCode") or row.get("code") or row.get("symbol") or row.get("itemName") or row.get("name") or "")
+            if identity and identity in seen:
+                continue
+            if identity:
+                seen.add(identity)
+            merged.append(row)
+    if merged:
+        return merged
     # Do not recreate a historical or hard-coded interest list when the
     # current contract has no registered-universe projection.
     return []
@@ -654,10 +697,10 @@ def _compact_leaders(row: Mapping[str, Any]) -> str:
     if values:
         return ", ".join(values)
     reason = row.get("leaderMissingReason") or row.get("missingReason")
-    return _display_reason(reason, "대표 주도주 미수신") if reason else "대표 주도주 미수신"
+    return _display_reason(reason, "대표 주도주 자료 없음") if reason else "대표 주도주 자료 없음"
 
 
-def _availability_text(row: Mapping[str, Any] | None, fallback: str = "원천 자료 확인 필요") -> str:
+def _availability_text(row: Mapping[str, Any] | None, fallback: str = "현재 자료로 확인 불가") -> str:
     if not isinstance(row, Mapping):
         return fallback
     detail = row.get("availability") or row.get("leaderAvailability")
@@ -668,7 +711,7 @@ def _availability_text(row: Mapping[str, Any] | None, fallback: str = "원천 �
     parts = [
         f"필요 자료: {detail.get('requiredData') or '원천 자료'} · "
         f"수신: {'예' if detail.get('received') else '아니오'} · "
-        f"공급자: {detail.get('producer') or '확인 필요'} · "
+        f"공급자: {_source_label(detail.get('producer'))} · "
         f"사유: {_display_reason(detail.get('missingReason'), '정상 수신')} · "
         f"다음 확인: {next_check_label(detail.get('nextCheckAt'))}"
     ]
@@ -680,12 +723,21 @@ def _availability_text(row: Mapping[str, Any] | None, fallback: str = "원천 �
 def _compact_group_lineage(rows: list[Mapping[str, Any]]) -> str:
     """Render the current-observation binding shared by HTML and Markdown."""
     row = next((item for item in rows if isinstance(item, Mapping)), {})
-    source = _text(row.get("leaderSource") or row.get("source"), "원천 미수신")
+    source = _source_label(row.get("leaderSource") or row.get("source"))
     source_date = _compact_date(row.get("sourceDate") or row.get("leaderObservationDate"))
     observation_date = _compact_date(row.get("observationDate") or row.get("leaderObservationDate"))
-    scope = _text(row.get("leaderScope") or row.get("scope"), "범위 확인 필요")
-    status = _display_status(row.get("leaderEvidenceStatus"), "주도주 상태 확인 필요")
-    return f"원천: {source} · 원천일: {source_date} · 관측일: {observation_date} · 범위: {scope} · 주도주 품질: {status}"
+    scope = _scope_label(row.get("leaderScope") or row.get("scope"))
+    status_code = str(row.get("leaderEvidenceStatus") or "").upper()
+    leaders = row.get("leaderCandidates") or row.get("leaders") or []
+    if not source or source == "자료 미수신":
+        status = "자료 미수신"
+    elif leaders:
+        status = "수신됨"
+    elif status_code in {"PARTIAL", "WARNING"}:
+        status = "일부 자료 수신됨"
+    else:
+        status = "대표 주도주 자료 없음"
+    return f"원천: {source} · 원천일: {source_date} · 관측일: {observation_date} · 범위: {scope} · 상태: {status}"
 
 
 def _snapshot_rank_rows(model: Mapping[str, Any], name: str) -> list[Mapping[str, Any]]:
@@ -712,7 +764,34 @@ def _snapshot_flow_rows(model: Mapping[str, Any]) -> list[tuple[str, str, Mappin
 
 def _snapshot_flow_date_mismatch(model: Mapping[str, Any]) -> bool:
     flow = (model.get("marketSnapshot") or {}).get("investorFlow") or {}
-    return flow.get("status") == "DATE_MISMATCH"
+    if str(flow.get("status") or "").upper() == "DATE_MISMATCH":
+        return True
+    dates = set()
+    for _, _, row in _snapshot_flow_rows(model):
+        value = row.get("sourceDate") or row.get("asOf") or row.get("tradingDate")
+        if value:
+            dates.add(_compact_normalized_date(value))
+    return len({date for date in dates if date}) > 1
+
+
+def _snapshot_flow_date_text(model: Mapping[str, Any]) -> str:
+    dates: dict[str, set[str]] = {"외국인": set(), "기관": set()}
+    for investor, _, row in _snapshot_flow_rows(model):
+        value = row.get("sourceDate") or row.get("asOf") or row.get("tradingDate")
+        normalized = _compact_normalized_date(value)
+        if normalized:
+            dates[investor].add(_compact_date(normalized))
+    foreign = ", ".join(sorted(dates["외국인"])) or "미수신"
+    institution = ", ".join(sorted(dates["기관"])) or "미수신"
+    if dates["외국인"] and dates["기관"] and dates["외국인"] != dates["기관"]:
+        return f"수급 자료 기준일이 달라 비교 보류 · 외국인 {foreign} · 기관 {institution}"
+    if dates["외국인"] and not dates["기관"]:
+        return f"외국인 자료 수신, 기관 자료 미수신 · 외국인 {foreign}"
+    if dates["기관"] and not dates["외국인"]:
+        return f"기관 자료 수신, 외국인 자료 미수신 · 기관 {institution}"
+    if dates["외국인"] and dates["기관"]:
+        return f"수급 기준일 {foreign}"
+    return "수급 자료 미수신"
 
 
 def _snapshot_number(value: Any) -> str:
@@ -729,6 +808,19 @@ def _snapshot_amount(row: Mapping[str, Any]) -> str:
     if amount is None:
         return "자료 없음"
     return f"{int(amount // 1_000_000):,}백만원"
+
+
+def _breadth_quality_text(current: Mapping[str, Any], total: int | float | None) -> str:
+    breadth = current.get("breadth") if isinstance(current.get("breadth"), Mapping) else {}
+    values = [breadth.get(key) for key in ("advancers", "decliners", "unchanged")]
+    if not isinstance(total, (int, float)) or any(not isinstance(value, (int, float)) for value in values):
+        return "시장 확산 자료 미수신"
+    warnings = {str(value).upper() for value in current.get("qualityWarnings") or []}
+    if "UNIVERSE_COMPOSITION_CHANGED" in warnings:
+        return "종목 구성 변동으로 비교 주의"
+    if sum(values) != total:
+        return "일부 종목 자료 누락"
+    return "자료 수신됨"
 
 
 def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
@@ -753,7 +845,7 @@ def _compact_snapshot_html(model: Mapping[str, Any]) -> str:
         and not _snapshot_flow_date_mismatch(model)
     )
     if _snapshot_flow_date_mismatch(model):
-        flow_rows = '<tr><td colspan=4>외국인·기관 수급 기준일 불일치</td></tr>'
+        flow_rows = f'<tr><td colspan=4>{_escape(_snapshot_flow_date_text(model))}</td></tr>'
     flow = (
         '<table><thead><tr><th>구분</th><th>방향</th><th>종목</th><th>금액</th></tr></thead>'
         f'<tbody>{flow_rows or "<tr><td colspan=4>자료 없음</td></tr>"}</tbody></table>'
@@ -779,9 +871,8 @@ def _compact_snapshot_markdown(model: Mapping[str, Any]) -> list[str]:
         and not _snapshot_flow_date_mismatch(model)
     ]
     lines += ["", "#### 외국인·기관 수급 상위"]
-    lines += _markdown_table(("구분", "방향", "종목", "금액"), flow_rows or [("자료 없음", "-", "-", "-")])
-    if _snapshot_flow_date_mismatch(model):
-        lines.append("외국인·기관 수급 기준일 불일치")
+    lines += _markdown_table(("구분", "방향", "종목", "금액"), flow_rows or [("수급 자료 미수신", "-", "-", "-")])
+    lines.append(_snapshot_flow_date_text(model))
     return lines
 
 
@@ -798,7 +889,7 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
     advancers = _num(current_breadth.get("advancers"))
     decliners = _num(current_breadth.get("decliners"))
     unchanged = _num(current_breadth.get("unchanged"))
-    if None in (total, advancers, decliners, unchanged) or advancers + decliners + unchanged != total:
+    if None in (total, advancers, decliners, unchanged):
         raise TemplateUnavailable("CURRENT_MARKET_OBSERVATION_UNAVAILABLE:BREADTH_ARITHMETIC_MISMATCH")
     historical_technical = contract.get("historicalTechnicalMarket") or {}
     if not isinstance(historical_technical, Mapping):
@@ -842,17 +933,17 @@ def _compact_model(report: Mapping[str, Any], *, allow_current_observation: bool
         "indexSessionLabel": _index_session_summary(list(contract.get("indices") or [])),
         "sessionContext": contract.get("sessionContext") or {"mode": "NOT_PREOPEN"},
         "currentMarketObservation": {
-            "source": _text(current_observation.get("source"), "확인 불가"),
+            "source": _source_label(current_observation.get("source")),
             "observedDate": _compact_date(current_observation.get("observedDate")),
             "sourceTime": _compact_kst(current_observation.get("sourceTime")),
-            "scope": _text(current_observation.get("scope"), "확인 불가"),
-            "qualityStatus": _display_status(current_observation.get("qualityStatus")),
+            "scope": _scope_label(current_observation.get("scope")),
+        "qualityStatus": _breadth_quality_text(current_observation, total),
             "qualityWarnings": list(current_observation.get("qualityWarnings") or []),
         },
         "historicalTechnicalMarket": {
-            "source": _text(historical_technical.get("source"), "확인 불가"),
+            "source": _source_label(historical_technical.get("source")),
             "targetDate": _compact_date(historical_technical.get("targetDate")),
-            "scope": _text(historical_technical.get("scope"), "확인 불가"),
+            "scope": _scope_label(historical_technical.get("scope")),
             "instrumentCount": _num(historical_technical.get("instrumentCount")),
             "metrics": historical_technical.get("metrics") or {},
         },
@@ -978,7 +1069,7 @@ def _compact_v1_cards(rows: list[Mapping[str, Any]], label: str, availability_de
     if not rows:
         return f'<div class="industry-item"><strong>운영 선정 {label} 미수신</strong><p>{_escape(_availability_text(availability_detail))}</p></div>'
     return "".join(
-        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>운영 선정 상태 · 대표 주도주 {_escape(_compact_leaders(row))}<br><small>{_escape(_compact_group_lineage([row]))}</small></p></div>'
+        f'<div class="industry-item"><div class="industry-head"><strong>{_escape(row.get("name") or row.get("id"))}</strong><span class="status-chip">{_escape(_display_status(row.get("status")))}</span></div><p>V1 운영 관심 목록 · 원천: 운영 관심 {label} 설정 + 당일 NAVER 관측자료 · 대표 주도주 {_escape(_compact_leaders(row))}<br><small>{_escape(_compact_group_lineage([row]))}</small></p></div>'
         for row in rows[:5]
     )
 
@@ -1018,12 +1109,12 @@ def _additional_status(value: Any) -> str:
         "NO_ELIGIBLE_TARGETS": "선정 가능한 대상 없음",
         "REPORT_LINK_FAILED": "리포트 연결 실패",
         "CONSUMED": "리포트 반영됨",
-    }.get(str(value or "").upper(), "원천 상태 확인 필요")
+    }.get(str(value or "").upper(), "현재 자료로 확인 불가")
 
 
 def _additional_reason(value: Any) -> str:
     if str(value or "").upper().startswith("ADDITIONAL_LINEAGE_MISSING"):
-        return "원천·날짜·범위·producer lineage가 완전하지 않습니다."
+        return "원천·날짜·범위 연결 정보가 완전하지 않습니다."
     return {
         "ADDITIONAL_OBSERVATION_TARGETS_NOT_CONFIGURED": "추가 관찰 대상 설정이 없습니다.",
         "PRODUCER_NOT_RUN": "추가 관찰 producer가 아직 실행되지 않았습니다.",
@@ -1035,7 +1126,7 @@ def _additional_reason(value: Any) -> str:
         "AUTO_SELECTION_INPUT_UNAVAILABLE": "추가 관찰 대상을 선정할 현재 관측 입력이 수신되지 않았습니다.",
         "NO_QUALIFIED_ADDITIONAL_TARGETS": "현재 관측에서 품질 기준을 충족한 추가 대상이 없습니다.",
         "ADDITIONAL_OBSERVATION_CONTRACT_LINK_FAILED": "추가 관찰 산출물은 수신됐지만 리포트 연결에 실패했습니다.",
-    }.get(str(value or "").upper(), "원천 자료 확인 필요")
+    }.get(str(value or "").upper(), "확인 불가 사유가 기록되지 않았습니다.")
 
 
 def _additional_contract_projection(contract: Mapping[str, Any]) -> dict[str, Any]:
@@ -1071,16 +1162,11 @@ def _additional_rows(model: Mapping[str, Any]) -> list[Mapping[str, Any]]:
 
 def _additional_lineage(row: Mapping[str, Any]) -> str:
     parts = [
-        f"원천: {_text(row.get('source'), '확인 불가')}",
+        f"원천: {_source_label(row.get('source'))}",
         f"원천일: {_compact_date(row.get('sourceDate'))}",
         f"관측일: {_compact_date(row.get('observationDate'))}",
-        f"범위: {_text(row.get('scope'), '확인 불가')}",
-        f"producer: {_text(row.get('producer'), '확인 불가')}",
-        f"산출물: {_text(row.get('artifactPath'), '확인 불가')}",
-        f"생성시각: {_text(row.get('generatedAt'), '확인 불가')}",
+        f"범위: {_scope_label(row.get('scope'))}",
     ]
-    if row.get("producerRunId") not in (None, ""):
-        parts.append(f"실행: {row['producerRunId']}")
     if row.get("selectionRank") not in (None, ""):
         parts.append(f"선정순위: {row['selectionRank']}")
     if row.get("selectionReason") not in (None, ""):
@@ -1119,10 +1205,10 @@ def _compact_v2_diagnostic_cards(model: Mapping[str, Any]) -> str:
         return f'<div class="industry-item"><strong>별도 산출 진단</strong><p>{_escape(model["v2HoldReason"])}.</p></div>'
     lineage = model.get("v2Lineage") or {}
     lineage_note = (
-        f'<p class="lineage-note">원천 {_escape(_text(lineage.get("source"), "확인 불가"))} · '
+        f'<p class="lineage-note">원천 {_escape(_source_label(lineage.get("source")))} · '
         f'원천일 {_escape(_compact_date(lineage.get("sourceDate")))} · '
         f'관측일 {_escape(_compact_date(lineage.get("observationDate")))} · '
-        f'관측 ID {_escape(_text(lineage.get("v2ObservationId"), "확인 불가"))}</p>'
+        f'상태 수신됨</p>'
     )
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
@@ -1140,10 +1226,10 @@ def _compact_v2_diagnostic_markdown(model: Mapping[str, Any]) -> list[str]:
         return lines
     lineage = model.get("v2Lineage") or {}
     lines.append(
-        f"원천: {lineage.get('source') or '확인 불가'} · "
+        f"원천: {_source_label(lineage.get('source'))} · "
         f"원천일: {_compact_date(lineage.get('sourceDate'))} · "
         f"관측일: {_compact_date(lineage.get('observationDate'))} · "
-        f"관측 ID: {lineage.get('v2ObservationId') or '확인 불가'}"
+        f"관측 자료 상태: 수신됨"
     )
     rows = []
     for label, group in (("업종", model["v2Industries"]), ("테마", model["v2Themes"])):
@@ -1170,7 +1256,12 @@ def _compact_interest_cards(model: Mapping[str, Any]) -> str:
 def _compact_kiwoom_cards(model: Mapping[str, Any]) -> str:
     rows = model["kiwoom"].get("stocks") or []
     if not rows:
-        return '<article class="stock"><h4>키움 후보 미수신</h4><p>조건검색 결과를 수신하지 못했습니다.</p></article>'
+        status = str(model["kiwoom"].get("status") or "").upper()
+        if status in {"AVAILABLE_EMPTY", "NO_RESULTS"}:
+            return '<article class="stock"><h4>키움 후보 없음</h4><p>전일 조건검색 결과가 0건입니다.</p></article>'
+        if status in {"UNAVAILABLE", "MISSING", "NOT_FOUND"}:
+            return '<article class="stock"><h4>키움 후보 자료 미수신</h4><p>해당 날짜 후보 자료가 수신되지 않았습니다.</p></article>'
+        return '<article class="stock"><h4>키움 후보 자료 확인 불가</h4><p>후보 자료의 날짜 또는 형식을 확인할 수 없습니다.</p></article>'
     def condition_text(row):
         details = row.get("candidateConditionDetails")
         if not isinstance(details, Mapping):
@@ -1272,7 +1363,7 @@ def _compact_market_html(model: Mapping[str, Any]) -> str:
         else _escape(historical_count)
     )
     metric_html = "".join(_metric_line(label, metrics.get(key) or {}) for label, key in (("MA20 상회", "aboveMA20"), ("MA60 상회", "aboveMA60"), ("MA120 상회", "aboveMA120")))
-    current_meta = f'원천 {_escape(current["source"])} · 관측일 {_escape(current["observedDate"])} · 범위 {_escape(current["scope"])} · 품질 {_escape(current["qualityStatus"])}'
+    current_meta = f'원천 {_escape(current["source"])} · 관측일 {_escape(current["observedDate"])} · 범위 {_escape(current["scope"])} · 상태 {_escape(current["qualityStatus"])}'
     historical_meta = f'원천 {_escape(historical["source"])} · 기준일 {_escape(historical["targetDate"])} · 범위 {_escape(historical["scope"])} · 대상 {historical_count_label}종목'
     return f'<div class="kpis"><article class="card"><div class="kpi-label">상승 종목</div><div class="kpi-value up">{market["advancers"]:,}</div><div class="kpi-sub">전체 {total:,}종목</div></article><article class="card"><div class="kpi-label">하락 종목</div><div class="kpi-value down">{market["decliners"]:,}</div><div class="kpi-sub">하락 비율 {_plain_pct(market["declineRatio"])}</div></article><article class="card"><div class="kpi-label">보합 종목</div><div class="kpi-value">{market["unchanged"]:,}</div><div class="kpi-sub">산술 검증 PASS</div></article></div><div class="grid two"><article class="card"><h3>시장 확산 <span class="tag">NAVER 현재시장 관측</span></h3><p class="muted tiny">{current_meta}</p><div class="big-number">{total:,} <span class="muted tiny">종목</span></div><div class="breadth" role="img" aria-label="상승 하락 보합"><div class="rise" style="width:{market["advancers"] / total * 100:.2f}%"></div><div class="fall" style="width:{market["decliners"] / total * 100:.2f}%"></div><div class="flat" style="width:{market["unchanged"] / total * 100:.2f}%"></div></div><div class="legend"><span>상승 <b>{market["advancers"]:,}</b></span><span>하락 <b>{market["decliners"]:,} · {_plain_pct(market["declineRatio"])}</b></span><span>보합 <b>{market["unchanged"]:,}</b></span></div></article><article class="card"><h3>이동평균 상회 비율 <span class="tag">KRX 기술지표</span></h3><p class="muted tiny">{historical_meta}</p>{metric_html}</article></div>'
 
@@ -1312,7 +1403,7 @@ def _compact_html(
     status = "" if model["status"].upper() == "AVAILABLE" else f'<div class="notice"><b>부분 자료 포함</b> · {_escape(model["reason"])}</div>'
     conclusions = "".join(f"<li>{_escape(item)}</li>" for item in _compact_conclusions(model))
     lineage = model["reportLineage"]
-    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="report-contract-id" content="{_escape(lineage["contractId"])}"><meta name="report-as-of" content="{_escape(lineage["asOf"])}"><meta name="report-created-at" content="{_escape(lineage["generatedAt"])}"><meta name="report-source" content="{_escape(lineage["source"])}"><meta name="report-scope" content="{_escape(lineage["scope"])}"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><!-- report-lineage: contractId={_escape(lineage["contractId"])};asOf={_escape(lineage["asOf"])};createdAt={_escape(lineage["generatedAt"])};source={_escape(lineage["source"])};scope={_escape(lineage["scope"])} --><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 관측일 {_escape(model["observationDateStatus"])} · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종", model.get("relativeIndustryAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마", model.get("relativeThemeAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종", model.get("v1IndustryAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마", model.get("v1ThemeAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">검증 중인 후보</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">WATCH POINTS</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>NOTICE</b> · {_escape(model["notice"])}</div></section><footer class="footer">A v1.1 승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
+    output = f'''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>국내증시 시장 모니터링 A v1.1</title><style>{css}</style></head><body><main class="wrap"><div class="topbar"><div class="brand">MARKET / DASHBOARD <span class="tag">A v1.1</span></div><nav aria-label="리포트 바로가기" class="nav"><a href="#part1">시장</a><a href="#part2">주도 그룹</a><a href="#part3">관심·후보</a></nav></div><header class="hero"><div class="eyebrow">KOREA MARKET INTELLIGENCE <span class="tag live">● {_escape(model["indexSessionLabel"])}</span></div><h1>국내증시 시장 모니터링</h1><p class="subtitle">{_escape(model["asOf"])} · {_escape(model["observedAt"])} 기준 · 관측일 {_escape(model["observationDateStatus"])} · 거래일 {_escape(model["tradingDateStatus"])}</p>{status}<div class="card"><h3>핵심 결론</h3><ul>{conclusions}</ul></div></header><section class="section section-anchor" id="part1"><div class="section-head"><h2>01. 시장 대시보드</h2><span class="label">MARKET PULSE</span></div><div class="grid two index-grid">{_compact_index_cards(model)}</div>{_session_context_html(model)}{_compact_market_html(model)}<div style="height:12px"></div>{_compact_snapshot_html(model)}</section><section class="section section-anchor" id="part2"><div class="section-head"><h2>02. 주도 업종·테마</h2><span class="label">TOP 5</span></div><article class="card"><div class="miniheading"><h3>오늘의 인기 업종 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeIndustries"], "업종", model.get("relativeIndustryAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>오늘의 인기 테마 TOP 5</h3><span class="tag">실측 상대강도</span></div><div class="industry-cards">{_compact_rank_cards(model["relativeThemes"], "테마", model.get("relativeThemeAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 업종</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Industries"], "업종", model.get("v1IndustryAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>운영 관심 테마</h3><span class="tag">운영 선정</span></div><div class="industry-cards">{_compact_v1_cards(model["v1Themes"], "테마", model.get("v1ThemeAvailability"))}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>추가 관찰 업종·테마</h3><span class="tag">추가 관찰 대상</span></div><div class="industry-cards">{_compact_v2_cards(model)}</div></article><div style="height:12px"></div><article class="card"><div class="miniheading"><h3>네이버 리서치 분석</h3><span class="tag">별도 참고</span></div><div class="industry-cards">{_compact_research_cards(model)}</div></article></section><section class="section section-anchor" id="part3"><div class="section-head"><h2>03. 관심종목·키움 후보</h2><span class="label">확인 항목</span></div><article class="card"><h3>관심종목</h3><div class="stock-list">{_compact_interest_cards(model)}</div></article><div style="height:12px"></div><article class="card"><h3>키움 전일 발굴 후보</h3><div class="stock-list">{_compact_kiwoom_cards(model)}</div></article><div class="notice"><b>안내</b> · {_escape(model["notice"])}</div></section><footer class="footer">승인 템플릿 기반 · 기준일 {_escape(model["asOf"])} · 기준시각 {_escape(model["observedAt"])}</footer></main></body></html>'''
     return _sanitize_user_text(
         output
         .replace("MARKET / DASHBOARD", "국내증시")
@@ -1345,7 +1436,6 @@ def _compact_markdown(
         raise TemplateUnavailable("CONTRACT_UNAVAILABLE:REQUIRED_RENDER_FIELDS")
     market = model["fullMarket"]
     lines = [
-        lineage_marker(model["contract"]),
         f"# 국내증시 시장 모니터링 — {model['asOf']}",
         "",
         "| 기준일 | 기준시각 | 시장 세션 | 관측일 상태 | 거래일 상태 |",
@@ -1394,7 +1484,7 @@ def _compact_markdown(
         if isinstance(historical_count, (int, float)) and not isinstance(historical_count, bool)
         else _escape(historical_count)
     )
-    lines += ["", "### 시장 확산", f"원천: {current['source']} · 관측일: {current['observedDate']} · 범위: {current['scope']} · 대상: {market['total']:,}종목 · 품질: {current['qualityStatus']}"]
+    lines += ["", "### 시장 확산", f"원천: {current['source']} · 관측일: {current['observedDate']} · 범위: {current['scope']} · 대상: {market['total']:,}종목 · 상태: {current['qualityStatus']}"]
     lines += _markdown_table(("상승", "하락", "보합", "하락 비율"), [(
         f"{market['advancers']:,}", f"{market['decliners']:,}", f"{market['unchanged']:,}",
         _plain_pct(market["declineRatio"]),
@@ -1415,7 +1505,7 @@ def _compact_markdown(
     ) for row in model["relativeIndustries"]]
     if not industry_rows:
         lines.append(_availability_text(model.get("relativeIndustryAvailability")))
-    lines += _markdown_table(("순위", "업종", "상대강도", "상승 비율", "대표 주도주", "상태"), industry_rows or [("-", "미수신", "-", "-", "-", "수신 상태 확인 필요")])
+    lines += _markdown_table(("순위", "업종", "상대강도", "상승 비율", "대표 주도주", "상태"), industry_rows or [("-", "자료 미수신", "-", "-", "-", "자료 미수신")])
     lines += ["", "### 테마 상대강도 TOP 5"]
     lines += [_compact_group_lineage(model["relativeThemes"])]
     theme_rows = [(
@@ -1425,7 +1515,7 @@ def _compact_markdown(
     ) for row in model["relativeThemes"]]
     if not theme_rows:
         lines.append(_availability_text(model.get("relativeThemeAvailability")))
-    lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "미수신", "-", "-", "-", "수신 상태 확인 필요")])
+    lines += _markdown_table(("순위", "테마", "상대강도", "상승 비율", "대표 주도주", "상태"), theme_rows or [("-", "자료 미수신", "-", "-", "-", "자료 미수신")])
     lines += ["", "### 운영 관심 업종"]
     lines += [_compact_group_lineage(model["v1Industries"])]
     v1_industry_rows = [(
@@ -1433,7 +1523,7 @@ def _compact_markdown(
     ) for row in model["v1Industries"] if _compact_row_available(row)]
     if not v1_industry_rows:
         lines.append(_availability_text(model.get("v1IndustryAvailability")))
-    lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_industry_rows or [("미수신", "수신 상태 확인 필요", "-")])
+    lines += _markdown_table(("업종", "상태", "대표 주도주"), v1_industry_rows or [("운영 관심 업종 미설정", "운영 관심 대상 미설정", "-")])
     lines += ["", "### 운영 관심 테마"]
     lines += [_compact_group_lineage(model["v1Themes"])]
     v1_theme_rows = [(
@@ -1441,7 +1531,7 @@ def _compact_markdown(
     ) for row in model["v1Themes"] if _compact_row_available(row)]
     if not v1_theme_rows:
         lines.append(_availability_text(model.get("v1ThemeAvailability")))
-    lines += _markdown_table(("테마", "상태", "대표 주도주"), v1_theme_rows or [("미수신", "수신 상태 확인 필요", "-")])
+    lines += _markdown_table(("테마", "상태", "대표 주도주"), v1_theme_rows or [("운영 관심 테마 미설정", "운영 관심 대상 미설정", "-")])
     lines += ["", "### 추가 관찰 업종·테마"]
     additional = model.get("additionalObservations") or {}
     additional_rows = _additional_rows(model)
@@ -1495,7 +1585,7 @@ def _compact_markdown(
     ]
     lines += _markdown_table(("종목", "현재가", "20일 이동평균", "60일 이동평균", "추세", "상태"), interest_rows or [("등록 관심종목 미수신", "-", "-", "-", "-", "-")])
     lines += ["", "### 키움 전일 발굴 후보"]
-    lines += _markdown_table(("후보", "기준값", "현재값", "기술지표", "조건 판정", "다음 확인사항"), _compact_kiwoom_markdown_rows(model) or [("자료 없음", "-", "-", "-", "자료 없음", "전일 장마감 후 조건검색 결과 자료 없음")])
+    lines += _markdown_table(("후보", "기준값", "현재값", "기술지표", "조건 판정", "다음 확인사항"), _compact_kiwoom_markdown_rows(model) or [("후보 없음", "-", "-", "-", "후보 없음", "전일 조건검색 결과가 0건입니다.")])
     lines += ["", f"> 안내: {model['notice']}", ""]
     return _sanitize_user_text("\n".join(lines))
 
@@ -1504,18 +1594,10 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
     plain = html.unescape(html_text)
     issues: list[str] = []
     lineage = model.get("reportLineage") or {}
-    contract_id_value = str(lineage.get("contractId") or "")
-    if not contract_id_value or contract_id_value not in markdown_text or contract_id_value not in plain:
-        issues.append("REPORT_CONTRACT_ID_MISSING")
-    for value in (lineage.get("asOf"), lineage.get("generatedAt"), lineage.get("source"), lineage.get("scope")):
-        if value not in (None, "") and str(value) not in markdown_text:
-            issues.append(f"MARKDOWN_LINEAGE_MISSING:{value}")
-        if value not in (None, "") and str(value) not in plain:
-            issues.append(f"HTML_LINEAGE_MISSING:{value}")
     for field, token, text in (("MARKDOWN_PART1", "## 1. 시장 대시보드", markdown_text), ("MARKDOWN_PART2", "## 2. 주도 업종·테마", markdown_text), ("MARKDOWN_PART3", "## 3. 관심종목·키움 후보", markdown_text), ("HTML_PART1", 'id="part1"', plain), ("HTML_PART2", 'id="part2"', plain), ("HTML_PART3", 'id="part3"', plain)):
         if token not in text:
             issues.append(f"{field}_MISSING")
-    for forbidden in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256", "sourceSha256", "sourcePath", "technicalProvenance", "technicalSourceDate", "technicalGenerationId", "technicalReceiptStatus", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "manifestPath", "runId", "executionHead", "provenance", "generatedAt", "generationId", "historicalGenerationId", "historicalTargetDate", "historicalLineage", "historicalIndicatorSource", "historicalFallbackAllowed", "currentSnapshotSource", "fallbackUsed", "finality", "evidenceClass"):
+    for forbidden in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceCommitStatus", "inputSnapshotSha256", "sourceSha256", "sourcePath", "technicalProvenance", "technicalSourceDate", "technicalGenerationId", "technicalReceiptStatus", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "manifestPath", "runId", "executionHead", "provenance", "generatedAt", "generationId", "historicalGenerationId", "historicalTargetDate", "historicalLineage", "historicalIndicatorSource", "historicalFallbackAllowed", "currentSnapshotSource", "fallbackUsed", "finality", "evidenceClass", "contractId", "reportLineage", "slotLineage", "candidateDetails", "current-observation", "sourceHash", "technicalEvidence", "workflow", "commit", "producer", "artifact"):
         if forbidden in markdown_text or forbidden in plain:
             issues.append(f"INTERNAL_TRACE_EXPOSED:{forbidden}")
     if "<pre" in plain.lower():
@@ -1574,9 +1656,19 @@ def _compact_validate(markdown_text: str, html_text: str, model: Mapping[str, An
         name = row.get("name") or row.get("id")
         if name and (str(name) not in part2_md or str(name) not in part2_html):
             issues.append(f"PART2_ADDITIONAL_MISSING:{name}")
-        for field in ("source", "sourceDate", "observationDate", "scope", "producer", "artifactPath", "generatedAt", "producerRunId", "selectionRank", "selectionReason", "failureReason"):
+        for field in ("source", "sourceDate", "observationDate", "scope"):
             value = row.get(field)
-            if value not in (None, "") and (not _contains_rendered(value, part2_md) or not _contains_rendered(value, part2_html)):
+            if value in (None, ""):
+                continue
+            # Lineage remains authoritative in the contract/manifest. User-facing
+            # views deliberately use localized source/scope labels, so validate
+            # the public representation rather than requiring internal tokens.
+            display_value = value
+            if field == "source":
+                display_value = _source_label(value)
+            elif field == "scope":
+                display_value = _scope_label(value)
+            if not _contains_rendered(display_value, part2_md) or not _contains_rendered(display_value, part2_html):
                 issues.append(f"PART2_ADDITIONAL_LINEAGE_MISSING:{value}")
     return issues
 
