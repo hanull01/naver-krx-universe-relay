@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "011200",
   "itemName": "HMM",
-  "reportCount": 15,
-  "latestReportNid": "96750",
-  "latestWriteDate": "2026-10-15",
+  "reportCount": 18,
+  "latestReportNid": "98184",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96750",
-    "writeDate": "2026-10-15",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre: 호시절 보내는 중",
-    "goalPrice": 24000,
-    "normalizedOpinion": "HOLD",
+    "nid": "98184",
+    "writeDate": "2026-11-13",
+    "brokerName": "미래에셋증권",
+    "title": "독보적인 원가 경쟁력",
+    "goalPrice": 28000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 1
+        "positive": 3,
+        "negative": 2
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
+      "earningsPositiveSignalCount": 1,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
         "원가": 3,
-        "환율": 2,
-        "조선": 1
+        "자동차": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98184",
+    "98175",
+    "98159",
     "96750",
     "96700",
     "95882",

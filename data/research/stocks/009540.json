@@ -2,31 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "009540",
   "itemName": "HD한국조선해양",
-  "reportCount": 14,
-  "latestReportNid": "97248",
-  "latestWriteDate": "2026-10-29",
+  "reportCount": 15,
+  "latestReportNid": "98131",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "97248",
-    "writeDate": "2026-10-29",
-    "brokerName": "유안타증권",
-    "title": "기말주주환원 수익률만 6%, 이건 엄중하다",
-    "goalPrice": 463000,
-    "normalizedOpinion": "BUY",
+    "nid": "98131",
+    "writeDate": "2026-11-13",
+    "brokerName": "IBK투자증권",
+    "title": "올해 결산배당을 긍정적으로 바라보는 이유",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 7,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 1,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "환율": 2
+        "조선": 10
       }
     }
   },
   "reportNids": [
+    "98131",
     "97248",
     "97242",
     "97200",

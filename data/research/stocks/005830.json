@@ -2,29 +2,32 @@
   "schemaVersion": 1,
   "itemCode": "005830",
   "itemName": "DB손해보험",
-  "reportCount": 19,
-  "latestReportNid": "96012",
-  "latestWriteDate": "2026-09-04",
+  "reportCount": 20,
+  "latestReportNid": "98171",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96012",
-    "writeDate": "2026-09-04",
-    "brokerName": "대신증권",
-    "title": "새로운 밸류업 정책으로 확대되는 배당총액",
-    "goalPrice": 250000,
+    "nid": "98171",
+    "writeDate": "2026-11-13",
+    "brokerName": "한화투자증권",
+    "title": "주요 투자포인트인 보험 수익성 개선을 재확인",
+    "goalPrice": 247000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
-        "negative": 0
+        "positive": 5,
+        "negative": 9
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
-      "topics": {}
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "자동차": 3
+      }
     }
   },
   "reportNids": [
+    "98171",
     "96012",
     "95990",
     "95946",

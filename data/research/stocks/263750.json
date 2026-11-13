@@ -2,31 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "263750",
   "itemName": "펄어비스",
-  "reportCount": 9,
-  "latestReportNid": "95530",
-  "latestWriteDate": "2026-08-13",
+  "reportCount": 10,
+  "latestReportNid": "98161",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "95530",
-    "writeDate": "2026-08-13",
-    "brokerName": "신한투자증권",
-    "title": "채널 믹스와 성과급으로 실적 부진",
-    "goalPrice": null,
-    "normalizedOpinion": "HOLD",
+    "nid": "98161",
+    "writeDate": "2026-11-13",
+    "brokerName": "유진투자증권",
+    "title": "양호한 붉은사막 DLC 반응, 다음은?",
+    "goalPrice": 35000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 0
+        "positive": 10,
+        "negative": 11
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 9,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
+        "환율": 7,
+        "원가": 2,
+        "AI": 1,
+        "가격": 1,
         "수요": 1
       }
     }
   },
   "reportNids": [
+    "98161",
     "95530",
     "95481",
     "95469",

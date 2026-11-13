@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "095610",
   "itemName": "테스",
-  "reportCount": 9,
-  "latestReportNid": "96196",
-  "latestWriteDate": "2026-09-17",
+  "reportCount": 10,
+  "latestReportNid": "98162",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96196",
-    "writeDate": "2026-09-17",
-    "brokerName": "한국IR협의회",
-    "title": "메모리 투자 확대와 장비 포트폴리오 다변화",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "98162",
+    "writeDate": "2026-11-13",
+    "brokerName": "SK증권",
+    "title": "수익성 좋아집니다",
+    "goalPrice": 160000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 7,
+        "positive": 0,
         "negative": 0
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 3,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
       "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "반도체": 5,
-        "수주": 2,
+        "수주": 6,
+        "원가": 2,
         "중국": 2,
-        "수요": 1
+        "수요": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98162",
     "96196",
     "96069",
     "95776",

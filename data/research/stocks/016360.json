@@ -2,32 +2,31 @@
   "schemaVersion": 1,
   "itemCode": "016360",
   "itemName": "삼성증권",
-  "reportCount": 23,
-  "latestReportNid": "96501",
-  "latestWriteDate": "2026-10-07",
+  "reportCount": 25,
+  "latestReportNid": "98154",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96501",
-    "writeDate": "2026-10-07",
-    "brokerName": "하나증권",
-    "title": "3Q26 Pre - 컨센 9% 하회 전망",
-    "goalPrice": 168000,
+    "nid": "98154",
+    "writeDate": "2026-11-13",
+    "brokerName": "SK증권",
+    "title": "3Q26 Review: 평법함이 특별해지는 순간",
+    "goalPrice": 105000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 5
+        "positive": 0,
+        "negative": 3
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {
-        "금리": 1,
-        "원가": 1
-      }
+      "topics": {}
     }
   },
   "reportNids": [
+    "98154",
+    "98148",
     "96501",
     "96078",
     "95259",

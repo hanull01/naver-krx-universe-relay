@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "009150",
   "itemName": "삼성전기",
-  "reportCount": 82,
-  "latestReportNid": "98086",
-  "latestWriteDate": "2026-11-12",
+  "reportCount": 83,
+  "latestReportNid": "98164",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "98086",
-    "writeDate": "2026-11-12",
-    "brokerName": "대신증권",
-    "title": "빅테크의 러브 콜은 추가로 확대! FC BGA/MLCC, 동시 공급은 유일!",
-    "goalPrice": 2800000,
-    "normalizedOpinion": "BUY",
+    "nid": "98164",
+    "writeDate": "2026-11-13",
+    "brokerName": "SK증권",
+    "title": "NDR 후기: \"가격 저항이 없다 & 기판 탑 2 도약”",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 3
+        "positive": 0,
+        "negative": 1
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 8,
-      "earningsNegativeSignalCount": 2,
-      "targetPriceMentionDirection": "UP",
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 4,
+        "가격": 3,
         "AI": 2,
-        "가격": 1
+        "재고": 1
       }
     }
   },
   "reportNids": [
+    "98164",
     "98086",
     "98045",
     "97255",

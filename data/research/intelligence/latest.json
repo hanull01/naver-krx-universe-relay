@@ -1,7 +1,8 @@
 {
   "status": "OK",
   "version": "research-intelligence-batch-v1",
-  "asOf": "2026-11-12",
+  "asOf": "2026-11-13",
+  "generatedAt": "2026-11-13T19:21:43+09:00",
   "universeSource": "config/universe.json",
   "enabledStockCount": 3,
   "statusCounts": {
@@ -41,40 +42,40 @@
       "rankingEligible": true,
       "reportCount": 84,
       "brokerCount": 15,
-      "recentReportCount": 15,
-      "previousReportCount": 6,
-      "recentTargetMean": 3299286,
-      "previousTargetMean": 3450000,
+      "recentReportCount": 14,
+      "previousReportCount": 7,
+      "recentTargetMean": 3276154,
+      "previousTargetMean": 3471429,
       "recentTargetMedian": 3200000,
-      "recentTargetStdev": 476452,
-      "targetMeanChangePct": -4.37,
-      "targetDispersionChangePct": -1.89,
+      "recentTargetStdev": 486803,
+      "targetMeanChangePct": -5.63,
+      "targetDispersionChangePct": 7.54,
       "revisionUp": 24,
       "revisionDown": 8,
       "risingTopics": [
         {
           "topic": "메모리",
-          "delta": 0.133,
+          "delta": 0.143,
           "ratio": null
         },
         {
           "topic": "HBM",
-          "delta": 0.067,
+          "delta": 0.071,
           "ratio": null
         },
         {
           "topic": "메모리 가격",
-          "delta": 0.067,
+          "delta": 0.071,
           "ratio": null
         },
         {
           "topic": "사이클",
-          "delta": 0.067,
+          "delta": 0.071,
           "ratio": null
         },
         {
           "topic": "주주환원",
-          "delta": 0.067,
+          "delta": 0.071,
           "ratio": null
         }
       ]
@@ -119,40 +120,40 @@
         "rankingEligible": true,
         "reportCount": 84,
         "brokerCount": 15,
-        "recentReportCount": 15,
-        "previousReportCount": 6,
-        "recentTargetMean": 3299286,
-        "previousTargetMean": 3450000,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
         "recentTargetMedian": 3200000,
-        "recentTargetStdev": 476452,
-        "targetMeanChangePct": -4.37,
-        "targetDispersionChangePct": -1.89,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
         "revisionUp": 24,
         "revisionDown": 8,
         "risingTopics": [
           {
             "topic": "메모리",
-            "delta": 0.133,
+            "delta": 0.143,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "메모리 가격",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "사이클",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "주주환원",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           }
         ]
@@ -215,51 +216,6 @@
     ],
     "targetMeanChange": [
       {
-        "itemCode": "000660",
-        "itemName": "SK하이닉스",
-        "status": "OK",
-        "rankingEligible": true,
-        "reportCount": 84,
-        "brokerCount": 15,
-        "recentReportCount": 15,
-        "previousReportCount": 6,
-        "recentTargetMean": 3299286,
-        "previousTargetMean": 3450000,
-        "recentTargetMedian": 3200000,
-        "recentTargetStdev": 476452,
-        "targetMeanChangePct": -4.37,
-        "targetDispersionChangePct": -1.89,
-        "revisionUp": 24,
-        "revisionDown": 8,
-        "risingTopics": [
-          {
-            "topic": "메모리",
-            "delta": 0.133,
-            "ratio": null
-          },
-          {
-            "topic": "HBM",
-            "delta": 0.067,
-            "ratio": null
-          },
-          {
-            "topic": "메모리 가격",
-            "delta": 0.067,
-            "ratio": null
-          },
-          {
-            "topic": "사이클",
-            "delta": 0.067,
-            "ratio": null
-          },
-          {
-            "topic": "주주환원",
-            "delta": 0.067,
-            "ratio": null
-          }
-        ]
-      },
-      {
         "itemCode": "005930",
         "itemName": "삼성전자",
         "status": "OK",
@@ -280,6 +236,51 @@
           {
             "topic": "주주환원",
             "delta": 0.091,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.143,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.071,
             "ratio": null
           }
         ]
@@ -378,40 +379,40 @@
         "rankingEligible": true,
         "reportCount": 84,
         "brokerCount": 15,
-        "recentReportCount": 15,
-        "previousReportCount": 6,
-        "recentTargetMean": 3299286,
-        "previousTargetMean": 3450000,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
         "recentTargetMedian": 3200000,
-        "recentTargetStdev": 476452,
-        "targetMeanChangePct": -4.37,
-        "targetDispersionChangePct": -1.89,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
         "revisionUp": 24,
         "revisionDown": 8,
         "risingTopics": [
           {
             "topic": "메모리",
-            "delta": 0.133,
+            "delta": 0.143,
             "ratio": null
           },
           {
             "topic": "HBM",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "메모리 가격",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "사이클",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           },
           {
             "topic": "주주환원",
-            "delta": 0.067,
+            "delta": 0.071,
             "ratio": null
           }
         ]
@@ -422,5 +423,6 @@
     "automaticUniversePromotion": false,
     "buySellUsedAsRecommendationScore": false,
     "minimumRecentReportsForRanking": 3
-  }
+  },
+  "sourceGeneration": "gen_20261112_1794524782845860000"
 }

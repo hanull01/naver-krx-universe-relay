@@ -2,32 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "036460",
   "itemName": "한국가스공사",
-  "reportCount": 12,
-  "latestReportNid": "96916",
-  "latestWriteDate": "2026-10-21",
+  "reportCount": 15,
+  "latestReportNid": "98179",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96916",
-    "writeDate": "2026-10-21",
+    "nid": "98179",
+    "writeDate": "2026-11-13",
     "brokerName": "하나증권",
-    "title": "해외 자원개발 실적 급성장",
+    "title": "JKM 강세로 실적과 미수금 동반 증가",
     "goalPrice": 55000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 5,
+        "positive": 8,
         "negative": 1
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 4,
+      "earningsNegativeSignalCount": 1,
       "targetPriceMentionDirection": "UNCHANGED",
       "topics": {
         "가격": 2,
-        "수요": 1
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98179",
+    "98150",
+    "98140",
     "96916",
     "96902",
     "96230",

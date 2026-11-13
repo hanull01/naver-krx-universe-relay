@@ -2,34 +2,30 @@
   "schemaVersion": 1,
   "itemCode": "042660",
   "itemName": "한화오션",
-  "reportCount": 41,
-  "latestReportNid": "97537",
-  "latestWriteDate": "2026-11-03",
+  "reportCount": 42,
+  "latestReportNid": "98091",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97537",
-    "writeDate": "2026-11-03",
-    "brokerName": "대신증권",
-    "title": "특수선 모멘텀 시그널",
-    "goalPrice": 102000,
+    "nid": "98091",
+    "writeDate": "2026-11-12",
+    "brokerName": "유안타증권",
+    "title": "(FY25) 높은 산, (FY26) 깊은 골, 적막한 산하",
+    "goalPrice": 104000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
         "positive": 0,
-        "negative": 3
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
+      "earningsTextDirection": "UNKNOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 3,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {
-        "수주": 2,
-        "미국": 1,
-        "조선": 1,
-        "환율": 1
-      }
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {}
     }
   },
   "reportNids": [
+    "98091",
     "97537",
     "97178",
     "97163",

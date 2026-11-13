@@ -2,35 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "066970",
   "itemName": "엘앤에프",
-  "reportCount": 23,
-  "latestReportNid": "98078",
-  "latestWriteDate": "2026-11-12",
+  "reportCount": 24,
+  "latestReportNid": "98172",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "98078",
-    "writeDate": "2026-11-12",
-    "brokerName": "삼성증권",
-    "title": "3Q26 review - LFP 양극재 사업 확장이 긍정적",
-    "goalPrice": 125000,
+    "nid": "98172",
+    "writeDate": "2026-11-13",
+    "brokerName": "하나증권",
+    "title": "재고평가손실로 적자전환, 출하는 견조",
+    "goalPrice": 140000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 4
+        "positive": 3,
+        "negative": 10
       },
       "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "DOWN",
+      "earningsNegativeSignalCount": 7,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 4,
-        "자동차": 3,
-        "수요": 2,
-        "재고": 2,
-        "환율": 1
+        "수요": 5,
+        "재고": 4,
+        "자동차": 2,
+        "환율": 2,
+        "가격": 1,
+        "배터리": 1
       }
     }
   },
   "reportNids": [
+    "98172",
     "98078",
     "97884",
     "97834",

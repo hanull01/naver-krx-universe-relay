@@ -2,34 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "003550",
   "itemName": "LG",
-  "reportCount": 17,
-  "latestReportNid": "96153",
-  "latestWriteDate": "2026-09-15",
+  "reportCount": 21,
+  "latestReportNid": "98186",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96153",
-    "writeDate": "2026-09-15",
-    "brokerName": "한화투자증권",
-    "title": "LG AI 토크콘서트 2026 후기",
-    "goalPrice": 140000,
+    "nid": "98186",
+    "writeDate": "2026-11-13",
+    "brokerName": "미래에셋증권",
+    "title": "AI로 끌고 환원으로 받친다",
+    "goalPrice": 120000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 4,
+        "negative": 4
       },
-      "earningsTextDirection": "UNKNOWN",
+      "earningsTextDirection": "DOWN",
       "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
+      "earningsNegativeSignalCount": 2,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "AI": 17,
-        "로봇": 2,
-        "미국": 1,
-        "중국": 1
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98186",
+    "98177",
+    "98174",
+    "98157",
     "96153",
     "96151",
     "95810",

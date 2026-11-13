@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "120110",
   "itemName": "코오롱인더",
-  "reportCount": 8,
-  "latestReportNid": "98056",
+  "reportCount": 9,
+  "latestReportNid": "98108",
   "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "98056",
+    "nid": "98108",
     "writeDate": "2026-11-12",
-    "brokerName": "신한투자증권",
-    "title": "본업은 기다림, 성장은 현재진행형",
+    "brokerName": "하나증권",
+    "title": "유가 안정화 이후 성장성 부각될 것",
     "goalPrice": 60000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 3
+        "positive": 4,
+        "negative": 7
       },
-      "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 2,
-      "earningsNegativeSignalCount": 0,
+      "earningsTextDirection": "MIXED",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 2,
-        "원가": 2,
+        "원가": 4,
+        "가격": 1,
+        "자동차": 1,
         "환율": 1
       }
     }
   },
   "reportNids": [
+    "98108",
     "98056",
     "95703",
     "95372",

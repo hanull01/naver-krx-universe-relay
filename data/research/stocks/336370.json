@@ -2,29 +2,37 @@
   "schemaVersion": 1,
   "itemCode": "336370",
   "itemName": "솔루스첨단소재",
-  "reportCount": 7,
-  "latestReportNid": "97807",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 8,
+  "latestReportNid": "98151",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "97807",
-    "writeDate": "2026-11-06",
-    "brokerName": "SK증권",
-    "title": "솔루스첨단소재 헝가리 1공장 가동중단 관련 코멘트",
-    "goalPrice": 17000,
+    "nid": "98151",
+    "writeDate": "2026-11-13",
+    "brokerName": "유진투자증권",
+    "title": "4분기부터 판가 인상 시작",
+    "goalPrice": 13000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 0
+        "positive": 8,
+        "negative": 4
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UNKNOWN",
-      "topics": {}
+      "earningsPositiveSignalCount": 6,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNCHANGED",
+      "topics": {
+        "가격": 2,
+        "미국": 2,
+        "수요": 2,
+        "배터리": 1,
+        "자동차": 1,
+        "중국": 1
+      }
     }
   },
   "reportNids": [
+    "98151",
     "97807",
     "94522",
     "94517",

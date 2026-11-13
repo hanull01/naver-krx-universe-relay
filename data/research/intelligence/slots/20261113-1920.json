@@ -1,0 +1,446 @@
+{
+  "status": "OK",
+  "version": "research-intelligence-batch-v1",
+  "asOf": "2026-11-13",
+  "generatedAt": "2026-11-13T19:21:43+09:00",
+  "universeSource": "config/universe.json",
+  "enabledStockCount": 3,
+  "statusCounts": {
+    "OK": 3
+  },
+  "rankingEligibleCount": 3,
+  "stocks": [
+    {
+      "itemCode": "005930",
+      "itemName": "삼성전자",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 95,
+      "brokerCount": 14,
+      "recentReportCount": 11,
+      "previousReportCount": 16,
+      "recentTargetMean": 485000,
+      "previousTargetMean": 507333,
+      "recentTargetMedian": 490000,
+      "recentTargetStdev": 96670,
+      "targetMeanChangePct": -4.4,
+      "targetDispersionChangePct": 28.2,
+      "revisionUp": 24,
+      "revisionDown": 7,
+      "risingTopics": [
+        {
+          "topic": "주주환원",
+          "delta": 0.091,
+          "ratio": null
+        }
+      ]
+    },
+    {
+      "itemCode": "000660",
+      "itemName": "SK하이닉스",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 84,
+      "brokerCount": 15,
+      "recentReportCount": 14,
+      "previousReportCount": 7,
+      "recentTargetMean": 3276154,
+      "previousTargetMean": 3471429,
+      "recentTargetMedian": 3200000,
+      "recentTargetStdev": 486803,
+      "targetMeanChangePct": -5.63,
+      "targetDispersionChangePct": 7.54,
+      "revisionUp": 24,
+      "revisionDown": 8,
+      "risingTopics": [
+        {
+          "topic": "메모리",
+          "delta": 0.143,
+          "ratio": null
+        },
+        {
+          "topic": "HBM",
+          "delta": 0.071,
+          "ratio": null
+        },
+        {
+          "topic": "메모리 가격",
+          "delta": 0.071,
+          "ratio": null
+        },
+        {
+          "topic": "사이클",
+          "delta": 0.071,
+          "ratio": null
+        },
+        {
+          "topic": "주주환원",
+          "delta": 0.071,
+          "ratio": null
+        }
+      ]
+    },
+    {
+      "itemCode": "298040",
+      "itemName": "효성중공업",
+      "status": "OK",
+      "rankingEligible": true,
+      "reportCount": 42,
+      "brokerCount": 10,
+      "recentReportCount": 10,
+      "previousReportCount": 4,
+      "recentTargetMean": 3460000,
+      "previousTargetMean": 4450000,
+      "recentTargetMedian": 3450000,
+      "recentTargetStdev": 681469,
+      "targetMeanChangePct": -22.25,
+      "targetDispersionChangePct": 87.21,
+      "revisionUp": 5,
+      "revisionDown": 14,
+      "risingTopics": [
+        {
+          "topic": "원가",
+          "delta": 0.8,
+          "ratio": null
+        },
+        {
+          "topic": "환율",
+          "delta": 0.25,
+          "ratio": 2.0
+        }
+      ]
+    }
+  ],
+  "rankings": {
+    "researchAttentionIncrease": [
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.143,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.071,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.8,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.25,
+            "ratio": 2.0
+          }
+        ]
+      },
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 95,
+        "brokerCount": 14,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
+        "revisionUp": 24,
+        "revisionDown": 7,
+        "risingTopics": [
+          {
+            "topic": "주주환원",
+            "delta": 0.091,
+            "ratio": null
+          }
+        ]
+      }
+    ],
+    "targetMeanChange": [
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 95,
+        "brokerCount": 14,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
+        "revisionUp": 24,
+        "revisionDown": 7,
+        "risingTopics": [
+          {
+            "topic": "주주환원",
+            "delta": 0.091,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.143,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.071,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.8,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.25,
+            "ratio": 2.0
+          }
+        ]
+      }
+    ],
+    "targetDispersionIncrease": [
+      {
+        "itemCode": "298040",
+        "itemName": "효성중공업",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 42,
+        "brokerCount": 10,
+        "recentReportCount": 10,
+        "previousReportCount": 4,
+        "recentTargetMean": 3460000,
+        "previousTargetMean": 4450000,
+        "recentTargetMedian": 3450000,
+        "recentTargetStdev": 681469,
+        "targetMeanChangePct": -22.25,
+        "targetDispersionChangePct": 87.21,
+        "revisionUp": 5,
+        "revisionDown": 14,
+        "risingTopics": [
+          {
+            "topic": "원가",
+            "delta": 0.8,
+            "ratio": null
+          },
+          {
+            "topic": "환율",
+            "delta": 0.25,
+            "ratio": 2.0
+          }
+        ]
+      },
+      {
+        "itemCode": "005930",
+        "itemName": "삼성전자",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 95,
+        "brokerCount": 14,
+        "recentReportCount": 11,
+        "previousReportCount": 16,
+        "recentTargetMean": 485000,
+        "previousTargetMean": 507333,
+        "recentTargetMedian": 490000,
+        "recentTargetStdev": 96670,
+        "targetMeanChangePct": -4.4,
+        "targetDispersionChangePct": 28.2,
+        "revisionUp": 24,
+        "revisionDown": 7,
+        "risingTopics": [
+          {
+            "topic": "주주환원",
+            "delta": 0.091,
+            "ratio": null
+          }
+        ]
+      },
+      {
+        "itemCode": "000660",
+        "itemName": "SK하이닉스",
+        "status": "OK",
+        "rankingEligible": true,
+        "reportCount": 84,
+        "brokerCount": 15,
+        "recentReportCount": 14,
+        "previousReportCount": 7,
+        "recentTargetMean": 3276154,
+        "previousTargetMean": 3471429,
+        "recentTargetMedian": 3200000,
+        "recentTargetStdev": 486803,
+        "targetMeanChangePct": -5.63,
+        "targetDispersionChangePct": 7.54,
+        "revisionUp": 24,
+        "revisionDown": 8,
+        "risingTopics": [
+          {
+            "topic": "메모리",
+            "delta": 0.143,
+            "ratio": null
+          },
+          {
+            "topic": "HBM",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "메모리 가격",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "사이클",
+            "delta": 0.071,
+            "ratio": null
+          },
+          {
+            "topic": "주주환원",
+            "delta": 0.071,
+            "ratio": null
+          }
+        ]
+      }
+    ]
+  },
+  "methodology": {
+    "automaticUniversePromotion": false,
+    "buySellUsedAsRecommendationScore": false,
+    "minimumRecentReportsForRanking": 3
+  },
+  "sourceGeneration": "gen_20261112_1794524782845860000",
+  "researchSlot": "19:20",
+  "slotLineage": {
+    "researchSlot": "19:20",
+    "reportSlot": "19:30",
+    "recheckReportSlot": null,
+    "expectedAt": "2026-11-13T19:20:00+09:00",
+    "sourceDate": "2026-11-13",
+    "generatedAt": "2026-11-13T19:21:43+09:00",
+    "producerRunId": "43408433997",
+    "artifactPath": "data/research/intelligence/slots/20261113-1920.json",
+    "artifactStatus": "AVAILABLE",
+    "producerStatus": "SUCCESS",
+    "freshnessStatus": "FRESH",
+    "failureReason": null,
+    "consumedByReport": [],
+    "nextCheckAt": "2026-11-13T19:30:00+09:00",
+    "checkedAt": "2026-11-13T19:21:43+09:00"
+  }
+}

@@ -2,33 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "054450",
   "itemName": "텔레칩스",
-  "reportCount": 4,
-  "latestReportNid": "97965",
-  "latestWriteDate": "2026-11-11",
+  "reportCount": 5,
+  "latestReportNid": "98153",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "97965",
-    "writeDate": "2026-11-11",
-    "brokerName": "한국IR협의회",
-    "title": "다시 뛰는 차량용 반도체 전문기업",
-    "goalPrice": null,
-    "normalizedOpinion": "NONE",
+    "nid": "98153",
+    "writeDate": "2026-11-13",
+    "brokerName": "유진투자증권",
+    "title": "3Q26P Review: 4분기 연속 흑자전환 성공",
+    "goalPrice": 11500,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 8,
-        "negative": 2
+        "positive": 27,
+        "negative": 4
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 5,
-      "earningsNegativeSignalCount": 1,
-      "targetPriceMentionDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 21,
+      "earningsNegativeSignalCount": 0,
+      "targetPriceMentionDirection": "DOWN",
       "topics": {
-        "반도체": 1,
-        "수요": 1,
-        "원가": 1
+        "반도체": 2,
+        "자동차": 2,
+        "중국": 2,
+        "AI": 1,
+        "환율": 1
       }
     }
   },
   "reportNids": [
+    "98153",
     "97965",
     "95249",
     "92699",

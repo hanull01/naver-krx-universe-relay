@@ -2,29 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "000880",
   "itemName": "한화",
-  "reportCount": 19,
-  "latestReportNid": "97691",
-  "latestWriteDate": "2026-11-05",
+  "reportCount": 20,
+  "latestReportNid": "98180",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "97691",
-    "writeDate": "2026-11-05",
-    "brokerName": "대신증권",
-    "title": "분할 회계는 끝났고, 다음 과제는 디레버리징",
-    "goalPrice": 110000,
+    "nid": "98180",
+    "writeDate": "2026-11-13",
+    "brokerName": "한화투자증권",
+    "title": "3Q26 Review : 한화생명 배당 재개 가능성에 주목",
+    "goalPrice": 105000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 2,
-        "negative": 4
+        "positive": 6,
+        "negative": 5
       },
-      "earningsTextDirection": "UNKNOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "DOWN",
-      "topics": {}
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 3,
+      "targetPriceMentionDirection": "UNKNOWN",
+      "topics": {
+        "가격": 2,
+        "수요": 1,
+        "원가": 1,
+        "자동차": 1,
+        "환율": 1
+      }
     }
   },
   "reportNids": [
+    "98180",
     "97691",
     "97675",
     "96172",

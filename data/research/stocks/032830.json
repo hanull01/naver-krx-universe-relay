@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "032830",
   "itemName": "삼성생명",
-  "reportCount": 20,
-  "latestReportNid": "95844",
-  "latestWriteDate": "2026-08-24",
+  "reportCount": 22,
+  "latestReportNid": "98145",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "95844",
-    "writeDate": "2026-08-24",
-    "brokerName": "한화투자증권",
-    "title": "삼성생명의 수혜는 계산이 쉽지만 주주의 수혜는 어렵다",
-    "goalPrice": 363000,
-    "normalizedOpinion": "HOLD",
+    "nid": "98145",
+    "writeDate": "2026-11-13",
+    "brokerName": "iM증권",
+    "title": "3Q26 Review: 밸류업 계획(진짜발표전최종본Final).docx",
+    "goalPrice": 294000,
+    "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 16,
-        "negative": 0
+        "positive": 13,
+        "negative": 5
       },
       "earningsTextDirection": "UP",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 0,
-      "targetPriceMentionDirection": "UP",
+      "earningsPositiveSignalCount": 5,
+      "earningsNegativeSignalCount": 1,
+      "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수요": 1
+        "금리": 4,
+        "원가": 1
       }
     }
   },
   "reportNids": [
+    "98145",
+    "98137",
     "95844",
     "95654",
     "95651",

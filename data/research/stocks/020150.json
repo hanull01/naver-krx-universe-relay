@@ -2,33 +2,38 @@
   "schemaVersion": 1,
   "itemCode": "020150",
   "itemName": "롯데에너지머티리얼즈",
-  "reportCount": 20,
-  "latestReportNid": "97811",
-  "latestWriteDate": "2026-11-06",
+  "reportCount": 21,
+  "latestReportNid": "98105",
+  "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "97811",
-    "writeDate": "2026-11-06",
-    "brokerName": "DS투자증권",
-    "title": "가공비 인상 확인, 흑전은 2H27",
-    "goalPrice": 70000,
+    "nid": "98105",
+    "writeDate": "2026-11-12",
+    "brokerName": "하나증권",
+    "title": "매출 YoY 증가 본격화",
+    "goalPrice": 69000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 1,
-        "negative": 3
+        "positive": 8,
+        "negative": 5
       },
       "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsPositiveSignalCount": 2,
+      "earningsNegativeSignalCount": 3,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 3,
-        "수요": 2,
-        "원가": 2
+        "수요": 4,
+        "원가": 2,
+        "AI": 1,
+        "미국": 1,
+        "배터리": 1,
+        "자동차": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "98105",
     "97811",
     "97772",
     "97761",

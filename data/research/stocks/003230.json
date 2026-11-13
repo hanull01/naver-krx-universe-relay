@@ -2,33 +2,35 @@
   "schemaVersion": 1,
   "itemCode": "003230",
   "itemName": "삼양식품",
-  "reportCount": 32,
-  "latestReportNid": "98049",
+  "reportCount": 35,
+  "latestReportNid": "98119",
   "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "98049",
+    "nid": "98119",
     "writeDate": "2026-11-12",
-    "brokerName": "신한투자증권",
-    "title": "수요가 증설을 부른다",
-    "goalPrice": 1750000,
-    "normalizedOpinion": "BUY",
+    "brokerName": "DS투자증권",
+    "title": "확장되는 불닭 Wave",
+    "goalPrice": null,
+    "normalizedOpinion": "NONE",
     "analysis": {
       "textSignalBalance": {
-        "positive": 4,
-        "negative": 2
+        "positive": 2,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
-      "earningsPositiveSignalCount": 1,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UNKNOWN",
+      "earningsPositiveSignalCount": 0,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "가격": 1,
-        "중국": 1,
-        "환율": 1
+        "수요": 1,
+        "중국": 1
       }
     }
   },
   "reportNids": [
+    "98119",
+    "98114",
+    "98098",
     "98049",
     "98038",
     "97918",

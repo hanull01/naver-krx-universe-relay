@@ -2,32 +2,36 @@
   "schemaVersion": 1,
   "itemCode": "036570",
   "itemName": "NC",
-  "reportCount": 35,
-  "latestReportNid": "98081",
+  "reportCount": 38,
+  "latestReportNid": "98118",
   "latestWriteDate": "2026-11-12",
   "latest": {
-    "nid": "98081",
+    "nid": "98118",
     "writeDate": "2026-11-12",
-    "brokerName": "SK증권",
-    "title": "실적은 견조, 주가의 열쇠는 다음 대작",
-    "goalPrice": 300000,
+    "brokerName": "교보증권",
+    "title": "27년 매출에 대한 공격적 가이던스 제시",
+    "goalPrice": 375000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 0,
-        "negative": 3
+        "positive": 3,
+        "negative": 1
       },
-      "earningsTextDirection": "DOWN",
-      "earningsPositiveSignalCount": 0,
-      "earningsNegativeSignalCount": 1,
+      "earningsTextDirection": "UP",
+      "earningsPositiveSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
+        "수요": 1,
         "원가": 1,
         "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98118",
+    "98110",
+    "98094",
     "98081",
     "98068",
     "98059",

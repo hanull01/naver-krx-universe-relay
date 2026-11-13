@@ -2,31 +2,34 @@
   "schemaVersion": 1,
   "itemCode": "089890",
   "itemName": "코세스",
-  "reportCount": 2,
-  "latestReportNid": "96854",
-  "latestWriteDate": "2026-10-20",
+  "reportCount": 3,
+  "latestReportNid": "98160",
+  "latestWriteDate": "2026-11-13",
   "latest": {
-    "nid": "96854",
-    "writeDate": "2026-10-20",
+    "nid": "98160",
+    "writeDate": "2026-11-13",
     "brokerName": "SK증권",
-    "title": "수주에서 실적으로, 다시 주목할 시점",
-    "goalPrice": 55000,
+    "title": "SOFC 수익성 확인, 27E OP 1,000억원 전망",
+    "goalPrice": 73000,
     "normalizedOpinion": "BUY",
     "analysis": {
       "textSignalBalance": {
-        "positive": 6,
-        "negative": 3
+        "positive": 3,
+        "negative": 0
       },
-      "earningsTextDirection": "MIXED",
+      "earningsTextDirection": "UP",
       "earningsPositiveSignalCount": 3,
-      "earningsNegativeSignalCount": 3,
+      "earningsNegativeSignalCount": 0,
       "targetPriceMentionDirection": "UNKNOWN",
       "topics": {
-        "수주": 2
+        "반도체": 2,
+        "원가": 1,
+        "자동차": 1
       }
     }
   },
   "reportNids": [
+    "98160",
     "96854",
     "94334"
   ]
