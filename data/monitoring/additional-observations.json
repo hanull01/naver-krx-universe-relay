@@ -6,8 +6,8 @@
   "observationDate": "20261113",
   "scope": "STOCK_ONLY",
   "producer": "tools/build_additional_observations.py",
-  "producerRunId": "43401838800",
-  "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+  "producerRunId": "43409525781",
+  "generatedAt": "2026-11-13T19:31:51.862808+09:00",
   "artifactPath": "data/monitoring/additional-observations.json",
   "configPath": "config/additional-observations.json",
   "inputPaths": {
@@ -36,9 +36,9 @@
       "themes": [
         "576",
         "556",
-        "547",
-        "178",
-        "482"
+        "119",
+        "481",
+        "178"
       ]
     },
     "excluded": {
@@ -180,10 +180,6 @@
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
         },
         {
-          "id": "269",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "327",
           "reason": "INPUT_COVERAGE_BELOW_MINIMUM"
         },
@@ -290,6 +286,106 @@
       ],
       "themes": [
         {
+          "id": "576",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
+          "id": "119",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
+          "id": "481",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
+          "id": "489",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "178",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
+          "id": "28",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "297",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "543",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "343",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "426",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "527",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "487",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "591",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "232",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "590",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "55",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "378",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "60",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "318",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "564",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "79",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "592",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "30",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "386",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "325",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "152",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -298,375 +394,15 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "405",
+          "id": "462",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "564",
+          "id": "619",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "445",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "92",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "559",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "178",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "448",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "547",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "388",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "533",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "155",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "614",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "173",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "520",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "9",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "556",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "33",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "373",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "175",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "311",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "321",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "112",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "352",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "328",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "472",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "191",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "270",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "492",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "446",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "566",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "534",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "568",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "579",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "66",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "389",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "436",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "64",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "200",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "377",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "435",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "28",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "523",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "575",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "540",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "329",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "537",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "335",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "272",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "174",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "576",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "449",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "376",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "241",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "615",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "242",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "590",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "170",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "325",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "595",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "55",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "187",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "147",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "313",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "79",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "180",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "511",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "283",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "19",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "223",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "72",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "62",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "205",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "379",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "188",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "349",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "385",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "401",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "110",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "571",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "113",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "598",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "8",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "45",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "76",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "285",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "500",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "417",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "323",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "386",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "144",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "387",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "546",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "98",
+          "id": "407",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -674,211 +410,7 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "507",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "149",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "462",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "60",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "128",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "176",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "94",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "506",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "483",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "124",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "580",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "139",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "447",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "527",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "488",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "381",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "141",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "210",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "49",
-          "reason": "MEMBERSHIP_BELOW_MINIMUM"
-        },
-        {
-          "id": "317",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "426",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "297",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "266",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "232",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "108",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "480",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "82",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "619",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "496",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "525",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "378",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "197",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "585",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "513",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "331",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "487",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "13",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "482",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "407",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "63",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "52",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "493",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "59",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "470",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "284",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "30",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "318",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "397",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "172",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "543",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "31",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "167",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -886,35 +418,51 @@
           "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
-          "id": "265",
+          "id": "86",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "42",
+          "id": "149",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "592",
+          "id": "94",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "384",
+          "id": "571",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "504",
+          "id": "128",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "597",
+          "id": "62",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "591",
+          "id": "537",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "171",
+          "id": "448",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "283",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "227",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "127",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "52",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -922,11 +470,431 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "593",
+          "id": "170",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "98",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "534",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "63",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "335",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "500",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "76",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "384",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "167",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "546",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "241",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "397",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "313",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "373",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "445",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "284",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "331",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "480",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "436",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "175",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "449",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "580",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "556",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
+          "id": "328",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "19",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "387",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "8",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "9",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "311",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "579",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "389",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "492",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "187",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "598",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "64",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "139",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "575",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "72",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "506",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "45",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "147",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "210",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "568",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "520",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "417",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "329",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "377",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "381",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "92",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "82",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "144",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "470",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "166",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "180",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "559",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "105",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "272",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "446",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "447",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "585",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "266",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "472",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "176",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "376",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "173",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "614",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "110",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "108",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "155",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "533",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "388",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "141",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "285",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "513",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "223",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "13",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "523",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "379",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "200",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "191",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "205",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "113",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "124",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "188",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "172",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "349",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "435",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "31",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "540",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "171",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "493",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "323",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "483",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "405",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "597",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "593",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "317",
+          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+        },
+        {
+          "id": "488",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "49",
+          "reason": "MEMBERSHIP_BELOW_MINIMUM"
+        },
+        {
+          "id": "270",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "242",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "504",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "615",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "42",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "265",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "507",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "595",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         }
       ]
@@ -942,9 +910,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
+      "producerRunId": "43409525781",
       "artifactPath": "data/monitoring/additional-observations.json#industrys/313",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
       "membershipCount": 19,
       "leaderCount": 3,
       "leaders": [
@@ -952,9 +920,9 @@
           "code": "126880",
           "name": "제이엔케이글로벌",
           "market": "KOSDAQ",
-          "currentPrice": 3370.0,
-          "changeRate": 5.48,
-          "accumulatedTradingValue": 962092000.0,
+          "currentPrice": 3390.0,
+          "changeRate": 6.1,
+          "accumulatedTradingValue": 977765000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -986,9 +954,9 @@
           "code": "012700",
           "name": "리드코프",
           "market": "KOSDAQ",
-          "currentPrice": 2750.0,
-          "changeRate": 3.77,
-          "accumulatedTradingValue": 25082000.0,
+          "currentPrice": 2725.0,
+          "changeRate": 2.83,
+          "accumulatedTradingValue": 25109000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1003,10 +971,10 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 1,
-      "selectionScore": 82.533333,
+      "selectionScore": 78.58123,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.393421,
+        "relativeStrength": 1.282852,
         "advancePct": 89.4737,
         "memberCount": 19,
         "weights": {
@@ -1029,9 +997,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
+      "producerRunId": "43409525781",
       "artifactPath": "data/monitoring/additional-observations.json#industrys/306",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
       "membershipCount": 32,
       "leaderCount": 3,
       "leaders": [
@@ -1039,26 +1007,9 @@
           "code": "024840",
           "name": "KBI메탈",
           "market": "KOSDAQ",
-          "currentPrice": 4560.0,
-          "changeRate": 24.93,
-          "accumulatedTradingValue": 92439813000.0,
-          "dist_high_20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "breakout_20_intraday": null,
-          "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261113",
-          "observationDate": "20261113",
-          "scope": "STOCK_ONLY"
-        },
-        {
-          "code": "125020",
-          "name": "티씨머티리얼즈",
-          "market": "KOSDAQ",
-          "currentPrice": 4135.0,
-          "changeRate": 6.99,
-          "accumulatedTradingValue": 2777061000.0,
+          "currentPrice": 4645.0,
+          "changeRate": 27.26,
+          "accumulatedTradingValue": 97206201000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1073,9 +1024,26 @@
           "code": "103590",
           "name": "일진전기",
           "market": "KOSPI",
-          "currentPrice": 57800.0,
-          "changeRate": 6.45,
-          "accumulatedTradingValue": 27588000000.0,
+          "currentPrice": 57900.0,
+          "changeRate": 6.63,
+          "accumulatedTradingValue": 27703000000.0,
+          "dist_high_20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "breakout_20_intraday": null,
+          "source": "NAVER_CURRENT_SNAPSHOT",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
+          "scope": "STOCK_ONLY"
+        },
+        {
+          "code": "125020",
+          "name": "티씨머티리얼즈",
+          "market": "KOSDAQ",
+          "currentPrice": 4080.0,
+          "changeRate": 5.56,
+          "accumulatedTradingValue": 2849833000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1090,11 +1058,11 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 2,
-      "selectionScore": 69.253604,
+      "selectionScore": 65.792382,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.304572,
-        "advancePct": 75.0,
+        "relativeStrength": 1.38726,
+        "advancePct": 65.625,
         "memberCount": 32,
         "weights": {
           "relativeStrength": 0.5,
@@ -1108,27 +1076,27 @@
       }
     },
     {
-      "id": "333",
-      "name": "무선통신서비스",
+      "id": "270",
+      "name": "자동차부품",
       "type": "industry",
       "source": "NAVER_CURRENT_SNAPSHOT",
       "sourceDate": "20261113",
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
-      "artifactPath": "data/monitoring/additional-observations.json#industrys/333",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
-      "membershipCount": 4,
+      "producerRunId": "43409525781",
+      "artifactPath": "data/monitoring/additional-observations.json#industrys/270",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
+      "membershipCount": 150,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "017670",
-          "name": "SK텔레콤",
+          "code": "002880",
+          "name": "디와이에이",
           "market": "KOSPI",
-          "currentPrice": 84300.0,
-          "changeRate": 3.44,
-          "accumulatedTradingValue": 80734000000.0,
+          "currentPrice": 4030.0,
+          "changeRate": 30.0,
+          "accumulatedTradingValue": 2482000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1140,12 +1108,12 @@
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "032640",
-          "name": "LG유플러스",
-          "market": "KOSPI",
-          "currentPrice": 15500.0,
-          "changeRate": 2.85,
-          "accumulatedTradingValue": 9552000000.0,
+          "code": "448900",
+          "name": "한국피아이엠",
+          "market": "KOSDAQ",
+          "currentPrice": 43350.0,
+          "changeRate": 12.02,
+          "accumulatedTradingValue": 4862591000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1157,12 +1125,12 @@
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "006490",
-          "name": "프리티",
-          "market": "KOSPI",
-          "currentPrice": 760.0,
-          "changeRate": 1.06,
-          "accumulatedTradingValue": 14000000.0,
+          "code": "212560",
+          "name": "네오오토",
+          "market": "KOSDAQ",
+          "currentPrice": 8840.0,
+          "changeRate": 11.62,
+          "accumulatedTradingValue": 1403515000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
@@ -1177,12 +1145,12 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 54.586577,
+      "selectionScore": 49.345447,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.036447,
-        "advancePct": 75.0,
-        "memberCount": 4,
+        "relativeStrength": 0.58401,
+        "advancePct": 63.3333,
+        "memberCount": 150,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
@@ -1197,288 +1165,20 @@
   ],
   "themes": [
     {
-      "id": "119",
-      "name": "창투사",
+      "id": "547",
+      "name": "CXL(컴퓨트익스프레스링크)",
       "type": "theme",
       "source": "NAVER_CURRENT_SNAPSHOT",
       "sourceDate": "20261113",
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/119",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
-      "membershipCount": 20,
+      "producerRunId": "43409525781",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/547",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
+      "membershipCount": 13,
       "leaderCount": 3,
       "leaders": [
-        {
-          "code": "241520",
-          "name": "DSC인베스트먼트",
-          "market": "KOSDAQ",
-          "currentPrice": 8120.0,
-          "change": 1870.0,
-          "changeRate": 29.92,
-          "accumulatedTradingValue": 30972733000.0,
-          "currentHigh": 8120.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
-        {
-          "code": "246690",
-          "name": "TS인베스트먼트",
-          "market": "KOSDAQ",
-          "currentPrice": 1849.0,
-          "change": 294.0,
-          "changeRate": 18.91,
-          "accumulatedTradingValue": 5052755000.0,
-          "currentHigh": 2000.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
-        {
-          "code": "100790",
-          "name": "미래에셋벤처투자",
-          "market": "KOSDAQ",
-          "currentPrice": 12780.0,
-          "change": 1060.0,
-          "changeRate": 9.04,
-          "accumulatedTradingValue": 6363393000.0,
-          "currentHigh": 13150.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        }
-      ],
-      "status": "AVAILABLE",
-      "failureReason": null,
-      "selectionRank": 1,
-      "selectionScore": 61.648027,
-      "selectionReason": "CURRENT_OBSERVATION_RANKING",
-      "selectionEvidence": {
-        "relativeStrength": 4.225947,
-        "advancePct": 70.0,
-        "memberCount": 20,
-        "weights": {
-          "relativeStrength": 0.5,
-          "advancePct": 0.3,
-          "memberCount": 0.2
-        },
-        "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261113",
-        "observationDate": "20261113",
-        "scope": "STOCK_ONLY"
-      }
-    },
-    {
-      "id": "545",
-      "name": "온디바이스 AI",
-      "type": "theme",
-      "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261113",
-      "observationDate": "20261113",
-      "scope": "STOCK_ONLY",
-      "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/545",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
-      "membershipCount": 24,
-      "leaderCount": 3,
-      "leaders": [
-        {
-          "code": "399720",
-          "name": "가온칩스",
-          "market": "KOSDAQ",
-          "currentPrice": 38650.0,
-          "change": 8900.0,
-          "changeRate": 29.92,
-          "accumulatedTradingValue": 31678638000.0,
-          "currentHigh": 38650.0,
-          "close_valid": true,
-          "ohlc_valid": true,
-          "volume_valid": true,
-          "traded_bar": true,
-          "ma5": null,
-          "ma20": null,
-          "ma60": null,
-          "ma120": null,
-          "ma240": null,
-          "dist_ma5": null,
-          "dist_ma20": null,
-          "dist_ma60": null,
-          "dist_ma120": null,
-          "dist_ma240": null,
-          "ret_1d": null,
-          "ret_5d": null,
-          "ret_20d": null,
-          "ret_60d": null,
-          "ret_120d": null,
-          "ret_240d": null,
-          "rolling_high_20": null,
-          "rolling_high_60": null,
-          "rolling_high_120": null,
-          "rolling_high_240": null,
-          "dist_high_20": null,
-          "dist_high_60": null,
-          "dist_high_120": null,
-          "dist_high_240": null,
-          "volume_ma20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "above_ma120": null,
-          "ma20_rising": null,
-          "ma60_rising": null,
-          "bullish_alignment": null,
-          "breakout_20_intraday": null,
-          "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
-          "temporaryCurrentBarDate": "20261113",
-          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
-          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
-          "officialReferencePrice": null,
-          "canonicalPreviousClose": null,
-          "historyScaleRatio": null,
-          "corporateActionConfirmed": false,
-          "derivedMetricsUsable": true
-        },
         {
           "code": "394280",
           "name": "오픈엣지테크놀로지",
@@ -1486,7 +1186,7 @@
           "currentPrice": 8130.0,
           "change": 1870.0,
           "changeRate": 29.87,
-          "accumulatedTradingValue": 79714000.0,
+          "accumulatedTradingValue": 80649000.0,
           "currentHigh": 8130.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1527,7 +1227,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1538,14 +1238,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "200710",
-          "name": "에이디테크놀로지",
+          "code": "432720",
+          "name": "퀄리타스반도체",
           "market": "KOSDAQ",
-          "currentPrice": 20200.0,
-          "change": 3370.0,
-          "changeRate": 20.02,
-          "accumulatedTradingValue": 22783500000.0,
-          "currentHigh": 21000.0,
+          "currentPrice": 10040.0,
+          "change": 1290.0,
+          "changeRate": 14.74,
+          "accumulatedTradingValue": 3934037000.0,
+          "currentHigh": 10970.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1585,7 +1285,65 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "080580",
+          "name": "오킨스전자",
+          "market": "KOSDAQ",
+          "currentPrice": 25000.0,
+          "change": 3150.0,
+          "changeRate": 14.42,
+          "accumulatedTradingValue": 21358854000.0,
+          "currentHigh": 25450.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1598,13 +1356,13 @@
       ],
       "status": "AVAILABLE",
       "failureReason": null,
-      "selectionRank": 2,
-      "selectionScore": 60.765306,
+      "selectionRank": 1,
+      "selectionScore": 63.319302,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 4.501447,
-        "advancePct": 62.5,
-        "memberCount": 24,
+        "relativeStrength": 5.084472,
+        "advancePct": 69.2308,
+        "memberCount": 13,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
@@ -1625,9 +1383,9 @@
       "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43401838800",
+      "producerRunId": "43409525781",
       "artifactPath": "data/monitoring/additional-observations.json#themes/307",
-      "generatedAt": "2026-11-13T18:31:40.146477+09:00",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
       "membershipCount": 59,
       "leaderCount": 3,
       "leaders": [
@@ -1638,7 +1396,7 @@
           "currentPrice": 38650.0,
           "change": 8900.0,
           "changeRate": 29.92,
-          "accumulatedTradingValue": 31678638000.0,
+          "accumulatedTradingValue": 31685247000.0,
           "currentHigh": 38650.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1679,7 +1437,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1737,7 +1495,7 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1754,7 +1512,7 @@
           "currentPrice": 8130.0,
           "change": 1870.0,
           "changeRate": 29.87,
-          "accumulatedTradingValue": 79714000.0,
+          "accumulatedTradingValue": 80649000.0,
           "currentHigh": 8130.0,
           "close_valid": true,
           "ohlc_valid": true,
@@ -1795,7 +1553,217 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-13T09:31:16.686546+00:00",
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        }
+      ],
+      "status": "AVAILABLE",
+      "failureReason": null,
+      "selectionRank": 2,
+      "selectionScore": 59.488865,
+      "selectionReason": "CURRENT_OBSERVATION_RANKING",
+      "selectionEvidence": {
+        "relativeStrength": 4.043807,
+        "advancePct": 69.4915,
+        "memberCount": 59,
+        "weights": {
+          "relativeStrength": 0.5,
+          "advancePct": 0.3,
+          "memberCount": 0.2
+        },
+        "source": "NAVER_CURRENT_SNAPSHOT",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
+        "scope": "STOCK_ONLY"
+      }
+    },
+    {
+      "id": "545",
+      "name": "온디바이스 AI",
+      "type": "theme",
+      "source": "NAVER_CURRENT_SNAPSHOT",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
+      "scope": "STOCK_ONLY",
+      "producer": "tools/build_additional_observations.py",
+      "producerRunId": "43409525781",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/545",
+      "generatedAt": "2026-11-13T19:31:51.862808+09:00",
+      "membershipCount": 24,
+      "leaderCount": 3,
+      "leaders": [
+        {
+          "code": "399720",
+          "name": "가온칩스",
+          "market": "KOSDAQ",
+          "currentPrice": 38650.0,
+          "change": 8900.0,
+          "changeRate": 29.92,
+          "accumulatedTradingValue": 31685247000.0,
+          "currentHigh": 38650.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "394280",
+          "name": "오픈엣지테크놀로지",
+          "market": "KOSDAQ",
+          "currentPrice": 8130.0,
+          "change": 1870.0,
+          "changeRate": 29.87,
+          "accumulatedTradingValue": 80649000.0,
+          "currentHigh": 8130.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
+          "temporaryCurrentBarDate": "20261113",
+          "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
+          "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
+          "officialReferencePrice": null,
+          "canonicalPreviousClose": null,
+          "historyScaleRatio": null,
+          "corporateActionConfirmed": false,
+          "derivedMetricsUsable": true
+        },
+        {
+          "code": "200710",
+          "name": "에이디테크놀로지",
+          "market": "KOSDAQ",
+          "currentPrice": 20050.0,
+          "change": 3220.0,
+          "changeRate": 19.13,
+          "accumulatedTradingValue": 22934842000.0,
+          "currentHigh": 21000.0,
+          "close_valid": true,
+          "ohlc_valid": true,
+          "volume_valid": true,
+          "traded_bar": true,
+          "ma5": null,
+          "ma20": null,
+          "ma60": null,
+          "ma120": null,
+          "ma240": null,
+          "dist_ma5": null,
+          "dist_ma20": null,
+          "dist_ma60": null,
+          "dist_ma120": null,
+          "dist_ma240": null,
+          "ret_1d": null,
+          "ret_5d": null,
+          "ret_20d": null,
+          "ret_60d": null,
+          "ret_120d": null,
+          "ret_240d": null,
+          "rolling_high_20": null,
+          "rolling_high_60": null,
+          "rolling_high_120": null,
+          "rolling_high_240": null,
+          "dist_high_20": null,
+          "dist_high_60": null,
+          "dist_high_120": null,
+          "dist_high_240": null,
+          "volume_ma20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "above_ma120": null,
+          "ma20_rising": null,
+          "ma60_rising": null,
+          "bullish_alignment": null,
+          "breakout_20_intraday": null,
+          "breakout_60_intraday": null,
+          "near_52week_high": false,
+          "snapshotGeneratedAt": "2026-11-13T10:31:32.533979+00:00",
           "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
@@ -1809,12 +1777,12 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 59.56597,
+      "selectionScore": 58.812909,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 3.864455,
-        "advancePct": 64.4068,
-        "memberCount": 59,
+        "relativeStrength": 4.631843,
+        "advancePct": 66.6667,
+        "memberCount": 24,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
