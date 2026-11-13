@@ -24,9 +24,9 @@ class ContractOnlyReportRenderingTests(unittest.TestCase):
             self.assertTrue(markdown_path.exists())
             self.assertEqual(result["htmlBytes"], len(html_text.encode("utf-8")))
             self.assertEqual(result["markdownSha256"], hashlib.sha256(markdown_text.encode("utf-8")).hexdigest())
-            self.assertIn(result["contractId"], markdown_text)
-            self.assertIn(f'name="report-contract-id"', html_text)
-            self.assertIn(f'content="{result["contractId"]}"', html_text)
+            self.assertNotIn(result["contractId"], markdown_text)
+            self.assertNotIn(f'name="report-contract-id"', html_text)
+            self.assertNotIn(f'content="{result["contractId"]}"', html_text)
             self.assertEqual(
                 result["htmlSha256"],
                 hashlib.sha256(html_text.encode("utf-8")).hexdigest(),

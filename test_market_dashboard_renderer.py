@@ -120,7 +120,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         html = render_dashboard_html(report)
         markdown = render_dashboard_markdown(report)
         html_text = html_lib.unescape(html)
-        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER_CURRENT_SNAPSHOT", "KRX", "삼성E&A", "59,800원", "현재 자동 산출 기능이 없습니다"):
+        for marker in ("2026-10-29 12:10 KST", "55.61%", "NAVER 현재 관측", "KRX 기술지표", "삼성E&A", "59,800원", "현재 자동 산출 기능이 없습니다"):
             self.assertIn(marker, html_text)
             self.assertIn(marker, markdown)
         for marker in ("CONTRACT_TRACE", "V2_DATA_TRACE", "TEMPLATE_TRACE", "historyDates", "sourceSha256", "htmlAllowed", "contractHtmlAllowed", "HTML_BLOCKED", "AVAILABLE_UNVERIFIED_SOURCE_COMMIT"):
@@ -539,6 +539,49 @@ class MarketDashboardRendererTests(unittest.TestCase):
         self.assertIn("네이버 리서치 미수신", html_lib.unescape(render_dashboard_html(report)))
         self.assertIn("미수신", render_dashboard_markdown(report))
 
+    def test_three_registered_interest_rows_are_all_kept_in_order(self):
+        report = report_fixture()
+        report["reportContract"]["registeredUniverse"] = {
+            "items": [
+                {"itemCode": "005930", "itemName": "삼성전자", "current": {"price": 1}, "technicals": {}},
+                {"itemCode": "000660", "itemName": "SK하이닉스", "current": {"price": 2}, "technicals": {}},
+                {"itemCode": "298040", "itemName": "효성중공업", "current": {"price": 3}, "technicals": {}},
+            ]
+        }
+        model = build_dashboard_model(report)
+        self.assertEqual([row["code"] for row in model["interests"]], ["005930", "000660", "298040"])
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for name in ("삼성전자", "SK하이닉스", "효성중공업"):
+            self.assertIn(name, html)
+            self.assertIn(name, markdown)
+
+    def test_breadth_quality_uses_reader_friendly_reason(self):
+        report = report_fixture()
+        report["reportContract"]["currentMarketObservation"]["qualityWarnings"] = []
+        html = html_lib.unescape(render_dashboard_html(report))
+        self.assertIn("자료 수신됨", html)
+        report["reportContract"]["currentMarketObservation"]["breadth"]["unchanged"] = 200
+        html = html_lib.unescape(render_dashboard_html(report))
+        self.assertIn("일부 종목 자료 누락", html)
+
+    def test_investor_flow_dates_are_explained_without_raw_warning_code(self):
+        report = report_fixture()
+        report["reportContract"]["marketSnapshot"] = {
+            "status": "PARTIAL", "rankings": {"items": {}},
+            "investorFlow": {"periods": {"DAY": [
+                {"investorType": "FOREIGNER", "buy": [{"name": "삼성전자", "sourceDate": "20261113", "amountStatus": "AVAILABLE", "amount": 1000000}], "sell": []},
+                {"investorType": "INSTITUTION", "buy": [{"name": "SK하이닉스", "sourceDate": "20261112", "amountStatus": "AVAILABLE", "amount": 1000000}], "sell": []},
+            ]}}
+        }
+        html = html_lib.unescape(render_dashboard_html(report))
+        markdown = render_dashboard_markdown(report)
+        for output in (html, markdown):
+            self.assertIn("수급 자료 기준일이 달라 비교 보류", output)
+            self.assertIn("2026-11-13", output)
+            self.assertIn("2026-11-12", output)
+            self.assertNotIn("DATE_MISMATCH", output)
+
     def test_missing_kospi_and_kosdaq_are_reported_individually(self):
         report = report_fixture()
         report["reportContract"]["indices"] = [{"name": "KOSPI", "close": 3000.0}]
@@ -553,7 +596,7 @@ class MarketDashboardRendererTests(unittest.TestCase):
         report = report_fixture()
         report["reportContract"]["kiwoomCandidates"] = {"stocks": []}
         markdown = render_dashboard_markdown(report)
-        self.assertIn("전일 장마감 후 조건검색 결과 미수신", markdown)
+        self.assertIn("전일 조건검색 결과가 0건입니다", markdown)
         self.assertNotIn("조건검색 실패", markdown)
 
     def test_kiwoom_candidate_renders_selection_and_indicators_without_code(self):
