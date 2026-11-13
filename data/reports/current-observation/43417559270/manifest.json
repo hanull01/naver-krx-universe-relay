@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "current-observation-manifest-v1",
+  "reportType": "current_observation",
+  "session": "POST_MARKET",
+  "tradingDate": "20261113",
+  "tradingDateStatus": "VERIFIED",
+  "observationDateStatus": "VERIFIED",
+  "sourceTime": "2026-11-13T20:15:00+09:00",
+  "reportContractPath": "latest-report-contract.json",
+  "reportContractSha256": "118ba3135ba4bcbdea10959f9d29c7fe41a61e30d98843cfe075715a0f754246",
+  "reportContractGeneratedAt": "2026-11-13T20:30:33.070244+09:00",
+  "contractId": "mrc-eed110baf8ddcb72",
+  "reportLineage": {
+    "schemaVersion": "report-lineage-v1",
+    "contractId": "mrc-eed110baf8ddcb72",
+    "asOf": "20261113",
+    "generatedAt": "2026-11-13T20:30:33.070244+09:00",
+    "source": "REPORT_CONTRACT",
+    "scope": "MARKET_REPORT",
+    "current": {
+      "source": "NAVER_CURRENT_SNAPSHOT",
+      "date": "20261113",
+      "scope": "STOCK_ONLY"
+    },
+    "historical": {
+      "source": "KRX",
+      "date": "20261112",
+      "scope": "STOCK_ONLY",
+      "generationId": "gen_20261112_1794524782845860000"
+    }
+  },
+  "source": "NAVER_CURRENT_SNAPSHOT",
+  "scope": "STOCK_ONLY",
+  "datedReportPath": "data/reports/2026-11-13.md",
+  "latestReportPath": "data/reports/latest.md",
+  "workflowRunId": "43417559270",
+  "executionHead": "3318e7ed42689136bd6b77362621963a16bf8a45",
+  "markdownPath": "report.md",
+  "htmlPath": "report.html",
+  "manifestPath": "manifest.json",
+  "markdownSha256": "f2b7debc48ec710e07d308d78bd7636cab65a5561616d99a515047dbf5a02d3d",
+  "htmlSha256": "9fbbc59d835d4a26668c062521c63b13ee7d63ee9b524fcf68f4ba9733888294",
+  "reportStatus": "AVAILABLE",
+  "currentObservationAllowed": true
+}
