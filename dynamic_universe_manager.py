@@ -7,6 +7,8 @@ files are deliberately separate from user-managed watchlists.
 from __future__ import annotations
 
 import json
+import hashlib
+import math
 import os
 import tempfile
 from datetime import datetime
@@ -108,6 +110,94 @@ def _number(value, default=None):
     return value if isinstance(value, (int, float)) and not isinstance(value, bool) else default
 
 
+def _finite_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _first_number(mapping, fields):
+    for field in fields:
+        value = mapping.get(field)
+        if _finite_number(value):
+            return value
+    return None
+
+
+def _sector_input_quality(row):
+    """Validate model inputs without converting missing values to zero."""
+    row = row if isinstance(row, dict) else {}
+    metrics = row.get("metrics") if isinstance(row.get("metrics"), dict) else row
+    missing = []
+    invalid = []
+
+    member_count = row.get("memberCount")
+    if not isinstance(member_count, int) or isinstance(member_count, bool) or member_count <= 0:
+        invalid.append("memberCount") if member_count is not None else missing.append("memberCount")
+    feature_count = row.get("featureValidMemberCount")
+    if not isinstance(feature_count, int) or isinstance(feature_count, bool) or feature_count <= 0:
+        invalid.append("featureValidMemberCount") if feature_count is not None else missing.append("featureValidMemberCount")
+
+    close_count = row.get("closeValidMemberCount")
+    if not isinstance(close_count, int) or isinstance(close_count, bool) or close_count != member_count:
+        invalid.append("closeValidMemberCount") if close_count is not None else missing.append("closeValidMemberCount")
+
+    advancer = _first_number(metrics, ("advancerPct", "advancePct"))
+    if advancer is None:
+        missing.append("advancerPct")
+    elif not 0 <= advancer <= 100:
+        invalid.append("advancerPct")
+
+    concentration = _first_number(metrics, ("turnoverConcentrationPct", "pctVolumeAbove20DayAverage"))
+    if concentration is None:
+        missing.append("turnoverConcentrationPct")
+    elif not 0 <= concentration <= 100:
+        invalid.append("turnoverConcentrationPct")
+
+    ma20 = _first_number(metrics, ("pctAboveMA20",))
+    if ma20 is None:
+        missing.append("pctAboveMA20")
+    elif not 0 <= ma20 <= 100:
+        invalid.append("pctAboveMA20")
+
+    relative = _first_number(metrics, (
+        "relativeStrength", "relativeStrengthVsMarket",
+        "officialChangeRateRelativeStrength", "changeRate",
+    ))
+    if relative is None:
+        missing.append("relativeStrength")
+
+    leaders = row.get("leaders")
+    if not isinstance(leaders, list):
+        missing.append("leaderCount")
+    elif len(leaders) < 1:
+        invalid.append("leaderCount")
+
+    return {
+        "ready": not missing and not invalid,
+        "missingFields": sorted(set(missing)),
+        "invalidFields": sorted(set(invalid)),
+        "status": "MODEL_READY" if not missing and not invalid else "MODEL_INPUT_UNAVAILABLE",
+    }
+
+
+def _stable_input_hash(context):
+    """Use a supplied source hash, otherwise hash stable current input facts."""
+    context = context if isinstance(context, dict) else {}
+    industries = context.get("industries") if isinstance(context.get("industries"), dict) else {}
+    supplied = context.get("sourceHash") or industries.get("sourceHash")
+    if supplied:
+        return str(supplied)
+    payload = {
+        "tradingDate": context.get("tradingDate"),
+        "source": industries.get("source"),
+        "sourceDate": industries.get("sourceDate"),
+        "observationDate": industries.get("observationDate"),
+        "scope": industries.get("scope"),
+        "industries": industries.get("industries") or [],
+    }
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
 def _code(row):
     value = (row.get("code") or row.get("itemCode") or row.get("symbol")) if isinstance(row, dict) else row
     return normalize_symbol(str(value)) if value else None
@@ -115,12 +205,20 @@ def _code(row):
 
 def _sector_decision(row, policy):
     metrics = row.get("metrics") or row
+    relative_strength = _first_number(metrics, (
+        "relativeStrength", "relativeStrengthVsMarket",
+        "officialChangeRateRelativeStrength", "changeRate",
+    ))
+    advancer_pct = _first_number(metrics, ("advancerPct", "advancePct"))
+    concentration = _first_number(metrics, ("turnoverConcentrationPct", "pctVolumeAbove20DayAverage"))
+    pct_above_ma20 = _first_number(metrics, ("pctAboveMA20",))
+    leader_count = _number(metrics.get("leaderCount"), len(row.get("leaders") or []))
     checks = {
-        "relativeStrength": (_number(metrics.get("relativeStrength"), _number(metrics.get("relativeStrengthVsMarket"), _number(metrics.get("changeRate")))) or 0) >= policy["minimumRelativeStrength"],
-        "advancerPct": (_number(metrics.get("advancerPct"), _number(metrics.get("advancePct"), 0)) or 0) >= policy["minimumAdvancerPct"],
-        "turnoverConcentrationPct": (_number(metrics.get("turnoverConcentrationPct"), _number(metrics.get("pctVolumeAbove20DayAverage"), 0)) or 0) >= policy["minimumTurnoverConcentrationPct"],
-        "pctAboveMA20": (_number(metrics.get("pctAboveMA20"), 0) or 0) >= policy["minimumPctAboveMA20"],
-        "leaderCount": int(_number(metrics.get("leaderCount"), len(row.get("leaders") or [])) or 0) >= policy["minimumLeaderCount"],
+        "relativeStrength": relative_strength is not None and relative_strength >= policy["minimumRelativeStrength"],
+        "advancerPct": advancer_pct is not None and advancer_pct >= policy["minimumAdvancerPct"],
+        "turnoverConcentrationPct": concentration is not None and concentration >= policy["minimumTurnoverConcentrationPct"],
+        "pctAboveMA20": pct_above_ma20 is not None and pct_above_ma20 >= policy["minimumPctAboveMA20"],
+        "leaderCount": leader_count is not None and int(leader_count) >= policy["minimumLeaderCount"],
     }
     score = _number(row.get("score"), _number(metrics.get("score")))
     if score is None:
@@ -190,20 +288,29 @@ def _transition(previous, qualified, policy):
     previous = previous or {}
     observed_date = policy.get("_observedTradingDate")
     last_date = str(previous.get("lastObservedTradingDate") or "")
+    previous_status = previous.get("lifecycleStatus") or previous.get("status")
     if not observed_date:
-        return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
+        return previous_status or "DISCOVERED", previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
     if last_date and observed_date <= last_date:
-        return previous.get("status", "DISCOVERED"), previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
-    was_managed = previous.get("status") in {"ACTIVE", "WATCH", "REENTERED"}
+        return previous_status or "DISCOVERED", previous.get("qualifyStreak", 0), previous.get("weakenStreak", 0)
+    was_managed = previous_status in {"ACTIVE", "WATCH", "REENTERED"}
     qualify_streak = (previous.get("qualifyStreak", 0) + 1) if qualified else 0
     weaken_streak = 0 if qualified else previous.get("weakenStreak", 0) + 1
     if qualified:
         if was_managed: status = "ACTIVE"
-        elif previous.get("status") == "REMOVED" and qualify_streak >= policy["activationConfirmations"]: status = "REENTERED"
+        elif previous_status == "REMOVED" and qualify_streak >= policy["activationConfirmations"]: status = "REENTERED"
         elif qualify_streak >= policy["activationConfirmations"]: status = "ACTIVE"
         else: status = "DISCOVERED"
-    elif was_managed and weaken_streak < policy["removalConfirmations"]: status = "WATCH"
-    else: status = "REMOVED"
+    elif not previous_status:
+        # A first failed observation is not proof that a new group should be
+        # removed.  Keep it discoverable until the configured failure count.
+        status = "DISCOVERED"
+    elif was_managed and weaken_streak < policy["removalConfirmations"]:
+        status = "WATCH"
+    elif previous_status == "DISCOVERED" and weaken_streak < policy["removalConfirmations"]:
+        status = "DISCOVERED"
+    else:
+        status = "REMOVED"
     return status, qualify_streak, weaken_streak
 
 
@@ -229,6 +336,11 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     leader_previous = _previous_index(previous, "leaders")
     sectors, themes, leaders, initial_candidates, pending, changes = [], [], [], [], [], []
     blocked_leaders = {}
+    input_hash = _stable_input_hash(context)
+    model_ready_count = 0
+    model_unavailable_count = 0
+    missing_model_fields = set()
+    invalid_model_fields = set()
 
     def record_block(group_type, group_id, candidate, checks):
         code = _code(candidate)
@@ -254,15 +366,78 @@ def build_management_result(context, universe, discovery=None, previous=None, po
     for row in industry_rows:
         identity = str(row.get("id") or row.get("name") or "")
         if not identity: continue
-        qualified, score, checks = _sector_decision(row, policy["sector"])
         old = sector_previous.get(identity)
+        input_quality = _sector_input_quality(row)
+        prior_lifecycle = (old or {}).get("lifecycleStatus") or (old or {}).get("status") or "DISCOVERED"
+        row_source = row.get("source") or industry_block.get("source") or "NAVER_CURRENT_SNAPSHOT"
+        row_source_date = row.get("sourceDate") or industry_block.get("sourceDate") or observed_trading_date
+        row_observation_date = row.get("observationDate") or industry_block.get("observationDate") or observed_trading_date
+        row_scope = row.get("scope") or industry_block.get("scope") or "STOCK_ONLY"
+        base_entry = {
+            "id": identity,
+            "name": row.get("name") or identity,
+            "inputHash": input_hash,
+            "inputDate": observed_trading_date,
+            "source": row_source,
+            "sourceDate": row_source_date,
+            "observationDate": row_observation_date,
+            "scope": row_scope,
+            "producer": industry_block.get("producer") or "NAVER 업종 현재 관측",
+            "artifactPath": industry_block.get("artifactPath") or "data/monitoring/latest-industries.json#industries[]",
+            "generatedAt": industry_block.get("generatedAt") or context.get("generatedAt"),
+            "memberCount": row.get("memberCount"),
+            "featureValidMemberCount": row.get("featureValidMemberCount"),
+            "leaderCount": len(row.get("leaders") or []) if isinstance(row.get("leaders"), list) else None,
+            "missingFields": input_quality["missingFields"],
+            "invalidFields": input_quality["invalidFields"],
+        }
+        same_input = bool(
+            old
+            and str(old.get("lastObservedTradingDate") or "") == str(observed_trading_date or "")
+            and old.get("inputHash") == input_hash
+        )
+        idempotency_status = "IDEMPOTENT" if same_input else (
+            "RE_EVALUATED_SAME_DATE" if old and str(old.get("lastObservedTradingDate") or "") == str(observed_trading_date or "")
+            else "NEW_INPUT"
+        )
+        if not input_quality["ready"]:
+            model_unavailable_count += 1
+            missing_model_fields.update(input_quality["missingFields"])
+            invalid_model_fields.update(input_quality["invalidFields"])
+            entry = {
+                **base_entry,
+                "status": "MODEL_INPUT_UNAVAILABLE",
+                "lifecycleStatus": prior_lifecycle,
+                "evaluationStatus": "MODEL_INPUT_UNAVAILABLE",
+                "modelStatus": "MODEL_INPUT_UNAVAILABLE",
+                "qualifyStreak": (old or {}).get("qualifyStreak", 0),
+                "weakenStreak": (old or {}).get("weakenStreak", 0),
+                "checks": {},
+                "failureReason": "MODEL_INPUT_MISSING" if input_quality["missingFields"] else "MODEL_INPUT_INVALID",
+                "idempotencyStatus": idempotency_status,
+                "evidenceQuality": industry_block.get("qualityStatus") or "UNKNOWN",
+            }
+            sectors.append(entry)
+            pending.append({"type": "AUTO_SECTOR", "id": identity,
+                            "status": "PENDING", "reason": entry["failureReason"],
+                            "missingFields": input_quality["missingFields"],
+                            "invalidFields": input_quality["invalidFields"]})
+            continue
+
+        model_ready_count += 1
+        qualified, score, checks = _sector_decision(row, policy["sector"])
         status, qs, ws = _transition(old, qualified, policy)
-        entry = {"id": identity, "name": row.get("name") or identity, "status": status, "score": score,
+        entry = {**base_entry, "status": status, "lifecycleStatus": status,
+                 "evaluationStatus": "QUALIFIED" if qualified else "UNQUALIFIED",
+                 "modelStatus": "MODEL_READY", "score": score,
                  "qualifyStreak": qs, "weakenStreak": ws, "checks": checks,
-                 "source": "FULL_MARKET_EVIDENCE", "sourceTime": row.get("sourceTime") or context.get("generatedAt"),
+                 "failureReason": None if qualified else "POLICY_CONDITION_NOT_MET",
+                 "idempotencyStatus": idempotency_status,
+                 "sourceTime": row.get("sourceTime") or context.get("generatedAt"),
                  "evidenceQuality": industry_block.get("qualityStatus") or "UNKNOWN"}
         sectors.append(entry)
-        if not old or old.get("status") != status: changes.append({"type": "AUTO_SECTOR", "id": identity, "from": (old or {}).get("status"), "to": status})
+        old_status = (old or {}).get("lifecycleStatus") or (old or {}).get("status")
+        if not old or old_status != status: changes.append({"type": "AUTO_SECTOR", "id": identity, "from": old_status, "to": status})
         # Asset disqualification is independent of industry/date usability.
         # This prevents an already-active non-equity leader from being frozen
         # merely because the current market evidence is partial or undated.
@@ -271,7 +446,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                 _, _, candidate_checks = _leader_decision(
                     candidate, policy["leader"], asset_registry, observed_trading_date)
                 record_block("sector", identity, candidate, candidate_checks)
-        evidence_usable = ((industry_block.get("qualityStatus") or "").upper() in {"FULL", "OK"}
+        evidence_usable = input_quality["ready"] and ((industry_block.get("sourceQualityStatus") or industry_block.get("qualityStatus") or "").upper() in {"FULL", "OK"}
                            or (industry_block.get("quality") or {}).get("industryEvidenceUsable") in {"FULL", "OK"})
         if status == "DISCOVERED" and evidence_usable:
             accepted_initial = []
@@ -393,7 +568,7 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                       key=lambda item: (-item.get("score", 0), item["code"], item["id"])):
         if row["code"] not in memberships and len(memberships) >= limit: continue
         admitted_auto_codes.add(row["code"])
-        member(row["code"], "AUTO_LEADER", f"{row['groupType']}:{row['groupId']}")
+        member(row["code"], "AUTO_LEADER", f"{row.get('groupType', 'unknown')}:{row.get('groupId', 'unknown')}")
     for row in normalized_leaders:
         row["collectionAdmitted"] = row.get("code") in admitted_auto_codes
     for collection, previous_index in ((sectors, sector_previous), (themes, theme_previous), (normalized_leaders, leader_previous)):
@@ -404,11 +579,41 @@ def build_management_result(context, universe, discovery=None, previous=None, po
                 row["lastObservedTradingDate"] = observed_trading_date
             elif prior_date:
                 row["lastObservedTradingDate"] = prior_date
+    if model_ready_count == len(industry_rows) and industry_rows:
+        model_status = "MODEL_READY"
+    elif model_ready_count and model_unavailable_count:
+        model_status = "PARTIAL_INPUT"
+    elif industry_rows:
+        model_status = "MODEL_INPUT_UNAVAILABLE"
+    else:
+        model_status = "PRODUCER_FAILED"
+    source_date = industry_block.get("sourceDate") or observed_trading_date
+    observation_date = industry_block.get("observationDate") or observed_trading_date
+    source = industry_block.get("source") or "NAVER_CURRENT_SNAPSHOT"
+    scope = industry_block.get("scope") or "STOCK_ONLY"
     return {"version": "dynamic-universe-management-v1", "generatedAt": generated_at, "networkCalls": 0,
+            "status": model_status,
+            "producerStatus": model_status,
+            "source": source,
+            "sourceDate": source_date,
+            "observationDate": observation_date,
+            "scope": scope,
+            "inputHash": input_hash,
             "industryEvidence": {"status": industry_block.get("qualityStatus") or "UNKNOWN",
                                   "sourceStatus": (industry_block.get("quality") or {}).get("sourceStatus"),
                                   "industryEvidenceUsable": (industry_block.get("quality") or {}).get("industryEvidenceUsable"),
-                                  "analyzedIndustryCount": len(industry_rows)},
+                                  "collectionQualityStatus": industry_block.get("collectionQualityStatus") or industry_block.get("qualityStatus"),
+                                  "analyzedIndustryCount": len(industry_rows),
+                                  "modelStatus": model_status,
+                                  "modelReadyCount": model_ready_count,
+                                  "modelUnavailableCount": model_unavailable_count,
+                                  "missingFields": sorted(missing_model_fields),
+                                  "invalidFields": sorted(invalid_model_fields),
+                                  "source": source,
+                                  "sourceDate": source_date,
+                                  "observationDate": observation_date,
+                                  "scope": scope,
+                                  "inputHash": input_hash},
             "sectors": sectors, "themes": themes, "leaders": normalized_leaders,
             "initialObservationCandidates": initial_candidates, "kiwoomDiscovery": discovery_rows,
             "userWatchlists": user_watchlists, "memberships": [memberships[code] for code in sorted(memberships)],

@@ -11,45 +11,52 @@ sys.path.insert(0, str(ROOT))
 import dynamic_universe_manager as manager
 import theme_research
 
-CURRENT_INDUSTRY_FIELDS = ("advancePct",)
-CURRENT_OR_HISTORICAL_STRENGTH_FIELDS = (
-    "officialChangeRateRelativeStrength", "relativeStrengthVsMarket",
-)
-
-
 def usable_industry_rows(payload):
-    """Select only rows with complete calculated market evidence."""
+    """Select collected rows; model readiness is evaluated separately."""
+    payload = payload if isinstance(payload, dict) else {}
     quality = payload.get("quality") or {}
     selected = []
     for row in payload.get("industries") or []:
         if not isinstance(row, dict):
             continue
-        member_count = row.get("memberCount")
-        if (not isinstance(member_count, int) or member_count <= 0
-                or row.get("closeValidMemberCount") != member_count
-                or not isinstance(row.get("featureValidMemberCount"), int)
-                or row.get("featureValidMemberCount") <= 0):
-            continue
-        if any(not isinstance(row.get(field), (int, float))
-               for field in CURRENT_INDUSTRY_FIELDS):
-            continue
-        # Current NAVER breadth and official change-rate relative strength are
-        # sufficient for the V1 evaluation input.  KRX-derived MA and
-        # historical-return fields may be unavailable while the current
-        # observation is still valid; they must not erase the group itself.
-        if not any(isinstance(row.get(field), (int, float))
-                   for field in CURRENT_OR_HISTORICAL_STRENGTH_FIELDS):
-            continue
-        if not isinstance(row.get("leaders"), list):
+        if not (row.get("id") or row.get("name")):
             continue
         selected.append(row)
     if quality.get("sourceStatus") == "OK" and quality.get("industryEvidenceUsable") == "FULL":
-        status = "FULL"
+        collection_status = "FULL"
     elif selected and quality.get("sourceStatus") in {"OK", "PARTIAL"}:
-        status = "PARTIAL_WITH_COVERAGE"
+        collection_status = "PARTIAL_WITH_COVERAGE"
     else:
-        status = "UNUSABLE"
-    return selected, status
+        collection_status = "UNUSABLE"
+    return selected, collection_status
+
+
+def model_input_summary(rows, quality):
+    """Separate collection coverage from readiness for the V1 policy."""
+    quality = quality if isinstance(quality, dict) else {}
+    ready = [row for row in rows if manager._sector_input_quality(row)["ready"]]
+    unavailable = [row for row in rows if not manager._sector_input_quality(row)["ready"]]
+    if quality.get("sourceStatus") not in {"OK", "PARTIAL"}:
+        status = "PRODUCER_FAILED"
+    elif not rows:
+        status = "PRODUCER_FAILED"
+    elif ready and unavailable:
+        status = "PARTIAL_INPUT"
+    elif ready:
+        status = "MODEL_READY"
+    else:
+        status = "MODEL_INPUT_UNAVAILABLE"
+    missing = sorted({field for row in unavailable for field in manager._sector_input_quality(row)["missingFields"]})
+    invalid = sorted({field for row in unavailable for field in manager._sector_input_quality(row)["invalidFields"]})
+    return {
+        "status": status,
+        "inputCount": len(rows),
+        "modelReadyCount": len(ready),
+        "unavailableCount": len(unavailable),
+        "missingFields": missing,
+        "invalidFields": invalid,
+        "sourceStatus": quality.get("sourceStatus"),
+    }
 
 
 def verified_trading_date(payload):
@@ -105,12 +112,26 @@ def main(argv=None):
     quality_payload = manager.load_json(
         args.quality or str(Path(args.industries).with_name("latest-quality.json")), {}) or {}
     quality = industries.get("quality") or {}
-    industry_rows, industry_quality_state = usable_industry_rows(industries)
+    industry_rows, collection_quality_state = usable_industry_rows(industries)
+    model_quality = model_input_summary(industry_rows, quality)
     trading_date = verified_trading_date(industries)
     context = {"generatedAt": industries.get("generatedAt"),
                "tradingDate": trading_date,
                "industries": {"status": "AVAILABLE" if industry_rows else "UNAVAILABLE",
-                              "industries": industry_rows, "qualityStatus": industry_quality_state,
+                              "industries": industry_rows,
+                              "qualityStatus": model_quality["status"],
+                              "collectionQualityStatus": collection_quality_state,
+                              "modelInputStatus": model_quality["status"],
+                              "modelInput": model_quality,
+                              "sourceQualityStatus": quality.get("sourceStatus"),
+                              "source": industries.get("source") or "NAVER_CURRENT_SNAPSHOT",
+                              "sourceHash": industries.get("sourceHash"),
+                              "sourceDate": industries.get("sourceDate") or trading_date,
+                              "observationDate": industries.get("observationDate") or trading_date,
+                              "scope": industries.get("scope") or "STOCK_ONLY",
+                              "producer": "NAVER 업종 현재 관측",
+                              "artifactPath": "data/monitoring/latest-industries.json#industries[]",
+                              "generatedAt": industries.get("generatedAt"),
                               "quality": quality},
                "themes": {"status": "UNAVAILABLE", "reason": "VERIFIED_THEME_MEMBERSHIP_NOT_PUBLISHED"}}
     previous = manager.load_json(args.output, {}) or {}
@@ -192,10 +213,12 @@ def main(argv=None):
                             row[field] = quote[field]
     if not args.no_write:
         result["inputEvidence"] = input_evidence(industries, quality_payload)
+        result["inputEvidence"].update(model_quality)
         manager.publish_result(result, args.output, args.output, args.history)
     else:
         result["inputEvidence"] = input_evidence(industries, quality_payload)
-    print(json.dumps({"status": "SUCCESS", "networkCalls": 0, "industryQuality": industry_quality_state,
+        result["inputEvidence"].update(model_quality)
+    print(json.dumps({"status": "SUCCESS", "networkCalls": 0, "industryQuality": model_quality["status"],
                       "sectorCount": len(result["sectors"]),
                       "themePending": bool(result["pending"]), "leaderCount": len(result["leaders"]),
                       "collectionCount": len(result["collectionCodes"]), "written": not args.no_write}, ensure_ascii=False))

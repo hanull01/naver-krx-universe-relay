@@ -56,6 +56,30 @@ class DailyReportTests(unittest.TestCase):
         self.assertEqual(projection["themes"], [])
         self.assertEqual(projection["artifactPath"], "config/universe.json#sectors,themes")
 
+    def test_dynamic_v1_artifact_is_the_source_when_config_is_empty(self):
+        projection = daily_report.configured_interest_group_projection(
+            {"sectors": {}, "themes": {}},
+            {
+                "status": "MODEL_INPUT_UNAVAILABLE",
+                "producerStatus": "MODEL_INPUT_UNAVAILABLE",
+                "generatedAt": "2026-11-13T04:31:52+00:00",
+                "source": "NAVER_CURRENT_SNAPSHOT",
+                "sourceDate": "20261113",
+                "observationDate": "20261113",
+                "scope": "STOCK_ONLY",
+                "industryEvidence": {"missingFields": ["pctAboveMA20"]},
+                "sectors": [{
+                    "id": "261", "name": "제약", "status": "MODEL_INPUT_UNAVAILABLE",
+                    "lifecycleStatus": "DISCOVERED", "failureReason": "MODEL_INPUT_MISSING",
+                }],
+                "themes": [],
+            },
+        )
+        self.assertEqual(projection["configurationStatus"], "PRODUCER_ARTIFACT")
+        self.assertEqual(projection["status"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertEqual(projection["sourceDate"], "20261113")
+        self.assertEqual(projection["sectors"][0]["failureReason"], "MODEL_INPUT_MISSING")
+
     def test_registered_projection_calculates_trend_from_current_and_krx_inputs(self):
         projection = daily_report.registered_universe_projection(
             [{"itemCode": "005930", "stockName": "삼성전자"}],

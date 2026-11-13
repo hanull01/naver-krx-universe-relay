@@ -20,6 +20,8 @@ POLICY = {
 
 def sector(name="반도체", score=80, leaders=None):
     return {"name": name, "score": score, "relativeStrength": 1,
+            "memberCount": 10, "featureValidMemberCount": 10,
+            "closeValidMemberCount": 10,
             "advancerPct": 70, "turnoverConcentrationPct": 10,
             "pctAboveMA20": 70, "leaderCount": len(leaders or [{"code": "005930", "score": 80}]),
             "leaders": leaders or [{"code": "005930", "score": 80, "assetType": "STOCK"}]}
@@ -64,7 +66,7 @@ class DynamicUniverseManagerTests(unittest.TestCase):
             {"id": "T2", "name": "미검증", "score": 90, "systemLeaders": []},
         ]}}}
         result = manager.build_management_result({**self._dated_context([], "20261023"), "themes": themes}, self.universe(), policy=POLICY)
-        self.assertEqual([row["status"] for row in result["themes"]], ["DISCOVERED", "REMOVED"])
+        self.assertEqual([row["status"] for row in result["themes"]], ["DISCOVERED", "DISCOVERED"])
 
     def test_deduplicates_collection_but_preserves_memberships(self):
         discovery = {"status": "AVAILABLE", "source": "KIWOOM_CONDITION_SEARCH",
@@ -119,6 +121,47 @@ class DynamicUniverseManagerTests(unittest.TestCase):
             repeated = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), previous=repeated, policy=POLICY)
         self.assertEqual(repeated["sectors"][0]["qualifyStreak"], first["sectors"][0]["qualifyStreak"])
         self.assertEqual(repeated["sectors"][0]["lastObservedTradingDate"], "20261023")
+        self.assertEqual(repeated["sectors"][0]["idempotencyStatus"], "IDEMPOTENT")
+
+    def test_missing_model_input_is_not_removed_and_preserves_lifecycle(self):
+        missing = sector()
+        missing["pctAboveMA20"] = None
+        first = manager.build_management_result(
+            self._dated_context([missing], "20261023"), self.universe(), policy=POLICY
+        )
+        self.assertEqual(first["sectors"][0]["status"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertEqual(first["sectors"][0]["modelStatus"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertEqual(first["sectors"][0]["lifecycleStatus"], "DISCOVERED")
+        previous = copy.deepcopy(first)
+        previous["sectors"][0]["lifecycleStatus"] = "ACTIVE"
+        previous["sectors"][0]["status"] = "ACTIVE"
+        held = manager.build_management_result(
+            self._dated_context([missing], "20261024"), self.universe(), previous=previous, policy=POLICY
+        )
+        self.assertEqual(held["sectors"][0]["status"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertEqual(held["sectors"][0]["lifecycleStatus"], "ACTIVE")
+
+    def test_new_unqualified_group_waits_for_removal_confirmations(self):
+        weak = sector(); weak["advancerPct"] = 0
+        first = manager.build_management_result(
+            self._dated_context([weak], "20261023"), self.universe(), policy=POLICY
+        )
+        second = manager.build_management_result(
+            self._dated_context([weak], "20261024"), self.universe(), previous=first, policy=POLICY
+        )
+        self.assertEqual(first["sectors"][0]["status"], "DISCOVERED")
+        self.assertEqual(second["sectors"][0]["status"], "REMOVED")
+
+    def test_zero_is_a_real_metric_value_not_missing_input(self):
+        zero = sector(); zero["pctAboveMA20"] = 0
+        result = manager.build_management_result(
+            self._dated_context([zero], "20261023"), self.universe(), policy=POLICY
+        )
+        row = result["sectors"][0]
+        self.assertEqual(row["modelStatus"], "MODEL_READY")
+        self.assertEqual(row["evaluationStatus"], "UNQUALIFIED")
+        self.assertEqual(row["status"], "DISCOVERED")
+        self.assertEqual(row["missingFields"], [])
 
     def test_same_day_condition_change_does_not_add_persistence(self):
         first = manager.build_management_result(self._dated_context([sector()], "20261023"), self.universe(), policy=POLICY)

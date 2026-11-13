@@ -680,7 +680,11 @@ def _compact_v2_change(row: Mapping[str, Any]) -> dict[str, Any]:
     return {key: row[key] for key in fields if row.get(key) is not None}
 
 
-_REPORT_V1_STATUSES = {"ACTIVE", "DISCOVERED", "MAINTAINED", "WATCH"}
+_REPORT_V1_STATUSES = {
+    "ACTIVE", "DISCOVERED", "MAINTAINED", "WATCH", "REENTERED",
+    "MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED",
+    "ARTIFACT_INVALID", "ARTIFACT_MISSING",
+}
 
 
 def _group_collection_availability(
@@ -714,13 +718,35 @@ def _group_collection_availability(
             output_count=0,
             next_expected_at=(groups or {}).get("nextExpectedAt"),
         )
-    reason = first_reason(groups, "missingReason", "reason", "policyReason", "validationReason")
+    reason = first_reason(groups, "missingReason", "reason", "failureReason", "policyReason", "validationReason")
     if not rows:
         reason = reason or (
             "PRODUCER_FAILED" if raw_status in {"FAILED", "ERROR", "INVALID"}
             else "INPUT_ARTIFACT_MISSING" if groups.get("artifactPath") is None
             else "INDUSTRY_MEMBERSHIP_MISSING" if kind == "industry"
             else "THEME_MEMBERSHIP_MISSING"
+        )
+    model_statuses = {"MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED", "ARTIFACT_INVALID", "ARTIFACT_MISSING"}
+    dynamic_failure = str(raw_status or "").upper() in model_statuses
+    if dynamic_failure:
+        return availability(
+            status=raw_status,
+            required_data=("V1 업종 모델 입력과 현재 관측" if kind == "industry" else "V1 테마 모델 입력과 현재 관측"),
+            received=False,
+            producer=(groups or {}).get("producer") or "V1 dynamic universe producer",
+            reason=(groups or {}).get("failureReason") or raw_status,
+            next_check_at=(groups or {}).get("nextCheckAt"),
+            producer_run_id=(groups or {}).get("producerRunId"),
+            artifact_path=(groups or {}).get("artifactPath"),
+            freshness_status=(groups or {}).get("freshnessStatus"),
+            checked_at=(groups or {}).get("checkedAt"),
+            generated_at=(groups or {}).get("generatedAt"),
+            source_date=(groups or {}).get("sourceDate"),
+            observation_date=(groups or {}).get("observationDate"),
+            scope=(groups or {}).get("scope"),
+            input_count=(groups or {}).get("inputCount"),
+            matched_count=(groups or {}).get("matchedCount"),
+            output_count=(groups or {}).get("outputCount"),
         )
     return availability(
         status=raw_status or ("AVAILABLE" if rows else "UNAVAILABLE"),
@@ -772,9 +798,20 @@ def _compact_v1_rows(
         if not isinstance(row, Mapping):
             continue
         status = str(row.get("status") or "").upper()
-        row_date = str(row.get("lastObservedTradingDate") or "").replace("-", "")
-        if status not in _REPORT_V1_STATUSES or (expected_date and row_date and row_date != expected_date):
+        row_date = str(
+            row.get("lastObservedTradingDate")
+            or row.get("observationDate")
+            or row.get("sourceDate")
+            or ""
+        ).replace("-", "")
+        if status not in _REPORT_V1_STATUSES or (expected_date and row_date != expected_date):
             continue
+        lifecycle_status = row.get("lifecycleStatus") or status
+        model_status = row.get("modelStatus") or (
+            "MODEL_INPUT_UNAVAILABLE" if status in {
+                "MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED", "ARTIFACT_INVALID"
+            } else "MODEL_READY"
+        )
         relative = relative_by_id.get(str(row.get("id")), {})
         source_row = source_by_id.get(str(row.get("id")), {})
         source_binding = (
@@ -809,6 +846,9 @@ def _compact_v1_rows(
             "name": row.get("name"),
             "kind": kind,
             "status": status,
+            "lifecycleStatus": lifecycle_status,
+            "evaluationStatus": row.get("evaluationStatus") or model_status,
+            "modelStatus": model_status,
             "score": row.get("score"),
             "tradingDate": row.get("lastObservedTradingDate") or trading_date,
             "leaders": _compact_group_leaders(candidates),
@@ -818,16 +858,25 @@ def _compact_v1_rows(
             "leaderObservationDate": relative.get("leaderObservationDate") or source_binding.get("observationDate") or relative.get("observationDate") or trading_date,
             "leaderScope": relative.get("leaderScope") or source_binding.get("scope") or relative.get("scope") or "STOCK_ONLY",
             "leaderMissingReason": leader_reason,
-            "source": relative.get("source") or "NAVER_CURRENT_SNAPSHOT",
-            "sourceDate": relative.get("sourceDate") or relative.get("sourceTradingDate") or trading_date,
-            "observationDate": relative.get("observationDate") or relative.get("sourceTradingDate") or trading_date,
-            "scope": relative.get("scope") or "STOCK_ONLY",
+            "source": row.get("source") or relative.get("source") or "NAVER_CURRENT_SNAPSHOT",
+            "sourceDate": row.get("sourceDate") or relative.get("sourceDate") or relative.get("sourceTradingDate") or trading_date,
+            "observationDate": row.get("observationDate") or relative.get("observationDate") or relative.get("sourceTradingDate") or trading_date,
+            "scope": row.get("scope") or relative.get("scope") or "STOCK_ONLY",
+            "producer": row.get("producer") or relative.get("producer") or "V1 dynamic universe producer",
+            "artifactPath": row.get("artifactPath") or relative.get("artifactPath") or "data/dynamic-universe/latest.json",
+            "generatedAt": row.get("generatedAt") or relative.get("generatedAt"),
+            "inputHash": row.get("inputHash") or relative.get("inputHash"),
+            "missingFields": row.get("missingFields") or [],
+            "invalidFields": row.get("invalidFields") or [],
+            "failureReason": row.get("failureReason") or (
+                "MODEL_INPUT_UNAVAILABLE" if model_status != "MODEL_READY" else None
+            ),
             "availability": availability(
                 status=relative.get("leaderEvidenceStatus") or row.get("status"),
                 required_data=("업종 현재 관측과 대표 주도주" if kind == "industry" else "테마 현재 관측과 대표 주도주"),
-                received=bool(candidates),
-                producer=("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
-                reason=leader_reason if not candidates else None,
+                received=model_status == "MODEL_READY" and bool(candidates),
+                producer=row.get("producer") or ("NAVER 업종 현재 관측" if kind == "industry" else "NAVER 테마 현재 관측"),
+                reason=(row.get("failureReason") or leader_reason) if model_status != "MODEL_READY" or not candidates else None,
                 next_check_at=relative.get("nextCheckAt"),
                 producer_run_id=relative.get("producerRunId"),
                 artifact_path=relative.get("artifactPath"),
@@ -2000,6 +2049,16 @@ def build_report_contract(
         v1_groups, "theme", relative_strength_tracking["themes"]["top5"], trading_date,
         source_rows=themes.get("themes") or [], observation_date=observed_date,
     )
+    v1_rows = v1_industries + v1_themes
+    v1_active = [row for row in v1_rows if row.get("status") in {"ACTIVE", "REENTERED", "MAINTAINED"}]
+    v1_input_unavailable = [row for row in v1_rows if row.get("status") in {
+        "MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED", "ARTIFACT_INVALID", "ARTIFACT_MISSING"
+    }]
+    v1_status = (
+        "AVAILABLE" if v1_active else
+        "MODEL_INPUT_UNAVAILABLE" if v1_input_unavailable else
+        "UNAVAILABLE"
+    )
     research_analysis = _compact_research_analysis(
         research, trading_date, relative_strength_tracking
     )
@@ -2179,7 +2238,18 @@ def build_report_contract(
         "themes": _compact_group_rows(themes.get("themes") or [], "theme"),
         "relativeStrengthTop5": relative_strength_tracking,
         "v1": {
-            "status": "AVAILABLE" if v1_industries or v1_themes else "UNAVAILABLE",
+            "status": v1_status,
+            "inputCount": (v1_groups or {}).get("inputCount"),
+            "matchedCount": (v1_groups or {}).get("matchedCount"),
+            "outputCount": (v1_groups or {}).get("outputCount"),
+            "modelUnavailableCount": (v1_groups or {}).get("modelUnavailableCount"),
+            "source": (v1_groups or {}).get("source"),
+            "sourceDate": (v1_groups or {}).get("sourceDate"),
+            "observationDate": (v1_groups or {}).get("observationDate"),
+            "scope": (v1_groups or {}).get("scope"),
+            "producer": (v1_groups or {}).get("producer"),
+            "artifactPath": (v1_groups or {}).get("artifactPath"),
+            "failureReason": (v1_groups or {}).get("failureReason"),
             "industries": v1_industries,
             "themes": v1_themes,
             "availability": {

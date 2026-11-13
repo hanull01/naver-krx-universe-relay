@@ -871,15 +871,79 @@ def restrict_staging_current_quotes(quotes, target_date):
     return current
 
 
-def configured_interest_group_projection(universe):
+def configured_interest_group_projection(universe, dynamic_universe=None):
     """Project only explicitly configured operating interest groups.
 
-    The dynamic-universe artifact contains automatic selection history, not
-    the user's operating interest-group configuration.  Keep those inputs
-    separate so removed/automatic rows cannot masquerade as configured
-    interest groups in the report.
+    Prefer the V1 dynamic-universe producer when it is present.  Explicit
+    config remains supported for callers that do not provide the producer
+    artifact, but an empty config is never treated as a successful source.
     """
     universe = universe if isinstance(universe, dict) else {}
+
+    dynamic_artifact_missing = isinstance(dynamic_universe, dict) and dynamic_universe.get("status") == "ARTIFACT_MISSING"
+    explicit_configured = bool(universe.get("sectors") or universe.get("themes"))
+    if isinstance(dynamic_universe, dict) and not (dynamic_artifact_missing and explicit_configured) and (
+        "sectors" in dynamic_universe or "themes" in dynamic_universe
+        or "producerStatus" in dynamic_universe
+    ):
+        evidence = dynamic_universe.get("industryEvidence") or {}
+        producer_status = (
+            dynamic_universe.get("producerStatus")
+            or dynamic_universe.get("status")
+            or evidence.get("modelStatus")
+            or "PRODUCER_NOT_RUN"
+        )
+        source = dynamic_universe.get("source") or evidence.get("source") or "NAVER_CURRENT_SNAPSHOT"
+        source_date = dynamic_universe.get("sourceDate") or evidence.get("sourceDate")
+        observation_date = dynamic_universe.get("observationDate") or evidence.get("observationDate")
+        scope = dynamic_universe.get("scope") or evidence.get("scope") or "STOCK_ONLY"
+        all_sectors = [row for row in dynamic_universe.get("sectors") or [] if isinstance(row, dict)]
+        all_themes = [row for row in dynamic_universe.get("themes") or [] if isinstance(row, dict)]
+        active_states = {"ACTIVE", "REENTERED", "MAINTAINED"}
+        active_sectors = [row for row in all_sectors if (
+            (row.get("lifecycleStatus") or row.get("status")) in active_states
+            and row.get("status") in active_states
+            and row.get("modelStatus") not in {"MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED", "ARTIFACT_INVALID"}
+        )]
+        active_themes = [row for row in all_themes if (
+            (row.get("lifecycleStatus") or row.get("status")) in active_states
+            and row.get("status") in active_states
+            and row.get("modelStatus") not in {"MODEL_INPUT_UNAVAILABLE", "PARTIAL_INPUT", "PRODUCER_FAILED", "ARTIFACT_INVALID"}
+        )]
+        unavailable_sectors = [row for row in all_sectors if row.get("status") == "MODEL_INPUT_UNAVAILABLE"]
+        unavailable_themes = [row for row in all_themes if row.get("status") == "MODEL_INPUT_UNAVAILABLE"]
+
+        def rows_for(active, unavailable, kind):
+            # Keep active rows and a bounded diagnostic sample for input
+            # shortage.  The counts below preserve the full producer result.
+            rows = list(active)
+            if not rows and unavailable:
+                rows.extend(unavailable[:5])
+            return rows
+
+        return {
+            "status": producer_status,
+            "configurationStatus": "PRODUCER_ARTIFACT",
+            "artifactPath": "data/dynamic-universe/latest.json",
+            "generatedAt": dynamic_universe.get("generatedAt"),
+            "source": source,
+            "sourceDate": source_date,
+            "observationDate": observation_date,
+            "scope": scope,
+            "producer": "V1 dynamic universe producer",
+            "inputCount": len(all_sectors) + len(all_themes),
+            "matchedCount": len(active_sectors) + len(active_themes),
+            "outputCount": len(active_sectors) + len(active_themes),
+            "modelUnavailableCount": len(unavailable_sectors) + len(unavailable_themes),
+            "missingFields": evidence.get("missingFields") or [],
+            "invalidFields": evidence.get("invalidFields") or [],
+            "failureReason": (
+                "MODEL_INPUT_UNAVAILABLE" if not active_sectors and unavailable_sectors
+                else "NO_ACTIVE_V1_SELECTION" if not active_sectors and not active_themes else None
+            ),
+            "sectors": rows_for(active_sectors, unavailable_sectors, "industry"),
+            "themes": rows_for(active_themes, unavailable_themes, "theme"),
+        }
 
     def rows_for(value):
         rows = []
@@ -1870,7 +1934,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
     try:
         dynamic_universe = load_json(DYNAMIC_UNIVERSE_PATH)
     except (OSError, ValueError, json.JSONDecodeError):
-        dynamic_universe = {"status": "UNAVAILABLE", "reason": "MISSING_DYNAMIC_UNIVERSE_SNAPSHOT", "themes": [], "leaders": []}
+        dynamic_universe = {"status": "ARTIFACT_MISSING", "reason": "MISSING_DYNAMIC_UNIVERSE_SNAPSHOT", "sectors": [], "themes": [], "leaders": []}
     def optional_json(path, default):
         try:
             return load_json(path)
@@ -2296,7 +2360,7 @@ def build_report(as_of=None, fetch_discovery_missing=False,
         registered_universe=registered_projection,
         current_market_observation=published_breadth,
         historical_technical_market=historical_technical_market,
-        v1_groups=configured_interest_group_projection(universe),
+        v1_groups=configured_interest_group_projection(universe, dynamic_universe),
         market_snapshot=market_snapshot,
         v2_status=shadow_status,
         additional_observations=additional_observations,
