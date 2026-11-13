@@ -1,16 +1,33 @@
 {
-  "runId": "43220306196",
-  "status": "GENERATION_UNAVAILABLE",
-  "observedAt": "2026-11-12T12:43:18.073526+00:00",
-  "generatedAt": "2026-11-12T12:43:18.073526+00:00",
-  "tradingDate": "2026-11-12",
+  "runId": "43337585597",
+  "status": "SUCCESS",
+  "observedAt": "2026-11-13T00:31:44.014172+00:00",
+  "generatedAt": "2026-11-13T00:31:44.014172+00:00",
+  "tradingDate": "20261113",
+  "v2ObservationId": "v2obs-5f8a0c54112672e02226274b667f0b40",
+  "v2Lineage": {
+    "v2ObservationId": "v2obs-5f8a0c54112672e02226274b667f0b40",
+    "source": "NAVER_CURRENT_SNAPSHOT",
+    "sourceDate": "20261113",
+    "observationDate": "20261113",
+    "sourceHash": "6ad569e4b823582698391157f5cae6b309426d5e553d183d166a9e84be6b2fbd",
+    "generatedAt": "2026-11-13T00:31:44.014172+00:00",
+    "producerRunId": "43337585597",
+    "artifactPath": "data/dynamic-universe/v2-shadow-latest.json",
+    "inputArtifactPath": "data/monitoring/latest-breadth.json",
+    "inputArtifactSha256": "596e2aff46fe2a8804961e7669915686175eac000fba3b589d824c3be1ca8a22",
+    "selectionPolicyVersion": "v2-current-observation-20261113",
+    "producerStatus": "SUCCESS",
+    "consumptionStatus": "CONSUMED",
+    "failureReason": null
+  },
   "summary": {
     "industries": {
       "count": 79,
       "v2StatusDistribution": {
         "WAIT": 79
       },
-      "v1V2StatusDifferences": 79,
+      "v1V2StatusDifferences": 78,
       "unavailable": 79
     },
     "themes": {
@@ -23,64 +40,37 @@
     }
   },
   "inputEvidence": {
-    "tradingDate": "2026-11-12",
-    "sourceQualityStatus": "COMPLETE_RECONCILIATION_PENDING",
-    "sourceCommit": null,
-    "sourceCommitStatus": "UNAVAILABLE",
-    "generationId": "gen_20261111_1794438352132244000",
-    "sourceProvenance": {
-      "schemaVersion": "v2-source-provenance-v1",
-      "status": "PARTIAL",
-      "sourceCommit": null,
-      "sourceCommitStatus": "UNAVAILABLE",
-      "reason": "SOURCE_COMMIT_UNAVAILABLE_PRE_PUBLISH",
-      "tradingDate": "20261112",
-      "calculationGeneration": "2026-11-12T12:43:13.903518+00:00",
-      "inputSnapshotSha256": "d6a5da7fc8379b4ec56db8341a7083bdbb8919eb5a23367a0c5faed9dad6828a",
-      "resultSha256": null,
-      "historySha256": null,
-      "files": [
-        {
-          "kind": "industries",
-          "path": "data/monitoring/latest-industries.json",
-          "status": "OBSERVED_HASH_ONLY",
-          "sha256": "2eeab3b4e350825ef3c4d0bb880d9b9f0ce8919dbfe7b7870924ce78aff3a686",
-          "bytes": 285378,
-          "generatedAt": "2026-11-12T12:43:13.903518+00:00",
-          "tradingDate": "20261112",
-          "generationStatus": "ALIGNED",
-          "dateStatus": "ALIGNED"
-        },
-        {
-          "kind": "themes",
-          "path": "data/monitoring/latest-theme-signals.json",
-          "status": "OBSERVED_HASH_ONLY",
-          "sha256": "6ab489bb8cd761a261947a4b79180dfb96b9c7b2a4b9ac0559105b1411ea4f1b",
-          "bytes": 8581855,
-          "generatedAt": "2026-11-12T12:43:13.903518+00:00",
-          "tradingDate": null,
-          "generationStatus": "ALIGNED",
-          "dateStatus": "UNAVAILABLE"
-        },
-        {
-          "kind": "v1Universe",
-          "path": "data/dynamic-universe/latest.json",
-          "status": "OBSERVED_HASH_ONLY",
-          "sha256": "7211da5686fb9044c5a894ecb47e226edc75befb87efdf264f4fe7fe10ce4a91",
-          "bytes": 193554,
-          "generatedAt": "2026-11-12T12:43:16.015548+00:00",
-          "tradingDate": null,
-          "generationStatus": "NOT_REQUIRED",
-          "dateStatus": "UNAVAILABLE"
-        }
-      ]
-    }
+    "source": "NAVER_CURRENT_SNAPSHOT",
+    "sourceDate": "20261113",
+    "observationDate": "20261113",
+    "sourceHash": "6ad569e4b823582698391157f5cae6b309426d5e553d183d166a9e84be6b2fbd",
+    "files": [
+      {
+        "kind": "breadth",
+        "path": "data/monitoring/latest-breadth.json",
+        "sha256": "596e2aff46fe2a8804961e7669915686175eac000fba3b589d824c3be1ca8a22",
+        "date": "20261113"
+      },
+      {
+        "kind": "industries",
+        "path": "data/monitoring/latest-industries.json",
+        "sha256": "c141d0382afcb62a4e54ca98a681a4f46e859438180aeaeec4661b738b4d5540",
+        "date": "20261113"
+      },
+      {
+        "kind": "themes",
+        "path": "data/monitoring/latest-theme-signals.json",
+        "sha256": "bb28d49526ff81f1f7d54140c15c8a6f18b5c3849da27978082003b980c21e96",
+        "date": "20261113"
+      }
+    ]
   },
+  "artifactPath": "/home/runner/work/naver-krx-universe-relay/naver-krx-universe-relay/data/dynamic-universe/v2-shadow-latest.json",
   "observationCount": 146,
-  "rawStatus": "OK",
-  "producerStatus": "OK",
-  "expectedGenerationId": "gen_20261111_1794438352132244000",
-  "consumptionStatus": "NOT_CONSUMED",
+  "rawStatus": "SUCCESS",
+  "producerStatus": "SUCCESS",
+  "runStatus": "SUCCESS",
+  "consumptionStatus": "CONSUMED",
   "publicationPolicy": "PARTIAL_NON_BLOCKING",
-  "failureReason": "V2_GENERATION_ID_MISSING"
+  "failureReason": null
 }

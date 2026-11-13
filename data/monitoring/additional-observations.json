@@ -2,12 +2,12 @@
   "schemaVersion": "additional-observations-artifact-v1",
   "status": "AVAILABLE",
   "source": "NAVER_CURRENT_SNAPSHOT",
-  "sourceDate": "20261112",
-  "observationDate": "20261112",
+  "sourceDate": "20261113",
+  "observationDate": "20261113",
   "scope": "STOCK_ONLY",
   "producer": "tools/build_additional_observations.py",
-  "producerRunId": "43220306196",
-  "generatedAt": "2026-11-12T21:43:16.373453+09:00",
+  "producerRunId": "43337585597",
+  "generatedAt": "2026-11-13T09:31:42.184003+09:00",
   "artifactPath": "data/monitoring/additional-observations.json",
   "configPath": "config/additional-observations.json",
   "inputPaths": {
@@ -27,25 +27,29 @@
     },
     "excludedRelativeStrengthTop5": {
       "industries": [
-        "305",
-        "310",
-        "318",
-        "319",
-        "287"
+        "278",
+        "306",
+        "301",
+        "333",
+        "288"
       ],
       "themes": [
-        "529",
-        "28",
-        "59",
-        "98",
-        "45"
+        "556",
+        "545",
+        "307",
+        "608",
+        "547"
       ]
     },
     "excluded": {
       "industries": [
         {
+          "id": "285",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "323",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "336",
@@ -53,23 +57,19 @@
         },
         {
           "id": "310",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "312",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "306",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "326",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "287",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "330",
@@ -80,40 +80,36 @@
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
         },
         {
-          "id": "291",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "331",
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
         },
         {
-          "id": "292",
+          "id": "268",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "268",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "290",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "311",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "313",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "id": "309",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "318",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "324",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "298",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "289",
@@ -128,12 +124,20 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "301",
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+        },
+        {
           "id": "261",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "328",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "293",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "303",
@@ -145,19 +149,23 @@
         },
         {
           "id": "278",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "304",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "314",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "319",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "305",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "25",
@@ -165,7 +173,7 @@
         },
         {
           "id": "320",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "270",
@@ -177,18 +185,18 @@
         },
         {
           "id": "264",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "274",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "279",
+          "id": "302",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "284",
+          "id": "296",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -198,10 +206,6 @@
         {
           "id": "339",
           "reason": "MEMBERSHIP_BELOW_MINIMUM"
-        },
-        {
-          "id": "269",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "327",
@@ -225,23 +229,19 @@
         },
         {
           "id": "288",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "277",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "299",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "317",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "333",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "332",
@@ -253,30 +253,22 @@
         },
         {
           "id": "322",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "271",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "272",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "280",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "283",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "334",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "294",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -289,38 +281,14 @@
         },
         {
           "id": "307",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "267",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "286",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "282",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "321",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "316",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "295",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "300",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "315",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -330,212 +298,36 @@
       ],
       "themes": [
         {
-          "id": "269",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "12",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "14",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "287",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "608",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "152",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "422",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "106",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "18",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "505",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "586",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "405",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "326",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "557",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "41",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "445",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "92",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "559",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "178",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "448",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "545",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "307",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "536",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "547",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "388",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "533",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "155",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "614",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "173",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "520",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "464",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "362",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "501",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "393",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "9",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "404",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "382",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "279",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "556",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "33",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "373",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "348",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "175",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "311",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "321",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "112",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "352",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "390",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "328",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "472",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "191",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
         },
         {
           "id": "270",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "492",
@@ -546,55 +338,7 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "415",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "446",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "566",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "229",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "534",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "568",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "579",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "587",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "66",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "452",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "56",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "567",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "389",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -602,103 +346,11 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "64",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "200",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "377",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "435",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "481",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "119",
+          "id": "400",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "28",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "213",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "123",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "324",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "523",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "575",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "540",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "584",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "329",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "332",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "537",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "288",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "335",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "272",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "174",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "576",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "449",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "376",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "398",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -706,43 +358,15 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "250",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "615",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "242",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "590",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "170",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "325",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "595",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "529",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "55",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "17",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -751,7 +375,7 @@
         },
         {
           "id": "27",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "147",
@@ -770,14 +394,6 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "517",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "184",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "511",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
@@ -786,20 +402,12 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "392",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "521",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "19",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "223",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "524",
@@ -807,26 +415,14 @@
         },
         {
           "id": "72",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "154",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "474",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "62",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "205",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "503",
+          "id": "62",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -839,14 +435,10 @@
         },
         {
           "id": "349",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "385",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "401",
+          "id": "385",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -862,35 +454,31 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "227",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "111",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
+          "id": "127",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
           "id": "113",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "598",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "342",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "8",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "45",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "560",
+          "id": "76",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -907,15 +495,7 @@
         },
         {
           "id": "234",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "276",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "99",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "417",
@@ -923,14 +503,10 @@
         },
         {
           "id": "323",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "386",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "144",
+          "id": "386",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -943,14 +519,10 @@
         },
         {
           "id": "98",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
-        },
-        {
-          "id": "181",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "44",
+          "id": "181",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -958,27 +530,23 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "149",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "462",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "60",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "176",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "582",
+          "id": "128",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "94",
+          "id": "176",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "330",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -998,23 +566,15 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "124",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "237",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "580",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "151",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "id": "316",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "185",
+          "id": "139",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1022,16 +582,12 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "527",
+          "id": "488",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "488",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
           "id": "381",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "177",
@@ -1047,7 +603,7 @@
         },
         {
           "id": "302",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "468",
@@ -1055,7 +611,7 @@
         },
         {
           "id": "210",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "49",
@@ -1066,35 +622,27 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "426",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "121",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "497",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "297",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "266",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
+        },
+        {
+          "id": "232",
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "108",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "480",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "514",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1106,7 +654,7 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "619",
+          "id": "82",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1118,35 +666,11 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "378",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "402",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "531",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "197",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "126",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "585",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "513",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "331",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1155,14 +679,10 @@
         },
         {
           "id": "489",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "13",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "482",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1170,28 +690,20 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "52",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "289",
+          "id": "63",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "493",
+          "id": "52",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "343",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "159",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "59",
-          "reason": "DUPLICATES_RELATIVE_STRENGTH_TOP5"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "470",
@@ -1199,11 +711,11 @@
         },
         {
           "id": "284",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "421",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "319",
@@ -1214,40 +726,24 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "318",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "397",
-          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
           "id": "204",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "298",
+          "id": "290",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "172",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "86",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "543",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "31",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "36",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "167",
@@ -1255,11 +751,11 @@
         },
         {
           "id": "136",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "48",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
+          "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "265",
@@ -1282,35 +778,19 @@
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "467",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "597",
+          "id": "38",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
           "id": "228",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "591",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
-        },
-        {
-          "id": "171",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
         },
         {
           "id": "16",
-          "reason": "ADVANCE_PCT_BELOW_MINIMUM"
-        },
-        {
-          "id": "164",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
-          "id": "593",
+          "id": "164",
           "reason": "RELATIVE_STRENGTH_BELOW_MINIMUM"
         },
         {
@@ -1326,292 +806,292 @@
   },
   "industries": [
     {
-      "id": "285",
-      "name": "방송과엔터테인먼트",
+      "id": "299",
+      "name": "기계",
       "type": "industry",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#industrys/285",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 54,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#industrys/299",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 104,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "035900",
-          "name": "JYP Ent.",
-          "market": "KOSDAQ",
-          "currentPrice": 45050.0,
-          "changeRate": 16.41,
-          "accumulatedTradingValue": 134830145000.0,
-          "dist_high_20": null,
-          "current_volume_ratio_20": null,
-          "above_ma20": null,
-          "above_ma60": null,
-          "breakout_20_intraday": null,
-          "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
-          "scope": "STOCK_ONLY"
-        },
-        {
-          "code": "037270",
-          "name": "YG PLUS",
+          "code": "003010",
+          "name": "혜인",
           "market": "KOSPI",
-          "currentPrice": 3345.0,
-          "changeRate": 15.74,
-          "accumulatedTradingValue": 16811000000.0,
+          "currentPrice": 9760.0,
+          "changeRate": 10.66,
+          "accumulatedTradingValue": 4631000000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "048910",
-          "name": "대원미디어",
+          "code": "277810",
+          "name": "레인보우로보틱스",
           "market": "KOSDAQ",
-          "currentPrice": 7530.0,
-          "changeRate": 10.09,
-          "accumulatedTradingValue": 1961868000.0,
+          "currentPrice": 379000.0,
+          "changeRate": 9.7,
+          "accumulatedTradingValue": 12863888000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
+          "scope": "STOCK_ONLY"
+        },
+        {
+          "code": "389500",
+          "name": "에스비비테크",
+          "market": "KOSDAQ",
+          "currentPrice": 32200.0,
+          "changeRate": 8.97,
+          "accumulatedTradingValue": 638138000.0,
+          "dist_high_20": null,
+          "current_volume_ratio_20": null,
+          "above_ma20": null,
+          "above_ma60": null,
+          "breakout_20_intraday": null,
+          "source": "NAVER_CURRENT_SNAPSHOT",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         }
       ],
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 1,
-      "selectionScore": 75.185173,
+      "selectionScore": 76.94619,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.934285,
-        "advancePct": 53.7037,
-        "memberCount": 54,
+        "relativeStrength": 0.89927,
+        "advancePct": 81.7308,
+        "memberCount": 104,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     },
     {
-      "id": "296",
-      "name": "운송인프라",
+      "id": "286",
+      "name": "생물공학",
       "type": "industry",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#industrys/296",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 8,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#industrys/286",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 55,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "005430",
-          "name": "한국공항",
-          "market": "KOSPI",
-          "currentPrice": 105300.0,
-          "changeRate": 7.45,
-          "accumulatedTradingValue": 4946000000.0,
+          "code": "174900",
+          "name": "앱클론",
+          "market": "KOSDAQ",
+          "currentPrice": 24750.0,
+          "changeRate": 13.27,
+          "accumulatedTradingValue": 1292110000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "038620",
-          "name": "위즈코프",
+          "code": "298380",
+          "name": "에이비엘바이오",
           "market": "KOSDAQ",
-          "currentPrice": 1842.0,
-          "changeRate": 4.36,
-          "accumulatedTradingValue": 13359000.0,
+          "currentPrice": 44200.0,
+          "changeRate": 8.73,
+          "accumulatedTradingValue": 2041172000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "121890",
-          "name": "에스디시스템",
+          "code": "206650",
+          "name": "유바이오로직스",
           "market": "KOSDAQ",
-          "currentPrice": 2680.0,
-          "changeRate": 2.49,
-          "accumulatedTradingValue": 58724000.0,
+          "currentPrice": 8560.0,
+          "changeRate": 6.87,
+          "accumulatedTradingValue": 1065564000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         }
       ],
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 2,
-      "selectionScore": 41.905578,
+      "selectionScore": 75.143682,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.590859,
-        "advancePct": 50.0,
-        "memberCount": 8,
+        "relativeStrength": 0.956444,
+        "advancePct": 85.4545,
+        "memberCount": 55,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     },
     {
-      "id": "314",
-      "name": "출판",
+      "id": "284",
+      "name": "우주항공과국방",
       "type": "industry",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#industrys/314",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 7,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#industrys/284",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 33,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "036000",
-          "name": "예림당",
+          "code": "462350",
+          "name": "이노스페이스",
           "market": "KOSDAQ",
-          "currentPrice": 2675.0,
-          "changeRate": 1.33,
-          "accumulatedTradingValue": 5016000.0,
+          "currentPrice": 6280.0,
+          "changeRate": 6.26,
+          "accumulatedTradingValue": 498883000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "432430",
-          "name": "와이랩",
+          "code": "099320",
+          "name": "쎄트렉아이",
           "market": "KOSDAQ",
-          "currentPrice": 1593.0,
-          "changeRate": 1.21,
-          "accumulatedTradingValue": 8044000.0,
+          "currentPrice": 64700.0,
+          "changeRate": 5.37,
+          "accumulatedTradingValue": 493186000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         },
         {
-          "code": "418470",
-          "name": "KT밀리의서재",
+          "code": "289930",
+          "name": "웨이비스",
           "market": "KOSDAQ",
-          "currentPrice": 8850.0,
-          "changeRate": 0.57,
-          "accumulatedTradingValue": 103458000.0,
+          "currentPrice": 7010.0,
+          "changeRate": 5.1,
+          "accumulatedTradingValue": 89181000.0,
           "dist_high_20": null,
           "current_volume_ratio_20": null,
           "above_ma20": null,
           "above_ma60": null,
           "breakout_20_intraday": null,
           "source": "NAVER_CURRENT_SNAPSHOT",
-          "sourceDate": "20261112",
-          "observationDate": "20261112",
+          "sourceDate": "20261113",
+          "observationDate": "20261113",
           "scope": "STOCK_ONLY"
         }
       ],
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 37.164607,
+      "selectionScore": 67.412582,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 0.523359,
-        "advancePct": 71.4286,
-        "memberCount": 7,
+        "relativeStrength": 0.844444,
+        "advancePct": 87.8788,
+        "memberCount": 33,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     }
   ],
   "themes": [
     {
-      "id": "128",
-      "name": "엔터테인먼트",
+      "id": "536",
+      "name": "HBM(고대역폭메모리)",
       "type": "theme",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/128",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 31,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/536",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 35,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "035900",
-          "name": "JYP Ent.",
+          "code": "394280",
+          "name": "오픈엣지테크놀로지",
           "market": "KOSDAQ",
-          "currentPrice": 45050.0,
-          "change": 6350.0,
-          "changeRate": 16.41,
-          "accumulatedTradingValue": 134830145000.0,
-          "currentHigh": 47600.0,
+          "currentPrice": 8130.0,
+          "change": 1870.0,
+          "changeRate": 29.87,
+          "accumulatedTradingValue": 54284000.0,
+          "currentHigh": 8130.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1651,8 +1131,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1662,14 +1142,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "041510",
-          "name": "에스엠",
+          "code": "232140",
+          "name": "와이씨",
           "market": "KOSDAQ",
-          "currentPrice": 77200.0,
-          "change": 4300.0,
-          "changeRate": 5.9,
-          "accumulatedTradingValue": 13985031000.0,
-          "currentHigh": 80500.0,
+          "currentPrice": 13790.0,
+          "change": 1720.0,
+          "changeRate": 14.25,
+          "accumulatedTradingValue": 7926008000.0,
+          "currentHigh": 13790.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1709,8 +1189,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1720,14 +1200,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "352820",
-          "name": "하이브",
-          "market": "KOSPI",
-          "currentPrice": 155600.0,
-          "change": 7800.0,
-          "changeRate": 5.28,
-          "accumulatedTradingValue": 68665000000.0,
-          "currentHigh": 157700.0,
+          "code": "095340",
+          "name": "ISC",
+          "market": "KOSDAQ",
+          "currentPrice": 156800.0,
+          "change": 13400.0,
+          "changeRate": 9.34,
+          "accumulatedTradingValue": 8025317000.0,
+          "currentHigh": 159800.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1767,8 +1247,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1781,47 +1261,47 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 1,
-      "selectionScore": 78.02984,
+      "selectionScore": 82.96656,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 2.229488,
-        "advancePct": 58.0645,
-        "memberCount": 31,
+        "relativeStrength": 3.501379,
+        "advancePct": 97.1429,
+        "memberCount": 35,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     },
     {
-      "id": "127",
-      "name": "영상콘텐츠",
+      "id": "599",
+      "name": "소캠(SOCAMM)",
       "type": "theme",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/127",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 32,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/599",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 11,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "035900",
-          "name": "JYP Ent.",
+          "code": "095340",
+          "name": "ISC",
           "market": "KOSDAQ",
-          "currentPrice": 45050.0,
-          "change": 6350.0,
-          "changeRate": 16.41,
-          "accumulatedTradingValue": 134830145000.0,
-          "currentHigh": 47600.0,
+          "currentPrice": 156800.0,
+          "change": 13400.0,
+          "changeRate": 9.34,
+          "accumulatedTradingValue": 8025317000.0,
+          "currentHigh": 159800.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1861,8 +1341,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1872,14 +1352,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "048910",
-          "name": "대원미디어",
-          "market": "KOSDAQ",
-          "currentPrice": 7530.0,
-          "change": 690.0,
-          "changeRate": 10.09,
-          "accumulatedTradingValue": 1961868000.0,
-          "currentHigh": 7910.0,
+          "code": "007810",
+          "name": "코리아써키트",
+          "market": "KOSPI",
+          "currentPrice": 95900.0,
+          "change": 7300.0,
+          "changeRate": 8.24,
+          "accumulatedTradingValue": 48661000000.0,
+          "currentHigh": 99500.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1919,8 +1399,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1930,14 +1410,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "317530",
-          "name": "에피소드컴퍼니",
+          "code": "425420",
+          "name": "티에프이",
           "market": "KOSDAQ",
-          "currentPrice": 3025.0,
-          "change": 140.0,
-          "changeRate": 4.85,
-          "accumulatedTradingValue": 6030000.0,
-          "currentHigh": 3170.0,
+          "currentPrice": 91000.0,
+          "change": 6700.0,
+          "changeRate": 7.95,
+          "accumulatedTradingValue": 5146823000.0,
+          "currentHigh": 92700.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -1976,9 +1456,9 @@
           "bullish_alignment": null,
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
-          "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "near_52week_high": true,
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -1991,47 +1471,47 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 2,
-      "selectionScore": 74.064844,
+      "selectionScore": 78.206177,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 1.788047,
-        "advancePct": 62.5,
-        "memberCount": 32,
+        "relativeStrength": 3.268081,
+        "advancePct": 100.0,
+        "memberCount": 11,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     },
     {
-      "id": "30",
-      "name": "조선",
+      "id": "12",
+      "name": "반도체 장비",
       "type": "theme",
       "source": "NAVER_CURRENT_SNAPSHOT",
-      "sourceDate": "20261112",
-      "observationDate": "20261112",
+      "sourceDate": "20261113",
+      "observationDate": "20261113",
       "scope": "STOCK_ONLY",
       "producer": "tools/build_additional_observations.py",
-      "producerRunId": "43220306196",
-      "artifactPath": "data/monitoring/additional-observations.json#themes/30",
-      "generatedAt": "2026-11-12T21:43:16.373453+09:00",
-      "membershipCount": 6,
+      "producerRunId": "43337585597",
+      "artifactPath": "data/monitoring/additional-observations.json#themes/12",
+      "generatedAt": "2026-11-13T09:31:42.184003+09:00",
+      "membershipCount": 98,
       "leaderCount": 3,
       "leaders": [
         {
-          "code": "439260",
-          "name": "대한조선",
-          "market": "KOSPI",
-          "currentPrice": 36900.0,
-          "change": 1950.0,
-          "changeRate": 5.58,
-          "accumulatedTradingValue": 2698000000.0,
-          "currentHigh": 37700.0,
+          "code": "064290",
+          "name": "인텍플러스",
+          "market": "KOSDAQ",
+          "currentPrice": 57400.0,
+          "change": 9650.0,
+          "changeRate": 20.21,
+          "accumulatedTradingValue": 20289026000.0,
+          "currentHigh": 58200.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -2071,8 +1551,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -2082,14 +1562,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "097230",
-          "name": "HJ중공업",
-          "market": "KOSPI",
-          "currentPrice": 11590.0,
-          "change": 390.0,
-          "changeRate": 3.48,
-          "accumulatedTradingValue": 3527000000.0,
-          "currentHigh": 11900.0,
+          "code": "232140",
+          "name": "와이씨",
+          "market": "KOSDAQ",
+          "currentPrice": 13790.0,
+          "change": 1720.0,
+          "changeRate": 14.25,
+          "accumulatedTradingValue": 7926008000.0,
+          "currentHigh": 13790.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -2129,8 +1609,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -2140,14 +1620,14 @@
           "derivedMetricsUsable": true
         },
         {
-          "code": "329180",
-          "name": "HD현대중공업",
-          "market": "KOSPI",
-          "currentPrice": 268000.0,
-          "change": 5500.0,
-          "changeRate": 2.1,
-          "accumulatedTradingValue": 100756000000.0,
-          "currentHigh": 273000.0,
+          "code": "323350",
+          "name": "다원넥스뷰",
+          "market": "KOSDAQ",
+          "currentPrice": 13720.0,
+          "change": 1580.0,
+          "changeRate": 13.01,
+          "accumulatedTradingValue": 815128000.0,
+          "currentHigh": 13890.0,
           "close_valid": true,
           "ohlc_valid": true,
           "volume_valid": true,
@@ -2187,8 +1667,8 @@
           "breakout_20_intraday": null,
           "breakout_60_intraday": null,
           "near_52week_high": false,
-          "snapshotGeneratedAt": "2026-11-12T12:42:55.440708+00:00",
-          "temporaryCurrentBarDate": "20261112",
+          "snapshotGeneratedAt": "2026-11-13T00:31:18.710593+00:00",
+          "temporaryCurrentBarDate": "20261113",
           "historyAdjustmentStatus": "HISTORY_NOT_EVALUATED",
           "historyAdjustmentReason": "CANONICAL_PREVIOUS_CLOSE_UNAVAILABLE",
           "officialReferencePrice": null,
@@ -2201,20 +1681,20 @@
       "status": "AVAILABLE",
       "failureReason": null,
       "selectionRank": 3,
-      "selectionScore": 73.75004,
+      "selectionScore": 78.130891,
       "selectionReason": "CURRENT_OBSERVATION_RANKING",
       "selectionEvidence": {
-        "relativeStrength": 2.275026,
-        "advancePct": 66.6667,
-        "memberCount": 6,
+        "relativeStrength": 2.652032,
+        "advancePct": 94.898,
+        "memberCount": 98,
         "weights": {
           "relativeStrength": 0.5,
           "advancePct": 0.3,
           "memberCount": 0.2
         },
         "source": "NAVER_CURRENT_SNAPSHOT",
-        "sourceDate": "20261112",
-        "observationDate": "20261112",
+        "sourceDate": "20261113",
+        "observationDate": "20261113",
         "scope": "STOCK_ONLY"
       }
     }
