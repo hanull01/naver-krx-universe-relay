@@ -38,6 +38,33 @@ class IndustryEvidenceTests(unittest.TestCase):
         self.assertEqual(status, "FULL")
         self.assertEqual([item["id"] for item in rows], ["261"])
 
+    def test_missing_model_metrics_are_retained_for_explicit_unavailable_status(self):
+        row = self.row(pctAboveMA20=None, pctVolumeAbove20DayAverage=None)
+        rows, status = usable_industry_rows({
+            "quality": {"sourceStatus": "OK", "industryEvidenceUsable": "FULL"},
+            "industries": [row],
+        })
+        self.assertEqual(status, "FULL")
+        self.assertEqual(len(rows), 1)
+        result = build_management_result(
+            {"tradingDate": "20261109", "industries": {
+                "qualityStatus": "MODEL_INPUT_UNAVAILABLE",
+                "quality": {"sourceStatus": "OK", "industryEvidenceUsable": "FULL"},
+                "industries": rows,
+            }}, {}, policy={
+                "activationConfirmations": 2, "removalConfirmations": 2,
+                "watchConfirmations": 1, "leaderLimitPerGroup": 3,
+                "collectionLimit": 120,
+                "sector": {"minimumScore": 60, "minimumRelativeStrength": 0,
+                           "minimumAdvancerPct": 50, "minimumTurnoverConcentrationPct": 0,
+                           "minimumPctAboveMA20": 50, "minimumLeaderCount": 1},
+                "theme": {"minimumScore": 60, "requireVerifiedMembership": True},
+                "leader": {"minimumScore": 60, "minimumPersistence": 1},
+            },
+        )
+        self.assertEqual(result["status"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertIn("pctAboveMA20", result["industryEvidence"]["missingFields"])
+
     def test_operating_sector_evaluation_receives_industry_rows(self):
         row = self.row(
             officialChangeRateRelativeStrength=2.5,
@@ -69,8 +96,8 @@ class IndustryEvidenceTests(unittest.TestCase):
             "quality": {"sourceStatus": "PARTIAL", "industryEvidenceUsable": "UNUSABLE"},
             "industries": [self.row(closeValidMemberCount=9), self.row(featureValidMemberCount=0)],
         })
-        self.assertEqual(status, "UNUSABLE")
-        self.assertEqual(rows, [])
+        self.assertEqual(status, "PARTIAL_WITH_COVERAGE")
+        self.assertEqual(len(rows), 2)
 
     def test_verified_trading_date_is_explicit_and_validated(self):
         self.assertEqual(verified_trading_date({"tradingDate": "2026-10-23"}), "20261023")

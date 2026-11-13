@@ -1042,3 +1042,35 @@ class ReportContractTests(unittest.TestCase):
         self.assertEqual(research["slotLineage"]["researchSlot"], "12:20")
         self.assertEqual(research["analysis"]["availability"]["artifactPath"], "data/research/intelligence/slots/20261112-1220.json")
         self.assertEqual(research["analysis"]["availability"]["producerRunId"], "research-run-1")
+
+    def test_v1_model_input_unavailable_is_connected_without_marking_it_available(self):
+        generated = "2026-11-13T04:31:52+00:00"
+        contract = build_report_contract(
+            indices={"generatedAt": generated, "indices": []},
+            summary={"generatedAt": generated, "fullMarket": {"tradingDate": "20261113"}},
+            breadth={"generatedAt": generated},
+            quality={"generatedAt": generated},
+            industries={"generatedAt": generated, "industries": []},
+            themes={"generatedAt": generated, "themes": []},
+            v2_latest={}, v2_history={"observations": []}, leaders={},
+            v1_groups={
+                "status": "MODEL_INPUT_UNAVAILABLE",
+                "producer": "V1 dynamic universe producer",
+                "artifactPath": "data/dynamic-universe/latest.json",
+                "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": "20261113",
+                "observationDate": "20261113", "scope": "STOCK_ONLY",
+                "failureReason": "MODEL_INPUT_UNAVAILABLE",
+                "sectors": [{
+                    "id": "261", "name": "제약", "status": "MODEL_INPUT_UNAVAILABLE",
+                    "lifecycleStatus": "DISCOVERED", "lastObservedTradingDate": "20261113",
+                    "modelStatus": "MODEL_INPUT_UNAVAILABLE",
+                    "failureReason": "MODEL_INPUT_MISSING",
+                    "source": "NAVER_CURRENT_SNAPSHOT", "sourceDate": "20261113",
+                    "observationDate": "20261113", "scope": "STOCK_ONLY",
+                }], "themes": [],
+            },
+        )
+        self.assertEqual(contract["v1"]["status"], "MODEL_INPUT_UNAVAILABLE")
+        self.assertEqual(contract["v1"]["availability"]["industries"]["received"], False)
+        self.assertEqual(contract["v1"]["industries"][0]["failureReason"], "MODEL_INPUT_MISSING")
+        self.assertEqual(contract["v1"]["industries"][0]["sourceDate"], "20261113")
