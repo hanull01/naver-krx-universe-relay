@@ -175,12 +175,14 @@ jobs:
           if missing:
               raise SystemExit("KRX_INPUT_UNAVAILABLE:" + ",".join(missing))
           resolution = json.loads((root / "krx-resolution.json").read_text(encoding="utf-8"))
-          if resolution.get("receiptStatus") != "VERIFIED":
-              raise SystemExit("KRX_INPUT_UNAVAILABLE:receipt")
+          if (resolution.get("receiptStatus") != "VERIFIED"
+                  or resolution.get("publicationAuthorized") is not True
+                  or resolution.get("historicalSource") != "KRX"):
+              raise SystemExit("KRX_INPUT_RECEIPT_INVALID")
           if resolution.get("sourceGeneration") != os.environ["KRX_GENERATION_ID"]:
-              raise SystemExit("KRX_INPUT_UNAVAILABLE:generation")
+              raise SystemExit("KRX_INPUT_GENERATION_MISMATCH")
           if resolution.get("targetDate") != os.environ["KRX_TARGET_DATE"]:
-              raise SystemExit("KRX_INPUT_UNAVAILABLE:date")
+              raise SystemExit("KRX_INPUT_TARGET_DATE_MISMATCH")
           print("KRX_INPUT=AVAILABLE historicalSource=KRX fallbackUsed=false")
           PY
 
@@ -207,9 +209,9 @@ jobs:
             echo "exit_code=0" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # This is the fast intraday path: use cached daily candles and
-          # refresh quotes, technicals, states, and group states without daily
-          # NAVER API requests.
+          # This is the fast intraday path: use the verified KRX staged
+          # generation inputs and refresh current NAVER quotes without any
+          # legacy data/daily lookup or daily NAVER API collection.
           started_at=$(TZ=Asia/Seoul date --iso-8601=seconds)
           echo "Collection started at ${started_at}"
           echo "collection_started_at=${started_at}" >> "$GITHUB_OUTPUT"
