@@ -55,6 +55,18 @@ _sync_state = {"status": "NOT_STARTED", "result": None,
                "lastAppliedSha256": _last_sync.get("latestSha256"),
                "lastCheckedAt": None, "lastSuccessAt": None}
 
+
+def _public_sync_state():
+    """Return sync status without exposing internal transport diagnostics."""
+    state = dict(_sync_state)
+    result = state.get("result")
+    if isinstance(result, dict):
+        public_result = dict(result)
+        for key in ("error", "errorCode", "diagnostic"):
+            public_result.pop(key, None)
+        state["result"] = public_result
+    return state
+
 def tailscale_ipv4(runner=None):
     """Legacy helper retained for diagnostics; Serve is the recommended path."""
     import subprocess
@@ -240,10 +252,10 @@ class UniverseWebApp:
             if method=="GET" and route=="/healthz": return HTTPStatus.OK,{"status":"ok"}
             if method=="GET" and route=="/api/dashboard": return HTTPStatus.OK,self.dashboard()
             if method=="GET" and route=="/api/automatic":
-                p=self.automatic_view_payload(); sync=dict(_sync_state); p["commit"]=sync.get("lastAppliedCommit") or p.get("commit"); p["sync"]=sync; return HTTPStatus.OK,p
+                p=self.automatic_view_payload(); sync=_public_sync_state(); p["commit"]=sync.get("lastAppliedCommit") or p.get("commit"); p["sync"]=sync; return HTTPStatus.OK,p
             if method=="GET" and route=="/api/history": return HTTPStatus.OK,self.dynamic_history()
             if method=="GET" and route=="/api/settings": return HTTPStatus.OK,dynamic.load_json(ROOT/"config"/"dynamic_universe_policy.json",{}) or {}
-            if method=="GET" and route=="/api/dynamic-sync/status": return HTTPStatus.OK,dict(_sync_state)
+            if method=="GET" and route=="/api/dynamic-sync/status": return HTTPStatus.OK,_public_sync_state()
             if method=="GET" and route=="/api/config-sync/status": return HTTPStatus.OK,config_sync.status(ROOT)
             if method=="GET" and route=="/api/config-sync/preview": return HTTPStatus.OK,config_sync.preview(ROOT)
             if method=="GET" and route=="/api/stocks": return HTTPStatus.OK,{"stocks":self.stocks()}
@@ -278,7 +290,9 @@ def _start_sync(source):
     with _sync_lock:
         if _sync_state.get("status") == "RUNNING": return
         previous_state = dict(_sync_state)
+        run_id = secrets.token_hex(16)
         _sync_state = {"status": "RUNNING", "result": None,
+                       "runId": run_id,
                        "lastAppliedCommit": _sync_state.get("lastAppliedCommit"),
                        "lastAppliedGeneratedAt": _sync_state.get("lastAppliedGeneratedAt"),
                        "lastAppliedSha256": _sync_state.get("lastAppliedSha256"),
@@ -291,18 +305,27 @@ def _start_sync(source):
         try:
             result = background_sync.run_result(["--root", str(ROOT), "--ref", "main"])
             saved = _saved_sync_state()
-            _sync_state = {"status": result.get("status", "COMPLETED"), "result": result,
-                           "lastAppliedCommit": result.get("appliedCommit") or result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
-                           "lastAppliedGeneratedAt": result.get("generatedAt") or saved.get("generatedAt") or _last_sync.get("generatedAt"),
-                           "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256"),
-                           "lastCheckedAt": checked_at, "lastSuccessAt": checked_at, "source": source}
+            with _sync_lock:
+                if _sync_state.get("runId") != run_id:
+                    return
+                _sync_state = {"status": result.get("status", "COMPLETED"), "result": result,
+                               "runId": run_id,
+                               "lastAppliedCommit": result.get("appliedCommit") or result.get("commit") or saved.get("commit") or _last_sync.get("commit"),
+                               "lastAppliedGeneratedAt": result.get("generatedAt") or saved.get("generatedAt") or _last_sync.get("generatedAt"),
+                               "lastAppliedSha256": saved.get("latestSha256") or _last_sync.get("latestSha256"),
+                               "lastCheckedAt": checked_at, "lastSuccessAt": checked_at, "source": source}
         except Exception as exc:
             safe_error = str(exc) if isinstance(exc, sync_contract.SyncError) else type(exc).__name__
-            _sync_state = {"status": "FAILED", "result": {"error": safe_error, "errorType": type(exc).__name__},
-                           "lastAppliedCommit": previous_state.get("lastAppliedCommit"),
-                           "lastAppliedGeneratedAt": previous_state.get("lastAppliedGeneratedAt"),
-                           "lastAppliedSha256": previous_state.get("lastAppliedSha256"),
-                           "lastCheckedAt": checked_at, "lastSuccessAt": previous_state.get("lastSuccessAt"), "source": source}
+            error_code = background_sync._error_code(exc, "sync")
+            with _sync_lock:
+                if _sync_state.get("runId") != run_id:
+                    return
+                _sync_state = {"status": "FAILED", "result": {"error": safe_error, "errorCode": error_code, "errorType": type(exc).__name__},
+                               "runId": run_id,
+                               "lastAppliedCommit": previous_state.get("lastAppliedCommit"),
+                               "lastAppliedGeneratedAt": previous_state.get("lastAppliedGeneratedAt"),
+                               "lastAppliedSha256": previous_state.get("lastAppliedSha256"),
+                               "lastCheckedAt": checked_at, "lastSuccessAt": previous_state.get("lastSuccessAt"), "source": source}
     threading.Thread(target=worker, name="dynamic-universe-login-sync", daemon=True).start()
 
 def sync_after_login():

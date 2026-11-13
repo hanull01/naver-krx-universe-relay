@@ -25,6 +25,17 @@ class RefreshIntradayWorkflowContractTests(unittest.TestCase):
         self.assertIn("KRX_INPUT=AVAILABLE historicalSource=KRX fallbackUsed=false", self.text)
         self.assertIn('"${{ steps.krx.outputs.krx_report_input_dir }}"', self.text)
 
+    def test_krx_input_failures_have_distinct_operational_codes(self):
+        for marker in (
+            "KRX_INPUT_UNAVAILABLE:",
+            "KRX_INPUT_RECEIPT_INVALID",
+            "KRX_INPUT_GENERATION_MISMATCH",
+            "KRX_INPUT_TARGET_DATE_MISMATCH",
+        ):
+            self.assertIn(marker, self.text)
+        self.assertIn("historicalSource", self.text)
+        self.assertIn('"report-contract-projection.json"', self.text)
+
     def test_current_indices_are_collected_without_final_close_validation(self):
         self.assertIn("python market_indices.py", self.text)
         self.assertIn("INTRADAY_INDEX_SNAPSHOT", self.text)

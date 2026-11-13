@@ -35,6 +35,27 @@ class RelayTests(unittest.TestCase):
                          'complete': True, 'noTrading': True})
         return {'datas': bars}
 
+    @staticmethod
+    def write_krx_intraday_fixture(root, *, generation='gen_test', target='20260928',
+                                   receipt='VERIFIED', publication=True):
+        common = {
+            'source': 'KRX_M10_GENERATION', 'generationId': generation,
+            'targetDate': target, 'datas': [], 'status': 'ok',
+        }
+        (root / 'technicals.json').write_text(json.dumps(common), encoding='utf-8')
+        (root / 'states.json').write_text(json.dumps(common), encoding='utf-8')
+        (root / 'group-states.json').write_text(json.dumps({'groups': []}), encoding='utf-8')
+        (root / 'report-contract-projection.json').write_text(json.dumps({
+            'status': 'AVAILABLE', 'source': 'KRX_M10_GENERATION',
+            'historicalSource': 'KRX', 'targetDate': target,
+        }), encoding='utf-8')
+        (root / 'krx-resolution.json').write_text(json.dumps({
+            'receiptStatus': receipt, 'publicationAuthorized': publication,
+            'historicalSource': 'KRX', 'sourceGeneration': generation,
+            'targetDate': target, 'manifestSha256': 'a' * 64,
+            'monitoringSha256': 'b' * 64,
+        }), encoding='utf-8')
+
     def test_technical_indicators_from_completed_bars(self):
         result = relay.calculate_technicals('000001', 'A', self.daily_fixture(260),
                                             {'accumulatedTradingVolume': 2501})
@@ -352,6 +373,103 @@ class RelayTests(unittest.TestCase):
             self.assertFalse(relay.run_quote_pipeline('/staged', require_krx_input=True))
         self.assertEqual(events, ['krx', 'naver'])
         load_krx.assert_called_once_with('/staged')
+
+    def test_intraday_pre_uses_krx_target_date_without_daily_dependency(self):
+        universe = self.expanded_universe()
+        codes = relay.universe_codes(universe)
+        current = datetime(2026, 9, 29, 8, 40, tzinfo=relay.KST)
+
+        def fetch(url):
+            requested = url.rsplit('/', 1)[-1].split(',')
+            return {'datas': [{
+                'itemCode': code, 'stockName': code,
+                'localTradedAt': '2026-09-28T15:30:00+09:00',
+                'closePriceRaw': '100', 'compareToPreviousClosePriceRaw': '0',
+                'fluctuationsRatioRaw': '0', 'openPriceRaw': '100',
+                'highPriceRaw': '100', 'lowPriceRaw': '100',
+                'accumulatedTradingVolumeRaw': '100',
+                'accumulatedTradingValueRaw': '100',
+                'stockExchangeType': {'delayTime': 0},
+                'marketStatus': 'CLOSE',
+            } for code in requested]}
+
+        for has_daily in (False, True):
+            with self.subTest(data_daily_present=has_daily), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.write_krx_intraday_fixture(root)
+                if has_daily:
+                    (root / 'data' / 'daily').mkdir(parents=True)
+                    (root / 'data' / 'daily' / '005930.json').write_text(
+                        json.dumps({'datas': [{'date': '20260927', 'close': 1}]}),
+                        encoding='utf-8',
+                    )
+                with patch.object(relay, 'ROOT', root), \
+                     patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
+                     patch.object(relay, 'now', return_value=current), \
+                     patch.object(relay, 'fetch', fetch), \
+                     patch.object(relay, 'load_daily_for_technical', side_effect=AssertionError('legacy daily used')), \
+                     patch.object(relay, 'save'):
+                    self.assertFalse(relay.run_quote_pipeline(str(root), require_krx_input=True))
+
+    def test_intraday_regular_and_closed_use_krx_quote_path_without_daily_reference(self):
+        universe = self.expanded_universe()
+        codes = relay.universe_codes(universe)
+        cases = (
+            (datetime(2026, 9, 29, 10, 0, tzinfo=relay.KST), '2026-09-29T09:55:00+09:00'),
+            (datetime(2026, 9, 29, 20, 30, tzinfo=relay.KST), '2026-09-29T20:00:00+09:00'),
+        )
+        for current, traded_at in cases:
+            with self.subTest(session=relay.detect_market_session(current)):
+                def fetch(url, traded_at=traded_at):
+                    requested = url.rsplit('/', 1)[-1].split(',')
+                    return {'datas': [{
+                        'itemCode': code, 'stockName': code,
+                        'localTradedAt': traded_at,
+                        'closePriceRaw': '100', 'compareToPreviousClosePriceRaw': '0',
+                        'fluctuationsRatioRaw': '0', 'openPriceRaw': '100',
+                        'highPriceRaw': '100', 'lowPriceRaw': '100',
+                        'accumulatedTradingVolumeRaw': '100',
+                        'accumulatedTradingValueRaw': '100',
+                        'stockExchangeType': {'delayTime': 0},
+                        'marketStatus': 'OPEN',
+                    } for code in requested]}
+
+                with patch.object(relay, 'universe_state', return_value=(universe, codes, {})), \
+                     patch.object(relay, 'now', return_value=current), \
+                     patch.object(relay, 'fetch', fetch), \
+                     patch.object(relay, 'load_daily_for_technical', side_effect=AssertionError('legacy daily used')), \
+                     patch.object(relay, 'quote_regular_reference', side_effect=AssertionError('daily reference used')), \
+                     patch.object(relay, 'save'):
+                    result = relay.collect_quotes(previous_business_day=datetime(2026, 9, 28).date())
+                self.assertEqual((result['count'], result['expectedCount'], result['status']), (3, 3, 'ok'))
+
+    def test_krx_intraday_input_errors_use_distinct_operational_codes(self):
+        cases = (
+            ('missing', 'KRX_INPUT_UNAVAILABLE:'),
+            ('generation', 'KRX_INPUT_GENERATION_MISMATCH'),
+            ('target', 'KRX_INPUT_TARGET_DATE_MISMATCH'),
+            ('receipt', 'KRX_INPUT_RECEIPT_INVALID'),
+        )
+        for kind, expected in cases:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.write_krx_intraday_fixture(root)
+                if kind == 'missing':
+                    (root / 'report-contract-projection.json').unlink()
+                elif kind == 'generation':
+                    payload = json.loads((root / 'technicals.json').read_text())
+                    payload['generationId'] = 'gen_other'
+                    (root / 'technicals.json').write_text(json.dumps(payload))
+                elif kind == 'target':
+                    payload = json.loads((root / 'technicals.json').read_text())
+                    payload['targetDate'] = '20260929'
+                    (root / 'technicals.json').write_text(json.dumps(payload))
+                else:
+                    payload = json.loads((root / 'krx-resolution.json').read_text())
+                    payload['receiptStatus'] = 'PARTIAL'
+                    (root / 'krx-resolution.json').write_text(json.dumps(payload))
+                with self.assertRaisesRegex(ValueError, expected):
+                    relay.load_krx_intraday_inputs(root)
 
     def test_timed_step_forwards_keyword_arguments_to_pipeline_step(self):
         step = Mock(return_value={'status': 'ok'})
@@ -1328,8 +1446,13 @@ class RelayTests(unittest.TestCase):
             (root / "technicals.json").write_text(json.dumps(common), encoding="utf-8")
             (root / "states.json").write_text(json.dumps(common), encoding="utf-8")
             (root / "group-states.json").write_text(json.dumps({"groups": []}), encoding="utf-8")
+            (root / "report-contract-projection.json").write_text(json.dumps({
+                "status": "AVAILABLE", "source": "KRX_M10_GENERATION",
+                "historicalSource": "KRX", "targetDate": "20261103",
+            }), encoding="utf-8")
             (root / "krx-resolution.json").write_text(json.dumps({
                 "receiptStatus": "VERIFIED", "publicationAuthorized": True,
+                "historicalSource": "KRX",
                 "sourceGeneration": "gen_test", "targetDate": "20261103",
                 "manifestSha256": "a" * 64, "monitoringSha256": "b" * 64,
             }), encoding="utf-8")

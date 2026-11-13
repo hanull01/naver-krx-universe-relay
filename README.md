@@ -34,6 +34,13 @@ For a local browser UI, run `python3 universe_web.py` and open
 `http://127.0.0.1:8765`. The Web UI is a GUI layer over the same manager logic; it
 requires Preview before Apply and is never exposed outside the local machine.
 
+Dynamic Universe synchronization reports `NOOP` only when the published data is
+already current or there is intentionally nothing to apply. A synchronization
+attempt that cannot verify GitHub or fails validation is `FAILED`, with its
+transport diagnostic retained internally. The browser view exposes only the
+user-facing result (for example, “갱신 실패”), not internal error codes such as
+`GITHUB_HTTP_ERROR`.
+
 ## Schedule and permissions
 
 - Monday–Friday 08:35 KST: Sunday–Thursday 23:35 UTC.

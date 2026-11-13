@@ -179,7 +179,7 @@ def price_basis(session):
     }[session]
 
 
-def quote_freshness(traded, current, market, delay):
+def quote_freshness(traded, current, market, delay, previous_business_day=None):
     """Apply the timestamp-based KRX/after-market price policy.
 
     ``market`` is retained for the stable call signature but intentionally is
@@ -194,7 +194,8 @@ def quote_freshness(traded, current, market, delay):
         return False, 'non_weekday'
     session = detect_market_session(current)
     if session == 'PRE':
-        valid = (traded.date() == previous_weekday(current.date())
+        expected = previous_business_day or previous_weekday(current.date())
+        valid = (traded.date() == expected
                  and traded.time() >= dtime(15, 30))
         return valid, 'previous_close' if valid else 'stale_previous_close'
     if session == 'REGULAR':
@@ -229,7 +230,7 @@ def optional_market_metadata(row, delay):
     )
 
 
-def normalize_quote(row, current, sector=None):
+def normalize_quote(row, current, sector=None, previous_business_day=None):
     code = row['itemCode']
     traded = datetime.fromisoformat(row['localTradedAt'])
     if traded.tzinfo is None:
@@ -251,7 +252,10 @@ def normalize_quote(row, current, sector=None):
         raise ValueError('invalid price or volume')
     delay = row.get('stockExchangeType', {}).get('delayTime')
     delay = number(delay, 'stockExchangeType.delayTime') if delay is not None else None
-    fresh, reason = quote_freshness(traded, current, row.get('marketStatus'), delay)
+    fresh, reason = quote_freshness(
+        traded, current, row.get('marketStatus'), delay,
+        previous_business_day=previous_business_day,
+    )
     session = detect_market_session(current)
     exchange_metadata, over_market_metadata = optional_market_metadata(row, delay)
     result.update(source='NAVER_KRX', sourceTime=traded.isoformat(),
@@ -262,6 +266,8 @@ def normalize_quote(row, current, sector=None):
                   ageSeconds=round((current - traded).total_seconds()), fresh=fresh,
                   status='ok' if fresh else 'stale', freshnessReason=reason,
                   session=session, priceBasis=price_basis(session))
+    if previous_business_day is not None:
+        result['previousBusinessDay'] = previous_business_day.isoformat()
     if session == 'AFTER':
         # The common after-hours contract is the top-level realtime price.
         # overMarketPriceInfo is intentionally metadata only: it is absent for
@@ -580,10 +586,13 @@ def quote_regular_reference(code, quote):
     return regular_reference(regular_bar, current_price)
 
 
-def collect_quotes():
+def collect_quotes(previous_business_day=None):
     universe, codes, sectors = universe_state()
     current = now()
-    if detect_market_session(current) == 'PRE':
+    # The legacy daily-close preopen path remains available to daily/all mode.
+    # Intraday mode passes the verified KRX target date and must use only the
+    # current NAVER quote endpoint, never data/daily or data/daily-regular.
+    if detect_market_session(current) == 'PRE' and previous_business_day is None:
         return collect_preclose_quotes(universe, codes, sectors, current)
     rows, errors = {}, []
 
@@ -597,10 +606,16 @@ def collect_quotes():
                 if code not in codes:
                     continue
                 try:
-                    normalized = normalize_quote(row, now())
+                    if previous_business_day is None:
+                        normalized = normalize_quote(row, now())
+                    else:
+                        normalized = normalize_quote(
+                            row, now(), previous_business_day=previous_business_day
+                        )
                     if sectors.get(code):
                         normalized['sector'] = sectors[code]
-                    if normalized.get('session') in ('AFTER', 'CLOSED'):
+                    if (previous_business_day is None
+                            and normalized.get('session') in ('AFTER', 'CLOSED')):
                         normalized.update(quote_regular_reference(code, normalized))
                     rows[code] = normalized
                 except Exception as exc:
@@ -1410,22 +1425,32 @@ def timed_step(name, fn, *args, **kwargs):
 def load_krx_intraday_inputs(input_dir):
     """Install verified KRX historical inputs while keeping NAVER quotes separate."""
     root = Path(input_dir)
-    required = ("technicals.json", "states.json", "group-states.json", "krx-resolution.json")
+    required = (
+        "technicals.json", "states.json", "group-states.json",
+        "report-contract-projection.json", "krx-resolution.json",
+    )
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise ValueError("KRX_INPUT_UNAVAILABLE:" + ",".join(missing))
     resolution = json.loads((root / "krx-resolution.json").read_text(encoding="utf-8"))
-    if resolution.get("receiptStatus") != "VERIFIED" or resolution.get("publicationAuthorized") is not True:
-        raise ValueError("KRX_RESOLUTION_NOT_VERIFIED")
+    if (resolution.get("receiptStatus") != "VERIFIED"
+            or resolution.get("publicationAuthorized") is not True):
+        raise ValueError("KRX_INPUT_RECEIPT_INVALID")
+    if resolution.get("historicalSource") != "KRX":
+        raise ValueError("KRX_INPUT_RECEIPT_INVALID:historicalSource")
+    target_date = str(resolution.get("targetDate") or "")
+    if not re.fullmatch(r"\d{8}", target_date):
+        raise ValueError("KRX_INPUT_TARGET_DATE_MISMATCH")
     technicals = json.loads((root / "technicals.json").read_text(encoding="utf-8"))
     states = json.loads((root / "states.json").read_text(encoding="utf-8"))
     groups = json.loads((root / "group-states.json").read_text(encoding="utf-8"))
+    json.loads((root / "report-contract-projection.json").read_text(encoding="utf-8"))
     if technicals.get("source") != "KRX_M10_GENERATION":
         raise ValueError("KRX_HISTORICAL_SOURCE_INVALID")
     if technicals.get("generationId") != resolution.get("sourceGeneration"):
         raise ValueError("KRX_INPUT_GENERATION_MISMATCH")
-    if technicals.get("targetDate") != resolution.get("targetDate"):
-        raise ValueError("KRX_INPUT_DATE_MISMATCH")
+    if technicals.get("targetDate") != target_date:
+        raise ValueError("KRX_INPUT_TARGET_DATE_MISMATCH")
     provenance = {
         "historicalSource": "KRX",
         "historicalFallbackAllowed": False,
@@ -1467,7 +1492,7 @@ def load_krx_intraday_inputs(input_dir):
         f"generation={resolution.get('sourceGeneration')} targetDate={resolution.get('targetDate')} "
         "currentSnapshotSource=NAVER_SEPARATE historicalFallbackAllowed=false"
     )
-    return technicals, states, groups
+    return technicals, states, groups, resolution
 
 
 def run_quote_pipeline(krx_input_dir=None, require_krx_input=False):
@@ -1477,17 +1502,33 @@ def run_quote_pipeline(krx_input_dir=None, require_krx_input=False):
         print('KRX_INPUT=UNAVAILABLE reason=intraday_requires_verified_input')
         return True
     krx_input_loaded = False
+    krx_previous_business_day = None
     if krx_input_dir:
         try:
-            load_krx_intraday_inputs(krx_input_dir)
+            loaded = load_krx_intraday_inputs(krx_input_dir)
+            if isinstance(loaded, tuple) and len(loaded) >= 4:
+                resolution = loaded[3]
+                krx_previous_business_day = datetime.strptime(
+                    resolution["targetDate"], "%Y%m%d"
+                ).date()
             krx_input_loaded = True
         except (OSError, ValueError, json.JSONDecodeError) as exc:
-            print(f"KRX_INPUT=UNAVAILABLE reason={exc}")
+            print(f"{exc}")
             return True
-    result = timed_step('quotes', collect_quotes)
+    if krx_previous_business_day is None:
+        result = timed_step('quotes', collect_quotes)
+    else:
+        result = timed_step(
+            'quotes', collect_quotes,
+            previous_business_day=krx_previous_business_day,
+        )
     failed |= result['count'] != result['expectedCount']
-    if quote_snapshot_unusable(result):
-        print('Quote collection failed; preserving last successful production snapshot.')
+    if result['count'] != result['expectedCount'] or quote_snapshot_unusable(result):
+        print(
+            'NAVER_COLLECTION_FAILED '
+            f"count={result.get('count')} expected={result.get('expectedCount')} "
+            f"status={result.get('status')}"
+        )
         return True
     if krx_input_loaded:
         return False
