@@ -89,6 +89,19 @@ function headers(env) {
 }
 
 async function github(env, path, init = {}) {
+  return (await githubWithMetadata(env, path, init)).body;
+}
+
+function responseSummary(body) {
+  if (!body || typeof body !== "object") return null;
+  const summary = {};
+  if (typeof body.message === "string") summary.message = body.message.slice(0, 240);
+  if (Array.isArray(body.errors)) summary.errorCount = body.errors.length;
+  if (typeof body.documentation_url === "string") summary.documentation_url = body.documentation_url;
+  return Object.keys(summary).length ? summary : null;
+}
+
+async function githubWithMetadata(env, path, init = {}) {
   const response = await fetch(`https://api.github.com${path}`, {
     ...init,
     headers: { ...headers(env), ...(init.headers || {}) },
@@ -100,9 +113,10 @@ async function github(env, path, init = {}) {
     const error = new Error(`GITHUB_HTTP_${response.status}`);
     error.code = `GITHUB_HTTP_${response.status}`;
     error.httpStatus = response.status;
+    error.responseSummary = responseSummary(body);
     throw error;
   }
-  return body;
+  return { body, status: response.status, responseSummary: responseSummary(body) };
 }
 
 function stageError(stage, error) {
@@ -135,6 +149,7 @@ export function failureDetails(error, fallbackStage = "UNKNOWN") {
     errorCode: code,
     errorType,
     ...(httpStatus ? { httpStatus } : {}),
+    ...(error?.responseSummary ? { responseSummary: error.responseSummary } : {}),
   };
 }
 
@@ -288,21 +303,42 @@ export async function observeSlot(api, repository, plan, scheduledTime) {
 export async function dispatchAndVerify(env, plan, slotKey, scheduledTime, options = {}) {
   const repository = env.GITHUB_REPOSITORY;
   const api = options.github || ((path, init) => github(env, path, init));
+  const dispatch = options.dispatch || api;
   const sleep = options.sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+  const inputs = plan.inputs || {};
+  const payloadHasResearchSlot = typeof inputs.research_slot === "string" && inputs.research_slot.length > 0;
+  const dispatchAudit = {
+    researchSlot: inputs.research_slot || null,
+    dispatchRequested: false,
+    payloadHasResearchSlot,
+    githubResponseStatus: null,
+    githubResponseSummary: null,
+  };
+  if (plan.key === "research" && !payloadHasResearchSlot) {
+    const error = new Error("RESEARCH_SLOT_INPUT_MISSING");
+    error.code = "RESEARCH_SLOT_INPUT_MISSING";
+    error.dispatchRequested = false;
+    throw error;
+  }
   const existing = await atStage("FIND_EXISTING_RUN", () => findExistingRun(api, repository, plan, scheduledTime));
-  if (existing) return { slotKey, workflow: plan.workflow, status: "EXISTING_RUN", runId: existing.id, runHead: existing.head_sha, runEvent: existing.event };
+  if (existing) return { slotKey, workflow: plan.workflow, status: "EXISTING_RUN", runId: existing.id, runHead: existing.head_sha, runEvent: existing.event, ...dispatchAudit };
 
   const dispatchedAt = Date.now();
-  await atStage("POST_WORKFLOW_DISPATCH", () => api(`/repos/${repository}/actions/workflows/${plan.workflow}/dispatches`, {
+  const dispatchResult = await atStage("POST_WORKFLOW_DISPATCH", () => dispatch(`/repos/${repository}/actions/workflows/${plan.workflow}/dispatches`, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ref: "main", inputs: plan.inputs }),
+    body: JSON.stringify({ ref: "main", inputs }),
   }));
   const creation = await atStage("WAIT_FOR_GITHUB_RUN", () => waitForDispatchedRun(api, repository, plan, dispatchedAt, sleep));
-  if (!creation.run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED" };
+  Object.assign(dispatchAudit, {
+    dispatchRequested: true,
+    githubResponseStatus: dispatchResult?.status ?? null,
+    githubResponseSummary: dispatchResult?.responseSummary || null,
+  });
+  if (!creation.run) return { slotKey, workflow: plan.workflow, status: "RUN_UNVERIFIED", ...dispatchAudit };
   const kst = kstParts(scheduledTime);
   const expectedDate = `${kst.year}${kst.month}${kst.day}`;
   const result = { slotKey, planKey: plan.key, workflow: plan.workflow, runId: creation.run.id, runHead: creation.run.head_sha,
-    runCreatedAt: creation.run.created_at, runUpdatedAt: creation.run.updated_at,
+    runCreatedAt: creation.run.created_at, runUpdatedAt: creation.run.updated_at, ...dispatchAudit,
     expectedDate, status: creation.status };
   if (creation.status !== "COMPLETED") return result;
   return { ...result, ...(await atStage("VERIFY_RUN", () => verifyRunCompletion(api, repository, plan, creation.run, { expectedDate }))) };
@@ -336,6 +372,17 @@ export default {
     if (!resolved) return;
     const { plan, slotCron } = resolved;
     const slotKey = slotKeyFor(plan, slotCron, event.scheduledTime);
+    const kst = kstParts(event.scheduledTime);
+    const audit = {
+      kst: `${kst.year}-${kst.month}-${kst.day} ${kst.hour}:${kst.minute}`,
+      researchSlot: plan.inputs?.research_slot || null,
+      workflow: plan.workflow,
+      repository: env.GITHUB_REPOSITORY,
+      claimStatus: "NOT_ATTEMPTED",
+      dispatchRequested: false,
+      payloadHasResearchSlot: typeof plan.inputs?.research_slot === "string" && plan.inputs.research_slot.length > 0,
+      duplicateExecution: false,
+    };
     ctx.waitUntil((async () => {
       let stage = "RECHECK_STARTED";
       try {
@@ -354,14 +401,21 @@ export default {
           return;
         }
         stage = "CLAIM_SLOT";
-        if (!(await claim(env, slotKey))) return;
+        if (!(await claim(env, slotKey))) {
+          console.log(JSON.stringify({ slotKey, ...audit, claimStatus: "DUPLICATE", duplicateExecution: true, status: "DUPLICATE_SLOT" }));
+          return;
+        }
+        audit.claimStatus = "CLAIMED";
         stage = "SET_STATE";
         await setState(env, slotKey, "CLAIMED");
         stage = "SET_STATE";
         await setState(env, slotKey, "DISPATCHED");
-        const runResult = await dispatchAndVerify(env, plan, slotKey, event.scheduledTime);
+        audit.dispatchRequested = true;
+        const runResult = await dispatchAndVerify(env, plan, slotKey, event.scheduledTime, {
+          dispatch: (path, init) => githubWithMetadata(env, path, init),
+        });
         runResult.deliveryStatus = "UNVERIFIED";
-        const result = { ...runResult, scheduledTime: event.scheduledTime };
+        const result = { ...audit, ...runResult, scheduledTime: event.scheduledTime };
         const state = result.publicationStatus === "PUBLISH_UNVERIFIED"
           ? "RUN_STARTED"
           : (result.publicationStatus === "PUBLISHED" ? "PUBLISHED" : result.status);
@@ -377,7 +431,7 @@ export default {
             stage: "SET_STATE", ...failureDetails(stateError, "SET_STATE"), status: "DISPATCH_FAILED" }));
           return;
         }
-        console.log(JSON.stringify({ slotKey, workflow: plan.workflow, scheduledTime: event.scheduledTime,
+        console.log(JSON.stringify({ slotKey, ...audit, workflow: plan.workflow, scheduledTime: event.scheduledTime,
           workerVersion: env.WORKER_VERSION || null, status: "DISPATCH_FAILED", ...details }));
       }
     })());

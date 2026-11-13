@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { CONSOLIDATED_CRON, RESEARCH_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
+import worker, { CONSOLIDATED_CRON, RESEARCH_CRON, SlotGate, dispatchAndVerify, failureDetails, observeSlot, planForCron, planForKey, recheckRun, resolveScheduledPlan, recheckStartedRuns, researchSlotForHour, slotKeyFor, verifyRunCompletion, waitForDispatchedRun } from "./worker.js";
 
 const repo = "hanull01/naver-krx-universe-relay";
 const refreshPlan = planForKey("refresh");
@@ -59,10 +59,54 @@ test("the canonical cron maps only refresh and research slots", () => {
 });
 
 test("the research cron dispatches only the three approved KST times", () => {
-  assert.equal(resolveScheduledPlan(RESEARCH_CRON, Date.UTC(2026, 9, 25, 22, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(RESEARCH_CRON, Date.UTC(2026, 9, 26, 3, 20)).plan.key, "research");
-  assert.equal(resolveScheduledPlan(RESEARCH_CRON, Date.UTC(2026, 9, 26, 10, 20)).plan.key, "research");
+  const slots = [
+    [Date.UTC(2026, 9, 25, 22, 20), "07:20"],
+    [Date.UTC(2026, 9, 26, 3, 20), "12:20"],
+    [Date.UTC(2026, 9, 26, 10, 20), "19:20"],
+  ];
+  for (const [scheduledTime, researchSlot] of slots) {
+    const resolved = resolveScheduledPlan(RESEARCH_CRON, scheduledTime);
+    assert.equal(resolved.plan.key, "research");
+    assert.deepEqual(resolved.plan.inputs, { research_slot: researchSlot });
+  }
   assert.equal(resolveScheduledPlan(RESEARCH_CRON, Date.UTC(2026, 9, 26, 0, 20)), null);
+  assert.equal(researchSlotForHour(6), null);
+});
+
+test("research dispatch preserves the slot payload and response metadata", async () => {
+  const run = { id: 115, event: "workflow_dispatch", created_at: new Date().toISOString(), status: "completed", conclusion: "success", head_sha: "research-head" };
+  let dispatched = false;
+  let payload;
+  const api = async (path) => {
+    if (path.includes("/runs?event=schedule")) return { workflow_runs: [] };
+    if (path.includes("/runs?event=workflow_dispatch")) return { workflow_runs: dispatched ? [run] : [] };
+    if (path.includes("/actions/runs/115")) return run;
+    if (path.includes("/artifacts?")) return { artifacts: [] };
+    throw new Error(`unexpected path ${path}`);
+  };
+  const dispatch = async (path, init) => {
+    assert.match(path, /refresh-research\.yml\/dispatches$/);
+    payload = JSON.parse(init.body);
+    dispatched = true;
+    return { status: 204, responseSummary: null };
+  };
+  const plan = { ...planForKey("research"), inputs: { research_slot: "12:20" } };
+  const result = await dispatchAndVerify({ GITHUB_REPOSITORY: repo }, plan, "research:slot", Date.now(), { github: api, dispatch, sleep: async () => {} });
+  assert.deepEqual(payload, { ref: "main", inputs: { research_slot: "12:20" } });
+  assert.equal(result.researchSlot, "12:20");
+  assert.equal(result.dispatchRequested, true);
+  assert.equal(result.payloadHasResearchSlot, true);
+  assert.equal(result.githubResponseStatus, 204);
+});
+
+test("research dispatch refuses a missing required slot before calling GitHub", async () => {
+  let calls = 0;
+  const api = async () => { calls += 1; throw new Error("unexpected GitHub call"); };
+  await assert.rejects(
+    dispatchAndVerify({ GITHUB_REPOSITORY: repo }, planForKey("research"), "research:missing-input", Date.now(), { github: api, sleep: async () => {} }),
+    (error) => error.code === "RESEARCH_SLOT_INPUT_MISSING",
+  );
+  assert.equal(calls, 0);
 });
 
 test("backfill publication verification accepts the workflow's dated commit message", async () => {
@@ -174,6 +218,20 @@ test("failure details classify GitHub HTTP errors without retaining messages", (
   }
 });
 
+test("failure details retain a sanitized GitHub response summary", () => {
+  const error = new Error("GITHUB_HTTP_422");
+  error.code = "GITHUB_HTTP_422";
+  error.httpStatus = 422;
+  error.responseSummary = { message: "Required input is missing", errorCount: 1 };
+  assert.deepEqual(failureDetails(error, "POST_WORKFLOW_DISPATCH"), {
+    stage: "POST_WORKFLOW_DISPATCH",
+    errorCode: "GITHUB_HTTP_422",
+    errorType: "GITHUB_API",
+    httpStatus: 422,
+    responseSummary: { message: "Required input is missing", errorCount: 1 },
+  });
+});
+
 test("Durable Object claim failures are classified separately", () => {
   const error = new Error("SLOT_STATE_HTTP_503");
   error.code = "SLOT_STATE_HTTP_503";
@@ -185,6 +243,43 @@ test("Durable Object claim failures are classified separately", () => {
     errorType: "DURABLE_OBJECT",
     httpStatus: 503,
   });
+});
+
+test("scheduled duplicate research claim is logged without dispatch", async () => {
+  const scheduledTime = Date.UTC(2026, 9, 26, 3, 20);
+  const slotKey = "research:2026-10-26T12:20:20 research";
+  const values = new Map([[slotKey, { slotKey, status: "CLAIMED" }]]);
+  const gate = new SlotGate({ storage: {
+    get: async (key) => values.get(key),
+    put: async (key, value) => values.set(key, value),
+    list: async () => values,
+  } });
+  const logs = [];
+  const originalLog = console.log;
+  console.log = (value) => logs.push(String(value));
+  try {
+    const env = {
+      GITHUB_REPOSITORY: repo,
+      SCHEDULE_RECHECK_STARTED: "false",
+      SCHEDULE_OBSERVE_ONLY: "false",
+      SCHEDULE_RECHECK_ONLY: "false",
+      SLOT_GATE: {
+        idFromName: () => "scheduler",
+        get: () => ({ fetch: (request, init) => gate.fetch(request instanceof Request ? request : new Request(request, init)) }),
+      },
+    };
+    let pending;
+    await worker.scheduled({ cron: RESEARCH_CRON, scheduledTime }, env, { waitUntil: (promise) => { pending = promise; } });
+    await pending;
+    const duplicate = logs.map((entry) => JSON.parse(entry)).find((entry) => entry.status === "DUPLICATE_SLOT");
+    assert.equal(duplicate.researchSlot, "12:20");
+    assert.equal(duplicate.claimStatus, "DUPLICATE");
+    assert.equal(duplicate.duplicateExecution, true);
+    assert.equal(duplicate.dispatchRequested, false);
+    assert.equal(duplicate.payloadHasResearchSlot, true);
+  } finally {
+    console.log = originalLog;
+  }
 });
 
 test("scheduled claim failure logs a sanitized stage and code", async () => {
