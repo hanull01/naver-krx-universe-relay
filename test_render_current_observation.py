@@ -76,10 +76,55 @@ from pathlib import Path
 
 from test_market_dashboard_renderer import report_fixture
 from tools.render_current_observation import render_current_observation
-from tools.report_lineage import lineage_from_contract, validate_rendered_as_of
+from tools.report_lineage import (
+    lineage_from_contract,
+    validate_current_observation_publish,
+    validate_rendered_as_of,
+)
 
 
 class CurrentObservationReportTests(unittest.TestCase):
+    def _publish_fixture(self):
+        lineage = {
+            "contractId": "mrc-test",
+            "asOf": "20261112",
+            "current": {"source": "NAVER_CURRENT_SNAPSHOT"},
+            "historical": {"source": "KRX"},
+        }
+        return (
+            {"contractId": "mrc-test", "asOf": "20261112", "reportLineage": lineage},
+            {"contractId": "mrc-test", "lineage": lineage},
+            {"contractId": "mrc-test", "reportLineage": lineage, "reportContractSha256": "sha"},
+        )
+
+    def test_publish_validation_allows_user_views_without_internal_lineage(self):
+        contract, rendered, manifest = self._publish_fixture()
+        validate_current_observation_publish(
+            manifest, rendered, contract, "자료 수신됨", "<p>자료 수신됨</p>", "sha"
+        )
+
+    def test_publish_validation_rejects_manifest_contract_id_mismatch(self):
+        contract, rendered, manifest = self._publish_fixture()
+        manifest["contractId"] = "mrc-other"
+        with self.assertRaisesRegex(ValueError, "CURRENT_OBSERVATION_CONTRACT_ID_MISMATCH"):
+            validate_current_observation_publish(
+                manifest, rendered, contract, "자료 수신됨", "<p>자료 수신됨</p>", "sha"
+            )
+
+    def test_publish_validation_rejects_contract_digest_mismatch(self):
+        contract, rendered, manifest = self._publish_fixture()
+        with self.assertRaisesRegex(ValueError, "CURRENT_OBSERVATION_CONTRACT_DIGEST_MISMATCH"):
+            validate_current_observation_publish(
+                manifest, rendered, contract, "자료 수신됨", "<p>자료 수신됨</p>", "wrong-sha"
+            )
+
+    def test_publish_validation_rejects_internal_token_in_user_view(self):
+        contract, rendered, manifest = self._publish_fixture()
+        with self.assertRaisesRegex(ValueError, "CURRENT_OBSERVATION_INTERNAL_METADATA_RENDERED"):
+            validate_current_observation_publish(
+                manifest, rendered, contract, "contractId=mrc-test", "<p>자료</p>", "sha"
+            )
+
     def test_manifest_lineage_as_of_is_canonical_without_top_level_rendered_as_of(self):
         manifest = {"reportLineage": {"asOf": "20261112"}}
         rendered = {"lineage": {"asOf": "20261112"}}

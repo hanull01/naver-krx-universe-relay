@@ -111,3 +111,37 @@ def validate_rendered_as_of(manifest: Mapping[str, Any], rendered: Mapping[str, 
     if rendered_as_of is not None and normalize_report_as_of(rendered_as_of) != canonical_as_of:
         raise ValueError("REPORT_RENDER_RESULT_ASOF_MISMATCH")
     return canonical_as_of
+
+
+def validate_current_observation_publish(
+    manifest: Mapping[str, Any],
+    rendered: Mapping[str, Any],
+    contract: Mapping[str, Any],
+    markdown_text: str,
+    html_text: str,
+    contract_sha256: str,
+) -> None:
+    """Validate internal publish lineage without requiring metadata in user views."""
+    expected_id = contract.get("contractId")
+    expected_lineage = contract.get("reportLineage")
+    if not expected_id or not isinstance(expected_lineage, Mapping):
+        raise ValueError("REPORT_LINEAGE_MISSING_FROM_CONTRACT")
+    if rendered.get("contractId") != expected_id or rendered.get("lineage") != expected_lineage:
+        raise ValueError("REPORT_RENDER_RESULT_LINEAGE_MISMATCH")
+    if manifest.get("contractId") != expected_id:
+        raise ValueError("CURRENT_OBSERVATION_CONTRACT_ID_MISMATCH")
+    if manifest.get("reportLineage") != expected_lineage:
+        raise ValueError("CURRENT_OBSERVATION_LINEAGE_MISMATCH")
+    if manifest.get("reportContractSha256") != contract_sha256:
+        raise ValueError("CURRENT_OBSERVATION_CONTRACT_DIGEST_MISMATCH")
+    forbidden = (
+        "contractId", "reportLineage", "sourceHash", "runId", "executionHead",
+        "producer", "artifact", "workflow", "commit",
+    )
+    for path, text in (("markdown", markdown_text), ("html", html_text)):
+        for token in forbidden:
+            if token in text:
+                raise ValueError(f"CURRENT_OBSERVATION_INTERNAL_METADATA_RENDERED:{token}:{path}")
+    validate_rendered_as_of(manifest, rendered, contract)
+    if rendered.get("lineage", {}).get("current") != expected_lineage.get("current"):
+        raise ValueError("REPORT_CURRENT_LINEAGE_MISMATCH")

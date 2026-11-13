@@ -56,13 +56,18 @@ class RefreshWorkflowShadowSafetyTests(unittest.TestCase):
         self.assertIn('staged_observation_files=', WORKFLOW)
         self.assertIn('git diff --cached --name-only | sort', WORKFLOW)
         self.assertIn('git diff-tree --no-commit-id --name-only -r HEAD', WORKFLOW)
-        self.assertIn('CURRENT_OBSERVATION_LINEAGE_MISMATCH', WORKFLOW)
+        self.assertIn('validate_current_observation_publish(', WORKFLOW)
         self.assertIn('current_observation_published=', WORKFLOW)
 
     def test_current_observation_as_of_uses_manifest_lineage(self):
-        self.assertIn("from tools.report_lineage import validate_rendered_as_of", WORKFLOW)
-        self.assertIn("validate_rendered_as_of(manifest, rendered, contract)", WORKFLOW)
+        self.assertIn("from tools.report_lineage import validate_current_observation_publish", WORKFLOW)
+        self.assertIn("validate_current_observation_publish(", WORKFLOW)
         self.assertNotIn('rendered.get("asOf") != contract.get("asOf")', WORKFLOW)
+
+    def test_current_observation_lineage_uses_internal_manifest_and_contract(self):
+        self.assertIn("from tools.report_lineage import validate_current_observation_publish", WORKFLOW)
+        self.assertIn("validate_current_observation_publish(", WORKFLOW)
+        self.assertNotIn("CURRENT_OBSERVATION_CONTRACT_ID_NOT_RENDERED", WORKFLOW)
 
     def test_current_observation_failure_preserves_prior_views_without_git_clean(self):
         self.assertIn("preserve_failed_observation_output()", WORKFLOW)

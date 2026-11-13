@@ -773,38 +773,25 @@ jobs:
           import hashlib
           import sys
           from pathlib import Path
-          from tools.report_lineage import validate_rendered_as_of
+          from tools.report_lineage import validate_current_observation_publish
 
           manifest_path, markdown_path, html_path, rendered_path, contract_path = map(Path, sys.argv[1:])
           manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
           rendered = json.loads(rendered_path.read_text(encoding="utf-8"))
           payload = json.loads(contract_path.read_text(encoding="utf-8"))
           contract = payload.get("reportContract", payload)
-          expected_id = rendered.get("contractId")
-          expected_lineage = rendered.get("lineage")
-          if not expected_id or not expected_lineage:
-              raise SystemExit("REPORT_LINEAGE_MISSING_FROM_RENDER_RESULT")
-          if manifest.get("contractId") != expected_id:
-              raise SystemExit("CURRENT_OBSERVATION_CONTRACT_ID_MISMATCH")
-          if manifest.get("reportLineage") != expected_lineage:
-              raise SystemExit("CURRENT_OBSERVATION_LINEAGE_MISMATCH")
           expected_contract_sha = hashlib.sha256(contract_path.read_bytes()).hexdigest()
-          if manifest.get("reportContractSha256") != expected_contract_sha:
-              raise SystemExit("CURRENT_OBSERVATION_CONTRACT_DIGEST_MISMATCH")
-          if contract.get("contractId") not in (None, expected_id):
-              raise SystemExit("REPORT_CONTRACT_ID_MISMATCH")
-          if contract.get("reportLineage") not in (None, expected_lineage):
-              raise SystemExit("REPORT_CONTRACT_LINEAGE_MISMATCH")
-          for path in (markdown_path, html_path):
-              text = path.read_text(encoding="utf-8")
-              if expected_id not in text:
-                  raise SystemExit(f"CURRENT_OBSERVATION_CONTRACT_ID_NOT_RENDERED:{path}")
           try:
-              validate_rendered_as_of(manifest, rendered, contract)
+              validate_current_observation_publish(
+                  manifest,
+                  rendered,
+                  contract,
+                  markdown_path.read_text(encoding="utf-8"),
+                  html_path.read_text(encoding="utf-8"),
+                  expected_contract_sha,
+              )
           except ValueError as exc:
               raise SystemExit(str(exc)) from exc
-          if rendered.get("lineage", {}).get("current") != expected_lineage.get("current"):
-              raise SystemExit("REPORT_CURRENT_LINEAGE_MISMATCH")
           PY
             git add -- "$observation_run_dir"
             staged_observation_files=$(git diff --cached --name-only -- "$observation_run_dir" | sort)
